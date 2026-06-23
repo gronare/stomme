@@ -1,13 +1,25 @@
 {
-  "name": "create-stomme",
-  "version": "0.0.0",
+  "name": "@gronare/create-stomme",
+  "version": "0.1.1",
   "description": "Scaffold a new stomme site from the starter template.",
   "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gronare/stomme.git",
+    "directory": "packages/create-stomme"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
   "bin": {
     "create-stomme": "./bin/create.mjs"
   },
   "files": [
     "bin",
     "template"
-  ]
+  ],
+  "scripts": {
+    "prepack": "node scripts/bundle-template.mjs",
+    "postpack": "node scripts/clean-template.mjs"
+  }
 }

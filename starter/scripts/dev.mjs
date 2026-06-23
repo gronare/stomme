@@ -2,7 +2,11 @@
 // the media library work with no login. The proxy runs on Decap's default port
 // (8081), matching `local_backend: true` in public/admin/config.yml. Override with
 // CMS_PROXY_PORT (and set local_backend.url to match). Torn down together on exit.
-import { spawn } from 'node:child_process';
+import { spawn, spawnSync } from 'node:child_process';
+
+// Regenerate the CMS config + preview assets from the current catalog, content and
+// theme before starting, so /admin always reflects the live site (build does the same).
+spawnSync('npx', ['stomme-gen'], { stdio: 'inherit' });
 
 const env = process.env.CMS_PROXY_PORT ? { ...process.env, PORT: process.env.CMS_PROXY_PORT } : process.env;
 
