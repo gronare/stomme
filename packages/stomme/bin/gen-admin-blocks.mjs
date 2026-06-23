@@ -40,9 +40,11 @@ if (!Array.isArray(BLOCKS)) {
 // Falls back to the package defaults when absent.
 let ROUTES = { services: '/services', towns: '/areas', blog: '/blog' };
 let FEATURES = null; // null = no `features` declared → fall back to folder-existence
+let CMS_LOCALE = 'en'; // Decap admin UI language (config.yml `locale:`); 'en' is Decap's default
 try {
   const mod = await jiti.import(resolve(root, 'src/site.config.ts'));
   if (mod.kit && mod.kit.routes) ROUTES = { ...ROUTES, ...mod.kit.routes };
+  if (mod.kit && mod.kit.cmsLocale) CMS_LOCALE = mod.kit.cmsLocale;
   if (mod.features) FEATURES = { blog: false, areas: false, services: false, testimonials: false, faq: false, ...mod.features };
 } catch {
   /* no site.config — use defaults */
@@ -353,7 +355,12 @@ if (total === 0) {
   console.error('No `# >>> blocks:generated` markers found in', configPath);
   process.exit(1);
 }
-writeFileSync(configPath, out.join('\n'));
+// Set Decap's admin UI language from the site's cmsLocale (top-level config.yml `locale:`).
+// Upsert keeps it idempotent: replace the line if present, else prepend it.
+let yaml = out.join('\n');
+const localeLine = `locale: ${CMS_LOCALE}`;
+yaml = /^locale:.*$/m.test(yaml) ? yaml.replace(/^locale:.*$/m, localeLine) : `${localeLine}\n${yaml}`;
+writeFileSync(configPath, yaml);
 
 // Ship the engine's generic preview templates into the site's admin so live page
 // previews + readable settings previews work out of the box (loaded before the

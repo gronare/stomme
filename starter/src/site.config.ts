@@ -19,6 +19,7 @@ export const features: StommeFeatures = {
 // must match the route folders under src/pages/.
 export const kit: KitConfig = {
   routes: { towns: '/areas', blog: '/blog', formSuccess: '/thanks' },
-  locale: 'en-US',
+  locale: 'en-US', // date/number formatting
+  cmsLocale: 'en', // Decap admin UI language: 'en' | 'sv' | 'da' | 'nb_no' | … (stomme-gen writes it to config.yml)
   strings: { readMore: 'Read more' },
 };

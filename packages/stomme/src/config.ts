@@ -11,7 +11,8 @@ export interface KitConfig {
     contact?: string; // contact page (town/service CTAs link here)
     formSuccess?: string; // contactForm success page
   };
-  locale?: string; // date/number formatting
+  locale?: string; // date/number formatting (BCP47, e.g. 'sv-SE')
+  cmsLocale?: string; // Decap admin UI language (e.g. 'en', 'sv'); written to config.yml by stomme-gen
   strings?: {
     readMore?: string;
     contact?: { name?: string; email?: string; phone?: string; message?: string; submit?: string; direct?: string };
@@ -59,6 +60,7 @@ export function resolveFeatures(f?: StommeFeatures): Required<StommeFeatures> {
 export const KIT_DEFAULTS = {
   routes: { services: '/services', towns: '/areas', blog: '/blog', contact: '/contact', formSuccess: '/thanks' },
   locale: 'en-US',
+  cmsLocale: 'en',
   strings: {
     readMore: 'Read more',
     town: {
@@ -82,6 +84,7 @@ export function resolveKit(c?: KitConfig) {
   return {
     routes: { ...KIT_DEFAULTS.routes, ...(c && c.routes) },
     locale: (c && c.locale) || KIT_DEFAULTS.locale,
+    cmsLocale: (c && c.cmsLocale) || KIT_DEFAULTS.cmsLocale,
     strings: {
       ...KIT_DEFAULTS.strings,
       ...s,
