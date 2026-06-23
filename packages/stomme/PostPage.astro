@@ -1,0 +1,21 @@
+---
+import { renderMarkdown } from './src/markdown';
+import { resolveKit, type KitConfig } from './src/config';
+
+// Blog post article rendered from a `posts` entry (its markdown body). Used by the
+// integration-injected /<blog>/[slug] route. Narrow reading measure.
+interface Props {
+  post: any; // CollectionEntry<'posts'>
+  config?: KitConfig;
+}
+const { post, config } = Astro.props;
+const kit = resolveKit(config);
+const html = await renderMarkdown(post.body ?? '');
+const date = post.data.date ? new Date(post.data.date).toLocaleDateString(kit.locale, { year: 'numeric', month: 'long', day: 'numeric' }) : '';
+---
+<article class="section section--read">
+  {date && <p class="mono">{date}</p>}
+  <h1 class="display display--hero" style="margin-top:0.5rem">{post.data.title}</h1>
+  {post.data.excerpt && <p class="intro">{post.data.excerpt}</p>}
+  <div class="prose" style="margin-top:1.5rem" set:html={html} />
+</article>

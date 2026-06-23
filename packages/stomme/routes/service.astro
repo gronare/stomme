@@ -1,0 +1,17 @@
+---
+// Injected by the stomme integration when `features.services` is on.
+import Base from '@stomme/base';
+import { kit } from '@stomme/config';
+import ServicePage from '../ServicePage.astro';
+import { getCollection } from 'astro:content';
+
+export async function getStaticPaths() {
+  const services = await getCollection('services');
+  return services.map((s) => ({ params: { slug: s.id }, props: { service: s } }));
+}
+const { service } = Astro.props;
+const { data } = service;
+---
+<Base title={data.seo?.title ?? data.title} description={data.seo?.description ?? ''}>
+  <ServicePage service={service} config={kit} />
+</Base>

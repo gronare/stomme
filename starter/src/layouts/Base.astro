@@ -1,0 +1,40 @@
+---
+import '../styles/global.css';
+import { getEntry } from 'astro:content';
+import Header from '@gronare/stomme/Header.astro';
+import Footer from '@gronare/stomme/Footer.astro';
+
+// `chrome` (default true) renders the site Header/Footer. The CMS chrome previews
+// set it false so they can render a single component in isolation, still themed.
+interface Props { title?: string; description?: string; chrome?: boolean }
+const { title, description, chrome = true } = Astro.props;
+
+const settings = (await getEntry('settings', 'site'))!.data;
+const theme = (await getEntry('theme', 'theme'))!.data;
+
+// Inject the owner-editable theme tokens as CSS vars on <html>, overriding the
+// build-time defaults in global.css.
+const themeVars = [
+  `--color-brand:${theme.brand}`,
+  `--color-ink:${theme.ink}`,
+  `--color-on-dark:${theme.onDark}`,
+  `--color-surface:${theme.surface}`,
+  `--color-paper:${theme.paper}`,
+  `--color-line:${theme.line}`,
+  `--color-highlight:${theme.highlight}`,
+].join(';');
+---
+<!doctype html>
+<html lang="en" style={themeVars}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title ?? settings.name}</title>
+    {description && <meta name="description" content={description} />}
+  </head>
+  <body>
+    {chrome && <Header />}
+    <main><slot /></main>
+    {chrome && <Footer />}
+  </body>
+</html>

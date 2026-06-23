@@ -1,0 +1,58 @@
+{
+  "name": "@gronare/stomme",
+  "version": "0.0.0",
+  "description": "Block-CMS engine for Astro + Decap — types, helpers, runtime components, tooling.",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gronare/stomme.git"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
+  "exports": {
+    "./kit": "./src/kit.ts",
+    "./href": "./src/href.ts",
+    "./markdown": "./src/markdown.ts",
+    "./config": "./src/config.ts",
+    "./catalog": "./catalog.ts",
+    "./collections": "./collections.ts",
+    "./integration": { "types": "./integration.d.ts", "default": "./integration.mjs" },
+    "./styles.css": "./styles.css",
+    "./Cover.astro": "./src/Cover.astro",
+    "./Icon.astro": "./src/Icon.astro",
+    "./BlockRenderer.astro": "./src/BlockRenderer.astro",
+    "./Header.astro": "./blocks/Header.astro",
+    "./Footer.astro": "./blocks/Footer.astro",
+    "./TownPage.astro": "./TownPage.astro",
+    "./ServicePage.astro": "./ServicePage.astro",
+    "./PostPage.astro": "./PostPage.astro",
+    "./routes/*": "./routes/*",
+    "./blocks/*": "./blocks/*"
+  },
+  "bin": {
+    "stomme-gen": "./bin/gen-admin-blocks.mjs",
+    "stomme-new-block": "./bin/new-block.mjs"
+  },
+  "files": [
+    "src",
+    "bin",
+    "admin",
+    "blocks",
+    "routes",
+    "catalog.ts",
+    "collections.ts",
+    "integration.mjs",
+    "integration.d.ts",
+    "TownPage.astro",
+    "ServicePage.astro",
+    "PostPage.astro",
+    "styles.css"
+  ],
+  "dependencies": {
+    "marked": "^18.0.5"
+  },
+  "peerDependencies": {
+    "astro": ">=5"
+  }
+}

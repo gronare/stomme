@@ -1,0 +1,38 @@
+---
+import { getEntry } from 'astro:content';
+import { resolveLink } from '../src/href';
+import Cover from '../src/Cover.astro';
+
+// Themeable site chrome (header). Reads the `navigation` + `settings` collections
+// by default, but accepts `nav`/`settings` as optional props so a draft can be
+// injected (e.g. the CMS live preview). A site that wants bespoke chrome can stop
+// importing this and render its own .site-header markup. The logo is an uploaded
+// image when `logo.image` is set, otherwise the two-tone text mark.
+interface NavData {
+  logo?: { textPre?: string; textAccent?: string; image?: string; alt?: string };
+  items?: { label: string; link?: unknown }[];
+  cta?: { label: string; link?: unknown };
+}
+interface Props { nav?: NavData; settings?: { name?: string } }
+
+let { nav, settings } = Astro.props;
+if (!nav) nav = (await getEntry('navigation', 'nav'))!.data as NavData;
+if (!settings) settings = (await getEntry('settings', 'site'))!.data as { name?: string };
+
+const logo = nav.logo ?? {};
+const items = nav.items ?? [];
+const homeHref = '/';
+---
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href={homeHref}>
+      {logo.image
+        ? <Cover src={logo.image} alt={logo.alt ?? settings.name} placeholder="/images/placeholder.svg" class="logo-img" />
+        : <Fragment>{logo.textPre ?? settings.name}<span class="accent">{logo.textAccent}</span></Fragment>}
+    </a>
+    <nav class="site-nav">
+      {items.map((i) => <a href={resolveLink(i.link, homeHref)}>{i.label}</a>)}
+      {nav.cta && <a class="btn" href={resolveLink(nav.cta.link, homeHref)}>{nav.cta.label}</a>}
+    </nav>
+  </div>
+</header>

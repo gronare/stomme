@@ -1,0 +1,14 @@
+---
+import Base from '../layouts/Base.astro';
+import BlockRenderer from '@gronare/stomme/BlockRenderer.astro';
+import { getCollection } from 'astro:content';
+
+export async function getStaticPaths() {
+  const pages = await getCollection('pages');
+  return pages.map((p) => ({ params: { slug: p.id }, props: { page: p } }));
+}
+const { page } = Astro.props;
+---
+<Base title={page.data.seo.title} description={page.data.seo.description}>
+  <BlockRenderer blocks={page.data.blocks} />
+</Base>

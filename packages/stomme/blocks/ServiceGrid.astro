@@ -1,0 +1,55 @@
+---
+import Cover from '../src/Cover.astro';
+import { getCollection } from 'astro:content';
+
+// Collection-backed cards from the `services` collection, each linking to a detail
+// page at `${kit.routes.services}/<slug>`. Pass a curated `services` slug list to
+// show a subset in the chosen order; omit to show all by `order`. Needs a `services`
+// collection (fields: navLabel, summary, order, image?, imageAlt?) in the consuming
+// site + a matching route folder (see stomme/ServicePage.astro). Each card shows
+// the service image, falling back to the service.svg placeholder when none is set.
+interface Props {
+  eyebrow?: string;
+  heading?: string;
+  intro?: string;
+  services?: string[];
+  kit?: any;
+}
+const { eyebrow, heading, intro, services: picked, kit } = Astro.props;
+const prefix = kit?.routes?.services ?? '/services';
+const readMore = kit?.strings?.readMore ?? 'Read more';
+const all = await getCollection('services');
+const services = (
+  Array.isArray(picked) && picked.length
+    ? picked.map((id) => all.find((s) => s.id === id)).filter((s) => s != null)
+    : [...all].sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0))
+) as typeof all;
+---
+<section class="section">
+  {(eyebrow || heading || intro) && (
+    <div class="section-head">
+      {eyebrow && <span class="mono mono-dot">{eyebrow}</span>}
+      {heading && <h2 class="display" style="margin-top:0.75rem">{heading}</h2>}
+      {intro && <p class="intro">{intro}</p>}
+    </div>
+  )}
+  <div class="service-grid">
+    {services.map((s) => (
+      <a href={`${prefix}/${s.id}`} class="card service-card">
+        <Cover
+          src={s.data.image}
+          alt={s.data.imageAlt ?? s.data.navLabel}
+          placeholder="/images/placeholders/service.svg"
+          width={800}
+          height={600}
+          class="service-card__img"
+        />
+        <div class="service-card__body">
+          <h3>{s.data.navLabel}</h3>
+          {s.data.summary && <p>{s.data.summary}</p>}
+          <span class="mono service-card__more">{readMore} →</span>
+        </div>
+      </a>
+    ))}
+  </div>
+</section>

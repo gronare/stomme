@@ -1,0 +1,31 @@
+---
+// Compact specialist / sub-services grid — title + body cards with a brand top-rule.
+// Denser than pillars (no big number) and flatter than featureGrid (no box/icon);
+// good for a longer list of capabilities under a service.
+interface Props {
+  eyebrow?: string;
+  heading?: string;
+  intro?: string;
+  items?: { title: string; body?: string }[];
+}
+const { eyebrow, heading, intro, items = [] } = Astro.props;
+---
+{(heading || items.length > 0) && (
+  <section class="section">
+    {(eyebrow || heading || intro) && (
+      <div class="section-head">
+        {eyebrow && <span class="mono mono-dot">{eyebrow}</span>}
+        {heading && <h2 class="display" style="margin-top:0.75rem">{heading}</h2>}
+        {intro && <p class="intro">{intro}</p>}
+      </div>
+    )}
+    <div class="specialist-grid">
+      {items.map((p) => (
+        <div class="specialist">
+          <h3 class="specialist__title">{p.title}</h3>
+          {p.body && <p class="specialist__body">{p.body}</p>}
+        </div>
+      ))}
+    </div>
+  </section>
+)}

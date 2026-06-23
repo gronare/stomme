@@ -1,0 +1,16 @@
+---
+import { getEntry } from 'astro:content';
+
+// Settings-backed: reads the partner list + lead-in from settings. No fields.
+const settings = (await getEntry('settings', 'site')).data;
+const partners = settings.partners ?? [];
+const lead = settings.partnersLead;
+---
+{partners.length > 0 && (
+  <section class="partner-strip">
+    <div class="section" style="text-align:center">
+      {lead && <p class="mono">{lead}</p>}
+      <div class="partner-logos">{partners.map((p) => <span>{p}</span>)}</div>
+    </div>
+  </section>
+)}

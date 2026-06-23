@@ -1,0 +1,45 @@
+---
+import { getCollection } from 'astro:content';
+
+// Collection-backed — lists every entry in the `posts` collection as cards
+// (newest first). The section head is optional (no defaults): pair it with a
+// pageHeader block, or give it its own eyebrow/heading here. Needs a `posts`
+// collection in the consuming site (fields: title, date, excerpt).
+//
+// Route prefix, date locale and the "read more" string come from the site config
+// (`kit`, forwarded by BlockRenderer); the prefix must match the route folder
+// under src/pages/.
+interface Props {
+  eyebrow?: string;
+  heading?: string;
+  intro?: string;
+  kit?: any;
+}
+const { eyebrow, heading, intro, kit } = Astro.props;
+const prefix = kit?.routes?.blog ?? '/blog';
+const locale = kit?.locale ?? 'en-US';
+const readMore = kit?.strings?.readMore ?? 'Read more';
+const posts = (await getCollection('posts')).sort((a, b) => (a.data.date < b.data.date ? 1 : -1));
+const fmt = (d: string) => new Date(d).toLocaleDateString(locale, { year: 'numeric', month: 'long', day: 'numeric' });
+---
+{posts.length > 0 && (
+  <section class="section">
+    {(eyebrow || heading || intro) && (
+      <div class="section-head post-head">
+        {eyebrow && <span class="mono mono-dot">{eyebrow}</span>}
+        {heading && <h2 class="display" style="margin-top:0.75rem">{heading}</h2>}
+        {intro && <p class="intro">{intro}</p>}
+      </div>
+    )}
+    <div class="post-grid">
+      {posts.map((p) => (
+        <a href={`${prefix}/${p.id}`} class="post-card">
+          <p class="mono">{fmt(p.data.date)}</p>
+          <h3 class="post-title">{p.data.title}</h3>
+          {p.data.excerpt && <p class="post-excerpt">{p.data.excerpt}</p>}
+          <span class="mono post-more">{readMore} →</span>
+        </a>
+      ))}
+    </div>
+  </section>
+)}

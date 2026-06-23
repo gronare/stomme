@@ -1,0 +1,90 @@
+---
+// Generic block renderer with the library blocks built in. Pass `blocks`; the
+// default registry maps the standard types to the library components. Add or
+// override with the optional `registry` prop (your custom blocks win on key clash).
+import Hero from '../blocks/Hero.astro';
+import PageHeader from '../blocks/PageHeader.astro';
+import Prose from '../blocks/Prose.astro';
+import FeatureGrid from '../blocks/FeatureGrid.astro';
+import ServiceGrid from '../blocks/ServiceGrid.astro';
+import Pillars from '../blocks/Pillars.astro';
+import SpecialistGrid from '../blocks/SpecialistGrid.astro';
+import Steps from '../blocks/Steps.astro';
+import Checklist from '../blocks/Checklist.astro';
+import Gallery from '../blocks/Gallery.astro';
+import BeforeAfter from '../blocks/BeforeAfter.astro';
+import TextImage from '../blocks/TextImage.astro';
+import TextQuote from '../blocks/TextQuote.astro';
+import Callout from '../blocks/Callout.astro';
+import StatPanel from '../blocks/StatPanel.astro';
+import Testimonials from '../blocks/Testimonials.astro';
+import LinkChips from '../blocks/LinkChips.astro';
+import PostList from '../blocks/PostList.astro';
+import CtaPanel from '../blocks/CtaPanel.astro';
+import CtaBox from '../blocks/CtaBox.astro';
+import Faq from '../blocks/Faq.astro';
+import StatsBar from '../blocks/StatsBar.astro';
+import LogoStrip from '../blocks/LogoStrip.astro';
+import ContactForm from '../blocks/ContactForm.astro';
+import { resolveKit, type KitConfig } from './config';
+
+const defaults: Record<string, any> = {
+  hero: Hero,
+  pageHeader: PageHeader,
+  prose: Prose,
+  featureGrid: FeatureGrid,
+  serviceGrid: ServiceGrid,
+  pillars: Pillars,
+  specialistGrid: SpecialistGrid,
+  steps: Steps,
+  checklist: Checklist,
+  gallery: Gallery,
+  beforeAfter: BeforeAfter,
+  textImage: TextImage,
+  textQuote: TextQuote,
+  callout: Callout,
+  statPanel: StatPanel,
+  testimonials: Testimonials,
+  linkChips: LinkChips,
+  postList: PostList,
+  ctaPanel: CtaPanel,
+  ctaBox: CtaBox,
+  faq: Faq,
+  statsBar: StatsBar,
+  logoStrip: LogoStrip,
+  contactForm: ContactForm,
+};
+
+interface Props {
+  blocks?: { type: string; surface?: string; [key: string]: unknown }[];
+  registry?: Record<string, any>;
+  config?: KitConfig;
+}
+const { blocks = [], registry = {}, config } = Astro.props;
+const reg = { ...defaults, ...registry };
+// Resolved per-site config (routes/locale/strings), forwarded to every block as
+// `kit` so blocks needn't be wired individually.
+const kit = resolveKit(config);
+
+const surfaceClass: Record<string, string> = { tint: 'surface-tint', band: 'band' };
+---
+{
+  blocks.map((block) => {
+    const Component = reg[block.type];
+    if (!Component) {
+      return (
+        <div class="section" style="color:#b00020">
+          ⚠ Unknown block: <code>{block.type}</code>
+        </div>
+      );
+    }
+    const surf = block.surface ? surfaceClass[block.surface] : undefined;
+    return surf ? (
+      <div class={surf}>
+        <Component {...block} kit={kit} />
+      </div>
+    ) : (
+      <Component {...block} kit={kit} />
+    );
+  })
+}

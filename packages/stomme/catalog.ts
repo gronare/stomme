@@ -1,0 +1,207 @@
+// The default block catalog — field definitions for the library blocks. Use it
+// directly or extend it: `export const BLOCKS = [...defaultBlocks, ...mine]`.
+import { headingFields, headingFieldsWith, linkField, imageField, iconField, surfaceField, widthField, cardListField, linkedCardListField, type BlockDef } from './src/kit.ts';
+
+export const defaultBlocks: BlockDef[] = [
+  {
+    type: 'hero',
+    label: 'Hero',
+    fields: [
+      { name: 'eyebrow', label: 'Eyebrow', widget: 'string', required: false },
+      { name: 'heading', label: 'Heading (H1)', widget: 'string' },
+      { name: 'intro', label: 'Intro', widget: 'text', required: false },
+      { name: 'ctaLabel', label: 'Button label', widget: 'string', required: false },
+      linkField('ctaHref', 'Button link'),
+      {
+        name: 'media',
+        label: 'Right-side media',
+        widget: 'select',
+        required: false,
+        default: 'none',
+        options: [
+          { label: 'None (text only)', value: 'none' },
+          { label: 'Image', value: 'image' },
+          { label: 'Energy flow', value: 'flow' },
+          { label: 'Operations / telemetry panel', value: 'ops' },
+        ],
+        hint: 'What shows beside the heading. Default: none.',
+      },
+      imageField('image', 'Image (if “Image” chosen)'),
+      { name: 'imageAlt', label: 'Image alt text', widget: 'string', required: false },
+      { name: 'flowNote', label: 'Flow · chip label (if “Energy flow”)', widget: 'string', required: false },
+      {
+        name: 'flow',
+        label: 'Flow · steps (if “Energy flow”)',
+        widget: 'list',
+        required: false,
+        fields: [iconField(), { name: 'title', label: 'Title', widget: 'string' }, { name: 'body', label: 'Text', widget: 'string', required: false }],
+      },
+      {
+        name: 'telemetry',
+        label: 'Ops · telemetry chips (if “Operations”)',
+        widget: 'list',
+        required: false,
+        field: { name: 'item', label: 'Chip', widget: 'string' },
+      },
+      { name: 'stamp', label: 'Ops · corner stamp (if “Operations”)', widget: 'string', required: false },
+    ],
+  },
+  {
+    type: 'pageHeader',
+    label: 'Page header',
+    fields: [
+      { name: 'variant', label: 'Style', widget: 'select', required: false, default: 'light', options: [{ label: 'Light', value: 'light' }, { label: 'Dark (band)', value: 'dark' }] },
+      widthField,
+      { name: 'eyebrow', label: 'Eyebrow', widget: 'string', required: false },
+      { name: 'heading', label: 'Heading (H1)', widget: 'string' },
+      { name: 'intro', label: 'Intro', widget: 'text', required: false },
+      { name: 'ctaLabel', label: 'Button label (optional)', widget: 'string', required: false },
+      linkField('ctaHref', 'Button link'),
+      surfaceField,
+    ],
+  },
+  {
+    type: 'prose',
+    label: 'Rich text',
+    fields: [{ name: 'heading', label: 'Heading (optional)', widget: 'string', required: false }, { name: 'body', label: 'Body', widget: 'markdown', required: false }, widthField, surfaceField],
+  },
+  {
+    type: 'featureGrid',
+    label: 'Feature cards',
+    fields: [
+      ...headingFields,
+      linkedCardListField,
+      { name: 'numbered', label: 'Numbered (01/02/03 instead of icons)', widget: 'boolean', required: false, default: false },
+      surfaceField,
+    ],
+  },
+  {
+    type: 'serviceGrid',
+    label: 'Service cards (from a collection)',
+    collection: 'services',
+    fields: [
+      ...headingFields,
+      { name: 'services', label: 'Services shown', widget: 'select', options: '$services', multiple: true, required: false, hint: 'Pick which services appear (in order). Leave empty to show all.' },
+      surfaceField,
+    ],
+  },
+  { type: 'pillars', label: 'Principles / values', fields: [...headingFields, cardListField, surfaceField] },
+  { type: 'specialistGrid', label: 'Specialist grid', fields: [...headingFields, cardListField, surfaceField] },
+  { type: 'steps', label: 'Process / steps', fields: [...headingFields, cardListField, widthField, surfaceField] },
+  {
+    type: 'checklist',
+    label: 'Checklist (ticked items)',
+    fields: [
+      ...headingFields,
+      { name: 'items', label: 'Items', widget: 'list', required: false, fields: [{ name: 'text', label: 'Text', widget: 'string' }, { name: 'note', label: 'Sub-line (optional)', widget: 'text', required: false }] },
+      { name: 'columns', label: 'Columns', widget: 'number', required: false, default: 2, hint: '1 or 2.' },
+      surfaceField,
+    ],
+  },
+  {
+    type: 'gallery',
+    label: 'Gallery',
+    fields: [
+      ...headingFields,
+      { name: 'images', label: 'Images', widget: 'list', required: false, fields: [imageField('image', 'Image'), { name: 'alt', label: 'Alt text', widget: 'string', required: false }, { name: 'caption', label: 'Caption', widget: 'string', required: false }] },
+      { name: 'columns', label: 'Columns', widget: 'number', required: false, default: 3, hint: '2 or 3.' },
+      surfaceField,
+    ],
+  },
+  {
+    type: 'beforeAfter',
+    label: 'Before / after',
+    fields: [...headingFields, imageField('before', 'Before image'), imageField('after', 'After image'), surfaceField],
+  },
+  {
+    type: 'textImage',
+    label: 'Text + image',
+    fields: [
+      { name: 'heading', label: 'Heading', widget: 'string', required: false },
+      { name: 'body', label: 'Text', widget: 'markdown' },
+      imageField('image', 'Image'),
+      { name: 'imageAlt', label: 'Alt text', widget: 'string', required: false },
+      { name: 'flip', label: 'Image on left', widget: 'boolean', required: false, default: false },
+      surfaceField,
+    ],
+  },
+  {
+    type: 'textQuote',
+    label: 'Text + quote',
+    fields: [
+      { name: 'body', label: 'Body text', widget: 'markdown' },
+      { name: 'quote', label: 'Quote', widget: 'text' },
+      { name: 'attribution', label: 'Source / name', widget: 'string', required: false },
+      { name: 'flip', label: 'Quote on left', widget: 'boolean', required: false, default: false },
+      surfaceField,
+    ],
+  },
+  {
+    type: 'callout',
+    label: 'Quote / highlighted statement',
+    fields: [{ name: 'eyebrow', label: 'Eyebrow', widget: 'string', required: false }, { name: 'quote', label: 'Quote / statement', widget: 'text' }, surfaceField],
+  },
+  {
+    type: 'statPanel',
+    label: 'Statement panel (dark, big number)',
+    fields: [
+      { name: 'eyebrow', label: 'Eyebrow', widget: 'string', required: false },
+      { name: 'heading', label: 'Heading', widget: 'string', required: false },
+      { name: 'body', label: 'Body', widget: 'text', required: false },
+      { name: 'badges', label: 'Badges', widget: 'list', required: false, field: { name: 'badge', label: 'Badge', widget: 'string' } },
+      { name: 'statValue', label: 'Big number', widget: 'string', required: false },
+      { name: 'statLabel', label: 'Number label', widget: 'string', required: false },
+    ],
+  },
+  {
+    type: 'testimonials',
+    label: 'Testimonials',
+    collection: 'testimonials',
+    fields: [...headingFieldsWith('Happy customers', 'References'), surfaceField],
+  },
+  {
+    type: 'linkChips',
+    label: 'Link chips (from a collection)',
+    collection: 'towns',
+    fields: [...headingFieldsWith('Service areas', 'Where we work'), surfaceField],
+  },
+  {
+    type: 'postList',
+    label: 'Blog posts – list',
+    collection: 'posts',
+    fields: [...headingFields, surfaceField],
+  },
+  {
+    type: 'ctaPanel',
+    label: 'Call to action (band)',
+    fields: [...headingFields, { name: 'label', label: 'Button label', widget: 'string', required: false }, linkField('href', 'Button link')],
+  },
+  {
+    type: 'ctaBox',
+    label: 'Call to action (box)',
+    fields: [{ name: 'eyebrow', label: 'Eyebrow', widget: 'string', required: false }, { name: 'heading', label: 'Heading', widget: 'string' }, { name: 'label', label: 'Button label', widget: 'string' }, linkField('href', 'Button link'), surfaceField],
+  },
+  {
+    type: 'faq',
+    label: 'FAQ',
+    collection: 'faq',
+    fields: [
+      { name: 'variant', label: 'Layout', widget: 'select', required: false, default: 'list', options: [{ label: 'List', value: 'list' }, { label: 'Accordion', value: 'accordion' }, { label: 'Cards', value: 'cards' }, { label: 'Split (index + reader)', value: 'split' }] },
+      ...headingFields,
+      { name: 'asideHeading', label: 'Aside · heading', widget: 'string', required: false, default: 'Still have questions?' },
+      { name: 'asideBody', label: 'Aside · text', widget: 'text', required: false, default: "Get in touch and we'll help you out." },
+      { name: 'asideCtaLabel', label: 'Aside · button label', widget: 'string', required: false, default: 'Contact' },
+      linkField('asideHref', 'Aside · button link'),
+      surfaceField,
+    ],
+  },
+  {
+    type: 'statsBar',
+    label: 'Stats / facts',
+    fields: [
+      { name: 'items', label: 'Facts (optional — defaults to the site’s settings facts)', widget: 'list', required: false, fields: [{ name: 'label', label: 'Label', widget: 'string' }, { name: 'value', label: 'Value', widget: 'string' }] },
+    ],
+  },
+  { type: 'logoStrip', label: 'Logo / partner strip (auto)', fields: [] },
+  { type: 'contactForm', label: 'Contact form (auto)', fields: [] },
+];

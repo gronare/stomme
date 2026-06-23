@@ -1,0 +1,41 @@
+---
+// Benefit / inclusion list — heading + intro + a grid of checkmark items, each a
+// short line with an optional supporting note. Brand-agnostic; the check badge
+// uses the theme `brand` token.
+interface Props {
+  eyebrow?: string;
+  heading?: string;
+  intro?: string;
+  items?: { text: string; note?: string }[];
+  columns?: number;
+}
+const { eyebrow, heading, intro, items = [], columns = 2 } = Astro.props;
+const single = columns === 1;
+---
+
+{(heading || items.length > 0) && (
+  <section class="section">
+    {(eyebrow || heading || intro) && (
+      <div class="section-head">
+        {eyebrow && <span class="mono mono-dot">{eyebrow}</span>}
+        {heading && <h2 class="display checklist__heading">{heading}</h2>}
+        {intro && <p class="intro">{intro}</p>}
+      </div>
+    )}
+    <ul class:list={['checklist', { 'checklist--single': single }]}>
+      {items.map((it) => (
+        <li class="checklist__item">
+          <span class="checklist__check">
+            <svg width="13" height="13" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.6" aria-hidden="true">
+              <path d="M4 10.5l3.5 3.5L16 5.5" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </span>
+          <span class="checklist__text">
+            <span class="checklist__label">{it.text}</span>
+            {it.note && <span class="checklist__note">{it.note}</span>}
+          </span>
+        </li>
+      ))}
+    </ul>
+  </section>
+)}

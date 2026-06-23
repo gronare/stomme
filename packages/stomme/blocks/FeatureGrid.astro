@@ -1,0 +1,42 @@
+---
+import Icon from '../src/Icon.astro';
+import { resolveLink } from '../src/href';
+
+interface Props {
+  eyebrow?: string;
+  heading?: string;
+  intro?: string;
+  items?: { icon?: string; title: string; body?: string; link?: unknown; linkLabel?: string }[];
+  numbered?: boolean;
+  kit?: any;
+}
+const { eyebrow, heading, intro, items = [], numbered = false, kit } = Astro.props;
+const readMore = kit?.strings?.readMore ?? 'Read more';
+---
+<section class="section">
+  {(eyebrow || heading || intro) && (
+    <div class="section-head">
+      {eyebrow && <span class="mono mono-dot">{eyebrow}</span>}
+      {heading && <h2 class="display" style="margin-top:0.75rem">{heading}</h2>}
+      {intro && <p class="intro">{intro}</p>}
+    </div>
+  )}
+  <div class="feature-grid">
+    {items.map((it, i) => {
+      const href = it.link ? resolveLink(it.link, '') : '';
+      const Tag = href ? 'a' : 'div';
+      return (
+        <Tag href={href || undefined} class="card feature-card">
+          {numbered ? (
+            <span class="mono" style="color:var(--color-brand)">{`0${i + 1}`}</span>
+          ) : (
+            it.icon && <span class="ico-badge"><Icon name={it.icon} /></span>
+          )}
+          <h3>{it.title}</h3>
+          {it.body && <p>{it.body}</p>}
+          {href && <span class="mono" style="display:inline-block;margin-top:1rem;color:var(--color-brand)">{it.linkLabel ?? readMore} →</span>}
+        </Tag>
+      );
+    })}
+  </div>
+</section>

@@ -1,0 +1,148 @@
+---
+import { getCollection, getEntry } from 'astro:content';
+import Icon from '../src/Icon.astro';
+import { resolveLink } from '../src/href';
+
+// Collection-backed: Q&A from the `faq` collection; chrome + the contact aside
+// are editable fields (CMS defaults supply the starting copy). Needs a `faq`
+// collection + `settings.email` in the consuming site.
+//
+// `variant` picks the layout:
+//   list      — open Q&A list + a contact aside (default)
+//   accordion — collapsible rows (native <details>, no JS), numbered, + aside
+//   cards      — two-column cards with a brand top-rule; the aside becomes a CTA card
+//   split      — numbered index + a single reader panel with an embedded CTA
+//                (JS-enhanced; without JS all answers show, degrading to a list)
+interface Props {
+  variant?: 'list' | 'accordion' | 'cards' | 'split';
+  eyebrow?: string;
+  heading?: string;
+  intro?: string;
+  asideHeading?: string;
+  asideBody?: string;
+  asideCtaLabel?: string;
+  asideHref?: unknown;
+  asideCtaHref?: unknown; // plain-string alias accepted from content
+}
+const { variant = 'list', eyebrow, heading, intro, asideHeading, asideBody, asideCtaLabel, asideHref, asideCtaHref } = Astro.props;
+const items = (await getCollection('faq')).sort((a, b) => a.data.order - b.data.order);
+const settings = (await getEntry('settings', 'site'))!.data;
+const aHref = resolveLink(asideHref ?? asideCtaHref, settings.email ? `mailto:${settings.email}` : '/');
+const hasAside = !!(asideHeading || asideBody || asideCtaLabel);
+const n = (i: number) => String(i + 1).padStart(2, '0');
+---
+<section class="section">
+  {(eyebrow || heading || intro) && (
+    <div class="section-head">
+      {eyebrow && <span class="mono mono-dot">{eyebrow}</span>}
+      {heading && <h2 class="display" style="margin-top:0.75rem">{heading}</h2>}
+      {intro && <p class="intro">{intro}</p>}
+    </div>
+  )}
+
+  {variant === 'list' && (
+    <div class="faq-grid">
+      <dl class="faq-list">
+        {items.map((f) => <div><dt>{f.data.question}</dt><dd>{f.data.answer}</dd></div>)}
+      </dl>
+      {hasAside && (
+        <aside class="faq-aside">
+          <span class="ico-badge"><Icon name="headset" /></span>
+          {asideHeading && <h3 class="faq-aside__h">{asideHeading}</h3>}
+          {asideBody && <p class="faq-aside__body">{asideBody}</p>}
+          {asideCtaLabel && <p style="margin-top:1.25rem;margin-bottom:0"><a href={aHref} class="btn">{asideCtaLabel}</a></p>}
+        </aside>
+      )}
+    </div>
+  )}
+
+  {variant === 'accordion' && (
+    <div class="faq-grid">
+      <div class="faq-acc">
+        {items.map((f, i) => (
+          <details class="faq-acc__item" open={i === 0}>
+            <summary class="faq-acc__q">
+              <span class="faq-acc__n">{n(i)}</span>
+              <span class="faq-acc__qt">{f.data.question}</span>
+              <span class="faq-acc__ic" aria-hidden="true"></span>
+            </summary>
+            <div class="faq-acc__a"><p>{f.data.answer}</p></div>
+          </details>
+        ))}
+      </div>
+      {hasAside && (
+        <aside class="faq-aside">
+          <span class="ico-badge"><Icon name="headset" /></span>
+          {asideHeading && <h3 class="faq-aside__h">{asideHeading}</h3>}
+          {asideBody && <p class="faq-aside__body">{asideBody}</p>}
+          {asideCtaLabel && <p style="margin-top:1.25rem;margin-bottom:0"><a href={aHref} class="btn">{asideCtaLabel}</a></p>}
+        </aside>
+      )}
+    </div>
+  )}
+
+  {variant === 'cards' && (
+    <div class="faq-cards">
+      {items.map((f, i) => (
+        <div class="faq-qcard">
+          <span class="faq-qcard__tag mono">{n(i)}</span>
+          <h3 class="faq-qcard__q">{f.data.question}</h3>
+          <p class="faq-qcard__a">{f.data.answer}</p>
+        </div>
+      ))}
+      {hasAside && (
+        <div class="faq-qcard faq-qcard--cta">
+          {asideHeading && <h3 class="faq-qcard__q">{asideHeading}</h3>}
+          {asideBody && <p class="faq-qcard__a">{asideBody}</p>}
+          {asideCtaLabel && <a href={aHref} class="btn faq-qcard__btn">{asideCtaLabel}</a>}
+        </div>
+      )}
+    </div>
+  )}
+
+  {variant === 'split' && (
+    <div class="faq-split">
+      <ul class="faq-idx">
+        {items.map((f, i) => (
+          <li class:list={['faq-idx__item', { active: i === 0 }]}>
+            <button type="button" class="faq-idx__btn" data-i={i}>
+              <span class="faq-idx__n">{n(i)}</span><span>{f.data.question}</span>
+            </button>
+          </li>
+        ))}
+      </ul>
+      <div class="faq-reader">
+        {items.map((f, i) => (
+          <div class:list={['faq-panel', { active: i === 0 }]} data-panel={i}>
+            <h3 class="faq-panel__q">{f.data.question}</h3>
+            <p class="faq-panel__a">{f.data.answer}</p>
+          </div>
+        ))}
+        {hasAside && (
+          <div class="faq-reader__cta">
+            {asideBody && <span>{asideBody}</span>}
+            {asideCtaLabel && <a href={aHref} class="btn">{asideCtaLabel}</a>}
+          </div>
+        )}
+      </div>
+    </div>
+  )}
+</section>
+
+<script>
+  // `split` enhancement: show one panel at a time, switched by the index. Without
+  // JS the `.js` class is never added, so every .faq-panel stays visible (a readable
+  // list). Bundled + deduped by Astro, so it wires every instance on the page.
+  document.querySelectorAll('.faq-split').forEach((root) => {
+    root.classList.add('js');
+    const panels = root.querySelectorAll('.faq-panel');
+    root.querySelectorAll('.faq-idx__btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const i = btn.getAttribute('data-i');
+        root.querySelectorAll('.faq-idx__item').forEach((li) => li.classList.remove('active'));
+        btn.closest('.faq-idx__item')?.classList.add('active');
+        panels.forEach((p) => p.classList.toggle('active', p.getAttribute('data-panel') === i));
+      });
+    });
+  });
+</script>

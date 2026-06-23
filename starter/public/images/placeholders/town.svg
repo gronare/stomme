@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 700" role="img" aria-label="Platshållarbild">
+  <rect width="1600" height="700" fill="#e7e5e4"/>
+  <rect width="1600" height="700" fill="#f04e30" opacity="0.05"/>
+  <!-- skyline -->
+  <g fill="#1a1a1a" opacity="0.18">
+    <rect x="120" y="360" width="160" height="340"/>
+    <rect x="300" y="260" width="130" height="440"/>
+    <rect x="450" y="420" width="120" height="280"/>
+    <rect x="900" y="320" width="150" height="380"/>
+    <rect x="1080" y="450" width="120" height="250"/>
+    <rect x="1230" y="300" width="140" height="400"/>
+  </g>
+  <g transform="translate(700,210)" stroke="#f04e30" stroke-width="6" fill="none">
+    <line x1="-55" y1="-28" x2="55" y2="28"/>
+    <line x1="55" y1="-28" x2="-55" y2="28"/>
+    <circle cx="-55" cy="-28" r="18"/><circle cx="55" cy="-28" r="18"/>
+    <circle cx="-55" cy="28" r="18"/><circle cx="55" cy="28" r="18"/>
+    <rect x="-20" y="-11" width="40" height="22" rx="5" fill="#f04e30"/>
+  </g>
+  <text x="800" y="610" fill="#1a1a1a" font-family="Inter, sans-serif" font-size="26" font-weight="800" text-anchor="middle" letter-spacing="4">PLATSHÅLLARBILD</text>
+</svg>

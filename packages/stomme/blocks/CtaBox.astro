@@ -1,0 +1,23 @@
+---
+import { resolveLink } from '../src/href';
+
+// Compact call-to-action box — a single brand-coloured panel with an eyebrow,
+// heading and one button. Distinct from ctaPanel (which sits on a surface band);
+// this one is always the brand colour with on-dark text.
+interface Props {
+  eyebrow?: string;
+  heading: string;
+  label: string;
+  href?: unknown;
+}
+const { eyebrow, heading, label, href } = Astro.props;
+const url = resolveLink(href, '/');
+---
+
+<section class="section">
+  <div class="ctabox">
+    {eyebrow && <span class="mono ctabox-eyebrow">{eyebrow}</span>}
+    <h2 class="display ctabox-heading">{heading}</h2>
+    <a href={url} class="ctabox-btn">{label}</a>
+  </div>
+</section>

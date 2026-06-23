@@ -1,0 +1,23 @@
+---
+import { getEntry } from 'astro:content';
+
+// A label/value facts grid. By default it's settings-backed (the editable
+// `settings.facts` list, so a site's KPIs appear everywhere the block is used);
+// pass an inline `items` list to show a different set (e.g. company info on an
+// about page) without touching settings.
+interface Props { items?: { label: string; value: string }[] }
+const { items } = Astro.props;
+const facts = Array.isArray(items) && items.length ? items : ((await getEntry('settings', 'site')).data.facts ?? []);
+---
+{facts.length > 0 && (
+  <section class="section">
+    <dl class="facts-grid">
+      {facts.map((f) => (
+        <div class="fact">
+          <dt class="mono">{f.label}</dt>
+          <dd class="fact-value">{f.value}</dd>
+        </div>
+      ))}
+    </dl>
+  </section>
+)}

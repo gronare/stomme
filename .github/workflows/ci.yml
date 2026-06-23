@@ -1,0 +1,49 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  # Build + typecheck the starter and both example sites. This is the regression
+  # net: a broken block, a type error, or a failing image/Astro build shows up here.
+  sites:
+    name: build + check (${{ matrix.site }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        site:
+          - starter
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4 # reads packageManager from package.json
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: astro check (types)
+        working-directory: ${{ matrix.site }}
+        run: pnpm exec astro check
+      - name: build (cms:gen + astro build)
+        working-directory: ${{ matrix.site }}
+        run: pnpm run build
+
+  # Catch syntax errors in the engine's plain-JS scripts (bins, integration,
+  # the Decap previews module) — none of these go through astro check.
+  engine-scripts:
+    name: engine scripts syntax
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: node --check
+        run: |
+          node --check packages/stomme/bin/gen-admin-blocks.mjs
+          node --check packages/stomme/bin/new-block.mjs
+          node --check packages/stomme/integration.mjs
+          node --check packages/stomme/admin/previews.js

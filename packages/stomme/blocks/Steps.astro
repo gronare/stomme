@@ -1,0 +1,35 @@
+---
+// Numbered process / steps. A bordered, hairline-separated list of rows, each
+// with a round brand number badge — reads as a sequence (narrow reading measure).
+interface Props {
+  eyebrow?: string;
+  heading?: string;
+  intro?: string;
+  items?: { title: string; body: string }[];
+  width?: 'narrow' | 'full';
+}
+const { eyebrow, heading, intro, items = [], width = 'narrow' } = Astro.props;
+---
+
+{(heading || items.length > 0) && (
+  <section class:list={['section', { 'section--read': width !== 'full' }]}>
+    {(eyebrow || heading || intro) && (
+      <div class="section-head">
+        {eyebrow && <span class="mono mono-dot">{eyebrow}</span>}
+        {heading && <h2 class="display steps__heading">{heading}</h2>}
+        {intro && <p class="intro">{intro}</p>}
+      </div>
+    )}
+    <ol class="steps-track">
+      {items.map((s, i) => (
+        <li class="step">
+          <span class="step__n">{i + 1}</span>
+          <div>
+            <h3 class="step__title">{s.title}</h3>
+            <p class="step__body">{s.body}</p>
+          </div>
+        </li>
+      ))}
+    </ol>
+  </section>
+)}

@@ -1,0 +1,27 @@
+---
+import { renderMarkdown } from '../src/markdown';
+import Cover from '../src/Cover.astro';
+
+// Two-column text + image. `flip` puts the image on the left instead of the right.
+interface Props {
+  heading?: string;
+  body?: string;
+  image?: string;
+  imageAlt?: string;
+  flip?: boolean;
+}
+const { heading, body = '', image, imageAlt, flip = false } = Astro.props;
+const html = await renderMarkdown(body);
+---
+
+<section class="section">
+  <div class="ti-grid">
+    <div class={flip ? 'ti-text ti-second' : 'ti-text'}>
+      {heading && <h2 class="display">{heading}</h2>}
+      <div class:list={['prose', { 'ti-body': heading }]} set:html={html} />
+    </div>
+    <div class={flip ? 'ti-first' : ''}>
+      <Cover src={image} alt={imageAlt ?? ''} placeholder="/images/placeholder.svg" width={960} height={720} class="ti-img" />
+    </div>
+  </div>
+</section>

@@ -1,0 +1,32 @@
+---
+import { getCollection } from 'astro:content';
+
+// Collection-backed (the `testimonials` collection) with editable chrome. The
+// section head renders only when given; CMS defaults pre-fill a new block.
+// Needs a `testimonials` collection in the consuming site (fields: name, role,
+// quote, order).
+interface Props {
+  eyebrow?: string;
+  heading?: string;
+  intro?: string;
+}
+const { eyebrow, heading, intro } = Astro.props;
+const items = (await getCollection('testimonials')).sort((a, b) => a.data.order - b.data.order);
+---
+<section class="section">
+  {(eyebrow || heading || intro) && (
+    <div class="section-head">
+      {eyebrow && <span class="mono mono-dot">{eyebrow}</span>}
+      {heading && <h2 class="display" style="margin-top:0.75rem">{heading}</h2>}
+      {intro && <p class="intro">{intro}</p>}
+    </div>
+  )}
+  <div class="testimonials-grid">
+    {items.map((t) => (
+      <figure class="testimonial">
+        <blockquote>”{t.data.quote}”</blockquote>
+        <figcaption class="mono"><span class="name">{t.data.name}</span> · {t.data.role}</figcaption>
+      </figure>
+    ))}
+  </div>
+</section>

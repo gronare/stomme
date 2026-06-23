@@ -1,0 +1,35 @@
+---
+// A bold, dark "statement + headline number" panel — a message (eyebrow / heading /
+// body) and a row of badge pills on one side, a single giant stat on the other.
+// Generic version of a trust/safety beat; all copy is editable. Always dark
+// (uses --color-ink + --color-on-dark) regardless of surface, for contrast.
+interface Props {
+  eyebrow?: string;
+  heading?: string;
+  body?: string;
+  badges?: string[];
+  statValue?: string;
+  statLabel?: string;
+}
+const { eyebrow, heading, body, badges = [], statValue, statLabel } = Astro.props;
+---
+<section class="stat-panel">
+  <div class="stat-panel__inner">
+    <div class="stat-panel__main">
+      {eyebrow && <span class="mono mono-dot">{eyebrow}</span>}
+      {heading && <h2 class="display stat-panel__h">{heading}</h2>}
+      {body && <p class="stat-panel__body">{body}</p>}
+      {badges.length > 0 && (
+        <div class="stat-panel__badges">
+          {badges.map((b) => <span class="stat-panel__pill">{b}</span>)}
+        </div>
+      )}
+    </div>
+    {statValue && (
+      <div class="stat-panel__stat">
+        <span class="stat-panel__value">{statValue}</span>
+        {statLabel && <span class="mono">{statLabel}</span>}
+      </div>
+    )}
+  </div>
+</section>

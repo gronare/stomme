@@ -1,0 +1,30 @@
+---
+import { getCollection } from 'astro:content';
+
+// Collection-backed (the `towns` collection) with editable chrome. The section
+// head renders only when given; CMS defaults pre-fill a new block. Needs a
+// `towns` collection in the consuming site (fields: name, order). The detail-page
+// route prefix comes from the site config (`kit.routes.towns`, forwarded by
+// BlockRenderer) and must match the actual route folder under src/pages/.
+interface Props {
+  eyebrow?: string;
+  heading?: string;
+  intro?: string;
+  kit?: any;
+}
+const { eyebrow, heading, intro, kit } = Astro.props;
+const prefix = kit?.routes?.towns ?? '/areas';
+const towns = (await getCollection('towns')).sort((a, b) => a.data.order - b.data.order);
+---
+<section class="section">
+  {(eyebrow || heading || intro) && (
+    <div class="section-head">
+      {eyebrow && <span class="mono mono-dot">{eyebrow}</span>}
+      {heading && <h2 class="display" style="margin-top:0.75rem">{heading}</h2>}
+      {intro && <p class="intro">{intro}</p>}
+    </div>
+  )}
+  <div class="link-chip-row">
+    {towns.map((t) => <a href={`${prefix}/${t.id}`} class="link-chip">{t.data.name}</a>)}
+  </div>
+</section>

@@ -1,0 +1,18 @@
+---
+// Pull-quote / standout statement to break up body text. A brand left rule and
+// an oversized display quote.
+interface Props {
+  eyebrow?: string;
+  quote?: string;
+}
+const { eyebrow, quote } = Astro.props;
+---
+
+{quote && (
+  <section class="section">
+    <figure class="callout">
+      {eyebrow && <span class="mono mono-dot">{eyebrow}</span>}
+      <blockquote class="display callout__quote">{quote}</blockquote>
+    </figure>
+  </section>
+)}

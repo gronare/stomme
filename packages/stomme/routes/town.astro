@@ -1,0 +1,17 @@
+---
+// Injected by the stomme integration when `features.areas` is on.
+import Base from '@stomme/base';
+import { kit } from '@stomme/config';
+import TownPage from '../TownPage.astro';
+import { getCollection } from 'astro:content';
+
+export async function getStaticPaths() {
+  const towns = await getCollection('towns');
+  return towns.map((t) => ({ params: { slug: t.id }, props: { town: t } }));
+}
+const { town } = Astro.props;
+const { data } = town;
+---
+<Base title={data.seo?.title ?? data.name} description={data.seo?.description ?? ''}>
+  <TownPage town={town} config={kit} />
+</Base>

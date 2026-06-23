@@ -1,0 +1,95 @@
+---
+import { getEntry } from 'astro:content';
+import { resolveLink } from '../src/href';
+import Cover from '../src/Cover.astro';
+import Icon from '../src/Icon.astro';
+
+// Library hero: universal left column + a swappable media slot (none | image |
+// flow | ops). Themed by the design tokens; styled by stomme/styles.css.
+// `ops` is a dark "operations / telemetry" scene — an animated drone over a
+// building with editable telemetry chips + a corner stamp.
+interface FlowItem { icon?: string; title: string; body?: string }
+interface Props {
+  eyebrow?: string;
+  heading: string;
+  intro?: string;
+  ctaLabel?: string;
+  ctaHref?: unknown;
+  media?: 'none' | 'image' | 'flow' | 'ops';
+  image?: string;
+  imageAlt?: string;
+  flowNote?: string;
+  flow?: FlowItem[];
+  telemetry?: string[];
+  stamp?: string;
+}
+const { eyebrow, heading, intro, ctaLabel, ctaHref, media = 'none', image, imageAlt, flowNote, flow = [], telemetry = [], stamp } = Astro.props;
+const href = resolveLink(ctaHref, '/');
+const settings = (await getEntry('settings', 'site')).data;
+const showImage = media === 'image' && !!image;
+const showFlow = media === 'flow' && flow.length > 0;
+const showOps = media === 'ops';
+const hasMedia = showImage || showFlow || showOps;
+---
+<section class="section">
+  <div class:list={['hero-grid', { 'has-media': hasMedia }]}>
+    <div>
+      {eyebrow && <span class="mono mono-dot">{eyebrow}</span>}
+      <h1 class="display display--hero" style="margin-top:1rem">{heading}</h1>
+      {intro && <p class="intro">{intro}</p>}
+      {(ctaLabel || settings.phone) && (
+        <div class="btn-row">
+          {ctaLabel && <a href={href} class="btn">{ctaLabel}</a>}
+          {settings.phone && <a href={`tel:${settings.phoneE164}`} class="btn-ghost">{settings.phone} →</a>}
+        </div>
+      )}
+    </div>
+
+    {showImage && (
+      <div class="hero-media">
+        <Cover src={image} alt={imageAlt ?? heading} placeholder="/images/placeholder.svg" width={1000} height={750} class="hero-img" />
+      </div>
+    )}
+
+    {showFlow && (
+      <div class="flow" aria-label="How it works, step by step">
+        {flowNote && <span class="chip"><i></i> {flowNote}</span>}
+        <span class="sun" aria-hidden="true"></span>
+        <ol>
+          {flow.map((f) => (
+            <li>
+              <span class="node"><Icon name={f.icon} /></span>
+              <div>
+                <div class="t">{f.title}</div>
+                {f.body && <div class="d">{f.body}</div>}
+              </div>
+            </li>
+          ))}
+        </ol>
+      </div>
+    )}
+
+    {showOps && (
+      <div class="ops" aria-hidden="true">
+        <div class="ops-sky"></div>
+        <div class="ops-bldg"></div>
+        <div class="ops-win">{Array.from({ length: 10 }).map(() => <i></i>)}</div>
+        <div class="ops-path"></div>
+        <div class="ops-drone">
+          <svg viewBox="0 0 68 30" fill="none" stroke-width="2.4" style="stroke: var(--color-brand)">
+            <line x1="10" y1="8" x2="58" y2="22" /><line x1="58" y1="8" x2="10" y2="22" />
+            <circle cx="10" cy="8" r="7" /><circle cx="58" cy="8" r="7" />
+            <circle cx="10" cy="22" r="7" /><circle cx="58" cy="22" r="7" />
+            <rect x="26" y="10" width="16" height="9" rx="3" stroke="none" style="fill: var(--color-brand)" />
+          </svg>
+        </div>
+        {telemetry.length > 0 && (
+          <div class="ops-telem">
+            {telemetry.map((t) => <span class="ops-chip"><b>●</b> {t}</span>)}
+          </div>
+        )}
+        {stamp && <div class="ops-stamp">{stamp}</div>}
+      </div>
+    )}
+  </div>
+</section>

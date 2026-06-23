@@ -1,0 +1,45 @@
+---
+import { getEntry } from 'astro:content';
+import { resolveLink } from '../src/href';
+
+// Generic page header for prose pages. `light` = plain header; `dark` = a
+// band/glow hero with CTA + phone (good for a landing/service page top).
+// Reads phone from `settings.site`; editor supplies copy + optional CTA.
+interface Props {
+  variant?: 'light' | 'dark';
+  width?: 'narrow' | 'full';
+  eyebrow?: string;
+  heading?: string;
+  intro?: string;
+  ctaLabel?: string;
+  ctaHref?: unknown;
+}
+const { variant = 'light', width = 'narrow', eyebrow, heading, intro, ctaLabel, ctaHref } = Astro.props;
+const read = width !== 'full';
+const href = resolveLink(ctaHref, '/');
+const settings = (await getEntry('settings', 'site')).data;
+---
+
+{variant === 'dark' ? (
+  <section class="band page-header page-header--dark">
+    <div class="page-header__glow" aria-hidden="true"></div>
+    <div class:list={['section', 'page-header__inner', { 'section--read': read }]}>
+      {eyebrow && <span class="mono mono-dot">{eyebrow}</span>}
+      <h1 class="display display--hero page-header__heading">{heading}</h1>
+      {intro && <p class="intro page-header__intro">{intro}</p>}
+      {ctaLabel && (
+        <div class="btn-row">
+          <a href={href} class="btn btn-on-dark">{ctaLabel}</a>
+          {settings.phone && <a href={`tel:${settings.phoneE164}`} class="btn-ghost">Call {settings.phone} →</a>}
+        </div>
+      )}
+    </div>
+  </section>
+) : (
+  <section class:list={['section', 'page-header', 'page-header--light', { 'section--read': read }]}>
+    {eyebrow && <span class="mono mono-dot">{eyebrow}</span>}
+    <h1 class="display display--hero page-header__heading">{heading}</h1>
+    {intro && <p class="intro page-header__intro">{intro}</p>}
+    {ctaLabel && <div class="btn-row"><a href={href} class="btn">{ctaLabel}</a></div>}
+  </section>
+)}

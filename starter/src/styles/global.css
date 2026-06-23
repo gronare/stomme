@@ -1,0 +1,5 @@
+/* The stomme component library stylesheet (tokens + all component classes).
+   Recolour by overriding the CSS variables — the theme collection injects them
+   on <html> at runtime (see Base.astro), or set them here. Restyle any class by
+   adding rules below; they load after the library so they win. */
+@import "@gronare/stomme/styles.css";

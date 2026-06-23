@@ -1,0 +1,33 @@
+---
+// Editorial "principles / values" block — heading + items shown as airy columns
+// with a large brand number and a top rule. Distinct from featureGrid (boxed,
+// small number) and a specialist grid (border-top, denser).
+interface Props {
+  eyebrow?: string;
+  heading?: string;
+  intro?: string;
+  items?: { title: string; body: string }[];
+}
+const { eyebrow, heading, intro, items = [] } = Astro.props;
+---
+
+{(heading || items.length > 0) && (
+  <section class="section">
+    {(eyebrow || heading || intro) && (
+      <div class="section-head">
+        {eyebrow && <span class="mono mono-dot">{eyebrow}</span>}
+        {heading && <h2 class="display pillars__heading">{heading}</h2>}
+        {intro && <p class="intro">{intro}</p>}
+      </div>
+    )}
+    <div class="pillars">
+      {items.map((p, i) => (
+        <div class="pillar">
+          <span class="pillar__n">{`0${i + 1}`}</span>
+          <h3 class="pillar__title">{p.title}</h3>
+          <p class="pillar__body">{p.body}</p>
+        </div>
+      ))}
+    </div>
+  </section>
+)}

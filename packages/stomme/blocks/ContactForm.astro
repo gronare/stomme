@@ -1,0 +1,57 @@
+---
+import { getEntry } from 'astro:content';
+
+// Netlify contact form + a direct-contact aside. Pulls phone/email/name/hq/orgNr
+// from settings. Field labels + success route come from the site config (`kit`,
+// forwarded by BlockRenderer); labels default to English. Needs `settings.{phone,
+// phoneE164, email, name, hq, orgNr}` in the consuming site.
+interface Props { kit?: any }
+const { kit } = Astro.props;
+const formSuccess = kit?.routes?.formSuccess ?? '/thanks';
+const c = kit?.strings?.contact ?? {};
+const L = {
+  name: c.name ?? 'Name',
+  email: c.email ?? 'Email',
+  phone: c.phone ?? 'Phone',
+  message: c.message ?? 'Describe your project',
+  submit: c.submit ?? 'Send request',
+  direct: c.direct ?? 'Direct contact',
+};
+
+const settings = (await getEntry('settings', 'site'))!.data;
+const contactLine = [settings.name, settings.hq, settings.orgNr && `Org.nr ${settings.orgNr}`]
+  .filter(Boolean)
+  .join(' · ');
+---
+<section class="section">
+  <div class="contact-grid">
+    <form name="quote" method="POST" data-netlify="true" netlify-honeypot="bot-field" action={formSuccess} class="contact-form">
+      <input type="hidden" name="form-name" value="quote" />
+      <p class="hp"><label>Don’t fill this in: <input name="bot-field" /></label></p>
+      <div class="field">
+        <label for="name" class="mono">{L.name}</label>
+        <input id="name" name="name" required />
+      </div>
+      <div class="field">
+        <label for="email" class="mono">{L.email}</label>
+        <input id="email" name="email" type="email" required />
+      </div>
+      <div class="field">
+        <label for="phone" class="mono">{L.phone}</label>
+        <input id="phone" name="phone" type="tel" />
+      </div>
+      <div class="field">
+        <label for="message" class="mono">{L.message}</label>
+        <textarea id="message" name="message" rows="5" required></textarea>
+      </div>
+      <button type="submit" class="btn">{L.submit}</button>
+    </form>
+
+    <aside class="contact-aside">
+      <span class="mono mono-dot">{L.direct}</span>
+      {settings.phone && <p class="phone"><a href={`tel:${settings.phoneE164}`}>{settings.phone}</a></p>}
+      {settings.email && <p class="email"><a href={`mailto:${settings.email}`}>{settings.email}</a></p>}
+      {contactLine && <p class="mono org">{contactLine}</p>}
+    </aside>
+  </div>
+</section>

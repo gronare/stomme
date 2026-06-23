@@ -1,0 +1,27 @@
+---
+import { renderMarkdown } from '../src/markdown';
+
+// Two-up: body text beside a quotation. The quote isn't meant to stand alone — it
+// accents the body text next to it. Text gets the wider column; the quote is
+// vertically centred. `flip` puts the quote on the left.
+interface Props {
+  body?: string;
+  quote?: string;
+  attribution?: string;
+  flip?: boolean;
+}
+const { body = '', quote, attribution, flip = false } = Astro.props;
+const html = await renderMarkdown(body);
+---
+
+<section class="section">
+  <div class:list={['tq-grid', { 'tq-flip': flip }]}>
+    <div class:list={['prose', 'tq-body', { 'tq-second': flip }]} set:html={html} />
+    {quote && (
+      <figure class:list={['tq-quote', { 'tq-first': flip }]}>
+        <blockquote class="display tq-text">{quote}</blockquote>
+        {attribution && <figcaption class="mono tq-attr">{attribution}</figcaption>}
+      </figure>
+    )}
+  </div>
+</section>

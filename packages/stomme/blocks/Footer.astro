@@ -1,0 +1,64 @@
+---
+import { getEntry } from 'astro:content';
+import { resolveLink } from '../src/href';
+import Cover from '../src/Cover.astro';
+
+// Themeable site chrome (footer). Reads the navigation/footer/settings collections
+// by default; accepts them as optional props (CMS preview drafts). Renders a links
+// column + org line only when those fields are present, so a minimal site stays simple.
+interface NavData { logo?: { textPre?: string; textAccent?: string; image?: string; alt?: string } }
+interface FooterData { tagline?: string; linksHeading?: string; links?: { label: string; link?: unknown }[]; showTowns?: boolean; townsHeading?: string; note?: string }
+interface SettingsData { name?: string; email?: string; phone?: string; phoneE164?: string; hq?: string; orgNr?: string; founded?: string }
+// `towns` + `townsHref` are optional: pass them (the site reads its towns collection
+// and forwards kit.routes.towns) to render a service-area column when footer.showTowns.
+// Towns-less sites simply don't pass them, so nothing extra renders.
+interface Props { nav?: NavData; footer?: FooterData; settings?: SettingsData; towns?: { id: string; name: string }[]; townsHref?: string }
+
+let { nav, footer, settings, towns, townsHref } = Astro.props;
+if (!nav) nav = (await getEntry('navigation', 'nav'))!.data as NavData;
+if (!footer) footer = (await getEntry('footer', 'footer'))!.data as FooterData;
+if (!settings) settings = (await getEntry('settings', 'site'))!.data as SettingsData;
+
+const logo = nav.logo ?? {};
+const links = footer.links ?? [];
+const tagline = [footer.tagline, settings.hq].filter(Boolean).join(' · ');
+const orgLine = [settings.orgNr && `Org.nr ${settings.orgNr}`, settings.founded && `Est. ${settings.founded}`].filter(Boolean).join(' · ');
+const year = new Date().getFullYear();
+---
+<footer class="site-footer">
+  <div class="inner">
+    <div class="footer-grid">
+      <div>
+        {logo.image
+          ? <Cover src={logo.image} alt={logo.alt ?? settings.name} placeholder="/images/placeholder.svg" class="logo-img" />
+          : <p class="logo" style="margin:0">{logo.textPre ?? settings.name}<span class="accent">{logo.textAccent}</span></p>}
+        {tagline && <p style="margin:0.5rem 0 0;max-width:36rem">{tagline}</p>}
+        {(settings.phone || settings.email) && (
+          <p style="margin:0.75rem 0 0">
+            {settings.phone && <a href={`tel:${settings.phoneE164}`} class="footer-link">{settings.phone}</a>}
+            {settings.phone && settings.email && <span> · </span>}
+            {settings.email && <a href={`mailto:${settings.email}`} class="footer-link">{settings.email}</a>}
+          </p>
+        )}
+        {orgLine && <p class="mono" style="margin-top:1rem">{orgLine}</p>}
+      </div>
+      {links.length > 0 && (
+        <nav>
+          <p class="mono mono-dot">{footer.linksHeading ?? 'Links'}</p>
+          <ul class="footer-links">
+            {links.map((l) => <li><a href={resolveLink(l.link, '/')} class="footer-link">{l.label}</a></li>)}
+          </ul>
+        </nav>
+      )}
+      {footer.showTowns && towns && towns.length > 0 && (
+        <nav>
+          <p class="mono mono-dot">{footer.townsHeading ?? 'Areas'}</p>
+          <ul class="footer-links footer-towns">
+            {towns.map((t) => <li><a href={`${townsHref ?? '/areas'}/${t.id}`} class="footer-link">{t.name}</a></li>)}
+          </ul>
+        </nav>
+      )}
+    </div>
+    <p class="mono" style="margin-top:2.5rem">© {settings.founded ? `${settings.founded}–` : ''}{year} {settings.name}{footer.note ? ` · ${footer.note}` : ''}</p>
+  </div>
+</footer>

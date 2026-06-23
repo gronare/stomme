@@ -1,0 +1,120 @@
+---
+import Cover from './src/Cover.astro';
+import { getEntry } from 'astro:content';
+import { resolveKit, type KitConfig } from './src/config';
+
+// Rich service-area landing rendered from a `towns` collection entry. Use it in a
+// site's /<towns>/[slug].astro route: do getStaticPaths there, then
+//   <Base title=... description=...><TownPage town={entry} config={kit} /></Base>
+// All chrome strings come from kit.strings.town (English defaults; override per-site,
+// `{name}` is interpolated); the CTAs link to kit.routes.contact. Expects a `towns`
+// schema with: name, title?, heroSubtitle?, heroNote?, why?, problems?, districts?,
+// localCase?, services?, image?, imageAlt?, seo?.
+interface Props {
+  town: { id: string; data: any };
+  config?: KitConfig;
+}
+const { town, config } = Astro.props;
+const { data } = town;
+const kit = resolveKit(config);
+const t = kit.strings.town;
+const contact = kit.routes.contact ?? '/contact';
+const fill = (s?: string) => (s ?? '').replace(/\{name\}/g, data.name);
+
+const whyParagraphs = (data.why ?? '').split(/\n\n+/).map((p: string) => p.trim()).filter(Boolean);
+const reasons = (t.reasons ?? []).map((r) => ({ title: fill(r.title), body: fill(r.body) }));
+
+const site = (await getEntry('settings', 'site'))?.data as any;
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Service',
+  name: data.title ?? data.name,
+  description: data.seo?.description ?? '',
+  ...(site?.name ? { provider: { '@type': 'LocalBusiness', name: site.name } } : {}),
+  areaServed: { '@type': 'City', name: data.name },
+};
+---
+<section class="section town-hero">
+  <span class="mono mono-dot">{fill(t.eyebrow)}</span>
+  <h1 class="display display--hero town-h1">{data.title ?? fill(t.heading)}</h1>
+  {data.heroSubtitle && <p class="intro town-sub">{data.heroSubtitle}</p>}
+  {data.heroNote && <p class="town-note">{data.heroNote}</p>}
+  <a href={contact} class="btn town-cta">{fill(t.cta)}</a>
+  {data.image && (
+    <Cover src={data.image} alt={data.imageAlt ?? fill(t.eyebrow)} placeholder="/images/placeholders/town.svg" width={1600} height={700} loading="eager" class="town-img" />
+  )}
+</section>
+
+<section class="section town-body">
+  {whyParagraphs.length > 0 && (
+    <div class="town-block">
+      <h2 class="display town-h2">{fill(t.whyHeading)}</h2>
+      <div class="town-why">{whyParagraphs.map((p: string) => <p>{p}</p>)}</div>
+    </div>
+  )}
+
+  {data.problems?.length > 0 && (
+    <div class="town-block">
+      <span class="mono">{fill(t.problemsHeading)}</span>
+      <ul class="town-list">{data.problems.map((p: string) => <li><span class="town-mark">›</span><span>{p}</span></li>)}</ul>
+    </div>
+  )}
+
+  {data.districts?.length > 0 && (
+    <div class="town-block">
+      <span class="mono">{fill(t.districtsHeading)}</span>
+      <div class="town-chips">{data.districts.map((d: string) => <span class="town-chip">{d}</span>)}</div>
+    </div>
+  )}
+
+  {reasons.length > 0 && (
+    <div class="town-reasons">
+      {reasons.map((r) => (
+        <div class="town-reason"><h3>{r.title}</h3><p>{r.body}</p></div>
+      ))}
+    </div>
+  )}
+
+  {data.localCase && (
+    <div class="town-case">
+      <span class="mono">{fill(t.caseHeading)}</span>
+      <p>{data.localCase}</p>
+    </div>
+  )}
+
+  {data.services?.length > 0 && (
+    <div class="town-block">
+      <h2 class="display town-h2">{fill(t.servicesHeading)}</h2>
+      <ul class="town-services">{data.services.map((s: string) => <li><span class="town-mark town-mark--tick">✓</span><span>{s}</span></li>)}</ul>
+      <a href={contact} class="btn town-cta">{fill(t.servicesCta)}</a>
+    </div>
+  )}
+</section>
+
+<script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+
+<style>
+  .town-hero { padding-bottom: 1rem; }
+  .town-h1 { margin-top: 1rem; }
+  .town-sub { color: var(--color-ink); font-size: 1.15rem; max-width: 42rem; }
+  .town-note { margin-top: 0.5rem; color: var(--color-muted); max-width: 42rem; }
+  .town-cta { margin-top: 2rem; }
+  .town-img { margin-top: 2.5rem; aspect-ratio: 16 / 7; width: 100%; border: 1px solid var(--color-line); border-radius: 1rem; object-fit: cover; display: block; }
+  .town-body { padding-top: 1rem; display: flex; flex-direction: column; gap: 2.5rem; }
+  .town-h2 { font-size: clamp(1.4rem, 2.5vw, 1.875rem); }
+  .town-why { margin-top: 1.25rem; display: flex; flex-direction: column; gap: 1rem; color: var(--color-muted); }
+  .town-list { margin: 1rem 0 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 0.625rem; }
+  .town-list li, .town-services li { display: flex; gap: 0.75rem; color: var(--color-ink); }
+  .town-mark { color: var(--color-brand); font-weight: 700; }
+  .town-chips { margin-top: 1rem; display: flex; flex-wrap: wrap; gap: 0.625rem; }
+  .town-chip { font-family: var(--bk-font-mono); font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; border: 1px solid var(--color-line); border-radius: 999px; padding: 8px 14px; color: var(--color-muted); background: var(--color-paper); }
+  .town-reasons { display: grid; gap: 1.25rem; grid-template-columns: 1fr; }
+  @media (min-width: 640px) { .town-reasons { grid-template-columns: repeat(3, 1fr); } }
+  .town-reason { border: 1px solid var(--color-line); border-radius: 1rem; padding: 1.5rem; }
+  .town-reason h3 { margin: 0; font-weight: 700; color: var(--color-brand); }
+  .town-reason p { margin: 0.5rem 0 0; font-size: 0.9rem; color: var(--color-muted); }
+  .town-case { border-radius: 1rem; padding: 1.5rem; background: color-mix(in srgb, var(--color-surface) 40%, var(--color-paper)); }
+  .town-case p { margin: 0.5rem 0 0; color: var(--color-ink); }
+  .town-services { margin: 1.25rem 0 0; padding: 0; list-style: none; display: grid; gap: 0.625rem; grid-template-columns: 1fr; }
+  @media (min-width: 640px) { .town-services { grid-template-columns: repeat(2, 1fr); } }
+</style>

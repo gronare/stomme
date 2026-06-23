@@ -1,0 +1,47 @@
+---
+import Cover from '../src/Cover.astro';
+
+// Before / after slider — drag (or use the keyboard-accessible range input) to
+// wipe between two images via a CSS clip driven by a custom property. The section
+// chrome (eyebrow/heading/intro) wraps the bespoke slider previously kept in a
+// separate BeforeAfter component — inlined here so the block is self-contained.
+interface Props {
+  eyebrow?: string;
+  heading?: string;
+  intro?: string;
+  before?: string;
+  after?: string;
+  beforeAlt?: string;
+  afterAlt?: string;
+}
+const { eyebrow, heading, intro, before, after, beforeAlt = 'Before', afterAlt = 'After' } = Astro.props;
+---
+
+<section class="section">
+  {(eyebrow || heading || intro) && (
+    <div class="section-head">
+      {eyebrow && <span class="mono mono-dot">{eyebrow}</span>}
+      {heading && <h2 class="display" style="margin-top:0.75rem">{heading}</h2>}
+      {intro && <p class="intro">{intro}</p>}
+    </div>
+  )}
+  <figure class="ba">
+    <Cover src={after} alt={afterAlt} placeholder="/images/placeholder.svg" width={1200} height={750} class="ba-img" />
+    <div class="ba-clip">
+      <Cover src={before} alt={beforeAlt} placeholder="/images/placeholder.svg" width={1200} height={750} class="ba-img" />
+    </div>
+    <div class="ba-line" aria-hidden="true"><span class="ba-handle">⇄</span></div>
+    <span class="ba-tag ba-tag-before" aria-hidden="true">Before</span>
+    <span class="ba-tag ba-tag-after" aria-hidden="true">After</span>
+    <input class="ba-range" type="range" min="0" max="100" value="50"
+      aria-label="Drag to compare before and after" />
+  </figure>
+</section>
+<script>
+  document.querySelectorAll('.ba').forEach((el) => {
+    const node = el as HTMLElement;
+    const range = node.querySelector('.ba-range') as HTMLInputElement | null;
+    const set = (v: string) => node.style.setProperty('--pos', v + '%');
+    range?.addEventListener('input', (e) => set((e.target as HTMLInputElement).value));
+  });
+</script>
