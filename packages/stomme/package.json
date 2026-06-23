@@ -1,6 +1,6 @@
 {
   "name": "@gronare/stomme",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Block-CMS engine for Astro + Decap — types, helpers, runtime components, tooling.",
   "type": "module",
   "repository": {
@@ -17,7 +17,10 @@
     "./config": "./src/config.ts",
     "./catalog": "./catalog.ts",
     "./collections": "./collections.ts",
-    "./integration": { "types": "./integration.d.ts", "default": "./integration.mjs" },
+    "./integration": {
+      "types": "./integration.d.ts",
+      "default": "./integration.mjs"
+    },
     "./styles.css": "./styles.css",
     "./Cover.astro": "./src/Cover.astro",
     "./Icon.astro": "./src/Icon.astro",
@@ -31,8 +34,8 @@
     "./blocks/*": "./blocks/*"
   },
   "bin": {
-    "stomme-gen": "./bin/gen-admin-blocks.mjs",
-    "stomme-new-block": "./bin/new-block.mjs"
+    "stomme-gen": "bin/gen-admin-blocks.mjs",
+    "stomme-new-block": "bin/new-block.mjs"
   },
   "files": [
     "src",
