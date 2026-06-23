@@ -2,6 +2,10 @@ packages:
   - 'packages/*'
   - 'sites/*'
   - 'starter'
+# Disable pnpm's 24h supply-chain freshness gate for the testing phase, so a same-day
+# `pnpm update` / freshly-published dep doesn't fail CI's --frozen-lockfile install.
+# Re-enable (remove this, or set a value like 1440) before going public/production.
+minimumReleaseAge: 0
 allowBuilds:
   '@parcel/watcher': true
   esbuild: true
