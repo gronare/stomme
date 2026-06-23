@@ -19,5 +19,8 @@
   },
   "devDependencies": {
     "decap-server": "^3.1.4"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": ["@parcel/watcher", "esbuild", "sharp"]
   }
 }

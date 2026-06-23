@@ -11,16 +11,25 @@
 // the TS types on import (Node 22.6+).
 import { readFileSync, writeFileSync, readdirSync, copyFileSync, mkdirSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
-import { pathToFileURL, fileURLToPath } from 'node:url';
+import { fileURLToPath } from 'node:url';
+import { createJiti } from 'jiti';
 
 const root = process.cwd();
 const here = dirname(fileURLToPath(import.meta.url));
+
+// Load the site's TS config/catalog through jiti rather than a bare dynamic import.
+// Node's built-in type-stripping refuses any .ts file under node_modules, so a plain
+// import of schema.ts / site.config.ts breaks the moment their import graph reaches the
+// installed package's .ts (e.g. '@gronare/stomme/kit', './catalog') — which is exactly
+// where a real registry install lives. jiti transpiles .ts everywhere, including
+// node_modules, and resolves each module's bare specifiers from its own location.
+const jiti = createJiti(import.meta.url);
 const schemaPath = resolve(root, process.env.BLOCKKIT_SCHEMA || 'src/blocks/schema.ts');
 const configPath = resolve(root, process.env.BLOCKKIT_CONFIG || 'public/admin/config.yml');
 
-// The site's catalog. Dynamic import so the bare '@gronare/stomme/kit' specifier inside
-// it resolves against the consumer's node_modules, not the package's.
-const { BLOCKS } = await import(pathToFileURL(schemaPath).href);
+// The site's catalog. Loaded via jiti so its bare '@gronare/stomme/kit' import resolves
+// against the consumer's node_modules and transpiles cleanly even when installed there.
+const { BLOCKS } = await jiti.import(schemaPath);
 if (!Array.isArray(BLOCKS)) {
   console.error(`No BLOCKS export found in ${schemaPath}`);
   process.exit(1);
@@ -32,7 +41,7 @@ if (!Array.isArray(BLOCKS)) {
 let ROUTES = { services: '/services', towns: '/areas', blog: '/blog' };
 let FEATURES = null; // null = no `features` declared → fall back to folder-existence
 try {
-  const mod = await import(pathToFileURL(resolve(root, 'src/site.config.ts')).href);
+  const mod = await jiti.import(resolve(root, 'src/site.config.ts'));
   if (mod.kit && mod.kit.routes) ROUTES = { ...ROUTES, ...mod.kit.routes };
   if (mod.features) FEATURES = { blog: false, areas: false, services: false, testimonials: false, faq: false, ...mod.features };
 } catch {

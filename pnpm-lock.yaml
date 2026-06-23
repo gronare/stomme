@@ -22,6 +22,9 @@ importers:
       astro:
         specifier: '>=5'
         version: 5.18.2(@netlify/blobs@10.7.9)(@types/node@26.0.0)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.62.2)(typescript@6.0.3)(yaml@2.9.0)
+      jiti:
+        specifier: ^2.6.0
+        version: 2.7.0
       marked:
         specifier: ^18.0.5
         version: 18.0.5
