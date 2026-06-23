@@ -13,11 +13,11 @@
   },
   "dependencies": {
     "@astrojs/netlify": "^6.6.5",
-    "@astrojs/sitemap": "^3.7.3",
-    "@gronare/stomme": "workspace:*",
-    "astro": "^5.18.2"
+    "@astrojs/sitemap": "^3.2.1",
+    "astro": "^5.2.5",
+    "@gronare/stomme": "workspace:*"
   },
   "devDependencies": {
-    "decap-server": "^3.9.1"
+    "decap-server": "^3.1.4"
   }
 }

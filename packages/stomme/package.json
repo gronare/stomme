@@ -53,7 +53,7 @@
     "styles.css"
   ],
   "dependencies": {
-    "jiti": "^2.7.0",
+    "jiti": "^2.6.0",
     "marked": "^18.0.5"
   },
   "peerDependencies": {
