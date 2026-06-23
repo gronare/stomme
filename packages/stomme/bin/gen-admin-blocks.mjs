@@ -50,6 +50,25 @@ try {
   /* no site.config — use defaults */
 }
 
+// Load every shipped admin label dictionary (labels.<locale>.js). FORWARD is the active
+// locale's dict (English ships none). REVERSE_ALL maps every translation back to English
+// so the pass can normalize a previously-localized config (incl. preserved hand-authored
+// labels) before re-localizing — making it idempotent and reversible across locale flips.
+let FORWARD = null;
+const REVERSE_ALL = {};
+try {
+  const adminDir = new URL('../admin/', import.meta.url);
+  for (const f of readdirSync(adminDir)) {
+    const mm = f.match(/^labels\.([\w-]+)\.js$/);
+    if (!mm) continue;
+    const dict = (await import(new URL(f, adminDir))).default;
+    for (const [en, loc] of Object.entries(dict)) REVERSE_ALL[loc] = en;
+    if (mm[1] === CMS_LOCALE) FORWARD = dict;
+  }
+} catch {
+  /* no dictionaries — labels stay English */
+}
+
 const MARKER_START = /# >>> (\w+):generated/;
 const q = (s) => `"${String(s).replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`;
 const pad = (n) => ' '.repeat(n);
@@ -355,11 +374,25 @@ if (total === 0) {
   console.error('No `# >>> blocks:generated` markers found in', configPath);
   process.exit(1);
 }
+// Localize label/label_singular/hint values: normalize any known translation back to
+// English, then map to the active locale. Unmapped values (custom labels, icon ids,
+// dynamic page options) pass through unchanged.
+function translateLabels(text) {
+  return text.replace(/\b(label|label_singular|hint): "((?:[^"\\]|\\.)*)"/g, (m, key, val) => {
+    const plain = val.replace(/\\"/g, '"').replace(/\\\\/g, '\\');
+    const en = REVERSE_ALL[plain] ?? plain;
+    const next = FORWARD && FORWARD[en] !== undefined ? FORWARD[en] : en;
+    if (next === plain) return m;
+    return `${key}: "${next.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`;
+  });
+}
+
 // Set Decap's admin UI language from the site's cmsLocale (top-level config.yml `locale:`).
 // Upsert keeps it idempotent: replace the line if present, else prepend it.
 let yaml = out.join('\n');
 const localeLine = `locale: ${CMS_LOCALE}`;
 yaml = /^locale:.*$/m.test(yaml) ? yaml.replace(/^locale:.*$/m, localeLine) : `${localeLine}\n${yaml}`;
+yaml = translateLabels(yaml);
 writeFileSync(configPath, yaml);
 
 // Ship the engine's generic preview templates into the site's admin so live page
