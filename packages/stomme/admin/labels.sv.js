@@ -27,6 +27,10 @@ export default {
   'Contact form (auto)': 'Kontaktformulär (auto)',
   'Logo / partner strip (auto)': 'Logotyp / partnerrad (auto)',
   'Checklist (ticked items)': 'Checklista (bockade punkter)',
+  'Service cards (from a collection)': 'Tjänstekort (från en samling)',
+  'Testimonials': 'Omdömen',
+  'Link chips (from a collection)': 'Länkchips (från en samling)',
+  'Blog posts – list': 'Blogginlägg – lista',
 
   // ── common field labels ──
   'Heading': 'Rubrik',
@@ -166,6 +170,32 @@ export default {
   'Filter sections…': 'Filtrera sektioner…',
   'No matches.': 'Inga träffar.',
   'Reads from a collection': 'Läser från en samling',
+
+  // ── block gallery: one-line summaries (what each section produces) ──
+  'Full-width intro — eyebrow, H1, text and a button, with optional image, energy-flow or ops panel beside it.': 'Intro i full bredd — dårrad, H1, text och knapp, med valfri bild, energiflöde eller driftpanel bredvid.',
+  'Page title band (light or dark): eyebrow, H1, intro and an optional button.': 'Sidtitelband (ljust eller mörkt): dårrad, H1, ingress och en valfri knapp.',
+  'A block of rich (markdown) text with an optional heading.': 'Ett block med formaterad text (markdown) och en valfri rubrik.',
+  'Grid of feature cards — icon or number, title and text; cards can link.': 'Rutnät med funktionskort — ikon eller siffra, titel och text; korten kan länka.',
+  'Service cards pulled from your Services collection.': 'Tjänstekort hämtade från din Tjänster-samling.',
+  'Row of principle / value cards (icon, title, text).': 'Rad med kort för principer/värderingar (ikon, titel, text).',
+  'Grid of specialist / team profile cards.': 'Rutnät med specialist-/teamprofiler.',
+  'Numbered process — a sequence of steps.': 'Numrerad process — en följd av steg.',
+  'Ticked checklist items in one or two columns.': 'Bockade checklistpunkter i en eller två kolumner.',
+  'Image grid (2–3 columns) with optional captions.': 'Bildrutnät (2–3 kolumner) med valfria bildtexter.',
+  'A before / after image pair.': 'Ett bildpar med före/efter.',
+  'Text beside an image (image on the left or right).': 'Text bredvid en bild (bild till vänster eller höger).',
+  'Body text paired with a pulled-out quote.': 'Brödtext tillsammans med ett utlyft citat.',
+  'A single highlighted quote or statement.': 'Ett enskilt framhävt citat eller uttalande.',
+  'Dark panel with a big number, statement and badges.': 'Mörk panel med ett stort tal, uttalande och märken.',
+  'Customer testimonials from your Testimonials collection.': 'Kundomdömen från din Omdömen-samling.',
+  'Chip links from your Areas collection (e.g. towns you serve).': 'Länkchips från din Områden-samling (t.ex. orter ni täcker).',
+  'List of the latest blog posts.': 'Lista över de senaste blogginläggen.',
+  'Full-width call-to-action band with a button.': 'Uppmaningsband i full bredd med en knapp.',
+  'A boxed call-to-action: heading, text and a button.': 'En inramad uppmaning: rubrik, text och en knapp.',
+  'FAQ from your FAQ collection — list, accordion, cards or split layout.': 'Vanliga frågor från din FAQ-samling — lista, dragspel, kort eller delad layout.',
+  'A row of stats / facts (label + value).': 'En rad med statistik/fakta (etikett + värde).',
+  'Logo / partner strip, filled automatically from settings.': 'Logotyp-/partnerrad som fylls automatiskt från inställningarna.',
+  'Contact form, rendered automatically.': 'Kontaktformulär som renderas automatiskt.',
 
   // ── hints ──
   '1 or 2.': '1 eller 2.',

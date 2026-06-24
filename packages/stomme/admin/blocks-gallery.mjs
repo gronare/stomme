@@ -37,9 +37,10 @@ export function renderGallery(blocks, { t = (s) => s, groupOrder = [], locale = 
   const sections = ordered.map((g) => {
     const cards = groups.get(g).map((b) => {
       const coll = b.collection ? `<span class="coll" title="${esc(t('Reads from a collection'))}">▢ ${esc(t('Reads from a collection'))}</span>` : '';
-      return `<article class="card" data-t="${esc((t(b.label) + ' ' + b.label + ' ' + (b.summary || '')).toLowerCase())}">
+      const summary = t(b.summary || '');
+      return `<article class="card" data-t="${esc((t(b.label) + ' ' + b.label + ' ' + (b.summary || '') + ' ' + summary).toLowerCase())}">
         <div class="wf" data-shape="${esc(b.shape || 'prose')}">${SHAPES[b.shape] || SHAPES.prose}</div>
-        <div class="meta"><h3>${esc(t(b.label))}</h3><p>${esc(b.summary || '')}</p>${coll}</div>
+        <div class="meta"><h3>${esc(t(b.label))}</h3><p>${esc(summary)}</p>${coll}</div>
       </article>`;
     }).join('');
     return `<section class="grp"><h2>${esc(t(g))}<span class="n">${groups.get(g).length}</span></h2><div class="cards">${cards}</div></section>`;
