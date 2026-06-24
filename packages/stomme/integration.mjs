@@ -21,6 +21,52 @@ function resolveListings(l) {
     .map((x) => ({ ...x, route: x.route.startsWith('/') ? x.route : `/${x.route}` }));
 }
 
+// Live-preview target, injected at /preview (generated so prerender is a literal
+// Astro can statically resolve — a Vite `define` is substituted too late for the
+// route scanner, which then prerenders the route and freezes it with empty blocks).
+// SSR on server targets so the CMS draft (?data=) renders the real components;
+// prerendered on `static` builds, where SSR (and thus live preview) isn't available.
+function previewEntrypoint(isStatic) {
+  return `---
+export const prerender = ${isStatic ? 'true' : 'false'};
+import Base from '@stomme/base';
+import { site } from '@stomme/config';
+import BlockRenderer from '@gronare/stomme/BlockRenderer.astro';
+import Header from '@gronare/stomme/Header.astro';
+import Footer from '@gronare/stomme/Footer.astro';
+
+const kind = Astro.url.searchParams.get('kind');
+const raw = Astro.url.searchParams.get('data');
+function decode() {
+  if (!raw) return null;
+  try { return JSON.parse(Buffer.from(raw, 'base64').toString('utf8')); }
+  catch { return null; }
+}
+const draft = decode();
+let blocks = [];
+if (!kind && Array.isArray(draft)) blocks = draft;
+const navDraft = kind === 'header' && draft && typeof draft === 'object' ? draft : undefined;
+const footerDraft = kind === 'footer' && draft && typeof draft === 'object' ? draft : undefined;
+---
+{kind === 'header' ? (
+  <Base title="Preview" chrome={false}><Header nav={navDraft} /></Base>
+) : kind === 'footer' ? (
+  <Base title="Preview" chrome={false}><Footer footer={footerDraft} /></Base>
+) : (
+  <Base title="Preview"><div id="preview-root"><BlockRenderer blocks={blocks} config={site} /></div></Base>
+)}
+<script is:inline>
+  window.addEventListener('message', (e) => {
+    if (e.data && e.data.type === 'stomme:preview' && typeof e.data.data === 'string') {
+      const u = new URL(location.href);
+      u.searchParams.set('data', e.data.data);
+      location.replace(u.toString());
+    }
+  });
+</script>
+`;
+}
+
 function listingEntrypoint(l) {
   const catalog = l.preset === 'catalog';
   const tmpl = catalog ? 'CatalogPage' : 'PostPage';
@@ -67,6 +113,15 @@ export default function stomme(options = {}) {
         });
 
         const enabled = [];
+        const outDir = resolve(root, '.astro/stomme');
+
+        // 0. Live-preview route — generated with a literal prerender per target.
+        const isStatic = (process.env.STOMME_TARGET || 'netlify') === 'static';
+        const previewFile = resolve(outDir, 'preview.astro');
+        mkdirSync(outDir, { recursive: true });
+        writeFileSync(previewFile, previewEntrypoint(isStatic));
+        injectRoute({ pattern: '/preview', entrypoint: previewFile });
+        enabled.push(`/preview${isStatic ? ' (static)' : ''}`);
 
         // 1. Fixed feature routes (blog/areas/services).
         const routed = [
@@ -81,9 +136,9 @@ export default function stomme(options = {}) {
         }
 
         // 2. Listing detail routes — one generated, prerendered entrypoint each.
-        const outDir = resolve(root, '.astro/stomme/listings');
+        const listingsDir = resolve(outDir, 'listings');
         for (const l of listings) {
-          const file = resolve(outDir, `${l.id}.astro`);
+          const file = resolve(listingsDir, `${l.id}.astro`);
           mkdirSync(dirname(file), { recursive: true });
           writeFileSync(file, listingEntrypoint(l));
           injectRoute({ pattern: `${l.route}/[slug]`, entrypoint: file });

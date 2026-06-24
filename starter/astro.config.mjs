@@ -5,9 +5,11 @@ import { site, features, listings } from './src/site.config.ts';
 
 // Build target — pick with STOMME_TARGET (default: netlify). Each has a `build:<target>`
 // script, e.g. `pnpm build` (netlify), `pnpm build:static`, `pnpm build:cloudflare`.
-//   netlify    → @astrojs/netlify  (preinstalled; SSR /preview as a function)
+//   netlify    → @astrojs/netlify  (preinstalled; the stomme integration injects /preview
+//                as an SSR function so the CMS live preview works)
 //   static     → no adapter; fully static dist/ for GitHub Pages / any web host (/preview
-//                is prerendered). For a GH Pages *project* site set `base: '/<repo>'` too.
+//                is prerendered — live preview needs SSR). For a GH Pages *project* site
+//                set `base: '/<repo>'` too.
 //   cloudflare → @astrojs/cloudflare   ┐ opt-in: install the adapter first, e.g.
 //   vercel     → @astrojs/vercel       │ `pnpm add @astrojs/cloudflare`. Only the target you
 //   node       → @astrojs/node         ┘ actually build needs its adapter installed.
@@ -32,6 +34,5 @@ const adapter = await loadAdapter();
 export default defineConfig({
   site: 'https://example.com',
   ...(adapter ? { adapter } : {}),
-  vite: { define: { __STOMME_STATIC__: JSON.stringify(STATIC) } },
   integrations: [stomme({ features, routes: site.routes, listings }), sitemap({ filter: (page) => !page.includes('/preview') })],
 });
