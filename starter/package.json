@@ -10,7 +10,10 @@
     "preview": "astro preview",
     "cms:gen": "stomme-gen",
     "block:new": "stomme-new-block",
-    "build:static": "STOMME_STATIC=1 pnpm run build"
+    "build:static": "STOMME_TARGET=static pnpm run build",
+    "build:cloudflare": "STOMME_TARGET=cloudflare pnpm run build",
+    "build:vercel": "STOMME_TARGET=vercel pnpm run build",
+    "build:node": "STOMME_TARGET=node pnpm run build"
   },
   "dependencies": {
     "@astrojs/netlify": "^6.6.5",
