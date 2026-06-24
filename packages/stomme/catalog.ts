@@ -41,10 +41,10 @@ export const defaultBlocks: BlockDef[] = [
       },
       {
         name: 'telemetry',
-        label: 'Ops · telemetry chips (if “Operations”)',
+        label: 'Ops · telemetry readouts (if “Operations”)',
         widget: 'list',
         required: false,
-        field: { name: 'item', label: 'Chip', widget: 'string' },
+        field: { name: 'item', label: 'Readout', widget: 'string' },
       },
       { name: 'stamp', label: 'Ops · corner stamp (if “Operations”)', widget: 'string', required: false },
       surfaceField,

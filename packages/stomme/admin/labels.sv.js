@@ -136,7 +136,8 @@ export default {
   'Flow · steps (if “Energy flow”)': 'Flöde · steg (om ”Energiflöde”)',
   // ── statPanel "operations" variant ──
   'Ops · corner stamp (if “Operations”)': 'Drift · hörnstämpel (om ”Drift”)',
-  'Ops · telemetry chips (if “Operations”)': 'Drift · telemetri-chips (om ”Drift”)',
+  'Ops · telemetry readouts (if “Operations”)': 'Drift · telemetrimätvärden (om ”Drift”)',
+  'Readout': 'Mätvärde',
   // ── textImage aside ──
   'Aside · heading': 'Sidoruta · rubrik',
   'Aside · text': 'Sidoruta · text',
