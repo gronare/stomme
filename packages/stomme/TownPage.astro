@@ -24,13 +24,13 @@ const fill = (s?: string) => (s ?? '').replace(/\{name\}/g, data.name);
 const whyParagraphs = (data.why ?? '').split(/\n\n+/).map((p: string) => p.trim()).filter(Boolean);
 const reasons = (t.reasons ?? []).map((r) => ({ title: fill(r.title), body: fill(r.body) }));
 
-const site = (await getEntry('settings', 'site'))?.data as any;
+const settings = (await getEntry('settings', 'site'))?.data as any;
 const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'Service',
   name: data.title ?? data.name,
   description: data.seo?.description ?? '',
-  ...(site?.name ? { provider: { '@type': 'LocalBusiness', name: site.name } } : {}),
+  ...(settings?.name ? { provider: { '@type': 'LocalBusiness', name: settings.name } } : {}),
   areaServed: { '@type': 'City', name: data.name },
 };
 ---
