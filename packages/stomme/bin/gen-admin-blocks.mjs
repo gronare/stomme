@@ -42,11 +42,16 @@ if (!Array.isArray(BLOCKS)) {
 let ROUTES = { services: '/services', towns: '/areas', blog: '/blog' };
 let FEATURES = null; // null = no `features` declared → fall back to folder-existence
 let CMS_LOCALE = 'en'; // Decap admin UI language (config.yml `locale:`); 'en' is Decap's default
+let LISTINGS = []; // config-defined collections (news/for-sale/…) → editors + seeded index
 try {
   const mod = await jiti.import(resolve(root, 'src/site.config.ts'));
   if (mod.kit && mod.kit.routes) ROUTES = { ...ROUTES, ...mod.kit.routes };
   if (mod.kit && mod.kit.cmsLocale) CMS_LOCALE = mod.kit.cmsLocale;
   if (mod.features) FEATURES = { blog: false, areas: false, services: false, testimonials: false, faq: false, ...mod.features };
+  if (Array.isArray(mod.listings))
+    LISTINGS = mod.listings
+      .filter((x) => x && x.id && x.route && (x.preset === 'article' || x.preset === 'catalog'))
+      .map((x) => ({ ...x, route: x.route.startsWith('/') ? x.route : `/${x.route}` }));
 } catch {
   /* no site.config — use defaults */
 }
@@ -159,7 +164,9 @@ function collectionEnabled(name) {
   if (FEATURES && FEATURE_OF[name]) return !!FEATURES[FEATURE_OF[name]];
   return collectionExists(name);
 }
-const AVAILABLE_BLOCKS = BLOCKS.filter((b) => !b.collection || collectionEnabled(b.collection));
+// catalogList only makes sense with a catalog listing present; hide it otherwise.
+const hasCatalog = LISTINGS.some((l) => l.preset === 'catalog');
+const AVAILABLE_BLOCKS = BLOCKS.filter((b) => (!b.collection || collectionEnabled(b.collection)) && (b.type !== 'catalogList' || hasCatalog));
 const SKIPPED_BLOCKS = BLOCKS.filter((b) => b.collection && !collectionEnabled(b.collection));
 
 // Cluster the "add section" picker (and the gallery) by group. Sort is stable, so blocks
@@ -348,11 +355,57 @@ const COLLECTION_EDITORS = {
     - { name: body, label: "Body", widget: markdown }`,
 };
 
-// Emit editor sections for whichever conventional collections the site has.
+// A CMS editor for a config-defined listing, from its preset's field set.
+function listingEditor(l) {
+  const articleFields = `    - { name: title, label: "Title", widget: string }
+    - { name: date, label: "Date", widget: datetime, date_format: "YYYY-MM-DD", time_format: false }
+    - { name: excerpt, label: "Excerpt", widget: text, required: false }
+    - { name: cover, label: "Cover image", widget: image, required: false }
+    - { name: body, label: "Body", widget: markdown }`;
+  const catalogFields = `    - { name: title, label: "Title", widget: string }
+    - { name: price, label: "Price", widget: string, required: false }
+    - name: status
+      label: "Status"
+      widget: select
+      default: available
+      options:
+        - { label: "Available", value: available }
+        - { label: "Reserved", value: reserved }
+        - { label: "Sold", value: sold }
+    - { name: category, label: "Category", widget: string, required: false }
+    - { name: cover, label: "Cover image", widget: image, required: false }
+    - name: gallery
+      label: "Gallery"
+      widget: list
+      required: false
+      fields:
+        - { name: image, label: "Image", widget: image }
+        - { name: alt, label: "Alt text", widget: string, required: false }
+    - name: specs
+      label: "Specs"
+      widget: list
+      required: false
+      fields:
+        - { name: label, label: "Label", widget: string }
+        - { name: value, label: "Value", widget: string }
+    - { name: date, label: "Date added", widget: datetime, date_format: "YYYY-MM-DD", time_format: false, required: false }
+    - { name: body, label: "Description", widget: markdown, required: false }`;
+  return `- name: ${l.id}
+  label: ${q(l.label || l.id)}
+  folder: "src/content/${l.id}"
+  create: true
+  slug: "{{slug}}"
+  fields:
+${l.preset === 'catalog' ? catalogFields : articleFields}`;
+}
+
+// Emit editor sections: the conventional collections the site has, then one per listing.
 function emitCollections(indent) {
   const p = pad(indent);
-  const present = Object.keys(COLLECTION_EDITORS).filter(collectionEnabled);
-  return present.map((name) => COLLECTION_EDITORS[name].split('\n').map((l) => (l ? p + l : l)).join('\n')).join('\n');
+  const ind = (s) => s.split('\n').map((l) => (l ? p + l : l)).join('\n');
+  const fixed = Object.keys(COLLECTION_EDITORS).filter(collectionEnabled).map((name) => ind(COLLECTION_EDITORS[name]));
+  const listing = LISTINGS.map((l) => ind(listingEditor(l)));
+  return [...fixed, ...listing].join('\n');
 }
 
 const EMITTERS = { blocks: emitWidget, collections: emitCollections };
@@ -455,6 +508,26 @@ try {
   }
 } catch (e) {
   console.warn('  (blog index seed skipped:', e.message + ')');
+}
+
+// Seed an editable index page per listing (once, if absent): pageHeader + the preset's
+// list block, pointed at the listing's collection + route. Edit or delete like any page.
+for (const l of LISTINGS) {
+  try {
+    const slug = l.route.replace(/^\/+/, '') || l.id;
+    const pagePath = resolve(root, 'src/content/pages', `${slug}.md`);
+    if (existsSync(pagePath)) continue;
+    const label = JSON.stringify(l.label || l.id);
+    const block =
+      l.preset === 'catalog'
+        ? `  - type: catalogList\n    source: ${l.id}\n    base: ${l.route}\n    filters: true\n    showImages: true\n    columns: 3`
+        : `  - type: postList\n    source: ${l.id}\n    base: ${l.route}\n    featured: true\n    showImages: true\n    columns: 3`;
+    mkdirSync(dirname(pagePath), { recursive: true });
+    writeFileSync(pagePath, `---\ntitle: ${label}\nseo:\n  title: ${label}\n  description: ${label}\nblocks:\n  - type: pageHeader\n    heading: ${label}\n${block}\n---\n`);
+    console.log(`  ↳ seeded editable listing index: src/content/pages/${slug}.md (${l.id})`);
+  } catch (e) {
+    console.warn(`  (listing index seed skipped for ${l.id}:`, e.message + ')');
+  }
 }
 
 console.log(`✓ stomme-gen: ${Object.entries(counts).map(([k, v]) => `${k}×${v}`).join(', ')} · ${AVAILABLE_BLOCKS.length} block types · ${PAGE_OPTIONS.length} link options`);

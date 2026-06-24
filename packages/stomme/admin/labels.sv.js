@@ -232,6 +232,19 @@ export default {
   'Image previews': 'Bildförhandsvisningar',
   'Show the newest post as a large lead card.': 'Visa det senaste inlägget som ett stort ledande kort.',
 
+  // ── catalog / listings ──
+  'Catalog – items for sale (from a listing)': 'Katalog – varor till salu (från en listning)',
+  'For-sale items from a catalog listing — filterable cards with cover, status badge, price and specs.': 'Varor till salu från en katalog-listning — filtrerbara kort med bild, statusmärke, pris och specifikationer.',
+  'Price': 'Pris',
+  'Status': 'Status',
+  'Category': 'Kategori',
+  'Category filters': 'Kategorifilter',
+  'Specs': 'Specifikationer',
+  'Date added': 'Tillagd',
+  'Available': 'Tillgänglig',
+  'Reserved': 'Reserverad',
+  'Sold': 'Såld',
+
   // ── hints ──
   '1 or 2.': '1 eller 2.',
   '2 or 3.': '2 eller 3.',

@@ -1,4 +1,4 @@
-import type { KitConfig, StommeFeatures } from '@gronare/stomme/config';
+import type { KitConfig, StommeFeatures, Listing } from '@gronare/stomme/config';
 
 // Optional engine features. Flip true → that collection's CMS editor, blocks, and
 // detail routes switch on. Omitted/false = off, so new engine features never appear
@@ -23,3 +23,10 @@ export const kit: KitConfig = {
   cmsLocale: 'en', // Decap admin UI language: 'en' | 'sv' | 'da' | 'nb_no' | … (stomme-gen writes it to config.yml)
   strings: { readMore: 'Read more' },
 };
+
+// Content listings: config-defined collections, each with an index + detail pages and its
+// own admin collection. preset 'article' (date/excerpt/cover — blog/news) or 'catalog'
+// (price/status/specs/gallery — for-sale). Add as many as you want; empty by default. e.g.:
+//   { id: 'nyheter', route: '/nyheter', label: 'Nyheter', preset: 'article' },
+//   { id: 'bilar',   route: '/till-salu', label: 'Till salu', preset: 'catalog' },
+export const listings: Listing[] = [];

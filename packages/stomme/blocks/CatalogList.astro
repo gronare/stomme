@@ -1,0 +1,88 @@
+---
+import { getCollection } from 'astro:content';
+import Cover from '../src/Cover.astro';
+
+// Catalog index for a `catalog` listing (for-sale items). Reads the listing's collection
+// (`source`) and renders a filterable card grid: cover + status badge, price, a few specs.
+// `base` is the detail-link prefix (the listing route). Newest first. Category filtering
+// is client-side. Status labels come from kit.strings.listingStatus (English default).
+interface Props {
+  eyebrow?: string;
+  heading?: string;
+  intro?: string;
+  source?: string;
+  base?: string;
+  columns?: number;
+  showImages?: boolean;
+  filters?: boolean;
+  kit?: any;
+}
+const { eyebrow, heading, intro, source = '', base, columns = 3, showImages = true, filters = true, kit } = Astro.props;
+const prefix = base ?? (source ? `/${source}` : '');
+const readMore = kit?.strings?.readMore ?? 'Read more';
+const sl = { available: 'Available', reserved: 'Reserved', sold: 'Sold', all: 'All', ...(kit?.strings?.listingStatus || {}) };
+const ST = { available: 'avail', reserved: 'res', sold: 'sold' };
+const items = source
+  ? (await getCollection(source)).sort((a, b) => ((a.data.date ?? '') < (b.data.date ?? '') ? 1 : -1))
+  : [];
+const cats = [...new Set(items.map((i) => i.data.category).filter(Boolean))];
+const PLACE = '/images/placeholders/service.svg';
+---
+{items.length > 0 && (
+  <section class="section">
+    {(eyebrow || heading || intro) && (
+      <div class="section-head post-head">
+        {eyebrow && <span class="mono mono-dot">{eyebrow}</span>}
+        {heading && <h2 class="display" style="margin-top:0.75rem">{heading}</h2>}
+        {intro && <p class="intro">{intro}</p>}
+      </div>
+    )}
+    {filters && cats.length > 1 && (
+      <div class="catalog-filters" data-catalog-filters>
+        <button type="button" class="catalog-chip is-on" data-cat="">{sl.all}</button>
+        {cats.map((c) => (
+          <button type="button" class="catalog-chip" data-cat={c}>{c}</button>
+        ))}
+      </div>
+    )}
+    <div class="catalog-grid" style={`--cat-cols:${columns}`}>
+      {items.map((it) => (
+        <a href={`${prefix}/${it.id}`} class={`listing-card is-${ST[it.data.status] || 'avail'}`} data-cat={it.data.category || ''}>
+          {showImages && (
+            <div class="listing-photo">
+              <Cover src={it.data.cover} alt={it.data.title} placeholder={PLACE} width={640} height={400} class="listing-img" />
+              <span class={`listing-badge b-${ST[it.data.status] || 'avail'}`}>{sl[it.data.status] || it.data.status}</span>
+            </div>
+          )}
+          <div class="listing-body">
+            <h3 class="listing-title">{it.data.title}</h3>
+            {it.data.price && <p class="listing-price">{it.data.price}</p>}
+            {it.data.specs && it.data.specs.length > 0 && (
+              <div class="listing-specs">
+                {it.data.specs.slice(0, 4).map((s) => (
+                  <div class="listing-spec"><span>{s.label}</span><b>{s.value}</b></div>
+                ))}
+              </div>
+            )}
+            <span class="mono listing-more">{readMore} →</span>
+          </div>
+        </a>
+      ))}
+    </div>
+  </section>
+)}
+<script>
+  document.querySelectorAll('[data-catalog-filters]').forEach((bar) => {
+    const grid = bar.parentElement?.querySelector('.catalog-grid');
+    if (!grid) return;
+    bar.addEventListener('click', (e) => {
+      const btn = (e.target as HTMLElement).closest('.catalog-chip');
+      if (!btn) return;
+      bar.querySelectorAll('.catalog-chip').forEach((c) => c.classList.toggle('is-on', c === btn));
+      const cat = btn.getAttribute('data-cat');
+      grid.querySelectorAll('.listing-card').forEach((card) => {
+        (card as HTMLElement).style.display = !cat || card.getAttribute('data-cat') === cat ? '' : 'none';
+      });
+    });
+  });
+</script>

@@ -1,0 +1,51 @@
+---
+import Cover from './src/Cover.astro';
+import { render } from 'astro:content';
+
+// Detail page for a `catalog` listing entry (for-sale item): gallery, status, price,
+// a spec table, the description body, and a contact CTA. Rendered inside the site's Base
+// by the per-listing route the integration injects. `config` is the site kit.
+interface Props {
+  entry: any;
+  config?: any;
+}
+const { entry, config: kit } = Astro.props;
+const d = entry.data;
+const sl = { available: 'Available', reserved: 'Reserved', sold: 'Sold', ...(kit?.strings?.listingStatus || {}) };
+const ST = { available: 'avail', reserved: 'res', sold: 'sold' };
+const cta = kit?.strings?.listingCta ?? 'Contact us';
+const contactHref = kit?.routes?.contact ?? '/contact';
+const gallery = d.gallery?.length ? d.gallery : d.cover ? [{ image: d.cover, alt: d.title }] : [];
+const { Content } = await render(entry);
+const PLACE = '/images/placeholders/service.svg';
+---
+<section class="section">
+  <div class="catalog-detail">
+    <div class="catalog-gallery">
+      <Cover src={gallery[0]?.image} alt={gallery[0]?.alt || d.title} placeholder={PLACE} width={1100} height={700} class="catalog-gallery__main" />
+      {gallery.length > 1 && (
+        <div class="catalog-thumbs">
+          {gallery.slice(1, 5).map((g) => (
+            <Cover src={g.image} alt={g.alt || d.title} placeholder={PLACE} width={320} height={220} class="catalog-thumb" />
+          ))}
+        </div>
+      )}
+    </div>
+    <div class="catalog-info">
+      <span class={`listing-badge b-${ST[d.status] || 'avail'}`}>{sl[d.status] || d.status}</span>
+      <h1 class="display catalog-h1">{d.title}</h1>
+      {d.price && <p class="catalog-price">{d.price}</p>}
+      {d.specs?.length > 0 && (
+        <dl class="catalog-spectable">
+          {d.specs.map((s) => (
+            <div><dt>{s.label}</dt><dd>{s.value}</dd></div>
+          ))}
+        </dl>
+      )}
+      <a class="btn catalog-cta" href={contactHref}>{cta}</a>
+    </div>
+  </div>
+  <div class="catalog-body section--read flow">
+    <Content />
+  </div>
+</section>

@@ -8,14 +8,33 @@
 // exists. Schemas are the superset the templates + generated CMS editors expect.
 import { defineCollection, z } from 'astro:content';
 import { glob } from 'astro/loaders';
+import { resolveListings, type Listing } from './src/config.ts';
 
 const seo = z.object({ title: z.string(), description: z.string() });
 const blocks = z.array(z.object({ type: z.string() }).passthrough()).default([]);
 const link = z.any().optional();
 const md = (name: string) => glob({ pattern: '**/*.md', base: `./src/content/${name}` });
+const dateField = z.union([z.string(), z.date()]).transform((d) => (d instanceof Date ? d.toISOString().slice(0, 10) : d));
 
-export function stommeCollections() {
-  return {
+// Listing preset schemas — `article` (blog/news) and `catalog` (for-sale of anything).
+export const PRESET_SCHEMAS = {
+  article: z.object({ title: z.string(), date: dateField, excerpt: z.string().default(''), cover: z.string().optional() }),
+  catalog: z.object({
+    title: z.string(),
+    price: z.string().default(''),
+    status: z.enum(['available', 'reserved', 'sold']).default('available'),
+    category: z.string().default(''),
+    cover: z.string().optional(),
+    gallery: z.array(z.object({ image: z.string(), alt: z.string().default('') })).default([]),
+    specs: z.array(z.object({ label: z.string(), value: z.string() })).default([]),
+    date: dateField.optional(),
+  }),
+} as const;
+
+// `listings` (from site.config) adds one collection per entry, keyed by id, using its
+// preset schema — so news/for-sale/… exist as real collections without bespoke code.
+export function stommeCollections(listings?: Listing[]) {
+  const base: Record<string, ReturnType<typeof defineCollection>> = {
     home: defineCollection({ loader: md('home'), schema: z.object({ seo, blocks }) }),
     pages: defineCollection({ loader: md('pages'), schema: z.object({ title: z.string(), seo, blocks }) }),
 
@@ -94,15 +113,7 @@ export function stommeCollections() {
       }),
     }),
 
-    posts: defineCollection({
-      loader: md('posts'),
-      schema: z.object({
-        title: z.string(),
-        date: z.union([z.string(), z.date()]).transform((d) => (d instanceof Date ? d.toISOString().slice(0, 10) : d)),
-        excerpt: z.string().default(''),
-        cover: z.string().optional(),
-      }),
-    }),
+    posts: defineCollection({ loader: md('posts'), schema: PRESET_SCHEMAS.article }),
 
     services: defineCollection({
       loader: md('services'),
@@ -118,4 +129,10 @@ export function stommeCollections() {
       }),
     }),
   };
+
+  // One collection per listing (skip ids that would clash with a base collection).
+  for (const l of resolveListings(listings)) {
+    if (!(l.id in base)) base[l.id] = defineCollection({ loader: md(l.id), schema: PRESET_SCHEMAS[l.preset] });
+  }
+  return base;
 }

@@ -31,6 +31,9 @@ export interface KitConfig {
     };
     // ServicePage chrome.
     service?: { eyebrow?: string; quoteEyebrow?: string; quoteHeading?: string; cta?: string };
+    // Catalog listing chrome (for-sale presentation).
+    listingStatus?: { available?: string; reserved?: string; sold?: string; all?: string };
+    listingCta?: string;
   };
 }
 
@@ -57,6 +60,25 @@ export function resolveFeatures(f?: StommeFeatures): Required<StommeFeatures> {
   return { ...FEATURE_DEFAULTS, ...(f || {}) };
 }
 
+// A content listing: a collection with an index + detail pages, instantiated from
+// config so several can coexist (news, for-sale, …) without bespoke engine features.
+// `preset` picks the schema + presentation: `article` (date/excerpt/cover — blog & news)
+// or `catalog` (price/status/specs/gallery — for-sale of anything). The engine adds a
+// collection per listing, a CMS editor, a seeded editable index page, and detail routes.
+export interface Listing {
+  id: string; // collection name + content folder (src/content/<id>)
+  route: string; // index + detail route base, e.g. '/till-salu'
+  label: string; // CMS collection + nav label
+  preset: 'article' | 'catalog';
+  options?: { columns?: number; showImages?: boolean; featured?: boolean; filters?: boolean };
+}
+// Normalize: drop entries missing an id/route/preset; default the route slash.
+export function resolveListings(l?: Listing[]): Listing[] {
+  return (Array.isArray(l) ? l : [])
+    .filter((x) => x && x.id && x.route && (x.preset === 'article' || x.preset === 'catalog'))
+    .map((x) => ({ ...x, route: x.route.startsWith('/') ? x.route : `/${x.route}` }));
+}
+
 export const KIT_DEFAULTS = {
   routes: { services: '/services', towns: '/areas', blog: '/blog', contact: '/contact', formSuccess: '/thanks' },
   locale: 'en-US',
@@ -76,6 +98,8 @@ export const KIT_DEFAULTS = {
       servicesCta: 'Contact us today',
     },
     service: { eyebrow: 'Service', quoteEyebrow: 'Free quote', quoteHeading: 'Want to know what it costs?', cta: 'Get a quote' },
+    listingStatus: { available: 'Available', reserved: 'Reserved', sold: 'Sold', all: 'All' },
+    listingCta: 'Contact us',
   },
 };
 
@@ -93,6 +117,8 @@ export function resolveKit(c?: KitConfig) {
       contact: { ...(s && s.contact) },
       town: { ...KIT_DEFAULTS.strings.town, ...(s && s.town) },
       service: { ...KIT_DEFAULTS.strings.service, ...(s && s.service) },
+      listingStatus: { ...KIT_DEFAULTS.strings.listingStatus, ...(s && s.listingStatus) },
+      listingCta: (s && s.listingCta) || KIT_DEFAULTS.strings.listingCta,
     },
   };
 }

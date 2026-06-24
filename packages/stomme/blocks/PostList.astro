@@ -15,13 +15,15 @@ interface Props {
   showImages?: boolean;
   featured?: boolean;
   columns?: number;
+  source?: string;
+  base?: string;
   kit?: any;
 }
-const { eyebrow, heading, intro, showImages = true, featured = true, columns = 3, kit } = Astro.props;
-const prefix = kit?.routes?.blog ?? '/blog';
+const { eyebrow, heading, intro, showImages = true, featured = true, columns = 3, source = 'posts', base, kit } = Astro.props;
+const prefix = base ?? kit?.routes?.blog ?? '/blog';
 const locale = kit?.locale ?? 'en-US';
 const readMore = kit?.strings?.readMore ?? 'Read more';
-const all = (await getCollection('posts')).sort((a, b) => (a.data.date < b.data.date ? 1 : -1));
+const all = (await getCollection(source)).sort((a, b) => (a.data.date < b.data.date ? 1 : -1));
 const fmt = (d: string) => new Date(d).toLocaleDateString(locale, { year: 'numeric', month: 'long', day: 'numeric' });
 const lead = featured && all.length > 1 ? all[0] : null;
 const rest = lead ? all.slice(1) : all;
