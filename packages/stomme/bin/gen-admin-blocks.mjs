@@ -9,7 +9,7 @@
 // Writes: <cwd>/public/admin/config.yml (override: BLOCKKIT_CONFIG)
 // The consumer's schema.ts imports field helpers from '@gronare/stomme/kit'; Node strips
 // the TS types on import (Node 22.6+).
-import { readFileSync, writeFileSync, readdirSync, copyFileSync, mkdirSync } from 'node:fs';
+import { readFileSync, writeFileSync, readdirSync, copyFileSync, mkdirSync, existsSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createJiti } from 'jiti';
@@ -319,6 +319,7 @@ const COLLECTION_EDITORS = {
     - { name: title, label: "Title", widget: string }
     - { name: date, label: "Date", widget: datetime, date_format: "YYYY-MM-DD", time_format: false }
     - { name: excerpt, label: "Excerpt", widget: text, required: false }
+    - { name: cover, label: "Cover image", widget: image, required: false }
     - { name: body, label: "Body", widget: markdown }`,
   services: `- name: services
   label: "Services"
@@ -433,6 +434,27 @@ try {
   writeFileSync(resolve(root, 'public/admin/blocks.html'), html);
 } catch (e) {
   console.warn('  (blocks.html skipped:', e.message + ')');
+}
+
+// When blog is enabled, seed an editable index page at the blog route — once, only if
+// absent, never overwriting edits. It's a normal managed page (pageHeader + postList), so
+// the blog has a default index that's composed of blocks and editable in the CMS rather
+// than a fixed template. Delete it to opt out (or turn the feature off).
+try {
+  if (collectionEnabled('posts')) {
+    const slug = (ROUTES.blog || '/blog').replace(/^\/+/, '') || 'blog';
+    const pagePath = resolve(root, 'src/content/pages', `${slug}.md`);
+    if (!existsSync(pagePath)) {
+      mkdirSync(dirname(pagePath), { recursive: true });
+      writeFileSync(
+        pagePath,
+        '---\ntitle: "Blog"\nseo:\n  title: "Blog"\n  description: "Latest posts, guides and updates."\nblocks:\n  - type: pageHeader\n    eyebrow: Blog\n    heading: Blog\n    intro: "Latest posts, guides and updates."\n  - type: postList\n    featured: true\n    showImages: true\n    columns: 3\n---\n',
+      );
+      console.log(`  ↳ seeded editable blog index: src/content/pages/${slug}.md`);
+    }
+  }
+} catch (e) {
+  console.warn('  (blog index seed skipped:', e.message + ')');
 }
 
 console.log(`✓ stomme-gen: ${Object.entries(counts).map(([k, v]) => `${k}×${v}`).join(', ')} · ${AVAILABLE_BLOCKS.length} block types · ${PAGE_OPTIONS.length} link options`);

@@ -227,6 +227,10 @@ export default {
   'Post': 'Inlägg',
   'Date': 'Datum',
   'Excerpt': 'Utdrag',
+  'Cover image': 'Omslagsbild',
+  'Featured first post': 'Framhävt första inlägg',
+  'Image previews': 'Bildförhandsvisningar',
+  'Show the newest post as a large lead card.': 'Visa det senaste inlägget som ett stort ledande kort.',
 
   // ── hints ──
   '1 or 2.': '1 eller 2.',

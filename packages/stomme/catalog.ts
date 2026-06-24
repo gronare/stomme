@@ -211,10 +211,16 @@ export const defaultBlocks: BlockDef[] = [
     type: 'postList',
     label: 'Blog posts – list',
     group: 'From collections',
-    summary: 'List of the latest blog posts.',
+    summary: 'List of the latest blog posts — featured lead + a card grid with cover images.',
     shape: 'list',
     collection: 'posts',
-    fields: [...headingFields, surfaceField],
+    fields: [
+      ...headingFields,
+      { name: 'featured', label: 'Featured first post', widget: 'boolean', required: false, default: true, hint: 'Show the newest post as a large lead card.' },
+      { name: 'showImages', label: 'Image previews', widget: 'boolean', required: false, default: true },
+      { name: 'columns', label: 'Columns', widget: 'number', required: false, default: 3, hint: '2 or 3.' },
+      surfaceField,
+    ],
   },
   {
     type: 'ctaPanel',
