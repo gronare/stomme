@@ -346,7 +346,7 @@ collections:
                       - { label: "Tinted", value: "tint" }
                       - { label: "Accent band", value: "band" }
               - name: checklist
-                label: "Checklist (ticked items)"
+                label: "Checklist"
                 widget: object
                 fields:
                   - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
@@ -905,7 +905,7 @@ collections:
                   - { label: "Tinted", value: "tint" }
                   - { label: "Accent band", value: "band" }
           - name: checklist
-            label: "Checklist (ticked items)"
+            label: "Checklist"
             widget: object
             fields:
               - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
