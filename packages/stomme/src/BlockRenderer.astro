@@ -68,7 +68,7 @@ const reg = { ...defaults, ...registry };
 // `site` so blocks needn't be wired individually.
 const site = resolveSite(config);
 
-const surfaceClass: Record<string, string> = { tint: 'surface-tint', band: 'band' };
+const surfaceClass: Record<string, string> = { tint: 'surface-tint', band: 'band', dark: 'surface-dark' };
 ---
 {
   blocks.map((block) => {

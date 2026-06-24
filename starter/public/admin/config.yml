@@ -1167,6 +1167,11 @@ collections:
           - { name: paper, label: "Page background", widget: color, default: "#ffffff", hint: "The main page background." }
           - { name: line, label: "Borders & lines", widget: color, default: "#e5e7eb", hint: "Card borders, dividers, rules." }
           - { name: highlight, label: "Accent", widget: color, default: "#f59e0b", hint: "Secondary accent — badges, small highlights." }
+          # Dark sections — the optional dark surface any block can use. Leave these
+          # empty to derive automatically from Primary; set one to override exactly.
+          - { name: dark, label: "Dark section background", widget: color, required: false, hint: "Background for blocks set to the Dark surface. Empty = derived from Primary." }
+          - { name: darkInk, label: "Dark section text", widget: color, required: false, hint: "Text colour on dark sections. Empty = a light off-white." }
+          - { name: darkLine, label: "Dark section borders", widget: color, required: false, hint: "Card borders / dividers on dark sections. Empty = a faint light rule." }
       - name: nav
         label: "Navigation"
         file: "src/content/navigation/nav.md"

@@ -105,6 +105,7 @@ export const surfaceField: Field = {
     { label: 'Standard (white)', value: 'standard' },
     { label: 'Tinted', value: 'tint' },
     { label: 'Accent band', value: 'band' },
+    { label: 'Dark', value: 'dark' },
   ],
   hint: 'The surface behind the section — for rhythm between blocks.',
 };

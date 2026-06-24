@@ -65,6 +65,11 @@ export function stommeCollections(listings?: Listing[]) {
         paper: z.string().default('#ffffff'),
         line: z.string().default('#e5e7eb'),
         highlight: z.string().default('#f59e0b'),
+        // Dark-section tokens — optional. Left unset, they derive from `brand`
+        // (see styles.css :root). Set to override the dark surface exactly.
+        dark: z.string().optional(),
+        darkInk: z.string().optional(),
+        darkLine: z.string().optional(),
       }),
     }),
 

@@ -22,6 +22,10 @@ const themeVars = [
   `--color-paper:${theme.paper}`,
   `--color-line:${theme.line}`,
   `--color-highlight:${theme.highlight}`,
+  // Dark-section tokens only when set — otherwise the brand-derived defaults apply.
+  ...(theme.dark ? [`--color-dark:${theme.dark}`] : []),
+  ...(theme.darkInk ? [`--color-dark-ink:${theme.darkInk}`] : []),
+  ...(theme.darkLine ? [`--color-dark-line:${theme.darkLine}`] : []),
 ].join(';');
 ---
 <!doctype html>

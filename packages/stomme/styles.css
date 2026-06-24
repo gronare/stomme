@@ -16,6 +16,12 @@
   --color-line: #e5e7eb;
   --color-highlight: #f59e0b;
 
+  /* Dark sections (the `dark` surface). Defaults derive from --color-brand, so they
+     follow the brand with no setup; the theme editor can override each one. */
+  --color-dark: color-mix(in srgb, var(--color-brand) 16%, #0c0e13);
+  --color-dark-ink: #e9ebf1;
+  --color-dark-line: color-mix(in srgb, var(--color-dark-ink) 14%, transparent);
+
   --bk-font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   --bk-font-display: var(--bk-font-sans);
   --bk-font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
@@ -49,6 +55,29 @@ body { font-family: var(--bk-font-sans); margin: 0; line-height: 1.6; }
 
 .band { background: var(--color-surface); color: var(--color-ink); }
 .surface-tint { background: color-mix(in srgb, var(--color-surface) 30%, var(--color-paper)); }
+
+/* Dark surface — the "almost dark mode" section finish. Rather than restyle every
+   block, it remaps the design tokens the blocks already read: paper→a dark ground,
+   ink→light text, surface→a slightly-raised dark (elevated cards), line→a faint light
+   rule. Brand + highlight + on-dark keep their values so accents stay vivid. */
+.surface-dark {
+  background: var(--color-dark);
+  color: var(--color-dark-ink);
+  --color-paper: color-mix(in srgb, var(--color-dark-ink) 7%, var(--color-dark));
+  --color-ink: var(--color-dark-ink);
+  --color-muted: color-mix(in srgb, var(--color-dark-ink) 56%, var(--color-dark));
+  --color-surface: color-mix(in srgb, var(--color-dark-ink) 12%, var(--color-dark));
+  --color-line: var(--color-dark-line);
+}
+/* Spots that hardcode light values the token remap can't reach. */
+.surface-dark .flow { background: color-mix(in srgb, var(--color-dark-ink) 5%, var(--color-dark)); border-color: var(--color-line); }
+.surface-dark .flow .chip,
+.surface-dark .flow .node { background: color-mix(in srgb, var(--color-dark-ink) 10%, var(--color-dark)); }
+.surface-dark .ico-badge { background: color-mix(in srgb, var(--color-brand) 28%, transparent); }
+/* StatPanel is already dark by design — let the wrapper show through instead of
+   painting its (now light) --color-ink ground over it. */
+.surface-dark .stat-panel { background: transparent; }
+
 .card { display: block; border: 1px solid var(--color-line); border-radius: 1rem; background: var(--color-paper); overflow: hidden; text-decoration: none; color: inherit; }
 
 /* hero */

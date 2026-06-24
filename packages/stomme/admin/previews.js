@@ -135,6 +135,12 @@
     var brand = g('brand', BRAND), ink = g('ink', INK), onDark = g('onDark', '#fff'),
         surface = g('surface', SURFACE), paper = g('paper', PAPER), line = g('line', LINE), highlight = g('highlight', HIGHLIGHT);
     var muted = 'color-mix(in srgb, ' + ink + ' 55%, ' + paper + ')';
+    // Dark-section tokens — derive from brand when unset (mirrors styles.css :root).
+    var dk = g('dark', 'color-mix(in srgb, ' + brand + ' 16%, #0c0e13)'),
+        dkInk = g('darkInk', '#e9ebf1'),
+        dkLine = g('darkLine', 'color-mix(in srgb, ' + dkInk + ' 14%, transparent)');
+    var dkCard = 'color-mix(in srgb, ' + dkInk + ' 7%, ' + dk + ')';
+    var dkMuted = 'color-mix(in srgb, ' + dkInk + ' 56%, ' + dk + ')';
     var swatch = function (name, color) {
       return h('div', { style: { flex: '1 1 0', minWidth: '88px' } },
         h('div', { style: { height: '52px', borderRadius: '10px', background: color, border: '1px solid ' + line } }),
@@ -147,16 +153,23 @@
     return h('div', { style: { background: paper, color: ink, minHeight: '100vh', padding: '32px', fontFamily: SANS, lineHeight: 1.5, boxSizing: 'border-box' } },
       h('span', { style: { fontFamily: MONO, fontSize: '11px', letterSpacing: '.16em', textTransform: 'uppercase', color: brand } }, 'Colour scheme'),
       h('div', { style: { display: 'flex', gap: '12px', margin: '12px 0 34px', flexWrap: 'wrap' } },
-        swatch('Brand', brand), swatch('Text', ink), swatch('On dark', onDark), swatch('Surface', surface), swatch('Paper', paper), swatch('Line', line), swatch('Highlight', highlight)),
+        swatch('Brand', brand), swatch('Text', ink), swatch('On dark', onDark), swatch('Surface', surface), swatch('Paper', paper), swatch('Line', line), swatch('Highlight', highlight), swatch('Dark', dk)),
       h('h1', { style: { fontSize: '2rem', fontWeight: 800, letterSpacing: '-.01em', margin: '0 0 10px' } }, 'Heading on a light surface'),
       h('p', { style: { color: muted, maxWidth: '52ch', margin: '0 0 18px' } }, 'Body text in the normal colour. A ',
         h('a', { style: { color: brand } }, 'link'), ' uses the brand colour, as do bullets and accents.'),
       h('div', { style: { display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap', marginBottom: '30px' } },
         btn('Primary button', brand, onDark), btn('Secondary', paper, ink, '1px solid ' + line), btn('Highlight', highlight, onDark)),
-      h('div', { style: { background: surface, borderRadius: '16px', padding: '28px' } },
+      h('div', { style: { background: surface, borderRadius: '16px', padding: '28px', marginBottom: '24px' } },
         h('span', { style: { fontFamily: MONO, fontSize: '11px', letterSpacing: '.16em', textTransform: 'uppercase', color: brand } }, 'Accent surface'),
         h('h2', { style: { color: brand, fontSize: '1.5rem', fontWeight: 800, margin: '10px 0 8px' } }, 'Heading on the accent surface'),
-        h('p', { style: { color: ink, maxWidth: '48ch', margin: 0 } }, 'Accent sections and the footer use the accent surface.')));
+        h('p', { style: { color: ink, maxWidth: '48ch', margin: 0 } }, 'Accent sections and the footer use the accent surface.')),
+      h('div', { style: { background: dk, color: dkInk, borderRadius: '16px', padding: '28px' } },
+        h('span', { style: { fontFamily: MONO, fontSize: '11px', letterSpacing: '.16em', textTransform: 'uppercase', color: highlight } }, 'Dark section'),
+        h('h2', { style: { color: dkInk, fontSize: '1.5rem', fontWeight: 800, margin: '10px 0 8px' } }, 'Heading on a dark section'),
+        h('p', { style: { color: dkMuted, maxWidth: '48ch', margin: '0 0 18px' } }, 'Any block can switch to the Dark surface — text turns light, cards become raised, accents stay vivid.'),
+        h('div', { style: { display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' } },
+          btn('Primary button', brand, onDark),
+          h('div', { style: { background: dkCard, border: '1px solid ' + dkLine, borderRadius: '10px', padding: '12px 16px', color: dkInk, fontSize: '13px', fontWeight: 600 } }, 'Raised card'))));
   };
 
   // Header & footer: render the REAL components (real logo, nav, CTA, theme) via
