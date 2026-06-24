@@ -7,7 +7,7 @@
 // `?kind=header` / `?kind=footer`: renders the real chrome with the draft nav/footer
 // object injected (the draft is merged over the live collections so partial drafts
 // still render).
-export const prerender = false;
+export const prerender = __STOMME_STATIC__;
 import Base from '../layouts/Base.astro';
 import BlockRenderer from '@gronare/stomme/BlockRenderer.astro';
 import Header from '@gronare/stomme/Header.astro';

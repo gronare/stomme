@@ -9,7 +9,8 @@
     "build": "stomme-gen && astro build",
     "preview": "astro preview",
     "cms:gen": "stomme-gen",
-    "block:new": "stomme-new-block"
+    "block:new": "stomme-new-block",
+    "build:static": "STOMME_STATIC=1 pnpm run build"
   },
   "dependencies": {
     "@astrojs/netlify": "^6.6.5",
