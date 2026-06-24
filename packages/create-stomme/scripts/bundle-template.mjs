@@ -13,7 +13,7 @@ const template = resolve(here, '../template');
 // run it) — shipping them would bake in a stale, engine-version-specific snapshot.
 const SKIP = new Set([
   'node_modules', 'dist', '.astro', '.netlify',
-  'stomme-previews.js', 'stomme-site.css', 'blockkit-previews.js', 'blockkit-site.css',
+  'stomme-previews.js', 'stomme-site.css', 'blockkit-previews.js', 'blockkit-site.css', 'blocks.html',
 ]);
 
 rmSync(template, { recursive: true, force: true });

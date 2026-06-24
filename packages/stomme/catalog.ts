@@ -6,6 +6,9 @@ export const defaultBlocks: BlockDef[] = [
   {
     type: 'hero',
     label: 'Hero',
+    group: 'Hero & headers',
+    summary: 'Full-width intro — eyebrow, H1, text and a button, with optional image, energy-flow or ops panel beside it.',
+    shape: 'hero',
     fields: [
       { name: 'eyebrow', label: 'Eyebrow', widget: 'string', required: false },
       { name: 'heading', label: 'Heading (H1)', widget: 'string' },
@@ -49,6 +52,9 @@ export const defaultBlocks: BlockDef[] = [
   {
     type: 'pageHeader',
     label: 'Page header',
+    group: 'Hero & headers',
+    summary: 'Page title band (light or dark): eyebrow, H1, intro and an optional button.',
+    shape: 'band',
     fields: [
       { name: 'variant', label: 'Style', widget: 'select', required: false, default: 'light', options: [{ label: 'Light', value: 'light' }, { label: 'Dark (band)', value: 'dark' }] },
       widthField,
@@ -63,11 +69,17 @@ export const defaultBlocks: BlockDef[] = [
   {
     type: 'prose',
     label: 'Rich text',
+    group: 'Text',
+    summary: 'A block of rich (markdown) text with an optional heading.',
+    shape: 'prose',
     fields: [{ name: 'heading', label: 'Heading (optional)', widget: 'string', required: false }, { name: 'body', label: 'Body', widget: 'markdown', required: false }, widthField, surfaceField],
   },
   {
     type: 'featureGrid',
     label: 'Feature cards',
+    group: 'Cards & lists',
+    summary: 'Grid of feature cards — icon or number, title and text; cards can link.',
+    shape: 'grid',
     fields: [
       ...headingFields,
       linkedCardListField,
@@ -78,6 +90,9 @@ export const defaultBlocks: BlockDef[] = [
   {
     type: 'serviceGrid',
     label: 'Service cards (from a collection)',
+    group: 'From collections',
+    summary: 'Service cards pulled from your Services collection.',
+    shape: 'grid',
     collection: 'services',
     fields: [
       ...headingFields,
@@ -85,12 +100,15 @@ export const defaultBlocks: BlockDef[] = [
       surfaceField,
     ],
   },
-  { type: 'pillars', label: 'Principles / values', fields: [...headingFields, cardListField, surfaceField] },
-  { type: 'specialistGrid', label: 'Specialist grid', fields: [...headingFields, cardListField, surfaceField] },
-  { type: 'steps', label: 'Process / steps', fields: [...headingFields, cardListField, widthField, surfaceField] },
+  { type: 'pillars', label: 'Principles / values', group: 'Cards & lists', summary: 'Row of principle / value cards (icon, title, text).', shape: 'grid', fields: [...headingFields, cardListField, surfaceField] },
+  { type: 'specialistGrid', label: 'Specialist grid', group: 'Cards & lists', summary: 'Grid of specialist / team profile cards.', shape: 'grid', fields: [...headingFields, cardListField, surfaceField] },
+  { type: 'steps', label: 'Process / steps', group: 'Cards & lists', summary: 'Numbered process — a sequence of steps.', shape: 'steps', fields: [...headingFields, cardListField, widthField, surfaceField] },
   {
     type: 'checklist',
     label: 'Checklist (ticked items)',
+    group: 'Cards & lists',
+    summary: 'Ticked checklist items in one or two columns.',
+    shape: 'checklist',
     fields: [
       ...headingFields,
       { name: 'items', label: 'Items', widget: 'list', required: false, fields: [{ name: 'text', label: 'Text', widget: 'string' }, { name: 'note', label: 'Sub-line (optional)', widget: 'text', required: false }] },
@@ -101,6 +119,9 @@ export const defaultBlocks: BlockDef[] = [
   {
     type: 'gallery',
     label: 'Gallery',
+    group: 'Media',
+    summary: 'Image grid (2–3 columns) with optional captions.',
+    shape: 'gallery',
     fields: [
       ...headingFields,
       { name: 'images', label: 'Images', widget: 'list', required: false, fields: [imageField('image', 'Image'), { name: 'alt', label: 'Alt text', widget: 'string', required: false }, { name: 'caption', label: 'Caption', widget: 'string', required: false }] },
@@ -111,11 +132,17 @@ export const defaultBlocks: BlockDef[] = [
   {
     type: 'beforeAfter',
     label: 'Before / after',
+    group: 'Media',
+    summary: 'A before / after image pair.',
+    shape: 'split',
     fields: [...headingFields, imageField('before', 'Before image'), imageField('after', 'After image'), surfaceField],
   },
   {
     type: 'textImage',
     label: 'Text + image',
+    group: 'Text',
+    summary: 'Text beside an image (image on the left or right).',
+    shape: 'split',
     fields: [
       { name: 'heading', label: 'Heading', widget: 'string', required: false },
       { name: 'body', label: 'Text', widget: 'markdown' },
@@ -128,6 +155,9 @@ export const defaultBlocks: BlockDef[] = [
   {
     type: 'textQuote',
     label: 'Text + quote',
+    group: 'Text',
+    summary: 'Body text paired with a pulled-out quote.',
+    shape: 'split',
     fields: [
       { name: 'body', label: 'Body text', widget: 'markdown' },
       { name: 'quote', label: 'Quote', widget: 'text' },
@@ -139,11 +169,17 @@ export const defaultBlocks: BlockDef[] = [
   {
     type: 'callout',
     label: 'Quote / highlighted statement',
+    group: 'Quote & highlight',
+    summary: 'A single highlighted quote or statement.',
+    shape: 'quote',
     fields: [{ name: 'eyebrow', label: 'Eyebrow', widget: 'string', required: false }, { name: 'quote', label: 'Quote / statement', widget: 'text' }, surfaceField],
   },
   {
     type: 'statPanel',
     label: 'Statement panel (dark, big number)',
+    group: 'Quote & highlight',
+    summary: 'Dark panel with a big number, statement and badges.',
+    shape: 'panel',
     fields: [
       { name: 'eyebrow', label: 'Eyebrow', widget: 'string', required: false },
       { name: 'heading', label: 'Heading', widget: 'string', required: false },
@@ -156,34 +192,52 @@ export const defaultBlocks: BlockDef[] = [
   {
     type: 'testimonials',
     label: 'Testimonials',
+    group: 'From collections',
+    summary: 'Customer testimonials from your Testimonials collection.',
+    shape: 'quote',
     collection: 'testimonials',
     fields: [...headingFieldsWith('Happy customers', 'References'), surfaceField],
   },
   {
     type: 'linkChips',
     label: 'Link chips (from a collection)',
+    group: 'From collections',
+    summary: 'Chip links from your Areas collection (e.g. towns you serve).',
+    shape: 'chips',
     collection: 'towns',
     fields: [...headingFieldsWith('Service areas', 'Where we work'), surfaceField],
   },
   {
     type: 'postList',
     label: 'Blog posts – list',
+    group: 'From collections',
+    summary: 'List of the latest blog posts.',
+    shape: 'list',
     collection: 'posts',
     fields: [...headingFields, surfaceField],
   },
   {
     type: 'ctaPanel',
     label: 'Call to action (band)',
+    group: 'Calls to action',
+    summary: 'Full-width call-to-action band with a button.',
+    shape: 'band',
     fields: [...headingFields, { name: 'label', label: 'Button label', widget: 'string', required: false }, linkField('href', 'Button link')],
   },
   {
     type: 'ctaBox',
     label: 'Call to action (box)',
+    group: 'Calls to action',
+    summary: 'A boxed call-to-action: heading, text and a button.',
+    shape: 'box',
     fields: [{ name: 'eyebrow', label: 'Eyebrow', widget: 'string', required: false }, { name: 'heading', label: 'Heading', widget: 'string' }, { name: 'label', label: 'Button label', widget: 'string' }, linkField('href', 'Button link'), surfaceField],
   },
   {
     type: 'faq',
     label: 'FAQ',
+    group: 'From collections',
+    summary: 'FAQ from your FAQ collection — list, accordion, cards or split layout.',
+    shape: 'list',
     collection: 'faq',
     fields: [
       { name: 'variant', label: 'Layout', widget: 'select', required: false, default: 'list', options: [{ label: 'List', value: 'list' }, { label: 'Accordion', value: 'accordion' }, { label: 'Cards', value: 'cards' }, { label: 'Split (index + reader)', value: 'split' }] },
@@ -198,10 +252,13 @@ export const defaultBlocks: BlockDef[] = [
   {
     type: 'statsBar',
     label: 'Stats / facts',
+    group: 'Numbers',
+    summary: 'A row of stats / facts (label + value).',
+    shape: 'stats',
     fields: [
       { name: 'items', label: 'Facts (optional — defaults to the site’s settings facts)', widget: 'list', required: false, fields: [{ name: 'label', label: 'Label', widget: 'string' }, { name: 'value', label: 'Value', widget: 'string' }] },
     ],
   },
-  { type: 'logoStrip', label: 'Logo / partner strip (auto)', fields: [] },
-  { type: 'contactForm', label: 'Contact form (auto)', fields: [] },
+  { type: 'logoStrip', label: 'Logo / partner strip (auto)', group: 'Automatic', summary: 'Logo / partner strip, filled automatically from settings.', shape: 'auto', fields: [] },
+  { type: 'contactForm', label: 'Contact form (auto)', group: 'Automatic', summary: 'Contact form, rendered automatically.', shape: 'auto', fields: [] },
 ];

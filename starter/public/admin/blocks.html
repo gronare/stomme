@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Block gallery</title>
+<style>
+:root{--paper:#f4f2ec;--card:#fbfaf6;--ink:#1c1916;--muted:#756f66;--rule:#ddd8cd;--red:#a8331f;--line:#c9c3b6;
+--mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;--serif:Georgia,"Times New Roman",serif}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--serif);line-height:1.5;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1000px;margin:0 auto;padding:clamp(20px,5vw,52px) clamp(16px,4vw,40px) 80px}
+header{border-bottom:3px double var(--ink);padding-bottom:16px}
+.kick{font-family:var(--mono);font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;color:var(--red);font-weight:700;margin:0 0 6px}
+h1{font-size:clamp(1.8rem,5vw,2.7rem);margin:0;letter-spacing:-.01em}
+.lede{color:var(--muted);margin:12px 0 0;max-width:60ch}
+.filter{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--rule);border-radius:7px;padding:9px 13px;margin:22px 0 0;max-width:340px}
+.filter input{border:0;background:transparent;font:inherit;font-family:var(--mono);font-size:.85rem;width:100%;outline:none;color:var(--ink)}
+.filter span{font-family:var(--mono);font-size:.78rem;color:var(--muted)}
+.grp{margin-top:38px}.grp.hide{display:none}
+h2{font-family:var(--mono);font-size:.74rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--red);margin:0 0 14px;padding-bottom:8px;border-bottom:1px solid var(--rule)}
+h2 .n{color:var(--muted);font-weight:400;margin-left:.5em}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px}
+.card{display:flex;gap:13px;background:var(--card);border:1px solid var(--rule);border-radius:9px;padding:13px}
+.card.hide{display:none}
+.meta h3{margin:0 0 3px;font-size:1.02rem;line-height:1.2}
+.meta p{margin:0;font-size:.82rem;color:var(--muted);line-height:1.4}
+.coll{display:inline-block;margin-top:6px;font-family:var(--mono);font-size:.62rem;letter-spacing:.04em;color:var(--red)}
+.nores{display:none;color:var(--muted);font-style:italic;padding:24px 0}.nores.show{display:block}
+footer{margin-top:50px;padding-top:14px;border-top:1px solid var(--rule);font-family:var(--mono);font-size:.7rem;color:var(--muted)}
+/* ── wireframe pictograms ── */
+.wf{flex:0 0 auto;width:92px;height:62px;background:#fff;border:1px solid var(--line);border-radius:5px;padding:7px;display:flex;flex-wrap:wrap;gap:3px;align-content:flex-start;overflow:hidden}
+.wf i,.wf b{display:block}
+.wf .ln{height:5px;border-radius:2px;background:var(--line);width:100%}
+.wf .w40{width:40%}.wf .w50{width:50%}.wf .w55{width:55%}.wf .w60{width:60%}.wf .w70{width:70%}.wf .w80{width:80%}.wf .w90{width:90%}.wf .w95{width:95%}.wf .w100{width:100%}
+.wf .ctr{margin:0 auto}
+.wf .col{flex:1;display:flex;flex-direction:column;gap:4px;min-width:0}
+.wf .box{flex:0 0 30px;align-self:stretch;background:var(--line);border-radius:3px;opacity:.7}
+.wf[data-shape=hero],.wf[data-shape=split]{flex-wrap:nowrap;gap:6px;align-content:stretch}
+.wf .bar{width:100%;height:20px;background:var(--line);border-radius:3px}
+.wf .cell{flex:0 0 calc(50% - 2px);height:22px;background:var(--line);border-radius:3px;opacity:.65}
+.wf[data-shape=grid]{align-content:center}
+.wf .img{flex:1;height:30px;background:var(--line);border-radius:3px;opacity:.6}
+.wf[data-shape=gallery]{flex-wrap:nowrap;align-content:center;align-items:center}
+.wf .row{display:flex;align-items:center;gap:5px;width:100%}
+.wf .num{font:700 8px/1 var(--mono);color:#fff;background:var(--red);border-radius:50%;width:12px;height:12px;display:flex;align-items:center;justify-content:center;flex:0 0 12px}
+.wf .tick{font:700 9px/1 var(--mono);color:var(--red);flex:0 0 12px;text-align:center}
+.wf[data-shape=steps],.wf[data-shape=checklist]{flex-direction:column;justify-content:center;gap:7px}
+.wf .qm{font:700 30px/0.7 var(--serif);color:var(--line)}
+.wf[data-shape=quote]{flex-direction:column;justify-content:center}
+.wf .dark{background:var(--ink);border-radius:4px;width:100%;height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:4px}
+.wf .big{font:700 17px/1 var(--mono);color:#fff}.wf .lt{background:#fff;opacity:.5}
+.wf .pill{height:9px;width:26px;background:var(--line);border-radius:9px}
+.wf[data-shape=chips]{align-content:center}
+.wf .lrow{width:100%;height:10px;background:var(--line);border-radius:2px;opacity:.7}
+.wf[data-shape=list]{flex-direction:column;justify-content:center;gap:6px}
+.wf .cbox{border:1.5px solid var(--line);border-radius:4px;width:100%;height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:6px}
+.wf .btn{width:34px;height:9px;background:var(--red);border-radius:3px;opacity:.8}
+.wf[data-shape=stats]{align-items:center;justify-content:space-around}
+.wf .stat{flex:1;text-align:center}.wf .stat b{font:700 13px/1 var(--mono);color:var(--ink)}
+.wf .dash{border:1.5px dashed var(--line);border-radius:4px;width:100%;height:100%;display:flex;align-items:center;justify-content:center;font:600 9px/1 var(--mono);color:var(--muted);letter-spacing:.1em;text-transform:uppercase}
+@media(max-width:480px){.card{flex-direction:column}.wf{width:100%}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+<p class="kick">Block gallery</p>
+<h1>Sections you can add</h1>
+<p class="lede">What each section produces. Keep this open beside /admin while you build a page.</p>
+<label class="filter"><span>filter</span><input id="q" type="text" placeholder="Filter sections…" autocomplete="off" aria-label="Filter"></label>
+</header>
+<div id="list"><section class="grp"><h2>Hero &amp; headers<span class="n">2</span></h2><div class="cards"><article class="card" data-t="hero hero full-width intro — eyebrow, h1, text and a button, with optional image, energy-flow or ops panel beside it.">
+        <div class="wf" data-shape="hero"><i class="col"><i class="ln w70"></i><i class="ln w90"></i><i class="ln w40"></i></i><i class="box"></i></div>
+        <div class="meta"><h3>Hero</h3><p>Full-width intro — eyebrow, H1, text and a button, with optional image, energy-flow or ops panel beside it.</p></div>
+      </article><article class="card" data-t="page header page header page title band (light or dark): eyebrow, h1, intro and an optional button.">
+        <div class="wf" data-shape="band"><i class="bar"></i><i class="ln w50 ctr"></i></div>
+        <div class="meta"><h3>Page header</h3><p>Page title band (light or dark): eyebrow, H1, intro and an optional button.</p></div>
+      </article></div></section><section class="grp"><h2>Text<span class="n">3</span></h2><div class="cards"><article class="card" data-t="rich text rich text a block of rich (markdown) text with an optional heading.">
+        <div class="wf" data-shape="prose"><i class="ln w90"></i><i class="ln w100"></i><i class="ln w80"></i><i class="ln w95"></i></div>
+        <div class="meta"><h3>Rich text</h3><p>A block of rich (markdown) text with an optional heading.</p></div>
+      </article><article class="card" data-t="text + image text + image text beside an image (image on the left or right).">
+        <div class="wf" data-shape="split"><i class="col"><i class="ln w80"></i><i class="ln w90"></i><i class="ln w50"></i></i><i class="box"></i></div>
+        <div class="meta"><h3>Text + image</h3><p>Text beside an image (image on the left or right).</p></div>
+      </article><article class="card" data-t="text + quote text + quote body text paired with a pulled-out quote.">
+        <div class="wf" data-shape="split"><i class="col"><i class="ln w80"></i><i class="ln w90"></i><i class="ln w50"></i></i><i class="box"></i></div>
+        <div class="meta"><h3>Text + quote</h3><p>Body text paired with a pulled-out quote.</p></div>
+      </article></div></section><section class="grp"><h2>Cards &amp; lists<span class="n">5</span></h2><div class="cards"><article class="card" data-t="feature cards feature cards grid of feature cards — icon or number, title and text; cards can link.">
+        <div class="wf" data-shape="grid"><i class="cell"></i><i class="cell"></i><i class="cell"></i><i class="cell"></i></div>
+        <div class="meta"><h3>Feature cards</h3><p>Grid of feature cards — icon or number, title and text; cards can link.</p></div>
+      </article><article class="card" data-t="principles / values principles / values row of principle / value cards (icon, title, text).">
+        <div class="wf" data-shape="grid"><i class="cell"></i><i class="cell"></i><i class="cell"></i><i class="cell"></i></div>
+        <div class="meta"><h3>Principles / values</h3><p>Row of principle / value cards (icon, title, text).</p></div>
+      </article><article class="card" data-t="specialist grid specialist grid grid of specialist / team profile cards.">
+        <div class="wf" data-shape="grid"><i class="cell"></i><i class="cell"></i><i class="cell"></i><i class="cell"></i></div>
+        <div class="meta"><h3>Specialist grid</h3><p>Grid of specialist / team profile cards.</p></div>
+      </article><article class="card" data-t="process / steps process / steps numbered process — a sequence of steps.">
+        <div class="wf" data-shape="steps"><i class="row"><b class="num">1</b><i class="ln w70"></i></i><i class="row"><b class="num">2</b><i class="ln w55"></i></i></div>
+        <div class="meta"><h3>Process / steps</h3><p>Numbered process — a sequence of steps.</p></div>
+      </article><article class="card" data-t="checklist (ticked items) checklist (ticked items) ticked checklist items in one or two columns.">
+        <div class="wf" data-shape="checklist"><i class="row"><b class="tick">✓</b><i class="ln w70"></i></i><i class="row"><b class="tick">✓</b><i class="ln w55"></i></i></div>
+        <div class="meta"><h3>Checklist (ticked items)</h3><p>Ticked checklist items in one or two columns.</p></div>
+      </article></div></section><section class="grp"><h2>Media<span class="n">2</span></h2><div class="cards"><article class="card" data-t="gallery gallery image grid (2–3 columns) with optional captions.">
+        <div class="wf" data-shape="gallery"><i class="img"></i><i class="img"></i><i class="img"></i></div>
+        <div class="meta"><h3>Gallery</h3><p>Image grid (2–3 columns) with optional captions.</p></div>
+      </article><article class="card" data-t="before / after before / after a before / after image pair.">
+        <div class="wf" data-shape="split"><i class="col"><i class="ln w80"></i><i class="ln w90"></i><i class="ln w50"></i></i><i class="box"></i></div>
+        <div class="meta"><h3>Before / after</h3><p>A before / after image pair.</p></div>
+      </article></div></section><section class="grp"><h2>Quote &amp; highlight<span class="n">2</span></h2><div class="cards"><article class="card" data-t="quote / highlighted statement quote / highlighted statement a single highlighted quote or statement.">
+        <div class="wf" data-shape="quote"><b class="qm">&rdquo;</b><i class="ln w80"></i><i class="ln w55"></i></div>
+        <div class="meta"><h3>Quote / highlighted statement</h3><p>A single highlighted quote or statement.</p></div>
+      </article><article class="card" data-t="statement panel (dark, big number) statement panel (dark, big number) dark panel with a big number, statement and badges.">
+        <div class="wf" data-shape="panel"><i class="dark"><b class="big">42</b><i class="ln w50 lt"></i></i></div>
+        <div class="meta"><h3>Statement panel (dark, big number)</h3><p>Dark panel with a big number, statement and badges.</p></div>
+      </article></div></section><section class="grp"><h2>Numbers<span class="n">1</span></h2><div class="cards"><article class="card" data-t="stats / facts stats / facts a row of stats / facts (label + value).">
+        <div class="wf" data-shape="stats"><i class="stat"><b>12</b></i><i class="stat"><b>98%</b></i><i class="stat"><b>4.9</b></i></div>
+        <div class="meta"><h3>Stats / facts</h3><p>A row of stats / facts (label + value).</p></div>
+      </article></div></section><section class="grp"><h2>From collections<span class="n">1</span></h2><div class="cards"><article class="card" data-t="faq faq faq from your faq collection — list, accordion, cards or split layout.">
+        <div class="wf" data-shape="list"><i class="lrow"></i><i class="lrow"></i><i class="lrow"></i></div>
+        <div class="meta"><h3>FAQ</h3><p>FAQ from your FAQ collection — list, accordion, cards or split layout.</p><span class="coll" title="Reads from a collection">▢ Reads from a collection</span></div>
+      </article></div></section><section class="grp"><h2>Calls to action<span class="n">2</span></h2><div class="cards"><article class="card" data-t="call to action (band) call to action (band) full-width call-to-action band with a button.">
+        <div class="wf" data-shape="band"><i class="bar"></i><i class="ln w50 ctr"></i></div>
+        <div class="meta"><h3>Call to action (band)</h3><p>Full-width call-to-action band with a button.</p></div>
+      </article><article class="card" data-t="call to action (box) call to action (box) a boxed call-to-action: heading, text and a button.">
+        <div class="wf" data-shape="box"><i class="cbox"><i class="ln w60 ctr"></i><i class="btn"></i></i></div>
+        <div class="meta"><h3>Call to action (box)</h3><p>A boxed call-to-action: heading, text and a button.</p></div>
+      </article></div></section><section class="grp"><h2>Automatic<span class="n">2</span></h2><div class="cards"><article class="card" data-t="logo / partner strip (auto) logo / partner strip (auto) logo / partner strip, filled automatically from settings.">
+        <div class="wf" data-shape="auto"><i class="dash">auto</i></div>
+        <div class="meta"><h3>Logo / partner strip (auto)</h3><p>Logo / partner strip, filled automatically from settings.</p></div>
+      </article><article class="card" data-t="contact form (auto) contact form (auto) contact form, rendered automatically.">
+        <div class="wf" data-shape="auto"><i class="dash">auto</i></div>
+        <div class="meta"><h3>Contact form (auto)</h3><p>Contact form, rendered automatically.</p></div>
+      </article></div></section></div>
+<p class="nores" id="nores">No matches.</p>
+<footer>@gronare/stomme · generated by stomme-gen from the block catalog</footer>
+</div>
+<script>
+const q=document.getElementById('q'),nores=document.getElementById('nores'),list=document.getElementById('list');
+q.addEventListener('input',()=>{const t=q.value.trim().toLowerCase();let shown=0;
+for(const sec of list.children){let vis=0;
+for(const c of sec.querySelectorAll('.card')){const m=!t||c.dataset.t.includes(t);c.classList.toggle('hide',!m);if(m){vis++;shown++}}
+sec.classList.toggle('hide',vis===0)}
+nores.classList.toggle('show',shown===0)});
+</script>
+</body>
+</html>

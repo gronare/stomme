@@ -33,7 +33,7 @@ export default {
   'Heading (H1)': 'Rubrik (H1)',
   'Heading (optional)': 'Rubrik (valfritt)',
   'Sub-line (optional)': 'Underrad (valfritt)',
-  'Eyebrow': 'Överrubrik',
+  'Eyebrow': 'Dårrad',
   'Intro': 'Ingress',
   'Body': 'Brödtext',
   'Body text': 'Brödtext',
@@ -151,6 +151,21 @@ export default {
 
   // ── label_singular ──
   'Section': 'Sektion',
+
+  // ── block gallery: group names + page chrome ──
+  'Hero & headers': 'Hero & sidhuvuden',
+  'Cards & lists': 'Kort & listor',
+  'Quote & highlight': 'Citat & framhävning',
+  'Numbers': 'Siffror',
+  'From collections': 'Från samlingar',
+  'Calls to action': 'Uppmaningar',
+  'Automatic': 'Automatiska',
+  'Block gallery': 'Blockgalleri',
+  'Sections you can add': 'Sektioner du kan lägga till',
+  'What each section produces. Keep this open beside /admin while you build a page.': 'Vad varje sektion ger. Ha den öppen bredvid /admin medan du bygger en sida.',
+  'Filter sections…': 'Filtrera sektioner…',
+  'No matches.': 'Inga träffar.',
+  'Reads from a collection': 'Läser från en samling',
 
   // ── hints ──
   '1 or 2.': '1 eller 2.',

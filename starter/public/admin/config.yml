@@ -168,6 +168,43 @@ collections:
                       - { label: "Standard (white)", value: "standard" }
                       - { label: "Tinted", value: "tint" }
                       - { label: "Accent band", value: "band" }
+              - name: textImage
+                label: "Text + image"
+                widget: object
+                fields:
+                  - { name: heading, label: "Heading", widget: string, required: false }
+                  - { name: body, label: "Text", widget: markdown }
+                  - { name: image, label: "Image", widget: image, required: false }
+                  - { name: imageAlt, label: "Alt text", widget: string, required: false }
+                  - { name: flip, label: "Image on left", widget: boolean, required: false, default: false }
+                  - name: surface
+                    label: "Background"
+                    widget: select
+                    required: false
+                    default: "standard"
+                    hint: "The surface behind the section — for rhythm between blocks."
+                    options:
+                      - { label: "Standard (white)", value: "standard" }
+                      - { label: "Tinted", value: "tint" }
+                      - { label: "Accent band", value: "band" }
+              - name: textQuote
+                label: "Text + quote"
+                widget: object
+                fields:
+                  - { name: body, label: "Body text", widget: markdown }
+                  - { name: quote, label: "Quote", widget: text }
+                  - { name: attribution, label: "Source / name", widget: string, required: false }
+                  - { name: flip, label: "Quote on left", widget: boolean, required: false, default: false }
+                  - name: surface
+                    label: "Background"
+                    widget: select
+                    required: false
+                    default: "standard"
+                    hint: "The surface behind the section — for rhythm between blocks."
+                    options:
+                      - { label: "Standard (white)", value: "standard" }
+                      - { label: "Tinted", value: "tint" }
+                      - { label: "Accent band", value: "band" }
               - name: featureGrid
                 label: "Feature cards"
                 widget: object
@@ -378,43 +415,6 @@ collections:
                       - { label: "Standard (white)", value: "standard" }
                       - { label: "Tinted", value: "tint" }
                       - { label: "Accent band", value: "band" }
-              - name: textImage
-                label: "Text + image"
-                widget: object
-                fields:
-                  - { name: heading, label: "Heading", widget: string, required: false }
-                  - { name: body, label: "Text", widget: markdown }
-                  - { name: image, label: "Image", widget: image, required: false }
-                  - { name: imageAlt, label: "Alt text", widget: string, required: false }
-                  - { name: flip, label: "Image on left", widget: boolean, required: false, default: false }
-                  - name: surface
-                    label: "Background"
-                    widget: select
-                    required: false
-                    default: "standard"
-                    hint: "The surface behind the section — for rhythm between blocks."
-                    options:
-                      - { label: "Standard (white)", value: "standard" }
-                      - { label: "Tinted", value: "tint" }
-                      - { label: "Accent band", value: "band" }
-              - name: textQuote
-                label: "Text + quote"
-                widget: object
-                fields:
-                  - { name: body, label: "Body text", widget: markdown }
-                  - { name: quote, label: "Quote", widget: text }
-                  - { name: attribution, label: "Source / name", widget: string, required: false }
-                  - { name: flip, label: "Quote on left", widget: boolean, required: false, default: false }
-                  - name: surface
-                    label: "Background"
-                    widget: select
-                    required: false
-                    default: "standard"
-                    hint: "The surface behind the section — for rhythm between blocks."
-                    options:
-                      - { label: "Standard (white)", value: "standard" }
-                      - { label: "Tinted", value: "tint" }
-                      - { label: "Accent band", value: "band" }
               - name: callout
                 label: "Quote / highlighted statement"
                 widget: object
@@ -445,6 +445,61 @@ collections:
                     field: { name: badge, label: "Badge", widget: string }
                   - { name: statValue, label: "Big number", widget: string, required: false }
                   - { name: statLabel, label: "Number label", widget: string, required: false }
+              - name: statsBar
+                label: "Stats / facts"
+                widget: object
+                fields:
+                  - name: items
+                    label: "Facts (optional — defaults to the site’s settings facts)"
+                    widget: list
+                    required: false
+                    fields:
+                      - { name: label, label: "Label", widget: string }
+                      - { name: value, label: "Value", widget: string }
+              - name: faq
+                label: "FAQ"
+                widget: object
+                fields:
+                  - name: variant
+                    label: "Layout"
+                    widget: select
+                    required: false
+                    default: "list"
+                    options:
+                      - { label: "List", value: "list" }
+                      - { label: "Accordion", value: "accordion" }
+                      - { label: "Cards", value: "cards" }
+                      - { label: "Split (index + reader)", value: "split" }
+                  - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
+                  - { name: heading, label: "Heading", widget: string, required: false }
+                  - { name: intro, label: "Intro", widget: text, required: false }
+                  - { name: asideHeading, label: "Aside · heading", widget: string, required: false, default: "Still have questions?" }
+                  - { name: asideBody, label: "Aside · text", widget: text, required: false, default: "Get in touch and we'll help you out." }
+                  - { name: asideCtaLabel, label: "Aside · button label", widget: string, required: false, default: "Contact" }
+                  - name: asideHref
+                    label: "Aside · button link"
+                    widget: object
+                    required: false
+                    fields:
+                      - name: page
+                        label: "Page"
+                        widget: select
+                        required: false
+                        hint: "Pick a page on the site."
+                        options:
+                          - { label: "Startsida (/)", value: "/" }
+                          - { label: "About (/about)", value: "/about" }
+                      - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
+                  - name: surface
+                    label: "Background"
+                    widget: select
+                    required: false
+                    default: "standard"
+                    hint: "The surface behind the section — for rhythm between blocks."
+                    options:
+                      - { label: "Standard (white)", value: "standard" }
+                      - { label: "Tinted", value: "tint" }
+                      - { label: "Accent band", value: "band" }
               - name: ctaPanel
                 label: "Call to action (band)"
                 widget: object
@@ -498,61 +553,6 @@ collections:
                       - { label: "Standard (white)", value: "standard" }
                       - { label: "Tinted", value: "tint" }
                       - { label: "Accent band", value: "band" }
-              - name: faq
-                label: "FAQ"
-                widget: object
-                fields:
-                  - name: variant
-                    label: "Layout"
-                    widget: select
-                    required: false
-                    default: "list"
-                    options:
-                      - { label: "List", value: "list" }
-                      - { label: "Accordion", value: "accordion" }
-                      - { label: "Cards", value: "cards" }
-                      - { label: "Split (index + reader)", value: "split" }
-                  - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
-                  - { name: heading, label: "Heading", widget: string, required: false }
-                  - { name: intro, label: "Intro", widget: text, required: false }
-                  - { name: asideHeading, label: "Aside · heading", widget: string, required: false, default: "Still have questions?" }
-                  - { name: asideBody, label: "Aside · text", widget: text, required: false, default: "Get in touch and we'll help you out." }
-                  - { name: asideCtaLabel, label: "Aside · button label", widget: string, required: false, default: "Contact" }
-                  - name: asideHref
-                    label: "Aside · button link"
-                    widget: object
-                    required: false
-                    fields:
-                      - name: page
-                        label: "Page"
-                        widget: select
-                        required: false
-                        hint: "Pick a page on the site."
-                        options:
-                          - { label: "Startsida (/)", value: "/" }
-                          - { label: "About (/about)", value: "/about" }
-                      - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
-                  - name: surface
-                    label: "Background"
-                    widget: select
-                    required: false
-                    default: "standard"
-                    hint: "The surface behind the section — for rhythm between blocks."
-                    options:
-                      - { label: "Standard (white)", value: "standard" }
-                      - { label: "Tinted", value: "tint" }
-                      - { label: "Accent band", value: "band" }
-              - name: statsBar
-                label: "Stats / facts"
-                widget: object
-                fields:
-                  - name: items
-                    label: "Facts (optional — defaults to the site’s settings facts)"
-                    widget: list
-                    required: false
-                    fields:
-                      - { name: label, label: "Label", widget: string }
-                      - { name: value, label: "Value", widget: string }
               - name: logoStrip
                 label: "Logo / partner strip (auto)"
                 widget: object
@@ -717,6 +717,43 @@ collections:
                 options:
                   - { label: "Narrow (reading column)", value: "narrow" }
                   - { label: "Full width", value: "full" }
+              - name: surface
+                label: "Background"
+                widget: select
+                required: false
+                default: "standard"
+                hint: "The surface behind the section — for rhythm between blocks."
+                options:
+                  - { label: "Standard (white)", value: "standard" }
+                  - { label: "Tinted", value: "tint" }
+                  - { label: "Accent band", value: "band" }
+          - name: textImage
+            label: "Text + image"
+            widget: object
+            fields:
+              - { name: heading, label: "Heading", widget: string, required: false }
+              - { name: body, label: "Text", widget: markdown }
+              - { name: image, label: "Image", widget: image, required: false }
+              - { name: imageAlt, label: "Alt text", widget: string, required: false }
+              - { name: flip, label: "Image on left", widget: boolean, required: false, default: false }
+              - name: surface
+                label: "Background"
+                widget: select
+                required: false
+                default: "standard"
+                hint: "The surface behind the section — for rhythm between blocks."
+                options:
+                  - { label: "Standard (white)", value: "standard" }
+                  - { label: "Tinted", value: "tint" }
+                  - { label: "Accent band", value: "band" }
+          - name: textQuote
+            label: "Text + quote"
+            widget: object
+            fields:
+              - { name: body, label: "Body text", widget: markdown }
+              - { name: quote, label: "Quote", widget: text }
+              - { name: attribution, label: "Source / name", widget: string, required: false }
+              - { name: flip, label: "Quote on left", widget: boolean, required: false, default: false }
               - name: surface
                 label: "Background"
                 widget: select
@@ -937,43 +974,6 @@ collections:
                   - { label: "Standard (white)", value: "standard" }
                   - { label: "Tinted", value: "tint" }
                   - { label: "Accent band", value: "band" }
-          - name: textImage
-            label: "Text + image"
-            widget: object
-            fields:
-              - { name: heading, label: "Heading", widget: string, required: false }
-              - { name: body, label: "Text", widget: markdown }
-              - { name: image, label: "Image", widget: image, required: false }
-              - { name: imageAlt, label: "Alt text", widget: string, required: false }
-              - { name: flip, label: "Image on left", widget: boolean, required: false, default: false }
-              - name: surface
-                label: "Background"
-                widget: select
-                required: false
-                default: "standard"
-                hint: "The surface behind the section — for rhythm between blocks."
-                options:
-                  - { label: "Standard (white)", value: "standard" }
-                  - { label: "Tinted", value: "tint" }
-                  - { label: "Accent band", value: "band" }
-          - name: textQuote
-            label: "Text + quote"
-            widget: object
-            fields:
-              - { name: body, label: "Body text", widget: markdown }
-              - { name: quote, label: "Quote", widget: text }
-              - { name: attribution, label: "Source / name", widget: string, required: false }
-              - { name: flip, label: "Quote on left", widget: boolean, required: false, default: false }
-              - name: surface
-                label: "Background"
-                widget: select
-                required: false
-                default: "standard"
-                hint: "The surface behind the section — for rhythm between blocks."
-                options:
-                  - { label: "Standard (white)", value: "standard" }
-                  - { label: "Tinted", value: "tint" }
-                  - { label: "Accent band", value: "band" }
           - name: callout
             label: "Quote / highlighted statement"
             widget: object
@@ -1004,6 +1004,61 @@ collections:
                 field: { name: badge, label: "Badge", widget: string }
               - { name: statValue, label: "Big number", widget: string, required: false }
               - { name: statLabel, label: "Number label", widget: string, required: false }
+          - name: statsBar
+            label: "Stats / facts"
+            widget: object
+            fields:
+              - name: items
+                label: "Facts (optional — defaults to the site’s settings facts)"
+                widget: list
+                required: false
+                fields:
+                  - { name: label, label: "Label", widget: string }
+                  - { name: value, label: "Value", widget: string }
+          - name: faq
+            label: "FAQ"
+            widget: object
+            fields:
+              - name: variant
+                label: "Layout"
+                widget: select
+                required: false
+                default: "list"
+                options:
+                  - { label: "List", value: "list" }
+                  - { label: "Accordion", value: "accordion" }
+                  - { label: "Cards", value: "cards" }
+                  - { label: "Split (index + reader)", value: "split" }
+              - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
+              - { name: heading, label: "Heading", widget: string, required: false }
+              - { name: intro, label: "Intro", widget: text, required: false }
+              - { name: asideHeading, label: "Aside · heading", widget: string, required: false, default: "Still have questions?" }
+              - { name: asideBody, label: "Aside · text", widget: text, required: false, default: "Get in touch and we'll help you out." }
+              - { name: asideCtaLabel, label: "Aside · button label", widget: string, required: false, default: "Contact" }
+              - name: asideHref
+                label: "Aside · button link"
+                widget: object
+                required: false
+                fields:
+                  - name: page
+                    label: "Page"
+                    widget: select
+                    required: false
+                    hint: "Pick a page on the site."
+                    options:
+                      - { label: "Startsida (/)", value: "/" }
+                      - { label: "About (/about)", value: "/about" }
+                  - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
+              - name: surface
+                label: "Background"
+                widget: select
+                required: false
+                default: "standard"
+                hint: "The surface behind the section — for rhythm between blocks."
+                options:
+                  - { label: "Standard (white)", value: "standard" }
+                  - { label: "Tinted", value: "tint" }
+                  - { label: "Accent band", value: "band" }
           - name: ctaPanel
             label: "Call to action (band)"
             widget: object
@@ -1057,61 +1112,6 @@ collections:
                   - { label: "Standard (white)", value: "standard" }
                   - { label: "Tinted", value: "tint" }
                   - { label: "Accent band", value: "band" }
-          - name: faq
-            label: "FAQ"
-            widget: object
-            fields:
-              - name: variant
-                label: "Layout"
-                widget: select
-                required: false
-                default: "list"
-                options:
-                  - { label: "List", value: "list" }
-                  - { label: "Accordion", value: "accordion" }
-                  - { label: "Cards", value: "cards" }
-                  - { label: "Split (index + reader)", value: "split" }
-              - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
-              - { name: heading, label: "Heading", widget: string, required: false }
-              - { name: intro, label: "Intro", widget: text, required: false }
-              - { name: asideHeading, label: "Aside · heading", widget: string, required: false, default: "Still have questions?" }
-              - { name: asideBody, label: "Aside · text", widget: text, required: false, default: "Get in touch and we'll help you out." }
-              - { name: asideCtaLabel, label: "Aside · button label", widget: string, required: false, default: "Contact" }
-              - name: asideHref
-                label: "Aside · button link"
-                widget: object
-                required: false
-                fields:
-                  - name: page
-                    label: "Page"
-                    widget: select
-                    required: false
-                    hint: "Pick a page on the site."
-                    options:
-                      - { label: "Startsida (/)", value: "/" }
-                      - { label: "About (/about)", value: "/about" }
-                  - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
-              - name: surface
-                label: "Background"
-                widget: select
-                required: false
-                default: "standard"
-                hint: "The surface behind the section — for rhythm between blocks."
-                options:
-                  - { label: "Standard (white)", value: "standard" }
-                  - { label: "Tinted", value: "tint" }
-                  - { label: "Accent band", value: "band" }
-          - name: statsBar
-            label: "Stats / facts"
-            widget: object
-            fields:
-              - name: items
-                label: "Facts (optional — defaults to the site’s settings facts)"
-                widget: list
-                required: false
-                fields:
-                  - { name: label, label: "Label", widget: string }
-                  - { name: value, label: "Value", widget: string }
           - name: logoStrip
             label: "Logo / partner strip (auto)"
             widget: object

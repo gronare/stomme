@@ -39,6 +39,12 @@ export type BlockDef = {
   // that collection isn't present (no `src/content/<name>/`). Settings-backed
   // blocks don't set this — settings always exists.
   collection?: string;
+  // Picker/gallery metadata (optional): `group` clusters the block in the "add section"
+  // ordering and the generated block gallery; `summary` is a one-line "what it produces";
+  // `shape` keys a crude wireframe pictogram in the gallery. Purely editorial aids.
+  group?: string;
+  summary?: string;
+  shape?: string;
 };
 
 // A link: pick a page from the dropdown OR type a custom URL (external / tel: /

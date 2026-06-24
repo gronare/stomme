@@ -13,6 +13,7 @@ import { readFileSync, writeFileSync, readdirSync, copyFileSync, mkdirSync } fro
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createJiti } from 'jiti';
+import { renderGallery } from '../admin/blocks-gallery.mjs';
 
 const root = process.cwd();
 const here = dirname(fileURLToPath(import.meta.url));
@@ -160,6 +161,12 @@ function collectionEnabled(name) {
 }
 const AVAILABLE_BLOCKS = BLOCKS.filter((b) => !b.collection || collectionEnabled(b.collection));
 const SKIPPED_BLOCKS = BLOCKS.filter((b) => b.collection && !collectionEnabled(b.collection));
+
+// Cluster the "add section" picker (and the gallery) by group. Sort is stable, so blocks
+// keep their catalog order within a group; unknown/missing groups fall to the end.
+const GROUP_ORDER = ['Hero & headers', 'Text', 'Cards & lists', 'Media', 'Quote & highlight', 'Numbers', 'From collections', 'Calls to action', 'Automatic'];
+const groupRank = (b) => { const i = GROUP_ORDER.indexOf(b.group); return i === -1 ? GROUP_ORDER.length : i; };
+AVAILABLE_BLOCKS.sort((a, b) => groupRank(a) - groupRank(b));
 
 // Emit a single field. Leaf widgets use flow style; list/object widgets expand.
 function emitField(f, indent) {
@@ -416,6 +423,16 @@ try {
   writeFileSync(resolve(root, 'public/admin/stomme-site.css'), siteCss);
 } catch (e) {
   console.warn('  (stomme-site.css skipped:', e.message + ')');
+}
+
+// Generate the block gallery reference (public/admin/blocks.html) from the catalog, so an
+// editor can see what each section produces — Decap's own picker can't show pictograms.
+try {
+  const t = (s) => (FORWARD && FORWARD[s] !== undefined ? FORWARD[s] : s);
+  const html = renderGallery(AVAILABLE_BLOCKS, { t, groupOrder: GROUP_ORDER, locale: CMS_LOCALE });
+  writeFileSync(resolve(root, 'public/admin/blocks.html'), html);
+} catch (e) {
+  console.warn('  (blocks.html skipped:', e.message + ')');
 }
 
 console.log(`✓ stomme-gen: ${Object.entries(counts).map(([k, v]) => `${k}×${v}`).join(', ')} · ${AVAILABLE_BLOCKS.length} block types · ${PAGE_OPTIONS.length} link options`);
