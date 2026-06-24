@@ -130,6 +130,28 @@ export default {
   'Text on brand': 'Text på varumärke',
   'Background': 'Bakgrund',
 
+  // ── cover block (full-bleed photo / video) ──
+  'Cover (full-bleed)': 'Helbild (full bredd)',
+  'Full-bleed banner — a background photo or muted looping video, with overlaid heading, text and buttons.': 'Helbildsbanner — ett bakgrundsfoto eller en tyst loopad video, med rubrik, text och knappar ovanpå.',
+  'Second button label': 'Andra knappens text',
+  'Second button link': 'Andra knappens länk',
+  'Video (looping)': 'Video (loopad)',
+  'A still photo, or a muted looping video.': 'Ett stillbildsfoto, eller en tyst loopad video.',
+  'Background image / video poster': 'Bakgrundsbild / videoposter',
+  'Video file (if “Video”)': 'Videofil (om ”Video”)',
+  'Uploaded MP4/WebM — muted + looping. The image shows until it plays, and on reduced-motion.': 'Uppladdad MP4/WebM — tyst + loopad. Bilden visas tills den spelas, och vid reducerad rörelse.',
+  '…or video URL': '…eller video-URL',
+  'External MP4/WebM URL. Used instead of an uploaded file if filled.': 'Extern MP4/WebM-URL. Används istället för uppladdad fil om ifylld.',
+  'Darken (overlay)': 'Mörkning (overlay)',
+  'Medium': 'Mellan',
+  'Strong': 'Stark',
+  'How much to darken the media so the text stays readable.': 'Hur mycket mediet mörkas så att texten förblir läsbar.',
+  'Text position': 'Textposition',
+  'Bottom left': 'Nere till vänster',
+  'Centered': 'Centrerad',
+  'Height': 'Höjd',
+  'Tall': 'Hög',
+
   // ── hero "energy flow" variant ──
   'Energy flow': 'Energiflöde',
   'Flow · chip label (if “Energy flow”)': 'Flöde · chip-etikett (om ”Energiflöde”)',

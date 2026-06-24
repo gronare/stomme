@@ -3,6 +3,7 @@
 // default registry maps the standard types to the library components. Add or
 // override with the optional `registry` prop (your custom blocks win on key clash).
 import Hero from '../blocks/Hero.astro';
+import CoverHero from '../blocks/CoverHero.astro';
 import PageHeader from '../blocks/PageHeader.astro';
 import Prose from '../blocks/Prose.astro';
 import FeatureGrid from '../blocks/FeatureGrid.astro';
@@ -31,6 +32,7 @@ import { resolveSite, type SiteConfig } from './config';
 
 const defaults: Record<string, any> = {
   hero: Hero,
+  cover: CoverHero,
   pageHeader: PageHeader,
   prose: Prose,
   featureGrid: FeatureGrid,

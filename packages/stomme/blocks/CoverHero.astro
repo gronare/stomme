@@ -1,0 +1,75 @@
+---
+import { getEntry } from 'astro:content';
+import { resolveLink } from '../src/href';
+import Cover from '../src/Cover.astro';
+
+// Full-bleed cover banner — a background photo or a muted looping video with
+// overlaid heading, intro and up to two buttons. The image always renders
+// behind the video, so it doubles as the poster / reduced-motion fallback
+// (the video is hidden under prefers-reduced-motion). Generic by design — no
+// domain-specific media, unlike the hero's flow/ops panels.
+interface Props {
+  eyebrow?: string;
+  heading: string;
+  intro?: string;
+  ctaLabel?: string;
+  ctaHref?: unknown;
+  cta2Label?: string;
+  cta2Href?: unknown;
+  media?: 'image' | 'video';
+  image?: string;
+  imageAlt?: string;
+  video?: string;
+  videoUrl?: string;
+  overlay?: 'light' | 'medium' | 'strong';
+  align?: 'start' | 'center';
+  height?: 'tall' | 'medium';
+}
+const {
+  eyebrow, heading, intro, ctaLabel, ctaHref, cta2Label, cta2Href,
+  media = 'image', image, imageAlt, video, videoUrl,
+  overlay = 'medium', align = 'start', height = 'tall',
+} = Astro.props;
+
+const href = resolveLink(ctaHref, '/');
+const href2 = resolveLink(cta2Href, '/');
+
+// Resolve an uploaded video to a served URL (Vite hashes it); external URLs win.
+const videoFiles = import.meta.glob('/src/assets/uploads/**/*.{mp4,webm,mov}', {
+  query: '?url', import: 'default', eager: true,
+});
+const videoSrc =
+  media === 'video'
+    ? (videoUrl || (video && (videoFiles as Record<string, string>)[video]) || video || undefined)
+    : undefined;
+---
+<section class:list={['cover', `cover--${align}`, `cover--h-${height}`, `cover--ov-${overlay}`]}>
+  <div class="cover__media">
+    <Cover
+      src={image}
+      alt={imageAlt ?? heading}
+      placeholder="/images/placeholder.svg"
+      width={1600}
+      height={900}
+      loading="eager"
+      class="cover__img"
+    />
+    {videoSrc && (
+      <video class="cover__video" autoplay muted loop playsinline preload="metadata" aria-hidden="true">
+        <source src={videoSrc} />
+      </video>
+    )}
+  </div>
+  <div class="cover__scrim" aria-hidden="true"></div>
+  <div class="cover__inner">
+    {eyebrow && <span class="cover__eyebrow">{eyebrow}</span>}
+    <h1 class="cover__h1">{heading}</h1>
+    {intro && <p class="cover__intro">{intro}</p>}
+    {(ctaLabel || cta2Label) && (
+      <div class="cover__cta">
+        {ctaLabel && <a href={href} class="btn">{ctaLabel}</a>}
+        {cta2Label && <a href={href2} class="btn cover__btn-ghost">{cta2Label}</a>}
+      </div>
+    )}
+  </div>
+</section>

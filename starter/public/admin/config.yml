@@ -105,6 +105,82 @@ collections:
                       - { label: "Tinted", value: "tint" }
                       - { label: "Accent band", value: "band" }
                       - { label: "Dark", value: "dark" }
+              - name: cover
+                label: "Cover (full-bleed)"
+                widget: object
+                fields:
+                  - { name: eyebrow, label: "Eyebrow", widget: string, required: false }
+                  - { name: heading, label: "Heading (H1)", widget: string }
+                  - { name: intro, label: "Intro", widget: text, required: false }
+                  - { name: ctaLabel, label: "Button label", widget: string, required: false }
+                  - name: ctaHref
+                    label: "Button link"
+                    widget: object
+                    required: false
+                    fields:
+                      - name: page
+                        label: "Page"
+                        widget: select
+                        required: false
+                        hint: "Pick a page on the site."
+                        options:
+                          - { label: "Startsida (/)", value: "/" }
+                          - { label: "About (/about)", value: "/about" }
+                      - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
+                  - { name: cta2Label, label: "Second button label", widget: string, required: false }
+                  - name: cta2Href
+                    label: "Second button link"
+                    widget: object
+                    required: false
+                    fields:
+                      - name: page
+                        label: "Page"
+                        widget: select
+                        required: false
+                        hint: "Pick a page on the site."
+                        options:
+                          - { label: "Startsida (/)", value: "/" }
+                          - { label: "About (/about)", value: "/about" }
+                      - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
+                  - name: media
+                    label: "Background"
+                    widget: select
+                    required: false
+                    default: "image"
+                    hint: "A still photo, or a muted looping video."
+                    options:
+                      - { label: "Image", value: "image" }
+                      - { label: "Video (looping)", value: "video" }
+                  - { name: image, label: "Background image / video poster", widget: image, required: false }
+                  - { name: imageAlt, label: "Image alt text", widget: string, required: false }
+                  - { name: video, label: "Video file (if “Video”)", widget: file, required: false, hint: "Uploaded MP4/WebM — muted + looping. The image shows until it plays, and on reduced-motion." }
+                  - { name: videoUrl, label: "…or video URL", widget: string, required: false, hint: "External MP4/WebM URL. Used instead of an uploaded file if filled." }
+                  - name: overlay
+                    label: "Darken (overlay)"
+                    widget: select
+                    required: false
+                    default: "medium"
+                    hint: "How much to darken the media so the text stays readable."
+                    options:
+                      - { label: "Light", value: "light" }
+                      - { label: "Medium", value: "medium" }
+                      - { label: "Strong", value: "strong" }
+                  - name: align
+                    label: "Text position"
+                    widget: select
+                    required: false
+                    default: "start"
+                    options:
+                      - { label: "Bottom left", value: "start" }
+                      - { label: "Centered", value: "center" }
+                  - name: height
+                    label: "Height"
+                    widget: select
+                    required: false
+                    default: "tall"
+                    options:
+                      - { label: "Tall", value: "tall" }
+                      - { label: "Medium", value: "medium" }
               - name: pageHeader
                 label: "Page header"
                 widget: object
@@ -689,6 +765,82 @@ collections:
                   - { label: "Tinted", value: "tint" }
                   - { label: "Accent band", value: "band" }
                   - { label: "Dark", value: "dark" }
+          - name: cover
+            label: "Cover (full-bleed)"
+            widget: object
+            fields:
+              - { name: eyebrow, label: "Eyebrow", widget: string, required: false }
+              - { name: heading, label: "Heading (H1)", widget: string }
+              - { name: intro, label: "Intro", widget: text, required: false }
+              - { name: ctaLabel, label: "Button label", widget: string, required: false }
+              - name: ctaHref
+                label: "Button link"
+                widget: object
+                required: false
+                fields:
+                  - name: page
+                    label: "Page"
+                    widget: select
+                    required: false
+                    hint: "Pick a page on the site."
+                    options:
+                      - { label: "Startsida (/)", value: "/" }
+                      - { label: "About (/about)", value: "/about" }
+                  - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
+              - { name: cta2Label, label: "Second button label", widget: string, required: false }
+              - name: cta2Href
+                label: "Second button link"
+                widget: object
+                required: false
+                fields:
+                  - name: page
+                    label: "Page"
+                    widget: select
+                    required: false
+                    hint: "Pick a page on the site."
+                    options:
+                      - { label: "Startsida (/)", value: "/" }
+                      - { label: "About (/about)", value: "/about" }
+                  - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
+              - name: media
+                label: "Background"
+                widget: select
+                required: false
+                default: "image"
+                hint: "A still photo, or a muted looping video."
+                options:
+                  - { label: "Image", value: "image" }
+                  - { label: "Video (looping)", value: "video" }
+              - { name: image, label: "Background image / video poster", widget: image, required: false }
+              - { name: imageAlt, label: "Image alt text", widget: string, required: false }
+              - { name: video, label: "Video file (if “Video”)", widget: file, required: false, hint: "Uploaded MP4/WebM — muted + looping. The image shows until it plays, and on reduced-motion." }
+              - { name: videoUrl, label: "…or video URL", widget: string, required: false, hint: "External MP4/WebM URL. Used instead of an uploaded file if filled." }
+              - name: overlay
+                label: "Darken (overlay)"
+                widget: select
+                required: false
+                default: "medium"
+                hint: "How much to darken the media so the text stays readable."
+                options:
+                  - { label: "Light", value: "light" }
+                  - { label: "Medium", value: "medium" }
+                  - { label: "Strong", value: "strong" }
+              - name: align
+                label: "Text position"
+                widget: select
+                required: false
+                default: "start"
+                options:
+                  - { label: "Bottom left", value: "start" }
+                  - { label: "Centered", value: "center" }
+              - name: height
+                label: "Height"
+                widget: select
+                required: false
+                default: "tall"
+                options:
+                  - { label: "Tall", value: "tall" }
+                  - { label: "Medium", value: "medium" }
           - name: pageHeader
             label: "Page header"
             widget: object
