@@ -1,24 +1,24 @@
 ---
 import Cover from './src/Cover.astro';
 import { render } from 'astro:content';
-import { resolveKit, type KitConfig } from './src/config';
+import { resolveSite, type SiteConfig } from './src/config';
 
 // Service detail page rendered from a `services` collection entry (its markdown
 // body becomes the article). Use in a site's /<services>/[slug].astro route: do
 // getStaticPaths there, then
-//   <Base title=... description=...><ServicePage service={entry} config={kit} /></Base>
-// Chrome strings come from kit.strings.service; CTA links to kit.routes.contact.
+//   <Base title=... description=...><ServicePage service={entry} config={site} /></Base>
+// Chrome strings come from site.strings.service; CTA links to site.routes.contact.
 // Expects a `services` schema with: title, navLabel, summary?, bullets?, image?,
 // imageAlt?, seo? + a markdown body.
 interface Props {
   service: any; // CollectionEntry<'services'>
-  config?: KitConfig;
+  config?: SiteConfig;
 }
 const { service, config } = Astro.props;
 const { data } = service;
-const kit = resolveKit(config);
-const t = kit.strings.service;
-const contact = kit.routes.contact ?? '/contact';
+const site = resolveSite(config);
+const t = site.strings.service;
+const contact = site.routes.contact ?? '/contact';
 const { Content } = await render(service);
 ---
 <section class="section service-page">

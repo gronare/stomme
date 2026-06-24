@@ -1,9 +1,9 @@
 // Per-site configuration for the library blocks: where collection pages live,
 // how dates format, and a few fixed strings. A site passes this to BlockRenderer
-// (`<BlockRenderer config={...}>`), which forwards it to every block as `kit`.
-// The TownPage/ServicePage templates take the same `kit`.
+// (`<BlockRenderer config={...}>`), which forwards it to every block as `site`.
+// The TownPage/ServicePage templates take the same `site`.
 // Defaults are neutral English; override only what differs.
-export interface KitConfig {
+export interface SiteConfig {
   routes?: {
     services?: string; // serviceGrid + ServicePage detail-page prefix
     towns?: string; // linkChips + TownPage detail-page prefix
@@ -79,7 +79,7 @@ export function resolveListings(l?: Listing[]): Listing[] {
     .map((x) => ({ ...x, route: x.route.startsWith('/') ? x.route : `/${x.route}` }));
 }
 
-export const KIT_DEFAULTS = {
+export const SITE_DEFAULTS = {
   routes: { services: '/services', towns: '/areas', blog: '/blog', contact: '/contact', formSuccess: '/thanks' },
   locale: 'en-US',
   cmsLocale: 'en',
@@ -103,22 +103,22 @@ export const KIT_DEFAULTS = {
   },
 };
 
-export function resolveKit(c?: KitConfig) {
+export function resolveSite(c?: SiteConfig) {
   const s = c && c.strings;
   return {
-    routes: { ...KIT_DEFAULTS.routes, ...(c && c.routes) },
-    locale: (c && c.locale) || KIT_DEFAULTS.locale,
-    cmsLocale: (c && c.cmsLocale) || KIT_DEFAULTS.cmsLocale,
+    routes: { ...SITE_DEFAULTS.routes, ...(c && c.routes) },
+    locale: (c && c.locale) || SITE_DEFAULTS.locale,
+    cmsLocale: (c && c.cmsLocale) || SITE_DEFAULTS.cmsLocale,
     strings: {
-      ...KIT_DEFAULTS.strings,
+      ...SITE_DEFAULTS.strings,
       ...s,
       // Deep-merge the nested string groups so a site can override one key
       // without having to re-supply the whole group.
       contact: { ...(s && s.contact) },
-      town: { ...KIT_DEFAULTS.strings.town, ...(s && s.town) },
-      service: { ...KIT_DEFAULTS.strings.service, ...(s && s.service) },
-      listingStatus: { ...KIT_DEFAULTS.strings.listingStatus, ...(s && s.listingStatus) },
-      listingCta: (s && s.listingCta) || KIT_DEFAULTS.strings.listingCta,
+      town: { ...SITE_DEFAULTS.strings.town, ...(s && s.town) },
+      service: { ...SITE_DEFAULTS.strings.service, ...(s && s.service) },
+      listingStatus: { ...SITE_DEFAULTS.strings.listingStatus, ...(s && s.listingStatus) },
+      listingCta: (s && s.listingCta) || SITE_DEFAULTS.strings.listingCta,
     },
   };
 }

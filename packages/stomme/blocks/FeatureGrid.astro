@@ -8,10 +8,10 @@ interface Props {
   intro?: string;
   items?: { icon?: string; title: string; body?: string; link?: unknown; linkLabel?: string }[];
   numbered?: boolean;
-  kit?: any;
+  site?: any;
 }
-const { eyebrow, heading, intro, items = [], numbered = false, kit } = Astro.props;
-const readMore = kit?.strings?.readMore ?? 'Read more';
+const { eyebrow, heading, intro, items = [], numbered = false, site } = Astro.props;
+const readMore = site?.strings?.readMore ?? 'Read more';
 ---
 <section class="section">
   {(eyebrow || heading || intro) && (

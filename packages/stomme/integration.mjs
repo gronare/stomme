@@ -5,8 +5,8 @@ import { mkdirSync, writeFileSync } from 'node:fs';
 // stomme Astro integration — injects collection-detail routes.
 //
 //   import stomme from '@gronare/stomme/integration';
-//   import { kit, features, listings } from './src/site.config.ts';
-//   integrations: [stomme({ features, routes: kit.routes, listings })]
+//   import { site, features, listings } from './src/site.config.ts';
+//   integrations: [stomme({ features, routes: site.routes, listings })]
 //
 // Two route sources, both rendered inside the SITE's Base (wired via aliases) so chrome
 // + theme match:
@@ -27,7 +27,7 @@ function listingEntrypoint(l) {
   const prop = catalog ? 'entry' : 'post';
   return `---
 import Base from '@stomme/base';
-import { kit } from '@stomme/config';
+import { site } from '@stomme/config';
 import Detail from '@gronare/stomme/${tmpl}.astro';
 import { getCollection } from 'astro:content';
 export async function getStaticPaths() {
@@ -37,7 +37,7 @@ export async function getStaticPaths() {
 const { entry } = Astro.props;
 ---
 <Base title={entry.data.title} description={entry.data.excerpt ?? entry.data.title}>
-  <Detail ${prop}={entry} config={kit} />
+  <Detail ${prop}={entry} config={site} />
 </Base>
 `;
 }

@@ -1,7 +1,7 @@
 ---
 // Injected by the stomme integration when `features.services` is on.
 import Base from '@stomme/base';
-import { kit } from '@stomme/config';
+import { site } from '@stomme/config';
 import ServicePage from '../ServicePage.astro';
 import { getCollection } from 'astro:content';
 
@@ -13,5 +13,5 @@ const { service } = Astro.props;
 const { data } = service;
 ---
 <Base title={data.seo?.title ?? data.title} description={data.seo?.description ?? ''}>
-  <ServicePage service={service} config={kit} />
+  <ServicePage service={service} config={site} />
 </Base>

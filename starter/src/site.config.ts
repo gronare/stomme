@@ -1,8 +1,8 @@
-import type { KitConfig, StommeFeatures, Listing } from '@gronare/stomme/config';
+import type { SiteConfig, StommeFeatures, Listing } from '@gronare/stomme/config';
 
 // ─────────────────────────────────────────────────────────────────────────────────────
 // site.config.ts — the single file that configures the engine for this site.
-// Three exports: `features` (on/off capabilities), `kit` (routes, locale, wording),
+// Three exports: `features` (on/off capabilities), `site` (routes, locale, wording),
 // and `listings` (config-defined collections). After changing ANYTHING here, re-run the
 // generator so /admin reflects it: `pnpm cms:gen` (or just `pnpm dev` / `pnpm build`,
 // which run it for you). Editing this file alone does not update the CMS until then.
@@ -19,8 +19,8 @@ export const features: StommeFeatures = {
   testimonials: false, // testimonials collection + the "Testimonials" block
 };
 
-// KIT — configuration handed to the blocks and page templates.
-export const kit: KitConfig = {
+// SITE — configuration handed to the blocks and page templates.
+export const site: SiteConfig = {
   // Route prefixes for collection pages. For the feature-backed ones (blog/areas/services)
   // these must match the route folders under src/pages/. Defaults shown — override as needed.
   routes: {

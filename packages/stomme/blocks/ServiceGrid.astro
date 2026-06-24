@@ -3,7 +3,7 @@ import Cover from '../src/Cover.astro';
 import { getCollection } from 'astro:content';
 
 // Collection-backed cards from the `services` collection, each linking to a detail
-// page at `${kit.routes.services}/<slug>`. Pass a curated `services` slug list to
+// page at `${site.routes.services}/<slug>`. Pass a curated `services` slug list to
 // show a subset in the chosen order; omit to show all by `order`. Needs a `services`
 // collection (fields: navLabel, summary, order, image?, imageAlt?) in the consuming
 // site + a matching route folder (see stomme/ServicePage.astro). Each card shows
@@ -13,11 +13,11 @@ interface Props {
   heading?: string;
   intro?: string;
   services?: string[];
-  kit?: any;
+  site?: any;
 }
-const { eyebrow, heading, intro, services: picked, kit } = Astro.props;
-const prefix = kit?.routes?.services ?? '/services';
-const readMore = kit?.strings?.readMore ?? 'Read more';
+const { eyebrow, heading, intro, services: picked, site } = Astro.props;
+const prefix = site?.routes?.services ?? '/services';
+const readMore = site?.strings?.readMore ?? 'Read more';
 const all = await getCollection('services');
 const services = (
   Array.isArray(picked) && picked.length

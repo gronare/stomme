@@ -4,16 +4,16 @@ import { getCollection } from 'astro:content';
 // Collection-backed (the `towns` collection) with editable chrome. The section
 // head renders only when given; CMS defaults pre-fill a new block. Needs a
 // `towns` collection in the consuming site (fields: name, order). The detail-page
-// route prefix comes from the site config (`kit.routes.towns`, forwarded by
+// route prefix comes from the site config (`site.routes.towns`, forwarded by
 // BlockRenderer) and must match the actual route folder under src/pages/.
 interface Props {
   eyebrow?: string;
   heading?: string;
   intro?: string;
-  kit?: any;
+  site?: any;
 }
-const { eyebrow, heading, intro, kit } = Astro.props;
-const prefix = kit?.routes?.towns ?? '/areas';
+const { eyebrow, heading, intro, site } = Astro.props;
+const prefix = site?.routes?.towns ?? '/areas';
 const towns = (await getCollection('towns')).sort((a, b) => a.data.order - b.data.order);
 ---
 <section class="section">

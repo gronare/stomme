@@ -37,7 +37,7 @@ if (!Array.isArray(BLOCKS)) {
 }
 
 // Collection→route map from the site's own config (no longer hardcoded). The site
-// exports `kit` (a KitConfig) from src/site.config.ts; Node strips its TS types.
+// exports `site` (a SiteConfig) from src/site.config.ts; Node strips its TS types.
 // Falls back to the package defaults when absent.
 let ROUTES = { services: '/services', towns: '/areas', blog: '/blog' };
 let FEATURES = null; // null = no `features` declared → fall back to folder-existence
@@ -45,8 +45,8 @@ let CMS_LOCALE = 'en'; // Decap admin UI language (config.yml `locale:`); 'en' i
 let LISTINGS = []; // config-defined collections (news/for-sale/…) → editors + seeded index
 try {
   const mod = await jiti.import(resolve(root, 'src/site.config.ts'));
-  if (mod.kit && mod.kit.routes) ROUTES = { ...ROUTES, ...mod.kit.routes };
-  if (mod.kit && mod.kit.cmsLocale) CMS_LOCALE = mod.kit.cmsLocale;
+  if (mod.site && mod.site.routes) ROUTES = { ...ROUTES, ...mod.site.routes };
+  if (mod.site && mod.site.cmsLocale) CMS_LOCALE = mod.site.cmsLocale;
   if (mod.features) FEATURES = { blog: false, areas: false, services: false, testimonials: false, faq: false, ...mod.features };
   if (Array.isArray(mod.listings))
     LISTINGS = mod.listings

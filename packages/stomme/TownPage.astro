@@ -1,24 +1,24 @@
 ---
 import Cover from './src/Cover.astro';
 import { getEntry } from 'astro:content';
-import { resolveKit, type KitConfig } from './src/config';
+import { resolveSite, type SiteConfig } from './src/config';
 
 // Rich service-area landing rendered from a `towns` collection entry. Use it in a
 // site's /<towns>/[slug].astro route: do getStaticPaths there, then
-//   <Base title=... description=...><TownPage town={entry} config={kit} /></Base>
-// All chrome strings come from kit.strings.town (English defaults; override per-site,
-// `{name}` is interpolated); the CTAs link to kit.routes.contact. Expects a `towns`
+//   <Base title=... description=...><TownPage town={entry} config={site} /></Base>
+// All chrome strings come from site.strings.town (English defaults; override per-site,
+// `{name}` is interpolated); the CTAs link to site.routes.contact. Expects a `towns`
 // schema with: name, title?, heroSubtitle?, heroNote?, why?, problems?, districts?,
 // localCase?, services?, image?, imageAlt?, seo?.
 interface Props {
   town: { id: string; data: any };
-  config?: KitConfig;
+  config?: SiteConfig;
 }
 const { town, config } = Astro.props;
 const { data } = town;
-const kit = resolveKit(config);
-const t = kit.strings.town;
-const contact = kit.routes.contact ?? '/contact';
+const site = resolveSite(config);
+const t = site.strings.town;
+const contact = site.routes.contact ?? '/contact';
 const fill = (s?: string) => (s ?? '').replace(/\{name\}/g, data.name);
 
 const whyParagraphs = (data.why ?? '').split(/\n\n+/).map((p: string) => p.trim()).filter(Boolean);

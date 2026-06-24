@@ -7,7 +7,7 @@ import Cover from '../src/Cover.astro';
 // own eyebrow/heading). Needs a `posts` collection (title, date, excerpt, cover).
 //
 // Route prefix, date locale and the "read more" string come from the site config
-// (`kit`, forwarded by BlockRenderer); the prefix must match the route under src/pages/.
+// (`site`, forwarded by BlockRenderer); the prefix must match the route under src/pages/.
 interface Props {
   eyebrow?: string;
   heading?: string;
@@ -17,12 +17,12 @@ interface Props {
   columns?: number;
   source?: string;
   base?: string;
-  kit?: any;
+  site?: any;
 }
-const { eyebrow, heading, intro, showImages = true, featured = true, columns = 3, source = 'posts', base, kit } = Astro.props;
-const prefix = base ?? kit?.routes?.blog ?? '/blog';
-const locale = kit?.locale ?? 'en-US';
-const readMore = kit?.strings?.readMore ?? 'Read more';
+const { eyebrow, heading, intro, showImages = true, featured = true, columns = 3, source = 'posts', base, site } = Astro.props;
+const prefix = base ?? site?.routes?.blog ?? '/blog';
+const locale = site?.locale ?? 'en-US';
+const readMore = site?.strings?.readMore ?? 'Read more';
 const all = (await getCollection(source)).sort((a, b) => (a.data.date < b.data.date ? 1 : -1));
 const fmt = (d: string) => new Date(d).toLocaleDateString(locale, { year: 'numeric', month: 'long', day: 'numeric' });
 const lead = featured && all.length > 1 ? all[0] : null;

@@ -1,7 +1,7 @@
 ---
 // Injected by the stomme integration when `features.areas` is on.
 import Base from '@stomme/base';
-import { kit } from '@stomme/config';
+import { site } from '@stomme/config';
 import TownPage from '../TownPage.astro';
 import { getCollection } from 'astro:content';
 
@@ -13,5 +13,5 @@ const { town } = Astro.props;
 const { data } = town;
 ---
 <Base title={data.seo?.title ?? data.name} description={data.seo?.description ?? ''}>
-  <TownPage town={town} config={kit} />
+  <TownPage town={town} config={site} />
 </Base>

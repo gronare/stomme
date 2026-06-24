@@ -2,13 +2,13 @@
 import { getEntry } from 'astro:content';
 
 // Netlify contact form + a direct-contact aside. Pulls phone/email/name/hq/orgNr
-// from settings. Field labels + success route come from the site config (`kit`,
+// from settings. Field labels + success route come from the site config (`site`,
 // forwarded by BlockRenderer); labels default to English. Needs `settings.{phone,
 // phoneE164, email, name, hq, orgNr}` in the consuming site.
-interface Props { kit?: any }
-const { kit } = Astro.props;
-const formSuccess = kit?.routes?.formSuccess ?? '/thanks';
-const c = kit?.strings?.contact ?? {};
+interface Props { site?: any }
+const { site } = Astro.props;
+const formSuccess = site?.routes?.formSuccess ?? '/thanks';
+const c = site?.strings?.contact ?? {};
 const L = {
   name: c.name ?? 'Name',
   email: c.email ?? 'Email',

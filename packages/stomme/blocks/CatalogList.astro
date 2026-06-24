@@ -5,7 +5,7 @@ import Cover from '../src/Cover.astro';
 // Catalog index for a `catalog` listing (for-sale items). Reads the listing's collection
 // (`source`) and renders a filterable card grid: cover + status badge, price, a few specs.
 // `base` is the detail-link prefix (the listing route). Newest first. Category filtering
-// is client-side. Status labels come from kit.strings.listingStatus (English default).
+// is client-side. Status labels come from site.strings.listingStatus (English default).
 interface Props {
   eyebrow?: string;
   heading?: string;
@@ -15,12 +15,12 @@ interface Props {
   columns?: number;
   showImages?: boolean;
   filters?: boolean;
-  kit?: any;
+  site?: any;
 }
-const { eyebrow, heading, intro, source = '', base, columns = 3, showImages = true, filters = true, kit } = Astro.props;
+const { eyebrow, heading, intro, source = '', base, columns = 3, showImages = true, filters = true, site } = Astro.props;
 const prefix = base ?? (source ? `/${source}` : '');
-const readMore = kit?.strings?.readMore ?? 'Read more';
-const sl = { available: 'Available', reserved: 'Reserved', sold: 'Sold', all: 'All', ...(kit?.strings?.listingStatus || {}) };
+const readMore = site?.strings?.readMore ?? 'Read more';
+const sl = { available: 'Available', reserved: 'Reserved', sold: 'Sold', all: 'All', ...(site?.strings?.listingStatus || {}) };
 const ST = { available: 'avail', reserved: 'res', sold: 'sold' };
 const items = source
   ? (await getCollection(source)).sort((a, b) => ((a.data.date ?? '') < (b.data.date ?? '') ? 1 : -1))

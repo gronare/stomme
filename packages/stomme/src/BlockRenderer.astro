@@ -27,7 +27,7 @@ import Faq from '../blocks/Faq.astro';
 import StatsBar from '../blocks/StatsBar.astro';
 import LogoStrip from '../blocks/LogoStrip.astro';
 import ContactForm from '../blocks/ContactForm.astro';
-import { resolveKit, type KitConfig } from './config';
+import { resolveSite, type SiteConfig } from './config';
 
 const defaults: Record<string, any> = {
   hero: Hero,
@@ -60,13 +60,13 @@ const defaults: Record<string, any> = {
 interface Props {
   blocks?: { type: string; surface?: string; [key: string]: unknown }[];
   registry?: Record<string, any>;
-  config?: KitConfig;
+  config?: SiteConfig;
 }
 const { blocks = [], registry = {}, config } = Astro.props;
 const reg = { ...defaults, ...registry };
 // Resolved per-site config (routes/locale/strings), forwarded to every block as
-// `kit` so blocks needn't be wired individually.
-const kit = resolveKit(config);
+// `site` so blocks needn't be wired individually.
+const site = resolveSite(config);
 
 const surfaceClass: Record<string, string> = { tint: 'surface-tint', band: 'band' };
 ---
@@ -83,10 +83,10 @@ const surfaceClass: Record<string, string> = { tint: 'surface-tint', band: 'band
     const surf = block.surface ? surfaceClass[block.surface] : undefined;
     return surf ? (
       <div class={surf}>
-        <Component {...block} kit={kit} />
+        <Component {...block} site={site} />
       </div>
     ) : (
-      <Component {...block} kit={kit} />
+      <Component {...block} site={site} />
     );
   })
 }

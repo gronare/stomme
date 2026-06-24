@@ -1,9 +1,9 @@
 ---
 // Injected by the stomme integration when `features.blog` is on. Renders inside
 // the SITE's Base (aliased) so chrome/theme match; the post template + the site's
-// kit config come from the package + the site's config alias.
+// site config come from the package + the site's config alias.
 import Base from '@stomme/base';
-import { kit } from '@stomme/config';
+import { site } from '@stomme/config';
 import PostPage from '../PostPage.astro';
 import { getCollection } from 'astro:content';
 
@@ -14,5 +14,5 @@ export async function getStaticPaths() {
 const { post } = Astro.props;
 ---
 <Base title={post.data.title} description={post.data.excerpt}>
-  <PostPage post={post} config={kit} />
+  <PostPage post={post} config={site} />
 </Base>

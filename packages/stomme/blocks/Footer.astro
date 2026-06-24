@@ -10,7 +10,7 @@ interface NavData { logo?: { textPre?: string; textAccent?: string; image?: stri
 interface FooterData { tagline?: string; linksHeading?: string; links?: { label: string; link?: unknown }[]; showTowns?: boolean; townsHeading?: string; note?: string }
 interface SettingsData { name?: string; email?: string; phone?: string; phoneE164?: string; hq?: string; orgNr?: string; founded?: string }
 // `towns` + `townsHref` are optional: pass them (the site reads its towns collection
-// and forwards kit.routes.towns) to render a service-area column when footer.showTowns.
+// and forwards site.routes.towns) to render a service-area column when footer.showTowns.
 // Towns-less sites simply don't pass them, so nothing extra renders.
 interface Props { nav?: NavData; footer?: FooterData; settings?: SettingsData; towns?: { id: string; name: string }[]; townsHref?: string }
 

@@ -4,17 +4,17 @@ import { render } from 'astro:content';
 
 // Detail page for a `catalog` listing entry (for-sale item): gallery, status, price,
 // a spec table, the description body, and a contact CTA. Rendered inside the site's Base
-// by the per-listing route the integration injects. `config` is the site kit.
+// by the per-listing route the integration injects. `config` is the resolved site config.
 interface Props {
   entry: any;
   config?: any;
 }
-const { entry, config: kit } = Astro.props;
+const { entry, config: site } = Astro.props;
 const d = entry.data;
-const sl = { available: 'Available', reserved: 'Reserved', sold: 'Sold', ...(kit?.strings?.listingStatus || {}) };
+const sl = { available: 'Available', reserved: 'Reserved', sold: 'Sold', ...(site?.strings?.listingStatus || {}) };
 const ST = { available: 'avail', reserved: 'res', sold: 'sold' };
-const cta = kit?.strings?.listingCta ?? 'Contact us';
-const contactHref = kit?.routes?.contact ?? '/contact';
+const cta = site?.strings?.listingCta ?? 'Contact us';
+const contactHref = site?.routes?.contact ?? '/contact';
 const gallery = d.gallery?.length ? d.gallery : d.cover ? [{ image: d.cover, alt: d.title }] : [];
 const { Content } = await render(entry);
 const PLACE = '/images/placeholders/service.svg';
