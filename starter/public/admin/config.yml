@@ -1160,13 +1160,13 @@ collections:
         label: "Theme colours"
         file: "src/content/theme/theme.md"
         fields:
-          - { name: brand, label: "Brand", widget: color, default: "#4338ca" }
-          - { name: ink, label: "Text", widget: color, default: "#1f2937" }
-          - { name: onDark, label: "Text on brand", widget: color, default: "#ffffff" }
-          - { name: surface, label: "Accent surface", widget: color, default: "#e0e7ff" }
-          - { name: paper, label: "Background", widget: color, default: "#ffffff" }
-          - { name: line, label: "Lines", widget: color, default: "#e5e7eb" }
-          - { name: highlight, label: "Highlight", widget: color, default: "#f59e0b" }
+          - { name: brand, label: "Primary", widget: color, default: "#4338ca", hint: "Buttons, links and key accents." }
+          - { name: ink, label: "Text", widget: color, default: "#1f2937", hint: "Default body-text colour." }
+          - { name: onDark, label: "Text on primary", widget: color, default: "#ffffff", hint: "Button labels and text on dark/brand bands." }
+          - { name: surface, label: "Tinted surface", widget: color, default: "#e0e7ff", hint: "Soft background for highlighted sections." }
+          - { name: paper, label: "Page background", widget: color, default: "#ffffff", hint: "The main page background." }
+          - { name: line, label: "Borders & lines", widget: color, default: "#e5e7eb", hint: "Card borders, dividers, rules." }
+          - { name: highlight, label: "Accent", widget: color, default: "#f59e0b", hint: "Secondary accent — badges, small highlights." }
       - name: nav
         label: "Navigation"
         file: "src/content/navigation/nav.md"
