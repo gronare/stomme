@@ -416,7 +416,7 @@ collections:
                       - { label: "Tinted", value: "tint" }
                       - { label: "Accent band", value: "band" }
               - name: callout
-                label: "Quote / highlighted statement"
+                label: "Highlighted quote"
                 widget: object
                 fields:
                   - { name: eyebrow, label: "Eyebrow", widget: string, required: false }
@@ -432,7 +432,7 @@ collections:
                       - { label: "Tinted", value: "tint" }
                       - { label: "Accent band", value: "band" }
               - name: statPanel
-                label: "Statement panel (dark, big number)"
+                label: "Statement panel"
                 widget: object
                 fields:
                   - { name: eyebrow, label: "Eyebrow", widget: string, required: false }
@@ -554,12 +554,12 @@ collections:
                       - { label: "Tinted", value: "tint" }
                       - { label: "Accent band", value: "band" }
               - name: logoStrip
-                label: "Logo / partner strip (auto)"
+                label: "Logo strip"
                 widget: object
                 fields:
                   - { name: _auto, label: "Auto", widget: hidden }
               - name: contactForm
-                label: "Contact form (auto)"
+                label: "Contact form"
                 widget: object
                 fields:
                   - { name: _auto, label: "Auto", widget: hidden }
@@ -975,7 +975,7 @@ collections:
                   - { label: "Tinted", value: "tint" }
                   - { label: "Accent band", value: "band" }
           - name: callout
-            label: "Quote / highlighted statement"
+            label: "Highlighted quote"
             widget: object
             fields:
               - { name: eyebrow, label: "Eyebrow", widget: string, required: false }
@@ -991,7 +991,7 @@ collections:
                   - { label: "Tinted", value: "tint" }
                   - { label: "Accent band", value: "band" }
           - name: statPanel
-            label: "Statement panel (dark, big number)"
+            label: "Statement panel"
             widget: object
             fields:
               - { name: eyebrow, label: "Eyebrow", widget: string, required: false }
@@ -1113,12 +1113,12 @@ collections:
                   - { label: "Tinted", value: "tint" }
                   - { label: "Accent band", value: "band" }
           - name: logoStrip
-            label: "Logo / partner strip (auto)"
+            label: "Logo strip"
             widget: object
             fields:
               - { name: _auto, label: "Auto", widget: hidden }
           - name: contactForm
-            label: "Contact form (auto)"
+            label: "Contact form"
             widget: object
             fields:
               - { name: _auto, label: "Auto", widget: hidden }

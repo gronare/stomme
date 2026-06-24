@@ -89,7 +89,7 @@ export const defaultBlocks: BlockDef[] = [
   },
   {
     type: 'serviceGrid',
-    label: 'Service cards (from a collection)',
+    label: 'Service cards',
     group: 'From collections',
     summary: 'Service cards pulled from your Services collection.',
     shape: 'grid',
@@ -105,7 +105,7 @@ export const defaultBlocks: BlockDef[] = [
   { type: 'steps', label: 'Process / steps', group: 'Cards & lists', summary: 'Numbered process — a sequence of steps.', shape: 'steps', fields: [...headingFields, cardListField, widthField, surfaceField] },
   {
     type: 'checklist',
-    label: 'Checklist (ticked items)',
+    label: 'Checklist',
     group: 'Cards & lists',
     summary: 'Ticked checklist items in one or two columns.',
     shape: 'checklist',
@@ -168,7 +168,7 @@ export const defaultBlocks: BlockDef[] = [
   },
   {
     type: 'callout',
-    label: 'Quote / highlighted statement',
+    label: 'Highlighted quote',
     group: 'Quote & highlight',
     summary: 'A single highlighted quote or statement.',
     shape: 'quote',
@@ -176,7 +176,7 @@ export const defaultBlocks: BlockDef[] = [
   },
   {
     type: 'statPanel',
-    label: 'Statement panel (dark, big number)',
+    label: 'Statement panel',
     group: 'Quote & highlight',
     summary: 'Dark panel with a big number, statement and badges.',
     shape: 'panel',
@@ -200,7 +200,7 @@ export const defaultBlocks: BlockDef[] = [
   },
   {
     type: 'linkChips',
-    label: 'Link chips (from a collection)',
+    label: 'Link chips',
     group: 'From collections',
     summary: 'Chip links from your Areas collection (e.g. towns you serve).',
     shape: 'chips',
@@ -209,7 +209,7 @@ export const defaultBlocks: BlockDef[] = [
   },
   {
     type: 'postList',
-    label: 'Blog posts – list',
+    label: 'Blog posts',
     group: 'From collections',
     summary: 'List of the latest blog posts — featured lead + a card grid with cover images.',
     shape: 'list',
@@ -226,7 +226,7 @@ export const defaultBlocks: BlockDef[] = [
   },
   {
     type: 'catalogList',
-    label: 'Catalog – items for sale (from a listing)',
+    label: 'Catalog (for sale)',
     group: 'From collections',
     summary: 'For-sale items from a catalog listing — filterable cards with cover, status badge, price and specs.',
     shape: 'grid',
@@ -283,6 +283,6 @@ export const defaultBlocks: BlockDef[] = [
       { name: 'items', label: 'Facts (optional — defaults to the site’s settings facts)', widget: 'list', required: false, fields: [{ name: 'label', label: 'Label', widget: 'string' }, { name: 'value', label: 'Value', widget: 'string' }] },
     ],
   },
-  { type: 'logoStrip', label: 'Logo / partner strip (auto)', group: 'Automatic', summary: 'Logo / partner strip, filled automatically from settings.', shape: 'auto', fields: [] },
-  { type: 'contactForm', label: 'Contact form (auto)', group: 'Automatic', summary: 'Contact form, rendered automatically.', shape: 'auto', fields: [] },
+  { type: 'logoStrip', label: 'Logo strip', group: 'Automatic', summary: 'Logo / partner strip, filled automatically from settings.', shape: 'auto', fields: [] },
+  { type: 'contactForm', label: 'Contact form', group: 'Automatic', summary: 'Contact form, rendered automatically.', shape: 'auto', fields: [] },
 ];

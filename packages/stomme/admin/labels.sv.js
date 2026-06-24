@@ -27,10 +27,16 @@ export default {
   'Contact form (auto)': 'Kontaktformulär (auto)',
   'Logo / partner strip (auto)': 'Logotyp / partnerrad (auto)',
   'Checklist (ticked items)': 'Checklista (bockade punkter)',
-  'Service cards (from a collection)': 'Tjänstekort (från en samling)',
   'Testimonials': 'Omdömen',
-  'Link chips (from a collection)': 'Länkchips (från en samling)',
-  'Blog posts – list': 'Blogginlägg – lista',
+  // shortened block-type labels (kept concise so the Decap add-menu doesn't truncate)
+  'Service cards': 'Tjänstekort',
+  'Link chips': 'Länkchips',
+  'Blog posts': 'Blogginlägg',
+  'Catalog (for sale)': 'Katalog (till salu)',
+  'Highlighted quote': 'Framhävt citat',
+  'Statement panel': 'Uttalandepanel',
+  'Logo strip': 'Logotyprad',
+  'Contact form': 'Kontaktformulär',
 
   // ── common field labels ──
   'Heading': 'Rubrik',
