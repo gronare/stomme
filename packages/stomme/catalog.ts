@@ -47,6 +47,7 @@ export const defaultBlocks: BlockDef[] = [
         field: { name: 'item', label: 'Chip', widget: 'string' },
       },
       { name: 'stamp', label: 'Ops · corner stamp (if “Operations”)', widget: 'string', required: false },
+      surfaceField,
     ],
   },
   {

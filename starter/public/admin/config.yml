@@ -94,6 +94,17 @@ collections:
                     required: false
                     field: { name: item, label: "Chip", widget: string }
                   - { name: stamp, label: "Ops · corner stamp (if “Operations”)", widget: string, required: false }
+                  - name: surface
+                    label: "Background"
+                    widget: select
+                    required: false
+                    default: "standard"
+                    hint: "The surface behind the section — for rhythm between blocks."
+                    options:
+                      - { label: "Standard (white)", value: "standard" }
+                      - { label: "Tinted", value: "tint" }
+                      - { label: "Accent band", value: "band" }
+                      - { label: "Dark", value: "dark" }
               - name: pageHeader
                 label: "Page header"
                 widget: object
@@ -143,6 +154,7 @@ collections:
                       - { label: "Standard (white)", value: "standard" }
                       - { label: "Tinted", value: "tint" }
                       - { label: "Accent band", value: "band" }
+                      - { label: "Dark", value: "dark" }
               - name: prose
                 label: "Rich text"
                 widget: object
@@ -168,6 +180,7 @@ collections:
                       - { label: "Standard (white)", value: "standard" }
                       - { label: "Tinted", value: "tint" }
                       - { label: "Accent band", value: "band" }
+                      - { label: "Dark", value: "dark" }
               - name: textImage
                 label: "Text + image"
                 widget: object
@@ -187,6 +200,7 @@ collections:
                       - { label: "Standard (white)", value: "standard" }
                       - { label: "Tinted", value: "tint" }
                       - { label: "Accent band", value: "band" }
+                      - { label: "Dark", value: "dark" }
               - name: textQuote
                 label: "Text + quote"
                 widget: object
@@ -205,6 +219,7 @@ collections:
                       - { label: "Standard (white)", value: "standard" }
                       - { label: "Tinted", value: "tint" }
                       - { label: "Accent band", value: "band" }
+                      - { label: "Dark", value: "dark" }
               - name: featureGrid
                 label: "Feature cards"
                 widget: object
@@ -264,6 +279,7 @@ collections:
                       - { label: "Standard (white)", value: "standard" }
                       - { label: "Tinted", value: "tint" }
                       - { label: "Accent band", value: "band" }
+                      - { label: "Dark", value: "dark" }
               - name: pillars
                 label: "Principles / values"
                 widget: object
@@ -288,6 +304,7 @@ collections:
                       - { label: "Standard (white)", value: "standard" }
                       - { label: "Tinted", value: "tint" }
                       - { label: "Accent band", value: "band" }
+                      - { label: "Dark", value: "dark" }
               - name: specialistGrid
                 label: "Specialist grid"
                 widget: object
@@ -312,6 +329,7 @@ collections:
                       - { label: "Standard (white)", value: "standard" }
                       - { label: "Tinted", value: "tint" }
                       - { label: "Accent band", value: "band" }
+                      - { label: "Dark", value: "dark" }
               - name: steps
                 label: "Process / steps"
                 widget: object
@@ -345,6 +363,7 @@ collections:
                       - { label: "Standard (white)", value: "standard" }
                       - { label: "Tinted", value: "tint" }
                       - { label: "Accent band", value: "band" }
+                      - { label: "Dark", value: "dark" }
               - name: checklist
                 label: "Checklist"
                 widget: object
@@ -370,6 +389,7 @@ collections:
                       - { label: "Standard (white)", value: "standard" }
                       - { label: "Tinted", value: "tint" }
                       - { label: "Accent band", value: "band" }
+                      - { label: "Dark", value: "dark" }
               - name: gallery
                 label: "Gallery"
                 widget: object
@@ -396,6 +416,7 @@ collections:
                       - { label: "Standard (white)", value: "standard" }
                       - { label: "Tinted", value: "tint" }
                       - { label: "Accent band", value: "band" }
+                      - { label: "Dark", value: "dark" }
               - name: beforeAfter
                 label: "Before / after"
                 widget: object
@@ -415,6 +436,7 @@ collections:
                       - { label: "Standard (white)", value: "standard" }
                       - { label: "Tinted", value: "tint" }
                       - { label: "Accent band", value: "band" }
+                      - { label: "Dark", value: "dark" }
               - name: callout
                 label: "Highlighted quote"
                 widget: object
@@ -431,6 +453,7 @@ collections:
                       - { label: "Standard (white)", value: "standard" }
                       - { label: "Tinted", value: "tint" }
                       - { label: "Accent band", value: "band" }
+                      - { label: "Dark", value: "dark" }
               - name: statPanel
                 label: "Statement panel"
                 widget: object
@@ -500,6 +523,7 @@ collections:
                       - { label: "Standard (white)", value: "standard" }
                       - { label: "Tinted", value: "tint" }
                       - { label: "Accent band", value: "band" }
+                      - { label: "Dark", value: "dark" }
               - name: ctaPanel
                 label: "Call to action (band)"
                 widget: object
@@ -553,6 +577,7 @@ collections:
                       - { label: "Standard (white)", value: "standard" }
                       - { label: "Tinted", value: "tint" }
                       - { label: "Accent band", value: "band" }
+                      - { label: "Dark", value: "dark" }
               - name: logoStrip
                 label: "Logo strip"
                 widget: object
@@ -653,6 +678,17 @@ collections:
                 required: false
                 field: { name: item, label: "Chip", widget: string }
               - { name: stamp, label: "Ops · corner stamp (if “Operations”)", widget: string, required: false }
+              - name: surface
+                label: "Background"
+                widget: select
+                required: false
+                default: "standard"
+                hint: "The surface behind the section — for rhythm between blocks."
+                options:
+                  - { label: "Standard (white)", value: "standard" }
+                  - { label: "Tinted", value: "tint" }
+                  - { label: "Accent band", value: "band" }
+                  - { label: "Dark", value: "dark" }
           - name: pageHeader
             label: "Page header"
             widget: object
@@ -702,6 +738,7 @@ collections:
                   - { label: "Standard (white)", value: "standard" }
                   - { label: "Tinted", value: "tint" }
                   - { label: "Accent band", value: "band" }
+                  - { label: "Dark", value: "dark" }
           - name: prose
             label: "Rich text"
             widget: object
@@ -727,6 +764,7 @@ collections:
                   - { label: "Standard (white)", value: "standard" }
                   - { label: "Tinted", value: "tint" }
                   - { label: "Accent band", value: "band" }
+                  - { label: "Dark", value: "dark" }
           - name: textImage
             label: "Text + image"
             widget: object
@@ -746,6 +784,7 @@ collections:
                   - { label: "Standard (white)", value: "standard" }
                   - { label: "Tinted", value: "tint" }
                   - { label: "Accent band", value: "band" }
+                  - { label: "Dark", value: "dark" }
           - name: textQuote
             label: "Text + quote"
             widget: object
@@ -764,6 +803,7 @@ collections:
                   - { label: "Standard (white)", value: "standard" }
                   - { label: "Tinted", value: "tint" }
                   - { label: "Accent band", value: "band" }
+                  - { label: "Dark", value: "dark" }
           - name: featureGrid
             label: "Feature cards"
             widget: object
@@ -823,6 +863,7 @@ collections:
                   - { label: "Standard (white)", value: "standard" }
                   - { label: "Tinted", value: "tint" }
                   - { label: "Accent band", value: "band" }
+                  - { label: "Dark", value: "dark" }
           - name: pillars
             label: "Principles / values"
             widget: object
@@ -847,6 +888,7 @@ collections:
                   - { label: "Standard (white)", value: "standard" }
                   - { label: "Tinted", value: "tint" }
                   - { label: "Accent band", value: "band" }
+                  - { label: "Dark", value: "dark" }
           - name: specialistGrid
             label: "Specialist grid"
             widget: object
@@ -871,6 +913,7 @@ collections:
                   - { label: "Standard (white)", value: "standard" }
                   - { label: "Tinted", value: "tint" }
                   - { label: "Accent band", value: "band" }
+                  - { label: "Dark", value: "dark" }
           - name: steps
             label: "Process / steps"
             widget: object
@@ -904,6 +947,7 @@ collections:
                   - { label: "Standard (white)", value: "standard" }
                   - { label: "Tinted", value: "tint" }
                   - { label: "Accent band", value: "band" }
+                  - { label: "Dark", value: "dark" }
           - name: checklist
             label: "Checklist"
             widget: object
@@ -929,6 +973,7 @@ collections:
                   - { label: "Standard (white)", value: "standard" }
                   - { label: "Tinted", value: "tint" }
                   - { label: "Accent band", value: "band" }
+                  - { label: "Dark", value: "dark" }
           - name: gallery
             label: "Gallery"
             widget: object
@@ -955,6 +1000,7 @@ collections:
                   - { label: "Standard (white)", value: "standard" }
                   - { label: "Tinted", value: "tint" }
                   - { label: "Accent band", value: "band" }
+                  - { label: "Dark", value: "dark" }
           - name: beforeAfter
             label: "Before / after"
             widget: object
@@ -974,6 +1020,7 @@ collections:
                   - { label: "Standard (white)", value: "standard" }
                   - { label: "Tinted", value: "tint" }
                   - { label: "Accent band", value: "band" }
+                  - { label: "Dark", value: "dark" }
           - name: callout
             label: "Highlighted quote"
             widget: object
@@ -990,6 +1037,7 @@ collections:
                   - { label: "Standard (white)", value: "standard" }
                   - { label: "Tinted", value: "tint" }
                   - { label: "Accent band", value: "band" }
+                  - { label: "Dark", value: "dark" }
           - name: statPanel
             label: "Statement panel"
             widget: object
@@ -1059,6 +1107,7 @@ collections:
                   - { label: "Standard (white)", value: "standard" }
                   - { label: "Tinted", value: "tint" }
                   - { label: "Accent band", value: "band" }
+                  - { label: "Dark", value: "dark" }
           - name: ctaPanel
             label: "Call to action (band)"
             widget: object
@@ -1112,6 +1161,7 @@ collections:
                   - { label: "Standard (white)", value: "standard" }
                   - { label: "Tinted", value: "tint" }
                   - { label: "Accent band", value: "band" }
+                  - { label: "Dark", value: "dark" }
           - name: logoStrip
             label: "Logo strip"
             widget: object
