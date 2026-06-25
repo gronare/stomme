@@ -49,7 +49,7 @@ body { font-family: var(--bk-font-sans); margin: 0; line-height: 1.6; }
 .mono-dot { display: inline-flex; align-items: center; gap: 10px; }
 .mono-dot::before { content: ""; width: 18px; height: 2px; background: var(--color-brand); display: inline-block; }
 
-.btn { display: inline-block; background: var(--color-brand); color: var(--color-on-dark); font-weight: 600; padding: 0.75rem 1.35rem; border-radius: 0.7rem; text-decoration: none; }
+.btn { display: inline-block; background: var(--color-brand); color: var(--color-on-dark); font-weight: 600; padding: 0.75rem 1.35rem; border-radius: 0.7rem; text-decoration: none; white-space: nowrap; }
 .btn:hover { background: var(--color-brand-press); }
 .btn-ghost { color: var(--color-ink); font-weight: 600; text-decoration: none; }
 .btn-ghost:hover { color: var(--color-brand); }
@@ -240,8 +240,10 @@ body { font-family: var(--bk-font-sans); margin: 0; line-height: 1.6; }
 /* chrome */
 .site-header { border-bottom: 1px solid var(--color-line); }
 .site-header .inner, .site-footer .inner { max-width: 72rem; margin-inline: auto; padding: 1rem 1.5rem; }
-.site-header .inner { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
-.site-nav { display: flex; gap: 1.25rem; align-items: center; flex-wrap: wrap; }
+.site-header .inner { display: flex; align-items: center; justify-content: flex-start; gap: 1rem; }
+/* Logo left; nav + CTA pushed to the right. The CTA lives in the bar (not the nav) so
+   it stays visible next to the hamburger on mobile. */
+.site-nav { display: flex; gap: 1.25rem; align-items: center; flex-wrap: wrap; margin-left: auto; }
 .site-nav a { text-decoration: none; color: var(--color-ink); }
 .site-nav a:hover { color: var(--color-brand); }
 /* The CTA is an <a class="btn"> inside the nav — keep the button's on-dark text
@@ -277,21 +279,27 @@ body { font-family: var(--bk-font-sans); margin: 0; line-height: 1.6; }
    Dropdowns become inline accordions inside the panel. */
 @media (max-width: 820px) {
   .nav-toggle { display: inline-flex; }
+  .site-cta { margin-left: auto; }       /* keep the CTA in the bar, between nav and the hamburger */
   .site-header .inner { position: relative; }
-  .site-nav { display: none; }
+  .site-nav { display: none; margin-left: 0; }
   .site-header.nav-open .site-nav {
-    display: flex; flex-direction: column; align-items: stretch; gap: 0.25rem;
+    display: flex; flex-direction: column; align-items: stretch; gap: 0;
     position: absolute; top: 100%; left: 0; right: 0; z-index: 60;
     background: var(--color-paper); border-top: 1px solid var(--color-line);
-    box-shadow: 0 22px 40px -26px rgba(0,0,0,0.4); padding: 0.5rem 1.5rem 1.25rem;
+    box-shadow: 0 22px 40px -26px rgba(0,0,0,0.4); padding: 0.25rem 1.5rem 1rem;
   }
-  .site-header.nav-open .site-nav > a { padding: 0.65rem 0; }
-  .nav-item--menu { display: block; width: 100%; padding: 0.4rem 0; }
-  .nav-top { padding: 0.25rem 0; }
-  .nav-submenu { position: static; opacity: 1; visibility: visible; transform: none; box-shadow: none;
-    border: 0; border-left: 2px solid var(--color-line); border-radius: 0; min-width: 0; margin: 4px 0 8px 10px; padding: 0; }
+  /* Each item is a full-width row, like the FAQ accordion. */
+  .site-header.nav-open .site-nav > a,
+  .nav-top { display: flex; justify-content: space-between; align-items: center; width: 100%;
+    padding: 0.9rem 0; border-bottom: 1px solid color-mix(in srgb, var(--color-line) 65%, transparent); }
+  .nav-item--menu { display: block; width: 100%; }
+  /* Accordion: submenu collapsed until its header is tapped (.is-open). */
+  .nav-submenu { display: none; position: static; opacity: 1; visibility: visible; transform: none; box-shadow: none;
+    border: 0; border-left: 2px solid var(--color-line); border-radius: 0; min-width: 0; margin: 0.25rem 0 0.75rem 0.25rem; padding: 0; }
   .nav-submenu::before { display: none; }
-  .site-nav a.btn { align-self: flex-start; margin-top: 0.6rem; }
+  .nav-item--menu.is-open .nav-submenu { display: block; }
+  .nav-caret { transition: transform 0.2s; }
+  .nav-item--menu.is-open .nav-caret { transform: rotate(-135deg) translateY(2px); }
 }
 
 .logo { font-family: var(--bk-font-display); font-weight: 800; font-size: 1.15rem; color: var(--color-ink); text-decoration: none; }

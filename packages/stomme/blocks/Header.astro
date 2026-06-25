@@ -58,9 +58,6 @@ const resolved = await Promise.all(
         ? <Cover src={logo.image} alt={logo.alt ?? settings.name} placeholder="/images/placeholder.svg" class="logo-img" />
         : <Fragment>{logo.textPre ?? settings.name}<span class="accent">{logo.textAccent}</span></Fragment>}
     </a>
-    <button class="nav-toggle" type="button" aria-label="Menu" aria-expanded="false" aria-controls="site-nav">
-      <span class="nav-toggle__bars" aria-hidden="true"></span>
-    </button>
     <nav class="site-nav" id="site-nav">
       {resolved.map((i) => i.children.length ? (
         <div class="nav-item nav-item--menu">
@@ -74,27 +71,45 @@ const resolved = await Promise.all(
       ) : (
         <a href={i.href || homeHref}>{i.label}</a>
       ))}
-      {nav.cta && <a class="btn" href={resolveLink(nav.cta.link, homeHref)}>{nav.cta.label}</a>}
     </nav>
+    {nav.cta && <a class="btn site-cta" href={resolveLink(nav.cta.link, homeHref)}>{nav.cta.label}</a>}
+    <button class="nav-toggle" type="button" aria-label="Menu" aria-expanded="false" aria-controls="site-nav">
+      <span class="nav-toggle__bars" aria-hidden="true"></span>
+    </button>
   </div>
 </header>
 <script is:inline>
-  // Dropdowns open on hover (and keyboard focus) via CSS, and close as soon as the
-  // pointer/focus leaves — nothing sticky. The one catch: a mouse click leaves the
-  // header focused, so :focus-within would keep it pinned open. Blurring it on click
-  // (a linked header still navigates) removes that focus so hover alone controls it.
-  document.querySelectorAll('.site-nav .nav-top').forEach(function (top) {
-    top.addEventListener('click', function () { top.blur(); });
-  });
-  // Mobile fold-out menu: the hamburger toggles a panel; a link tap closes it.
   (function () {
     var header = document.querySelector('.site-header');
-    var toggle = header && header.querySelector('.nav-toggle');
-    if (!toggle) return;
-    var set = function (open) { header.classList.toggle('nav-open', open); toggle.setAttribute('aria-expanded', open ? 'true' : 'false'); };
-    toggle.addEventListener('click', function () { set(!header.classList.contains('nav-open')); });
-    header.querySelectorAll('.site-nav a[href]').forEach(function (a) {
-      a.addEventListener('click', function () { set(false); });
+    if (!header) return;
+    var toggle = header.querySelector('.nav-toggle');
+    var mobile = window.matchMedia('(max-width: 820px)');
+
+    // Desktop dropdowns open on hover/focus (CSS). A click leaves the header focused,
+    // so :focus-within would pin it open — blur it so hover alone controls it. On
+    // mobile a dropdown header is instead an accordion toggle (tap to expand its items).
+    header.querySelectorAll('.nav-item--menu .nav-top').forEach(function (top) {
+      top.addEventListener('click', function (e) {
+        if (mobile.matches) {
+          e.preventDefault();
+          top.closest('.nav-item--menu').classList.toggle('is-open');
+        } else {
+          top.blur();
+        }
+      });
     });
+
+    // Mobile fold-out panel: the hamburger toggles it; tapping a real destination
+    // (leaf link or the CTA — not an accordion header) closes it.
+    if (toggle) {
+      var setOpen = function (open) {
+        header.classList.toggle('nav-open', open);
+        toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+      };
+      toggle.addEventListener('click', function () { setOpen(!header.classList.contains('nav-open')); });
+      header.querySelectorAll('.site-nav a[href]:not(.nav-top), .site-cta').forEach(function (a) {
+        a.addEventListener('click', function () { setOpen(false); });
+      });
+    }
   })();
 </script>
