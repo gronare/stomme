@@ -633,11 +633,12 @@ body { font-family: var(--bk-font-sans); margin: 0; line-height: 1.6; }
   .listing-photo { position: relative; }
   .listing-img { width: 100%; aspect-ratio: 16 / 10; object-fit: cover; display: block; }
   .listing-badge {
-    position: absolute; top: 0.7rem; left: 0.7rem; color: #fff;
+    position: absolute; top: 0.7rem; left: 0.7rem;
     font-family: var(--bk-font-mono); font-size: 0.64rem; font-weight: 700;
     letter-spacing: 0.06em; text-transform: uppercase; padding: 0.25rem 0.55rem; border-radius: 6px;
   }
-  .b-avail { background: #059669; } .b-res { background: #d97706; } .b-sold { background: #64748b; }
+  /* Soft tinted pills — light background, darker same-hue text. Lighter look + readable. */
+  .b-avail { background: #d1fae5; color: #047857; } .b-res { background: #fef3c7; color: #b45309; } .b-sold { background: #e2e8f0; color: #475569; }
   .listing-card.is-sold .listing-img { filter: grayscale(0.7) opacity(0.85); }
   .listing-body { padding: 0.95rem 1rem 1.1rem; display: flex; flex-direction: column; gap: 0.55rem; flex: 1; }
   .listing-title { margin: 0; font-size: 1.05rem; line-height: 1.2; }
