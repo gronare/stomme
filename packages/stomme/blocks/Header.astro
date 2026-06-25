@@ -58,7 +58,10 @@ const resolved = await Promise.all(
         ? <Cover src={logo.image} alt={logo.alt ?? settings.name} placeholder="/images/placeholder.svg" class="logo-img" />
         : <Fragment>{logo.textPre ?? settings.name}<span class="accent">{logo.textAccent}</span></Fragment>}
     </a>
-    <nav class="site-nav">
+    <button class="nav-toggle" type="button" aria-label="Menu" aria-expanded="false" aria-controls="site-nav">
+      <span class="nav-toggle__bars" aria-hidden="true"></span>
+    </button>
+    <nav class="site-nav" id="site-nav">
       {resolved.map((i) => i.children.length ? (
         <div class="nav-item nav-item--menu">
           {i.href
@@ -83,4 +86,15 @@ const resolved = await Promise.all(
   document.querySelectorAll('.site-nav .nav-top').forEach(function (top) {
     top.addEventListener('click', function () { top.blur(); });
   });
+  // Mobile fold-out menu: the hamburger toggles a panel; a link tap closes it.
+  (function () {
+    var header = document.querySelector('.site-header');
+    var toggle = header && header.querySelector('.nav-toggle');
+    if (!toggle) return;
+    var set = function (open) { header.classList.toggle('nav-open', open); toggle.setAttribute('aria-expanded', open ? 'true' : 'false'); };
+    toggle.addEventListener('click', function () { set(!header.classList.contains('nav-open')); });
+    header.querySelectorAll('.site-nav a[href]').forEach(function (a) {
+      a.addEventListener('click', function () { set(false); });
+    });
+  })();
 </script>
