@@ -60,7 +60,7 @@ const n = (i: number) => String(i + 1).padStart(2, '0');
     <div class="faq-grid">
       <div class="faq-acc">
         {items.map((f, i) => (
-          <details class="faq-acc__item" open={i === 0}>
+          <details class="faq-acc__item" name="faq-acc" open={i === 0}>
             <summary class="faq-acc__q">
               <span class="faq-acc__n">{n(i)}</span>
               <span class="faq-acc__qt">{f.data.question}</span>
