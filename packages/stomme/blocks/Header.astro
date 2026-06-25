@@ -62,8 +62,9 @@ const resolved = await Promise.all(
       {resolved.map((i) => i.children.length ? (
         <div class="nav-item nav-item--menu">
           {i.href
-            ? <a class="nav-top" href={i.href} aria-haspopup="true">{i.label}<span class="nav-caret" aria-hidden="true"></span></a>
-            : <span class="nav-top" role="button" tabindex="0" aria-haspopup="true">{i.label}<span class="nav-caret" aria-hidden="true"></span></span>}
+            ? <a class="nav-top" href={i.href} aria-haspopup="true">{i.label}</a>
+            : <span class="nav-top" role="button" tabindex="0" aria-haspopup="true">{i.label}</span>}
+          <button class="nav-caret-btn" type="button" aria-label="Show submenu" aria-expanded="false"><span class="nav-caret" aria-hidden="true"></span></button>
           <ul class="nav-submenu">
             {i.children.map((c) => <li><a href={c.href}>{c.label}</a></li>)}
           </ul>
@@ -85,17 +86,22 @@ const resolved = await Promise.all(
     var toggle = header.querySelector('.nav-toggle');
     var mobile = window.matchMedia('(max-width: 820px)');
 
-    // Desktop dropdowns open on hover/focus (CSS). A click leaves the header focused,
-    // so :focus-within would pin it open — blur it so hover alone controls it. On
-    // mobile a dropdown header is instead an accordion toggle (tap to expand its items).
-    header.querySelectorAll('.nav-item--menu .nav-top').forEach(function (top) {
-      top.addEventListener('click', function (e) {
-        if (mobile.matches) {
-          e.preventDefault();
-          top.closest('.nav-item--menu').classList.toggle('is-open');
-        } else {
-          top.blur();
-        }
+    // Desktop dropdowns open on hover/focus (CSS); a click would otherwise pin them
+    // open via :focus-within, so blur on click. On mobile the caret button is the
+    // accordion toggle (expand its items), while the label link navigates as normal —
+    // a link-less header has nothing to navigate to, so tapping its label expands too.
+    header.querySelectorAll('.nav-item--menu').forEach(function (item) {
+      var top = item.querySelector('.nav-top');
+      var caret = item.querySelector('.nav-caret-btn');
+      var expand = function () {
+        var open = !item.classList.contains('is-open');
+        item.classList.toggle('is-open', open);
+        if (caret) caret.setAttribute('aria-expanded', open ? 'true' : 'false');
+      };
+      if (caret) caret.addEventListener('click', function () { if (mobile.matches) expand(); caret.blur(); });
+      if (top) top.addEventListener('click', function (e) {
+        if (mobile.matches && top.tagName === 'SPAN') { e.preventDefault(); expand(); }
+        else { top.blur(); }
       });
     });
 
