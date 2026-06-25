@@ -45,6 +45,7 @@ collections:
                         required: false
                         hint: "Pick a page on the site."
                         options:
+                          - { label: "— No page —", value: "" }
                           - { label: "Startsida (/)", value: "/" }
                           - { label: "About (/about)", value: "/about" }
                       - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
@@ -124,6 +125,7 @@ collections:
                         required: false
                         hint: "Pick a page on the site."
                         options:
+                          - { label: "— No page —", value: "" }
                           - { label: "Startsida (/)", value: "/" }
                           - { label: "About (/about)", value: "/about" }
                       - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
@@ -139,6 +141,7 @@ collections:
                         required: false
                         hint: "Pick a page on the site."
                         options:
+                          - { label: "— No page —", value: "" }
                           - { label: "Startsida (/)", value: "/" }
                           - { label: "About (/about)", value: "/about" }
                       - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
@@ -217,6 +220,7 @@ collections:
                         required: false
                         hint: "Pick a page on the site."
                         options:
+                          - { label: "— No page —", value: "" }
                           - { label: "Startsida (/)", value: "/" }
                           - { label: "About (/about)", value: "/about" }
                       - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
@@ -340,6 +344,7 @@ collections:
                             required: false
                             hint: "Pick a page on the site."
                             options:
+                              - { label: "— No page —", value: "" }
                               - { label: "Startsida (/)", value: "/" }
                               - { label: "About (/about)", value: "/about" }
                           - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
@@ -586,6 +591,7 @@ collections:
                         required: false
                         hint: "Pick a page on the site."
                         options:
+                          - { label: "— No page —", value: "" }
                           - { label: "Startsida (/)", value: "/" }
                           - { label: "About (/about)", value: "/about" }
                       - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
@@ -619,6 +625,7 @@ collections:
                         required: false
                         hint: "Pick a page on the site."
                         options:
+                          - { label: "— No page —", value: "" }
                           - { label: "Startsida (/)", value: "/" }
                           - { label: "About (/about)", value: "/about" }
                       - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
@@ -640,6 +647,7 @@ collections:
                         required: false
                         hint: "Pick a page on the site."
                         options:
+                          - { label: "— No page —", value: "" }
                           - { label: "Startsida (/)", value: "/" }
                           - { label: "About (/about)", value: "/about" }
                       - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
@@ -705,6 +713,7 @@ collections:
                     required: false
                     hint: "Pick a page on the site."
                     options:
+                      - { label: "— No page —", value: "" }
                       - { label: "Startsida (/)", value: "/" }
                       - { label: "About (/about)", value: "/about" }
                   - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
@@ -784,6 +793,7 @@ collections:
                     required: false
                     hint: "Pick a page on the site."
                     options:
+                      - { label: "— No page —", value: "" }
                       - { label: "Startsida (/)", value: "/" }
                       - { label: "About (/about)", value: "/about" }
                   - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
@@ -799,6 +809,7 @@ collections:
                     required: false
                     hint: "Pick a page on the site."
                     options:
+                      - { label: "— No page —", value: "" }
                       - { label: "Startsida (/)", value: "/" }
                       - { label: "About (/about)", value: "/about" }
                   - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
@@ -877,6 +888,7 @@ collections:
                     required: false
                     hint: "Pick a page on the site."
                     options:
+                      - { label: "— No page —", value: "" }
                       - { label: "Startsida (/)", value: "/" }
                       - { label: "About (/about)", value: "/about" }
                   - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
@@ -1000,6 +1012,7 @@ collections:
                         required: false
                         hint: "Pick a page on the site."
                         options:
+                          - { label: "— No page —", value: "" }
                           - { label: "Startsida (/)", value: "/" }
                           - { label: "About (/about)", value: "/about" }
                       - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
@@ -1246,6 +1259,7 @@ collections:
                     required: false
                     hint: "Pick a page on the site."
                     options:
+                      - { label: "— No page —", value: "" }
                       - { label: "Startsida (/)", value: "/" }
                       - { label: "About (/about)", value: "/about" }
                   - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
@@ -1279,6 +1293,7 @@ collections:
                     required: false
                     hint: "Pick a page on the site."
                     options:
+                      - { label: "— No page —", value: "" }
                       - { label: "Startsida (/)", value: "/" }
                       - { label: "About (/about)", value: "/about" }
                   - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
@@ -1300,6 +1315,7 @@ collections:
                     required: false
                     hint: "Pick a page on the site."
                     options:
+                      - { label: "— No page —", value: "" }
                       - { label: "Startsida (/)", value: "/" }
                       - { label: "About (/about)", value: "/about" }
                   - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
@@ -1404,6 +1420,7 @@ collections:
                     required: false
                     hint: "Pick a page on the site. Leave blank for a dropdown-only header (the label just opens its menu)."
                     options:
+                      - { label: "— No page —", value: "" }
                       - { label: "Startsida (/)", value: "/" }
                       - { label: "About (/about)", value: "/about" }
                   - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto: — overrides the page above." }
@@ -1430,6 +1447,7 @@ collections:
                         required: false
                         hint: "Pick a page on the site. Leave blank for a dropdown-only header (the label just opens its menu)."
                         options:
+                          - { label: "— No page —", value: "" }
                           - { label: "Startsida (/)", value: "/" }
                           - { label: "About (/about)", value: "/about" }
                       - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto: — overrides the page above." }
@@ -1450,6 +1468,7 @@ collections:
                     required: false
                     hint: "Pick a page on the site. Leave blank for a dropdown-only header (the label just opens its menu)."
                     options:
+                      - { label: "— No page —", value: "" }
                       - { label: "Startsida (/)", value: "/" }
                       - { label: "About (/about)", value: "/about" }
                   - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto: — overrides the page above." }

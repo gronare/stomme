@@ -154,6 +154,7 @@ export default {
   'Tall': 'Hög',
 
   // ── nav links + dropdowns ──
+  '— No page —': '— Ingen sida —',
   'Dropdown from collection': 'Rullgardin från samling',
   '…or manual sub-links': '…eller egna underlänkar',
   'External link, tel: or mailto: — overrides the page above.': 'Extern länk, tel: eller mailto: — åsidosätter sidan ovan.',

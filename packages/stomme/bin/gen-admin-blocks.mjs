@@ -133,6 +133,7 @@ function pageRouteOptions() {
 // Computed once: home + managed pages + every service + every town page. The
 // service/town route prefixes come from the site's config (ROUTES above).
 const PAGE_OPTIONS = [
+  { label: '— No page —', value: '' }, // lets a link be cleared / left blank (e.g. a dropdown-only nav header)
   ...pageRouteOptions(),
   ...collectionOptions('src/content/services', ROUTES.services, 'navLabel'),
   ...collectionOptions('src/content/towns', ROUTES.towns, 'name'),
