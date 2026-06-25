@@ -1,13 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" role="img" aria-label="Platshållarbild">
-  <rect width="800" height="600" fill="#f5f5f4"/>
-  <rect width="800" height="600" fill="#f04e30" opacity="0.06"/>
-  <g transform="translate(400,260)" stroke="#f04e30" stroke-width="8" fill="none">
-    <line x1="-90" y1="-45" x2="90" y2="45"/>
-    <line x1="90" y1="-45" x2="-90" y2="45"/>
-    <circle cx="-90" cy="-45" r="28"/><circle cx="90" cy="-45" r="28"/>
-    <circle cx="-90" cy="45" r="28"/><circle cx="90" cy="45" r="28"/>
-    <rect x="-32" y="-18" width="64" height="36" rx="8" fill="#f04e30"/>
-  </g>
-  <text x="400" y="420" fill="#1a1a1a" font-family="Inter, sans-serif" font-size="30" font-weight="800" text-anchor="middle" letter-spacing="-0.5">DRÖNAR<tspan fill="#f04e30">FLEX</tspan></text>
-  <text x="400" y="452" fill="#9a9a9a" font-family="Inter, sans-serif" font-size="15" text-anchor="middle" letter-spacing="5">PLATSHÅLLARBILD</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" role="img" aria-label="Image placeholder">
+  <rect width="800" height="600" fill="#eceff3"/>
+  <circle cx="600" cy="175" r="58" fill="#d7dde5"/>
+  <path d="M0 470 L230 255 L380 385 L520 275 L800 480 L800 600 L0 600 Z" fill="#d7dde5"/>
+  <path d="M0 545 L185 405 L330 505 L470 415 L650 545 L800 480 L800 600 L0 600 Z" fill="#c4ccd8"/>
 </svg>
