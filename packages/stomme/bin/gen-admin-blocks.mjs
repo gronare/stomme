@@ -276,8 +276,8 @@ function emitWidget(indent) {
 // or with manual sub-links.
 function navLinkField() {
   return {
-    name: 'link', label: 'Link', widget: 'object', fields: [
-      { name: 'page', label: 'Page', widget: 'select', options: '$pages', hint: 'Pick a page on the site.' },
+    name: 'link', label: 'Link', widget: 'object', required: false, fields: [
+      { name: 'page', label: 'Page', widget: 'select', options: '$pages', required: false, hint: 'Pick a page on the site. Leave blank for a dropdown-only header (the label just opens its menu).' },
       { name: 'url', label: '…or a custom URL', widget: 'string', required: false, hint: 'External link, tel: or mailto: — overrides the page above.' },
     ],
   };

@@ -45,8 +45,10 @@ async function childrenOf(item: NavItem): Promise<{ label: string; href: string 
   if (Array.isArray(item.children)) return item.children.map((c) => ({ label: c.label, href: resolveLink(c.link, homeHref) }));
   return [];
 }
+// Empty href (not the home fallback) marks a dropdown-only header — a parent that
+// just opens its menu and links nowhere.
 const resolved = await Promise.all(
-  items.map(async (i) => ({ label: i.label, href: resolveLink(i.link, homeHref), children: await childrenOf(i) })),
+  items.map(async (i) => ({ label: i.label, href: resolveLink(i.link, ''), children: await childrenOf(i) })),
 );
 ---
 <header class="site-header">
@@ -59,13 +61,15 @@ const resolved = await Promise.all(
     <nav class="site-nav">
       {resolved.map((i) => i.children.length ? (
         <div class="nav-item nav-item--menu">
-          <a class="nav-top" href={i.href} aria-haspopup="true">{i.label}<span class="nav-caret" aria-hidden="true"></span></a>
+          {i.href
+            ? <a class="nav-top" href={i.href} aria-haspopup="true">{i.label}<span class="nav-caret" aria-hidden="true"></span></a>
+            : <span class="nav-top" role="button" tabindex="0" aria-haspopup="true">{i.label}<span class="nav-caret" aria-hidden="true"></span></span>}
           <ul class="nav-submenu">
             {i.children.map((c) => <li><a href={c.href}>{c.label}</a></li>)}
           </ul>
         </div>
       ) : (
-        <a href={i.href}>{i.label}</a>
+        <a href={i.href || homeHref}>{i.label}</a>
       ))}
       {nav.cta && <a class="btn" href={resolveLink(nav.cta.link, homeHref)}>{nav.cta.label}</a>}
     </nav>

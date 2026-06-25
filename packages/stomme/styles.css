@@ -248,7 +248,7 @@ body { font-family: var(--bk-font-sans); margin: 0; line-height: 1.6; }
 .site-nav a.btn:hover { color: var(--color-on-dark); }
 /* nav dropdown — CSS-only flyout (hover + focus-within); inline accordion on mobile */
 .nav-item--menu { position: relative; display: inline-flex; align-items: center; }
-.nav-top { display: inline-flex; align-items: center; gap: 6px; text-decoration: none; color: var(--color-ink); }
+.nav-top { display: inline-flex; align-items: center; gap: 6px; text-decoration: none; color: var(--color-ink); cursor: pointer; }
 .nav-top:hover { color: var(--color-brand); }
 .nav-caret { width: 7px; height: 7px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(45deg) translateY(-2px); opacity: 0.55; }
 .nav-submenu { position: absolute; top: calc(100% + 10px); left: 0; min-width: 224px; margin: 0; padding: 8px; list-style: none;

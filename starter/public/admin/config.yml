@@ -1396,11 +1396,13 @@ collections:
               - name: link
                 label: "Link"
                 widget: object
+                required: false
                 fields:
                   - name: page
                     label: "Page"
                     widget: select
-                    hint: "Pick a page on the site."
+                    required: false
+                    hint: "Pick a page on the site. Leave blank for a dropdown-only header (the label just opens its menu)."
                     options:
                       - { label: "Startsida (/)", value: "/" }
                       - { label: "About (/about)", value: "/about" }
@@ -1420,11 +1422,13 @@ collections:
                   - name: link
                     label: "Link"
                     widget: object
+                    required: false
                     fields:
                       - name: page
                         label: "Page"
                         widget: select
-                        hint: "Pick a page on the site."
+                        required: false
+                        hint: "Pick a page on the site. Leave blank for a dropdown-only header (the label just opens its menu)."
                         options:
                           - { label: "Startsida (/)", value: "/" }
                           - { label: "About (/about)", value: "/about" }
@@ -1438,11 +1442,13 @@ collections:
               - name: link
                 label: "Link"
                 widget: object
+                required: false
                 fields:
                   - name: page
                     label: "Page"
                     widget: select
-                    hint: "Pick a page on the site."
+                    required: false
+                    hint: "Pick a page on the site. Leave blank for a dropdown-only header (the label just opens its menu)."
                     options:
                       - { label: "Startsida (/)", value: "/" }
                       - { label: "About (/about)", value: "/about" }
