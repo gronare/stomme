@@ -56,6 +56,16 @@ const footerDraft = kind === 'footer' && draft && typeof draft === 'object' ? dr
   <Base title="Preview"><div id="preview-root"><BlockRenderer blocks={blocks} config={site} /></div></Base>
 )}
 <script is:inline>
+  // Each edit re-points this iframe at a new ?data=, so it reloads. Persist + restore
+  // the scroll position so the preview doesn't jump back to the top on every keystroke.
+  (function () {
+    var KEY = 'stomme:previewScroll';
+    try {
+      var saved = sessionStorage.getItem(KEY);
+      if (saved) window.addEventListener('load', function () { window.scrollTo(0, +saved); });
+      window.addEventListener('scroll', function () { sessionStorage.setItem(KEY, String(window.scrollY)); }, { passive: true });
+    } catch (e) {}
+  })();
   window.addEventListener('message', (e) => {
     if (e.data && e.data.type === 'stomme:preview' && typeof e.data.data === 'string') {
       const u = new URL(location.href);

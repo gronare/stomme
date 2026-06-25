@@ -7,7 +7,9 @@
 
 :root {
   --color-brand: #4338ca;
-  --color-brand-press: #3730a3;
+  /* Pressed/hover shade of the brand — derived so it tracks any brand colour the
+     theme sets (it isn't a theme field). */
+  --color-brand-press: color-mix(in srgb, var(--color-brand) 82%, #000);
   --color-ink: #1f2937;
   --color-on-dark: #ffffff;
   --color-surface: #e0e7ff;
