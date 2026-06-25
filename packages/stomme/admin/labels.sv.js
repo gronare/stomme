@@ -153,6 +153,13 @@ export default {
   'Height': 'Höjd',
   'Tall': 'Hög',
 
+  // ── nav links + dropdowns ──
+  'Dropdown from collection': 'Rullgardin från samling',
+  '…or manual sub-links': '…eller egna underlänkar',
+  'External link, tel: or mailto: — overrides the page above.': 'Extern länk, tel: eller mailto: — åsidosätter sidan ovan.',
+  'Optional. Fill a dropdown with every entry of a collection (e.g. all services). Overrides manual sub-links below.': 'Valfritt. Fyll en rullgardin med alla poster i en samling (t.ex. alla tjänster). Åsidosätter egna underlänkar nedan.',
+  'Blog': 'Blogg',
+
   // ── hero "energy flow" variant ──
   'Energy flow': 'Energiflöde',
   'Flow · chip label (if “Energy flow”)': 'Flöde · chip-etikett (om ”Energiflöde”)',

@@ -246,6 +246,23 @@ body { font-family: var(--bk-font-sans); margin: 0; line-height: 1.6; }
    (the nav link colour above would otherwise out-specify .btn). */
 .site-nav a.btn { color: var(--color-on-dark); }
 .site-nav a.btn:hover { color: var(--color-on-dark); }
+/* nav dropdown — CSS-only flyout (hover + focus-within); inline accordion on mobile */
+.nav-item--menu { position: relative; display: inline-flex; align-items: center; }
+.nav-top { display: inline-flex; align-items: center; gap: 6px; text-decoration: none; color: var(--color-ink); }
+.nav-top:hover { color: var(--color-brand); }
+.nav-caret { width: 7px; height: 7px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(45deg) translateY(-2px); opacity: 0.55; }
+.nav-submenu { position: absolute; top: calc(100% + 10px); left: 0; min-width: 224px; margin: 0; padding: 8px; list-style: none;
+  background: var(--color-paper); border: 1px solid var(--color-line); border-radius: 12px; box-shadow: 0 24px 48px -24px rgba(0,0,0,0.35);
+  opacity: 0; visibility: hidden; transform: translateY(-6px); transition: opacity 0.15s, transform 0.15s, visibility 0.15s; z-index: 50; }
+.nav-item--menu:hover .nav-submenu, .nav-item--menu:focus-within .nav-submenu { opacity: 1; visibility: visible; transform: translateY(0); }
+.nav-submenu a { display: block; padding: 9px 12px; border-radius: 8px; text-decoration: none; color: var(--color-ink); }
+.nav-submenu a:hover { background: color-mix(in srgb, var(--color-surface) 30%, var(--color-paper)); color: var(--color-brand); }
+@media (max-width: 760px) {
+  .nav-item--menu { display: block; width: 100%; }
+  .nav-submenu { position: static; opacity: 1; visibility: visible; transform: none; box-shadow: none;
+    border: 0; border-left: 2px solid var(--color-line); border-radius: 0; min-width: 0; margin: 4px 0 4px 10px; padding: 0; }
+}
+
 .logo { font-family: var(--bk-font-display); font-weight: 800; font-size: 1.15rem; color: var(--color-ink); text-decoration: none; }
 .logo .accent { color: var(--color-brand); }
 .logo-img { display: block; height: 30px; width: auto; }

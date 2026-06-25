@@ -172,6 +172,16 @@ const presetOk = (b) => (b.type !== 'catalogList' || hasCatalog) && (b.type !== 
 const AVAILABLE_BLOCKS = BLOCKS.filter((b) => (!b.collection || collectionEnabled(b.collection)) && presetOk(b));
 const SKIPPED_BLOCKS = BLOCKS.filter((b) => (b.collection && !collectionEnabled(b.collection)) || !presetOk(b));
 
+// Nav dropdown sources: collections that render detail pages. The value encodes
+// "<collectionId>::<routeBase>" so Header can both query the collection and build
+// per-entry links. Feature collections with detail routes + every listing.
+const MENU_OPTIONS = [];
+if (collectionEnabled('services')) MENU_OPTIONS.push({ label: 'Services', value: `services::${ROUTES.services || '/services'}` });
+if (collectionEnabled('towns')) MENU_OPTIONS.push({ label: 'Areas', value: `towns::${ROUTES.towns || '/areas'}` });
+if (collectionEnabled('posts')) MENU_OPTIONS.push({ label: 'Blog', value: `posts::${ROUTES.blog || '/blog'}` });
+for (const l of LISTINGS) MENU_OPTIONS.push({ label: l.label || l.id, value: `${l.id}::${l.route}` });
+OPTION_SOURCES['$menus'] = MENU_OPTIONS;
+
 // Cluster the "add section" picker (and the gallery) by group. Sort is stable, so blocks
 // keep their catalog order within a group; unknown/missing groups fall to the end.
 const GROUP_ORDER = ['Hero & headers', 'Text', 'Cards & lists', 'Media', 'Quote & highlight', 'Numbers', 'From collections', 'Calls to action', 'Automatic'];
@@ -248,6 +258,37 @@ function emitWidget(indent) {
     }
   }
   return lines.join('\n');
+}
+
+// ── Nav links (generated) ───────────────────────────────────────────────────
+// Nav links use the same page-dropdown as blocks ($pages) instead of a free string,
+// and the page is required (a custom URL overrides it) so a link always resolves.
+// Each menu item can also become a dropdown — auto-filled from a collection ($menus)
+// or with manual sub-links.
+function navLinkField() {
+  return {
+    name: 'link', label: 'Link', widget: 'object', fields: [
+      { name: 'page', label: 'Page', widget: 'select', options: '$pages', hint: 'Pick a page on the site.' },
+      { name: 'url', label: '…or a custom URL', widget: 'string', required: false, hint: 'External link, tel: or mailto: — overrides the page above.' },
+    ],
+  };
+}
+function emitNavLinks(indent) {
+  const items = {
+    name: 'items', label: 'Menu links', widget: 'list', required: false, fields: [
+      { name: 'label', label: 'Label', widget: 'string' },
+      navLinkField(),
+      { name: 'menu', label: 'Dropdown from collection', widget: 'select', options: '$menus', required: false, hint: 'Optional. Fill a dropdown with every entry of a collection (e.g. all services). Overrides manual sub-links below.' },
+      { name: 'children', label: '…or manual sub-links', widget: 'list', required: false, fields: [{ name: 'label', label: 'Label', widget: 'string' }, navLinkField()] },
+    ],
+  };
+  const cta = {
+    name: 'cta', label: 'Button', widget: 'object', required: false, fields: [
+      { name: 'label', label: 'Label', widget: 'string' },
+      navLinkField(),
+    ],
+  };
+  return [emitField(items, indent), emitField(cta, indent)].join('\n');
 }
 
 // ── Collection editors ──────────────────────────────────────────────────────
@@ -411,7 +452,7 @@ function emitCollections(indent) {
   return [...fixed, ...listing].join('\n');
 }
 
-const EMITTERS = { blocks: emitWidget, collections: emitCollections };
+const EMITTERS = { blocks: emitWidget, collections: emitCollections, navlinks: emitNavLinks };
 
 // Fill every `# >>> NAME:generated … # <<< NAME:generated` region (idempotent).
 const lines = readFileSync(configPath, 'utf8').split('\n');

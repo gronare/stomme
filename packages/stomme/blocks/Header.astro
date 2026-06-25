@@ -1,5 +1,5 @@
 ---
-import { getEntry } from 'astro:content';
+import { getEntry, getCollection } from 'astro:content';
 import { resolveLink } from '../src/href';
 import Cover from '../src/Cover.astro';
 
@@ -8,9 +8,14 @@ import Cover from '../src/Cover.astro';
 // injected (e.g. the CMS live preview). A site that wants bespoke chrome can stop
 // importing this and render its own .site-header markup. The logo is an uploaded
 // image when `logo.image` is set, otherwise the two-tone text mark.
+//
+// A nav item becomes a dropdown when it has `menu` (auto: "<collectionId>::<routeBase>"
+// — lists every entry, linked to its detail page) or manual `children`.
+interface NavLink { label: string; link?: unknown }
+interface NavItem extends NavLink { menu?: string; children?: NavLink[] }
 interface NavData {
   logo?: { textPre?: string; textAccent?: string; image?: string; alt?: string };
-  items?: { label: string; link?: unknown }[];
+  items?: NavItem[];
   cta?: { label: string; link?: unknown };
 }
 interface Props { nav?: NavData; settings?: { name?: string } }
@@ -22,6 +27,27 @@ if (!settings) settings = (await getEntry('settings', 'site'))!.data as { name?:
 const logo = nav.logo ?? {};
 const items = nav.items ?? [];
 const homeHref = '/';
+
+// Resolve an item's dropdown children: auto from a collection, or manual links.
+async function childrenOf(item: NavItem): Promise<{ label: string; href: string }[]> {
+  if (item.menu) {
+    const [id, base] = String(item.menu).split('::');
+    try {
+      const entries = await getCollection(id as any);
+      entries.sort((a: any, b: any) => {
+        const da = a.data.date, db = b.data.date;
+        if (da && db) return da < db ? 1 : -1;
+        return String(a.data.navLabel ?? a.data.title ?? a.id).localeCompare(String(b.data.navLabel ?? b.data.title ?? b.id));
+      });
+      return entries.map((e: any) => ({ label: e.data.navLabel ?? e.data.title ?? e.id, href: `${base}/${e.id}` }));
+    } catch { return []; }
+  }
+  if (Array.isArray(item.children)) return item.children.map((c) => ({ label: c.label, href: resolveLink(c.link, homeHref) }));
+  return [];
+}
+const resolved = await Promise.all(
+  items.map(async (i) => ({ label: i.label, href: resolveLink(i.link, homeHref), children: await childrenOf(i) })),
+);
 ---
 <header class="site-header">
   <div class="inner">
@@ -31,7 +57,16 @@ const homeHref = '/';
         : <Fragment>{logo.textPre ?? settings.name}<span class="accent">{logo.textAccent}</span></Fragment>}
     </a>
     <nav class="site-nav">
-      {items.map((i) => <a href={resolveLink(i.link, homeHref)}>{i.label}</a>)}
+      {resolved.map((i) => i.children.length ? (
+        <div class="nav-item nav-item--menu">
+          <a class="nav-top" href={i.href} aria-haspopup="true">{i.label}<span class="nav-caret" aria-hidden="true"></span></a>
+          <ul class="nav-submenu">
+            {i.children.map((c) => <li><a href={c.href}>{c.label}</a></li>)}
+          </ul>
+        </div>
+      ) : (
+        <a href={i.href}>{i.label}</a>
+      ))}
       {nav.cta && <a class="btn" href={resolveLink(nav.cta.link, homeHref)}>{nav.cta.label}</a>}
     </nav>
   </div>

@@ -77,7 +77,12 @@ export function stommeCollections(listings?: Listing[]) {
       loader: md('navigation'),
       schema: z.object({
         logo: z.object({ textPre: z.string().default(''), textAccent: z.string().default(''), image: z.string().optional(), alt: z.string().optional() }).default({}),
-        items: z.array(z.object({ label: z.string(), link })).default([]),
+        items: z.array(z.object({
+          label: z.string(),
+          link,
+          menu: z.string().optional(), // "<collectionId>::<routeBase>" → auto dropdown
+          children: z.array(z.object({ label: z.string(), link })).default([]), // manual dropdown
+        })).default([]),
         cta: z.object({ label: z.string(), link }).optional(),
       }),
     }),

@@ -1386,17 +1386,49 @@ collections:
               - { name: alt, label: "Logo alt text", widget: string, required: false }
               - { name: textPre, label: "Logo text (if no image)", widget: string, required: false }
               - { name: textAccent, label: "Logo accent", widget: string, required: false }
+          # >>> navlinks:generated (run: pnpm cms:gen — do not edit between markers)
           - name: items
             label: "Menu links"
             widget: list
+            required: false
             fields:
               - { name: label, label: "Label", widget: string }
               - name: link
                 label: "Link"
                 widget: object
                 fields:
-                  - { name: page, label: "Page", widget: string, required: false }
-                  - { name: url, label: "Custom URL", widget: string, required: false }
+                  - name: page
+                    label: "Page"
+                    widget: select
+                    hint: "Pick a page on the site."
+                    options:
+                      - { label: "Startsida (/)", value: "/" }
+                      - { label: "About (/about)", value: "/about" }
+                  - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto: — overrides the page above." }
+              - name: menu
+                label: "Dropdown from collection"
+                widget: select
+                required: false
+                hint: "Optional. Fill a dropdown with every entry of a collection (e.g. all services). Overrides manual sub-links below."
+                options: []
+              - name: children
+                label: "…or manual sub-links"
+                widget: list
+                required: false
+                fields:
+                  - { name: label, label: "Label", widget: string }
+                  - name: link
+                    label: "Link"
+                    widget: object
+                    fields:
+                      - name: page
+                        label: "Page"
+                        widget: select
+                        hint: "Pick a page on the site."
+                        options:
+                          - { label: "Startsida (/)", value: "/" }
+                          - { label: "About (/about)", value: "/about" }
+                      - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto: — overrides the page above." }
           - name: cta
             label: "Button"
             widget: object
@@ -1407,8 +1439,15 @@ collections:
                 label: "Link"
                 widget: object
                 fields:
-                  - { name: page, label: "Page", widget: string, required: false }
-                  - { name: url, label: "Custom URL", widget: string, required: false }
+                  - name: page
+                    label: "Page"
+                    widget: select
+                    hint: "Pick a page on the site."
+                    options:
+                      - { label: "Startsida (/)", value: "/" }
+                      - { label: "About (/about)", value: "/about" }
+                  - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto: — overrides the page above." }
+          # <<< navlinks:generated
       - name: footer
         label: "Footer"
         file: "src/content/footer/footer.md"
