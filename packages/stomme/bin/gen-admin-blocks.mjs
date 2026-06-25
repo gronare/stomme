@@ -55,6 +55,16 @@ try {
 } catch {
   /* no site.config — use defaults */
 }
+// The blog is an article listing in all but name — desugar it so one code path
+// (editor, seeded index, dropdown source) covers blog + every listing. Honour the
+// features flag, or fall back to a posts folder for sites with no features config
+// (mirrors collectionEnabled). Skip if the site already declares a `posts` listing.
+const blogEnabled = FEATURES
+  ? !!FEATURES.blog
+  : (() => { try { return readdirSync(resolve(root, 'src/content/posts')).some((f) => f.endsWith('.md')); } catch { return false; } })();
+if (blogEnabled && !LISTINGS.some((l) => l.id === 'posts')) {
+  LISTINGS.unshift({ id: 'posts', route: ROUTES.blog || '/blog', label: 'Blog', preset: 'article' });
+}
 
 // Load every shipped admin label dictionary (labels.<locale>.js). FORWARD is the active
 // locale's dict (English ships none). REVERSE_ALL maps every translation back to English
@@ -178,8 +188,7 @@ const SKIPPED_BLOCKS = BLOCKS.filter((b) => (b.collection && !collectionEnabled(
 const MENU_OPTIONS = [];
 if (collectionEnabled('services')) MENU_OPTIONS.push({ label: 'Services', value: `services::${ROUTES.services || '/services'}` });
 if (collectionEnabled('towns')) MENU_OPTIONS.push({ label: 'Areas', value: `towns::${ROUTES.towns || '/areas'}` });
-if (collectionEnabled('posts')) MENU_OPTIONS.push({ label: 'Blog', value: `posts::${ROUTES.blog || '/blog'}` });
-for (const l of LISTINGS) MENU_OPTIONS.push({ label: l.label || l.id, value: `${l.id}::${l.route}` });
+for (const l of LISTINGS) MENU_OPTIONS.push({ label: l.label || l.id, value: `${l.id}::${l.route}` }); // blog is in LISTINGS too
 OPTION_SOURCES['$menus'] = MENU_OPTIONS;
 
 // Cluster the "add section" picker (and the gallery) by group. Sort is stable, so blocks
@@ -360,18 +369,6 @@ const COLLECTION_EDITORS = {
       fields:
         - { name: title, label: "Title", widget: string }
         - { name: description, label: "Description", widget: text }`,
-  posts: `- name: posts
-  label: "Blog posts"
-  label_singular: "Post"
-  folder: "src/content/posts"
-  create: true
-  slug: "{{slug}}"
-  fields:
-    - { name: title, label: "Title", widget: string }
-    - { name: date, label: "Date", widget: datetime, date_format: "YYYY-MM-DD", time_format: false }
-    - { name: excerpt, label: "Excerpt", widget: text, required: false }
-    - { name: cover, label: "Cover image", widget: image, required: false }
-    - { name: body, label: "Body", widget: markdown }`,
   services: `- name: services
   label: "Services"
   label_singular: "Service"
@@ -533,26 +530,6 @@ try {
   console.warn('  (blocks.html skipped:', e.message + ')');
 }
 
-// When blog is enabled, seed an editable index page at the blog route — once, only if
-// absent, never overwriting edits. It's a normal managed page (pageHeader + postList), so
-// the blog has a default index that's composed of blocks and editable in the CMS rather
-// than a fixed template. Delete it to opt out (or turn the feature off).
-try {
-  if (collectionEnabled('posts')) {
-    const slug = (ROUTES.blog || '/blog').replace(/^\/+/, '') || 'blog';
-    const pagePath = resolve(root, 'src/content/pages', `${slug}.md`);
-    if (!existsSync(pagePath)) {
-      mkdirSync(dirname(pagePath), { recursive: true });
-      writeFileSync(
-        pagePath,
-        '---\ntitle: "Blog"\nseo:\n  title: "Blog"\n  description: "Latest posts, guides and updates."\nblocks:\n  - type: pageHeader\n    eyebrow: Blog\n    heading: Blog\n    intro: "Latest posts, guides and updates."\n  - type: postList\n    featured: true\n    showImages: true\n    columns: 3\n---\n',
-      );
-      console.log(`  ↳ seeded editable blog index: src/content/pages/${slug}.md`);
-    }
-  }
-} catch (e) {
-  console.warn('  (blog index seed skipped:', e.message + ')');
-}
 
 // Seed an editable index page per listing (once, if absent): pageHeader + the preset's
 // list block, pointed at the listing's collection + route. Edit or delete like any page.

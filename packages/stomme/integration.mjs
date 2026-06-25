@@ -92,6 +92,11 @@ export default function stomme(options = {}) {
   const features = options.features || {};
   const routes = options.routes || {};
   const listings = resolveListings(options.listings);
+  // The blog is an article listing in all but name — fold it in so detail routes go
+  // through the same generated entrypoint (PostPage) as any listing.
+  if (features.blog && !listings.some((l) => l.id === 'posts')) {
+    listings.unshift({ id: 'posts', route: routes.blog || '/blog', label: 'Blog', preset: 'article' });
+  }
   const layout = options.layout || 'src/layouts/Base.astro';
   const configPath = options.config || 'src/site.config.ts';
 
@@ -123,9 +128,8 @@ export default function stomme(options = {}) {
         injectRoute({ pattern: '/preview', entrypoint: previewFile });
         enabled.push(`/preview${isStatic ? ' (static)' : ''}`);
 
-        // 1. Fixed feature routes (blog/areas/services).
+        // 1. Fixed feature routes (areas/services). Blog is handled as a listing below.
         const routed = [
-          { on: features.blog, prefix: routes.blog || '/blog', entrypoint: '@gronare/stomme/routes/post.astro' },
           { on: features.areas, prefix: routes.towns || '/areas', entrypoint: '@gronare/stomme/routes/town.astro' },
           { on: features.services, prefix: routes.services || '/services', entrypoint: '@gronare/stomme/routes/service.astro' },
         ];
