@@ -64,7 +64,16 @@ export const site: SiteConfig = {
 //   preset  — 'article' (title, date, excerpt, cover, body  → blog/news)
 //          — 'catalog' (title, price, status, category, gallery, specs, body → for-sale of anything)
 //   options — optional presentation: { columns?: number; showImages?: boolean; featured?: boolean; filters?: boolean }
+// Uncomment an example to enable it, then run `pnpm cms:gen`. You then get, per entry:
+//   • an admin collection "Nyheter" / "Till salu" to add entries in
+//   • an editable index page at the route (pageHeader + the list block), seeded once
+//   • detail pages at <route>/<slug>
+//   • content under src/content/<id>/ (e.g. src/content/nyheter/my-post.md)
 export const listings: Listing[] = [
-  // { id: 'nyheter', route: '/nyheter',  label: 'Nyheter',   preset: 'article' },
-  // { id: 'bilar',   route: '/till-salu', label: 'Till salu', preset: 'catalog', options: { columns: 3, filters: true } },
+  // News: /nyheter index + /nyheter/<slug> posts. Entries: title, date, excerpt, cover, body.
+  // { id: 'nyheter', route: '/nyheter', label: 'Nyheter', preset: 'article' },
+
+  // For-sale (e.g. used cars): /till-salu index with category filters + status badges
+  // (available/reserved/sold), and /till-salu/<slug> detail with price, specs + gallery.
+  // { id: 'bilar', route: '/till-salu', label: 'Till salu', preset: 'catalog', options: { columns: 3, filters: true } },
 ];
