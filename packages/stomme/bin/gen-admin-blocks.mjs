@@ -164,10 +164,13 @@ function collectionEnabled(name) {
   if (FEATURES && FEATURE_OF[name]) return !!FEATURES[FEATURE_OF[name]];
   return collectionExists(name);
 }
-// catalogList only makes sense with a catalog listing present; hide it otherwise.
+// The preset-list blocks only make sense with a matching listing present (postList
+// also covers the blog, which is an article listing in all but name) — hide otherwise.
 const hasCatalog = LISTINGS.some((l) => l.preset === 'catalog');
-const AVAILABLE_BLOCKS = BLOCKS.filter((b) => (!b.collection || collectionEnabled(b.collection)) && (b.type !== 'catalogList' || hasCatalog));
-const SKIPPED_BLOCKS = BLOCKS.filter((b) => b.collection && !collectionEnabled(b.collection));
+const hasArticle = !!(FEATURES && FEATURES.blog) || LISTINGS.some((l) => l.preset === 'article');
+const presetOk = (b) => (b.type !== 'catalogList' || hasCatalog) && (b.type !== 'postList' || hasArticle);
+const AVAILABLE_BLOCKS = BLOCKS.filter((b) => (!b.collection || collectionEnabled(b.collection)) && presetOk(b));
+const SKIPPED_BLOCKS = BLOCKS.filter((b) => (b.collection && !collectionEnabled(b.collection)) || !presetOk(b));
 
 // Cluster the "add section" picker (and the gallery) by group. Sort is stable, so blocks
 // keep their catalog order within a group; unknown/missing groups fall to the end.

@@ -277,11 +277,10 @@ export const defaultBlocks: BlockDef[] = [
   },
   {
     type: 'postList',
-    label: 'Blog posts',
+    label: 'Posts (blog / news)',
     group: 'From collections',
-    summary: 'List of the latest blog posts — featured lead + a card grid with cover images.',
+    summary: 'List of the latest posts — featured lead + a card grid with cover images. Works with the blog or any article listing.',
     shape: 'list',
-    collection: 'posts',
     fields: [
       ...headingFields,
       { name: 'source', label: 'source', widget: 'hidden' },
