@@ -20,6 +20,6 @@
   ],
   "scripts": {
     "prepack": "node scripts/bundle-template.mjs",
-    "postpack": "node scripts/clean-template.mjs"
+    "clean-template": "node scripts/clean-template.mjs"
   }
 }

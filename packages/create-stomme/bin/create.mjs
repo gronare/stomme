@@ -11,8 +11,11 @@ import { resolve, dirname, basename } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const here = dirname(fileURLToPath(import.meta.url));
-const bundled = resolve(here, '../template');
-const template = existsSync(bundled) ? bundled : resolve(here, '../../../starter');
+// Prefer the live monorepo starter when it exists (dev/linked); the published package
+// has no starter sibling and falls back to the bundled ./template snapshot. This way a
+// lingering ./template never shadows the live starter, so publish needn't race to delete it.
+const starter = resolve(here, '../../../starter');
+const template = existsSync(starter) ? starter : resolve(here, '../template');
 
 const arg = process.argv[2];
 if (!arg) {

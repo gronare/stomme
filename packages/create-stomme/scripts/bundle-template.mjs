@@ -12,7 +12,7 @@ const template = resolve(here, '../template');
 // Skip build output and the admin assets that stomme-gen regenerates (dev + build both
 // run it) — shipping them would bake in a stale, engine-version-specific snapshot.
 const SKIP = new Set([
-  'node_modules', 'dist', '.astro', '.netlify',
+  'node_modules', 'dist', '.astro', '.netlify', '.gitkeep',
   'stomme-previews.js', 'stomme-site.css', 'blockkit-previews.js', 'blockkit-site.css', 'blocks.html',
 ]);
 
