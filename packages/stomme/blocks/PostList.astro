@@ -28,6 +28,10 @@ const fmt = (d: string) => new Date(d).toLocaleDateString(locale, { year: 'numer
 const lead = featured && all.length > 1 ? all[0] : null;
 const rest = lead ? all.slice(1) : all;
 const PLACE = '/images/placeholders/service.svg';
+// Show an image only when the post actually has a cover — otherwise the card is
+// text-only (no placeholder). The index mixes both kinds cleanly.
+const leadHasImg = !!(lead && showImages && lead.data.cover);
+const hasImg = (p: any) => !!(showImages && p.data.cover);
 ---
 {all.length > 0 && (
   <section class="section">
@@ -39,8 +43,8 @@ const PLACE = '/images/placeholders/service.svg';
       </div>
     )}
     {lead && (
-      <a href={`${prefix}/${lead.id}`} class="post-feature">
-        {showImages && (
+      <a href={`${prefix}/${lead.id}`} class:list={['post-feature', { 'post-feature--text': !leadHasImg }]}>
+        {leadHasImg && (
           <Cover src={lead.data.cover} alt={lead.data.title} placeholder={PLACE} width={1000} height={640} class="post-feature__img" />
         )}
         <div class="post-feature__body">
@@ -55,7 +59,7 @@ const PLACE = '/images/placeholders/service.svg';
       <div class="post-grid" style={`--post-cols:${columns}`}>
         {rest.map((p) => (
           <a href={`${prefix}/${p.id}`} class="post-card">
-            {showImages && (
+            {hasImg(p) && (
               <Cover src={p.data.cover} alt={p.data.title} placeholder={PLACE} width={800} height={480} class="post-card__img" />
             )}
             <div class="post-card__body">
