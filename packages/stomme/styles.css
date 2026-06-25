@@ -254,7 +254,7 @@ body { font-family: var(--bk-font-sans); margin: 0; line-height: 1.6; }
 .nav-submenu { position: absolute; top: calc(100% + 10px); left: 0; min-width: 224px; margin: 0; padding: 8px; list-style: none;
   background: var(--color-paper); border: 1px solid var(--color-line); border-radius: 12px; box-shadow: 0 24px 48px -24px rgba(0,0,0,0.35);
   opacity: 0; visibility: hidden; transform: translateY(-6px); transition: opacity 0.15s, transform 0.15s, visibility 0.15s; z-index: 50; }
-.nav-item--menu:hover .nav-submenu, .nav-item--menu:focus-within .nav-submenu { opacity: 1; visibility: visible; transform: translateY(0); }
+.nav-item--menu:hover .nav-submenu, .nav-item--menu:focus-within .nav-submenu, .nav-item--menu.is-open .nav-submenu { opacity: 1; visibility: visible; transform: translateY(0); }
 .nav-submenu a { display: block; padding: 9px 12px; border-radius: 8px; text-decoration: none; color: var(--color-ink); }
 .nav-submenu a:hover { background: color-mix(in srgb, var(--color-surface) 30%, var(--color-paper)); color: var(--color-brand); }
 @media (max-width: 760px) {

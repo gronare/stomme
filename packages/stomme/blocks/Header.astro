@@ -75,3 +75,35 @@ const resolved = await Promise.all(
     </nav>
   </div>
 </header>
+<script is:inline>
+  // Dropdowns open on hover + keyboard focus (CSS). This stops a click from pinning
+  // a menu open via :focus-within: a linked header blurs (so it navigates without
+  // sticking); a dropdown-only header toggles open and closes the others. Only one
+  // menu is ever open. Outside-click + Escape close any open menu.
+  (function () {
+    var menus = document.querySelectorAll('.site-nav .nav-item--menu');
+    var closeAll = function (except) {
+      menus.forEach(function (m) { if (m !== except) m.classList.remove('is-open'); });
+    };
+    menus.forEach(function (item) {
+      var top = item.querySelector('.nav-top');
+      if (!top) return;
+      top.addEventListener('click', function (e) {
+        if (top.tagName === 'SPAN') {
+          e.preventDefault();
+          var willOpen = !item.classList.contains('is-open');
+          closeAll(item);
+          if (willOpen) item.classList.add('is-open');
+          else { item.classList.remove('is-open'); top.blur(); }
+        } else {
+          closeAll();
+          top.blur(); // navigates; don't let :focus-within pin it open
+        }
+      });
+    });
+    document.addEventListener('click', function (e) {
+      if (!e.target.closest || !e.target.closest('.nav-item--menu')) closeAll();
+    });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeAll(); });
+  })();
+</script>
