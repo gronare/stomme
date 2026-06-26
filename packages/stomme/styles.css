@@ -325,31 +325,31 @@ body { font-family: var(--bk-font-sans); margin: 0; line-height: 1.6; }
    floats over it (fixed, light text, no bar) so the hero runs to the top edge, then
    turns solid (.solid, added on scroll past the hero) and over an open mobile panel
    (.nav-open). Pages that don't open with a cover keep the normal in-flow solid header. */
-body:has(main > .cover:first-child) .site-header {
+body:has(main .cover:first-child) .site-header {
   position: fixed; top: 0; left: 0; right: 0; z-index: 50;
   background: transparent; border-bottom-color: transparent; color: #fff;
   transition: background 0.3s, box-shadow 0.3s, border-color 0.3s, color 0.3s;
 }
-body:has(main > .cover:first-child) .site-header .logo,
-body:has(main > .cover:first-child) .site-header .site-nav a,
-body:has(main > .cover:first-child) .site-header .nav-top,
-body:has(main > .cover:first-child) .site-header .nav-toggle { color: #fff; }
-body:has(main > .cover:first-child) .site-header .logo .accent { color: color-mix(in srgb, var(--color-brand) 45%, #fff); }
+body:has(main .cover:first-child) .site-header .logo,
+body:has(main .cover:first-child) .site-header .site-nav a,
+body:has(main .cover:first-child) .site-header .nav-top,
+body:has(main .cover:first-child) .site-header .nav-toggle { color: #fff; }
+body:has(main .cover:first-child) .site-header .logo .accent { color: color-mix(in srgb, var(--color-brand) 45%, #fff); }
 /* solid state — scrolled past the hero, or the mobile menu is open */
-body:has(main > .cover:first-child) .site-header.solid,
-body:has(main > .cover:first-child) .site-header.nav-open {
+body:has(main .cover:first-child) .site-header.solid,
+body:has(main .cover:first-child) .site-header.nav-open {
   background: color-mix(in srgb, var(--color-paper) 96%, transparent);
   -webkit-backdrop-filter: saturate(1.2) blur(8px); backdrop-filter: saturate(1.2) blur(8px);
   border-bottom-color: var(--color-line); box-shadow: 0 12px 30px -24px rgba(0,0,0,0.5);
 }
-body:has(main > .cover:first-child) .site-header.solid .logo,
-body:has(main > .cover:first-child) .site-header.solid .site-nav a,
-body:has(main > .cover:first-child) .site-header.solid .nav-top,
-body:has(main > .cover:first-child) .site-header.solid .nav-toggle,
-body:has(main > .cover:first-child) .site-header.nav-open .logo,
-body:has(main > .cover:first-child) .site-header.nav-open .nav-toggle { color: var(--color-ink); }
-body:has(main > .cover:first-child) .site-header.solid .logo .accent,
-body:has(main > .cover:first-child) .site-header.nav-open .logo .accent { color: var(--color-brand); }
+body:has(main .cover:first-child) .site-header.solid .logo,
+body:has(main .cover:first-child) .site-header.solid .site-nav a,
+body:has(main .cover:first-child) .site-header.solid .nav-top,
+body:has(main .cover:first-child) .site-header.solid .nav-toggle,
+body:has(main .cover:first-child) .site-header.nav-open .logo,
+body:has(main .cover:first-child) .site-header.nav-open .nav-toggle { color: var(--color-ink); }
+body:has(main .cover:first-child) .site-header.solid .logo .accent,
+body:has(main .cover:first-child) .site-header.nav-open .logo .accent { color: var(--color-brand); }
 
 .site-footer { background: var(--color-surface); color: var(--color-ink); margin-top: 4rem; }
 .site-footer .inner { padding-block: 3rem; }

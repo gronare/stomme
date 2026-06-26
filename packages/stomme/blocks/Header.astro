@@ -122,7 +122,7 @@ const resolved = await Promise.all(
     // header (styled transparent via CSS :has) turns solid once scrolled past the hero.
     // This script runs before <main> is parsed, so defer the lookup until DOM ready.
     var initOverlay = function () {
-      var cover = document.querySelector('main > .cover:first-child');
+      var cover = document.querySelector('main .cover:first-child');
       if (!cover) return;
       var onScroll = function () { header.classList.toggle('solid', window.scrollY > cover.offsetHeight * 0.72); };
       window.addEventListener('scroll', onScroll, { passive: true });
