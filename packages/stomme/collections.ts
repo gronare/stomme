@@ -74,7 +74,8 @@ export function stommeCollections(listings?: Listing[]) {
         // uploaded font file used when a picker is set to 'custom'.
         fontDisplay: z.string().optional(),
         fontBody: z.string().optional(),
-        fontCustomFile: z.string().optional(),
+        fontCustomFile: z.string().optional(), // heading custom font
+        fontCustomBodyFile: z.string().optional(), // body custom font
         fontCustomName: z.string().optional(),
       }),
     }),

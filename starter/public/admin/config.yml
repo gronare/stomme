@@ -1418,8 +1418,9 @@ collections:
               - { label: "Rounded", value: "rounded" }
               - { label: "Slab serif", value: "slab" }
               - { label: "Custom (uploaded below)", value: "custom" }
-          - { name: fontCustomFile, label: "Custom font file", widget: file, required: false, hint: "A .woff2 / .woff / .ttf / .otf file. Used where a font above is set to Custom. (A font file, not an SVG.)" }
-          - { name: fontCustomName, label: "Custom font note", widget: string, required: false, hint: "Optional — just a reminder of which font this is." }
+          - { name: fontCustomFile, label: "Custom heading font file", widget: file, required: false, hint: "Used when Heading font = Custom. A .woff2 / .woff / .ttf / .otf file (a font file, not an SVG)." }
+          - { name: fontCustomBodyFile, label: "Custom body font file", widget: file, required: false, hint: "Used when Body font = Custom. Leave empty to reuse the heading font for body." }
+          - { name: fontCustomName, label: "Custom font note", widget: string, required: false, hint: "Optional — just a reminder of which font(s) these are." }
       - name: nav
         label: "Navigation"
         file: "src/content/navigation/nav.md"

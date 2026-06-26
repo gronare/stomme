@@ -17,8 +17,10 @@ const { title, description, chrome = true } = Astro.props;
 
 const settings = (await getEntry('settings', 'site'))!.data;
 const theme = (await getEntry('theme', 'theme'))!.data;
-const customFontUrl = theme.fontCustomFile ? (fontFiles as Record<string, string>)[theme.fontCustomFile] : null;
-const fonts = resolveFonts(theme, customFontUrl);
+const ff = fontFiles as Record<string, string>;
+const customDisplayUrl = theme.fontCustomFile ? ff[theme.fontCustomFile] : null;
+const customBodyUrl = theme.fontCustomBodyFile ? ff[theme.fontCustomBodyFile] : null;
+const fonts = resolveFonts(theme, customDisplayUrl, customBodyUrl);
 
 // Inject the owner-editable theme tokens as CSS vars on <html>, overriding the
 // build-time defaults in global.css.
@@ -45,7 +47,7 @@ const themeVars = [
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title ?? settings.name}</title>
     {description && <meta name="description" content={description} />}
-    {fonts.preload && <link rel="preload" as="font" type={fonts.preload.type} href={fonts.preload.href} crossorigin />}
+    {fonts.preloads.map((p) => <link rel="preload" as="font" type={p.type} href={p.href} crossorigin />)}
     {fonts.fontFace && <style is:inline set:html={fonts.fontFace}></style>}
   </head>
   <body>

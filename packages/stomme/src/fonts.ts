@@ -12,33 +12,39 @@ export const FONT_STACKS: Record<string, string> = {
   mono: 'ui-monospace, "SF Mono", Menlo, Consolas, monospace',
 };
 
-const CUSTOM_FAMILY = '"StommeCustom"';
 const formatOf = (path: string) =>
   path.endsWith('.woff2') ? 'woff2' : path.endsWith('.woff') ? 'woff' : path.endsWith('.otf') ? 'opentype' : 'truetype';
 // MIME type for <link rel=preload as=font type=…>
 const mimeOf = (path: string) =>
   path.endsWith('.woff2') ? 'font/woff2' : path.endsWith('.woff') ? 'font/woff' : path.endsWith('.otf') ? 'font/otf' : 'font/ttf';
+const fontFace = (family: string, url: string) =>
+  `@font-face{font-family:"${family}";src:url("${url}") format("${formatOf(url)}");font-display:swap;font-weight:100 900;}`;
 
-// Resolve the theme's font choices into CSS-var declarations, an optional @font-face,
-// and (for a custom upload) a preload descriptor so Base can fetch the font before paint
-// — avoids the flash of fallback text (FOUT). `customUrl` is the served URL of an
-// uploaded font file (Base resolves it via a glob).
+// Resolve the theme's font choices into CSS-var declarations, @font-face rules, and
+// preload descriptors (so Base fetches custom fonts before paint — avoids the FOUT flash).
+// Two independent custom uploads: one for the display (heading) picker, one for the body
+// picker — each used where its picker is set to 'custom'. URLs are the served upload paths
+// (Base resolves them via a glob).
 export function resolveFonts(
   theme: { fontDisplay?: string; fontBody?: string } = {},
-  customUrl?: string | null,
-): { vars: string[]; fontFace: string | null; preload: { href: string; type: string } | null } {
-  const stack = (key?: string): string | null => {
-    if (key === 'custom') return customUrl ? `${CUSTOM_FAMILY}, ${FONT_STACKS.system}` : null;
+  customDisplayUrl?: string | null,
+  customBodyUrl?: string | null,
+): { vars: string[]; fontFace: string | null; preloads: { href: string; type: string }[] } {
+  const stack = (key: string | undefined, customFamily: string | null): string | null => {
+    if (key === 'custom') return customFamily ? `${customFamily}, ${FONT_STACKS.system}` : null;
     return key && FONT_STACKS[key] ? FONT_STACKS[key] : null;
   };
+  const dispFamily = customDisplayUrl ? '"StommeFontDisplay"' : null;
+  // Body custom font falls back to the heading one when not uploaded (one-font setups).
+  const bodyFamily = customBodyUrl ? '"StommeFontBody"' : dispFamily;
   const vars: string[] = [];
-  const d = stack(theme.fontDisplay);
+  const d = stack(theme.fontDisplay, dispFamily);
   if (d) vars.push(`--bk-font-display:${d}`);
-  const b = stack(theme.fontBody);
+  const b = stack(theme.fontBody, bodyFamily);
   if (b) vars.push(`--bk-font-sans:${b}`);
-  const fontFace = customUrl
-    ? `@font-face{font-family:${CUSTOM_FAMILY};src:url("${customUrl}") format("${formatOf(customUrl)}");font-display:swap;font-weight:100 900;}`
-    : null;
-  const preload = customUrl ? { href: customUrl, type: mimeOf(customUrl) } : null;
-  return { vars, fontFace, preload };
+  const faces: string[] = [];
+  const preloads: { href: string; type: string }[] = [];
+  if (customDisplayUrl) { faces.push(fontFace('StommeFontDisplay', customDisplayUrl)); preloads.push({ href: customDisplayUrl, type: mimeOf(customDisplayUrl) }); }
+  if (customBodyUrl) { faces.push(fontFace('StommeFontBody', customBodyUrl)); preloads.push({ href: customBodyUrl, type: mimeOf(customBodyUrl) }); }
+  return { vars, fontFace: faces.length ? faces.join('') : null, preloads };
 }
