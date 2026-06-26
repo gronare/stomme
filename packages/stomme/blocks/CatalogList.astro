@@ -1,6 +1,8 @@
 ---
 import { getCollection } from 'astro:content';
 import Cover from '../src/Cover.astro';
+import * as siteConfig from '@stomme/config';
+import { resolveListings, listingSpecRows } from '../src/config';
 
 // Catalog index for a `catalog` listing (for-sale items). Reads the listing's collection
 // (`source`) and renders a filterable card grid: cover + status badge, price, a few specs.
@@ -25,6 +27,8 @@ const ST = { available: 'avail', reserved: 'res', sold: 'sold' };
 const items = source
   ? (await getCollection(source)).sort((a, b) => ((a.data.date ?? '') < (b.data.date ?? '') ? 1 : -1))
   : [];
+// The listing's config-defined specs (labels), paired per-item with keyed values below.
+const listing = resolveListings((siteConfig as any).listings).find((l) => l.id === source);
 const cats = [...new Set(items.map((i) => i.data.category).filter(Boolean))];
 const PLACE = '/images/placeholders/service.svg';
 ---
@@ -57,9 +61,9 @@ const PLACE = '/images/placeholders/service.svg';
           <div class="listing-body">
             <h3 class="listing-title">{it.data.title}</h3>
             {it.data.price && <p class="listing-price">{it.data.price}</p>}
-            {it.data.specs && it.data.specs.length > 0 && (
+            {listingSpecRows(it.data, listing).length > 0 && (
               <div class="listing-specs">
-                {it.data.specs.slice(0, 4).map((s) => (
+                {listingSpecRows(it.data, listing).slice(0, 4).map((s) => (
                   <div class="listing-spec"><span>{s.label}</span><b>{s.value}</b></div>
                 ))}
               </div>

@@ -26,7 +26,8 @@ export const PRESET_SCHEMAS = {
     category: z.string().default(''),
     cover: z.string().optional(),
     gallery: z.array(z.object({ image: z.string(), alt: z.string().default('') })).default([]),
-    specs: z.array(z.object({ label: z.string(), value: z.string() })).default([]),
+    // Keyed by the listing's configured spec keys (see Listing.specs); labels live in config.
+    specs: z.record(z.string()).default({}),
     date: dateField.optional(),
   }),
 } as const;

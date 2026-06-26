@@ -65,18 +65,38 @@ export function resolveFeatures(f?: StommeFeatures): Required<StommeFeatures> {
 // `preset` picks the schema + presentation: `article` (date/excerpt/cover — blog & news)
 // or `catalog` (price/status/specs/gallery — for-sale of anything). The engine adds a
 // collection per listing, a CMS editor, a seeded editable index page, and detail routes.
+// A catalog spec field: a label (in the site's language) + a stable key the entry data
+// is stored under. A bare string is shorthand — the key defaults to its position
+// (`spec_0`, `spec_1`, …) so renaming a label (e.g. to localize) never orphans the data;
+// only reordering would. Give an explicit `key` for a readable key in the content files.
+export type SpecInput = string | { key?: string; label: string };
+export interface SpecDef { key: string; label: string }
+export function resolveSpecs(specs?: SpecInput[]): SpecDef[] {
+  return (Array.isArray(specs) ? specs : []).map((s, i) =>
+    typeof s === 'string' ? { key: `spec_${i}`, label: s } : { key: s.key || `spec_${i}`, label: s.label });
+}
+// The {label, value} rows to render for a catalog entry: the listing's configured specs,
+// paired with the entry's keyed values; empty values are dropped.
+export function listingSpecRows(entryData: any, listing?: { specs?: SpecDef[] }): { label: string; value: string }[] {
+  const vals = (entryData && entryData.specs) || {};
+  return (listing?.specs || [])
+    .map(({ key, label }) => ({ label, value: vals[key] }))
+    .filter((r) => r.value);
+}
+
 export interface Listing {
   id: string; // collection name + content folder (src/content/<id>)
   route: string; // index + detail route base, e.g. '/till-salu'
   label: string; // CMS collection + nav label
   preset: 'article' | 'catalog';
+  specs?: SpecInput[]; // catalog: the spec fields every item shares (config-defined, consistent)
   options?: { columns?: number; showImages?: boolean; featured?: boolean; filters?: boolean };
 }
-// Normalize: drop entries missing an id/route/preset; default the route slash.
-export function resolveListings(l?: Listing[]): Listing[] {
+// Normalize: drop entries missing an id/route/preset; default the route slash; resolve specs.
+export function resolveListings(l?: Listing[]): (Omit<Listing, 'specs'> & { specs: SpecDef[] })[] {
   return (Array.isArray(l) ? l : [])
     .filter((x) => x && x.id && x.route && (x.preset === 'article' || x.preset === 'catalog'))
-    .map((x) => ({ ...x, route: x.route.startsWith('/') ? x.route : `/${x.route}` }));
+    .map((x) => ({ ...x, route: x.route.startsWith('/') ? x.route : `/${x.route}`, specs: resolveSpecs(x.specs) }));
 }
 
 export const SITE_DEFAULTS = {

@@ -75,5 +75,7 @@ export const listings: Listing[] = [
 
   // For-sale (e.g. used cars): /till-salu index with category filters + status badges
   // (available/reserved/sold), and /till-salu/<slug> detail with price, specs + gallery.
-  // { id: 'bilar', route: '/till-salu', label: 'Till salu', preset: 'catalog', options: { columns: 3, filters: true } },
+  // `specs` defines the spec fields every item shares (label in your language; the data is
+  // stored under a stable key, so renaming a label to localize never orphans existing data).
+  // { id: 'bilar', route: '/till-salu', label: 'Till salu', preset: 'catalog', specs: ['Year', 'Mileage', 'Gearbox', 'Fuel'], options: { columns: 3, filters: true } },
 ];

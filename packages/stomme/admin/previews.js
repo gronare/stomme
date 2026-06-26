@@ -250,9 +250,13 @@
   // Catalog (for-sale) listing item → CatalogPage. Price, status pill, category,
   // a spec table, and the markdown body.
   var STATUS = { available: ['Available', '#d1fae5', '#047857'], reserved: ['Reserved', '#fef3c7', '#b45309'], sold: ['Sold', '#e2e8f0', '#475569'] };
-  var CatalogPreview = function (props) {
+  var CatalogPreview = function (props, specDefs) {
     var e = props.entry;
-    var specs = arr(e, 'specs');
+    // Specs are keyed by the listing's config-defined keys; pair them with the labels
+    // stomme-gen passes in (specDefs). Fall back to legacy [{label,value}] if none given.
+    var specs = (specDefs && specDefs.length)
+      ? specDefs.map(function (d) { var val = e.getIn(['data', 'specs', d.key]); return { label: d.label, value: val == null ? '' : val }; }).filter(function (r) { return r.value; })
+      : arr(e, 'specs');
     var st = STATUS[v(e, 'status')] || STATUS.available;
     return h('div', { className: 'bk' },
       h('span', { className: 'bk-eyebrow' }, v(e, 'category') || 'For sale'),
@@ -284,9 +288,13 @@
   window.CMS.registerPreviewTemplate('footer', FooterPreview);
 
   // Config-defined listing collections (news / for-sale / …) get the matching preset
-  // preview. stomme-gen appends stommeRegisterListing(id, preset) calls for this site.
-  window.stommeRegisterListing = function (id, preset) {
-    window.CMS.registerPreviewTemplate(id, preset === 'catalog' ? CatalogPreview : PostPreview);
+  // preview. stomme-gen appends stommeRegisterListing(id, preset, specs) calls for this
+  // site; `specs` is the catalog listing's [{key,label}] so the preview can label them.
+  window.stommeRegisterListing = function (id, preset, specs) {
+    var tmpl = preset === 'catalog'
+      ? function (props) { return CatalogPreview(props, specs); }
+      : PostPreview;
+    window.CMS.registerPreviewTemplate(id, tmpl);
   };
 
   // ── "Image" editor component for markdown bodies ────────────────────────────
