@@ -15,13 +15,18 @@ export const FONT_STACKS: Record<string, string> = {
 const CUSTOM_FAMILY = '"StommeCustom"';
 const formatOf = (path: string) =>
   path.endsWith('.woff2') ? 'woff2' : path.endsWith('.woff') ? 'woff' : path.endsWith('.otf') ? 'opentype' : 'truetype';
+// MIME type for <link rel=preload as=font type=…>
+const mimeOf = (path: string) =>
+  path.endsWith('.woff2') ? 'font/woff2' : path.endsWith('.woff') ? 'font/woff' : path.endsWith('.otf') ? 'font/otf' : 'font/ttf';
 
-// Resolve the theme's font choices into CSS-var declarations + an optional @font-face.
-// `customUrl` is the served URL of an uploaded font file (Base resolves it via a glob).
+// Resolve the theme's font choices into CSS-var declarations, an optional @font-face,
+// and (for a custom upload) a preload descriptor so Base can fetch the font before paint
+// — avoids the flash of fallback text (FOUT). `customUrl` is the served URL of an
+// uploaded font file (Base resolves it via a glob).
 export function resolveFonts(
   theme: { fontDisplay?: string; fontBody?: string } = {},
   customUrl?: string | null,
-): { vars: string[]; fontFace: string | null } {
+): { vars: string[]; fontFace: string | null; preload: { href: string; type: string } | null } {
   const stack = (key?: string): string | null => {
     if (key === 'custom') return customUrl ? `${CUSTOM_FAMILY}, ${FONT_STACKS.system}` : null;
     return key && FONT_STACKS[key] ? FONT_STACKS[key] : null;
@@ -34,5 +39,6 @@ export function resolveFonts(
   const fontFace = customUrl
     ? `@font-face{font-family:${CUSTOM_FAMILY};src:url("${customUrl}") format("${formatOf(customUrl)}");font-display:swap;font-weight:100 900;}`
     : null;
-  return { vars, fontFace };
+  const preload = customUrl ? { href: customUrl, type: mimeOf(customUrl) } : null;
+  return { vars, fontFace, preload };
 }

@@ -45,6 +45,7 @@ const themeVars = [
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title ?? settings.name}</title>
     {description && <meta name="description" content={description} />}
+    {fonts.preload && <link rel="preload" as="font" type={fonts.preload.type} href={fonts.preload.href} crossorigin />}
     {fonts.fontFace && <style is:inline set:html={fonts.fontFace}></style>}
   </head>
   <body>

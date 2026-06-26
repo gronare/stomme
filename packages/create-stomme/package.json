@@ -1,6 +1,6 @@
 {
   "name": "@gronare/create-stomme",
-  "version": "0.1.11",
+  "version": "0.1.12",
   "description": "Scaffold a new stomme site from the starter template.",
   "type": "module",
   "repository": {
