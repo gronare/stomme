@@ -1433,6 +1433,8 @@ collections:
               - { name: alt, label: "Logo alt text", widget: string, required: false }
               - { name: textPre, label: "Logo text (if no image)", widget: string, required: false }
               - { name: textAccent, label: "Logo accent", widget: string, required: false }
+              - { name: textSize, label: "Logo text size", widget: select, required: false, default: "md", hint: "Text logo only (ignored with a logo image).", options: [{ label: "Small", value: "sm" }, { label: "Medium", value: "md" }, { label: "Large", value: "lg" }, { label: "Extra large", value: "xl" }] }
+              - { name: textWeight, label: "Logo text weight", widget: select, required: false, default: "bold", hint: "Text logo only.", options: [{ label: "Normal", value: "normal" }, { label: "Bold", value: "bold" }, { label: "Heavy", value: "heavy" }] }
           # >>> navlinks:generated (run: pnpm cms:gen — do not edit between markers)
           - name: items
             label: "Menu links"

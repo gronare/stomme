@@ -28,6 +28,13 @@ const logo = nav.logo ?? {};
 const items = nav.items ?? [];
 const homeHref = '/';
 
+// Text-logo size + weight (ignored when a logo image is used).
+const LOGO_SIZE: Record<string, string> = { sm: '1rem', md: '1.15rem', lg: '1.45rem', xl: '1.8rem' };
+const LOGO_WEIGHT: Record<string, string> = { normal: '600', bold: '800', heavy: '900' };
+const logoStyle = !logo.image
+  ? [LOGO_SIZE[logo.textSize as string] && `font-size:${LOGO_SIZE[logo.textSize as string]}`, LOGO_WEIGHT[logo.textWeight as string] && `font-weight:${LOGO_WEIGHT[logo.textWeight as string]}`].filter(Boolean).join(';')
+  : '';
+
 // Resolve an item's dropdown children: auto from a collection, or manual links.
 async function childrenOf(item: NavItem): Promise<{ label: string; href: string }[]> {
   if (item.menu) {
@@ -53,7 +60,7 @@ const resolved = await Promise.all(
 ---
 <header class="site-header">
   <div class="inner">
-    <a class="logo" href={homeHref}>
+    <a class="logo" href={homeHref} style={logoStyle || undefined}>
       {logo.image
         ? <Cover src={logo.image} alt={logo.alt ?? settings.name} placeholder="/images/placeholder.svg" class="logo-img" />
         : <Fragment>{logo.textPre ?? settings.name}<span class="accent">{logo.textAccent}</span></Fragment>}
