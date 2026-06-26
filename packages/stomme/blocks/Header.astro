@@ -117,5 +117,14 @@ const resolved = await Promise.all(
         a.addEventListener('click', function () { setOpen(false); });
       });
     }
+
+    // Transparent overlay header: when the page opens with a full-bleed cover, the
+    // header (styled transparent via CSS :has) turns solid once scrolled past the hero.
+    var cover = document.querySelector('main > .cover:first-child');
+    if (cover) {
+      var onScroll = function () { header.classList.toggle('solid', window.scrollY > cover.offsetHeight * 0.72); };
+      window.addEventListener('scroll', onScroll, { passive: true });
+      onScroll();
+    }
   })();
 </script>
