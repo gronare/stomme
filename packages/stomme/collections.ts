@@ -70,6 +70,12 @@ export function stommeCollections(listings?: Listing[]) {
         dark: z.string().optional(),
         darkInk: z.string().optional(),
         darkLine: z.string().optional(),
+        // Fonts — a curated stack key (see src/fonts.ts) or 'custom'; + an optional
+        // uploaded font file used when a picker is set to 'custom'.
+        fontDisplay: z.string().optional(),
+        fontBody: z.string().optional(),
+        fontCustomFile: z.string().optional(),
+        fontCustomName: z.string().optional(),
       }),
     }),
 

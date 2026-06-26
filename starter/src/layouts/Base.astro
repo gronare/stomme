@@ -1,8 +1,14 @@
 ---
 import '../styles/global.css';
 import { getEntry } from 'astro:content';
+import { resolveFonts } from '@gronare/stomme/fonts';
 import Header from '@gronare/stomme/Header.astro';
 import Footer from '@gronare/stomme/Footer.astro';
+
+// Uploaded font files → served URLs (Vite hashes them), for a custom theme font.
+const fontFiles = import.meta.glob('/src/assets/uploads/**/*.{woff2,woff,ttf,otf}', {
+  query: '?url', import: 'default', eager: true,
+});
 
 // `chrome` (default true) renders the site Header/Footer. The CMS chrome previews
 // set it false so they can render a single component in isolation, still themed.
@@ -11,6 +17,8 @@ const { title, description, chrome = true } = Astro.props;
 
 const settings = (await getEntry('settings', 'site'))!.data;
 const theme = (await getEntry('theme', 'theme'))!.data;
+const customFontUrl = theme.fontCustomFile ? (fontFiles as Record<string, string>)[theme.fontCustomFile] : null;
+const fonts = resolveFonts(theme, customFontUrl);
 
 // Inject the owner-editable theme tokens as CSS vars on <html>, overriding the
 // build-time defaults in global.css.
@@ -26,6 +34,8 @@ const themeVars = [
   ...(theme.dark ? [`--color-dark:${theme.dark}`] : []),
   ...(theme.darkInk ? [`--color-dark-ink:${theme.darkInk}`] : []),
   ...(theme.darkLine ? [`--color-dark-line:${theme.darkLine}`] : []),
+  // Fonts (display / body), with an optional uploaded custom font.
+  ...fonts.vars,
 ].join(';');
 ---
 <!doctype html>
@@ -35,6 +45,7 @@ const themeVars = [
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title ?? settings.name}</title>
     {description && <meta name="description" content={description} />}
+    {fonts.fontFace && <style is:inline set:html={fonts.fontFace}></style>}
   </head>
   <body>
     {chrome && <Header />}

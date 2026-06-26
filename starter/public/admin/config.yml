@@ -1392,6 +1392,34 @@ collections:
           - { name: dark, label: "Dark section background", widget: color, required: false, hint: "Background for blocks set to the Dark surface. Empty = derived from Primary." }
           - { name: darkInk, label: "Dark section text", widget: color, required: false, hint: "Text colour on dark sections. Empty = a light off-white." }
           - { name: darkLine, label: "Dark section borders", widget: color, required: false, hint: "Card borders / dividers on dark sections. Empty = a faint light rule." }
+          # Fonts — pick a ready-made stack for headings + body (no external requests),
+          # or choose "Custom" and upload a font file below.
+          - name: fontDisplay
+            label: "Heading font"
+            widget: select
+            required: false
+            hint: "Font for headings. Empty = system default."
+            options:
+              - { label: "System (default)", value: "system" }
+              - { label: "Serif (elegant headlines)", value: "serif" }
+              - { label: "Grotesk (clean sans)", value: "grotesk" }
+              - { label: "Rounded", value: "rounded" }
+              - { label: "Slab serif", value: "slab" }
+              - { label: "Custom (uploaded below)", value: "custom" }
+          - name: fontBody
+            label: "Body font"
+            widget: select
+            required: false
+            hint: "Font for body text. Empty = system default."
+            options:
+              - { label: "System (default)", value: "system" }
+              - { label: "Serif (elegant headlines)", value: "serif" }
+              - { label: "Grotesk (clean sans)", value: "grotesk" }
+              - { label: "Rounded", value: "rounded" }
+              - { label: "Slab serif", value: "slab" }
+              - { label: "Custom (uploaded below)", value: "custom" }
+          - { name: fontCustomFile, label: "Custom font file", widget: file, required: false, hint: "A .woff2 / .woff / .ttf / .otf file. Used where a font above is set to Custom. (A font file, not an SVG.)" }
+          - { name: fontCustomName, label: "Custom font note", widget: string, required: false, hint: "Optional — just a reminder of which font this is." }
       - name: nav
         label: "Navigation"
         file: "src/content/navigation/nav.md"
