@@ -141,13 +141,12 @@ body { font-family: var(--bk-font-sans); margin: 0; line-height: 1.6; }
 .cover--h-medium { min-height: 58vh; }
 .cover__media { position: absolute; inset: 0; z-index: -2; }
 .cover__img, .cover__video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
-/* Generated gradient background — no asset, fully theme-driven: the dark-section
-   colour (--color-dark, brand-tinted) as the base + a soft highlight from the tinted
-   surface, slowly drifting (ken-burns). Recolours with the theme. */
+/* Generated gradient background — no asset, fully theme-driven (mockup structure):
+   a 120° diagonal sweep of --color-dark with a lighter band through the middle
+   (--color-dark tinted by --color-surface), slowly drifting (ken-burns). It reads as
+   an angled band, not a circle, and recolours with the theme. */
 .cover__media--gradient {
-  background:
-    radial-gradient(70% 60% at 74% 24%, color-mix(in srgb, var(--color-surface) 24%, transparent), transparent 62%),
-    linear-gradient(125deg, var(--color-dark), color-mix(in srgb, var(--color-surface) 12%, var(--color-dark)) 55%, var(--color-dark));
+  background: linear-gradient(120deg, var(--color-dark), color-mix(in srgb, var(--color-surface) 16%, var(--color-dark)) 60%, var(--color-dark));
   animation: cover-kb 24s ease-in-out infinite alternate;
 }
 @keyframes cover-kb { from { transform: scale(1.08); } to { transform: scale(1.18) translate(-2%, -1%); } }
