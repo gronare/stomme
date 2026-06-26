@@ -151,10 +151,20 @@
         dkLine = g('darkLine', 'color-mix(in srgb, ' + dkInk + ' 14%, transparent)');
     var dkCard = 'color-mix(in srgb, ' + dkInk + ' 7%, ' + dk + ')';
     var dkMuted = 'color-mix(in srgb, ' + dkInk + ' 56%, ' + dk + ')';
-    // Apply the chosen fonts so the preview reflects the pickers (curated stacks only;
-    // a custom uploaded font isn't loaded in this mockup).
-    var dispFont = fontFor(g('fontDisplay', 'system'));
-    var bodyFont = fontFor(g('fontBody', 'system'));
+    // Apply the chosen fonts so the preview reflects the pickers — including custom
+    // uploads, loaded via Decap's getAsset (resolves the upload to a usable URL).
+    var assetUrl = function (p) { try { return p && props.getAsset ? String(props.getAsset(p)) : null; } catch (_e) { return null; } };
+    var dispCustom = assetUrl(g('fontCustomFile', ''));
+    var bodyCustom = assetUrl(g('fontCustomBodyFile', '')) || dispCustom;
+    var faces = [];
+    if (dispCustom) faces.push('@font-face{font-family:"StommeFontDisplay";src:url(' + dispCustom + ');font-display:swap}');
+    if (bodyCustom) faces.push('@font-face{font-family:"StommeFontBody";src:url(' + bodyCustom + ');font-display:swap}');
+    var pickFont = function (key, customUrl, customFamily) {
+      if (key === 'custom') return customUrl ? '"' + customFamily + '",' + SANS : SANS;
+      return fontFor(key);
+    };
+    var dispFont = pickFont(g('fontDisplay', 'system'), dispCustom, 'StommeFontDisplay');
+    var bodyFont = pickFont(g('fontBody', 'system'), bodyCustom, 'StommeFontBody');
     var swatch = function (name, color) {
       return h('div', { style: { flex: '1 1 0', minWidth: '88px' } },
         h('div', { style: { height: '52px', borderRadius: '10px', background: color, border: '1px solid ' + line } }),
@@ -165,6 +175,7 @@
       return h('span', { style: { display: 'inline-flex', borderRadius: '999px', padding: '11px 20px', fontWeight: 700, fontSize: '14px', background: bg, color: fg, border: border || '0' } }, label);
     };
     return h('div', { style: { background: paper, color: ink, minHeight: '100vh', padding: '32px', fontFamily: bodyFont, lineHeight: 1.5, boxSizing: 'border-box' } },
+      faces.length ? h('style', {}, faces.join('')) : null,
       h('span', { style: { fontFamily: MONO, fontSize: '11px', letterSpacing: '.16em', textTransform: 'uppercase', color: brand } }, 'Colour scheme'),
       h('div', { style: { display: 'flex', gap: '12px', margin: '12px 0 34px', flexWrap: 'wrap' } },
         swatch('Brand', brand), swatch('Text', ink), swatch('On dark', onDark), swatch('Surface', surface), swatch('Paper', paper), swatch('Line', line), swatch('Highlight', highlight), swatch('Dark', dk)),
