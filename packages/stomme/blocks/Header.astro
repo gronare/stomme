@@ -17,6 +17,7 @@ interface NavData {
   logo?: { textPre?: string; textAccent?: string; image?: string; alt?: string };
   items?: NavItem[];
   cta?: { label: string; link?: unknown };
+  sticky?: boolean;
 }
 interface Props { nav?: NavData; settings?: { name?: string } }
 
@@ -58,7 +59,7 @@ const resolved = await Promise.all(
   items.map(async (i) => ({ label: i.label, href: resolveLink(i.link, ''), children: await childrenOf(i) })),
 );
 ---
-<header class="site-header">
+<header class:list={['site-header', { 'is-sticky': nav.sticky }]}>
   <div class="inner">
     <a class="logo" href={homeHref} style={logoStyle || undefined}>
       {logo.image
@@ -125,19 +126,23 @@ const resolved = await Promise.all(
       });
     }
 
-    // Transparent overlay header: when the page opens with a full-bleed cover, the
-    // header (styled transparent via CSS :has) turns solid just before the hero's text
-    // would scroll up under it — so the logo/nav never overlap the heading. Measured from
-    // the actual text block, so it's robust to any title size. Runs before <main> is
-    // parsed, so defer until DOM ready.
+    // Transparent overlay header: when the page opens with a full-bleed hero (a cover,
+    // or a hero with a Dark/Gradient surface) the header is styled transparent via CSS
+    // :has. A non-sticky header is positioned over the hero and simply scrolls away with
+    // it (no JS needed). Only a *sticky* header stays put, so only then do we turn it
+    // solid — just before the hero's text would scroll under it, so the logo/nav never
+    // overlap the heading. Runs before <main> is parsed, so defer until DOM ready.
     var initOverlay = function () {
+      if (!header.classList.contains('is-sticky')) return;
       var cover = document.querySelector('main .cover:first-child');
-      if (!cover) return;
-      var inner = cover.querySelector('.cover__inner');
+      var darkHero = document.querySelector('main .surface-dark:first-child .hero-grid, main .surface-gradient:first-child .hero-grid');
+      var hero = cover || (darkHero && darkHero.closest('.surface-dark, .surface-gradient'));
+      if (!hero) return;
+      var inner = hero.querySelector('.cover__inner, .hero-grid');
       var trigger = 0;
       var measure = function () {
         var headerH = header.offsetHeight || 64;
-        var top = inner ? inner.getBoundingClientRect().top + window.scrollY : cover.offsetHeight * 0.5;
+        var top = inner ? inner.getBoundingClientRect().top + window.scrollY : hero.offsetHeight * 0.5;
         trigger = Math.max(0, top - headerH - 16);
       };
       var onScroll = function () { header.classList.toggle('solid', window.scrollY > trigger); };

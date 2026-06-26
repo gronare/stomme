@@ -104,6 +104,16 @@ collections:
                     options:
                       - { label: "Normal", value: "normal" }
                       - { label: "Tall", value: "tall" }
+                  - name: align
+                    label: "Text position"
+                    widget: select
+                    required: false
+                    default: "center"
+                    hint: "Where the text sits in a Tall hero."
+                    options:
+                      - { label: "Top", value: "top" }
+                      - { label: "Center", value: "center" }
+                      - { label: "Bottom", value: "bottom" }
                   - name: surface
                     label: "Background"
                     widget: select
@@ -797,6 +807,16 @@ collections:
                 options:
                   - { label: "Normal", value: "normal" }
                   - { label: "Tall", value: "tall" }
+              - name: align
+                label: "Text position"
+                widget: select
+                required: false
+                default: "center"
+                hint: "Where the text sits in a Tall hero."
+                options:
+                  - { label: "Top", value: "top" }
+                  - { label: "Center", value: "center" }
+                  - { label: "Bottom", value: "bottom" }
               - name: surface
                 label: "Background"
                 widget: select
@@ -1483,6 +1503,7 @@ collections:
               - { name: textAccent, label: "Logo accent", widget: string, required: false }
               - { name: textSize, label: "Logo text size", widget: select, required: false, default: "md", hint: "Text logo only (ignored with a logo image).", options: [{ label: "Small", value: "sm" }, { label: "Medium", value: "md" }, { label: "Large", value: "lg" }, { label: "Extra large", value: "xl" }] }
               - { name: textWeight, label: "Logo text weight", widget: select, required: false, default: "bold", hint: "Text logo only.", options: [{ label: "Normal", value: "normal" }, { label: "Bold", value: "bold" }, { label: "Heavy", value: "heavy" }] }
+          - { name: sticky, label: "Sticky header", widget: boolean, required: false, default: false, hint: "Header stays fixed at the top while scrolling. Default: it scrolls away with the page." }
           # >>> navlinks:generated (run: pnpm cms:gen — do not edit between markers)
           - name: items
             label: "Menu links"

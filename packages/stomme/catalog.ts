@@ -52,6 +52,11 @@ export const defaultBlocks: BlockDef[] = [
         hint: 'Tall fills the viewport (good with a Gradient or Dark background).',
         options: [{ label: 'Normal', value: 'normal' }, { label: 'Tall', value: 'tall' }],
       },
+      {
+        name: 'align', label: 'Text position', widget: 'select', required: false, default: 'center',
+        hint: 'Where the text sits in a Tall hero.',
+        options: [{ label: 'Top', value: 'top' }, { label: 'Center', value: 'center' }, { label: 'Bottom', value: 'bottom' }],
+      },
       surfaceField,
     ],
   },

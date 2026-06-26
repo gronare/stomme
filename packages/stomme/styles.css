@@ -94,8 +94,11 @@ body { font-family: var(--bk-font-sans); margin: 0; line-height: 1.6; }
 .surface-gradient .display { color: #e9ebf1; }
 .surface-gradient .ico-badge { background: color-mix(in srgb, var(--color-brand) 28%, transparent); }
 .surface-gradient .stat-panel { background: transparent; }
-/* Tall hero (the height option) — fills the viewport, content vertically centred. */
-.section--hero-tall { display: flex; flex-direction: column; justify-content: center; min-height: 100vh; min-height: 100dvh; }
+/* Tall hero (the height option) — fills the viewport; text position is selectable. */
+.section--hero-tall { display: flex; flex-direction: column; min-height: 100vh; min-height: 100dvh; }
+.section--hero-top { justify-content: flex-start; }
+.section--hero-center { justify-content: center; }
+.section--hero-bottom { justify-content: flex-end; }
 
 .card { display: block; border: 1px solid var(--color-line); border-radius: 1rem; background: var(--color-paper); overflow: hidden; text-decoration: none; color: inherit; }
 
@@ -343,31 +346,42 @@ body { font-family: var(--bk-font-sans); margin: 0; line-height: 1.6; }
    floats over it (fixed, light text, no bar) so the hero runs to the top edge, then
    turns solid (.solid, added on scroll past the hero) and over an open mobile panel
    (.nav-open). Pages that don't open with a cover keep the normal in-flow solid header. */
-body:has(main .cover:first-child) .site-header {
-  position: fixed; top: 0; left: 0; right: 0; z-index: 50;
+/* Sticky header (opt-in via nav.sticky). On normal pages it sticks to the top, opaque.
+   Default (no .is-sticky) the header is in normal flow and scrolls away with the page. */
+.site-header.is-sticky { position: sticky; top: 0; z-index: 50; }
+
+/* Transparent overlay header — the page opens with a full-bleed hero-type block: a cover,
+   or a hero set to a Dark/Gradient surface. The header floats over it with light text and
+   no bar. By default it is NOT sticky, so it's positioned over the hero (absolute) and
+   scrolls away with it — the logo/nav can never overlap the heading. When sticky it stays
+   fixed and turns solid (.solid, added on scroll past the hero) to stay legible; it also
+   goes solid over an open mobile panel (.nav-open). */
+body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header {
+  position: absolute; top: 0; left: 0; right: 0; z-index: 50;
   background: transparent; border-bottom-color: transparent; color: #fff;
   transition: background 0.3s, box-shadow 0.3s, border-color 0.3s, color 0.3s;
 }
-body:has(main .cover:first-child) .site-header .logo,
-body:has(main .cover:first-child) .site-header .site-nav a,
-body:has(main .cover:first-child) .site-header .nav-top,
-body:has(main .cover:first-child) .site-header .nav-toggle { color: #fff; }
-body:has(main .cover:first-child) .site-header .logo .accent { color: color-mix(in srgb, var(--color-brand) 45%, #fff); }
-/* solid state — scrolled past the hero, or the mobile menu is open */
-body:has(main .cover:first-child) .site-header.solid,
-body:has(main .cover:first-child) .site-header.nav-open {
+body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header.is-sticky { position: fixed; }
+body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header .logo,
+body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header .site-nav a,
+body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header .nav-top,
+body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header .nav-toggle { color: #fff; }
+body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header .logo .accent { color: color-mix(in srgb, var(--color-brand) 45%, #fff); }
+/* solid state — sticky header scrolled past the hero, or the mobile menu is open */
+body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header.solid,
+body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header.nav-open {
   background: color-mix(in srgb, var(--color-paper) 96%, transparent);
   -webkit-backdrop-filter: saturate(1.2) blur(8px); backdrop-filter: saturate(1.2) blur(8px);
   border-bottom-color: var(--color-line); box-shadow: 0 12px 30px -24px rgba(0,0,0,0.5);
 }
-body:has(main .cover:first-child) .site-header.solid .logo,
-body:has(main .cover:first-child) .site-header.solid .site-nav a,
-body:has(main .cover:first-child) .site-header.solid .nav-top,
-body:has(main .cover:first-child) .site-header.solid .nav-toggle,
-body:has(main .cover:first-child) .site-header.nav-open .logo,
-body:has(main .cover:first-child) .site-header.nav-open .nav-toggle { color: var(--color-ink); }
-body:has(main .cover:first-child) .site-header.solid .logo .accent,
-body:has(main .cover:first-child) .site-header.nav-open .logo .accent { color: var(--color-brand); }
+body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header.solid .logo,
+body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header.solid .site-nav a,
+body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header.solid .nav-top,
+body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header.solid .nav-toggle,
+body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header.nav-open .logo,
+body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header.nav-open .nav-toggle { color: var(--color-ink); }
+body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header.solid .logo .accent,
+body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header.nav-open .logo .accent { color: var(--color-brand); }
 
 .site-footer { background: var(--color-surface); color: var(--color-ink); margin-top: 4rem; }
 .site-footer .inner { padding-block: 3rem; }

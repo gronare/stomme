@@ -157,6 +157,12 @@ export default {
   'Tall': 'Hög',
   'Gradient': 'Gradient',
   'Tall fills the viewport (good with a Gradient or Dark background).': 'Hög fyller hela skärmen (bra med Gradient- eller Mörk bakgrund).',
+  'Top': 'Överst',
+  'Center': 'Centrerat',
+  'Bottom': 'Nederst',
+  'Where the text sits in a Tall hero.': 'Var texten sitter i en hög hero.',
+  'Sticky header': 'Fäst sidhuvud',
+  'Header stays fixed at the top while scrolling. Default: it scrolls away with the page.': 'Sidhuvudet stannar kvar högst upp vid scrollning. Standard: det rullar bort med sidan.',
 
   // ── nav links + dropdowns ──
   '— No page —': '— Ingen sida —',

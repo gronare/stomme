@@ -91,6 +91,7 @@ export function stommeCollections(listings?: Listing[]) {
           children: z.array(z.object({ label: z.string(), link })).default([]), // manual dropdown
         })).default([]),
         cta: z.object({ label: z.string(), link }).optional(),
+        sticky: z.boolean().default(false),
       }),
     }),
 
