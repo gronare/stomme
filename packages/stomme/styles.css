@@ -83,9 +83,7 @@ body { font-family: var(--bk-font-sans); margin: 0; line-height: 1.6; }
 /* Gradient surface — the cover's slate gradient (+ brand glow) as a full-bleed section
    background with light text. Same token remap as .surface-dark; headings go light. */
 .surface-gradient {
-  background:
-    radial-gradient(75% 65% at 72% 24%, color-mix(in srgb, var(--color-brand) 22%, transparent), transparent 64%),
-    linear-gradient(120deg, #12151d, #222a3a 60%, #10131a);
+  background: linear-gradient(120deg, #12151d, #222a3a 60%, #10131a);
   color: #e9ebf1;
   --color-paper: #1c212e;
   --color-ink: #e9ebf1;
