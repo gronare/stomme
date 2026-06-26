@@ -25,6 +25,16 @@
       LINE = '#e5e7eb', MUTED = '#6b7280', HIGHLIGHT = '#f59e0b';
   var SANS = 'ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif';
   var MONO = 'ui-monospace,Menlo,Consolas,monospace';
+  // Mirrors src/fonts.ts FONT_STACKS so the theme preview reflects the font pickers.
+  var FONT_STACKS = {
+    system: SANS,
+    serif: '"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif',
+    grotesk: '"Helvetica Neue",Helvetica,Arial,"Segoe UI",system-ui,sans-serif',
+    rounded: 'ui-rounded,"SF Pro Rounded","Hiragino Maru Gothic ProN","Segoe UI",system-ui,sans-serif',
+    slab: 'Rockwell,"Rockwell Nova","Roboto Slab","DejaVu Serif",Georgia,serif',
+    mono: MONO,
+  };
+  var fontFor = function (key) { return key && FONT_STACKS[key] ? FONT_STACKS[key] : SANS; };
   var cBrand = 'var(--color-brand,' + BRAND + ')', cInk = 'var(--color-ink,' + INK + ')',
       cSurface = 'var(--color-surface,' + SURFACE + ')', cPaper = 'var(--color-paper,' + PAPER + ')',
       cLine = 'var(--color-line,' + LINE + ')', cMuted = 'var(--color-muted,' + MUTED + ')';
@@ -141,6 +151,10 @@
         dkLine = g('darkLine', 'color-mix(in srgb, ' + dkInk + ' 14%, transparent)');
     var dkCard = 'color-mix(in srgb, ' + dkInk + ' 7%, ' + dk + ')';
     var dkMuted = 'color-mix(in srgb, ' + dkInk + ' 56%, ' + dk + ')';
+    // Apply the chosen fonts so the preview reflects the pickers (curated stacks only;
+    // a custom uploaded font isn't loaded in this mockup).
+    var dispFont = fontFor(g('fontDisplay', 'system'));
+    var bodyFont = fontFor(g('fontBody', 'system'));
     var swatch = function (name, color) {
       return h('div', { style: { flex: '1 1 0', minWidth: '88px' } },
         h('div', { style: { height: '52px', borderRadius: '10px', background: color, border: '1px solid ' + line } }),
@@ -150,22 +164,22 @@
     var btn = function (label, bg, fg, border) {
       return h('span', { style: { display: 'inline-flex', borderRadius: '999px', padding: '11px 20px', fontWeight: 700, fontSize: '14px', background: bg, color: fg, border: border || '0' } }, label);
     };
-    return h('div', { style: { background: paper, color: ink, minHeight: '100vh', padding: '32px', fontFamily: SANS, lineHeight: 1.5, boxSizing: 'border-box' } },
+    return h('div', { style: { background: paper, color: ink, minHeight: '100vh', padding: '32px', fontFamily: bodyFont, lineHeight: 1.5, boxSizing: 'border-box' } },
       h('span', { style: { fontFamily: MONO, fontSize: '11px', letterSpacing: '.16em', textTransform: 'uppercase', color: brand } }, 'Colour scheme'),
       h('div', { style: { display: 'flex', gap: '12px', margin: '12px 0 34px', flexWrap: 'wrap' } },
         swatch('Brand', brand), swatch('Text', ink), swatch('On dark', onDark), swatch('Surface', surface), swatch('Paper', paper), swatch('Line', line), swatch('Highlight', highlight), swatch('Dark', dk)),
-      h('h1', { style: { fontSize: '2rem', fontWeight: 800, letterSpacing: '-.01em', margin: '0 0 10px' } }, 'Heading on a light surface'),
+      h('h1', { style: { fontFamily: dispFont, fontSize: '2rem', fontWeight: 800, letterSpacing: '-.01em', margin: '0 0 10px' } }, 'Heading on a light surface'),
       h('p', { style: { color: muted, maxWidth: '52ch', margin: '0 0 18px' } }, 'Body text in the normal colour. A ',
         h('a', { style: { color: brand } }, 'link'), ' uses the brand colour, as do bullets and accents.'),
       h('div', { style: { display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap', marginBottom: '30px' } },
         btn('Primary button', brand, onDark), btn('Secondary', paper, ink, '1px solid ' + line), btn('Highlight', highlight, onDark)),
       h('div', { style: { background: surface, borderRadius: '16px', padding: '28px', marginBottom: '24px' } },
         h('span', { style: { fontFamily: MONO, fontSize: '11px', letterSpacing: '.16em', textTransform: 'uppercase', color: brand } }, 'Accent surface'),
-        h('h2', { style: { color: brand, fontSize: '1.5rem', fontWeight: 800, margin: '10px 0 8px' } }, 'Heading on the accent surface'),
+        h('h2', { style: { fontFamily: dispFont, color: brand, fontSize: '1.5rem', fontWeight: 800, margin: '10px 0 8px' } }, 'Heading on the accent surface'),
         h('p', { style: { color: ink, maxWidth: '48ch', margin: 0 } }, 'Accent sections and the footer use the accent surface.')),
       h('div', { style: { background: dk, color: dkInk, borderRadius: '16px', padding: '28px' } },
         h('span', { style: { fontFamily: MONO, fontSize: '11px', letterSpacing: '.16em', textTransform: 'uppercase', color: highlight } }, 'Dark section'),
-        h('h2', { style: { color: dkInk, fontSize: '1.5rem', fontWeight: 800, margin: '10px 0 8px' } }, 'Heading on a dark section'),
+        h('h2', { style: { fontFamily: dispFont, color: dkInk, fontSize: '1.5rem', fontWeight: 800, margin: '10px 0 8px' } }, 'Heading on a dark section'),
         h('p', { style: { color: dkMuted, maxWidth: '48ch', margin: '0 0 18px' } }, 'Any block can switch to the Dark surface — text turns light, cards become raised, accents stay vivid.'),
         h('div', { style: { display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' } },
           btn('Primary button', brand, onDark),
