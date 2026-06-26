@@ -80,6 +80,25 @@ body { font-family: var(--bk-font-sans); margin: 0; line-height: 1.6; }
    painting its (now light) --color-ink ground over it. */
 .surface-dark .stat-panel { background: transparent; }
 
+/* Gradient surface — the cover's slate gradient (+ brand glow) as a full-bleed section
+   background with light text. Same token remap as .surface-dark; headings go light. */
+.surface-gradient {
+  background:
+    radial-gradient(75% 65% at 72% 24%, color-mix(in srgb, var(--color-brand) 22%, transparent), transparent 64%),
+    linear-gradient(120deg, #12151d, #222a3a 60%, #10131a);
+  color: #e9ebf1;
+  --color-paper: #1c212e;
+  --color-ink: #e9ebf1;
+  --color-muted: #aab0bd;
+  --color-surface: #232938;
+  --color-line: rgba(233, 235, 241, 0.14);
+}
+.surface-gradient .display { color: #e9ebf1; }
+.surface-gradient .ico-badge { background: color-mix(in srgb, var(--color-brand) 28%, transparent); }
+.surface-gradient .stat-panel { background: transparent; }
+/* Tall hero (the height option) — fills the viewport, content vertically centred. */
+.section--hero-tall { display: flex; flex-direction: column; justify-content: center; min-height: 100vh; min-height: 100dvh; }
+
 .card { display: block; border: 1px solid var(--color-line); border-radius: 1rem; background: var(--color-paper); overflow: hidden; text-decoration: none; color: inherit; }
 
 /* hero */

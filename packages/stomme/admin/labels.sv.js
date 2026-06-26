@@ -155,6 +155,8 @@ export default {
   'Centered': 'Centrerad',
   'Height': 'Höjd',
   'Tall': 'Hög',
+  'Gradient': 'Gradient',
+  'Tall fills the viewport (good with a Gradient or Dark background).': 'Hög fyller hela skärmen (bra med Gradient- eller Mörk bakgrund).',
 
   // ── nav links + dropdowns ──
   '— No page —': '— Ingen sida —',

@@ -47,6 +47,11 @@ export const defaultBlocks: BlockDef[] = [
         field: { name: 'item', label: 'Readout', widget: 'string' },
       },
       { name: 'stamp', label: 'Ops · corner stamp (if “Operations”)', widget: 'string', required: false },
+      {
+        name: 'height', label: 'Height', widget: 'select', required: false, default: 'normal',
+        hint: 'Tall fills the viewport (good with a Gradient or Dark background).',
+        options: [{ label: 'Normal', value: 'normal' }, { label: 'Tall', value: 'tall' }],
+      },
       surfaceField,
     ],
   },

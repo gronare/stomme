@@ -95,6 +95,15 @@ collections:
                     required: false
                     field: { name: item, label: "Readout", widget: string }
                   - { name: stamp, label: "Ops · corner stamp (if “Operations”)", widget: string, required: false }
+                  - name: height
+                    label: "Height"
+                    widget: select
+                    required: false
+                    default: "normal"
+                    hint: "Tall fills the viewport (good with a Gradient or Dark background)."
+                    options:
+                      - { label: "Normal", value: "normal" }
+                      - { label: "Tall", value: "tall" }
                   - name: surface
                     label: "Background"
                     widget: select
@@ -106,6 +115,7 @@ collections:
                       - { label: "Tinted", value: "tint" }
                       - { label: "Accent band", value: "band" }
                       - { label: "Dark", value: "dark" }
+                      - { label: "Gradient", value: "gradient" }
               - name: cover
                 label: "Cover (full-bleed)"
                 widget: object
@@ -236,6 +246,7 @@ collections:
                       - { label: "Tinted", value: "tint" }
                       - { label: "Accent band", value: "band" }
                       - { label: "Dark", value: "dark" }
+                      - { label: "Gradient", value: "gradient" }
               - name: prose
                 label: "Rich text"
                 widget: object
@@ -262,6 +273,7 @@ collections:
                       - { label: "Tinted", value: "tint" }
                       - { label: "Accent band", value: "band" }
                       - { label: "Dark", value: "dark" }
+                      - { label: "Gradient", value: "gradient" }
               - name: textImage
                 label: "Text + image"
                 widget: object
@@ -282,6 +294,7 @@ collections:
                       - { label: "Tinted", value: "tint" }
                       - { label: "Accent band", value: "band" }
                       - { label: "Dark", value: "dark" }
+                      - { label: "Gradient", value: "gradient" }
               - name: textQuote
                 label: "Text + quote"
                 widget: object
@@ -301,6 +314,7 @@ collections:
                       - { label: "Tinted", value: "tint" }
                       - { label: "Accent band", value: "band" }
                       - { label: "Dark", value: "dark" }
+                      - { label: "Gradient", value: "gradient" }
               - name: featureGrid
                 label: "Feature cards"
                 widget: object
@@ -362,6 +376,7 @@ collections:
                       - { label: "Tinted", value: "tint" }
                       - { label: "Accent band", value: "band" }
                       - { label: "Dark", value: "dark" }
+                      - { label: "Gradient", value: "gradient" }
               - name: pillars
                 label: "Principles / values"
                 widget: object
@@ -387,6 +402,7 @@ collections:
                       - { label: "Tinted", value: "tint" }
                       - { label: "Accent band", value: "band" }
                       - { label: "Dark", value: "dark" }
+                      - { label: "Gradient", value: "gradient" }
               - name: specialistGrid
                 label: "Specialist grid"
                 widget: object
@@ -412,6 +428,7 @@ collections:
                       - { label: "Tinted", value: "tint" }
                       - { label: "Accent band", value: "band" }
                       - { label: "Dark", value: "dark" }
+                      - { label: "Gradient", value: "gradient" }
               - name: steps
                 label: "Process / steps"
                 widget: object
@@ -446,6 +463,7 @@ collections:
                       - { label: "Tinted", value: "tint" }
                       - { label: "Accent band", value: "band" }
                       - { label: "Dark", value: "dark" }
+                      - { label: "Gradient", value: "gradient" }
               - name: checklist
                 label: "Checklist"
                 widget: object
@@ -472,6 +490,7 @@ collections:
                       - { label: "Tinted", value: "tint" }
                       - { label: "Accent band", value: "band" }
                       - { label: "Dark", value: "dark" }
+                      - { label: "Gradient", value: "gradient" }
               - name: gallery
                 label: "Gallery"
                 widget: object
@@ -499,6 +518,7 @@ collections:
                       - { label: "Tinted", value: "tint" }
                       - { label: "Accent band", value: "band" }
                       - { label: "Dark", value: "dark" }
+                      - { label: "Gradient", value: "gradient" }
               - name: beforeAfter
                 label: "Before / after"
                 widget: object
@@ -519,6 +539,7 @@ collections:
                       - { label: "Tinted", value: "tint" }
                       - { label: "Accent band", value: "band" }
                       - { label: "Dark", value: "dark" }
+                      - { label: "Gradient", value: "gradient" }
               - name: callout
                 label: "Highlighted quote"
                 widget: object
@@ -536,6 +557,7 @@ collections:
                       - { label: "Tinted", value: "tint" }
                       - { label: "Accent band", value: "band" }
                       - { label: "Dark", value: "dark" }
+                      - { label: "Gradient", value: "gradient" }
               - name: statPanel
                 label: "Statement panel"
                 widget: object
@@ -607,6 +629,7 @@ collections:
                       - { label: "Tinted", value: "tint" }
                       - { label: "Accent band", value: "band" }
                       - { label: "Dark", value: "dark" }
+                      - { label: "Gradient", value: "gradient" }
               - name: ctaPanel
                 label: "Call to action (band)"
                 widget: object
@@ -663,6 +686,7 @@ collections:
                       - { label: "Tinted", value: "tint" }
                       - { label: "Accent band", value: "band" }
                       - { label: "Dark", value: "dark" }
+                      - { label: "Gradient", value: "gradient" }
               - name: logoStrip
                 label: "Logo strip"
                 widget: object
@@ -764,6 +788,15 @@ collections:
                 required: false
                 field: { name: item, label: "Readout", widget: string }
               - { name: stamp, label: "Ops · corner stamp (if “Operations”)", widget: string, required: false }
+              - name: height
+                label: "Height"
+                widget: select
+                required: false
+                default: "normal"
+                hint: "Tall fills the viewport (good with a Gradient or Dark background)."
+                options:
+                  - { label: "Normal", value: "normal" }
+                  - { label: "Tall", value: "tall" }
               - name: surface
                 label: "Background"
                 widget: select
@@ -775,6 +808,7 @@ collections:
                   - { label: "Tinted", value: "tint" }
                   - { label: "Accent band", value: "band" }
                   - { label: "Dark", value: "dark" }
+                  - { label: "Gradient", value: "gradient" }
           - name: cover
             label: "Cover (full-bleed)"
             widget: object
@@ -905,6 +939,7 @@ collections:
                   - { label: "Tinted", value: "tint" }
                   - { label: "Accent band", value: "band" }
                   - { label: "Dark", value: "dark" }
+                  - { label: "Gradient", value: "gradient" }
           - name: prose
             label: "Rich text"
             widget: object
@@ -931,6 +966,7 @@ collections:
                   - { label: "Tinted", value: "tint" }
                   - { label: "Accent band", value: "band" }
                   - { label: "Dark", value: "dark" }
+                  - { label: "Gradient", value: "gradient" }
           - name: textImage
             label: "Text + image"
             widget: object
@@ -951,6 +987,7 @@ collections:
                   - { label: "Tinted", value: "tint" }
                   - { label: "Accent band", value: "band" }
                   - { label: "Dark", value: "dark" }
+                  - { label: "Gradient", value: "gradient" }
           - name: textQuote
             label: "Text + quote"
             widget: object
@@ -970,6 +1007,7 @@ collections:
                   - { label: "Tinted", value: "tint" }
                   - { label: "Accent band", value: "band" }
                   - { label: "Dark", value: "dark" }
+                  - { label: "Gradient", value: "gradient" }
           - name: featureGrid
             label: "Feature cards"
             widget: object
@@ -1031,6 +1069,7 @@ collections:
                   - { label: "Tinted", value: "tint" }
                   - { label: "Accent band", value: "band" }
                   - { label: "Dark", value: "dark" }
+                  - { label: "Gradient", value: "gradient" }
           - name: pillars
             label: "Principles / values"
             widget: object
@@ -1056,6 +1095,7 @@ collections:
                   - { label: "Tinted", value: "tint" }
                   - { label: "Accent band", value: "band" }
                   - { label: "Dark", value: "dark" }
+                  - { label: "Gradient", value: "gradient" }
           - name: specialistGrid
             label: "Specialist grid"
             widget: object
@@ -1081,6 +1121,7 @@ collections:
                   - { label: "Tinted", value: "tint" }
                   - { label: "Accent band", value: "band" }
                   - { label: "Dark", value: "dark" }
+                  - { label: "Gradient", value: "gradient" }
           - name: steps
             label: "Process / steps"
             widget: object
@@ -1115,6 +1156,7 @@ collections:
                   - { label: "Tinted", value: "tint" }
                   - { label: "Accent band", value: "band" }
                   - { label: "Dark", value: "dark" }
+                  - { label: "Gradient", value: "gradient" }
           - name: checklist
             label: "Checklist"
             widget: object
@@ -1141,6 +1183,7 @@ collections:
                   - { label: "Tinted", value: "tint" }
                   - { label: "Accent band", value: "band" }
                   - { label: "Dark", value: "dark" }
+                  - { label: "Gradient", value: "gradient" }
           - name: gallery
             label: "Gallery"
             widget: object
@@ -1168,6 +1211,7 @@ collections:
                   - { label: "Tinted", value: "tint" }
                   - { label: "Accent band", value: "band" }
                   - { label: "Dark", value: "dark" }
+                  - { label: "Gradient", value: "gradient" }
           - name: beforeAfter
             label: "Before / after"
             widget: object
@@ -1188,6 +1232,7 @@ collections:
                   - { label: "Tinted", value: "tint" }
                   - { label: "Accent band", value: "band" }
                   - { label: "Dark", value: "dark" }
+                  - { label: "Gradient", value: "gradient" }
           - name: callout
             label: "Highlighted quote"
             widget: object
@@ -1205,6 +1250,7 @@ collections:
                   - { label: "Tinted", value: "tint" }
                   - { label: "Accent band", value: "band" }
                   - { label: "Dark", value: "dark" }
+                  - { label: "Gradient", value: "gradient" }
           - name: statPanel
             label: "Statement panel"
             widget: object
@@ -1276,6 +1322,7 @@ collections:
                   - { label: "Tinted", value: "tint" }
                   - { label: "Accent band", value: "band" }
                   - { label: "Dark", value: "dark" }
+                  - { label: "Gradient", value: "gradient" }
           - name: ctaPanel
             label: "Call to action (band)"
             widget: object
@@ -1332,6 +1379,7 @@ collections:
                   - { label: "Tinted", value: "tint" }
                   - { label: "Accent band", value: "band" }
                   - { label: "Dark", value: "dark" }
+                  - { label: "Gradient", value: "gradient" }
           - name: logoStrip
             label: "Logo strip"
             widget: object

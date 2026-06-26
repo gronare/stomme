@@ -22,8 +22,9 @@ interface Props {
   flow?: FlowItem[];
   telemetry?: string[];
   stamp?: string;
+  height?: 'normal' | 'tall';
 }
-const { eyebrow, heading, intro, ctaLabel, ctaHref, media = 'none', image, imageAlt, flowNote, flow = [], telemetry = [], stamp } = Astro.props;
+const { eyebrow, heading, intro, ctaLabel, ctaHref, media = 'none', image, imageAlt, flowNote, flow = [], telemetry = [], stamp, height = 'normal' } = Astro.props;
 const href = resolveLink(ctaHref, '/');
 const settings = (await getEntry('settings', 'site')).data;
 const showImage = media === 'image' && !!image;
@@ -31,7 +32,7 @@ const showFlow = media === 'flow' && flow.length > 0;
 const showOps = media === 'ops';
 const hasMedia = showImage || showFlow || showOps;
 ---
-<section class="section">
+<section class:list={['section', { 'section--hero-tall': height === 'tall' }]}>
   <div class:list={['hero-grid', { 'has-media': hasMedia }]}>
     <div>
       {eyebrow && <span class="mono mono-dot">{eyebrow}</span>}
