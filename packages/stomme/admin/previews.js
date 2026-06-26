@@ -236,6 +236,29 @@
       note('Service detail page (ServicePage); shown as a card in the Service-cards block.'));
   };
 
+  // Catalog (for-sale) listing item → CatalogPage. Price, status pill, category,
+  // a spec table, and the markdown body.
+  var STATUS = { available: ['Available', '#d1fae5', '#047857'], reserved: ['Reserved', '#fef3c7', '#b45309'], sold: ['Sold', '#e2e8f0', '#475569'] };
+  var CatalogPreview = function (props) {
+    var e = props.entry;
+    var specs = arr(e, 'specs');
+    var st = STATUS[v(e, 'status')] || STATUS.available;
+    return h('div', { className: 'bk' },
+      h('span', { className: 'bk-eyebrow' }, v(e, 'category') || 'For sale'),
+      h('h1', { className: 'bk-h1' }, v(e, 'title')),
+      h('div', { style: { display: 'flex', gap: '12px', alignItems: 'center', margin: '8px 0 4px', flexWrap: 'wrap' } },
+        v(e, 'price') ? h('span', { style: { fontSize: '1.5rem', fontWeight: 800, color: cBrand } }, v(e, 'price')) : null,
+        h('span', { style: { fontFamily: fMono, fontSize: '.62rem', fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase', padding: '4px 9px', borderRadius: '6px', background: st[1], color: st[2] } }, st[0])),
+      specs.length ? h('dl', { style: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px 20px', margin: '18px 0', padding: '14px 0', borderTop: '1px solid ' + cLine, borderBottom: '1px solid ' + cLine } },
+        specs.map(function (s, i) {
+          return h('div', { key: i },
+            h('dt', { style: { fontSize: '.6rem', letterSpacing: '.06em', textTransform: 'uppercase', color: cMuted } }, s.label),
+            h('dd', { style: { margin: 0, fontWeight: 600 } }, s.value));
+        })) : null,
+      h('div', { style: { marginTop: '18px', maxWidth: '62ch', color: cMuted } }, props.widgetFor ? props.widgetFor('body') : null),
+      note('For-sale item (CatalogPage); shown as a card in the catalog list.'));
+  };
+
   // Folder collections register by collection name; FILE collections by file name.
   window.CMS.registerPreviewTemplate('home', PagePreview);
   window.CMS.registerPreviewTemplate('pages', PagePreview);
@@ -248,6 +271,12 @@
   window.CMS.registerPreviewTemplate('theme', ThemePreview);
   window.CMS.registerPreviewTemplate('nav', HeaderPreview);
   window.CMS.registerPreviewTemplate('footer', FooterPreview);
+
+  // Config-defined listing collections (news / for-sale / …) get the matching preset
+  // preview. stomme-gen appends stommeRegisterListing(id, preset) calls for this site.
+  window.stommeRegisterListing = function (id, preset) {
+    window.CMS.registerPreviewTemplate(id, preset === 'catalog' ? CatalogPreview : PostPreview);
+  };
 
   // ── "Image" editor component for markdown bodies ────────────────────────────
   // Overrides the default image button: caption + placement + size, no keyword
