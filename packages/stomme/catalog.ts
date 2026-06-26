@@ -58,7 +58,7 @@ export const defaultBlocks: BlockDef[] = [
     shape: 'hero',
     fields: [
       { name: 'eyebrow', label: 'Eyebrow', widget: 'string', required: false },
-      { name: 'heading', label: 'Heading (H1)', widget: 'string' },
+      { name: 'heading', label: 'Heading (H1)', widget: 'text', hint: 'Press Enter for a line break.' },
       { name: 'intro', label: 'Intro', widget: 'text', required: false },
       { name: 'ctaLabel', label: 'Button label', widget: 'string', required: false },
       linkField('ctaHref', 'Button link'),

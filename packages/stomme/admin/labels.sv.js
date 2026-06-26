@@ -138,6 +138,7 @@ export default {
   'Second button link': 'Andra knappens länk',
   'Video (looping)': 'Video (loopad)',
   'Gradient (no image)': 'Gradient (ingen bild)',
+  'Press Enter for a line break.': 'Tryck Enter för en radbrytning.',
   'A still photo, a muted looping video, or a generated gradient (no asset — follows your brand colour).': 'Ett stillbildsfoto, en tyst loopad video, eller en genererad gradient (ingen fil — följer din varumärkesfärg).',
   'A still photo, or a muted looping video.': 'Ett stillbildsfoto, eller en tyst loopad video.',
   'Background image / video poster': 'Bakgrundsbild / videoposter',

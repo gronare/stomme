@@ -145,8 +145,8 @@ body { font-family: var(--bk-font-sans); margin: 0; line-height: 1.6; }
    brand-coloured glow, slowly drifting (ken-burns). The glow follows the theme. */
 .cover__media--gradient {
   background:
-    radial-gradient(60% 50% at 72% 28%, color-mix(in srgb, var(--color-brand) 35%, transparent), transparent 60%),
-    linear-gradient(120deg, #12151d, #222a3a 60%, #10131a);
+    linear-gradient(120deg, #12151d, #222a3a 60%, #10131a),
+    radial-gradient(60% 50% at 72% 28%, color-mix(in srgb, var(--color-brand) 35%, transparent), transparent 60%);
   animation: cover-kb 24s ease-in-out infinite alternate;
 }
 @keyframes cover-kb { from { transform: scale(1.08); } to { transform: scale(1.18) translate(-2%, -1%); } }
