@@ -16,7 +16,7 @@ interface Props {
   ctaHref?: unknown;
   cta2Label?: string;
   cta2Href?: unknown;
-  media?: 'image' | 'video';
+  media?: 'image' | 'video' | 'gradient';
   image?: string;
   imageAlt?: string;
   video?: string;
@@ -44,16 +44,18 @@ const videoSrc =
     : undefined;
 ---
 <section class:list={['cover', `cover--${align}`, `cover--h-${height}`, `cover--ov-${overlay}`]}>
-  <div class="cover__media">
-    <Cover
-      src={image}
-      alt={imageAlt ?? heading}
-      placeholder="/images/placeholder.svg"
-      width={1600}
-      height={900}
-      loading="eager"
-      class="cover__img"
-    />
+  <div class:list={['cover__media', { 'cover__media--gradient': media === 'gradient' }]}>
+    {media !== 'gradient' && (
+      <Cover
+        src={image}
+        alt={imageAlt ?? heading}
+        placeholder="/images/placeholder.svg"
+        width={1600}
+        height={900}
+        loading="eager"
+        class="cover__img"
+      />
+    )}
     {videoSrc && (
       <video class="cover__video" autoplay muted loop playsinline preload="metadata" aria-hidden="true">
         <source src={videoSrc} />

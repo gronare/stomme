@@ -70,10 +70,11 @@ export const defaultBlocks: BlockDef[] = [
         widget: 'select',
         required: false,
         default: 'image',
-        hint: 'A still photo, or a muted looping video.',
+        hint: 'A still photo, a muted looping video, or a generated gradient (no asset — follows your brand colour).',
         options: [
           { label: 'Image', value: 'image' },
           { label: 'Video (looping)', value: 'video' },
+          { label: 'Gradient (no image)', value: 'gradient' },
         ],
       },
       imageField('image', 'Background image / video poster'),
