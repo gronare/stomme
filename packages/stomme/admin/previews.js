@@ -196,20 +196,24 @@
         swatch('Brand', brand), swatch('Secondary', secondary), swatch('Text', ink), swatch('On dark', onDark), swatch('Surface', surface), swatch('Paper', paper), swatch('Line', line), swatch('Highlight', highlight), swatch('Dark', dk)),
       h('h1', { style: { fontFamily: dispFont, fontSize: '2rem', fontWeight: 800, letterSpacing: '-.01em', margin: '0 0 10px' } }, 'Heading on a light surface'),
       h('p', { style: { color: muted, maxWidth: '52ch', margin: '0 0 18px' } }, 'Body text in the normal colour. A ',
-        h('a', { style: { color: brand } }, 'link'), ' uses the brand colour, as do bullets and accents.'),
+        h('a', { style: { color: brand } }, 'link'), ' uses the brand; the eyebrow marker uses your chosen accent.'),
       h('div', { style: { display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap', marginBottom: '30px' } },
         btn('Primary button', brand, onDark), btn('Secondary', secondary, onDark), btn('Highlight', highlight, onDark)),
       h('div', { style: { background: surface, borderRadius: '16px', padding: '28px', marginBottom: '24px' } },
-        eyebrowSample('Accent surface', brand),
+        eyebrowSample('Accent surface', ebAccent),
         h('h2', { style: { fontFamily: dispFont, color: brand, fontSize: '1.5rem', fontWeight: 800, margin: '10px 0 8px' } }, 'Heading on the accent surface'),
         h('p', { style: { color: ink, maxWidth: '48ch', margin: 0 } }, 'Accent sections and the footer use the accent surface.')),
       h('div', { style: { background: dk, color: dkInk, borderRadius: '16px', padding: '28px' } },
-        eyebrowSample('Dark section', highlight),
+        eyebrowSample('Dark section', ebAccent),
         h('h2', { style: { fontFamily: dispFont, color: dkInk, fontSize: '1.5rem', fontWeight: 800, margin: '10px 0 8px' } }, 'Heading on a dark section'),
         h('p', { style: { color: dkMuted, maxWidth: '48ch', margin: '0 0 18px' } }, 'Any block can switch to the Dark surface — text turns light, cards become raised, accents stay vivid.'),
         h('div', { style: { display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' } },
           btn('Primary button', brand, onDark),
-          h('div', { style: { background: dkCard, border: '1px solid ' + dkLine, borderRadius: '10px', padding: '12px 16px', color: dkInk, fontSize: '13px', fontWeight: 600 } }, 'Raised card'))));
+          h('div', { style: { background: dkCard, border: '1px solid ' + dkLine, borderRadius: '10px', padding: '12px 16px', color: dkInk, fontSize: '13px', fontWeight: 600 } }, 'Raised card'))),
+      h('div', { style: { background: 'linear-gradient(120deg, #12151d, #222a3a 60%, #10131a)', color: '#e9ebf1', borderRadius: '16px', padding: '28px', marginTop: '24px' } },
+        eyebrowSample('Gradient surface', ebAccent),
+        h('h2', { style: { fontFamily: dispFont, color: '#e9ebf1', fontSize: '1.5rem', fontWeight: 800, margin: '10px 0 8px' } }, 'Heading on a gradient'),
+        h('p', { style: { color: '#aab0bd', maxWidth: '48ch', margin: 0 } }, 'The gradient surface — a slate backdrop, good behind a tall or dark hero.')));
   };
 
   // Header & footer: render the REAL components (real logo, nav, CTA, theme) via
