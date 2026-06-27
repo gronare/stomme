@@ -1,5 +1,9 @@
 ---
 import Cover from '../src/Cover.astro';
+// Default art (no images set): the structural wireframe→built pair, inlined so its
+// currentColor tints to the brand. Uploaded before/after images render via Cover.
+import beforeArt from '../assets/images/placeholders/before.svg?raw';
+import afterArt from '../assets/images/placeholders/after.svg?raw';
 
 // Before / after slider — drag (or use the keyboard-accessible range input) to
 // wipe between two images via a CSS clip driven by a custom property. The section
@@ -26,9 +30,13 @@ const { eyebrow, heading, intro, before, after, beforeAlt = 'Before', afterAlt =
     </div>
   )}
   <figure class="ba">
-    <Cover src={after} alt={afterAlt} placeholder="/images/placeholders/after.svg" width={1200} height={750} class="ba-img" />
+    {after
+      ? <Cover src={after} alt={afterAlt} placeholder="/images/placeholders/after.svg" width={1200} height={750} class="ba-img" />
+      : <div class="ba-img ba-art" set:html={afterArt} />}
     <div class="ba-clip">
-      <Cover src={before} alt={beforeAlt} placeholder="/images/placeholders/before.svg" width={1200} height={750} class="ba-img" />
+      {before
+        ? <Cover src={before} alt={beforeAlt} placeholder="/images/placeholders/before.svg" width={1200} height={750} class="ba-img" />
+        : <div class="ba-img ba-art" set:html={beforeArt} />}
     </div>
     <div class="ba-line" aria-hidden="true"><span class="ba-handle">⇄</span></div>
     <span class="ba-tag ba-tag-before" aria-hidden="true">Before</span>
