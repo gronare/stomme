@@ -375,7 +375,10 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
 body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header.solid .logo .accent,
 body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header.nav-open .logo .accent { color: var(--color-brand); }
 
-.site-footer { background: var(--color-surface); color: var(--color-ink); margin-top: 4rem; }
+/* No top margin — the footer sits flush against the last block (its own padding-block
+   gives the breathing room). A margin here showed the page background as a gap, which
+   reads as a stray white strip above a dark footer or after a coloured band. */
+.site-footer { background: var(--color-surface); color: var(--color-ink); }
 .site-footer .inner { padding-block: 3rem; }
 /* Dark footer (footer.dark) — reuses the dark-section tokens so it matches dark blocks. */
 .site-footer--dark {
