@@ -190,11 +190,9 @@ body { font-family: var(--bk-font-sans); margin: 0; line-height: 1.6; }
 .cover--center .cover__inner { align-self: center; }
 .cover--center .cover__h1, .cover--center .cover__intro { margin-inline: auto; }
 .cover--center .cover__cta { justify-content: center; }
-/* Cover eyebrow now uses the shared .mono.mono-dot system so it follows the site-wide
-   eyebrow style; it only overrides the colour for legibility on a dark photo, and tints
-   the marker to match (currentColor). */
-.cover__eyebrow { color: color-mix(in srgb, var(--color-brand) 45%, #fff); }
-.cover__eyebrow.mono-dot::before { background: currentColor; }
+/* Cover eyebrow keeps its own bold/wide/no-marker treatment regardless of the site-wide
+   eyebrow style — a deliberate component override (it's the hero's signature look). */
+.cover__eyebrow { font-family: var(--bk-font-mono); text-transform: uppercase; letter-spacing: 0.16em; font-size: 0.74rem; font-weight: 700; color: color-mix(in srgb, var(--color-brand) 45%, #fff); }
 .cover__h1 { font-family: var(--bk-font-display); font-weight: 800; letter-spacing: -0.02em; line-height: 1.04; font-size: clamp(2.4rem, 6vw, 4.6rem); color: #fff; margin: 0.8rem 0 0; max-width: 18ch; text-shadow: 0 2px 30px rgba(0,0,0,.35); }
 .cover--center .cover__h1 { max-width: 22ch; }
 .cover__intro { margin: 1.1rem 0 0; font-size: 1.12rem; color: rgba(255,255,255,.86); max-width: 48ch; }
@@ -279,7 +277,7 @@ body { font-family: var(--bk-font-sans); margin: 0; line-height: 1.6; }
   color: color-mix(in srgb, var(--color-ink) 42%, var(--color-paper)); }
 
 /* chrome */
-.site-header { border-bottom: 1px solid var(--color-line); }
+.site-header { background: var(--color-paper); border-bottom: 1px solid var(--color-line); }
 .site-header .inner, .site-footer .inner { max-width: 72rem; margin-inline: auto; padding: 1rem 1.5rem; }
 .site-header .inner { display: flex; align-items: center; justify-content: flex-start; gap: 1rem; }
 /* Logo left; nav + CTA pushed to the right. The CTA lives in the bar (not the nav) so
@@ -373,9 +371,10 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
 }
 body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header.is-sticky { position: fixed; }
 body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header .logo,
-body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header .site-nav a,
+body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header .site-nav > a,
 body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header .nav-top,
 body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header .nav-toggle { color: #fff; }
+/* The dropdown panel is always a light popup, so its links keep the normal dark colour. */
 body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header .logo .accent { color: color-mix(in srgb, var(--color-brand) 45%, #fff); }
 /* solid state — sticky header scrolled past the hero, or the mobile menu is open */
 body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header.solid,
@@ -385,10 +384,12 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
   border-bottom-color: var(--color-line); box-shadow: 0 12px 30px -24px rgba(0,0,0,0.5);
 }
 body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header.solid .logo,
-body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header.solid .site-nav a,
+body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header.solid .site-nav > a,
 body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header.solid .nav-top,
 body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header.solid .nav-toggle,
 body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header.nav-open .logo,
+body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header.nav-open .site-nav > a,
+body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header.nav-open .nav-top,
 body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header.nav-open .nav-toggle { color: var(--color-ink); }
 body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header.solid .logo .accent,
 body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header.nav-open .logo .accent { color: var(--color-brand); }
