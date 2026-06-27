@@ -1590,11 +1590,10 @@ collections:
             label: "Logo"
             widget: object
             fields:
-              - { name: image, label: "Logo image (overrides text)", widget: image, required: false }
-              - { name: imageDark, label: "Logo for dark backgrounds", widget: image, required: false, hint: "Shown on the dark footer. Use a transparent/currentColor variant. Falls back to the main logo." }
+              - { name: image, label: "Logo mark (shown beside the text)", widget: image, required: false, hint: "An icon/mark. The wordmark is the text below, set in your display font." }
               - { name: alt, label: "Logo alt text", widget: string, required: false }
-              - { name: textPre, label: "Logo text (if no image)", widget: string, required: false }
-              - { name: textAccent, label: "Logo accent", widget: string, required: false }
+              - { name: textPre, label: "Wordmark text", widget: string, required: false }
+              - { name: textAccent, label: "Wordmark accent (in brand colour)", widget: string, required: false }
           - { name: sticky, label: "Sticky header", widget: boolean, required: false, default: false, hint: "Header stays fixed at the top while scrolling. Default: it scrolls away with the page." }
           # >>> navlinks:generated (run: pnpm cms:gen — do not edit between markers)
           - name: items

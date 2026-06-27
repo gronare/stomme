@@ -1,9 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" role="img" aria-label="Placeholder">
-  <!-- The brand mark: the outline of a page. Used as a CSS mask (.ph-tint), so
-       only alpha matters — headings tint full brand, body lines at 0.5 read as
-       the muted slate. Logo and placeholder art share one shape. -->
-  <rect x="15.19" y="10.00" width="44.44" height="14.07" rx="7.04"/>
-  <rect x="15.19" y="33.70" width="68.15" height="10.37" rx="5.19" opacity="0.5"/>
-  <rect x="37.41" y="55.93" width="38.52" height="14.07" rx="7.04"/>
-  <rect x="37.41" y="79.63" width="47.41" height="10.37" rx="5.19" opacity="0.5"/>
+  <!-- The brand mark: the outline of a page (one canonical grid). Used as a CSS
+       mask (.ph-tint), so only alpha matters — headings tint full brand, body
+       lines at 0.5 read as the muted slate. Logo + placeholder share one shape. -->
+  <rect x="24" y="22" width="34" height="11" rx="5.5"/>
+  <rect x="24" y="39" width="54" height="8" rx="4" opacity="0.5"/>
+  <rect x="40" y="53" width="28" height="11" rx="5.5"/>
+  <rect x="40" y="70" width="36" height="8" rx="4" opacity="0.5"/>
 </svg>

@@ -1,13 +1,11 @@
 ---
 import { getEntry } from 'astro:content';
 import { resolveLink } from '../src/href';
-import { inlineLocalSvg } from '../src/inline-svg';
-import Cover from '../src/Cover.astro';
 
 // Themeable site chrome (footer). Reads the navigation/footer/settings collections
 // by default; accepts them as optional props (CMS preview drafts). Renders a links
 // column + org line only when those fields are present, so a minimal site stays simple.
-interface NavData { logo?: { textPre?: string; textAccent?: string; image?: string; imageDark?: string; alt?: string } }
+interface NavData { logo?: { textPre?: string; textAccent?: string; image?: string; alt?: string } }
 interface FooterData { dark?: boolean; tagline?: string; showLinks?: boolean; linksHeading?: string; links?: { label: string; link?: unknown }[]; showTowns?: boolean; townsHeading?: string; legal?: { label: string; link?: unknown }[]; note?: string }
 interface SettingsData { name?: string; email?: string; phone?: string; phoneE164?: string; hq?: string; orgNr?: string; founded?: string }
 // `towns` + `townsHref` are optional: pass them (the site reads its towns collection
@@ -21,9 +19,7 @@ if (!footer) footer = (await getEntry('footer', 'footer'))!.data as FooterData;
 if (!settings) settings = (await getEntry('settings', 'site'))!.data as SettingsData;
 
 const logo = nav.logo ?? {};
-// On a dark footer, prefer a dark-background logo variant when the site provides one.
-const logoImg = (footer.dark && logo.imageDark) ? logo.imageDark : logo.image;
-const logoSvg = inlineLocalSvg(logoImg);
+const showWord = !!logo.textPre || !logo.image;
 const links = footer.links ?? [];
 const legal = footer.legal ?? [];
 const tagline = [footer.tagline, settings.hq].filter(Boolean).join(' · ');
@@ -34,11 +30,10 @@ const year = new Date().getFullYear();
   <div class="inner">
     <div class="footer-grid">
       <div>
-        {logoSvg
-          ? <span class="logo logo-lockup" style="margin:0">{<Fragment set:html={logoSvg} />}</span>
-          : logoImg
-          ? <Cover src={logoImg} alt={logo.alt ?? settings.name} placeholder="/images/placeholder.svg" class="logo-img" />
-          : <p class="logo" style="margin:0">{logo.textPre ?? settings.name}<span class="accent">{logo.textAccent}</span></p>}
+        <div class="logo" style="margin:0">
+          {logo.image && <img class="logo-mark" src={logo.image} alt="" />}
+          {showWord && <span class="logo-word">{logo.textPre ?? settings.name}<span class="accent">{logo.textAccent}</span></span>}
+        </div>
         {tagline && <p style="margin:0.5rem 0 0;max-width:36rem">{tagline}</p>}
         {(settings.phone || settings.email) && (
           <p style="margin:0.75rem 0 0">

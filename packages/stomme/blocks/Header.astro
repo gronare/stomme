@@ -1,14 +1,14 @@
 ---
 import { getEntry, getCollection } from 'astro:content';
 import { resolveLink } from '../src/href';
-import { inlineLocalSvg } from '../src/inline-svg';
-import Cover from '../src/Cover.astro';
 
 // Themeable site chrome (header). Reads the `navigation` + `settings` collections
 // by default, but accepts `nav`/`settings` as optional props so a draft can be
 // injected (e.g. the CMS live preview). A site that wants bespoke chrome can stop
-// importing this and render its own .site-header markup. The logo is an uploaded
-// image when `logo.image` is set, otherwise the two-tone text mark.
+// importing this and render its own .site-header markup. The logo is composed: an
+// optional mark image (`logo.image`) beside the wordmark text (`logo.textPre` +
+// `textAccent`), set in the site's display font so it matches the headings and
+// tints to its context. Either part alone works too.
 //
 // A nav item becomes a dropdown when it has `menu` (auto: "<collectionId>::<routeBase>"
 // — lists every entry, linked to its detail page) or manual `children`.
@@ -27,11 +27,8 @@ if (!nav) nav = (await getEntry('navigation', 'nav'))!.data as NavData;
 if (!settings) settings = (await getEntry('settings', 'site'))!.data as { name?: string };
 
 const logo = nav.logo ?? {};
-// A local .svg logo is inlined so a currentColor wordmark tints to the header;
-// other logos render as an <img>. When the header is transparent over a dark hero
-// we swap to the dark variant (if provided) so a tiled mark doesn't sit on dark.
-const logoSvg = inlineLocalSvg(logo.image);
-const logoDarkSvg = logo.imageDark ? inlineLocalSvg(logo.imageDark) : null;
+// Show the wordmark text when set, or as the fallback when there's no mark image.
+const showWord = !!logo.textPre || !logo.image;
 const items = nav.items ?? [];
 const homeHref = '/';
 
@@ -61,14 +58,8 @@ const resolved = await Promise.all(
 <header class:list={['site-header', { 'is-sticky': nav.sticky }]}>
   <div class="inner">
     <a class="logo" href={homeHref} aria-label={settings.name}>
-      {logoSvg
-        ? <Fragment>
-            <span class:list={['logo-lockup', { 'logo-lockup--light': logoDarkSvg }]} set:html={logoSvg} />
-            {logoDarkSvg && <span class="logo-lockup logo-lockup--dark" set:html={logoDarkSvg} />}
-          </Fragment>
-        : logo.image
-        ? <Cover src={logo.image} alt={logo.alt ?? settings.name} placeholder="/images/placeholder.svg" class="logo-img" />
-        : <Fragment>{logo.textPre ?? settings.name}<span class="accent">{logo.textAccent}</span></Fragment>}
+      {logo.image && <img class="logo-mark" src={logo.image} alt="" />}
+      {showWord && <span class="logo-word">{logo.textPre ?? settings.name}<span class="accent">{logo.textAccent}</span></span>}
     </a>
     <nav class="site-nav" id="site-nav">
       {resolved.map((i) => i.children.length ? (

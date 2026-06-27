@@ -341,17 +341,14 @@ body { font-family: var(--bk-font-sans); margin: 0; line-height: 1.6; }
   .nav-item--menu.is-open .nav-caret { transform: rotate(-135deg) translateY(2px); }
 }
 
-.logo { font-family: var(--bk-font-display); font-weight: 800; font-size: 1.5rem; color: var(--color-ink); text-decoration: none; }
+/* Composed logo: an optional mark image beside the wordmark text, set in the
+   display font so it matches the headings. The text colour follows .logo (ink in
+   the light header, light in the dark footer / over a dark hero); the mark is its
+   own fixed-colour file that reads on either ground. */
+.logo { display: inline-flex; align-items: center; gap: 0.5rem; font-family: var(--bk-font-display); font-weight: 600; font-size: 1.9rem; color: var(--color-ink); text-decoration: none; line-height: 1; }
 .logo .accent { color: var(--color-brand); }
-.logo-img { display: block; height: 30px; width: auto; }
-/* Inline SVG logo (lockup). The wordmark uses currentColor, so it follows the
-   .logo link colour — ink in the light header, on-dark in the footer, light when
-   overlaid on a dark hero — while the mark badge keeps its own fixed colours. */
-.logo-lockup { display: inline-flex; align-items: center; }
-.logo-lockup svg { display: block; height: 44px; width: auto; }
-/* When a dark logo variant is provided, it's hidden until the header is
-   transparent over a dark hero (see the overlay rules below). */
-.logo-lockup--dark { display: none; }
+.logo-mark { display: block; height: 1.3em; width: auto; flex: 0 0 auto; }
+.logo-word { white-space: nowrap; }
 
 /* Transparent overlay header — when a page opens with a full-bleed cover, the header
    floats over it (fixed, light text, no bar) so the hero runs to the top edge, then
@@ -379,11 +376,6 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
 body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header .nav-toggle { color: #fff; }
 /* The dropdown panel is always a light popup, so its links keep the normal dark colour. */
 body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header .logo .accent { color: color-mix(in srgb, var(--color-brand) 45%, #fff); }
-/* Transparent over a dark hero → swap to the dark logo variant (when provided),
-   so a tiled mark doesn't sit on the dark ground. Reverts when the header goes
-   solid or the mobile menu opens (both light). */
-body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header:not(.solid):not(.nav-open) .logo-lockup--light { display: none; }
-body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header:not(.solid):not(.nav-open) .logo-lockup--dark { display: inline-flex; }
 /* solid state — sticky header scrolled past the hero, or the mobile menu is open */
 body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header.solid,
 body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header.nav-open {
