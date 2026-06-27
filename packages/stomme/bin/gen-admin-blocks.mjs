@@ -9,7 +9,7 @@
 // Writes: <cwd>/public/admin/config.yml (override: BLOCKKIT_CONFIG)
 // The consumer's schema.ts imports field helpers from '@gronare/stomme/kit'; Node strips
 // the TS types on import (Node 22.6+).
-import { readFileSync, writeFileSync, readdirSync, copyFileSync, mkdirSync, existsSync } from 'node:fs';
+import { readFileSync, writeFileSync, readdirSync, copyFileSync, cpSync, mkdirSync, existsSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createJiti } from 'jiti';
@@ -535,6 +535,17 @@ try {
   writeFileSync(resolve(root, 'public/admin/stomme-site.css'), siteCss);
 } catch (e) {
   console.warn('  (stomme-site.css skipped:', e.message + ')');
+}
+
+// Ship the engine's default art (structural placeholder SVGs + the animated cover bg)
+// into the site's public/images. Engine-managed: overwritten each run, so improvements
+// flow with a version bump. A site that wants its own art sets a block's image field
+// instead of editing these files.
+try {
+  const imgSrc = resolve(here, '../assets/images');
+  if (existsSync(imgSrc)) cpSync(imgSrc, resolve(root, 'public/images'), { recursive: true });
+} catch (e) {
+  console.warn('  (default images skipped:', e.message + ')');
 }
 
 // Generate the block gallery reference (public/admin/blocks.html) from the catalog, so an

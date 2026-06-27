@@ -1,6 +1,6 @@
 {
   "name": "@gronare/stomme",
-  "version": "0.1.54",
+  "version": "0.1.55",
   "description": "Block-CMS engine for Astro + Decap — types, helpers, runtime components, tooling.",
   "type": "module",
   "repository": {
@@ -43,6 +43,7 @@
     "src",
     "bin",
     "admin",
+    "assets",
     "blocks",
     "routes",
     "catalog.ts",

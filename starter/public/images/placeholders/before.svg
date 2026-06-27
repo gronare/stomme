@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" fill="#64748b" role="img" aria-label="Placeholder (before)">
+  <rect width="800" height="600" fill="#64748b" opacity=".05"/>
+  <line x1="120" y1="470" x2="680" y2="470" stroke="#64748b" stroke-width="3" opacity=".4"/>
+  <g fill="none" stroke="#64748b" stroke-width="6" opacity=".55">
+    <rect x="200" y="290" width="130" height="180" rx="18"/>
+    <rect x="360" y="210" width="150" height="260" rx="20"/>
+    <rect x="540" y="320" width="120" height="150" rx="16"/>
+  </g>
+  <path d="M435 210 L435 180" stroke="#64748b" stroke-width="3" stroke-dasharray="6 8" opacity=".4"/>
+</svg>

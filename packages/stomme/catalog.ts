@@ -80,11 +80,12 @@ export const defaultBlocks: BlockDef[] = [
         widget: 'select',
         required: false,
         default: 'image',
-        hint: 'A still photo, a muted looping video, or a generated gradient (no asset — follows your brand colour).',
+        hint: 'A photo, a looping video, a generated gradient, or an animated block pattern — both gradient and animated follow your brand colour, no asset needed.',
         options: [
           { label: 'Image', value: 'image' },
           { label: 'Video (looping)', value: 'video' },
           { label: 'Gradient (no image)', value: 'gradient' },
+          { label: 'Animated (no image)', value: 'animated' },
         ],
       },
       imageField('image', 'Background image / video poster'),

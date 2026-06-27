@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" fill="#64748b" role="img" aria-label="Placeholder">
+  <rect width="400" height="400" fill="#64748b" opacity=".06"/>
+  <rect x="70" y="70" width="260" height="260" rx="48" fill="none" stroke="#64748b" stroke-width="6" opacity=".5"/>
+  <circle cx="200" cy="172" r="56" opacity="1"/>
+  <rect x="118" y="256" width="164" height="74" rx="37" opacity=".5"/>
+</svg>

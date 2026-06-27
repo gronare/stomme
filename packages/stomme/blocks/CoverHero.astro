@@ -2,6 +2,8 @@
 import { getEntry } from 'astro:content';
 import { resolveLink } from '../src/href';
 import Cover from '../src/Cover.astro';
+// The animated background is inlined (not <img>) so its currentColor tints to the brand.
+import motionSvg from '../assets/images/placeholders/motion.svg?raw';
 
 // Full-bleed cover banner — a background photo or a muted looping video with
 // overlaid heading, intro and up to two buttons. The image always renders
@@ -16,7 +18,7 @@ interface Props {
   ctaHref?: unknown;
   cta2Label?: string;
   cta2Href?: unknown;
-  media?: 'image' | 'video' | 'gradient';
+  media?: 'image' | 'video' | 'gradient' | 'animated';
   image?: string;
   imageAlt?: string;
   video?: string;
@@ -44,8 +46,8 @@ const videoSrc =
     : undefined;
 ---
 <section class:list={['cover', `cover--${align}`, `cover--h-${height}`, `cover--ov-${overlay}`]}>
-  <div class:list={['cover__media', { 'cover__media--gradient': media === 'gradient' }]}>
-    {media !== 'gradient' && (
+  <div class:list={['cover__media', { 'cover__media--gradient': media === 'gradient' || media === 'animated' }]}>
+    {media !== 'gradient' && media !== 'animated' && (
       <Cover
         src={image}
         alt={imageAlt ?? heading}
@@ -56,6 +58,7 @@ const videoSrc =
         class="cover__img"
       />
     )}
+    {media === 'animated' && <div class="cover__motion" aria-hidden="true" set:html={motionSvg} />}
     {videoSrc && (
       <video class="cover__video" autoplay muted loop playsinline preload="metadata" aria-hidden="true">
         <source src={videoSrc} />

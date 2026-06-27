@@ -170,11 +170,12 @@ collections:
                     widget: select
                     required: false
                     default: "image"
-                    hint: "A still photo, a muted looping video, or a generated gradient (no asset — follows your brand colour)."
+                    hint: "A photo, a looping video, a generated gradient, or an animated block pattern — both gradient and animated follow your brand colour, no asset needed."
                     options:
                       - { label: "Image", value: "image" }
                       - { label: "Video (looping)", value: "video" }
                       - { label: "Gradient (no image)", value: "gradient" }
+                      - { label: "Animated (no image)", value: "animated" }
                   - { name: image, label: "Background image / video poster", widget: image, required: false }
                   - { name: imageAlt, label: "Image alt text", widget: string, required: false }
                   - { name: video, label: "Video file (if “Video”)", widget: file, required: false, hint: "Uploaded MP4/WebM — muted + looping. The image shows until it plays, and on reduced-motion." }
@@ -873,11 +874,12 @@ collections:
                 widget: select
                 required: false
                 default: "image"
-                hint: "A still photo, a muted looping video, or a generated gradient (no asset — follows your brand colour)."
+                hint: "A photo, a looping video, a generated gradient, or an animated block pattern — both gradient and animated follow your brand colour, no asset needed."
                 options:
                   - { label: "Image", value: "image" }
                   - { label: "Video (looping)", value: "video" }
                   - { label: "Gradient (no image)", value: "gradient" }
+                  - { label: "Animated (no image)", value: "animated" }
               - { name: image, label: "Background image / video poster", widget: image, required: false }
               - { name: imageAlt, label: "Image alt text", widget: string, required: false }
               - { name: video, label: "Video file (if “Video”)", widget: file, required: false, hint: "Uploaded MP4/WebM — muted + looping. The image shows until it plays, and on reduced-motion." }
