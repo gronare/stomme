@@ -18,7 +18,7 @@ const dateField = z.union([z.string(), z.date()]).transform((d) => (d instanceof
 
 // Listing preset schemas — `article` (blog/news) and `catalog` (for-sale of anything).
 export const PRESET_SCHEMAS = {
-  article: z.object({ title: z.string(), date: dateField, excerpt: z.string().default(''), cover: z.string().optional() }),
+  article: z.object({ title: z.string(), date: dateField, excerpt: z.string().default(''), cover: z.string().optional(), showCover: z.boolean().default(false) }),
   catalog: z.object({
     title: z.string(),
     price: z.string().default(''),

@@ -682,7 +682,12 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
 /* PostList */
 .post-head { margin-bottom: 2.5rem; }
   /* featured lead card (newest post) */
+  /* "Latest" tag on the featured post — the highlight (attention) accent in isolation. */
+  .post-latest { position: absolute; top: 1rem; left: 1rem; z-index: 2;
+    font-family: var(--bk-font-mono); font-size: 0.62rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+    background: var(--color-highlight); color: color-mix(in srgb, #000 80%, var(--color-highlight)); padding: 4px 11px; border-radius: 999px; }
   .post-feature {
+    position: relative;
     display: grid;
     grid-template-columns: 1.1fr 0.9fr;
     border: 1px solid var(--color-line);

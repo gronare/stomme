@@ -403,6 +403,7 @@ function listingEditor(l) {
     - { name: date, label: "Date", widget: datetime, date_format: "YYYY-MM-DD", time_format: false }
     - { name: excerpt, label: "Excerpt", widget: text, required: false }
     - { name: cover, label: "Cover image", widget: image, required: false }
+    - { name: showCover, label: "Show cover", widget: boolean, required: false, default: false, hint: "Show a cover on cards + the article — your image, or a themed default if none." }
     - { name: body, label: "Body", widget: markdown }`;
   // Catalog specs are config-defined (Listing.specs) so every item shares the same fields.
   // Each becomes a string field keyed by its stable key; labels are the site's own strings.

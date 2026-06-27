@@ -15,7 +15,7 @@ const html = await renderMarkdown(post.body ?? '');
 const date = post.data.date ? new Date(post.data.date).toLocaleDateString(site.locale, { year: 'numeric', month: 'long', day: 'numeric' }) : '';
 ---
 <article class="section section--read">
-  {post.data.cover && (
+  {post.data.showCover && (
     <Cover src={post.data.cover} alt={post.data.title} placeholder="/images/placeholders/service.svg" width={1100} height={620} loading="eager" class="post-article__cover" />
   )}
   {date && <p class="mono">{date}</p>}

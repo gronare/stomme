@@ -117,7 +117,7 @@
     var coverUrl = '';
     try { if (cover && props.getAsset) coverUrl = String(props.getAsset(cover)); } catch (_e) {}
     return h('div', { className: 'bk' },
-      coverUrl ? h('img', { src: coverUrl, style: { width: '100%', aspectRatio: '16 / 9', objectFit: 'cover', borderRadius: '12px', display: 'block', marginBottom: '18px' } }) : null,
+      (coverUrl && v(e, 'showCover')) ? h('img', { src: coverUrl, style: { width: '100%', aspectRatio: '16 / 9', objectFit: 'cover', borderRadius: '12px', display: 'block', marginBottom: '18px' } }) : null,
       h('p', { className: 'bk-post-date' }, v(e, 'date')),
       h('h1', { className: 'bk-h1' }, v(e, 'title')),
       v(e, 'excerpt') ? h('p', { className: 'bk-intro' }, v(e, 'excerpt')) : null,

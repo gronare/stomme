@@ -23,15 +23,16 @@ const { eyebrow, heading, intro, showImages = true, featured = true, columns = 3
 const prefix = base ?? site?.routes?.blog ?? '/blog';
 const locale = site?.locale ?? 'en-US';
 const readMore = site?.strings?.readMore ?? 'Read more';
+const latest = site?.strings?.latest ?? 'Latest';
 const all = (await getCollection(source)).sort((a, b) => (a.data.date < b.data.date ? 1 : -1));
 const fmt = (d: string) => new Date(d).toLocaleDateString(locale, { year: 'numeric', month: 'long', day: 'numeric' });
 const lead = featured && all.length > 1 ? all[0] : null;
 const rest = lead ? all.slice(1) : all;
 const PLACE = '/images/placeholders/service.svg';
-// Show an image only when the post actually has a cover — otherwise the card is
-// text-only (no placeholder). The index mixes both kinds cleanly.
-const leadHasImg = !!(lead && showImages && lead.data.cover);
-const hasImg = (p: any) => !!(showImages && p.data.cover);
+// Show a cover when the post opts in (showCover): its uploaded image, or the brand-tinted
+// default if none. Otherwise the card is text-only. The index mixes both kinds cleanly.
+const leadHasImg = !!(lead && showImages && lead.data.showCover);
+const hasImg = (p: any) => !!(showImages && p.data.showCover);
 ---
 {all.length > 0 && (
   <section class="section">
@@ -44,6 +45,7 @@ const hasImg = (p: any) => !!(showImages && p.data.cover);
     )}
     {lead && (
       <a href={`${prefix}/${lead.id}`} class:list={['post-feature', { 'post-feature--text': !leadHasImg }]}>
+        <span class="post-latest">{latest}</span>
         {leadHasImg && (
           <Cover src={lead.data.cover} alt={lead.data.title} placeholder={PLACE} width={1000} height={640} class="post-feature__img" />
         )}

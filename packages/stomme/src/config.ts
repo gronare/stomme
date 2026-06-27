@@ -15,6 +15,7 @@ export interface SiteConfig {
   cmsLocale?: string; // Decap admin UI language (e.g. 'en', 'sv'); written to config.yml by stomme-gen
   strings?: {
     readMore?: string;
+    latest?: string; // "Latest" tag on the featured post
     contact?: { name?: string; email?: string; phone?: string; message?: string; submit?: string; direct?: string };
     // TownPage chrome. Strings may contain `{name}` — replaced with the town name.
     town?: {
@@ -109,6 +110,7 @@ export const SITE_DEFAULTS = {
   cmsLocale: 'en',
   strings: {
     readMore: 'Read more',
+    latest: 'Latest',
     town: {
       eyebrow: 'Local service: {name}',
       heading: '{name}',
