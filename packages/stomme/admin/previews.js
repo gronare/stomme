@@ -198,7 +198,7 @@
       h('p', { style: { color: muted, maxWidth: '52ch', margin: '0 0 18px' } }, 'Body text in the normal colour. A ',
         h('a', { style: { color: brand } }, 'link'), ' uses the brand colour, as do bullets and accents.'),
       h('div', { style: { display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap', marginBottom: '30px' } },
-        btn('Primary button', brand, onDark), btn('Secondary', paper, ink, '1px solid ' + line), btn('Highlight', highlight, onDark)),
+        btn('Primary button', brand, onDark), btn('Secondary', secondary, onDark), btn('Highlight', highlight, onDark)),
       h('div', { style: { background: surface, borderRadius: '16px', padding: '28px', marginBottom: '24px' } },
         eyebrowSample('Accent surface', brand),
         h('h2', { style: { fontFamily: dispFont, color: brand, fontSize: '1.5rem', fontWeight: 800, margin: '10px 0 8px' } }, 'Heading on the accent surface'),
