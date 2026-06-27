@@ -31,6 +31,7 @@ function previewEntrypoint(isStatic) {
 export const prerender = ${isStatic ? 'true' : 'false'};
 import Base from '@stomme/base';
 import { site } from '@stomme/config';
+import { getCollection } from 'astro:content';
 import BlockRenderer from '@gronare/stomme/BlockRenderer.astro';
 import Header from '@gronare/stomme/Header.astro';
 import Footer from '@gronare/stomme/Footer.astro';
@@ -47,11 +48,14 @@ let blocks = [];
 if (!kind && Array.isArray(draft)) blocks = draft;
 const navDraft = kind === 'header' && draft && typeof draft === 'object' ? draft : undefined;
 const footerDraft = kind === 'footer' && draft && typeof draft === 'object' ? draft : undefined;
+const towns = kind === 'footer'
+  ? (await getCollection('towns')).sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0)).map((t) => ({ id: t.id, name: t.data.name }))
+  : [];
 ---
 {kind === 'header' ? (
   <Base title="Preview" chrome={false}><Header nav={navDraft} /></Base>
 ) : kind === 'footer' ? (
-  <Base title="Preview" chrome={false}><Footer footer={footerDraft} /></Base>
+  <Base title="Preview" chrome={false}><Footer footer={footerDraft} towns={towns} townsHref={site.routes?.towns ?? '/areas'} /></Base>
 ) : (
   <Base title="Preview"><div id="preview-root"><BlockRenderer blocks={blocks} config={site} /></div></Base>
 )}
