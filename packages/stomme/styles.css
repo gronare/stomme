@@ -107,6 +107,15 @@ body { font-family: var(--bk-font-sans); margin: 0; line-height: 1.6; }
 
 .card { display: block; border: 1px solid var(--color-line); border-radius: 1rem; background: var(--color-paper); overflow: hidden; text-decoration: none; color: inherit; }
 
+/* Tinted placeholder — a fallback image (no upload) drawn as the brand colour masked by
+   the placeholder SVG's alpha, so the default art follows the theme. Keeps the image
+   class's box (width/aspect/radius); the mask replaces object-fit. */
+.ph-tint { display: block; background-color: var(--color-brand);
+  -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+  -webkit-mask-position: center; mask-position: center;
+  -webkit-mask-size: cover; mask-size: cover;
+  -webkit-mask-mode: alpha; mask-mode: alpha; }
+
 /* hero */
 .hero-grid { display: grid; grid-template-columns: 1fr; gap: clamp(2rem, 5vw, 3.5rem); align-items: center; }
 @media (min-width: 920px) { .hero-grid.has-media { grid-template-columns: 1.1fr .9fr; } }

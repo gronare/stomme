@@ -3,10 +3,10 @@ import { Image } from 'astro:assets';
 import type { ImageMetadata } from 'astro';
 
 // Renders a content image through Astro's optimizer when it's a real uploaded
-// raster image (stored under /src/assets/uploads via the CMS), and falls back to
-// a plain <img> for SVG placeholders or public-path images that can't be optimized.
-// width/height are optional — omit them to use the image's intrinsic size (good
-// for `object-contain` framing); pass them for fixed `object-cover` slots.
+// raster image (stored under /src/assets/uploads via the CMS). A user-set public-path
+// image renders as a plain <img>. With NO image, it falls back to the placeholder SVG
+// drawn as a brand-tinted CSS mask, so the default art follows the theme (an <img>
+// can't inherit currentColor). width/height are optional.
 interface Props {
   src?: string; // value stored in frontmatter (may be undefined)
   alt: string;
@@ -28,7 +28,14 @@ const dims = { ...(width ? { width } : {}), ...(height ? { height } : {}) };
 {
   optimized ? (
     <Image src={optimized()} alt={alt} {...dims} class={cls} loading={loading} />
+  ) : src ? (
+    <img src={src} alt={alt} {...dims} loading={loading} class={cls} decoding="async" />
   ) : (
-    <img src={src ?? placeholder} alt={alt} {...dims} loading={loading} class={cls} decoding="async" />
+    <span
+      class:list={[cls, 'ph-tint']}
+      role="img"
+      aria-label={alt}
+      style={`-webkit-mask-image:url(${placeholder});mask-image:url(${placeholder})`}
+    />
   )
 }
