@@ -1,6 +1,6 @@
 import { fileURLToPath } from 'node:url';
 import { resolve, dirname } from 'node:path';
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { mkdirSync, writeFileSync, existsSync } from 'node:fs';
 
 // stomme Astro integration — injects collection-detail routes.
 //
@@ -131,12 +131,20 @@ export default function stomme(options = {}) {
         const outDir = resolve(root, '.astro/stomme');
 
         // 0. Live-preview route — generated with a literal prerender per target.
+        // Skip it if the site ships its own src/pages/preview.astro (a richer preview
+        // that can use the site's renderer + custom blocks); that one wins, no collision.
         const isStatic = (process.env.STOMME_TARGET || 'netlify') === 'static';
-        const previewFile = resolve(outDir, 'preview.astro');
-        mkdirSync(outDir, { recursive: true });
-        writeFileSync(previewFile, previewEntrypoint(isStatic));
-        injectRoute({ pattern: '/preview', entrypoint: previewFile });
-        enabled.push(`/preview${isStatic ? ' (static)' : ''}`);
+        const sitePreview = ['preview.astro', 'preview.ts', 'preview.js', 'preview.mdx']
+          .some((f) => existsSync(resolve(root, 'src/pages', f)));
+        if (sitePreview) {
+          logger.info("using the site's own /preview (skipped the generated one)");
+        } else {
+          const previewFile = resolve(outDir, 'preview.astro');
+          mkdirSync(outDir, { recursive: true });
+          writeFileSync(previewFile, previewEntrypoint(isStatic));
+          injectRoute({ pattern: '/preview', entrypoint: previewFile });
+          enabled.push(`/preview${isStatic ? ' (static)' : ''}`);
+        }
 
         // 1. Fixed feature routes (areas/services). Blog is handled as a listing below.
         const routed = [
