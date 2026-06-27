@@ -47,7 +47,13 @@ body { font-family: var(--bk-font-sans); margin: 0; line-height: 1.6; }
 
 .mono { font-family: var(--bk-font-mono); text-transform: uppercase; letter-spacing: 0.12em; font-size: 0.74rem; color: var(--color-muted); }
 .mono-dot { display: inline-flex; align-items: center; gap: 10px; }
+/* Eyebrow marker — site-wide style via [data-eyebrow] on <html> (theme.eyebrow).
+   Default: a brand dash. `bullet`: a brand dot. `bold`: no marker, but the eyebrow
+   itself goes heavy + wide-tracked (the cover/"helbild" treatment, extracted). */
 .mono-dot::before { content: ""; width: 18px; height: 2px; background: var(--color-brand); display: inline-block; }
+[data-eyebrow="bullet"] .mono-dot::before { width: 7px; height: 7px; border-radius: 50%; }
+[data-eyebrow="bold"] .mono-dot::before { display: none; }
+[data-eyebrow="bold"] .mono-dot { font-weight: 700; letter-spacing: 0.16em; }
 
 .btn { display: inline-block; background: var(--color-brand); color: var(--color-on-dark); font-weight: 600; padding: 0.6rem 1.3rem; border-radius: 0.7rem; text-decoration: none; white-space: nowrap; }
 .btn:hover { background: var(--color-brand-press); }
@@ -184,7 +190,11 @@ body { font-family: var(--bk-font-sans); margin: 0; line-height: 1.6; }
 .cover--center .cover__inner { align-self: center; }
 .cover--center .cover__h1, .cover--center .cover__intro { margin-inline: auto; }
 .cover--center .cover__cta { justify-content: center; }
-.cover__eyebrow { font-family: var(--bk-font-mono); text-transform: uppercase; letter-spacing: 0.16em; font-size: 0.74rem; font-weight: 700; color: color-mix(in srgb, var(--color-brand) 45%, #fff); }
+/* Cover eyebrow now uses the shared .mono.mono-dot system so it follows the site-wide
+   eyebrow style; it only overrides the colour for legibility on a dark photo, and tints
+   the marker to match (currentColor). */
+.cover__eyebrow { color: color-mix(in srgb, var(--color-brand) 45%, #fff); }
+.cover__eyebrow.mono-dot::before { background: currentColor; }
 .cover__h1 { font-family: var(--bk-font-display); font-weight: 800; letter-spacing: -0.02em; line-height: 1.04; font-size: clamp(2.4rem, 6vw, 4.6rem); color: #fff; margin: 0.8rem 0 0; max-width: 18ch; text-shadow: 0 2px 30px rgba(0,0,0,.35); }
 .cover--center .cover__h1 { max-width: 22ch; }
 .cover__intro { margin: 1.1rem 0 0; font-size: 1.12rem; color: rgba(255,255,255,.86); max-width: 48ch; }

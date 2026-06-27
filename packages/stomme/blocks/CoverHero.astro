@@ -64,7 +64,7 @@ const videoSrc =
   </div>
   <div class="cover__scrim" aria-hidden="true"></div>
   <div class="cover__inner">
-    {eyebrow && <span class="cover__eyebrow">{eyebrow}</span>}
+    {eyebrow && <span class="mono mono-dot cover__eyebrow">{eyebrow}</span>}
     <h1 class="cover__h1">{String(heading).split('\n').map((line, i) => i === 0 ? line : <Fragment><br />{line}</Fragment>)}</h1>
     {intro && <p class="cover__intro">{intro}</p>}
     {(ctaLabel || cta2Label) && (

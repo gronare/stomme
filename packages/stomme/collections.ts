@@ -78,6 +78,9 @@ export function stommeCollections(listings?: Listing[]) {
         fontCustomFile: z.string().optional(), // heading custom font
         fontCustomBodyFile: z.string().optional(), // body custom font
         fontCustomName: z.string().optional(),
+        // Site-wide eyebrow style (the small label above headings): dash marker,
+        // bullet marker, or the bold/wide cover treatment with no marker.
+        eyebrow: z.enum(['dash', 'bullet', 'bold']).default('dash'),
       }),
     }),
 

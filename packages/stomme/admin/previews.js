@@ -174,9 +174,16 @@
     var btn = function (label, bg, fg, border) {
       return h('span', { style: { display: 'inline-flex', borderRadius: '999px', padding: '11px 20px', fontWeight: 700, fontSize: '14px', background: bg, color: fg, border: border || '0' } }, label);
     };
+    // Eyebrow sample — reflects the site-wide eyebrow style picker (dash / bullet / bold).
+    var eb = g('eyebrow', 'dash'), ebBold = eb === 'bold';
+    var eyebrowSample = function (label, color) {
+      var marker = eb === 'dash' ? { width: '18px', height: '2px' } : eb === 'bullet' ? { width: '7px', height: '7px', borderRadius: '50%' } : null;
+      return h('span', { style: { display: 'inline-flex', alignItems: 'center', gap: '10px', fontFamily: MONO, fontSize: '11px', letterSpacing: ebBold ? '.2em' : '.16em', textTransform: 'uppercase', fontWeight: ebBold ? 700 : 400, color: color } },
+        marker ? h('i', { style: Object.assign({ display: 'inline-block', background: color }, marker) }) : null, label);
+    };
     return h('div', { style: { background: paper, color: ink, minHeight: '100vh', padding: '32px', fontFamily: bodyFont, lineHeight: 1.5, boxSizing: 'border-box' } },
       faces.length ? h('style', {}, faces.join('')) : null,
-      h('span', { style: { fontFamily: MONO, fontSize: '11px', letterSpacing: '.16em', textTransform: 'uppercase', color: brand } }, 'Colour scheme'),
+      eyebrowSample('Colour scheme', brand),
       h('div', { style: { display: 'flex', gap: '12px', margin: '12px 0 34px', flexWrap: 'wrap' } },
         swatch('Brand', brand), swatch('Text', ink), swatch('On dark', onDark), swatch('Surface', surface), swatch('Paper', paper), swatch('Line', line), swatch('Highlight', highlight), swatch('Dark', dk)),
       h('h1', { style: { fontFamily: dispFont, fontSize: '2rem', fontWeight: 800, letterSpacing: '-.01em', margin: '0 0 10px' } }, 'Heading on a light surface'),
@@ -185,11 +192,11 @@
       h('div', { style: { display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap', marginBottom: '30px' } },
         btn('Primary button', brand, onDark), btn('Secondary', paper, ink, '1px solid ' + line), btn('Highlight', highlight, onDark)),
       h('div', { style: { background: surface, borderRadius: '16px', padding: '28px', marginBottom: '24px' } },
-        h('span', { style: { fontFamily: MONO, fontSize: '11px', letterSpacing: '.16em', textTransform: 'uppercase', color: brand } }, 'Accent surface'),
+        eyebrowSample('Accent surface', brand),
         h('h2', { style: { fontFamily: dispFont, color: brand, fontSize: '1.5rem', fontWeight: 800, margin: '10px 0 8px' } }, 'Heading on the accent surface'),
         h('p', { style: { color: ink, maxWidth: '48ch', margin: 0 } }, 'Accent sections and the footer use the accent surface.')),
       h('div', { style: { background: dk, color: dkInk, borderRadius: '16px', padding: '28px' } },
-        h('span', { style: { fontFamily: MONO, fontSize: '11px', letterSpacing: '.16em', textTransform: 'uppercase', color: highlight } }, 'Dark section'),
+        eyebrowSample('Dark section', highlight),
         h('h2', { style: { fontFamily: dispFont, color: dkInk, fontSize: '1.5rem', fontWeight: 800, margin: '10px 0 8px' } }, 'Heading on a dark section'),
         h('p', { style: { color: dkMuted, maxWidth: '48ch', margin: '0 0 18px' } }, 'Any block can switch to the Dark surface — text turns light, cards become raised, accents stay vivid.'),
         h('div', { style: { display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' } },
