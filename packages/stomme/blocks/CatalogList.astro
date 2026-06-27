@@ -1,7 +1,6 @@
 ---
 import { getCollection } from 'astro:content';
 import Cover from '../src/Cover.astro';
-import * as siteConfig from '@stomme/config';
 import { resolveListings, listingSpecRows } from '../src/config';
 
 // Catalog index for a `catalog` listing (for-sale items). Reads the listing's collection
@@ -27,8 +26,9 @@ const ST = { available: 'avail', reserved: 'res', sold: 'sold' };
 const items = source
   ? (await getCollection(source)).sort((a, b) => ((a.data.date ?? '') < (b.data.date ?? '') ? 1 : -1))
   : [];
-// The listing's config-defined specs (labels), paired per-item with keyed values below.
-const listing = resolveListings((siteConfig as any).listings).find((l) => l.id === source);
+// The listing's config-defined specs (labels) — from the site config forwarded via the
+// `site` prop — paired per-item with keyed values below.
+const listing = resolveListings(site?.listings).find((l) => l.id === source);
 const cats = [...new Set(items.map((i) => i.data.category).filter(Boolean))];
 const PLACE = '/images/placeholders/service.svg';
 ---

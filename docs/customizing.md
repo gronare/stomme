@@ -80,6 +80,45 @@ route folder** under `src/pages/` (e.g. `routes.blog: '/blogg'` ⇒
    ```
    Then `pnpm cms:gen`.
 
+## Overriding a default block
+
+Registering a component under a built-in key (e.g. `hero`) replaces the engine's
+version for that type — custom keys win on clash. Use this for site-specific
+functionality the core shouldn't carry (a domain hero media, a bespoke card, …).
+
+To extend rather than replace, delegate the cases you don't handle back to the
+engine block. The `an example site` / `a live site` examples do exactly this — they add a
+hero media (an energy-flow diagram / a drone scene) and pass everything else through:
+
+```astro
+---
+// src/blocks/Hero.astro
+import EngineHero from '@gronare/stomme/blocks/Hero.astro';
+import { resolveLink } from '@gronare/stomme/href';
+import Icon from '@gronare/stomme/Icon.astro';
+const props = Astro.props;
+---
+{props.media === 'flow'
+  ? (/* render the hero shell (.hero-grid) + your custom media */)
+  : <EngineHero {...props} />}
+```
+
+```astro
+---
+// src/blocks/BlockRenderer.astro — register it over the engine hero
+import Engine from '@gronare/stomme/BlockRenderer.astro';
+import Hero from './Hero.astro';
+import { site, listings } from '../site.config';
+const { blocks = [] } = Astro.props;
+---
+<Engine blocks={blocks} registry={{ hero: Hero }} config={{ ...site, listings }} />
+```
+
+A custom media *value* (like `flow`) renders from content immediately. To expose it
+as a choice in the CMS, add it to the hero's `media` options in `src/blocks/schema.ts`
+and re-run `pnpm cms:gen`. Put any styles in `src/styles/global.css` (it loads after
+the library, so it wins).
+
 ## Features (optional collections)
 
 Optional capabilities are **feature flags** in `src/site.config.ts` — flip one to

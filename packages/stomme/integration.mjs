@@ -83,7 +83,7 @@ function listingEntrypoint(l) {
   const prop = catalog ? 'entry' : 'post';
   return `---
 import Base from '@stomme/base';
-import { site } from '@stomme/config';
+import { site, listings } from '@stomme/config';
 import Detail from '@gronare/stomme/${tmpl}.astro';
 import { getCollection } from 'astro:content';
 export async function getStaticPaths() {
@@ -93,7 +93,7 @@ export async function getStaticPaths() {
 const { entry } = Astro.props;
 ---
 <Base title={entry.data.title} description={entry.data.excerpt ?? entry.data.title}>
-  <Detail ${prop}={entry} config={site} />
+  <Detail ${prop}={entry} config={{ ...site, listings }} />
 </Base>
 `;
 }

@@ -1,7 +1,6 @@
 ---
 import Cover from './src/Cover.astro';
 import { render } from 'astro:content';
-import * as siteConfig from '@stomme/config';
 import { resolveListings, listingSpecRows } from './src/config';
 
 // Detail page for a `catalog` listing entry (for-sale item): gallery, status, price,
@@ -14,7 +13,8 @@ interface Props {
 const { entry, config: site } = Astro.props;
 const d = entry.data;
 // The listing's config-defined specs (labels) paired with this entry's keyed values.
-const listing = resolveListings((siteConfig as any).listings).find((l) => l.id === entry.collection);
+// Listings come via the `config` prop (the detail entrypoint forwards them).
+const listing = resolveListings(site?.listings).find((l) => l.id === entry.collection);
 const specRows = listingSpecRows(d, listing);
 const sl = { available: 'Available', reserved: 'Reserved', sold: 'Sold', ...(site?.strings?.listingStatus || {}) };
 const ST = { available: 'avail', reserved: 'res', sold: 'sold' };

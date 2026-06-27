@@ -58,13 +58,12 @@ collections:
                     options:
                       - { label: "None (text only)", value: "none" }
                       - { label: "Image", value: "image" }
-                      - { label: "Energy flow", value: "flow" }
-                      - { label: "Operations / telemetry panel", value: "ops" }
+                      - { label: "Highlights (icon + title + line)", value: "highlights" }
+                      - { label: "Motif (animated, no image)", value: "motif" }
                   - { name: image, label: "Image (if “Image” chosen)", widget: image, required: false }
                   - { name: imageAlt, label: "Image alt text", widget: string, required: false }
-                  - { name: flowNote, label: "Flow · chip label (if “Energy flow”)", widget: string, required: false }
-                  - name: flow
-                    label: "Flow · steps (if “Energy flow”)"
+                  - name: highlights
+                    label: "Highlights (if “Highlights” chosen)"
                     widget: list
                     required: false
                     fields:
@@ -89,12 +88,6 @@ collections:
                           - { label: "mail", value: "mail" }
                       - { name: title, label: "Title", widget: string }
                       - { name: body, label: "Text", widget: string, required: false }
-                  - name: telemetry
-                    label: "Ops · telemetry readouts (if “Operations”)"
-                    widget: list
-                    required: false
-                    field: { name: item, label: "Readout", widget: string }
-                  - { name: stamp, label: "Ops · corner stamp (if “Operations”)", widget: string, required: false }
                   - name: height
                     label: "Height"
                     widget: select
@@ -762,13 +755,12 @@ collections:
                 options:
                   - { label: "None (text only)", value: "none" }
                   - { label: "Image", value: "image" }
-                  - { label: "Energy flow", value: "flow" }
-                  - { label: "Operations / telemetry panel", value: "ops" }
+                  - { label: "Highlights (icon + title + line)", value: "highlights" }
+                  - { label: "Motif (animated, no image)", value: "motif" }
               - { name: image, label: "Image (if “Image” chosen)", widget: image, required: false }
               - { name: imageAlt, label: "Image alt text", widget: string, required: false }
-              - { name: flowNote, label: "Flow · chip label (if “Energy flow”)", widget: string, required: false }
-              - name: flow
-                label: "Flow · steps (if “Energy flow”)"
+              - name: highlights
+                label: "Highlights (if “Highlights” chosen)"
                 widget: list
                 required: false
                 fields:
@@ -793,12 +785,6 @@ collections:
                       - { label: "mail", value: "mail" }
                   - { name: title, label: "Title", widget: string }
                   - { name: body, label: "Text", widget: string, required: false }
-              - name: telemetry
-                label: "Ops · telemetry readouts (if “Operations”)"
-                widget: list
-                required: false
-                field: { name: item, label: "Readout", widget: string }
-              - { name: stamp, label: "Ops · corner stamp (if “Operations”)", widget: string, required: false }
               - name: height
                 label: "Height"
                 widget: select

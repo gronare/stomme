@@ -35,6 +35,10 @@ export interface SiteConfig {
     listingStatus?: { available?: string; reserved?: string; sold?: string; all?: string };
     listingCta?: string;
   };
+  // Config-defined listings, forwarded to blocks via the `site` prop so catalog blocks
+  // can resolve their specs without importing the integration's config alias. A site
+  // that uses listings passes them in (e.g. `config={{ ...site, listings }}`).
+  listings?: Listing[];
 }
 
 // Optional capabilities a site can switch on. A flag that's missing (or the whole
@@ -140,5 +144,6 @@ export function resolveSite(c?: SiteConfig) {
       listingStatus: { ...SITE_DEFAULTS.strings.listingStatus, ...(s && s.listingStatus) },
       listingCta: (s && s.listingCta) || SITE_DEFAULTS.strings.listingCta,
     },
+    listings: resolveListings(c && c.listings),
   };
 }

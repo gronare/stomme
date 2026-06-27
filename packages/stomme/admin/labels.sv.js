@@ -174,14 +174,11 @@ export default {
   'Optional. Fill a dropdown with every entry of a collection (e.g. all services). Overrides manual sub-links below.': 'Valfritt. Fyll en rullgardin med alla poster i en samling (t.ex. alla tjänster). Åsidosätter egna underlänkar nedan.',
   'Blog': 'Blogg',
 
-  // ── hero "energy flow" variant ──
-  'Energy flow': 'Energiflöde',
-  'Flow · chip label (if “Energy flow”)': 'Flöde · chip-etikett (om ”Energiflöde”)',
-  'Flow · steps (if “Energy flow”)': 'Flöde · steg (om ”Energiflöde”)',
-  // ── statPanel "operations" variant ──
-  'Ops · corner stamp (if “Operations”)': 'Drift · hörnstämpel (om ”Drift”)',
-  'Ops · telemetry readouts (if “Operations”)': 'Drift · telemetrimätvärden (om ”Drift”)',
-  'Readout': 'Mätvärde',
+  // ── hero "highlights" + "motif" media ──
+  'Highlights (icon + title + line)': 'Höjdpunkter (ikon + titel + rad)',
+  'Motif (animated, no image)': 'Mönster (animerat, ingen bild)',
+  'Highlights (if “Highlights” chosen)': 'Höjdpunkter (om ”Höjdpunkter” valts)',
+  'A few key points shown as a stacked panel beside the heading.': 'Några nyckelpunkter som visas som en panel bredvid rubriken.',
   // ── textImage aside ──
   'Aside · heading': 'Sidoruta · rubrik',
   'Aside · text': 'Sidoruta · text',
@@ -273,7 +270,7 @@ export default {
   'Reads from a collection': 'Läser från en samling',
 
   // ── block gallery: one-line summaries (what each section produces) ──
-  'Full-width intro — eyebrow, H1, text and a button, with optional image, energy-flow or ops panel beside it.': 'Intro i full bredd — dårrad, H1, text och knapp, med valfri bild, energiflöde eller driftpanel bredvid.',
+  'Full-width intro — eyebrow, H1, text and a button, with an optional image, highlights list or animated motif beside it.': 'Intro i full bredd — dårrad, H1, text och knapp, med valfri bild, höjdpunktslista eller animerat mönster bredvid.',
   'Page title band (light or dark): eyebrow, H1, intro and an optional button.': 'Sidtitelband (ljust eller mörkt): dårrad, H1, ingress och en valfri knapp.',
   'A block of rich (markdown) text with an optional heading.': 'Ett block med formaterad text (markdown) och en valfri rubrik.',
   'Grid of feature cards — icon or number, title and text; cards can link.': 'Rutnät med funktionskort — ikon eller siffra, titel och text; korten kan länka.',

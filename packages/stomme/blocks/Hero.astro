@@ -4,34 +4,34 @@ import { resolveLink } from '../src/href';
 import Cover from '../src/Cover.astro';
 import Icon from '../src/Icon.astro';
 
-// Library hero: universal left column + a swappable media slot (none | image |
-// flow | ops). Themed by the design tokens; styled by stomme/styles.css.
-// `ops` is a dark "operations / telemetry" scene — an animated drone over a
-// building with editable telemetry chips + a corner stamp.
-interface FlowItem { icon?: string; title: string; body?: string }
+// Library hero: a universal left column + a swappable, generic media slot:
+//   none        — text only
+//   image       — a picture beside the heading
+//   highlights   — an editable list of icon + title + line (key points / selling points)
+//   motif       — a decorative, theme-tinted block animation (no content)
+// Domain-specific media (e.g. an energy-flow diagram or a drone scene) live in the
+// consuming site as a custom hero registered over this one — see docs/customizing.md.
+interface Highlight { icon?: string; title: string; body?: string }
 interface Props {
   eyebrow?: string;
   heading: string;
   intro?: string;
   ctaLabel?: string;
   ctaHref?: unknown;
-  media?: 'none' | 'image' | 'flow' | 'ops';
+  media?: 'none' | 'image' | 'highlights' | 'motif';
   image?: string;
   imageAlt?: string;
-  flowNote?: string;
-  flow?: FlowItem[];
-  telemetry?: string[];
-  stamp?: string;
+  highlights?: Highlight[];
   height?: 'normal' | 'tall';
   align?: 'top' | 'center' | 'bottom';
 }
-const { eyebrow, heading, intro, ctaLabel, ctaHref, media = 'none', image, imageAlt, flowNote, flow = [], telemetry = [], stamp, height = 'normal', align = 'center' } = Astro.props;
+const { eyebrow, heading, intro, ctaLabel, ctaHref, media = 'none', image, imageAlt, highlights = [], height = 'normal', align = 'center' } = Astro.props;
 const href = resolveLink(ctaHref, '/');
 const settings = (await getEntry('settings', 'site')).data;
 const showImage = media === 'image' && !!image;
-const showFlow = media === 'flow' && flow.length > 0;
-const showOps = media === 'ops';
-const hasMedia = showImage || showFlow || showOps;
+const showHighlights = media === 'highlights' && highlights.length > 0;
+const showMotif = media === 'motif';
+const hasMedia = showImage || showHighlights || showMotif;
 ---
 <section class:list={['section', { 'section--hero-tall': height === 'tall' }, height === 'tall' && `section--hero-${align}`]}>
   <div class:list={['hero-grid', { 'has-media': hasMedia }]}>
@@ -53,44 +53,32 @@ const hasMedia = showImage || showFlow || showOps;
       </div>
     )}
 
-    {showFlow && (
-      <div class="flow" aria-label="How it works, step by step">
-        {flowNote && <span class="chip"><i></i> {flowNote}</span>}
-        <span class="sun" aria-hidden="true"></span>
-        <ol>
-          {flow.map((f) => (
-            <li>
-              <span class="node"><Icon name={f.icon} /></span>
-              <div>
-                <div class="t">{f.title}</div>
-                {f.body && <div class="d">{f.body}</div>}
-              </div>
-            </li>
-          ))}
-        </ol>
-      </div>
+    {showHighlights && (
+      <ul class="hero-highlights">
+        {highlights.map((h) => (
+          <li class="hl-row">
+            <span class="hl-ic"><Icon name={h.icon} /></span>
+            <div>
+              <div class="hl-t">{h.title}</div>
+              {h.body && <div class="hl-d">{h.body}</div>}
+            </div>
+          </li>
+        ))}
+      </ul>
     )}
 
-    {showOps && (
-      <div class="ops" aria-hidden="true">
-        <div class="ops-sky"></div>
-        <div class="ops-bldg"></div>
-        <div class="ops-win">{Array.from({ length: 10 }).map(() => <i></i>)}</div>
-        <div class="ops-path"></div>
-        <div class="ops-drone">
-          <svg viewBox="0 0 68 30" fill="none" stroke-width="2.4" style="stroke: var(--color-brand)">
-            <line x1="10" y1="8" x2="58" y2="22" /><line x1="58" y1="8" x2="10" y2="22" />
-            <circle cx="10" cy="8" r="7" /><circle cx="58" cy="8" r="7" />
-            <circle cx="10" cy="22" r="7" /><circle cx="58" cy="22" r="7" />
-            <rect x="26" y="10" width="16" height="9" rx="3" stroke="none" style="fill: var(--color-brand)" />
-          </svg>
-        </div>
-        {telemetry.length > 0 && (
-          <div class="ops-telem">
-            {telemetry.map((t) => <span class="ops-chip"><b>●</b> {t}</span>)}
-          </div>
-        )}
-        {stamp && <div class="ops-stamp">{stamp}</div>}
+    {showMotif && (
+      <div class="hero-motif" aria-hidden="true">
+        <svg viewBox="0 0 320 260" role="img" aria-label="">
+          <line x1="40" y1="206" x2="280" y2="206" stroke="currentColor" stroke-width="2.5" opacity=".3" />
+          <rect class="hm-rise hm-d1" x="52" y="124" width="36" height="82" rx="9" opacity=".5" />
+          <rect class="hm-rise hm-d2" x="104" y="78" width="42" height="128" rx="10" opacity="1" />
+          <rect class="hm-rise hm-d3" x="162" y="148" width="36" height="58" rx="9" opacity=".22" />
+          <rect class="hm-rise hm-d4" x="214" y="108" width="38" height="98" rx="9" opacity=".5" />
+          <rect class="hm-rise hm-d5" x="266" y="138" width="14" height="68" rx="7" opacity=".5" />
+          <rect class="hm-float" x="214" y="44" width="46" height="32" rx="9" opacity=".85" />
+          <circle cx="125" cy="78" r="4" />
+        </svg>
       </div>
     )}
   </div>
