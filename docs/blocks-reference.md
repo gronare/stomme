@@ -1,17 +1,21 @@
 # Blocks reference
 
-The built-in library blocks (`stomme/catalog`). Most section blocks also accept
-`surface` (`standard` / `tint` / `band`) — the renderer wraps them in a full-bleed
-band. Add your own blocks alongside these (see [customizing](customizing.md)).
+The built-in library blocks (`stomme/catalog`). Most section blocks accept
+`surface` (`standard` / `tint` / `band` / `dark` / `gradient`) — the renderer wraps
+them in a full-bleed band. Several also accept `accent` (`brand` / `secondary` /
+`highlight`), which colours that block's rule/icon/number (not the eyebrow — that
+follows `theme.eyebrowColor`). Add your own blocks alongside these (see
+[customizing](customizing.md)).
 
 ## Content & layout
 
 | Type | What it renders | Key fields |
 |---|---|---|
-| `hero` | Headline + intro + dual CTA, with a swappable right slot | `eyebrow`, `heading`, `intro`, `ctaLabel`, `ctaHref`, `media` (`none`/`image`/`flow`/`ops`), `image`/`imageAlt`, `flowNote`/`flow[]`, `telemetry[]`/`stamp` (ops: a dark animated drone/telemetry scene) |
-| `pageHeader` | Inner-page title header (light or dark band) | `variant` (`light`/`dark`), `width` (`narrow`/`full`), `eyebrow`, `heading`, `intro`, `ctaLabel`, `ctaHref` |
+| `hero` | Headline + intro + CTA, with a swappable right-side media slot | `eyebrow`, `heading`, `intro`, `ctaLabel`, `ctaHref`, `media` (`none`/`image`/`highlights`/`motif`), `image`/`imageAlt`, `highlights[]` (`icon`,`title`,`body`), `height` (`normal`/`tall`), `align` (`top`/`center`/`bottom`) |
+| `cover` | Full-bleed banner with overlaid text + up to two CTAs | `eyebrow`, `heading`, `intro`, `ctaLabel`/`ctaHref`, `cta2Label`/`cta2Href`, `media` (`image`/`video`/`gradient`/`animated`), `image` (also the video poster), `imageAlt`, `video`/`videoUrl`, `overlay` (`light`/`medium`/`strong`), `align` (`start`/`center`), `height` (`tall`/`medium`) |
+| `pageHeader` | Inner-page title header (light band or grey "Band") | `variant` (`light`/`dark`), `width` (`narrow`/`full`), `eyebrow`, `heading`, `intro`, `ctaLabel`, `ctaHref` |
 | `prose` | Rich text from markdown (inline images optimized + placed) | `heading`, `body` (markdown), `width` (`narrow`/`full`) |
-| `featureGrid` | Grid of icon + title + text cards | `eyebrow`/`heading`/`intro`, `items[]` (`icon`, `title`, `body`) |
+| `featureGrid` | Grid of icon + title + text cards (cards can link) | `eyebrow`/`heading`/`intro`, `items[]` (`icon`, `title`, `body`, `link`, `linkLabel`), `numbered`, `accent` |
 | `pillars` | Columns of title + text (principles / values) | `eyebrow`/`heading`/`intro`, `items[]` (`title`, `body`) |
 | `specialistGrid` | Compact title + text grid with a brand top-rule | `eyebrow`/`heading`/`intro`, `items[]` (`title`, `body`) |
 | `steps` | A numbered process (bordered rows + badges) | `eyebrow`/`heading`/`intro`, `items[]` (`title`, `body`), `width` (`narrow`/`full`) |
@@ -19,9 +23,9 @@ band. Add your own blocks alongside these (see [customizing](customizing.md)).
 | `gallery` | Responsive image grid with captions | `eyebrow`/`heading`/`intro`, `images[]` (`image`, `alt`, `caption`), `columns` |
 | `beforeAfter` | Draggable before/after image slider | `eyebrow`/`heading`/`intro`, `before`, `after` |
 | `textImage` | Text column beside an image (flippable) | `heading`, `body` (markdown), `image`, `imageAlt`, `flip` |
-| `textQuote` | Body text beside a pull quote (flippable) | `body` (markdown), `quote`, `attribution`, `flip` |
-| `callout` | Single highlighted statement / quote | `eyebrow`, `quote` |
-| `statPanel` | Dark statement panel beside a giant stat number | `eyebrow`, `heading`, `body`, `badges[]`, `statValue`, `statLabel` |
+| `textQuote` | Body text beside a pull quote (flippable) | `body` (markdown), `quote`, `attribution`, `flip`, `accent` |
+| `callout` | Single highlighted statement / quote | `eyebrow`, `quote`, `accent` |
+| `statPanel` | Dark statement panel beside a giant stat number | `eyebrow`, `heading`, `body`, `badges[]`, `statValue`, `statLabel`, `accent` |
 
 ## Calls to action
 
@@ -41,7 +45,8 @@ when it's absent). Chrome fields (`eyebrow`/`heading`/`intro`) are optional.
 | `testimonials` | `testimonials` (`name`, `role`, `quote`, `order`) | — | Quote cards |
 | `linkChips` | `towns` (`name`, `order`) | `routes.towns` | Chip links to each entry's page |
 | `serviceGrid` | `services` (`navLabel`, `summary`, `order`, `image?`) | `routes.services` | Service cards (image, placeholder fallback) → detail page; `services[]` picks/orders a subset |
-| `postList` | `posts` (`title`, `date`, `excerpt`) | `routes.blog` | Blog cards; date via `locale`, "read more" via `strings.readMore` |
+| `postList` | `posts` / any `article` listing (`title`, `date`, `excerpt`, `cover`, `showCover`) | listing `route` | Featured lead (a "Latest" tag, `strings.latest`) + card grid; per-post `showCover` shows the image or a brand-tinted default; `featured`/`showImages`/`columns` |
+| `catalogList` | any `catalog` listing (`title`, `price`, `status`, `category`, `cover`, `gallery[]`, keyed `specs`) | listing `route` | Filterable cards with cover, status badge (themed), price + the listing's config-defined specs; `filters`/`showImages`/`columns` |
 
 ## Settings-backed (auto)
 

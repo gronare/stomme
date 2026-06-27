@@ -13,7 +13,6 @@ export default {
   'Quote / statement': 'Citat / uttalande',
   'Quote / highlighted statement': 'Citat / framhävt uttalande',
   'Statement panel (dark, big number)': 'Uttalandepanel (mörk, stort tal)',
-  'Operations / telemetry panel': 'Drift / telemetripanel',
   'Feature cards': 'Funktionskort',
   'Process / steps': 'Process / steg',
   'Principles / values': 'Principer / värderingar',

@@ -257,6 +257,9 @@ function emitWidget(indent) {
     `${p}  label_singular: "Section"`,
     `${p}  widget: list`,
     `${p}  required: false`,
+    // Collapsed-item label: show the block's heading (or quote) so several of the same
+    // type are distinguishable at a glance; falls back to the type name when both empty.
+    `${p}  summary: "{{fields.heading}}{{fields.quote}}"`,
     `${p}  types:`,
   ];
   for (const b of AVAILABLE_BLOCKS) {
