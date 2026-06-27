@@ -43,21 +43,25 @@ const year = new Date().getFullYear();
         )}
         {orgLine && <p class="mono" style="margin-top:1rem">{orgLine}</p>}
       </div>
-      {footer.showLinks !== false && links.length > 0 && (
-        <nav>
-          <p class="mono mono-dot">{footer.linksHeading ?? 'Links'}</p>
-          <ul class="footer-links">
-            {links.map((l) => <li><a href={resolveLink(l.link, '/')} class="footer-link">{l.label}</a></li>)}
-          </ul>
-        </nav>
-      )}
-      {footer.showTowns && towns && towns.length > 0 && (
-        <nav>
-          <p class="mono mono-dot">{footer.townsHeading ?? 'Areas'}</p>
-          <ul class="footer-links footer-towns">
-            {towns.map((t) => <li><a href={`${townsHref ?? '/areas'}/${t.id}`} class="footer-link">{t.name}</a></li>)}
-          </ul>
-        </nav>
+      {((footer.showLinks !== false && links.length > 0) || (footer.showTowns && towns && towns.length > 0)) && (
+        <div class="footer-cols">
+          {footer.showLinks !== false && links.length > 0 && (
+            <nav>
+              <p class="mono mono-dot">{footer.linksHeading ?? 'Links'}</p>
+              <ul class="footer-links">
+                {links.map((l) => <li><a href={resolveLink(l.link, '/')} class="footer-link">{l.label}</a></li>)}
+              </ul>
+            </nav>
+          )}
+          {footer.showTowns && towns && towns.length > 0 && (
+            <nav>
+              <p class="mono mono-dot">{footer.townsHeading ?? 'Areas'}</p>
+              <ul class="footer-links footer-towns">
+                {towns.map((t) => <li><a href={`${townsHref ?? '/areas'}/${t.id}`} class="footer-link">{t.name}</a></li>)}
+              </ul>
+            </nav>
+          )}
+        </div>
       )}
     </div>
     <div class="footer-bar">

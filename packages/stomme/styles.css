@@ -401,7 +401,11 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
   --color-muted: color-mix(in srgb, var(--color-dark-ink, #e9ebf1) 58%, transparent);
   --color-line: var(--color-dark-line, rgba(233, 235, 241, 0.13));
 }
-.footer-grid { display: flex; gap: 48px; flex-wrap: wrap; justify-content: space-between; }
+.footer-grid { display: flex; gap: 40px 56px; flex-wrap: wrap; align-items: flex-start; }
+.footer-grid > :first-child { flex: 1 1 300px; }
+/* Link columns stay grouped + right-aligned: they wrap below the brand together
+   (never one-up/one-down), and margin-left:auto keeps them right even when wrapped. */
+.footer-cols { display: flex; gap: 32px 56px; flex-wrap: wrap; margin-left: auto; }
 .footer-link { color: inherit; text-decoration: none; font-weight: 600; }
 .footer-link:hover { color: var(--color-brand); }
 .footer-links { list-style: none; padding: 0; margin: 1rem 0 0; }
