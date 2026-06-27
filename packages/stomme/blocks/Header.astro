@@ -33,13 +33,6 @@ const logoSvg = inlineLocalSvg(logo.image);
 const items = nav.items ?? [];
 const homeHref = '/';
 
-// Text-logo size + weight (ignored when a logo image is used).
-const LOGO_SIZE: Record<string, string> = { sm: '1rem', md: '1.15rem', lg: '1.45rem', xl: '1.8rem' };
-const LOGO_WEIGHT: Record<string, string> = { normal: '600', bold: '800', heavy: '900' };
-const logoStyle = !logo.image
-  ? [LOGO_SIZE[logo.textSize as string] && `font-size:${LOGO_SIZE[logo.textSize as string]}`, LOGO_WEIGHT[logo.textWeight as string] && `font-weight:${LOGO_WEIGHT[logo.textWeight as string]}`].filter(Boolean).join(';')
-  : '';
-
 // Resolve an item's dropdown children: auto from a collection, or manual links.
 async function childrenOf(item: NavItem): Promise<{ label: string; href: string }[]> {
   if (item.menu) {
@@ -65,7 +58,7 @@ const resolved = await Promise.all(
 ---
 <header class:list={['site-header', { 'is-sticky': nav.sticky }]}>
   <div class="inner">
-    <a class="logo" href={homeHref} style={logoStyle || undefined} aria-label={settings.name}>
+    <a class="logo" href={homeHref} aria-label={settings.name}>
       {logoSvg
         ? <span class="logo-lockup" set:html={logoSvg} />
         : logo.image

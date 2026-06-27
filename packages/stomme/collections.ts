@@ -96,7 +96,7 @@ export function stommeCollections(listings?: Listing[]) {
     navigation: defineCollection({
       loader: md('navigation'),
       schema: z.object({
-        logo: z.object({ textPre: z.string().default(''), textAccent: z.string().default(''), image: z.string().optional(), alt: z.string().optional(), textSize: z.string().optional(), textWeight: z.string().optional() }).default({}),
+        logo: z.object({ textPre: z.string().default(''), textAccent: z.string().default(''), image: z.string().optional(), imageDark: z.string().optional(), alt: z.string().optional() }).default({}),
         items: z.array(z.object({
           label: z.string(),
           link,

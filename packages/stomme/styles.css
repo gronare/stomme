@@ -341,7 +341,7 @@ body { font-family: var(--bk-font-sans); margin: 0; line-height: 1.6; }
   .nav-item--menu.is-open .nav-caret { transform: rotate(-135deg) translateY(2px); }
 }
 
-.logo { font-family: var(--bk-font-display); font-weight: 800; font-size: 1.15rem; color: var(--color-ink); text-decoration: none; }
+.logo { font-family: var(--bk-font-display); font-weight: 800; font-size: 1.5rem; color: var(--color-ink); text-decoration: none; }
 .logo .accent { color: var(--color-brand); }
 .logo-img { display: block; height: 30px; width: auto; }
 /* Inline SVG logo (lockup). The wordmark uses currentColor, so it follows the
