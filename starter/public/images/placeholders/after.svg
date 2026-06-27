@@ -1,8 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" fill="#64748b" role="img" aria-label="Placeholder (after)">
-  <rect width="800" height="600" fill="#64748b" opacity=".06"/>
-  <line x1="120" y1="470" x2="680" y2="470" stroke="#64748b" stroke-width="3" opacity=".4"/>
-  <rect x="200" y="290" width="130" height="180" rx="18" opacity=".5"/>
-  <rect x="360" y="210" width="150" height="260" rx="20" opacity="1"/>
-  <rect x="540" y="320" width="120" height="150" rx="16" opacity=".5"/>
-  <circle cx="435" cy="210" r="9"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 750" fill="#64748b" role="img" aria-label="Placeholder (after)">
+  <rect width="1200" height="750" fill="#64748b" opacity=".06"/>
+  <line x1="210" y1="560" x2="990" y2="560" stroke="#64748b" stroke-width="4" opacity=".4"/>
+  <rect x="330" y="300" width="180" height="260" rx="22" opacity=".5"/>
+  <rect x="530" y="190" width="195" height="370" rx="24" opacity="1"/>
+  <rect x="745" y="355" width="170" height="205" rx="20" opacity=".5"/>
 </svg>
