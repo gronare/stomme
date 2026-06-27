@@ -37,6 +37,9 @@ const themeVars = [
   `--color-paper:${theme.paper}`,
   `--color-line:${theme.line}`,
   `--color-highlight:${theme.highlight}`,
+  ...(theme.secondary ? [`--color-secondary:${theme.secondary}`] : []),
+  // Which accent the eyebrow marker uses (theme.eyebrowColor → brand/secondary/highlight).
+  `--eyebrow-accent:var(--color-${theme.eyebrowColor === 'highlight' ? 'highlight' : theme.eyebrowColor === 'secondary' ? 'secondary' : 'brand'})`,
   // Dark-section tokens only when set — otherwise the brand-derived defaults apply.
   ...(theme.dark ? [`--color-dark:${theme.dark}`] : []),
   ...(theme.darkInk ? [`--color-dark-ink:${theme.darkInk}`] : []),

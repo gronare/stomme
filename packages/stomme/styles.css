@@ -16,7 +16,12 @@
   --color-paper: #ffffff;
   --color-muted: #6b7280;
   --color-line: #e5e7eb;
+  /* Secondary accent — a deployable second brand colour (theme sets it; default below).
+     Used where a block/eyebrow opts into it, never forced beside the primary. */
+  --color-secondary: #0ea5e9;
   --color-highlight: #f59e0b;
+  /* Which accent the eyebrow marker uses — overridden on <html> from theme.eyebrowColor. */
+  --eyebrow-accent: var(--color-brand);
 
   /* Dark sections (the `dark` surface). Defaults derive from --color-brand, so they
      follow the brand with no setup; the theme editor can override each one. */
@@ -50,7 +55,7 @@ body { font-family: var(--bk-font-sans); margin: 0; line-height: 1.6; }
 /* Eyebrow marker — site-wide style via [data-eyebrow] on <html> (theme.eyebrow).
    Default: a brand dash. `bullet`: a brand dot. `bold`: no marker, but the eyebrow
    itself goes heavy + wide-tracked (the cover/"helbild" treatment, extracted). */
-.mono-dot::before { content: ""; width: 18px; height: 2px; background: var(--color-brand); display: inline-block; }
+.mono-dot::before { content: ""; width: 18px; height: 2px; background: var(--eyebrow-accent, var(--color-brand)); display: inline-block; }
 [data-eyebrow="bullet"] .mono-dot::before { width: 7px; height: 7px; border-radius: 50%; }
 [data-eyebrow="bold"] .mono-dot::before { display: none; }
 [data-eyebrow="bold"] .mono-dot { font-weight: 700; letter-spacing: 0.16em; }
@@ -452,7 +457,7 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
 /* Callout */
 .callout {
     margin: 0;
-    border-left: 4px solid var(--color-brand);
+    border-left: 4px solid var(--callout-accent, var(--color-brand));
     padding-left: 1.5rem;
   }
   @media (min-width: 640px) { .callout { padding-left: 2rem; } }
@@ -773,7 +778,11 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
     letter-spacing: 0.06em; text-transform: uppercase; padding: 0.25rem 0.55rem; border-radius: 6px;
   }
   /* Soft tinted pills — light background, darker same-hue text. Lighter look + readable. */
-  .b-avail { background: #d1fae5; color: #047857; } .b-res { background: #fef3c7; color: #b45309; } .b-sold { background: #e2e8f0; color: #475569; }
+  /* Status badges, themed from tokens: available = brand, reserved = highlight
+     (a caution mark — an attention accent), sold = neutral (ink-derived). */
+  .b-avail { background: color-mix(in srgb, var(--color-brand) 16%, var(--color-paper)); color: color-mix(in srgb, var(--color-brand) 78%, #000); }
+  .b-res { background: color-mix(in srgb, var(--color-highlight) 20%, var(--color-paper)); color: color-mix(in srgb, var(--color-highlight) 80%, #000); }
+  .b-sold { background: color-mix(in srgb, var(--color-ink) 9%, var(--color-paper)); color: color-mix(in srgb, var(--color-ink) 55%, var(--color-paper)); }
   .listing-card.is-sold .listing-img { filter: grayscale(0.7) opacity(0.85); }
   .listing-body { padding: 0.95rem 1rem 1.1rem; display: flex; flex-direction: column; gap: 0.55rem; flex: 1; }
   .listing-title { margin: 0; font-size: 1.05rem; line-height: 1.2; }

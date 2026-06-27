@@ -244,7 +244,12 @@ export const defaultBlocks: BlockDef[] = [
     group: 'Quote & highlight',
     summary: 'A single highlighted quote or statement.',
     shape: 'quote',
-    fields: [{ name: 'eyebrow', label: 'Eyebrow', widget: 'string', required: false }, { name: 'quote', label: 'Quote / statement', widget: 'text' }, surfaceField],
+    fields: [
+      { name: 'eyebrow', label: 'Eyebrow', widget: 'string', required: false },
+      { name: 'quote', label: 'Quote / statement', widget: 'text' },
+      { name: 'accent', label: 'Accent', widget: 'select', required: false, default: 'brand', hint: 'Colour of the rule + eyebrow marker.', options: [{ label: 'Brand', value: 'brand' }, { label: 'Secondary', value: 'secondary' }, { label: 'Highlight', value: 'highlight' }] },
+      surfaceField,
+    ],
   },
   {
     type: 'statPanel',

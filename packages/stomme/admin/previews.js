@@ -148,6 +148,10 @@
     var g = function (k, d) { var x = e.getIn(['data', k]); return x == null || x === '' ? d : x; };
     var brand = g('brand', BRAND), ink = g('ink', INK), onDark = g('onDark', '#fff'),
         surface = g('surface', SURFACE), paper = g('paper', PAPER), line = g('line', LINE), highlight = g('highlight', HIGHLIGHT);
+    var secondary = g('secondary', '#3b82f6');
+    // Which accent the eyebrow marker uses (theme.eyebrowColor).
+    var ebColorKey = g('eyebrowColor', 'brand');
+    var ebAccent = ebColorKey === 'secondary' ? secondary : ebColorKey === 'highlight' ? highlight : brand;
     var muted = 'color-mix(in srgb, ' + ink + ' 55%, ' + paper + ')';
     // Dark-section tokens — derive from brand when unset (mirrors styles.css :root).
     var dk = g('dark', 'color-mix(in srgb, ' + brand + ' 16%, #0c0e13)'),
@@ -187,9 +191,9 @@
     };
     return h('div', { style: { background: paper, color: ink, minHeight: '100vh', padding: '32px', fontFamily: bodyFont, lineHeight: 1.5, boxSizing: 'border-box' } },
       faces.length ? h('style', {}, faces.join('')) : null,
-      eyebrowSample('Colour scheme', brand),
+      eyebrowSample('Colour scheme', ebAccent),
       h('div', { style: { display: 'flex', gap: '12px', margin: '12px 0 34px', flexWrap: 'wrap' } },
-        swatch('Brand', brand), swatch('Text', ink), swatch('On dark', onDark), swatch('Surface', surface), swatch('Paper', paper), swatch('Line', line), swatch('Highlight', highlight), swatch('Dark', dk)),
+        swatch('Brand', brand), swatch('Secondary', secondary), swatch('Text', ink), swatch('On dark', onDark), swatch('Surface', surface), swatch('Paper', paper), swatch('Line', line), swatch('Highlight', highlight), swatch('Dark', dk)),
       h('h1', { style: { fontFamily: dispFont, fontSize: '2rem', fontWeight: 800, letterSpacing: '-.01em', margin: '0 0 10px' } }, 'Heading on a light surface'),
       h('p', { style: { color: muted, maxWidth: '52ch', margin: '0 0 18px' } }, 'Body text in the normal colour. A ',
         h('a', { style: { color: brand } }, 'link'), ' uses the brand colour, as do bullets and accents.'),

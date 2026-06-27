@@ -65,6 +65,8 @@ export function stommeCollections(listings?: Listing[]) {
         surface: z.string().default('#e0e7ff'),
         paper: z.string().default('#ffffff'),
         line: z.string().default('#e5e7eb'),
+        // Secondary brand accent — a deployable second colour (eyebrow/callout choices).
+        secondary: z.string().optional(),
         highlight: z.string().default('#f59e0b'),
         // Dark-section tokens — optional. Left unset, they derive from `brand`
         // (see styles.css :root). Set to override the dark surface exactly.
@@ -81,6 +83,8 @@ export function stommeCollections(listings?: Listing[]) {
         // Site-wide eyebrow style (the small label above headings): dash marker,
         // bullet marker, or the bold/wide cover treatment with no marker.
         eyebrow: z.enum(['dash', 'bullet', 'bold']).default('dash'),
+        // Eyebrow marker colour — pick which accent the dash/bullet uses.
+        eyebrowColor: z.enum(['brand', 'secondary', 'highlight']).default('brand'),
       }),
     }),
 

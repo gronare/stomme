@@ -1,16 +1,18 @@
 ---
-// Pull-quote / standout statement to break up body text. A brand left rule and
-// an oversized display quote.
+// Pull-quote / standout statement to break up body text. A coloured left rule and
+// an oversized display quote. `accent` picks which token the rule + eyebrow marker use.
 interface Props {
   eyebrow?: string;
   quote?: string;
+  accent?: 'brand' | 'secondary' | 'highlight';
 }
-const { eyebrow, quote } = Astro.props;
+const { eyebrow, quote, accent = 'brand' } = Astro.props;
+const accentVar = accent === 'secondary' ? 'var(--color-secondary)' : accent === 'highlight' ? 'var(--color-highlight)' : 'var(--color-brand)';
 ---
 
 {quote && (
   <section class="section">
-    <figure class="callout">
+    <figure class="callout" style={`--callout-accent:${accentVar};--eyebrow-accent:${accentVar}`}>
       {eyebrow && <span class="mono mono-dot">{eyebrow}</span>}
       <blockquote class="display callout__quote">{quote}</blockquote>
     </figure>
