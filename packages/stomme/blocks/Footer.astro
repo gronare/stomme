@@ -1,6 +1,7 @@
 ---
 import { getEntry } from 'astro:content';
 import { resolveLink } from '../src/href';
+import { inlineLocalSvg } from '../src/inline-svg';
 import Cover from '../src/Cover.astro';
 
 // Themeable site chrome (footer). Reads the navigation/footer/settings collections
@@ -20,6 +21,7 @@ if (!footer) footer = (await getEntry('footer', 'footer'))!.data as FooterData;
 if (!settings) settings = (await getEntry('settings', 'site'))!.data as SettingsData;
 
 const logo = nav.logo ?? {};
+const logoSvg = inlineLocalSvg(logo.image);
 const links = footer.links ?? [];
 const legal = footer.legal ?? [];
 const tagline = [footer.tagline, settings.hq].filter(Boolean).join(' · ');
@@ -30,7 +32,9 @@ const year = new Date().getFullYear();
   <div class="inner">
     <div class="footer-grid">
       <div>
-        {logo.image
+        {logoSvg
+          ? <span class="logo logo-lockup" style="margin:0">{<Fragment set:html={logoSvg} />}</span>
+          : logo.image
           ? <Cover src={logo.image} alt={logo.alt ?? settings.name} placeholder="/images/placeholder.svg" class="logo-img" />
           : <p class="logo" style="margin:0">{logo.textPre ?? settings.name}<span class="accent">{logo.textAccent}</span></p>}
         {tagline && <p style="margin:0.5rem 0 0;max-width:36rem">{tagline}</p>}

@@ -1,6 +1,7 @@
 ---
 import { getEntry, getCollection } from 'astro:content';
 import { resolveLink } from '../src/href';
+import { inlineLocalSvg } from '../src/inline-svg';
 import Cover from '../src/Cover.astro';
 
 // Themeable site chrome (header). Reads the `navigation` + `settings` collections
@@ -26,6 +27,9 @@ if (!nav) nav = (await getEntry('navigation', 'nav'))!.data as NavData;
 if (!settings) settings = (await getEntry('settings', 'site'))!.data as { name?: string };
 
 const logo = nav.logo ?? {};
+// A local .svg logo is inlined so a currentColor wordmark tints to the header;
+// other logos render as an <img>.
+const logoSvg = inlineLocalSvg(logo.image);
 const items = nav.items ?? [];
 const homeHref = '/';
 
@@ -61,8 +65,10 @@ const resolved = await Promise.all(
 ---
 <header class:list={['site-header', { 'is-sticky': nav.sticky }]}>
   <div class="inner">
-    <a class="logo" href={homeHref} style={logoStyle || undefined}>
-      {logo.image
+    <a class="logo" href={homeHref} style={logoStyle || undefined} aria-label={settings.name}>
+      {logoSvg
+        ? <span class="logo-lockup" set:html={logoSvg} />
+        : logo.image
         ? <Cover src={logo.image} alt={logo.alt ?? settings.name} placeholder="/images/placeholder.svg" class="logo-img" />
         : <Fragment>{logo.textPre ?? settings.name}<span class="accent">{logo.textAccent}</span></Fragment>}
     </a>

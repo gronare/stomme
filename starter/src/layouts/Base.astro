@@ -27,6 +27,13 @@ const customDisplayUrl = theme.fontCustomFile ? ff[theme.fontCustomFile] : null;
 const customBodyUrl = theme.fontCustomBodyFile ? ff[theme.fontCustomBodyFile] : null;
 const fonts = resolveFonts(theme, customDisplayUrl, customBodyUrl);
 
+// Favicon: site-set (settings.favicon) or the shipped default; an SVG scales to
+// any tab size. settings.appleIcon is the optional iOS home-screen PNG.
+const favicon = settings.favicon || '/favicon.svg';
+const faviconType = favicon.endsWith('.svg') ? 'image/svg+xml'
+  : favicon.endsWith('.png') ? 'image/png'
+  : favicon.endsWith('.ico') ? 'image/x-icon' : undefined;
+
 // Inject the owner-editable theme tokens as CSS vars on <html>, overriding the
 // build-time defaults in global.css.
 const themeVars = [
@@ -55,6 +62,8 @@ const themeVars = [
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title ?? settings.name}</title>
     {description && <meta name="description" content={description} />}
+    <link rel="icon" href={favicon} type={faviconType} />
+    {settings.appleIcon && <link rel="apple-touch-icon" href={settings.appleIcon} />}
     {fonts.preloads.map((p) => <link rel="preload" as="font" type={p.type} href={p.href} crossorigin />)}
     {fonts.fontFace && <style is:inline set:html={fonts.fontFace}></style>}
   </head>

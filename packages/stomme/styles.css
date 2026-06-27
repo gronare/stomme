@@ -344,6 +344,11 @@ body { font-family: var(--bk-font-sans); margin: 0; line-height: 1.6; }
 .logo { font-family: var(--bk-font-display); font-weight: 800; font-size: 1.15rem; color: var(--color-ink); text-decoration: none; }
 .logo .accent { color: var(--color-brand); }
 .logo-img { display: block; height: 30px; width: auto; }
+/* Inline SVG logo (lockup). The wordmark uses currentColor, so it follows the
+   .logo link colour — ink in the light header, on-dark in the footer, light when
+   overlaid on a dark hero — while the mark badge keeps its own fixed colours. */
+.logo-lockup { display: inline-flex; align-items: center; }
+.logo-lockup svg { display: block; height: 30px; width: auto; }
 
 /* Transparent overlay header — when a page opens with a full-bleed cover, the header
    floats over it (fixed, light text, no bar) so the hero runs to the top edge, then

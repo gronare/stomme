@@ -1514,6 +1514,8 @@ collections:
               - { name: value, label: "Value", widget: string }
           - { name: partners, label: "Partners", widget: list, required: false }
           - { name: partnersLead, label: "Partners lead-in", widget: string, required: false }
+          - { name: favicon, label: "Favicon", widget: image, required: false, hint: "Browser-tab icon — SVG recommended (scales to any size). Defaults to the shipped mark when empty." }
+          - { name: appleIcon, label: "Home-screen icon", widget: image, required: false, hint: "iOS home-screen icon — a 180×180 PNG. Optional." }
       - name: theme
         label: "Theme colours"
         file: "src/content/theme/theme.md"
