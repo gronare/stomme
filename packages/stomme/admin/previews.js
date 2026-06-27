@@ -198,7 +198,7 @@
       h('p', { style: { color: muted, maxWidth: '52ch', margin: '0 0 18px' } }, 'Body text in the normal colour. A ',
         h('a', { style: { color: brand } }, 'link'), ' uses the brand; the eyebrow marker uses your chosen accent.'),
       h('div', { style: { display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap', marginBottom: '14px' } },
-        btn('Primary button', brand, onDark), btn('Secondary', paper, ink, '1px solid ' + line)),
+        btn('Primary', brand, onDark), btn('Secondary', secondary, onDark), btn('Ghost', paper, ink, '1px solid ' + line)),
       h('div', { style: { display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap', marginBottom: '30px' } },
         h('span', { style: { fontFamily: MONO, fontSize: '10px', letterSpacing: '.08em', textTransform: 'uppercase', color: muted, marginRight: '4px' } }, 'Block accents'),
         [brand, secondary, highlight].map(function (c) { return h('span', { style: { display: 'inline-flex', width: '36px', height: '36px', borderRadius: '10px', alignItems: 'center', justifyContent: 'center', background: 'color-mix(in srgb, ' + c + ' 14%, ' + paper + ')', color: c, fontWeight: 800 } }, '◆'); })),
