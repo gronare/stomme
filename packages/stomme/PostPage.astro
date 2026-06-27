@@ -1,4 +1,5 @@
 ---
+import Cover from './src/Cover.astro';
 import { renderMarkdown } from './src/markdown';
 import { resolveSite, type SiteConfig } from './src/config';
 
@@ -14,6 +15,9 @@ const html = await renderMarkdown(post.body ?? '');
 const date = post.data.date ? new Date(post.data.date).toLocaleDateString(site.locale, { year: 'numeric', month: 'long', day: 'numeric' }) : '';
 ---
 <article class="section section--read">
+  {post.data.cover && (
+    <Cover src={post.data.cover} alt={post.data.title} placeholder="/images/placeholders/service.svg" width={1100} height={620} loading="eager" class="post-article__cover" />
+  )}
   {date && <p class="mono">{date}</p>}
   <h1 class="display display--hero" style="margin-top:0.5rem">{post.data.title}</h1>
   {post.data.excerpt && <p class="intro">{post.data.excerpt}</p>}

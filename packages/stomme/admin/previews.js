@@ -113,7 +113,11 @@
 
   var PostPreview = function (props) {
     var e = props.entry;
+    var cover = v(e, 'cover');
+    var coverUrl = '';
+    try { if (cover && props.getAsset) coverUrl = String(props.getAsset(cover)); } catch (_e) {}
     return h('div', { className: 'bk' },
+      coverUrl ? h('img', { src: coverUrl, style: { width: '100%', aspectRatio: '16 / 9', objectFit: 'cover', borderRadius: '12px', display: 'block', marginBottom: '18px' } }) : null,
       h('p', { className: 'bk-post-date' }, v(e, 'date')),
       h('h1', { className: 'bk-h1' }, v(e, 'title')),
       v(e, 'excerpt') ? h('p', { className: 'bk-intro' }, v(e, 'excerpt')) : null,
@@ -265,7 +269,11 @@
       ? specDefs.map(function (d) { var val = e.getIn(['data', 'specs', d.key]); return { label: d.label, value: val == null ? '' : val }; }).filter(function (r) { return r.value; })
       : arr(e, 'specs');
     var st = STATUS[v(e, 'status')] || STATUS.available;
+    var cover = v(e, 'cover');
+    var coverUrl = '';
+    try { if (cover && props.getAsset) coverUrl = String(props.getAsset(cover)); } catch (_e) {}
     return h('div', { className: 'bk' },
+      coverUrl ? h('img', { src: coverUrl, style: { width: '100%', aspectRatio: '16 / 10', objectFit: 'cover', borderRadius: '12px', display: 'block', marginBottom: '16px' } }) : null,
       h('span', { className: 'bk-eyebrow' }, v(e, 'category') || 'For sale'),
       h('h1', { className: 'bk-h1' }, v(e, 'title')),
       h('div', { style: { display: 'flex', gap: '12px', alignItems: 'center', margin: '8px 0 4px', flexWrap: 'wrap' } },
