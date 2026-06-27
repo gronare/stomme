@@ -380,6 +380,7 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
 /* Dark footer (footer.dark) — reuses the dark-section tokens so it matches dark blocks. */
 .site-footer--dark {
   background: var(--color-dark, #141821); color: var(--color-dark-ink, #e9ebf1);
+  --color-ink: var(--color-dark-ink, #e9ebf1);
   --color-muted: color-mix(in srgb, var(--color-dark-ink, #e9ebf1) 58%, transparent);
   --color-line: var(--color-dark-line, rgba(233, 235, 241, 0.13));
 }
