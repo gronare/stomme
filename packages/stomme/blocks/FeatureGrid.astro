@@ -8,12 +8,14 @@ interface Props {
   intro?: string;
   items?: { icon?: string; title: string; body?: string; link?: unknown; linkLabel?: string }[];
   numbered?: boolean;
+  accent?: 'brand' | 'secondary' | 'highlight';
   site?: any;
 }
-const { eyebrow, heading, intro, items = [], numbered = false, site } = Astro.props;
+const { eyebrow, heading, intro, items = [], numbered = false, accent = 'brand', site } = Astro.props;
 const readMore = site?.strings?.readMore ?? 'Read more';
+const accentVar = accent === 'secondary' ? 'var(--color-secondary)' : accent === 'highlight' ? 'var(--color-highlight)' : 'var(--color-brand)';
 ---
-<section class="section">
+<section class="section" style={`--block-accent:${accentVar}`}>
   {(eyebrow || heading || intro) && (
     <div class="section-head">
       {eyebrow && <span class="mono mono-dot">{eyebrow}</span>}
@@ -28,7 +30,7 @@ const readMore = site?.strings?.readMore ?? 'Read more';
       return (
         <Tag href={href || undefined} class="card feature-card">
           {numbered ? (
-            <span class="mono" style="color:var(--color-brand)">{`0${i + 1}`}</span>
+            <span class="mono" style="color:var(--block-accent, var(--color-brand))">{`0${i + 1}`}</span>
           ) : (
             it.icon && <span class="ico-badge"><Icon name={it.icon} /></span>
           )}

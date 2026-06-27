@@ -10,10 +10,12 @@ interface Props {
   badges?: string[];
   statValue?: string;
   statLabel?: string;
+  accent?: 'brand' | 'secondary' | 'highlight';
 }
-const { eyebrow, heading, body, badges = [], statValue, statLabel } = Astro.props;
+const { eyebrow, heading, body, badges = [], statValue, statLabel, accent = 'brand' } = Astro.props;
+const accentVar = accent === 'secondary' ? 'var(--color-secondary)' : accent === 'highlight' ? 'var(--color-highlight)' : 'var(--color-brand)';
 ---
-<section class="stat-panel">
+<section class="stat-panel" style={`--block-accent:${accentVar}`}>
   <div class="stat-panel__inner">
     <div class="stat-panel__main">
       {eyebrow && <span class="mono mono-dot">{eyebrow}</span>}

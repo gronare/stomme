@@ -111,6 +111,22 @@ export const surfaceField: Field = {
   hint: 'The surface behind the section — for rhythm between blocks.',
 };
 
+// Accent choice for a block's decorative accent (a rule, icon, or number). Sets
+// `--block-accent`; the eyebrow marker is unaffected (it follows theme.eyebrowColor).
+export const accentField: Field = {
+  name: 'accent',
+  label: 'Accent',
+  widget: 'select',
+  required: false,
+  default: 'brand',
+  options: [
+    { label: 'Brand', value: 'brand' },
+    { label: 'Secondary', value: 'secondary' },
+    { label: 'Highlight', value: 'highlight' },
+  ],
+  hint: "This block's accent colour (rule, icon or number) — not the eyebrow.",
+};
+
 // Width toggle for text-led blocks (pageHeader / prose / steps): a narrow reading
 // column (default) or the full section width. Grids ignore this — they're always full.
 export const widthField: Field = {

@@ -12,7 +12,7 @@ const accentVar = accent === 'secondary' ? 'var(--color-secondary)' : accent ===
 
 {quote && (
   <section class="section">
-    <figure class="callout" style={`--callout-accent:${accentVar};--eyebrow-accent:${accentVar}`}>
+    <figure class="callout" style={`--block-accent:${accentVar}`}>
       {eyebrow && <span class="mono mono-dot">{eyebrow}</span>}
       <blockquote class="display callout__quote">{quote}</blockquote>
     </figure>

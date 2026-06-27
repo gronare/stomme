@@ -128,6 +128,8 @@ export default {
   'Dark': 'Mörk',
   'Tinted': 'Tonad',
   'Brand': 'Varumärke',
+  'Secondary': 'Sekundär',
+  "This block's accent colour (rule, icon or number) — not the eyebrow.": 'Blockets accentfärg (linje, ikon eller siffra) — inte dårraden.',
   'Text on brand': 'Text på varumärke',
   'Background': 'Bakgrund',
 

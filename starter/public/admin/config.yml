@@ -306,6 +306,16 @@ collections:
                   - { name: body, label: "Body text", widget: markdown }
                   - { name: quote, label: "Quote", widget: text }
                   - { name: attribution, label: "Source / name", widget: string, required: false }
+                  - name: accent
+                    label: "Accent"
+                    widget: select
+                    required: false
+                    default: "brand"
+                    hint: "This block's accent colour (rule, icon or number) — not the eyebrow."
+                    options:
+                      - { label: "Brand", value: "brand" }
+                      - { label: "Secondary", value: "secondary" }
+                      - { label: "Highlight", value: "highlight" }
                   - { name: flip, label: "Quote on left", widget: boolean, required: false, default: false }
                   - name: surface
                     label: "Background"
@@ -369,6 +379,16 @@ collections:
                           - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
                       - { name: linkLabel, label: "Link label", widget: string, required: false, hint: "E.g. \"Read more\". Shown only if the card has a link." }
                   - { name: numbered, label: "Numbered (01/02/03 instead of icons)", widget: boolean, required: false, default: false }
+                  - name: accent
+                    label: "Accent"
+                    widget: select
+                    required: false
+                    default: "brand"
+                    hint: "This block's accent colour (rule, icon or number) — not the eyebrow."
+                    options:
+                      - { label: "Brand", value: "brand" }
+                      - { label: "Secondary", value: "secondary" }
+                      - { label: "Highlight", value: "highlight" }
                   - name: surface
                     label: "Background"
                     widget: select
@@ -555,7 +575,7 @@ collections:
                     widget: select
                     required: false
                     default: "brand"
-                    hint: "Colour of the rule + eyebrow marker."
+                    hint: "This block's accent colour (rule, icon or number) — not the eyebrow."
                     options:
                       - { label: "Brand", value: "brand" }
                       - { label: "Secondary", value: "secondary" }
@@ -586,6 +606,16 @@ collections:
                     field: { name: badge, label: "Badge", widget: string }
                   - { name: statValue, label: "Big number", widget: string, required: false }
                   - { name: statLabel, label: "Number label", widget: string, required: false }
+                  - name: accent
+                    label: "Accent"
+                    widget: select
+                    required: false
+                    default: "brand"
+                    hint: "This block's accent colour (rule, icon or number) — not the eyebrow."
+                    options:
+                      - { label: "Brand", value: "brand" }
+                      - { label: "Secondary", value: "secondary" }
+                      - { label: "Highlight", value: "highlight" }
               - name: statsBar
                 label: "Stats / facts"
                 widget: object
@@ -1013,6 +1043,16 @@ collections:
               - { name: body, label: "Body text", widget: markdown }
               - { name: quote, label: "Quote", widget: text }
               - { name: attribution, label: "Source / name", widget: string, required: false }
+              - name: accent
+                label: "Accent"
+                widget: select
+                required: false
+                default: "brand"
+                hint: "This block's accent colour (rule, icon or number) — not the eyebrow."
+                options:
+                  - { label: "Brand", value: "brand" }
+                  - { label: "Secondary", value: "secondary" }
+                  - { label: "Highlight", value: "highlight" }
               - { name: flip, label: "Quote on left", widget: boolean, required: false, default: false }
               - name: surface
                 label: "Background"
@@ -1076,6 +1116,16 @@ collections:
                       - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
                   - { name: linkLabel, label: "Link label", widget: string, required: false, hint: "E.g. \"Read more\". Shown only if the card has a link." }
               - { name: numbered, label: "Numbered (01/02/03 instead of icons)", widget: boolean, required: false, default: false }
+              - name: accent
+                label: "Accent"
+                widget: select
+                required: false
+                default: "brand"
+                hint: "This block's accent colour (rule, icon or number) — not the eyebrow."
+                options:
+                  - { label: "Brand", value: "brand" }
+                  - { label: "Secondary", value: "secondary" }
+                  - { label: "Highlight", value: "highlight" }
               - name: surface
                 label: "Background"
                 widget: select
@@ -1262,7 +1312,7 @@ collections:
                 widget: select
                 required: false
                 default: "brand"
-                hint: "Colour of the rule + eyebrow marker."
+                hint: "This block's accent colour (rule, icon or number) — not the eyebrow."
                 options:
                   - { label: "Brand", value: "brand" }
                   - { label: "Secondary", value: "secondary" }
@@ -1293,6 +1343,16 @@ collections:
                 field: { name: badge, label: "Badge", widget: string }
               - { name: statValue, label: "Big number", widget: string, required: false }
               - { name: statLabel, label: "Number label", widget: string, required: false }
+              - name: accent
+                label: "Accent"
+                widget: select
+                required: false
+                default: "brand"
+                hint: "This block's accent colour (rule, icon or number) — not the eyebrow."
+                options:
+                  - { label: "Brand", value: "brand" }
+                  - { label: "Secondary", value: "secondary" }
+                  - { label: "Highlight", value: "highlight" }
           - name: statsBar
             label: "Stats / facts"
             widget: object

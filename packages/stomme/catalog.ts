@@ -1,6 +1,6 @@
 // The default block catalog — field definitions for the library blocks. Use it
 // directly or extend it: `export const BLOCKS = [...defaultBlocks, ...mine]`.
-import { headingFields, headingFieldsWith, linkField, imageField, iconField, surfaceField, widthField, cardListField, linkedCardListField, type BlockDef } from './src/kit.ts';
+import { headingFields, headingFieldsWith, linkField, imageField, iconField, surfaceField, accentField, widthField, cardListField, linkedCardListField, type BlockDef } from './src/kit.ts';
 
 export const defaultBlocks: BlockDef[] = [
   {
@@ -156,6 +156,7 @@ export const defaultBlocks: BlockDef[] = [
       ...headingFields,
       linkedCardListField,
       { name: 'numbered', label: 'Numbered (01/02/03 instead of icons)', widget: 'boolean', required: false, default: false },
+      accentField,
       surfaceField,
     ],
   },
@@ -234,6 +235,7 @@ export const defaultBlocks: BlockDef[] = [
       { name: 'body', label: 'Body text', widget: 'markdown' },
       { name: 'quote', label: 'Quote', widget: 'text' },
       { name: 'attribution', label: 'Source / name', widget: 'string', required: false },
+      accentField,
       { name: 'flip', label: 'Quote on left', widget: 'boolean', required: false, default: false },
       surfaceField,
     ],
@@ -247,7 +249,7 @@ export const defaultBlocks: BlockDef[] = [
     fields: [
       { name: 'eyebrow', label: 'Eyebrow', widget: 'string', required: false },
       { name: 'quote', label: 'Quote / statement', widget: 'text' },
-      { name: 'accent', label: 'Accent', widget: 'select', required: false, default: 'brand', hint: 'Colour of the rule + eyebrow marker.', options: [{ label: 'Brand', value: 'brand' }, { label: 'Secondary', value: 'secondary' }, { label: 'Highlight', value: 'highlight' }] },
+      accentField,
       surfaceField,
     ],
   },
@@ -264,6 +266,7 @@ export const defaultBlocks: BlockDef[] = [
       { name: 'badges', label: 'Badges', widget: 'list', required: false, field: { name: 'badge', label: 'Badge', widget: 'string' } },
       { name: 'statValue', label: 'Big number', widget: 'string', required: false },
       { name: 'statLabel', label: 'Number label', widget: 'string', required: false },
+      accentField,
     ],
   },
   {

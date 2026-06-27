@@ -9,8 +9,10 @@ interface Props {
   quote?: string;
   attribution?: string;
   flip?: boolean;
+  accent?: 'brand' | 'secondary' | 'highlight';
 }
-const { body = '', quote, attribution, flip = false } = Astro.props;
+const { body = '', quote, attribution, flip = false, accent = 'brand' } = Astro.props;
+const accentVar = accent === 'secondary' ? 'var(--color-secondary)' : accent === 'highlight' ? 'var(--color-highlight)' : 'var(--color-brand)';
 const html = await renderMarkdown(body);
 ---
 
@@ -18,7 +20,7 @@ const html = await renderMarkdown(body);
   <div class:list={['tq-grid', { 'tq-flip': flip }]}>
     <div class:list={['prose', 'tq-body', { 'tq-second': flip }]} set:html={html} />
     {quote && (
-      <figure class:list={['tq-quote', { 'tq-first': flip }]}>
+      <figure class:list={['tq-quote', { 'tq-first': flip }]} style={`--block-accent:${accentVar}`}>
         <blockquote class="display tq-text">{quote}</blockquote>
         {attribution && <figcaption class="mono tq-attr">{attribution}</figcaption>}
       </figure>
