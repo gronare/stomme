@@ -128,7 +128,7 @@ export const defaultBlocks: BlockDef[] = [
     summary: 'Page title band (light or dark): eyebrow, H1, intro and an optional button.',
     shape: 'band',
     fields: [
-      { name: 'variant', label: 'Style', widget: 'select', required: false, default: 'light', options: [{ label: 'Light', value: 'light' }, { label: 'Dark (band)', value: 'dark' }] },
+      { name: 'variant', label: 'Style', widget: 'select', required: false, default: 'light', options: [{ label: 'Light', value: 'light' }, { label: 'Band', value: 'dark' }] },
       widthField,
       { name: 'eyebrow', label: 'Eyebrow', widget: 'string', required: false },
       { name: 'heading', label: 'Heading (H1)', widget: 'string' },

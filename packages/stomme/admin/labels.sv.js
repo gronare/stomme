@@ -122,7 +122,7 @@ export default {
   'Numbered (01/02/03 instead of icons)': 'Numrerad (01/02/03 istället för ikoner)',
   'Standard (white)': 'Standard (vit)',
   'Light': 'Ljus',
-  'Dark (band)': 'Mörk (band)',
+  'Band': 'Band',
   'Accent band': 'Accentband',
   'Accent surface': 'Accentyta',
   'Dark': 'Mörk',

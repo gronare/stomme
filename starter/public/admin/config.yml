@@ -210,7 +210,7 @@ collections:
                     default: "light"
                     options:
                       - { label: "Light", value: "light" }
-                      - { label: "Dark (band)", value: "dark" }
+                      - { label: "Band", value: "dark" }
                   - name: width
                     label: "Width"
                     widget: select
@@ -907,7 +907,7 @@ collections:
                 default: "light"
                 options:
                   - { label: "Light", value: "light" }
-                  - { label: "Dark (band)", value: "dark" }
+                  - { label: "Band", value: "dark" }
               - name: width
                 label: "Width"
                 widget: select
