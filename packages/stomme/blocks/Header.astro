@@ -28,8 +28,10 @@ if (!settings) settings = (await getEntry('settings', 'site'))!.data as { name?:
 
 const logo = nav.logo ?? {};
 // A local .svg logo is inlined so a currentColor wordmark tints to the header;
-// other logos render as an <img>.
+// other logos render as an <img>. When the header is transparent over a dark hero
+// we swap to the dark variant (if provided) so a tiled mark doesn't sit on dark.
 const logoSvg = inlineLocalSvg(logo.image);
+const logoDarkSvg = logo.imageDark ? inlineLocalSvg(logo.imageDark) : null;
 const items = nav.items ?? [];
 const homeHref = '/';
 
@@ -60,7 +62,10 @@ const resolved = await Promise.all(
   <div class="inner">
     <a class="logo" href={homeHref} aria-label={settings.name}>
       {logoSvg
-        ? <span class="logo-lockup" set:html={logoSvg} />
+        ? <Fragment>
+            <span class:list={['logo-lockup', { 'logo-lockup--light': logoDarkSvg }]} set:html={logoSvg} />
+            {logoDarkSvg && <span class="logo-lockup logo-lockup--dark" set:html={logoDarkSvg} />}
+          </Fragment>
         : logo.image
         ? <Cover src={logo.image} alt={logo.alt ?? settings.name} placeholder="/images/placeholder.svg" class="logo-img" />
         : <Fragment>{logo.textPre ?? settings.name}<span class="accent">{logo.textAccent}</span></Fragment>}

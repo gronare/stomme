@@ -348,7 +348,10 @@ body { font-family: var(--bk-font-sans); margin: 0; line-height: 1.6; }
    .logo link colour — ink in the light header, on-dark in the footer, light when
    overlaid on a dark hero — while the mark badge keeps its own fixed colours. */
 .logo-lockup { display: inline-flex; align-items: center; }
-.logo-lockup svg { display: block; height: 40px; width: auto; }
+.logo-lockup svg { display: block; height: 44px; width: auto; }
+/* When a dark logo variant is provided, it's hidden until the header is
+   transparent over a dark hero (see the overlay rules below). */
+.logo-lockup--dark { display: none; }
 
 /* Transparent overlay header — when a page opens with a full-bleed cover, the header
    floats over it (fixed, light text, no bar) so the hero runs to the top edge, then
@@ -376,6 +379,11 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
 body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header .nav-toggle { color: #fff; }
 /* The dropdown panel is always a light popup, so its links keep the normal dark colour. */
 body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header .logo .accent { color: color-mix(in srgb, var(--color-brand) 45%, #fff); }
+/* Transparent over a dark hero → swap to the dark logo variant (when provided),
+   so a tiled mark doesn't sit on the dark ground. Reverts when the header goes
+   solid or the mobile menu opens (both light). */
+body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header:not(.solid):not(.nav-open) .logo-lockup--light { display: none; }
+body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header:not(.solid):not(.nav-open) .logo-lockup--dark { display: inline-flex; }
 /* solid state — sticky header scrolled past the hero, or the mobile menu is open */
 body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header.solid,
 body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header.nav-open {
