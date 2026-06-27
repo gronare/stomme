@@ -102,11 +102,14 @@ export function stommeCollections(listings?: Listing[]) {
     footer: defineCollection({
       loader: md('footer'),
       schema: z.object({
+        dark: z.boolean().default(false),
         tagline: z.string().default(''),
+        showLinks: z.boolean().default(true),
         linksHeading: z.string().default(''),
         links: z.array(z.object({ label: z.string(), link })).default([]),
         showTowns: z.boolean().default(false),
         townsHeading: z.string().default(''),
+        legal: z.array(z.object({ label: z.string(), link })).default([]),
         note: z.string().default(''),
       }),
     }),

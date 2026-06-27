@@ -1,9 +1,10 @@
 ---
 import '../styles/global.css';
-import { getEntry } from 'astro:content';
+import { getEntry, getCollection } from 'astro:content';
 import { resolveFonts } from '@gronare/stomme/fonts';
 import Header from '@gronare/stomme/Header.astro';
 import Footer from '@gronare/stomme/Footer.astro';
+import { site } from '../site.config';
 
 // Uploaded font files → served URLs (Vite hashes them), for a custom theme font.
 const fontFiles = import.meta.glob('/src/assets/uploads/**/*.{woff2,woff,ttf,otf}', {
@@ -17,6 +18,10 @@ const { title, description, chrome = true } = Astro.props;
 
 const settings = (await getEntry('settings', 'site'))!.data;
 const theme = (await getEntry('theme', 'theme'))!.data;
+// Service areas for the footer's areas column (rendered only when footer.showTowns).
+const towns = (await getCollection('towns'))
+  .sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0))
+  .map((t) => ({ id: t.id, name: t.data.name }));
 const ff = fontFiles as Record<string, string>;
 const customDisplayUrl = theme.fontCustomFile ? ff[theme.fontCustomFile] : null;
 const customBodyUrl = theme.fontCustomBodyFile ? ff[theme.fontCustomBodyFile] : null;
@@ -53,6 +58,6 @@ const themeVars = [
   <body>
     {chrome && <Header />}
     <main><slot /></main>
-    {chrome && <Footer />}
+    {chrome && <Footer towns={towns} townsHref={site.routes?.towns ?? '/areas'} />}
   </body>
 </html>

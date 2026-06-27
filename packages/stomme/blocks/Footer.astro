@@ -7,7 +7,7 @@ import Cover from '../src/Cover.astro';
 // by default; accepts them as optional props (CMS preview drafts). Renders a links
 // column + org line only when those fields are present, so a minimal site stays simple.
 interface NavData { logo?: { textPre?: string; textAccent?: string; image?: string; alt?: string } }
-interface FooterData { tagline?: string; linksHeading?: string; links?: { label: string; link?: unknown }[]; showTowns?: boolean; townsHeading?: string; note?: string }
+interface FooterData { dark?: boolean; tagline?: string; showLinks?: boolean; linksHeading?: string; links?: { label: string; link?: unknown }[]; showTowns?: boolean; townsHeading?: string; legal?: { label: string; link?: unknown }[]; note?: string }
 interface SettingsData { name?: string; email?: string; phone?: string; phoneE164?: string; hq?: string; orgNr?: string; founded?: string }
 // `towns` + `townsHref` are optional: pass them (the site reads its towns collection
 // and forwards site.routes.towns) to render a service-area column when footer.showTowns.
@@ -21,11 +21,12 @@ if (!settings) settings = (await getEntry('settings', 'site'))!.data as Settings
 
 const logo = nav.logo ?? {};
 const links = footer.links ?? [];
+const legal = footer.legal ?? [];
 const tagline = [footer.tagline, settings.hq].filter(Boolean).join(' · ');
 const orgLine = [settings.orgNr && `Org.nr ${settings.orgNr}`, settings.founded && `Est. ${settings.founded}`].filter(Boolean).join(' · ');
 const year = new Date().getFullYear();
 ---
-<footer class="site-footer">
+<footer class:list={['site-footer', { 'site-footer--dark': footer.dark }]}>
   <div class="inner">
     <div class="footer-grid">
       <div>
@@ -42,7 +43,7 @@ const year = new Date().getFullYear();
         )}
         {orgLine && <p class="mono" style="margin-top:1rem">{orgLine}</p>}
       </div>
-      {links.length > 0 && (
+      {footer.showLinks !== false && links.length > 0 && (
         <nav>
           <p class="mono mono-dot">{footer.linksHeading ?? 'Links'}</p>
           <ul class="footer-links">
@@ -59,6 +60,13 @@ const year = new Date().getFullYear();
         </nav>
       )}
     </div>
-    <p class="mono" style="margin-top:2.5rem">© {settings.founded ? `${settings.founded}–` : ''}{year} {settings.name}{footer.note ? ` · ${footer.note}` : ''}</p>
+    <div class="footer-bar">
+      <p class="mono" style="margin:0">© {settings.founded ? `${settings.founded}–` : ''}{year} {settings.name}{footer.note ? ` · ${footer.note}` : ''}</p>
+      {legal.length > 0 && (
+        <ul class="footer-legal">
+          {legal.map((l) => <li><a href={resolveLink(l.link, '/')} class="footer-link">{l.label}</a></li>)}
+        </ul>
+      )}
+    </div>
   </div>
 </footer>
