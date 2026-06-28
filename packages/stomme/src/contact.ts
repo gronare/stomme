@@ -49,11 +49,13 @@ export const POST: APIRoute = async ({ request, locals, redirect }) => {
 
   const subject = `New enquiry from ${name || email || 'website'}`;
   const text = [`Name:  ${name}`, `Email: ${email}`, `Phone: ${phone}`, '', message].join('\n');
+  // Per-customer tracking: tag by site host (sanitised to Resend's allowed tag chars).
+  const siteTag = new URL(request.url).hostname.replace(/[^a-zA-Z0-9_-]/g, '-');
 
   const res = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ from, to, reply_to: email || undefined, subject, text }),
+    body: JSON.stringify({ from, to, reply_to: email || undefined, subject, text, tags: [{ name: 'site', value: siteTag }] }),
   });
   if (!res.ok) return fail('Could not send your message — please try again.', 502);
 
