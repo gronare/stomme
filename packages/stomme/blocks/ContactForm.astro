@@ -25,9 +25,8 @@ const contactLine = [settings.name, settings.hq, settings.orgNr && `Org.nr ${set
 ---
 <section class="section">
   <div class="contact-grid">
-    <form name="quote" method="POST" data-netlify="true" netlify-honeypot="bot-field" action={formSuccess} class="contact-form">
-      <input type="hidden" name="form-name" value="quote" />
-      <p class="hp"><label>Don’t fill this in: <input name="bot-field" /></label></p>
+    <form method="POST" action="/api/contact" class="contact-form">
+      <p class="hp" aria-hidden="true"><label>Don’t fill this in: <input name="bot-field" tabindex="-1" autocomplete="off" /></label></p>
       <div class="field">
         <label for="name" class="mono">{L.name}</label>
         <input id="name" name="name" required />

@@ -16,6 +16,7 @@
     "./markdown": "./src/markdown.ts",
     "./fonts": "./src/fonts.ts",
     "./config": "./src/config.ts",
+    "./contact": "./src/contact.ts",
     "./catalog": "./catalog.ts",
     "./collections": "./collections.ts",
     "./integration": {
