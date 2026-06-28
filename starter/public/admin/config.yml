@@ -1,7 +1,9 @@
 locale: en
+# >>> cms:generated (run: pnpm cms:gen — do not edit between markers)
 backend:
   name: git-gateway
   branch: main
+# <<< cms:generated
 local_backend: true
 media_folder: "src/assets/uploads"
 public_folder: "/src/assets/uploads"

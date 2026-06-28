@@ -42,11 +42,13 @@ if (!Array.isArray(BLOCKS)) {
 let ROUTES = { services: '/services', towns: '/areas', blog: '/blog' };
 let FEATURES = null; // null = no `features` declared → fall back to folder-existence
 let CMS_LOCALE = 'en'; // Decap admin UI language (config.yml `locale:`); 'en' is Decap's default
+let CMS = null; // site.cms → generated `backend:` block (between # >>> cms:generated markers)
 let LISTINGS = []; // config-defined collections (news/for-sale/…) → editors + seeded index
 try {
   const mod = await jiti.import(resolve(root, 'src/site.config.ts'));
   if (mod.site && mod.site.routes) ROUTES = { ...ROUTES, ...mod.site.routes };
   if (mod.site && mod.site.cmsLocale) CMS_LOCALE = mod.site.cmsLocale;
+  if (mod.site && mod.site.cms) CMS = mod.site.cms;
   if (mod.features) FEATURES = { blog: false, areas: false, services: false, testimonials: false, faq: false, ...mod.features };
   if (Array.isArray(mod.listings))
     LISTINGS = mod.listings
@@ -459,7 +461,26 @@ function emitCollections(indent) {
   return [...fixed, ...listing].join('\n');
 }
 
-const EMITTERS = { blocks: emitWidget, collections: emitCollections, navlinks: emitNavLinks };
+// ── CMS backend (generated) ──────────────────────────────────────────────────
+// Emit the Decap `backend:` block from the site's `cms` config so config.yml auth
+// isn't hand-edited. Generic: only the fields the site sets are written. Defaults:
+// backend git-gateway, branch main. (No `cms:generated` markers in a site's
+// config.yml → nothing emitted, hand-authored backend preserved — back-compatible.)
+function emitCms(indent) {
+  const p = ' '.repeat(indent);
+  const c = CMS || {};
+  const L = [`${p}backend:`, `${p}  name: ${c.backend || 'git-gateway'}`];
+  if (c.repo) L.push(`${p}  repo: ${c.repo}`);
+  L.push(`${p}  branch: ${c.branch || 'main'}`);
+  if (c.baseUrl) L.push(`${p}  base_url: ${c.baseUrl}`);
+  if (c.authEndpoint) L.push(`${p}  auth_endpoint: ${c.authEndpoint}`);
+  if (c.apiRoot) L.push(`${p}  api_root: ${c.apiRoot}`);
+  if (c.gatewayUrl) L.push(`${p}  gateway_url: ${c.gatewayUrl}`);
+  if (c.identityUrl) L.push(`${p}  identity_url: ${c.identityUrl}`);
+  return L.join('\n');
+}
+
+const EMITTERS = { blocks: emitWidget, collections: emitCollections, navlinks: emitNavLinks, cms: emitCms };
 
 // Fill every `# >>> NAME:generated … # <<< NAME:generated` region (idempotent).
 const lines = readFileSync(configPath, 'utf8').split('\n');

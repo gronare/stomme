@@ -40,6 +40,20 @@ export interface SiteConfig {
   // can resolve their specs without importing the integration's config alias. A site
   // that uses listings passes them in (e.g. `config={{ ...site, listings }}`).
   listings?: Listing[];
+  // CMS auth/backend for the generated Decap config.yml. stomme-gen emits the
+  // `backend:` block from this (between the `# >>> cms:generated` markers) so a
+  // site picks its backend without hand-editing config.yml. Generic across
+  // github / git-gateway (Netlify Identity, DecapBridge, a custom OAuth proxy).
+  cms?: {
+    backend?: string; // 'github' | 'git-gateway' | 'gitlab'
+    repo?: string; // 'owner/name' (github/gitlab)
+    branch?: string; // default 'main'
+    baseUrl?: string; // OAuth base / proxy origin (github backend, custom OAuth)
+    authEndpoint?: string; // OAuth path under baseUrl (e.g. 'auth')
+    apiRoot?: string; // git provider API root (a proxy that injects the server token)
+    gatewayUrl?: string; // git-gateway gateway URL (DecapBridge / self-hosted)
+    identityUrl?: string; // git-gateway identity URL (DecapBridge / GoTrue)
+  };
 }
 
 // Optional capabilities a site can switch on. A flag that's missing (or the whole
