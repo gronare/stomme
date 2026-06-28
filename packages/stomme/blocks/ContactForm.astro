@@ -53,4 +53,45 @@ const contactLine = [settings.name, settings.hq, settings.orgNr && `Org.nr ${set
       {contactLine && <p class="mono org">{contactLine}</p>}
     </aside>
   </div>
+  <script is:inline>
+    // Progressive enhancement: submit via fetch and replace the form with a
+    // confirmation that shows what was sent. No-JS falls back to a plain POST → /thanks.
+    (function () {
+      var form = document.currentScript.closest('section').querySelector('.contact-form');
+      if (!form) return;
+      form.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        var btn = form.querySelector('button[type=submit]');
+        if (btn) btn.disabled = true;
+        var fd = new FormData(form);
+        try {
+          var res = await fetch(form.action, { method: 'POST', body: fd, headers: { Accept: 'application/json', 'X-Requested-With': 'fetch' } });
+          if (!res.ok) throw new Error('send failed');
+          var sent = document.createElement('div');
+          sent.className = 'contact-sent';
+          var h = document.createElement('h3');
+          h.textContent = 'Thanks' + (fd.get('name') ? ', ' + fd.get('name') : '') + " — we'll be in touch.";
+          sent.appendChild(h);
+          var p = document.createElement('p');
+          p.className = 'mono';
+          p.textContent = 'What you sent:';
+          sent.appendChild(p);
+          var dl = document.createElement('dl');
+          [['Email', fd.get('email')], ['Phone', fd.get('phone')], ['Message', fd.get('message')]].forEach(function (row) {
+            if (!row[1]) return;
+            var dt = document.createElement('dt'); dt.textContent = row[0];
+            var dd = document.createElement('dd'); dd.textContent = row[1];
+            dl.appendChild(dt); dl.appendChild(dd);
+          });
+          sent.appendChild(dl);
+          form.replaceWith(sent);
+        } catch (err) {
+          if (btn) btn.disabled = false;
+          var msg = form.querySelector('.contact-error');
+          if (!msg) { msg = document.createElement('p'); msg.className = 'contact-error'; form.appendChild(msg); }
+          msg.textContent = 'Sorry — could not send. Please try again or email us directly.';
+        }
+      });
+    })();
+  </script>
 </section>
