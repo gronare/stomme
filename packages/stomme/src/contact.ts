@@ -32,10 +32,11 @@ export const POST: APIRoute = async ({ request, locals, redirect }) => {
 
   if (form.get('bot-field')) return ok({ ok: true }); // honeypot → silently "succeed"
 
-  const name = String(form.get('name') || '').trim();
-  const email = String(form.get('email') || '').trim();
-  const phone = String(form.get('phone') || '').trim();
-  const message = String(form.get('message') || '').trim();
+  const cap = (v: FormDataEntryValue | null, n: number) => String(v || '').trim().slice(0, n);
+  const name = cap(form.get('name'), 200);
+  const email = cap(form.get('email'), 200);
+  const phone = cap(form.get('phone'), 60);
+  const message = cap(form.get('message'), 5000);
 
   const apiKey = env(locals, 'RESEND_API_KEY');
   const from = env(locals, 'CONTACT_FROM');
@@ -55,7 +56,7 @@ export const POST: APIRoute = async ({ request, locals, redirect }) => {
   const res = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ from, to, reply_to: email || undefined, subject, text, tags: [{ name: 'site', value: siteTag }] }),
+    body: JSON.stringify({ from, to, reply_to: /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email) ? email : undefined, subject, text, tags: [{ name: 'site', value: siteTag }] }),
   });
   if (!res.ok) return fail('Could not send your message — please try again.', 502);
 
