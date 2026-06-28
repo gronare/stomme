@@ -63,6 +63,7 @@ const themeVars = [
     <title>{title ?? settings.name}</title>
     {description && <meta name="description" content={description} />}
     <link rel="icon" href={favicon} type={faviconType} />
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
     {settings.appleIcon && <link rel="apple-touch-icon" href={settings.appleIcon} />}
     {fonts.preloads.map((p) => <link rel="preload" as="font" type={p.type} href={p.href} crossorigin />)}
     {fonts.fontFace && <style is:inline set:html={fonts.fontFace}></style>}
