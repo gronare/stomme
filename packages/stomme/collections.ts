@@ -43,6 +43,9 @@ export function stommeCollections(listings?: Listing[]) {
       loader: md('settings'),
       schema: z.object({
         name: z.string(),
+        // Logo lives with site identity (used in BOTH header and footer); each of those
+        // chooses whether to show the mark / wordmark via their own toggles.
+        logo: z.object({ image: z.string().optional(), alt: z.string().optional(), textPre: z.string().default(''), textAccent: z.string().default('') }).default({}),
         description: z.string().default(''),
         phone: z.string().default(''),
         phoneE164: z.string().default(''),
@@ -97,7 +100,6 @@ export function stommeCollections(listings?: Listing[]) {
     navigation: defineCollection({
       loader: md('navigation'),
       schema: z.object({
-        logo: z.object({ textPre: z.string().default(''), textAccent: z.string().default(''), image: z.string().optional(), alt: z.string().optional() }).default({}),
         items: z.array(z.object({
           label: z.string(),
           link,
@@ -106,6 +108,9 @@ export function stommeCollections(listings?: Listing[]) {
         })).default([]),
         cta: z.object({ label: z.string(), link }).optional(),
         sticky: z.boolean().default(false),
+        // Which parts of the site logo (Identity settings) the header shows.
+        showLogo: z.boolean().default(true),
+        showWordmark: z.boolean().default(true),
       }),
     }),
 
@@ -121,6 +126,9 @@ export function stommeCollections(listings?: Listing[]) {
         townsHeading: z.string().default(''),
         legal: z.array(z.object({ label: z.string(), link })).default([]),
         note: z.string().default(''),
+        // Which parts of the site logo (Identity settings) the footer shows.
+        showLogo: z.boolean().default(true),
+        showWordmark: z.boolean().default(true),
       }),
     }),
 

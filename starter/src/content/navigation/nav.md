@@ -1,7 +1,4 @@
 ---
-logo:
-  textPre: "Starter"
-  textAccent: "Co"
 items:
   - label: Home
     link:
