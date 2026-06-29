@@ -31,15 +31,17 @@ const contactLine = [settings.name, settings.hq, settings.orgNr && `Org.nr ${set
 // Falls back to the per-site /api/contact endpoint if the site isn't CMS/gateway-wired.
 const contactAction = site?.cms?.baseUrl ? `${site.cms.baseUrl}/contact` : '/api/contact';
 
-// Thank-you copy: single source = the "Thank-you" settings (optional), localized fallback.
-// Same shape the /thanks page + CMS preview use, so the inline confirmation matches.
+// Thank-you copy: editable content from the "Thank-you" settings (pre-seeded in the starter,
+// removable in the CMS — blank renders nothing). UI chrome (eyebrow, the recap/direct labels)
+// stays on the localized strings. Same shape the /thanks page + CMS preview use, so the inline
+// confirmation matches.
 const tset: any = (await getEntry('thanks', 'thanks').catch(() => null))?.data ?? {};
 const tk = (site?.strings?.thanks ?? {}) as Record<string, string>;
 const thanksData = {
   eyebrow: tk.eyebrow ?? 'Message sent',
-  heading: tset.heading || (tk.heading ?? "Thanks{name} — it's on its way."),
-  lead: tset.message || (tk.lead ?? "We've got your message and we'll reply within one business day."),
-  primaryLabel: tset.button?.label || (tk.home ?? 'Back to home'),
+  heading: tset.heading || '',
+  lead: tset.message || '',
+  primaryLabel: tset.button?.label || '',
   primaryHref: resolveLink(tset.button?.link, '/'),
   secondaryLabel: tset.button2?.label || '',
   secondaryHref: resolveLink(tset.button2?.link, '/'),
@@ -118,18 +120,20 @@ const thanksData = {
           badge.innerHTML = '<svg viewBox="0 0 56 56" aria-hidden="true"><circle cx="28" cy="28" r="26"/><path d="M17 29.5 L24.5 37 L40 20"/></svg>';
           confirm.appendChild(badge);
           confirm.appendChild(el('span', 'mono mono-dot cs-eyebrow', t.eyebrow || 'Message sent'));
-          confirm.appendChild(el('h2', 'cs-head', (t.heading || "Thanks{name} — it's on its way.").replace('{name}', name ? ', ' + name : '')));
-          confirm.appendChild(el('p', 'cs-lead', t.lead || ''));
-          var actions = el('div', 'cs-actions');
-          var primary = el('a', 'btn', t.primaryLabel || 'Back to home'); primary.href = t.primaryHref || '/'; actions.appendChild(primary);
-          if (t.secondaryLabel) { var sec = el('a', 'btn btn-ghost', t.secondaryLabel); sec.href = t.secondaryHref || '/'; actions.appendChild(sec); }
-          confirm.appendChild(actions);
+          if (t.heading) confirm.appendChild(el('h2', 'cs-head', t.heading.replace('{name}', name ? ', ' + name : '')));
+          if (t.lead) confirm.appendChild(el('p', 'cs-lead', t.lead));
+          if (t.primaryLabel || t.secondaryLabel) {
+            var actions = el('div', 'cs-actions');
+            if (t.primaryLabel) { var primary = el('a', 'btn', t.primaryLabel); primary.href = t.primaryHref || '/'; actions.appendChild(primary); }
+            if (t.secondaryLabel) { var sec = el('a', 'btn btn-ghost', t.secondaryLabel); sec.href = t.secondaryHref || '/'; actions.appendChild(sec); }
+            confirm.appendChild(actions);
+          }
 
           var hasDirect = t.showContact !== false && (d.phone || d.email);
           var cols = el('div', 'thanks-cols' + (hasDirect ? '' : ' thanks-cols--solo'));
 
           var recap = el('section', 'cs-card');
-          recap.appendChild(el('p', 'cs-label', t.recapLabel || 'What you sent'));
+          recap.appendChild(el('p', 'mono mono-dot cs-label', t.recapLabel || 'What you sent'));
           var dl = el('dl', 'cs-recap-dl');
           [[t.emailLabel || 'Email', fd.get('email')], [t.phoneLabel || 'Phone', fd.get('phone')]].forEach(function (row) {
             if (!row[1]) return;
@@ -145,7 +149,7 @@ const thanksData = {
 
           if (hasDirect) {
             var aside = el('aside', 'cs-card cs-card--tint');
-            aside.appendChild(el('p', 'cs-label', t.talkLabel || 'Prefer to talk?'));
+            aside.appendChild(el('p', 'mono mono-dot cs-label', t.talkLabel || 'Prefer to talk?'));
             if (d.phone) { var pp = el('p', 'cs-phone'); var pa = el('a', null, d.phone); pa.href = 'tel:' + (d.phoneE164 || d.phone); pp.appendChild(pa); aside.appendChild(pp); }
             if (d.email) { var ep = el('p', 'cs-email'); var ea = el('a', null, d.email); ea.href = 'mailto:' + d.email; ep.appendChild(ea); aside.appendChild(ep); }
             if (d.hours) aside.appendChild(el('p', 'cs-hours', d.hours));

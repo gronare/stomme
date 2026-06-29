@@ -1,8 +1,9 @@
 ---
 // Contact-form success page (no-JS fallback for /thanks). Renders the shared Thanks component
-// from the "Thank-you" settings (localized fallback) — the same component the CMS preview shows.
-// A direct page visit has no submitted data, so there's no "what you sent" recap here (the
-// inline confirmation after a real submit shows it). The CMS preview mocks the recap.
+// from the "Thank-you" settings. Editable copy (heading/message/buttons) comes from the entry
+// (pre-seeded in the starter, removable in the CMS — blank renders nothing); UI chrome (eyebrow,
+// the recap/direct labels) stays localized. A direct page visit has no submitted data, so
+// there's no "what you sent" recap here (the inline confirmation shows it); the preview mocks it.
 import Base from '../layouts/Base.astro';
 import { getEntry } from 'astro:content';
 import { resolveSite } from '@gronare/stomme/config';
@@ -18,11 +19,11 @@ const ts: any = (await getEntry('thanks', 'thanks').catch(() => null))?.data ?? 
 <Base title="Thank you" description={ts.message || t.lead}>
   <Thanks
     eyebrow={t.eyebrow}
-    heading={ts.heading || t.heading.replace('{name}', '')}
-    message={ts.message || t.lead}
-    primaryLabel={ts.button?.label || t.home}
+    heading={(ts.heading ?? '').replace('{name}', '')}
+    message={ts.message ?? ''}
+    primaryLabel={ts.button?.label ?? ''}
     primaryHref={resolveLink(ts.button?.link, '/')}
-    secondaryLabel={ts.button2?.label}
+    secondaryLabel={ts.button2?.label ?? ''}
     secondaryHref={resolveLink(ts.button2?.link, '/')}
     showContact={ts.showContact !== false}
     talkLabel={t.talkLabel}

@@ -67,9 +67,9 @@ if (kind === 'thanks') {
   const settings = (await getEntry('settings', 'site'))?.data ?? {};
   thanks = {
     eyebrow: t.eyebrow,
-    heading: td.heading || t.heading.replace('{name}', ''),
-    message: td.message || t.lead,
-    primaryLabel: (td.button && td.button.label) || t.home,
+    heading: (td.heading || '').replace('{name}', ''),
+    message: td.message || '',
+    primaryLabel: (td.button && td.button.label) || '',
     primaryHref: resolveLink(td.button && td.button.link, '/'),
     secondaryLabel: (td.button2 && td.button2.label) || '',
     secondaryHref: resolveLink(td.button2 && td.button2.link, '/'),
