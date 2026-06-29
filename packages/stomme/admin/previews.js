@@ -22,6 +22,28 @@
   document.addEventListener('DOMContentLoaded', relabel);
 })();
 
+// Same-window auth handoff. Browsers that open the login in the current tab instead of
+// a popup (Arc, some mobile) have no window.opener to receive the token, so the gateway
+// redirects back here with the token in the URL fragment. Persist it exactly as Decap
+// does (login state survives reload for the github backend) and reload — no popup needed.
+(function () {
+  try {
+    var m = (location.hash || '').match(/stomme_cms_token=([^&]+)/);
+    if (!m) return;
+    var token = decodeURIComponent(m[1]);
+    if (!token) return;
+    var email = '';
+    try {
+      var b = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+      b += '==='.slice((b.length + 3) % 4);
+      email = (JSON.parse(atob(b)) || {}).email || '';
+    } catch (e) {}
+    localStorage.setItem('decap-cms-user', JSON.stringify({ name: email, login: email, email: email, token: token, backendName: 'github' }));
+    history.replaceState(null, '', location.pathname + location.search); // strip the token from the URL
+    location.reload();
+  } catch (e) {}
+})();
+
 (function () {
   if (typeof window.CMS === 'undefined' || typeof window.h === 'undefined') {
     console.warn('[stomme] Decap globals unavailable; skipping previews.');
