@@ -2,8 +2,9 @@
 // Contact-form confirmation — the real /thanks page AND the CMS "Thank-you" preview render
 // this (via /preview?kind=thanks), so the preview shows the live page with the site theme.
 // Presentational: the caller resolves copy/links/recap and passes them in. Matches the
-// confirmation mockup — centered success, then a two-up of the "what you sent" recap and a
-// tinted direct-contact card.
+// confirmation mockup — centered success, then a two-up of the "what you sent" recap and the
+// shared direct-contact card (DirectContact.astro, same as the contact page).
+import DirectContact from './DirectContact.astro';
 interface Recap {
   emailLabel?: string; email?: string;
   phoneLabel?: string; phone?: string;
@@ -69,13 +70,7 @@ const twoCol = hasRecap && hasDirect;
       </section>
     )}
     {hasDirect && (
-      <aside class="cs-card cs-card--tint" aria-label={talkLabel}>
-        <p class="mono mono-dot cs-label">{talkLabel}</p>
-        {phone && <p class="cs-phone"><a href={`tel:${phoneE164 || phone}`}>{phone}</a></p>}
-        {email && <p class="cs-email"><a href={`mailto:${email}`}>{email}</a></p>}
-        {hours && <p class="cs-hours">{hours}</p>}
-        {who && <p class="cs-who">{who}</p>}
-      </aside>
+      <DirectContact label={talkLabel} phone={phone} phoneE164={phoneE164} email={email} hours={hours} footer={who} tint />
     )}
   </div>
 )}

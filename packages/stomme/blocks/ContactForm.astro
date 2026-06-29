@@ -1,6 +1,7 @@
 ---
 import { getEntry } from 'astro:content';
 import { resolveLink } from '../src/href';
+import DirectContact from '../DirectContact.astro';
 
 // Contact form block — self-contained: heading, intro, field labels, submit text and the
 // direct-contact toggle are all editable on the block. The thank-you copy (inline
@@ -85,13 +86,14 @@ const thanksData = {
     </form>
 
     {showAside && (
-      <aside class="contact-aside">
-        <span class="mono mono-dot">{L.direct}</span>
-        {settings.phone && <p class="phone"><a href={`tel:${settings.phoneE164}`}>{settings.phone}</a></p>}
-        {settings.email && <p class="email"><a href={`mailto:${settings.email}`}>{settings.email}</a></p>}
-        {settings.openingHours && <p class="hours">{settings.openingHours}</p>}
-        {contactLine && <p class="mono org">{contactLine}</p>}
-      </aside>
+      <DirectContact
+        label={L.direct}
+        phone={settings.phone}
+        phoneE164={settings.phoneE164}
+        email={settings.email}
+        hours={settings.openingHours}
+        footer={contactLine}
+      />
     )}
   </div>
   <script is:inline>
@@ -148,12 +150,12 @@ const thanksData = {
           recap.appendChild(dl); cols.appendChild(recap);
 
           if (hasDirect) {
-            var aside = el('aside', 'cs-card cs-card--tint');
-            aside.appendChild(el('p', 'mono mono-dot cs-label', t.talkLabel || 'Prefer to talk?'));
-            if (d.phone) { var pp = el('p', 'cs-phone'); var pa = el('a', null, d.phone); pa.href = 'tel:' + (d.phoneE164 || d.phone); pp.appendChild(pa); aside.appendChild(pp); }
-            if (d.email) { var ep = el('p', 'cs-email'); var ea = el('a', null, d.email); ea.href = 'mailto:' + d.email; ep.appendChild(ea); aside.appendChild(ep); }
-            if (d.hours) aside.appendChild(el('p', 'cs-hours', d.hours));
-            if (d.who) aside.appendChild(el('p', 'cs-who', d.who));
+            var aside = el('aside', 'direct-card direct-card--tint');
+            aside.appendChild(el('p', 'mono mono-dot direct-card__label', t.talkLabel || 'Prefer to talk?'));
+            if (d.phone) { var pp = el('p', 'direct-card__phone'); var pa = el('a', null, d.phone); pa.href = 'tel:' + (d.phoneE164 || d.phone); pp.appendChild(pa); aside.appendChild(pp); }
+            if (d.email) { var ep = el('p', 'direct-card__email'); var ea = el('a', null, d.email); ea.href = 'mailto:' + d.email; ep.appendChild(ea); aside.appendChild(ep); }
+            if (d.hours) aside.appendChild(el('p', 'direct-card__hours', d.hours));
+            if (d.who) aside.appendChild(el('p', 'direct-card__footer', d.who));
             cols.appendChild(aside);
           }
 

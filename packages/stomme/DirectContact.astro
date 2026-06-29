@@ -1,0 +1,22 @@
+---
+// Direct-contact card — ONE component shared by the contact-form aside, the /thanks page,
+// and the inline confirmation (built to match in ContactForm's script). Phone in the brand
+// colour + display font, email in ink; `tint` gives the soft brand-tinted variant.
+interface Props {
+  label: string;
+  phone?: string;
+  phoneE164?: string;
+  email?: string;
+  hours?: string;
+  footer?: string;
+  tint?: boolean;
+}
+const { label, phone, phoneE164, email, hours, footer, tint } = Astro.props;
+---
+<aside class:list={['direct-card', tint && 'direct-card--tint']}>
+  <p class="mono mono-dot direct-card__label">{label}</p>
+  {phone && <p class="direct-card__phone"><a href={`tel:${phoneE164 || phone}`}>{phone}</a></p>}
+  {email && <p class="direct-card__email"><a href={`mailto:${email}`}>{email}</a></p>}
+  {hours && <p class="direct-card__hours">{hours}</p>}
+  {footer && <p class="mono direct-card__footer">{footer}</p>}
+</aside>
