@@ -1695,7 +1695,7 @@ collections:
               - { name: label, label: "Label", widget: string }
               - { name: link, label: "Link", widget: string, hint: "A path like /privacy, or a full URL." }
           - { name: note, label: "Note", widget: string, required: false, hint: "Appended to the © line." }
-      - label: "Thank-you page"
+      - label: "Form confirmation"
         name: thanks
         file: "src/content/thanks/thanks.md"
         fields:

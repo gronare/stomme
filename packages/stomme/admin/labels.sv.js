@@ -375,7 +375,7 @@ export default {
   'Submit button text': 'Text på skicka-knappen',
   'Show the direct-contact card': 'Visa direktkontaktkortet',
   'Opening hours': 'Öppettider',
-  'Thank-you page': 'Tack-sida',
+  'Form confirmation': 'Formulärbekräftelse',
   'Message': 'Meddelande',
   'Primary button': 'Primärknapp',
   'Second button (optional)': 'Andra knappen (valfritt)',
