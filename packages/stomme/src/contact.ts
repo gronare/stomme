@@ -32,6 +32,18 @@ export const POST: APIRoute = async ({ request, locals, redirect }) => {
 
   if (form.get('bot-field')) return ok({ ok: true }); // honeypot → silently "succeed"
 
+  // Per-IP rate limit: blocks spam bursts and keeps us under Resend's per-second send
+  // limit. Uses the STOMME_RL KV binding on the Pages project; skipped if it isn't bound
+  // (older sites simply don't rate-limit). 5 submissions / 10 min per IP per site.
+  const rlKv = (locals as any)?.runtime?.env?.STOMME_RL;
+  if (rlKv) {
+    const ip = request.headers.get('CF-Connecting-IP') || request.headers.get('x-forwarded-for') || 'unknown';
+    const key = `c:${new URL(request.url).hostname}:${ip}`;
+    const n = Number(await rlKv.get(key)) || 0;
+    if (n >= 5) return fail('Too many messages just now — please try again in a few minutes.', 429);
+    await rlKv.put(key, String(n + 1), { expirationTtl: 600 });
+  }
+
   const cap = (v: FormDataEntryValue | null, n: number) => String(v || '').trim().slice(0, n);
   const name = cap(form.get('name'), 200);
   const email = cap(form.get('email'), 200);
@@ -58,6 +70,7 @@ export const POST: APIRoute = async ({ request, locals, redirect }) => {
     headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
     body: JSON.stringify({ from, to, reply_to: /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email) ? email : undefined, subject, text, tags: [{ name: 'site', value: siteTag }] }),
   });
+  if (res.status === 429) return fail('Too many messages just now — please try again shortly.', 429);
   if (!res.ok) return fail('Could not send your message — please try again.', 502);
 
   return ok({ ok: true });
