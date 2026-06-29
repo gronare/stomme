@@ -345,6 +345,21 @@ export default {
   'Reserved': 'Reserverad',
   'Sold': 'Såld',
 
+  // ── contact form + thank-you ──
+  'Intro / description': 'Intro / beskrivning',
+  'Field label — name': 'Fältetikett — namn',
+  'Field label — email': 'Fältetikett — e-post',
+  'Field label — phone': 'Fältetikett — telefon',
+  'Field label — message': 'Fältetikett — meddelande',
+  'Submit button text': 'Text på skicka-knappen',
+  'Show the direct-contact card': 'Visa direktkontaktkortet',
+  'Opening hours': 'Öppettider',
+  'Thank-you page': 'Tack-sida',
+  'Message': 'Meddelande',
+  'Back-to-home button text': 'Text på tillbaka-knappen',
+  'Show phone/email on the page': 'Visa telefon/e-post på sidan',
+  'A contact form with an optional direct-contact card. Heading, intro, field labels and layout are all editable.': 'Ett kontaktformulär med ett valfritt direktkontaktkort. Rubrik, intro, fältetiketter och layout går att redigera.',
+
   // ── hints ──
   '1 or 2.': '1 eller 2.',
   '2 or 3.': '2 eller 3.',

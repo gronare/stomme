@@ -318,22 +318,23 @@
       note('For-sale item (CatalogPage); shown as a card in the catalog list.'));
   };
 
-  // Thank-you settings pane — the confirmation page as the visitor sees it (mockup style).
+  // Thank-you settings pane — the confirmation as the visitor sees it. Inline-styled
+  // (self-contained, like the other previews) so it doesn't depend on the site stylesheet.
   var ThanksPreview = function (props) {
     var e = props.entry;
     var heading = v(e, 'heading') || "Thanks — it's on its way.";
     var message = v(e, 'message') || "We've got your message and we'll reply within one business day.";
     var button = v(e, 'buttonLabel') || 'Back to home';
-    return h('section', { className: 'section' },
-      h('div', { className: 'contact-sent' },
-        h('div', { className: 'cs-badge' },
-          h('svg', { viewBox: '0 0 56 56' },
-            h('circle', { cx: 28, cy: 28, r: 26 }),
-            h('path', { d: 'M17 29.5 L24.5 37 L40 20' }))),
-        h('p', { className: 'cs-eyebrow' }, 'Message sent'),
-        h('h1', { className: 'cs-head' }, heading),
-        h('p', { className: 'cs-lead' }, message),
-        h('div', { className: 'cs-actions' }, h('a', { className: 'btn', href: '#' }, button))));
+    return h('div', { className: 'bk', style: { padding: '56px 32px', textAlign: 'center' } },
+      h('div', { style: { width: '64px', height: '64px', margin: '0 auto 22px', borderRadius: '999px', display: 'grid', placeItems: 'center', background: 'color-mix(in srgb, ' + cBrand + ' 12%, ' + cPaper + ')', border: '1px solid color-mix(in srgb, ' + cBrand + ' 25%, ' + cPaper + ')' } },
+        h('svg', { width: '30', height: '30', viewBox: '0 0 56 56', fill: 'none', stroke: cBrand, 'stroke-width': '3', 'stroke-linecap': 'round', 'stroke-linejoin': 'round' },
+          h('circle', { cx: '28', cy: '28', r: '26' }),
+          h('path', { d: 'M17 29.5 L24.5 37 L40 20' }))),
+      h('p', { className: 'bk-eyebrow' }, 'Message sent'),
+      h('h1', { className: 'bk-h1', style: { margin: '12px 0 0' } }, heading),
+      h('p', { className: 'bk-intro', style: { margin: '14px auto 0' } }, message),
+      h('div', { style: { marginTop: '24px' } },
+        h('span', { style: { display: 'inline-block', background: cBrand, color: '#fff', fontWeight: 700, padding: '12px 22px', borderRadius: '12px' } }, button)));
   };
 
   // Folder collections register by collection name; FILE collections by file name.
