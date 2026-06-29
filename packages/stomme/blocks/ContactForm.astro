@@ -116,7 +116,7 @@ const thanksData = {
           var badge = el('div', 'cs-badge');
           badge.innerHTML = '<svg viewBox="0 0 56 56" aria-hidden="true"><circle cx="28" cy="28" r="26"/><path d="M17 29.5 L24.5 37 L40 20"/></svg>';
           confirm.appendChild(badge);
-          confirm.appendChild(el('p', 'cs-eyebrow', t.eyebrow || 'Message sent'));
+          confirm.appendChild(el('span', 'mono mono-dot cs-eyebrow', t.eyebrow || 'Message sent'));
           confirm.appendChild(el('h2', 'cs-head', (t.heading || "Thanks{name} — it's on its way.").replace('{name}', name ? ', ' + name : '')));
           confirm.appendChild(el('p', 'cs-lead', t.lead || ''));
           var actions = el('div', 'cs-actions');
