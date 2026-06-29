@@ -207,6 +207,14 @@ export default {
   'Legal links (bottom bar)': 'Juridiska länkar (nedre raden)',
   'A path like /privacy, or a full URL.': 'En sökväg som /integritet, eller en fullständig URL.',
   'Appended to the © line.': 'Läggs till på ©-raden.',
+  // logo (Identity) + header/footer show toggles
+  'Shown in the header and footer (each chooses what to display).': 'Visas i sidhuvud och sidfot (var och en väljer vad som visas).',
+  'Show logo mark': 'Visa logotypmärke',
+  'Show wordmark text': 'Visa ordmärkestext',
+  'Show the logo image (set under Identity) in the header.': 'Visa logotypbilden (anges under Identitet) i sidhuvudet.',
+  'Show the wordmark text (set under Identity) in the header.': 'Visa ordmärkestexten (anges under Identitet) i sidhuvudet.',
+  'Show the logo image (set under Identity) in the footer.': 'Visa logotypbilden (anges under Identitet) i sidfoten.',
+  'Show the wordmark text (set under Identity) in the footer.': 'Visa ordmärkestexten (anges under Identitet) i sidfoten.',
   'Theme colours': 'Temafärger',
   // theme colour fields (role-based labels + hints)
   'Primary': 'Primärfärg',
