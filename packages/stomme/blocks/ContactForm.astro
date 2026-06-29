@@ -1,22 +1,25 @@
 ---
 import { getEntry } from 'astro:content';
 
-// Netlify contact form + a direct-contact aside. Pulls phone/email/name/hq/orgNr
-// from settings. Field labels + success route come from the site config (`site`,
-// forwarded by BlockRenderer); labels default to English. Needs `settings.{phone,
-// phoneE164, email, name, hq, orgNr}` in the consuming site.
-interface Props { site?: any; submitLabel?: string; thanksHeading?: string; thanksMessage?: string }
-const { site, submitLabel, thanksHeading, thanksMessage } = Astro.props;
-const formSuccess = site?.routes?.formSuccess ?? '/thanks';
+// Contact form block — self-contained: heading, intro, field labels, submit text and the
+// direct-contact toggle are all editable on the block. The thank-you copy (inline
+// confirmation + /thanks) is the single source in the "Thank-you" settings, localized.
+interface Props {
+  site?: any; heading?: string; intro?: string;
+  labelName?: string; labelEmail?: string; labelPhone?: string; labelMessage?: string;
+  submitLabel?: string; showDirectContact?: boolean;
+}
+const { site, heading, intro, labelName, labelEmail, labelPhone, labelMessage, submitLabel, showDirectContact } = Astro.props;
 const c = site?.strings?.contact ?? {};
 const L = {
-  name: c.name ?? 'Name',
-  email: c.email ?? 'Email',
-  phone: c.phone ?? 'Phone',
-  message: c.message ?? 'Describe your project',
+  name: labelName || (c.name ?? 'Name'),
+  email: labelEmail || (c.email ?? 'Email'),
+  phone: labelPhone || (c.phone ?? 'Phone'),
+  message: labelMessage || (c.message ?? 'Describe your project'),
   submit: submitLabel || (c.submit ?? 'Send request'),
   direct: c.direct ?? 'Direct contact',
 };
+const showAside = showDirectContact !== false; // default on; off → full-width form
 
 const settings = (await getEntry('settings', 'site'))!.data;
 const contactLine = [settings.name, settings.hq, settings.orgNr && `Org.nr ${settings.orgNr}`]
@@ -27,18 +30,25 @@ const contactLine = [settings.name, settings.hq, settings.orgNr && `Org.nr ${set
 // Falls back to the per-site /api/contact endpoint if the site isn't CMS/gateway-wired.
 const contactAction = site?.cms?.baseUrl ? `${site.cms.baseUrl}/contact` : '/api/contact';
 
-// Confirmation copy (localized via cmsLocale); serialized to the inline script below.
+// Thank-you copy: single source = the "Thank-you" settings (optional), localized fallback.
+const tset: any = (await getEntry('thanks', 'thanks').catch(() => null))?.data ?? {};
 const tk = (site?.strings?.thanks ?? {}) as Record<string, string>;
 const thanksData = {
   eyebrow: tk.eyebrow ?? 'Message sent',
-  heading: thanksHeading || (tk.heading ?? "Thanks{name} — it's on its way."),
-  lead: thanksMessage || (tk.lead ?? "We've got your message and we'll reply within one business day."),
+  heading: tset.heading || (tk.heading ?? "Thanks{name} — it's on its way."),
+  lead: tset.message || (tk.lead ?? "We've got your message and we'll reply within one business day."),
   recapLabel: tk.recapLabel ?? 'What you sent',
   email: L.email, phone: L.phone, message: L.message,
 };
 ---
 <section class="section">
-  <div class="contact-grid">
+  {(heading || intro) && (
+    <div class="contact-head">
+      {heading && <h1 class="contact-h1">{heading}</h1>}
+      {intro && <p class="contact-intro">{intro}</p>}
+    </div>
+  )}
+  <div class:list={['contact-grid', !showAside && 'contact-grid--solo']}>
     <form method="POST" action={contactAction} class="contact-form" data-thanks={JSON.stringify(thanksData)}>
       <p class="hp" aria-hidden="true"><label>Don’t fill this in: <input name="bot-field" tabindex="-1" autocomplete="off" /></label></p>
       <div class="field">
@@ -60,12 +70,15 @@ const thanksData = {
       <button type="submit" class="btn">{L.submit}</button>
     </form>
 
-    <aside class="contact-aside">
-      <span class="mono mono-dot">{L.direct}</span>
-      {settings.phone && <p class="phone"><a href={`tel:${settings.phoneE164}`}>{settings.phone}</a></p>}
-      {settings.email && <p class="email"><a href={`mailto:${settings.email}`}>{settings.email}</a></p>}
-      {contactLine && <p class="mono org">{contactLine}</p>}
-    </aside>
+    {showAside && (
+      <aside class="contact-aside">
+        <span class="mono mono-dot">{L.direct}</span>
+        {settings.phone && <p class="phone"><a href={`tel:${settings.phoneE164}`}>{settings.phone}</a></p>}
+        {settings.email && <p class="email"><a href={`mailto:${settings.email}`}>{settings.email}</a></p>}
+        {settings.openingHours && <p class="hours">{settings.openingHours}</p>}
+        {contactLine && <p class="mono org">{contactLine}</p>}
+      </aside>
+    )}
   </div>
   <script is:inline>
     // Progressive enhancement: submit via fetch and replace the form with a

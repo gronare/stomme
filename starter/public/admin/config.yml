@@ -1508,6 +1508,7 @@ collections:
           - { name: phone, label: "Phone", widget: string, required: false }
           - { name: phoneE164, label: "Phone (tel: link)", widget: string, required: false }
           - { name: email, label: "Email", widget: string, required: false }
+          - { name: openingHours, label: "Opening hours", widget: string, required: false, hint: "e.g. Mon–Fri 08–17. Shown on the contact card." }
           - name: facts
             label: "Facts / stats"
             widget: list
@@ -1694,3 +1695,11 @@ collections:
               - { name: label, label: "Label", widget: string }
               - { name: link, label: "Link", widget: string, hint: "A path like /privacy, or a full URL." }
           - { name: note, label: "Note", widget: string, required: false, hint: "Appended to the © line." }
+      - label: "Thank-you page"
+        name: thanks
+        file: "src/content/thanks/thanks.md"
+        fields:
+          - { name: heading, label: "Heading", widget: string, required: false, hint: "Big confirmation headline. Blank = localized default." }
+          - { name: message, label: "Message", widget: text, required: false, hint: "Reassurance line under the heading. Blank = default." }
+          - { name: buttonLabel, label: "Back-to-home button text", widget: string, required: false }
+          - { name: showContact, label: "Show phone/email on the page", widget: boolean, required: false, default: true }

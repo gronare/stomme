@@ -50,6 +50,7 @@ export function stommeCollections(listings?: Listing[]) {
         orgNr: z.string().default(''),
         founded: z.string().default(''),
         hq: z.string().default(''),
+        openingHours: z.string().default(''),
         facts: z.array(z.object({ label: z.string(), value: z.string() })).default([]),
         partners: z.array(z.string()).default([]),
         partnersLead: z.string().default(''),
@@ -125,6 +126,9 @@ export function stommeCollections(listings?: Listing[]) {
 
     // ── Optional (gated by features for admin/blocks/routes; always defined here) ──
     faq: defineCollection({ loader: md('faq'), schema: z.object({ question: z.string(), answer: z.string(), order: z.number().default(0) }) }),
+    // Contact-form confirmation copy (the "Thank-you" settings pane + /thanks page). All
+    // optional — blank falls back to the localized defaults.
+    thanks: defineCollection({ loader: md('thanks'), schema: z.object({ heading: z.string().optional(), message: z.string().optional(), buttonLabel: z.string().optional(), showContact: z.boolean().default(true) }) }),
 
     testimonials: defineCollection({ loader: md('testimonials'), schema: z.object({ name: z.string(), role: z.string().default(''), quote: z.string(), order: z.number().default(0) }) }),
 

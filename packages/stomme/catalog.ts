@@ -364,12 +364,17 @@ export const defaultBlocks: BlockDef[] = [
   },
   { type: 'logoStrip', label: 'Logo strip', group: 'Automatic', summary: 'Logo / partner strip, filled automatically from settings.', shape: 'auto', fields: [] },
   {
-    type: 'contactForm', label: 'Contact form', group: 'Automatic',
-    summary: 'Contact form — edit the submit button + confirmation copy here.', shape: 'auto',
+    type: 'contactForm', label: 'Contact form', group: 'Calls to action',
+    summary: 'A contact form with an optional direct-contact card. Heading, intro, field labels and layout are all editable.', shape: 'band',
     fields: [
+      { name: 'heading', label: 'Heading', widget: 'string', required: false, hint: 'Blank uses the page title.' },
+      { name: 'intro', label: 'Intro / description', widget: 'text', required: false },
+      { name: 'labelName', label: 'Field label — name', widget: 'string', required: false },
+      { name: 'labelEmail', label: 'Field label — email', widget: 'string', required: false },
+      { name: 'labelPhone', label: 'Field label — phone', widget: 'string', required: false },
+      { name: 'labelMessage', label: 'Field label — message', widget: 'string', required: false, hint: 'e.g. "What can we help you with?" — word it for your business.' },
       { name: 'submitLabel', label: 'Submit button text', widget: 'string', required: false, hint: 'Blank uses the localized default ("Send request").' },
-      { name: 'thanksHeading', label: 'Thank-you heading', widget: 'string', required: false, hint: 'Shown after the form is sent. Blank = localized default.' },
-      { name: 'thanksMessage', label: 'Thank-you message', widget: 'text', required: false, hint: 'Reassurance line under the heading. Blank = default.' },
+      { name: 'showDirectContact', label: 'Show the direct-contact card', widget: 'boolean', required: false, default: true, hint: 'Off → the form fills the width (no phone/email card).' },
     ],
   },
 ];

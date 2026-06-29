@@ -318,6 +318,24 @@
       note('For-sale item (CatalogPage); shown as a card in the catalog list.'));
   };
 
+  // Thank-you settings pane — the confirmation page as the visitor sees it (mockup style).
+  var ThanksPreview = function (props) {
+    var e = props.entry;
+    var heading = v(e, 'heading') || "Thanks — it's on its way.";
+    var message = v(e, 'message') || "We've got your message and we'll reply within one business day.";
+    var button = v(e, 'buttonLabel') || 'Back to home';
+    return h('section', { className: 'section' },
+      h('div', { className: 'contact-sent' },
+        h('div', { className: 'cs-badge' },
+          h('svg', { viewBox: '0 0 56 56' },
+            h('circle', { cx: 28, cy: 28, r: 26 }),
+            h('path', { d: 'M17 29.5 L24.5 37 L40 20' }))),
+        h('p', { className: 'cs-eyebrow' }, 'Message sent'),
+        h('h1', { className: 'cs-head' }, heading),
+        h('p', { className: 'cs-lead' }, message),
+        h('div', { className: 'cs-actions' }, h('a', { className: 'btn', href: '#' }, button))));
+  };
+
   // Folder collections register by collection name; FILE collections by file name.
   window.CMS.registerPreviewTemplate('home', PagePreview);
   window.CMS.registerPreviewTemplate('pages', PagePreview);
@@ -330,6 +348,7 @@
   window.CMS.registerPreviewTemplate('theme', ThemePreview);
   window.CMS.registerPreviewTemplate('nav', HeaderPreview);
   window.CMS.registerPreviewTemplate('footer', FooterPreview);
+  window.CMS.registerPreviewTemplate('thanks', ThanksPreview);
 
   // Config-defined listing collections (news / for-sale / …) get the matching preset
   // preview. stomme-gen appends stommeRegisterListing(id, preset, specs) calls for this
