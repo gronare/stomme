@@ -118,47 +118,92 @@ export function resolveListings(l?: Listing[]): (Omit<Listing, 'specs'> & { spec
     .map((x) => ({ ...x, route: x.route.startsWith('/') ? x.route : `/${x.route}`, specs: resolveSpecs(x.specs) }));
 }
 
+// Per-language site-string defaults. English is the base; other locales override only
+// the keys they translate (anything omitted falls back to English). A site's
+// `config.strings` still overrides all of this. Contact labels mirror ContactForm.astro's
+// own English fallbacks, so English sites are unaffected.
+const STRINGS_EN = {
+  readMore: 'Read more',
+  latest: 'Latest',
+  contact: { name: 'Name', email: 'Email', phone: 'Phone', message: 'Describe your project', submit: 'Send request', direct: 'Direct contact' },
+  town: {
+    eyebrow: 'Local service: {name}',
+    heading: '{name}',
+    cta: 'Get a quote',
+    whyHeading: 'Why choose us in {name}?',
+    problemsHeading: 'Common problems we solve',
+    districtsHeading: 'Where we work in {name}',
+    caseHeading: 'Local case',
+    reasons: [] as { title: string; body: string }[],
+    servicesHeading: 'Our services in {name}',
+    servicesCta: 'Contact us today',
+  },
+  service: { eyebrow: 'Service', quoteEyebrow: 'Free quote', quoteHeading: 'Want to know what it costs?', cta: 'Get a quote' },
+  listingStatus: { available: 'Available', reserved: 'Reserved', sold: 'Sold', all: 'All' },
+  listingCta: 'Contact us',
+};
+
+const STRINGS_SV: typeof STRINGS_EN = {
+  readMore: 'Läs mer',
+  latest: 'Senaste',
+  contact: { name: 'Namn', email: 'E-post', phone: 'Telefon', message: 'Beskriv ditt projekt', submit: 'Skicka förfrågan', direct: 'Direktkontakt' },
+  town: {
+    eyebrow: 'Lokal tjänst: {name}',
+    heading: '{name}',
+    cta: 'Begär offert',
+    whyHeading: 'Varför välja oss i {name}?',
+    problemsHeading: 'Vanliga problem vi löser',
+    districtsHeading: 'Var vi arbetar i {name}',
+    caseHeading: 'Lokalt exempel',
+    reasons: [],
+    servicesHeading: 'Våra tjänster i {name}',
+    servicesCta: 'Kontakta oss idag',
+  },
+  service: { eyebrow: 'Tjänst', quoteEyebrow: 'Kostnadsfri offert', quoteHeading: 'Vill du veta vad det kostar?', cta: 'Begär offert' },
+  listingStatus: { available: 'Tillgänglig', reserved: 'Reserverad', sold: 'Såld', all: 'Alla' },
+  listingCta: 'Kontakta oss',
+};
+
+const STRINGS_BY_LANG: Record<string, typeof STRINGS_EN> = { en: STRINGS_EN, sv: STRINGS_SV };
+
+// Pick the base string set for a locale, deep-merged onto English so a partially
+// translated locale (or an unknown one) always falls back to English.
+function baseStrings(cmsLocale?: string, locale?: string) {
+  const lang = String(cmsLocale || locale || 'en').split(/[-_]/)[0].toLowerCase();
+  const b = STRINGS_BY_LANG[lang] || STRINGS_EN;
+  return {
+    ...STRINGS_EN, ...b,
+    contact: { ...STRINGS_EN.contact, ...b.contact },
+    town: { ...STRINGS_EN.town, ...b.town },
+    service: { ...STRINGS_EN.service, ...b.service },
+    listingStatus: { ...STRINGS_EN.listingStatus, ...b.listingStatus },
+  };
+}
+
 export const SITE_DEFAULTS = {
   routes: { services: '/services', towns: '/areas', blog: '/blog', contact: '/contact', formSuccess: '/thanks' },
   locale: 'en-US',
   cmsLocale: 'en',
-  strings: {
-    readMore: 'Read more',
-    latest: 'Latest',
-    town: {
-      eyebrow: 'Local service: {name}',
-      heading: '{name}',
-      cta: 'Get a quote',
-      whyHeading: 'Why choose us in {name}?',
-      problemsHeading: 'Common problems we solve',
-      districtsHeading: 'Where we work in {name}',
-      caseHeading: 'Local case',
-      reasons: [] as { title: string; body: string }[],
-      servicesHeading: 'Our services in {name}',
-      servicesCta: 'Contact us today',
-    },
-    service: { eyebrow: 'Service', quoteEyebrow: 'Free quote', quoteHeading: 'Want to know what it costs?', cta: 'Get a quote' },
-    listingStatus: { available: 'Available', reserved: 'Reserved', sold: 'Sold', all: 'All' },
-    listingCta: 'Contact us',
-  },
+  strings: STRINGS_EN,
 };
 
 export function resolveSite(c?: SiteConfig) {
   const s = c && c.strings;
+  const base = baseStrings(c && c.cmsLocale, c && c.locale);
   return {
     routes: { ...SITE_DEFAULTS.routes, ...(c && c.routes) },
     locale: (c && c.locale) || SITE_DEFAULTS.locale,
     cmsLocale: (c && c.cmsLocale) || SITE_DEFAULTS.cmsLocale,
     strings: {
-      ...SITE_DEFAULTS.strings,
+      ...base,
       ...s,
       // Deep-merge the nested string groups so a site can override one key
       // without having to re-supply the whole group.
-      contact: { ...(s && s.contact) },
-      town: { ...SITE_DEFAULTS.strings.town, ...(s && s.town) },
-      service: { ...SITE_DEFAULTS.strings.service, ...(s && s.service) },
-      listingStatus: { ...SITE_DEFAULTS.strings.listingStatus, ...(s && s.listingStatus) },
-      listingCta: (s && s.listingCta) || SITE_DEFAULTS.strings.listingCta,
+      contact: { ...base.contact, ...(s && s.contact) },
+      town: { ...base.town, ...(s && s.town) },
+      service: { ...base.service, ...(s && s.service) },
+      listingStatus: { ...base.listingStatus, ...(s && s.listingStatus) },
+      listingCta: (s && s.listingCta) || base.listingCta,
     },
     listings: resolveListings(c && c.listings),
   };
