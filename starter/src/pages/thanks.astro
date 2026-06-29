@@ -1,9 +1,10 @@
 ---
-// Contact-form success page (no-JS fallback for /thanks). Engine-rendered in the refreshed
-// confirmation style from the "Thank-you" settings (localized fallback) — NOT a CMS Page.
+// Contact-form success page (no-JS fallback for /thanks). Renders the shared Thanks component
+// from the "Thank-you" settings (localized fallback) — the same component the CMS preview shows.
 import Base from '../layouts/Base.astro';
 import { getEntry } from 'astro:content';
 import { resolveSite } from '@gronare/stomme/config';
+import Thanks from '@gronare/stomme/Thanks.astro';
 import { site as siteConfig } from '../site.config';
 
 const site = resolveSite(siteConfig);
@@ -16,16 +17,16 @@ const button = ts.buttonLabel || t.home;
 const showContact = ts.showContact !== false;
 ---
 <Base title="Thank you" description={message}>
-  <section class="section">
-    <div class="contact-sent">
-      <div class="cs-badge"><svg viewBox="0 0 56 56" aria-hidden="true"><circle cx="28" cy="28" r="26"></circle><path d="M17 29.5 L24.5 37 L40 20"></path></svg></div>
-      <p class="cs-eyebrow">{t.eyebrow}</p>
-      <h1 class="cs-head">{heading}</h1>
-      <p class="cs-lead">{message}</p>
-      <div class="cs-actions"><a class="btn" href="/">{button}</a></div>
-      {showContact && settings.phone && (
-        <p class="cs-lead">{site.strings.contact.direct}: <a href={`tel:${settings.phoneE164}`}>{settings.phone}</a></p>
-      )}
-    </div>
-  </section>
+  <Thanks
+    eyebrow={t.eyebrow}
+    heading={heading}
+    message={message}
+    button={button}
+    showContact={showContact}
+    directLabel={site.strings.contact.direct}
+    phone={settings.phone}
+    phoneE164={settings.phoneE164}
+    email={settings.email}
+    hours={settings.openingHours}
+  />
 </Base>

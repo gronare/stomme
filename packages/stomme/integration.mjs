@@ -31,10 +31,12 @@ function previewEntrypoint(isStatic) {
 export const prerender = ${isStatic ? 'true' : 'false'};
 import Base from '@stomme/base';
 import { site } from '@stomme/config';
-import { getCollection } from 'astro:content';
+import { getCollection, getEntry } from 'astro:content';
+import { resolveSite } from '@gronare/stomme/config';
 import BlockRenderer from '@gronare/stomme/BlockRenderer.astro';
 import Header from '@gronare/stomme/Header.astro';
 import Footer from '@gronare/stomme/Footer.astro';
+import Thanks from '@gronare/stomme/Thanks.astro';
 
 const kind = Astro.url.searchParams.get('kind');
 const raw = Astro.url.searchParams.get('data');
@@ -51,11 +53,35 @@ const footerDraft = kind === 'footer' && draft && typeof draft === 'object' ? dr
 const towns = kind === 'footer'
   ? (await getCollection('towns')).sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0)).map((t) => ({ id: t.id, name: t.data.name }))
   : [];
+
+// Thank-you: render the real Thanks component with the draft copy over the localized
+// defaults + the site's contact settings, so the preview matches the live /thanks page.
+let thanks = null;
+if (kind === 'thanks') {
+  const rs = resolveSite(site);
+  const t = rs.strings.thanks;
+  const td = draft && typeof draft === 'object' ? draft : {};
+  const settings = (await getEntry('settings', 'site'))?.data ?? {};
+  thanks = {
+    eyebrow: t.eyebrow,
+    heading: td.heading || t.heading.replace('{name}', ''),
+    message: td.message || t.lead,
+    button: td.buttonLabel || t.home,
+    showContact: td.showContact !== false,
+    directLabel: rs.strings.contact.direct,
+    phone: settings.phone,
+    phoneE164: settings.phoneE164,
+    email: settings.email,
+    hours: settings.openingHours,
+  };
+}
 ---
 {kind === 'header' ? (
   <Base title="Preview" chrome={false}><Header nav={navDraft} /></Base>
 ) : kind === 'footer' ? (
   <Base title="Preview" chrome={false}><Footer footer={footerDraft} towns={towns} townsHref={site.routes?.towns ?? '/areas'} /></Base>
+) : kind === 'thanks' ? (
+  <Base title="Preview"><Thanks {...thanks} /></Base>
 ) : (
   <Base title="Preview"><div id="preview-root"><BlockRenderer blocks={blocks} config={site} /></div></Base>
 )}
