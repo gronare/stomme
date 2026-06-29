@@ -306,6 +306,28 @@ function emitNavLinks(indent) {
   return [emitField(items, indent), emitField(cta, indent)].join('\n');
 }
 
+// ── Thank-you page buttons (generated) ──────────────────────────────────────
+// The /thanks confirmation has a primary + optional second button. Each uses the same
+// page-dropdown ($pages) + custom-URL override as nav links, so the destination is a
+// real picker, not a free string. Resolve at render via resolveLink (stomme/href).
+function linkObjectField(name, label) {
+  return {
+    name, label, widget: 'object', required: false, fields: [
+      { name: 'page', label: 'Page', widget: 'select', options: '$pages', required: false, hint: 'Pick a page on the site.' },
+      { name: 'url', label: '…or a custom URL', widget: 'string', required: false, hint: 'External link, tel: or mailto: — overrides the page above.' },
+    ],
+  };
+}
+function emitThanksButtons(indent) {
+  const fields = [
+    { name: 'buttonLabel', label: 'Primary button text', widget: 'string', required: false, hint: 'Blank = localized default ("Back to home").' },
+    linkObjectField('button', 'Primary button link'),
+    { name: 'button2Label', label: 'Second button text (optional)', widget: 'string', required: false, hint: 'Leave blank for a single button.' },
+    linkObjectField('button2', 'Second button link'),
+  ];
+  return fields.map((f) => emitField(f, indent)).join('\n');
+}
+
 // ── Collection editors ──────────────────────────────────────────────────────
 // Decap editor sections for the conventional content collections. Emitted (gated
 // by collectionExists) into the `# >>> collections:generated` region so the CMS
@@ -480,7 +502,7 @@ function emitCms(indent) {
   return L.join('\n');
 }
 
-const EMITTERS = { blocks: emitWidget, collections: emitCollections, navlinks: emitNavLinks, cms: emitCms };
+const EMITTERS = { blocks: emitWidget, collections: emitCollections, navlinks: emitNavLinks, thanksbuttons: emitThanksButtons, cms: emitCms };
 
 // Fill every `# >>> NAME:generated … # <<< NAME:generated` region (idempotent).
 const lines = readFileSync(configPath, 'utf8').split('\n');

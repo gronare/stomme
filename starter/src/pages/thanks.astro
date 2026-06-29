@@ -6,6 +6,7 @@
 import Base from '../layouts/Base.astro';
 import { getEntry } from 'astro:content';
 import { resolveSite } from '@gronare/stomme/config';
+import { resolveLink } from '@gronare/stomme/href';
 import Thanks from '@gronare/stomme/Thanks.astro';
 import { site as siteConfig } from '../site.config';
 
@@ -20,9 +21,9 @@ const ts: any = (await getEntry('thanks', 'thanks').catch(() => null))?.data ?? 
     heading={ts.heading || t.heading.replace('{name}', '')}
     message={ts.message || t.lead}
     primaryLabel={ts.buttonLabel || t.home}
-    primaryHref={ts.buttonHref || '/'}
+    primaryHref={resolveLink(ts.button, '/')}
     secondaryLabel={ts.button2Label}
-    secondaryHref={ts.button2Href || '/'}
+    secondaryHref={resolveLink(ts.button2, '/')}
     showContact={ts.showContact !== false}
     talkLabel={t.talkLabel}
     phone={settings.phone}

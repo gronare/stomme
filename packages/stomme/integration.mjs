@@ -33,6 +33,7 @@ import Base from '@stomme/base';
 import { site } from '@stomme/config';
 import { getCollection, getEntry } from 'astro:content';
 import { resolveSite } from '@gronare/stomme/config';
+import { resolveLink } from '@gronare/stomme/href';
 import BlockRenderer from '@gronare/stomme/BlockRenderer.astro';
 import Header from '@gronare/stomme/Header.astro';
 import Footer from '@gronare/stomme/Footer.astro';
@@ -69,9 +70,9 @@ if (kind === 'thanks') {
     heading: td.heading || t.heading.replace('{name}', ''),
     message: td.message || t.lead,
     primaryLabel: td.buttonLabel || t.home,
-    primaryHref: td.buttonHref || '/',
+    primaryHref: resolveLink(td.button, '/'),
     secondaryLabel: td.button2Label || '',
-    secondaryHref: td.button2Href || '/',
+    secondaryHref: resolveLink(td.button2, '/'),
     recapLabel: t.recapLabel,
     recap: {
       emailLabel: c.email, email: settings.email || 'name@example.com',

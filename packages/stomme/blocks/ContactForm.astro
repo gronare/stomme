@@ -1,5 +1,6 @@
 ---
 import { getEntry } from 'astro:content';
+import { resolveLink } from '../src/href';
 
 // Contact form block — self-contained: heading, intro, field labels, submit text and the
 // direct-contact toggle are all editable on the block. The thank-you copy (inline
@@ -39,9 +40,9 @@ const thanksData = {
   heading: tset.heading || (tk.heading ?? "Thanks{name} — it's on its way."),
   lead: tset.message || (tk.lead ?? "We've got your message and we'll reply within one business day."),
   primaryLabel: tset.buttonLabel || (tk.home ?? 'Back to home'),
-  primaryHref: tset.buttonHref || '/',
+  primaryHref: resolveLink(tset.button, '/'),
   secondaryLabel: tset.button2Label || '',
-  secondaryHref: tset.button2Href || '/',
+  secondaryHref: resolveLink(tset.button2, '/'),
   recapLabel: tk.recapLabel ?? 'What you sent',
   talkLabel: tk.talkLabel ?? 'Prefer to talk?',
   emailLabel: L.email, phoneLabel: L.phone, messageLabel: L.message,
