@@ -118,14 +118,14 @@ const thanksData = {
           var name = (fd.get('name') || '').trim();
 
           var confirm = el('div', 'thanks-confirm');
-          var badge = el('div', 'cs-badge');
+          var badge = el('div', 'confirm-badge');
           badge.innerHTML = '<svg viewBox="0 0 56 56" aria-hidden="true"><circle cx="28" cy="28" r="26"/><path d="M17 29.5 L24.5 37 L40 20"/></svg>';
           confirm.appendChild(badge);
-          confirm.appendChild(el('span', 'mono eyebrow cs-eyebrow', t.eyebrow || 'Message sent'));
-          if (t.heading) confirm.appendChild(el('h2', 'cs-head', t.heading.replace('{name}', name ? ', ' + name : '')));
-          if (t.lead) confirm.appendChild(el('p', 'cs-lead', t.lead));
+          confirm.appendChild(el('span', 'mono eyebrow confirm-eyebrow', t.eyebrow || 'Message sent'));
+          if (t.heading) confirm.appendChild(el('h2', 'confirm-head', t.heading.replace('{name}', name ? ', ' + name : '')));
+          if (t.lead) confirm.appendChild(el('p', 'confirm-lead', t.lead));
           if (t.primaryLabel || t.secondaryLabel) {
-            var actions = el('div', 'cs-actions');
+            var actions = el('div', 'confirm-actions');
             if (t.primaryLabel) { var primary = el('a', 'btn', t.primaryLabel); primary.href = t.primaryHref || '/'; actions.appendChild(primary); }
             if (t.secondaryLabel) { var sec = el('a', 'btn btn-ghost', t.secondaryLabel); sec.href = t.secondaryHref || '/'; actions.appendChild(sec); }
             confirm.appendChild(actions);
@@ -134,15 +134,15 @@ const thanksData = {
           var hasDirect = t.showContact !== false && (d.phone || d.email);
           var cols = el('div', 'thanks-cols' + (hasDirect ? '' : ' thanks-cols--solo'));
 
-          var recap = el('section', 'cs-card');
-          recap.appendChild(el('p', 'mono eyebrow cs-label', t.recapLabel || 'What you sent'));
-          var dl = el('dl', 'cs-recap-dl');
+          var recap = el('section', 'confirm-card');
+          recap.appendChild(el('p', 'mono eyebrow confirm-label', t.recapLabel || 'What you sent'));
+          var dl = el('dl', 'confirm-recap-dl');
           [[t.emailLabel || 'Email', fd.get('email')], [t.phoneLabel || 'Phone', fd.get('phone')]].forEach(function (row) {
             if (!row[1]) return;
             dl.appendChild(el('dt', null, row[0])); dl.appendChild(el('dd', null, row[1]));
           });
           if (fd.get('message')) {
-            var msgWrap = el('div', 'cs-msg');
+            var msgWrap = el('div', 'confirm-msg');
             msgWrap.appendChild(el('dt', null, t.messageLabel || 'Message'));
             msgWrap.appendChild(el('dd', null, fd.get('message')));
             dl.appendChild(msgWrap);
