@@ -5,8 +5,8 @@ import { getEntry } from 'astro:content';
 // from settings. Field labels + success route come from the site config (`site`,
 // forwarded by BlockRenderer); labels default to English. Needs `settings.{phone,
 // phoneE164, email, name, hq, orgNr}` in the consuming site.
-interface Props { site?: any }
-const { site } = Astro.props;
+interface Props { site?: any; submitLabel?: string; thanksHeading?: string; thanksMessage?: string }
+const { site, submitLabel, thanksHeading, thanksMessage } = Astro.props;
 const formSuccess = site?.routes?.formSuccess ?? '/thanks';
 const c = site?.strings?.contact ?? {};
 const L = {
@@ -14,7 +14,7 @@ const L = {
   email: c.email ?? 'Email',
   phone: c.phone ?? 'Phone',
   message: c.message ?? 'Describe your project',
-  submit: c.submit ?? 'Send request',
+  submit: submitLabel || (c.submit ?? 'Send request'),
   direct: c.direct ?? 'Direct contact',
 };
 
@@ -31,8 +31,8 @@ const contactAction = site?.cms?.baseUrl ? `${site.cms.baseUrl}/contact` : '/api
 const tk = (site?.strings?.thanks ?? {}) as Record<string, string>;
 const thanksData = {
   eyebrow: tk.eyebrow ?? 'Message sent',
-  heading: settings.thanksHeading || (tk.heading ?? "Thanks{name} — it's on its way."),
-  lead: settings.thanksMessage || (tk.lead ?? "We've got your message and we'll reply within one business day."),
+  heading: thanksHeading || (tk.heading ?? "Thanks{name} — it's on its way."),
+  lead: thanksMessage || (tk.lead ?? "We've got your message and we'll reply within one business day."),
   recapLabel: tk.recapLabel ?? 'What you sent',
   email: L.email, phone: L.phone, message: L.message,
 };

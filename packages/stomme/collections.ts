@@ -58,9 +58,6 @@ export function stommeCollections(listings?: Listing[]) {
         // PNG (180×180); optional.
         favicon: z.string().optional(),
         appleIcon: z.string().optional(),
-        // Contact-form confirmation overrides — blank uses the localized defaults.
-        thanksHeading: z.string().optional(),
-        thanksMessage: z.string().optional(),
       }),
     }),
 

@@ -363,5 +363,13 @@ export const defaultBlocks: BlockDef[] = [
     ],
   },
   { type: 'logoStrip', label: 'Logo strip', group: 'Automatic', summary: 'Logo / partner strip, filled automatically from settings.', shape: 'auto', fields: [] },
-  { type: 'contactForm', label: 'Contact form', group: 'Automatic', summary: 'Contact form, rendered automatically.', shape: 'auto', fields: [] },
+  {
+    type: 'contactForm', label: 'Contact form', group: 'Automatic',
+    summary: 'Contact form — edit the submit button + confirmation copy here.', shape: 'auto',
+    fields: [
+      { name: 'submitLabel', label: 'Submit button text', widget: 'string', required: false, hint: 'Blank uses the localized default ("Send request").' },
+      { name: 'thanksHeading', label: 'Thank-you heading', widget: 'string', required: false, hint: 'Shown after the form is sent. Blank = localized default.' },
+      { name: 'thanksMessage', label: 'Thank-you message', widget: 'text', required: false, hint: 'Reassurance line under the heading. Blank = default.' },
+    ],
+  },
 ];
