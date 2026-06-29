@@ -550,6 +550,47 @@ try {
   console.warn('  (stomme-previews.js copy skipped:', e.message + ')');
 }
 
+// Same-window auth handoff for /admin. Browsers that open the login in the current tab
+// instead of a popup (Arc, some mobile) have no live window.opener to receive the token,
+// so the gateway redirects back to /admin with the token in the URL fragment. This shim
+// persists it the way Decap does and reloads. It MUST run before the Decap bundle (whose
+// hash router would otherwise consume the fragment), so it's injected into <head>.
+// Managed here (idempotent via the markers) so every site gets it — and stays current —
+// on build, rather than living as a hand-edited per-site file.
+const AUTH_SHIM = `      (function () {
+        try {
+          var m = (location.hash || '').match(/stomme_cms_token=([^&]+)/);
+          if (!m) return;
+          var token = decodeURIComponent(m[1]);
+          if (!token) return;
+          var email = '';
+          try {
+            var b = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+            b += '==='.slice((b.length + 3) % 4);
+            email = (JSON.parse(atob(b)) || {}).email || '';
+          } catch (e) {}
+          localStorage.setItem('decap-cms-user', JSON.stringify({ name: email, login: email, email: email, token: token, backendName: 'github' }));
+          history.replaceState(null, '', location.pathname + location.search);
+          location.reload();
+        } catch (e) {}
+      })();`;
+try {
+  const indexPath = resolve(root, 'public/admin/index.html');
+  let html = readFileSync(indexPath, 'utf8');
+  const START = '<!-- >>> stomme-auth:generated (managed by stomme-gen — do not edit) -->';
+  const END = '<!-- <<< stomme-auth:generated -->';
+  const region = `${START}\n    <script>\n${AUTH_SHIM}\n    </script>\n    ${END}`;
+  const s = html.indexOf(START), e = html.indexOf(END);
+  if (s !== -1 && e !== -1) {
+    html = html.slice(0, s) + region + html.slice(e + END.length); // refresh in place
+  } else if (html.includes('</head>')) {
+    html = html.replace('</head>', `    ${region}\n  </head>`); // inject once
+  }
+  writeFileSync(indexPath, html);
+} catch (e) {
+  console.warn('  (admin auth shim skipped:', e.message + ')');
+}
+
 // Resolve the site's stylesheet (inline the library @import) into the admin so the
 // CMS preview mockups reflect the site theme — tokens AND any class overrides the
 // site adds. previews.js loads it via registerPreviewStyle('/admin/stomme-site.css').

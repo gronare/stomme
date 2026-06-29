@@ -4,29 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Content Manager</title>
-    <script>
-      // Same-window auth handoff — MUST run before Decap loads (Decap's hash router would
-      // otherwise consume the token in the URL fragment first). Browsers that open the
-      // login in the same window/tab (Arc etc.) get the token redirected back here by the
-      // gateway; persist it the way Decap does and reload so Decap restores the session.
-      (function () {
-        try {
-          var m = (location.hash || '').match(/stomme_cms_token=([^&]+)/);
-          if (!m) return;
-          var token = decodeURIComponent(m[1]);
-          if (!token) return;
-          var email = '';
-          try {
-            var b = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
-            b += '==='.slice((b.length + 3) % 4);
-            email = (JSON.parse(atob(b)) || {}).email || '';
-          } catch (e) {}
-          localStorage.setItem('decap-cms-user', JSON.stringify({ name: email, login: email, email: email, token: token, backendName: 'github' }));
-          history.replaceState(null, '', location.pathname + location.search);
-          location.reload();
-        } catch (e) {}
-      })();
-    </script>
+    <!-- stomme-gen injects the same-window auth handoff shim here (before the Decap bundle). -->
   </head>
   <body>
     <script src="https://unpkg.com/decap-cms@^3.8.4/dist/decap-cms.js"></script>
