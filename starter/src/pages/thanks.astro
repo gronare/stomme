@@ -20,10 +20,10 @@ const ts: any = (await getEntry('thanks', 'thanks').catch(() => null))?.data ?? 
     eyebrow={t.eyebrow}
     heading={ts.heading || t.heading.replace('{name}', '')}
     message={ts.message || t.lead}
-    primaryLabel={ts.buttonLabel || t.home}
-    primaryHref={resolveLink(ts.button, '/')}
-    secondaryLabel={ts.button2Label}
-    secondaryHref={resolveLink(ts.button2, '/')}
+    primaryLabel={ts.button?.label || t.home}
+    primaryHref={resolveLink(ts.button?.link, '/')}
+    secondaryLabel={ts.button2?.label}
+    secondaryHref={resolveLink(ts.button2?.link, '/')}
     showContact={ts.showContact !== false}
     talkLabel={t.talkLabel}
     phone={settings.phone}

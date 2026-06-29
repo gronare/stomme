@@ -117,7 +117,7 @@ function collectionOptions(dir, routePrefix, labelKey) {
 }
 
 function pageRouteOptions() {
-  const opts = [{ label: 'Startsida (/)', value: '/' }];
+  const opts = [{ label: 'Home (/)', value: '/' }];
   let files = [];
   try {
     files = readdirSync(resolve(root, 'src/content/pages')).filter((f) => f.endsWith('.md'));
@@ -307,25 +307,23 @@ function emitNavLinks(indent) {
 }
 
 // ── Thank-you page buttons (generated) ──────────────────────────────────────
-// The /thanks confirmation has a primary + optional second button. Each uses the same
-// page-dropdown ($pages) + custom-URL override as nav links, so the destination is a
-// real picker, not a free string. Resolve at render via resolveLink (stomme/href).
-function linkObjectField(name, label) {
+// The /thanks confirmation has a primary + optional second button. Each is a Button object
+// { label, link } — the SAME shape as the header CTA (reuses navLinkField), so the editor
+// is consistent: a Label + a Link with a page-dropdown ($pages) + custom-URL override.
+// Resolve at render via resolveLink (stomme/href).
+function buttonField(name, label, labelHint) {
   return {
     name, label, widget: 'object', required: false, fields: [
-      { name: 'page', label: 'Page', widget: 'select', options: '$pages', required: false, hint: 'Pick a page on the site.' },
-      { name: 'url', label: '…or a custom URL', widget: 'string', required: false, hint: 'External link, tel: or mailto: — overrides the page above.' },
+      { name: 'label', label: 'Label', widget: 'string', required: false, hint: labelHint },
+      navLinkField(),
     ],
   };
 }
 function emitThanksButtons(indent) {
-  const fields = [
-    { name: 'buttonLabel', label: 'Primary button text', widget: 'string', required: false, hint: 'Blank = localized default ("Back to home").' },
-    linkObjectField('button', 'Primary button link'),
-    { name: 'button2Label', label: 'Second button text (optional)', widget: 'string', required: false, hint: 'Leave blank for a single button.' },
-    linkObjectField('button2', 'Second button link'),
-  ];
-  return fields.map((f) => emitField(f, indent)).join('\n');
+  return [
+    emitField(buttonField('button', 'Primary button', 'Blank = localized default ("Back to home").'), indent),
+    emitField(buttonField('button2', 'Second button (optional)', 'Leave blank for a single button.'), indent),
+  ].join('\n');
 }
 
 // ── Collection editors ──────────────────────────────────────────────────────
