@@ -235,9 +235,34 @@
   };
   var HeaderPreview = ChromePreview('header');
   var FooterPreview = ChromePreview('footer');
-  // Site & contact → render the real direct-contact card (via /preview?kind=settings) from
-  // the draft name/phone/email/hours, so the preview shows where these fields actually appear.
-  var SettingsPreview = ChromePreview('settings');
+
+  var nested = function (e, a, b) { var x = e.getIn(['data', a, b]); return x == null ? '' : x; };
+  // Identity — name + logo wordmark + the SEO description (inline, like the theme pane).
+  var IdentityPreview = function (props) {
+    var e = props.entry;
+    var name = v(e, 'name') || 'Site name';
+    var pre = nested(e, 'logo', 'textPre'), accent = nested(e, 'logo', 'textAccent');
+    var desc = v(e, 'description');
+    return h('div', { className: 'bk' },
+      h('div', { style: { fontFamily: 'var(--bk-font-display,' + SANS + ')', fontWeight: 800, fontSize: '1.7rem', letterSpacing: '-.02em' } },
+        (pre || name), accent ? h('span', { style: { color: cBrand } }, accent) : null),
+      desc ? h('p', { className: 'bk-intro', style: { margin: '12px 0 0' } }, desc) : null,
+      note('Logo + name appear in the header and footer; the description is the default SEO text.'));
+  };
+  // Contact — the direct-contact card look (contact page + form confirmation + footer line).
+  var ContactPreview = function (props) {
+    var e = props.entry;
+    var phone = v(e, 'phone'), email = v(e, 'email'), hours = v(e, 'openingHours');
+    var org = [v(e, 'hq'), v(e, 'orgNr') ? 'Org.nr ' + v(e, 'orgNr') : ''].filter(Boolean).join('  ·  ');
+    return h('div', { className: 'bk' },
+      h('div', { style: { maxWidth: '420px', border: '1px solid ' + cLine, borderRadius: '18px', padding: '1.6rem 1.8rem', background: 'color-mix(in srgb, ' + cBrand + ' 7%, ' + cPaper + ')' } },
+        h('p', { className: 'bk-eyebrow' }, 'Direct contact'),
+        phone ? h('p', { style: { fontFamily: 'var(--bk-font-display,' + SANS + ')', fontSize: '1.5rem', fontWeight: 800, color: cBrand, margin: 0 } }, phone) : null,
+        email ? h('p', { style: { fontWeight: 600, margin: '.5rem 0 0' } }, email) : null,
+        hours ? h('p', { style: { color: cMuted, fontSize: '.92rem', margin: '1rem 0 0' } }, hours) : null,
+        org ? h('p', { style: { fontFamily: fMono, fontSize: '.7rem', letterSpacing: '.14em', textTransform: 'uppercase', color: cMuted, margin: '1.4rem 0 0' } }, org) : null),
+      note('The direct-contact card (contact page + form confirmation) and the footer contact line.'));
+  };
 
   var arr = function (e, k) { var x = e.getIn(['data', k]); x = x && x.toJS ? x.toJS() : x; return Array.isArray(x) ? x : []; };
   var chipRow = function (items) { return h('div', { className: 'bk-chips' }, items.map(function (s, i) { return h('span', { className: 'bk-chip', key: i }, s); })); };
@@ -317,7 +342,8 @@
   window.CMS.registerPreviewTemplate('towns', TownPreview);
   window.CMS.registerPreviewTemplate('services', ServicePreview);
   window.CMS.registerPreviewTemplate('posts', PostPreview);
-  window.CMS.registerPreviewTemplate('site', SettingsPreview);
+  window.CMS.registerPreviewTemplate('site', IdentityPreview);
+  window.CMS.registerPreviewTemplate('contact', ContactPreview);
   window.CMS.registerPreviewTemplate('theme', ThemePreview);
   window.CMS.registerPreviewTemplate('nav', HeaderPreview);
   window.CMS.registerPreviewTemplate('footer', FooterPreview);

@@ -14,6 +14,7 @@ import { site as siteConfig } from '../site.config';
 const site = resolveSite(siteConfig);
 const t = site.strings.thanks;
 const settings = (await getEntry('settings', 'site'))!.data;
+const contact: any = (await getEntry('contact', 'contact').catch(() => null))?.data ?? {};
 const ts: any = (await getEntry('thanks', 'thanks').catch(() => null))?.data ?? {};
 ---
 <Base title="Thank you" description={ts.message || t.lead}>
@@ -27,10 +28,10 @@ const ts: any = (await getEntry('thanks', 'thanks').catch(() => null))?.data ?? 
     secondaryHref={resolveLink(ts.button2?.link, '/')}
     showContact={ts.showContact !== false}
     talkLabel={t.talkLabel}
-    phone={settings.phone}
-    phoneE164={settings.phoneE164}
-    email={settings.email}
-    hours={settings.openingHours}
+    phone={contact.phone}
+    phoneE164={contact.phoneE164}
+    email={contact.email}
+    hours={contact.openingHours}
     who={settings.name}
   />
 </Base>

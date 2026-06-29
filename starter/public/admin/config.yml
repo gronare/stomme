@@ -1500,7 +1500,7 @@ collections:
     label: "Settings"
     files:
       - name: site
-        label: "Site & contact"
+        label: "Identity"
         file: "src/content/settings/site.md"
         fields:
           - { name: name, label: "Site name", widget: string }
@@ -1514,10 +1514,6 @@ collections:
               - { name: textPre, label: "Wordmark text", widget: string, required: false }
               - { name: textAccent, label: "Wordmark accent (in brand colour)", widget: string, required: false }
           - { name: description, label: "Description", widget: text }
-          - { name: phone, label: "Phone", widget: string, required: false }
-          - { name: phoneE164, label: "Phone (tel: link)", widget: string, required: false }
-          - { name: email, label: "Email", widget: string, required: false }
-          - { name: openingHours, label: "Opening hours", widget: string, required: false, hint: "e.g. Mon–Fri 08–17. Shown on the contact card." }
           - name: facts
             label: "Facts / stats"
             widget: list
@@ -1529,6 +1525,17 @@ collections:
           - { name: partnersLead, label: "Partners lead-in", widget: string, required: false }
           - { name: favicon, label: "Favicon", widget: image, required: false, hint: "Browser-tab icon — SVG recommended (scales to any size). Defaults to the shipped mark when empty." }
           - { name: appleIcon, label: "Home-screen icon", widget: image, required: false, hint: "iOS home-screen icon — a 180×180 PNG. Optional." }
+      - name: contact
+        label: "Contact"
+        file: "src/content/contact/contact.md"
+        fields:
+          - { name: phone, label: "Phone", widget: string, required: false }
+          - { name: phoneE164, label: "Phone (tel: link)", widget: string, required: false, hint: "Digits with country code, e.g. +46701234567 — used for the click-to-call link." }
+          - { name: email, label: "Email", widget: string, required: false }
+          - { name: openingHours, label: "Opening hours", widget: string, required: false, hint: "e.g. Mon–Fri 08–17. Shown on the contact card." }
+          - { name: hq, label: "Location / HQ", widget: string, required: false, hint: "City or address — shown in the footer + contact line." }
+          - { name: orgNr, label: "Org. number", widget: string, required: false }
+          - { name: founded, label: "Founded (year)", widget: string, required: false }
       - name: theme
         label: "Theme colours"
         file: "src/content/theme/theme.md"

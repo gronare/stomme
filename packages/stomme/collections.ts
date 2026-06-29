@@ -39,6 +39,8 @@ export function stommeCollections(listings?: Listing[]) {
     home: defineCollection({ loader: md('home'), schema: z.object({ seo, blocks }) }),
     pages: defineCollection({ loader: md('pages'), schema: z.object({ title: z.string(), seo, blocks, published: z.boolean().default(true) }) }),
 
+    // Identity — name, logo, SEO/icons. Contact details live in their own `contact`
+    // collection; facts/partners live on their blocks (Stats / Logo-strip).
     settings: defineCollection({
       loader: md('settings'),
       schema: z.object({
@@ -47,21 +49,26 @@ export function stommeCollections(listings?: Listing[]) {
         // chooses whether to show the mark / wordmark via their own toggles.
         logo: z.object({ image: z.string().optional(), alt: z.string().optional(), textPre: z.string().default(''), textAccent: z.string().default('') }).default({}),
         description: z.string().default(''),
-        phone: z.string().default(''),
-        phoneE164: z.string().default(''),
-        email: z.string().default(''),
-        orgNr: z.string().default(''),
-        founded: z.string().default(''),
-        hq: z.string().default(''),
-        openingHours: z.string().default(''),
-        facts: z.array(z.object({ label: z.string(), value: z.string() })).default([]),
-        partners: z.array(z.string()).default([]),
-        partnersLead: z.string().default(''),
         // Browser-tab icon (SVG recommended — scales to any size). Falls back to
         // the shipped /favicon.svg when unset. `appleIcon` is the iOS home-screen
         // PNG (180×180); optional.
         favicon: z.string().optional(),
         appleIcon: z.string().optional(),
+      }),
+    }),
+
+    // Contact details — phone/email/hours + registration (used by the contact form,
+    // the direct-contact card, and the footer).
+    contact: defineCollection({
+      loader: md('contact'),
+      schema: z.object({
+        phone: z.string().default(''),
+        phoneE164: z.string().default(''),
+        email: z.string().default(''),
+        openingHours: z.string().default(''),
+        hq: z.string().default(''),
+        orgNr: z.string().default(''),
+        founded: z.string().default(''),
       }),
     }),
 

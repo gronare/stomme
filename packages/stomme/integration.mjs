@@ -38,7 +38,6 @@ import BlockRenderer from '@gronare/stomme/BlockRenderer.astro';
 import Header from '@gronare/stomme/Header.astro';
 import Footer from '@gronare/stomme/Footer.astro';
 import Thanks from '@gronare/stomme/Thanks.astro';
-import DirectContact from '@gronare/stomme/DirectContact.astro';
 
 const kind = Astro.url.searchParams.get('kind');
 const raw = Astro.url.searchParams.get('data');
@@ -66,6 +65,7 @@ if (kind === 'thanks') {
   const c = rs.strings.contact;
   const td = draft && typeof draft === 'object' ? draft : {};
   const settings = (await getEntry('settings', 'site'))?.data ?? {};
+  const ct = (await getEntry('contact', 'contact'))?.data ?? {};
   thanks = {
     eyebrow: t.eyebrow,
     heading: (td.heading || '').replace('{name}', ''),
@@ -76,29 +76,17 @@ if (kind === 'thanks') {
     secondaryHref: resolveLink(td.button2 && td.button2.link, '/'),
     recapLabel: t.recapLabel,
     recap: {
-      emailLabel: c.email, email: settings.email || 'name@example.com',
-      phoneLabel: c.phone, phone: settings.phone || '070 123 45 67',
+      emailLabel: c.email, email: ct.email || 'name@example.com',
+      phoneLabel: c.phone, phone: ct.phone || '070 123 45 67',
       messageLabel: c.message, message: 'Hi! I would like to book a meeting next week if that works for you.',
     },
     showContact: td.showContact !== false,
     talkLabel: t.talkLabel,
-    phone: settings.phone,
-    phoneE164: settings.phoneE164,
-    email: settings.email,
-    hours: settings.openingHours,
+    phone: ct.phone,
+    phoneE164: ct.phoneE164,
+    email: ct.email,
+    hours: ct.openingHours,
     who: settings.name,
-  };
-}
-
-// Site & contact: preview the real direct-contact card from the draft settings.
-let contact = null;
-if (kind === 'settings') {
-  const rs = resolveSite(site);
-  const d = draft && typeof draft === 'object' ? draft : {};
-  contact = {
-    label: rs.strings.contact.direct,
-    phone: d.phone, phoneE164: d.phoneE164, email: d.email, hours: d.openingHours,
-    footer: [d.name, d.hq, d.orgNr && ('Org.nr ' + d.orgNr)].filter(Boolean).join(' · '),
   };
 }
 ---
@@ -108,8 +96,6 @@ if (kind === 'settings') {
   <Base title="Preview" chrome={false}><Footer footer={footerDraft} towns={towns} townsHref={site.routes?.towns ?? '/areas'} /></Base>
 ) : kind === 'thanks' ? (
   <Base title="Preview"><Thanks {...thanks} /></Base>
-) : kind === 'settings' ? (
-  <Base title="Preview"><div class="section" style="max-width:520px"><DirectContact {...contact} /></div></Base>
 ) : (
   <Base title="Preview"><div id="preview-root"><BlockRenderer blocks={blocks} config={site} /></div></Base>
 )}

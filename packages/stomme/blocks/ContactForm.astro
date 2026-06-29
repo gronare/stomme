@@ -24,7 +24,8 @@ const L = {
 const showAside = showDirectContact !== false; // default on; off → full-width form
 
 const settings = (await getEntry('settings', 'site'))!.data;
-const contactLine = [settings.name, settings.hq, settings.orgNr && `Org.nr ${settings.orgNr}`]
+const contact = ((await getEntry('contact', 'contact').catch(() => null))?.data ?? {}) as any;
+const contactLine = [settings.name, contact.hq, contact.orgNr && `Org.nr ${contact.orgNr}`]
   .filter(Boolean)
   .join(' · ');
 
@@ -51,8 +52,8 @@ const thanksData = {
   emailLabel: L.email, phoneLabel: L.phone, messageLabel: L.message,
   showContact: showAside,
   direct: {
-    phone: settings.phone || '', phoneE164: settings.phoneE164 || '',
-    email: settings.email || '', hours: settings.openingHours || '', who: settings.name || '',
+    phone: contact.phone || '', phoneE164: contact.phoneE164 || '',
+    email: contact.email || '', hours: contact.openingHours || '', who: settings.name || '',
   },
 };
 ---
@@ -88,10 +89,10 @@ const thanksData = {
     {showAside && (
       <DirectContact
         label={L.direct}
-        phone={settings.phone}
-        phoneE164={settings.phoneE164}
-        email={settings.email}
-        hours={settings.openingHours}
+        phone={contact.phone}
+        phoneE164={contact.phoneE164}
+        email={contact.email}
+        hours={contact.openingHours}
         footer={contactLine}
       />
     )}
