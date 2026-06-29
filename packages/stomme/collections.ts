@@ -51,7 +51,7 @@ export function stommeCollections(listings?: Listing[]) {
         description: z.string().default(''),
         // Browser-tab icon (SVG recommended — scales to any size). Falls back to
         // the shipped /favicon.svg when unset. `appleIcon` is the iOS home-screen
-        // PNG (180×180); optional.
+        // PNG (180×180); optional. Facts/partners live on their blocks (Stats / Logo-strip).
         favicon: z.string().optional(),
         appleIcon: z.string().optional(),
       }),

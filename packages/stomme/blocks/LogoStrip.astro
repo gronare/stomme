@@ -1,16 +1,14 @@
 ---
-import { getEntry } from 'astro:content';
-
-// Settings-backed: reads the partner list + lead-in from settings. No fields.
-const settings = (await getEntry('settings', 'site')).data;
-const partners = settings.partners ?? [];
-const lead = settings.partnersLead;
+// Partner / client names with an optional lead-in. Content lives on the block instance.
+interface Props { lead?: string; logos?: string[] }
+const { lead, logos } = Astro.props;
+const names = Array.isArray(logos) ? logos.filter(Boolean) : [];
 ---
-{partners.length > 0 && (
+{names.length > 0 && (
   <section class="partner-strip">
     <div class="section" style="text-align:center">
       {lead && <p class="mono">{lead}</p>}
-      <div class="partner-logos">{partners.map((p) => <span>{p}</span>)}</div>
+      <div class="partner-logos">{names.map((p) => <span>{p}</span>)}</div>
     </div>
   </section>
 )}

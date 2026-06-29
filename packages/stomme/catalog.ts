@@ -359,10 +359,17 @@ export const defaultBlocks: BlockDef[] = [
     summary: 'A row of stats / facts (label + value).',
     shape: 'stats',
     fields: [
-      { name: 'items', label: 'Facts (optional — defaults to the site’s settings facts)', widget: 'list', required: false, fields: [{ name: 'label', label: 'Label', widget: 'string' }, { name: 'value', label: 'Value', widget: 'string' }] },
+      { name: 'items', label: 'Facts (label + value)', widget: 'list', required: false, fields: [{ name: 'label', label: 'Label', widget: 'string' }, { name: 'value', label: 'Value', widget: 'string' }] },
     ],
   },
-  { type: 'logoStrip', label: 'Logo strip', group: 'Automatic', summary: 'Logo / partner strip, filled automatically from settings.', shape: 'auto', fields: [] },
+  {
+    type: 'logoStrip', label: 'Logo strip', group: 'Numbers', shape: 'chips',
+    summary: 'A centered row of partner / client names with an optional lead-in.',
+    fields: [
+      { name: 'lead', label: 'Lead-in', widget: 'string', required: false, hint: 'e.g. “Trusted by” or “Built on”.' },
+      { name: 'logos', label: 'Names', widget: 'list', required: false, field: { name: 'name', label: 'Name', widget: 'string' } },
+    ],
+  },
   {
     type: 'contactForm', label: 'Contact form', group: 'Calls to action',
     summary: 'A contact form with an optional direct-contact card. Heading, intro, field labels and layout are all editable.', shape: 'band',
