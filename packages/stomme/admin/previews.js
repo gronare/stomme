@@ -99,23 +99,9 @@
     for (var i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
     return btoa(bin);
   }
-  // Decap re-renders the preview on every keystroke. Changing the iframe `src` each
-  // time forces a full reload (re-fetch CSS + re-run the SSR /preview render), which
-  // makes editing feel sluggish and flickery. So we don't put `src` in props; instead
-  // a ref callback (re-invoked every render, since it's a fresh closure) debounces the
-  // src update — first load immediate, later loads only after ~500 ms of idle typing.
-  var PREVIEW_DEBOUNCE = 500;
   var PagePreview = function (props) {
-    var want = '/preview?data=' + encodeURIComponent(b64(jsBlocks(props.entry)));
     return h('iframe', {
-      ref: function (node) {
-        if (!node) return;
-        node._want = want;
-        clearTimeout(node._t);
-        var apply = function () { if (node.getAttribute('src') !== node._want) node.setAttribute('src', node._want); };
-        if (!node._loaded) { node._loaded = true; apply(); } // first paint: no delay
-        else node._t = setTimeout(apply, PREVIEW_DEBOUNCE);
-      },
+      src: '/preview?data=' + encodeURIComponent(b64(jsBlocks(props.entry))),
       style: { width: '100%', height: '100vh', border: '0', display: 'block', background: '#fff' },
     });
   };
