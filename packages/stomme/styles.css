@@ -594,17 +594,30 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
   .cs-recap .cs-msg { grid-column: 1 / -1; border-top: 1px solid var(--color-line); padding-top: 1rem; }
   .cs-recap .cs-msg dt { margin-bottom: .35rem; }
   .cs-actions { margin-top: 1.6rem; display: flex; gap: .8rem; flex-wrap: wrap; align-items: center; }
-  /* /thanks page — centered confirmation + an optional direct-contact card */
-  .contact-sent--center { max-width: 640px; margin-inline: auto; text-align: center; }
-  .contact-sent--center .cs-badge { margin-inline: auto; }
-  .contact-sent--center .cs-head, .contact-sent--center .cs-lead { margin-inline: auto; }
-  .contact-sent--center .cs-actions { justify-content: center; }
-  .cs-direct { margin: 2rem auto 0; max-width: 420px; text-align: left;
-    background: var(--color-surface); border: 1px solid var(--color-line); border-radius: 1rem; padding: 1.3rem 1.5rem; }
-  .cs-direct .cs-label { justify-content: flex-start; }
-  .cs-phone a { font-size: 1.25rem; font-weight: 700; }
-  .cs-phone, .cs-email { margin: 0 0 .3rem; }
-  .cs-hours { color: var(--color-muted); font-size: .92rem; margin: .6rem 0 0; }
+  .btn-ghost { background: var(--color-paper); color: var(--color-brand); border: 1px solid var(--color-line); }
+  .btn-ghost:hover { border-color: color-mix(in srgb, var(--color-brand) 40%, var(--color-line)); }
+  /* /thanks page + Thank-you preview — centered confirmation, then a two-up of the
+     "what you sent" recap and a tinted direct-contact card (confirmation mockup parity). */
+  .thanks-confirm { max-width: 760px; margin-inline: auto; text-align: center; padding-bottom: 1rem; animation: cs-rise .55s cubic-bezier(.2,.7,.3,1) both; }
+  .thanks-confirm .cs-badge { margin-inline: auto; }
+  .thanks-confirm .cs-head, .thanks-confirm .cs-lead { margin-inline: auto; }
+  .thanks-confirm .cs-actions { justify-content: center; }
+  .thanks-cols { width: min(1080px, 100%); margin: 0 auto; display: grid; grid-template-columns: 1.4fr 1fr; gap: 1.4rem; align-items: start; }
+  .thanks-cols--solo { grid-template-columns: 1fr; max-width: 560px; }
+  @media (max-width: 760px) { .thanks-cols { grid-template-columns: 1fr; } }
+  .cs-card { background: var(--color-paper); border: 1px solid var(--color-line); border-radius: 18px; padding: 1.75rem 1.9rem; text-align: left; }
+  .cs-card--tint { background: color-mix(in srgb, var(--color-brand) 7%, var(--color-paper)); border-color: color-mix(in srgb, var(--color-brand) 18%, var(--color-paper)); }
+  .cs-card .cs-label { justify-content: flex-start; margin: 0 0 1.1rem; }
+  .cs-recap-dl { margin: 0; display: grid; grid-template-columns: max-content 1fr; gap: .85rem 1.5rem; align-items: baseline; }
+  .cs-recap-dl dt { font-family: var(--bk-font-mono); font-size: .74rem; letter-spacing: .06em; text-transform: uppercase; color: var(--color-muted); }
+  .cs-recap-dl dd { margin: 0; overflow-wrap: anywhere; }
+  .cs-recap-dl .cs-msg { grid-column: 1 / -1; border-top: 1px solid var(--color-line); padding-top: 1rem; margin-top: .1rem; }
+  .cs-recap-dl .cs-msg dt { margin-bottom: .35rem; }
+  .cs-phone { font-size: 1.55rem; font-weight: 800; color: var(--color-brand); letter-spacing: -.01em; margin: 0; }
+  .cs-phone a { text-decoration: none; }
+  .cs-email { margin: .5rem 0 0; font-weight: 600; }
+  .cs-hours { margin: 1.25rem 0 0; color: var(--color-muted); font-size: .92rem; }
+  .cs-who { margin: 1.4rem 0 0; font-family: var(--bk-font-mono); font-size: .7rem; letter-spacing: .14em; text-transform: uppercase; color: var(--color-muted); }
   @keyframes cs-rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
   @keyframes cs-draw { to { stroke-dashoffset: 0; } }
   .cs-badge circle { stroke-dasharray: 164; stroke-dashoffset: 164; animation: cs-draw .6s ease-out .1s forwards; }

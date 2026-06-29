@@ -1,6 +1,8 @@
 ---
 // Contact-form success page (no-JS fallback for /thanks). Renders the shared Thanks component
 // from the "Thank-you" settings (localized fallback) — the same component the CMS preview shows.
+// A direct page visit has no submitted data, so there's no "what you sent" recap here (the
+// inline confirmation after a real submit shows it). The CMS preview mocks the recap.
 import Base from '../layouts/Base.astro';
 import { getEntry } from 'astro:content';
 import { resolveSite } from '@gronare/stomme/config';
@@ -11,22 +13,22 @@ const site = resolveSite(siteConfig);
 const t = site.strings.thanks;
 const settings = (await getEntry('settings', 'site'))!.data;
 const ts: any = (await getEntry('thanks', 'thanks').catch(() => null))?.data ?? {};
-const heading = ts.heading || t.heading.replace('{name}', '');
-const message = ts.message || t.lead;
-const button = ts.buttonLabel || t.home;
-const showContact = ts.showContact !== false;
 ---
-<Base title="Thank you" description={message}>
+<Base title="Thank you" description={ts.message || t.lead}>
   <Thanks
     eyebrow={t.eyebrow}
-    heading={heading}
-    message={message}
-    button={button}
-    showContact={showContact}
-    directLabel={site.strings.contact.direct}
+    heading={ts.heading || t.heading.replace('{name}', '')}
+    message={ts.message || t.lead}
+    primaryLabel={ts.buttonLabel || t.home}
+    primaryHref={ts.buttonHref || '/'}
+    secondaryLabel={ts.button2Label}
+    secondaryHref={ts.button2Href || '/'}
+    showContact={ts.showContact !== false}
+    talkLabel={t.talkLabel}
     phone={settings.phone}
     phoneE164={settings.phoneE164}
     email={settings.email}
     hours={settings.openingHours}
+    who={settings.name}
   />
 </Base>

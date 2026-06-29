@@ -356,8 +356,10 @@ export default {
   'Opening hours': 'Öppettider',
   'Thank-you page': 'Tack-sida',
   'Message': 'Meddelande',
-  'Back-to-home button text': 'Text på tillbaka-knappen',
-  'Show phone/email on the page': 'Visa telefon/e-post på sidan',
+  'Primary button text': 'Text på primärknappen',
+  'Primary button link': 'Länk för primärknappen',
+  'Second button text (optional)': 'Text på andra knappen (valfritt)',
+  'Second button link': 'Länk för andra knappen',
   'A contact form with an optional direct-contact card. Heading, intro, field labels and layout are all editable.': 'Ett kontaktformulär med ett valfritt direktkontaktkort. Rubrik, intro, fältetiketter och layout går att redigera.',
 
   // ── hints ──

@@ -56,23 +56,35 @@ const towns = kind === 'footer'
 
 // Thank-you: render the real Thanks component with the draft copy over the localized
 // defaults + the site's contact settings, so the preview matches the live /thanks page.
+// A submission has no real data in a preview, so the "what you sent" recap is mocked.
 let thanks = null;
 if (kind === 'thanks') {
   const rs = resolveSite(site);
   const t = rs.strings.thanks;
+  const c = rs.strings.contact;
   const td = draft && typeof draft === 'object' ? draft : {};
   const settings = (await getEntry('settings', 'site'))?.data ?? {};
   thanks = {
     eyebrow: t.eyebrow,
     heading: td.heading || t.heading.replace('{name}', ''),
     message: td.message || t.lead,
-    button: td.buttonLabel || t.home,
+    primaryLabel: td.buttonLabel || t.home,
+    primaryHref: td.buttonHref || '/',
+    secondaryLabel: td.button2Label || '',
+    secondaryHref: td.button2Href || '/',
+    recapLabel: t.recapLabel,
+    recap: {
+      emailLabel: c.email, email: settings.email || 'name@example.com',
+      phoneLabel: c.phone, phone: settings.phone || '070 123 45 67',
+      messageLabel: c.message, message: 'Hi! I would like to book a meeting next week if that works for you.',
+    },
     showContact: td.showContact !== false,
-    directLabel: rs.strings.contact.direct,
+    talkLabel: t.talkLabel,
     phone: settings.phone,
     phoneE164: settings.phoneE164,
     email: settings.email,
     hours: settings.openingHours,
+    who: settings.name,
   };
 }
 ---

@@ -1701,5 +1701,8 @@ collections:
         fields:
           - { name: heading, label: "Heading", widget: string, required: false, hint: "Big confirmation headline. Blank = localized default." }
           - { name: message, label: "Message", widget: text, required: false, hint: "Reassurance line under the heading. Blank = default." }
-          - { name: buttonLabel, label: "Back-to-home button text", widget: string, required: false }
-          - { name: showContact, label: "Show phone/email on the page", widget: boolean, required: false, default: true }
+          - { name: buttonLabel, label: "Primary button text", widget: string, required: false, hint: "Blank = localized default (\"Back to home\")." }
+          - { name: buttonHref, label: "Primary button link", widget: string, required: false, default: "/", hint: "Where the primary button goes. e.g. / or /services" }
+          - { name: button2Label, label: "Second button text (optional)", widget: string, required: false, hint: "Leave blank for a single button." }
+          - { name: button2Href, label: "Second button link", widget: string, required: false, default: "/", hint: "Where the optional second button goes." }
+          - { name: showContact, label: "Show the direct-contact card", widget: boolean, required: false, default: true, hint: "Phone / email / hours from Site & contact." }

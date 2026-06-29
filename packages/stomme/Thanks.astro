@@ -1,35 +1,79 @@
 ---
 // Contact-form confirmation — the real /thanks page AND the CMS "Thank-you" preview render
 // this (via /preview?kind=thanks), so the preview shows the live page with the site theme.
-// Presentational: the caller resolves the copy (settings → localized fallback) and passes it.
+// Presentational: the caller resolves copy/links/recap and passes them in. Matches the
+// confirmation mockup — centered success, then a two-up of the "what you sent" recap and a
+// tinted direct-contact card.
+interface Recap {
+  emailLabel?: string; email?: string;
+  phoneLabel?: string; phone?: string;
+  messageLabel?: string; message?: string;
+}
 interface Props {
   eyebrow?: string;
   heading: string;
   message: string;
-  button: string;
+  primaryLabel: string;
+  primaryHref?: string;
+  secondaryLabel?: string;
+  secondaryHref?: string;
+  recapLabel?: string;
+  recap?: Recap | null;
   showContact?: boolean;
-  directLabel?: string;
+  talkLabel?: string;
   phone?: string;
   phoneE164?: string;
   email?: string;
   hours?: string;
+  who?: string;
 }
-const { eyebrow = 'Message sent', heading, message, button, showContact, directLabel = 'Direct contact', phone, phoneE164, email, hours } = Astro.props;
+const {
+  eyebrow = 'Message sent', heading, message,
+  primaryLabel, primaryHref = '/', secondaryLabel, secondaryHref = '/',
+  recapLabel = 'What you sent', recap = null,
+  showContact, talkLabel = 'Prefer to talk?', phone, phoneE164, email, hours, who,
+} = Astro.props;
+
+const hasRecap = !!recap && !!(recap.email || recap.phone || recap.message);
+const hasDirect = showContact !== false && !!(phone || email);
+const twoCol = hasRecap && hasDirect;
 ---
-<section class="section">
-  <div class="contact-sent contact-sent--center">
-    <div class="cs-badge"><svg viewBox="0 0 56 56" aria-hidden="true"><circle cx="28" cy="28" r="26"></circle><path d="M17 29.5 L24.5 37 L40 20"></path></svg></div>
-    <p class="cs-eyebrow">{eyebrow}</p>
-    <h1 class="cs-head">{heading}</h1>
-    <p class="cs-lead">{message}</p>
-    <div class="cs-actions"><a class="btn" href="/">{button}</a></div>
-    {showContact && (phone || email) && (
-      <aside class="cs-direct">
-        <p class="cs-label">{directLabel}</p>
+<section class="section thanks-confirm">
+  <div class="cs-badge"><svg viewBox="0 0 56 56" aria-hidden="true"><circle cx="28" cy="28" r="26"></circle><path d="M17 29.5 L24.5 37 L40 20"></path></svg></div>
+  <p class="cs-eyebrow">{eyebrow}</p>
+  <h1 class="cs-head">{heading}</h1>
+  <p class="cs-lead">{message}</p>
+  <div class="cs-actions">
+    <a class="btn" href={primaryHref}>{primaryLabel}</a>
+    {secondaryLabel && <a class="btn btn-ghost" href={secondaryHref}>{secondaryLabel}</a>}
+  </div>
+</section>
+
+{(hasRecap || hasDirect) && (
+  <div class:list={['thanks-cols', !twoCol && 'thanks-cols--solo']}>
+    {hasRecap && (
+      <section class="cs-card" aria-label={recapLabel}>
+        <p class="cs-label">{recapLabel}</p>
+        <dl class="cs-recap-dl">
+          {recap!.email && (<><dt>{recap!.emailLabel ?? 'Email'}</dt><dd>{recap!.email}</dd></>)}
+          {recap!.phone && (<><dt>{recap!.phoneLabel ?? 'Phone'}</dt><dd>{recap!.phone}</dd></>)}
+          {recap!.message && (
+            <div class="cs-msg">
+              <dt>{recap!.messageLabel ?? 'Message'}</dt>
+              <dd>{recap!.message}</dd>
+            </div>
+          )}
+        </dl>
+      </section>
+    )}
+    {hasDirect && (
+      <aside class="cs-card cs-card--tint" aria-label={talkLabel}>
+        <p class="cs-label">{talkLabel}</p>
         {phone && <p class="cs-phone"><a href={`tel:${phoneE164 || phone}`}>{phone}</a></p>}
         {email && <p class="cs-email"><a href={`mailto:${email}`}>{email}</a></p>}
         {hours && <p class="cs-hours">{hours}</p>}
+        {who && <p class="cs-who">{who}</p>}
       </aside>
     )}
   </div>
-</section>
+)}
