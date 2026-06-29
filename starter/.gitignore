@@ -1,0 +1,19 @@
+# dependencies
+node_modules/
+
+# build output
+dist/
+.astro/
+.output/
+
+# adapters / deploy
+.wrangler/
+.vercel/
+.netlify/
+
+# env + local
+.env
+.env.*
+!.env.example
+*.log
+.DS_Store
