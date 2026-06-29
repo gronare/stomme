@@ -5,7 +5,7 @@ import { resolveLink } from '../src/href';
 
 // Collection-backed: Q&A from the `faq` collection; chrome + the contact aside
 // are editable fields (CMS defaults supply the starting copy). Needs a `faq`
-// collection + `settings.email` in the consuming site.
+// collection + the `contact` collection's email in the consuming site.
 //
 // `variant` picks the layout:
 //   list      — open Q&A list + a contact aside (default)
@@ -26,8 +26,8 @@ interface Props {
 }
 const { variant = 'list', eyebrow, heading, intro, asideHeading, asideBody, asideCtaLabel, asideHref, asideCtaHref } = Astro.props;
 const items = (await getCollection('faq')).sort((a, b) => a.data.order - b.data.order);
-const settings = (await getEntry('settings', 'site'))!.data;
-const aHref = resolveLink(asideHref ?? asideCtaHref, settings.email ? `mailto:${settings.email}` : '/');
+const contact = ((await getEntry('contact', 'contact').catch(() => null))?.data ?? {}) as any;
+const aHref = resolveLink(asideHref ?? asideCtaHref, contact.email ? `mailto:${contact.email}` : '/');
 const hasAside = !!(asideHeading || asideBody || asideCtaLabel);
 const n = (i: number) => String(i + 1).padStart(2, '0');
 ---

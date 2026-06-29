@@ -27,7 +27,7 @@ interface Props {
 }
 const { eyebrow, heading, intro, ctaLabel, ctaHref, media = 'none', image, imageAlt, highlights = [], height = 'normal', align = 'center' } = Astro.props;
 const href = resolveLink(ctaHref, '/');
-const settings = (await getEntry('settings', 'site')).data;
+const contact = ((await getEntry('contact', 'contact').catch(() => null))?.data ?? {}) as any;
 const showImage = media === 'image' && !!image;
 const showHighlights = media === 'highlights' && highlights.length > 0;
 const showMotif = media === 'motif';
@@ -39,10 +39,10 @@ const hasMedia = showImage || showHighlights || showMotif;
       {eyebrow && <span class="mono eyebrow">{eyebrow}</span>}
       <h1 class="display display--hero" style="margin-top:1rem">{heading}</h1>
       {intro && <p class="intro">{intro}</p>}
-      {(ctaLabel || settings.phone) && (
+      {(ctaLabel || contact.phone) && (
         <div class="btn-row">
           {ctaLabel && <a href={href} class="btn">{ctaLabel}</a>}
-          {settings.phone && <a href={`tel:${settings.phoneE164}`} class="btn-ghost">{settings.phone} →</a>}
+          {contact.phone && <a href={`tel:${contact.phoneE164}`} class="btn-ghost">{contact.phone} →</a>}
         </div>
       )}
     </div>

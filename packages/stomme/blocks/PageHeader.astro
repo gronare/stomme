@@ -4,7 +4,7 @@ import { resolveLink } from '../src/href';
 
 // Generic page header for prose pages. `light` = plain header; `dark` = a
 // band/glow hero with CTA + phone (good for a landing/service page top).
-// Reads phone from `settings.site`; editor supplies copy + optional CTA.
+// Reads phone from the `contact` collection; editor supplies copy + optional CTA.
 interface Props {
   variant?: 'light' | 'dark';
   width?: 'narrow' | 'full';
@@ -17,7 +17,7 @@ interface Props {
 const { variant = 'light', width = 'narrow', eyebrow, heading, intro, ctaLabel, ctaHref } = Astro.props;
 const read = width !== 'full';
 const href = resolveLink(ctaHref, '/');
-const settings = (await getEntry('settings', 'site')).data;
+const contact = ((await getEntry('contact', 'contact').catch(() => null))?.data ?? {}) as any;
 ---
 
 {variant === 'dark' ? (
@@ -30,7 +30,7 @@ const settings = (await getEntry('settings', 'site')).data;
       {ctaLabel && (
         <div class="btn-row">
           <a href={href} class="btn btn-on-dark">{ctaLabel}</a>
-          {settings.phone && <a href={`tel:${settings.phoneE164}`} class="btn-ghost">Call {settings.phone} →</a>}
+          {contact.phone && <a href={`tel:${contact.phoneE164}`} class="btn-ghost">Call {contact.phone} →</a>}
         </div>
       )}
     </div>

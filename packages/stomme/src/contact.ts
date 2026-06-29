@@ -6,7 +6,7 @@ import { getEntry } from 'astro:content';
 // The ContactForm block POSTs name/email/phone/message + a bot-field honeypot here.
 // Sends via Resend: from a verified COMPANY sender (env CONTACT_FROM — one verified
 // domain serves every site), TO the business inbox (env CONTACT_TO, else the CMS
-// settings email), reply-to the visitor.
+// contact email), reply-to the visitor.
 //
 // Responds JSON to fetch (the block shows an inline "what you sent" confirmation),
 // or 303→/thanks for a plain (no-JS) form POST.
@@ -14,7 +14,7 @@ import { getEntry } from 'astro:content';
 // Env (Cloudflare: Pages var/secret on locals.runtime.env; Netlify/node: process.env):
 //   RESEND_API_KEY  (secret, required)
 //   CONTACT_FROM    (required — e.g. 'forms@your-company.com'; must be a Resend-verified domain)
-//   CONTACT_TO      (optional override; default = settings.email)
+//   CONTACT_TO      (optional override; default = contact.email)
 
 export const prerender = false;
 
@@ -54,10 +54,10 @@ export const POST: APIRoute = async ({ request, locals, redirect }) => {
   const from = env(locals, 'CONTACT_FROM');
   let to = env(locals, 'CONTACT_TO');
   if (!to) {
-    try { to = (await getEntry('settings', 'site'))?.data?.email; } catch {}
+    try { to = (await getEntry('contact', 'contact'))?.data?.email; } catch {}
   }
   if (!apiKey || !from || !to) {
-    return fail('Contact form not configured (RESEND_API_KEY, CONTACT_FROM, CONTACT_TO/settings.email).', 500);
+    return fail('Contact form not configured (RESEND_API_KEY, CONTACT_FROM, CONTACT_TO/contact.email).', 500);
   }
 
   const subject = `New enquiry from ${name || email || 'website'}`;
