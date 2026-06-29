@@ -30,6 +30,7 @@
     "./Header.astro": "./blocks/Header.astro",
     "./Footer.astro": "./blocks/Footer.astro",
     "./Thanks.astro": "./Thanks.astro",
+    "./DirectContact.astro": "./DirectContact.astro",
     "./TownPage.astro": "./TownPage.astro",
     "./ServicePage.astro": "./ServicePage.astro",
     "./PostPage.astro": "./PostPage.astro",

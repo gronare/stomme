@@ -142,23 +142,6 @@
       note('Blog post — the full article renders on its own page.'));
   };
 
-  var SettingsPreview = function (props) {
-    var e = props.entry;
-    var partners = (e.getIn(['data', 'partners']) || []); partners = partners.toJS ? partners.toJS() : partners;
-    var facts = (e.getIn(['data', 'facts']) || []); facts = facts.toJS ? facts.toJS() : facts;
-    var lead = v(e, 'partnersLead');
-    return h('div', { className: 'bk' },
-      h('div', { className: 'bk-foot' },
-        h('p', { className: 'b', style: { fontSize: '1.2rem', margin: 0 } }, v(e, 'name') || 'Company name'),
-        v(e, 'hq') ? h('p', { style: { margin: '8px 0 0' } }, v(e, 'hq')) : null,
-        h('p', { style: { margin: '4px 0 0' } }, h('span', { className: 'r' }, v(e, 'phone')), v(e, 'email') ? '  ·  ' + v(e, 'email') : ''),
-        facts.length ? h('div', { className: 'bk-stats' }, facts.map(function (f, i) {
-          return h('div', { key: i }, h('div', { className: 'n' }, f.value), h('div', { className: 'l' }, f.label));
-        })) : null),
-      (partners.length && lead) ? h('p', { className: 'bk-section-label' }, lead) : null,
-      partners.length ? h('div', { className: 'bk-chips' }, partners.map(function (x, i) { return h('span', { className: 'bk-chip', key: i }, x); })) : null,
-      note('Used in the footer + the Stats / Logo-strip blocks.'));
-  };
 
   var ThemePreview = function (props) {
     var e = props.entry;
@@ -252,6 +235,9 @@
   };
   var HeaderPreview = ChromePreview('header');
   var FooterPreview = ChromePreview('footer');
+  // Site & contact → render the real direct-contact card (via /preview?kind=settings) from
+  // the draft name/phone/email/hours, so the preview shows where these fields actually appear.
+  var SettingsPreview = ChromePreview('settings');
 
   var arr = function (e, k) { var x = e.getIn(['data', k]); x = x && x.toJS ? x.toJS() : x; return Array.isArray(x) ? x : []; };
   var chipRow = function (items) { return h('div', { className: 'bk-chips' }, items.map(function (s, i) { return h('span', { className: 'bk-chip', key: i }, s); })); };

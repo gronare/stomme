@@ -38,6 +38,7 @@ import BlockRenderer from '@gronare/stomme/BlockRenderer.astro';
 import Header from '@gronare/stomme/Header.astro';
 import Footer from '@gronare/stomme/Footer.astro';
 import Thanks from '@gronare/stomme/Thanks.astro';
+import DirectContact from '@gronare/stomme/DirectContact.astro';
 
 const kind = Astro.url.searchParams.get('kind');
 const raw = Astro.url.searchParams.get('data');
@@ -88,6 +89,18 @@ if (kind === 'thanks') {
     who: settings.name,
   };
 }
+
+// Site & contact: preview the real direct-contact card from the draft settings.
+let contact = null;
+if (kind === 'settings') {
+  const rs = resolveSite(site);
+  const d = draft && typeof draft === 'object' ? draft : {};
+  contact = {
+    label: rs.strings.contact.direct,
+    phone: d.phone, phoneE164: d.phoneE164, email: d.email, hours: d.openingHours,
+    footer: [d.name, d.hq, d.orgNr && ('Org.nr ' + d.orgNr)].filter(Boolean).join(' · '),
+  };
+}
 ---
 {kind === 'header' ? (
   <Base title="Preview" chrome={false}><Header nav={navDraft} /></Base>
@@ -95,6 +108,8 @@ if (kind === 'thanks') {
   <Base title="Preview" chrome={false}><Footer footer={footerDraft} towns={towns} townsHref={site.routes?.towns ?? '/areas'} /></Base>
 ) : kind === 'thanks' ? (
   <Base title="Preview"><Thanks {...thanks} /></Base>
+) : kind === 'settings' ? (
+  <Base title="Preview"><div class="section" style="max-width:520px"><DirectContact {...contact} /></div></Base>
 ) : (
   <Base title="Preview"><div id="preview-root"><BlockRenderer blocks={blocks} config={site} /></div></Base>
 )}
