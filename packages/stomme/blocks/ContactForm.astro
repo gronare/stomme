@@ -22,10 +22,14 @@ const settings = (await getEntry('settings', 'site'))!.data;
 const contactLine = [settings.name, settings.hq, settings.orgNr && `Org.nr ${settings.orgNr}`]
   .filter(Boolean)
   .join(' · ');
+
+// Send through the gateway (Resend key + rate limit live there, one place for all sites).
+// Falls back to the per-site /api/contact endpoint if the site isn't CMS/gateway-wired.
+const contactAction = site?.cms?.baseUrl ? `${site.cms.baseUrl}/contact` : '/api/contact';
 ---
 <section class="section">
   <div class="contact-grid">
-    <form method="POST" action="/api/contact" class="contact-form">
+    <form method="POST" action={contactAction} class="contact-form">
       <p class="hp" aria-hidden="true"><label>Don’t fill this in: <input name="bot-field" tabindex="-1" autocomplete="off" /></label></p>
       <div class="field">
         <label for="name" class="mono">{L.name}</label>
