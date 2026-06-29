@@ -183,10 +183,11 @@ const STRINGS_SV: typeof STRINGS_EN = {
 
 const STRINGS_BY_LANG: Record<string, typeof STRINGS_EN> = { en: STRINGS_EN, sv: STRINGS_SV };
 
-// Pick the base string set for a locale, deep-merged onto English so a partially
-// translated locale (or an unknown one) always falls back to English.
-function baseStrings(cmsLocale?: string, locale?: string) {
-  const lang = String(cmsLocale || locale || 'en').split(/[-_]/)[0].toLowerCase();
+// Pick the base string set for the SITE language. Driven by `locale` (the site's BCP47
+// language/region, e.g. sv-SE) — NOT cmsLocale, which is only the Decap admin UI language.
+// cmsLocale is just a fallback for older configs that set it but no locale.
+function baseStrings(locale?: string, cmsLocale?: string) {
+  const lang = String(locale || cmsLocale || 'en').split(/[-_]/)[0].toLowerCase();
   const b = STRINGS_BY_LANG[lang] || STRINGS_EN;
   return {
     ...STRINGS_EN, ...b,
@@ -207,7 +208,7 @@ export const SITE_DEFAULTS = {
 
 export function resolveSite(c?: SiteConfig) {
   const s = c && c.strings;
-  const base = baseStrings(c && c.cmsLocale, c && c.locale);
+  const base = baseStrings(c && c.locale, c && c.cmsLocale);
   return {
     routes: { ...SITE_DEFAULTS.routes, ...(c && c.routes) },
     locale: (c && c.locale) || SITE_DEFAULTS.locale,

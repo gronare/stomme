@@ -1519,6 +1519,8 @@ collections:
           - { name: partnersLead, label: "Partners lead-in", widget: string, required: false }
           - { name: favicon, label: "Favicon", widget: image, required: false, hint: "Browser-tab icon — SVG recommended (scales to any size). Defaults to the shipped mark when empty." }
           - { name: appleIcon, label: "Home-screen icon", widget: image, required: false, hint: "iOS home-screen icon — a 180×180 PNG. Optional." }
+          - { name: thanksHeading, label: "Thank-you heading", widget: string, required: false, hint: "Shown after the contact form is sent. Leave blank for the default." }
+          - { name: thanksMessage, label: "Thank-you message", widget: text, required: false, hint: "The reassurance line under the heading. Leave blank for the default." }
       - name: theme
         label: "Theme colours"
         file: "src/content/theme/theme.md"

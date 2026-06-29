@@ -31,8 +31,8 @@ const contactAction = site?.cms?.baseUrl ? `${site.cms.baseUrl}/contact` : '/api
 const tk = (site?.strings?.thanks ?? {}) as Record<string, string>;
 const thanksData = {
   eyebrow: tk.eyebrow ?? 'Message sent',
-  heading: tk.heading ?? "Thanks{name} — it's on its way.",
-  lead: tk.lead ?? "We've got your message and we'll reply within one business day.",
+  heading: settings.thanksHeading || (tk.heading ?? "Thanks{name} — it's on its way."),
+  lead: settings.thanksMessage || (tk.lead ?? "We've got your message and we'll reply within one business day."),
   recapLabel: tk.recapLabel ?? 'What you sent',
   email: L.email, phone: L.phone, message: L.message,
 };

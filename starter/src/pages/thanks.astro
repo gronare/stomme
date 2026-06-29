@@ -16,8 +16,8 @@ const settings = (await getEntry('settings', 'site'))!.data;
     <div class="contact-sent">
       <div class="cs-badge"><svg viewBox="0 0 56 56" aria-hidden="true"><circle cx="28" cy="28" r="26"></circle><path d="M17 29.5 L24.5 37 L40 20"></path></svg></div>
       <p class="cs-eyebrow">{t.eyebrow}</p>
-      <h1 class="cs-head">{t.heading.replace('{name}', '')}</h1>
-      <p class="cs-lead">{t.lead}</p>
+      <h1 class="cs-head">{settings.thanksHeading || t.heading.replace('{name}', '')}</h1>
+      <p class="cs-lead">{settings.thanksMessage || t.lead}</p>
       <div class="cs-actions"><a class="btn" href="/">{t.home}</a></div>
       {settings.phone && (
         <p class="cs-lead">{site.strings.contact.direct}: <a href={`tel:${settings.phoneE164}`}>{settings.phone}</a></p>
