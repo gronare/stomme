@@ -141,6 +141,15 @@ const STRINGS_EN = {
   service: { eyebrow: 'Service', quoteEyebrow: 'Free quote', quoteHeading: 'Want to know what it costs?', cta: 'Get a quote' },
   listingStatus: { available: 'Available', reserved: 'Reserved', sold: 'Sold', all: 'All' },
   listingCta: 'Contact us',
+  // Contact-form confirmation (inline "what you sent" + the /thanks page). {name} → ", Carl" or "".
+  thanks: {
+    eyebrow: 'Message sent',
+    heading: "Thanks{name} — it's on its way.",
+    lead: "We've got your message and we'll reply within one business day.",
+    recapLabel: 'What you sent',
+    talkLabel: 'Prefer to talk?',
+    home: 'Back to home',
+  },
 };
 
 const STRINGS_SV: typeof STRINGS_EN = {
@@ -162,6 +171,14 @@ const STRINGS_SV: typeof STRINGS_EN = {
   service: { eyebrow: 'Tjänst', quoteEyebrow: 'Kostnadsfri offert', quoteHeading: 'Vill du veta vad det kostar?', cta: 'Begär offert' },
   listingStatus: { available: 'Tillgänglig', reserved: 'Reserverad', sold: 'Såld', all: 'Alla' },
   listingCta: 'Kontakta oss',
+  thanks: {
+    eyebrow: 'Skickat',
+    heading: 'Tack{name} — meddelandet är på väg.',
+    lead: 'Vi har fått ditt meddelande och svarar inom en arbetsdag.',
+    recapLabel: 'Det du skickade',
+    talkLabel: 'Hellre prata?',
+    home: 'Till startsidan',
+  },
 };
 
 const STRINGS_BY_LANG: Record<string, typeof STRINGS_EN> = { en: STRINGS_EN, sv: STRINGS_SV };
@@ -177,6 +194,7 @@ function baseStrings(cmsLocale?: string, locale?: string) {
     town: { ...STRINGS_EN.town, ...b.town },
     service: { ...STRINGS_EN.service, ...b.service },
     listingStatus: { ...STRINGS_EN.listingStatus, ...b.listingStatus },
+    thanks: { ...STRINGS_EN.thanks, ...b.thanks },
   };
 }
 
@@ -204,6 +222,7 @@ export function resolveSite(c?: SiteConfig) {
       service: { ...base.service, ...(s && s.service) },
       listingStatus: { ...base.listingStatus, ...(s && s.listingStatus) },
       listingCta: (s && s.listingCta) || base.listingCta,
+      thanks: { ...base.thanks, ...((s && (s as any).thanks) || {}) },
     },
     listings: resolveListings(c && c.listings),
     cms: c && c.cms, // forwarded so blocks (e.g. ContactForm) can reach the gateway baseUrl

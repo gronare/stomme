@@ -1,0 +1,27 @@
+---
+// Contact-form success page (no-JS fallback target for /thanks). Engine-rendered from the
+// localized `thanks` strings + settings — NOT a CMS content page, so it stays out of the
+// pages list and just works. To let owners edit the copy, add optional settings fields.
+import Base from '../layouts/Base.astro';
+import { getEntry } from 'astro:content';
+import { resolveSite } from '@gronare/stomme/config';
+import { site as siteConfig } from '../site.config';
+
+const site = resolveSite(siteConfig);
+const t = site.strings.thanks;
+const settings = (await getEntry('settings', 'site'))!.data;
+---
+<Base title="Thank you" description={t.lead}>
+  <section class="section">
+    <div class="contact-sent">
+      <div class="cs-badge"><svg viewBox="0 0 56 56" aria-hidden="true"><circle cx="28" cy="28" r="26"></circle><path d="M17 29.5 L24.5 37 L40 20"></path></svg></div>
+      <p class="cs-eyebrow">{t.eyebrow}</p>
+      <h1 class="cs-head">{t.heading.replace('{name}', '')}</h1>
+      <p class="cs-lead">{t.lead}</p>
+      <div class="cs-actions"><a class="btn" href="/">{t.home}</a></div>
+      {settings.phone && (
+        <p class="cs-lead">{site.strings.contact.direct}: <a href={`tel:${settings.phoneE164}`}>{settings.phone}</a></p>
+      )}
+    </div>
+  </section>
+</Base>

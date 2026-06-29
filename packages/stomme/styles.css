@@ -567,6 +567,34 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
   .contact-aside .email a:hover { color: var(--color-brand); }
   .contact-aside .org { margin-top: 2rem; color: var(--color-muted); }
 
+/* Contact confirmation — the inline "what you sent" (after submit) + the /thanks page */
+  .contact-sent { animation: cs-rise .55s cubic-bezier(.2,.7,.3,1) both; }
+  .cs-badge { width: 68px; height: 68px; border-radius: 999px; display: grid; place-items: center; margin-bottom: 1.4rem;
+    background: color-mix(in srgb, var(--color-brand) 12%, var(--color-paper));
+    border: 1px solid color-mix(in srgb, var(--color-brand) 22%, var(--color-paper)); }
+  .cs-badge svg { width: 34px; height: 34px; }
+  .cs-badge circle, .cs-badge path { fill: none; stroke: var(--color-brand); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+  .cs-eyebrow { font-family: var(--bk-font-mono); font-size: .72rem; letter-spacing: .18em; text-transform: uppercase; color: var(--color-brand); margin: 0 0 .7rem; }
+  .cs-head { font-size: clamp(1.6rem, 3.5vw, 2.1rem); font-weight: 800; letter-spacing: -.02em; line-height: 1.1; margin: 0; max-width: 20ch; text-wrap: balance; }
+  .cs-lead { color: var(--color-muted); font-size: 1.08rem; margin: .9rem 0 0; max-width: 46ch; }
+  .cs-recap { margin-top: 1.8rem; background: var(--color-surface); border: 1px solid var(--color-line); border-radius: 1rem; padding: 1.4rem 1.5rem; }
+  .cs-label { font-family: var(--bk-font-mono); font-size: .7rem; letter-spacing: .16em; text-transform: uppercase; color: var(--color-muted); margin: 0 0 1rem; display: flex; align-items: center; gap: .6rem; }
+  .cs-label::before { content: ""; width: 22px; height: 2px; background: var(--color-brand); border-radius: 2px; }
+  .cs-recap dl { margin: 0; display: grid; grid-template-columns: max-content 1fr; gap: .8rem 1.4rem; align-items: baseline; }
+  .cs-recap dt { font-family: var(--bk-font-mono); font-size: .72rem; letter-spacing: .06em; text-transform: uppercase; color: var(--color-muted); }
+  .cs-recap dd { margin: 0; overflow-wrap: anywhere; }
+  .cs-recap .cs-msg { grid-column: 1 / -1; border-top: 1px solid var(--color-line); padding-top: 1rem; }
+  .cs-recap .cs-msg dt { margin-bottom: .35rem; }
+  .cs-actions { margin-top: 1.6rem; display: flex; gap: .8rem; flex-wrap: wrap; align-items: center; }
+  @keyframes cs-rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+  @keyframes cs-draw { to { stroke-dashoffset: 0; } }
+  .cs-badge circle { stroke-dasharray: 164; stroke-dashoffset: 164; animation: cs-draw .6s ease-out .1s forwards; }
+  .cs-badge path { stroke-dasharray: 36; stroke-dashoffset: 36; animation: cs-draw .35s ease-out .55s forwards; }
+  @media (prefers-reduced-motion: reduce) {
+    .contact-sent { animation: none; }
+    .cs-badge circle, .cs-badge path { animation: none; stroke-dashoffset: 0; }
+  }
+
 /* CtaBox */
 .ctabox {
     border-radius: 1.5rem;

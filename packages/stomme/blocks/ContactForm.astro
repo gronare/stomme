@@ -26,10 +26,20 @@ const contactLine = [settings.name, settings.hq, settings.orgNr && `Org.nr ${set
 // Send through the gateway (Resend key + rate limit live there, one place for all sites).
 // Falls back to the per-site /api/contact endpoint if the site isn't CMS/gateway-wired.
 const contactAction = site?.cms?.baseUrl ? `${site.cms.baseUrl}/contact` : '/api/contact';
+
+// Confirmation copy (localized via cmsLocale); serialized to the inline script below.
+const tk = (site?.strings?.thanks ?? {}) as Record<string, string>;
+const thanksData = {
+  eyebrow: tk.eyebrow ?? 'Message sent',
+  heading: tk.heading ?? "Thanks{name} — it's on its way.",
+  lead: tk.lead ?? "We've got your message and we'll reply within one business day.",
+  recapLabel: tk.recapLabel ?? 'What you sent',
+  email: L.email, phone: L.phone, message: L.message,
+};
 ---
 <section class="section">
   <div class="contact-grid">
-    <form method="POST" action={contactAction} class="contact-form">
+    <form method="POST" action={contactAction} class="contact-form" data-thanks={JSON.stringify(thanksData)}>
       <p class="hp" aria-hidden="true"><label>Don’t fill this in: <input name="bot-field" tabindex="-1" autocomplete="off" /></label></p>
       <div class="field">
         <label for="name" class="mono">{L.name}</label>
@@ -71,23 +81,35 @@ const contactAction = site?.cms?.baseUrl ? `${site.cms.baseUrl}/contact` : '/api
         try {
           var res = await fetch(form.action, { method: 'POST', body: fd, headers: { Accept: 'application/json', 'X-Requested-With': 'fetch' } });
           if (!res.ok) throw new Error('send failed');
+          var t = {}; try { t = JSON.parse(form.dataset.thanks || '{}'); } catch (e) {}
+          var name = (fd.get('name') || '').trim();
           var sent = document.createElement('div');
           sent.className = 'contact-sent';
-          var h = document.createElement('h3');
-          h.textContent = 'Thanks' + (fd.get('name') ? ', ' + fd.get('name') : '') + " — we'll be in touch.";
+          var badge = document.createElement('div');
+          badge.className = 'cs-badge';
+          badge.innerHTML = '<svg viewBox="0 0 56 56" aria-hidden="true"><circle cx="28" cy="28" r="26"/><path d="M17 29.5 L24.5 37 L40 20"/></svg>';
+          sent.appendChild(badge);
+          var eb = document.createElement('p'); eb.className = 'cs-eyebrow'; eb.textContent = t.eyebrow || 'Message sent'; sent.appendChild(eb);
+          var h = document.createElement('h2'); h.className = 'cs-head';
+          h.textContent = (t.heading || "Thanks{name} — it's on its way.").replace('{name}', name ? ', ' + name : '');
           sent.appendChild(h);
-          var p = document.createElement('p');
-          p.className = 'mono';
-          p.textContent = 'What you sent:';
-          sent.appendChild(p);
+          var lead = document.createElement('p'); lead.className = 'cs-lead'; lead.textContent = t.lead || ''; sent.appendChild(lead);
+          var recap = document.createElement('div'); recap.className = 'cs-recap';
+          var rl = document.createElement('p'); rl.className = 'cs-label'; rl.textContent = t.recapLabel || 'What you sent'; recap.appendChild(rl);
           var dl = document.createElement('dl');
-          [['Email', fd.get('email')], ['Phone', fd.get('phone')], ['Message', fd.get('message')]].forEach(function (row) {
+          [[t.email || 'Email', fd.get('email')], [t.phone || 'Phone', fd.get('phone')]].forEach(function (row) {
             if (!row[1]) return;
             var dt = document.createElement('dt'); dt.textContent = row[0];
             var dd = document.createElement('dd'); dd.textContent = row[1];
             dl.appendChild(dt); dl.appendChild(dd);
           });
-          sent.appendChild(dl);
+          if (fd.get('message')) {
+            var wrap = document.createElement('div'); wrap.className = 'cs-msg';
+            var mdt = document.createElement('dt'); mdt.textContent = t.message || 'Message';
+            var mdd = document.createElement('dd'); mdd.textContent = fd.get('message');
+            wrap.appendChild(mdt); wrap.appendChild(mdd); dl.appendChild(wrap);
+          }
+          recap.appendChild(dl); sent.appendChild(recap);
           form.replaceWith(sent);
         } catch (err) {
           if (btn) btn.disabled = false;
