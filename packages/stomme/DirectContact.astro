@@ -14,7 +14,7 @@ interface Props {
 const { label, phone, phoneE164, email, hours, footer, tint } = Astro.props;
 ---
 <aside class:list={['direct-card', tint && 'direct-card--tint']}>
-  <p class="mono mono-dot direct-card__label">{label}</p>
+  <p class="mono eyebrow direct-card__label">{label}</p>
   {phone && <p class="direct-card__phone"><a href={`tel:${phoneE164 || phone}`}>{phone}</a></p>}
   {email && <p class="direct-card__email"><a href={`mailto:${email}`}>{email}</a></p>}
   {hours && <p class="direct-card__hours">{hours}</p>}

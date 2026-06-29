@@ -36,7 +36,7 @@ const hasMedia = showImage || showHighlights || showMotif;
 <section class:list={['section', { 'section--hero-tall': height === 'tall' }, height === 'tall' && `section--hero-${align}`]}>
   <div class:list={['hero-grid', { 'has-media': hasMedia }]}>
     <div>
-      {eyebrow && <span class="mono mono-dot">{eyebrow}</span>}
+      {eyebrow && <span class="mono eyebrow">{eyebrow}</span>}
       <h1 class="display display--hero" style="margin-top:1rem">{heading}</h1>
       {intro && <p class="intro">{intro}</p>}
       {(ctaLabel || settings.phone) && (

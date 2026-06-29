@@ -22,7 +22,7 @@ const contact = site.routes.contact ?? '/contact';
 const { Content } = await render(service);
 ---
 <section class="section service-page">
-  <span class="mono mono-dot">{t.eyebrow}</span>
+  <span class="mono eyebrow">{t.eyebrow}</span>
   <h1 class="display display--hero service-h1">{data.title}</h1>
   {data.image && (
     <Cover src={data.image} alt={data.imageAlt ?? data.title} placeholder="/images/placeholders/service.svg" width={1200} height={675} loading="eager" class="service-img" />

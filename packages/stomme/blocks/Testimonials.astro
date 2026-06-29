@@ -16,7 +16,7 @@ const items = (await getCollection('testimonials')).sort((a, b) => a.data.order 
 <section class="section">
   {(eyebrow || heading || intro) && (
     <div class="section-head">
-      {eyebrow && <span class="mono mono-dot">{eyebrow}</span>}
+      {eyebrow && <span class="mono eyebrow">{eyebrow}</span>}
       {heading && <h2 class="display" style="margin-top:0.75rem">{heading}</h2>}
       {intro && <p class="intro">{intro}</p>}
     </div>

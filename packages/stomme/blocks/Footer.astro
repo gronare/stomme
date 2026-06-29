@@ -48,7 +48,7 @@ const year = new Date().getFullYear();
         <div class="footer-cols">
           {footer.showLinks !== false && links.length > 0 && (
             <nav>
-              <p class="mono mono-dot">{footer.linksHeading ?? 'Links'}</p>
+              <p class="mono eyebrow">{footer.linksHeading ?? 'Links'}</p>
               <ul class="footer-links">
                 {links.map((l) => <li><a href={resolveLink(l.link, '/')} class="footer-link">{l.label}</a></li>)}
               </ul>
@@ -56,7 +56,7 @@ const year = new Date().getFullYear();
           )}
           {footer.showTowns && towns && towns.length > 0 && (
             <nav>
-              <p class="mono mono-dot">{footer.townsHeading ?? 'Areas'}</p>
+              <p class="mono eyebrow">{footer.townsHeading ?? 'Areas'}</p>
               <ul class="footer-links footer-towns">
                 {towns.map((t) => <li><a href={`${townsHref ?? '/areas'}/${t.id}`} class="footer-link">{t.name}</a></li>)}
               </ul>

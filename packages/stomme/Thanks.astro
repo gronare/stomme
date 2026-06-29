@@ -41,7 +41,7 @@ const twoCol = hasRecap && hasDirect;
 ---
 <section class="section thanks-confirm">
   <div class="cs-badge"><svg viewBox="0 0 56 56" aria-hidden="true"><circle cx="28" cy="28" r="26"></circle><path d="M17 29.5 L24.5 37 L40 20"></path></svg></div>
-  <span class="mono mono-dot cs-eyebrow">{eyebrow}</span>
+  <span class="mono eyebrow cs-eyebrow">{eyebrow}</span>
   {heading && <h1 class="cs-head">{heading}</h1>}
   {message && <p class="cs-lead">{message}</p>}
   {(primaryLabel || secondaryLabel) && (
@@ -56,7 +56,7 @@ const twoCol = hasRecap && hasDirect;
   <div class:list={['thanks-cols', !twoCol && 'thanks-cols--solo']}>
     {hasRecap && (
       <section class="cs-card" aria-label={recapLabel}>
-        <p class="mono mono-dot cs-label">{recapLabel}</p>
+        <p class="mono eyebrow cs-label">{recapLabel}</p>
         <dl class="cs-recap-dl">
           {recap!.email && (<><dt>{recap!.emailLabel ?? 'Email'}</dt><dd>{recap!.email}</dd></>)}
           {recap!.phone && (<><dt>{recap!.phoneLabel ?? 'Phone'}</dt><dd>{recap!.phone}</dd></>)}

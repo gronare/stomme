@@ -15,7 +15,7 @@ const { eyebrow, heading, intro, items = [], width = 'narrow' } = Astro.props;
   <section class:list={['section', { 'section--read': width !== 'full' }]}>
     {(eyebrow || heading || intro) && (
       <div class="section-head">
-        {eyebrow && <span class="mono mono-dot">{eyebrow}</span>}
+        {eyebrow && <span class="mono eyebrow">{eyebrow}</span>}
         {heading && <h2 class="display steps__heading">{heading}</h2>}
         {intro && <p class="intro">{intro}</p>}
       </div>

@@ -52,14 +52,14 @@ body > main { flex: 1 0 auto; } /* sticky footer: main grows so the footer sits 
 .intro { margin-top: 1rem; color: var(--color-muted); font-size: 1.1rem; max-width: 38rem; }
 
 .mono { font-family: var(--bk-font-mono); text-transform: uppercase; letter-spacing: 0.12em; font-size: 0.74rem; color: var(--color-muted); }
-.mono-dot { display: inline-flex; align-items: center; gap: 10px; }
+.eyebrow { display: inline-flex; align-items: center; gap: 10px; }
 /* Eyebrow marker — site-wide style via [data-eyebrow] on <html> (theme.eyebrow).
    Default: a brand dash. `bullet`: a brand dot. `bold`: no marker, but the eyebrow
    itself goes heavy + wide-tracked (the cover/"helbild" treatment, extracted). */
-.mono-dot::before { content: ""; width: 18px; height: 2px; background: var(--eyebrow-accent, var(--color-brand)); display: inline-block; }
-[data-eyebrow="bullet"] .mono-dot::before { width: 7px; height: 7px; border-radius: 50%; }
-[data-eyebrow="bold"] .mono-dot::before { display: none; }
-[data-eyebrow="bold"] .mono-dot { font-weight: 700; letter-spacing: 0.16em; }
+.eyebrow::before { content: ""; width: 18px; height: 2px; background: var(--eyebrow-accent, var(--color-brand)); display: inline-block; }
+[data-eyebrow="bullet"] .eyebrow::before { width: 7px; height: 7px; border-radius: 50%; }
+[data-eyebrow="bold"] .eyebrow::before { display: none; }
+[data-eyebrow="bold"] .eyebrow { font-weight: 700; letter-spacing: 0.16em; }
 
 .btn { display: inline-block; background: var(--color-brand); color: var(--color-on-dark); font-weight: 600; padding: 0.6rem 1.3rem; border-radius: 0.7rem; text-decoration: none; white-space: nowrap; }
 .btn:hover { background: var(--color-brand-press); }
@@ -591,7 +591,7 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
   .cs-head { font-size: clamp(1.6rem, 3.5vw, 2.1rem); font-weight: 800; letter-spacing: -.02em; line-height: 1.1; margin: 0; max-width: 20ch; text-wrap: balance; }
   .cs-lead { color: var(--color-muted); font-size: 1.08rem; margin: .9rem 0 0; max-width: 46ch; }
   .cs-recap { margin-top: 1.8rem; background: var(--color-surface); border: 1px solid var(--color-line); border-radius: 1rem; padding: 1.4rem 1.5rem; }
-  /* card section label — uses the shared .mono .mono-dot eyebrow so it follows the
+  /* card section label — uses the shared .mono .eyebrow eyebrow so it follows the
      site's eyebrow style + colour ([data-eyebrow] + --eyebrow-accent); this is just spacing */
   .cs-label { margin: 0 0 1rem; }
   .cs-recap dl { margin: 0; display: grid; grid-template-columns: max-content 1fr; gap: .8rem 1.4rem; align-items: baseline; }

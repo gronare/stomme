@@ -18,7 +18,7 @@ const accentVar = accent === 'secondary' ? 'var(--color-secondary)' : accent ===
 <section class="stat-panel" style={`--block-accent:${accentVar}`}>
   <div class="stat-panel__inner">
     <div class="stat-panel__main">
-      {eyebrow && <span class="mono mono-dot">{eyebrow}</span>}
+      {eyebrow && <span class="mono eyebrow">{eyebrow}</span>}
       {heading && <h2 class="display stat-panel__h">{heading}</h2>}
       {body && <p class="stat-panel__body">{body}</p>}
       {badges.length > 0 && (
