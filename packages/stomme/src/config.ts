@@ -206,5 +206,6 @@ export function resolveSite(c?: SiteConfig) {
       listingCta: (s && s.listingCta) || base.listingCta,
     },
     listings: resolveListings(c && c.listings),
+    cms: c && c.cms, // forwarded so blocks (e.g. ContactForm) can reach the gateway baseUrl
   };
 }

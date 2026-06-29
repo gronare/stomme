@@ -12,5 +12,5 @@ items:
 cta:
   label: Contact
   link:
-    page: /about
+    page: /contact
 ---

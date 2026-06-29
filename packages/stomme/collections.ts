@@ -37,7 +37,7 @@ export const PRESET_SCHEMAS = {
 export function stommeCollections(listings?: Listing[]) {
   const base: Record<string, ReturnType<typeof defineCollection>> = {
     home: defineCollection({ loader: md('home'), schema: z.object({ seo, blocks }) }),
-    pages: defineCollection({ loader: md('pages'), schema: z.object({ title: z.string(), seo, blocks }) }),
+    pages: defineCollection({ loader: md('pages'), schema: z.object({ title: z.string(), seo, blocks, published: z.boolean().default(true) }) }),
 
     settings: defineCollection({
       loader: md('settings'),

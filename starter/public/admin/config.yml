@@ -753,6 +753,7 @@ collections:
     slug: "{{slug}}"
     fields:
       - { name: title, label: "Title", widget: string }
+      - { name: published, label: "Published (uncheck to hide this page from the site)", widget: boolean, default: true, required: false }
       - label: "SEO"
         name: seo
         widget: object
