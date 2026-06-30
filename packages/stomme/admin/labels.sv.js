@@ -190,6 +190,8 @@ export default {
   'Settings': 'Inställningar',
   'Site & contact': 'Webbplats & kontakt',
   'Site name': 'Webbplatsnamn',
+  'Business name': 'Företagsnamn',
+  'Company name — used in the footer ©, the contact card, and search structured data. Not a page title.': 'Företagsnamn — används i sidfotens ©, kontaktkortet och sökstrukturdata. Inte en sidtitel.',
   'Navigation': 'Navigering',
   'Header': 'Sidhuvud',
   'Menu links': 'Menylänkar',

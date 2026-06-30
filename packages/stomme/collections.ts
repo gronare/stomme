@@ -39,8 +39,10 @@ export function stommeCollections(listings?: Listing[]) {
     home: defineCollection({ loader: md('home'), schema: z.object({ seo, blocks }) }),
     pages: defineCollection({ loader: md('pages'), schema: z.object({ title: z.string(), seo, blocks, published: z.boolean().default(true) }) }),
 
-    // Identity — name, logo, SEO/icons. Contact details live in their own `contact`
-    // collection; facts/partners live on their blocks (Stats / Logo-strip).
+    // Identity — business name, logo, icons. `name` is the company name (footer ©, contact
+    // card, LocalBusiness schema, logo aria-label), NOT a page title — pages set their own
+    // required seo.title/description. Contact details live in the `contact` collection;
+    // facts/partners live on their blocks (Stats / Logo-strip).
     settings: defineCollection({
       loader: md('settings'),
       schema: z.object({
@@ -48,10 +50,8 @@ export function stommeCollections(listings?: Listing[]) {
         // Logo lives with site identity (used in BOTH header and footer); each of those
         // chooses whether to show the mark / wordmark via their own toggles.
         logo: z.object({ image: z.string().optional(), alt: z.string().optional(), textPre: z.string().default(''), textAccent: z.string().default('') }).default({}),
-        description: z.string().default(''),
         // Browser-tab icon (SVG recommended — scales to any size). Falls back to
-        // the shipped /favicon.svg when unset. `appleIcon` is the iOS home-screen
-        // PNG (180×180); optional. Facts/partners live on their blocks (Stats / Logo-strip).
+        // the shipped /favicon.svg when unset. `appleIcon` is the iOS home-screen PNG (180×180).
         favicon: z.string().optional(),
         appleIcon: z.string().optional(),
       }),

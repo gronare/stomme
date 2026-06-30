@@ -1543,7 +1543,7 @@ collections:
         label: "Identity"
         file: "src/content/settings/site.md"
         fields:
-          - { name: name, label: "Site name", widget: string }
+          - { name: name, label: "Business name", widget: string, hint: "Company name — used in the footer ©, the contact card, and search structured data. Not a page title." }
           - name: logo
             label: "Logo"
             widget: object
@@ -1553,7 +1553,6 @@ collections:
               - { name: alt, label: "Logo alt text", widget: string, required: false }
               - { name: textPre, label: "Wordmark text", widget: string, required: false }
               - { name: textAccent, label: "Wordmark accent (in brand colour)", widget: string, required: false }
-          - { name: description, label: "Description", widget: text }
           - { name: favicon, label: "Favicon", widget: image, required: false, hint: "Browser-tab icon — SVG recommended (scales to any size). Defaults to the shipped mark when empty." }
           - { name: appleIcon, label: "Home-screen icon", widget: image, required: false, hint: "iOS home-screen icon — a 180×180 PNG. Optional." }
       - name: contact
