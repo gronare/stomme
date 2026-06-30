@@ -76,8 +76,9 @@ export function stommeCollections(listings?: Listing[]) {
           lat: z.number().optional(),
           lng: z.number().optional(),
         }).default({}),
-        // Weekly hours as editable lines (days + hours text), plus special/holiday lines.
-        hours: z.array(z.object({ days: z.string(), hours: z.string() })).default([]),
+        // Weekly hours as editable lines (days + hours text + an optional exception note,
+        // e.g. "Closed 12–13 for lunch"), plus special/holiday lines.
+        hours: z.array(z.object({ days: z.string(), hours: z.string(), note: z.string().default('') })).default([]),
         holidayHours: z.array(z.object({ when: z.string(), note: z.string() })).default([]),
         // Global "we're away" banner — shows on every card; auto-hides past `until` (client-side).
         away: z.object({

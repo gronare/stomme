@@ -573,9 +573,11 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
   /* sections (hours / visit / follow) */
   .direct-card__sec { margin-top: 1.25rem; }
   .direct-card__h { font-size: 0.62rem; letter-spacing: 0.12em; color: var(--color-muted); margin: 0 0 0.5rem; font-weight: 600; }
-  .direct-card__hours { margin: 0; display: grid; grid-template-columns: max-content 1fr; gap: 0.25rem 1.1rem; font-size: 0.92rem; font-variant-numeric: tabular-nums; }
-  .direct-card__hours dt { color: var(--color-muted); }
-  .direct-card__hours dd { margin: 0; }
+  .direct-card__hours { margin: 0; display: flex; flex-direction: column; gap: 0.3rem; font-size: 0.92rem; font-variant-numeric: tabular-nums; }
+  .direct-card__hrow { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 0.9rem; row-gap: 0.1rem; }
+  .direct-card__days { color: var(--color-muted); min-width: 5.5em; }
+  .direct-card__hval { color: var(--color-ink); }
+  .direct-card__hnote { flex-basis: 100%; padding-left: 5.5em; color: var(--color-muted); font-size: 0.82rem; }
   .direct-card__addr { margin: 0; font-size: 0.95rem; line-height: 1.5; }
   /* away + holiday notice — highlight-tinted */
   .direct-card__away, .direct-card__holiday { display: flex; gap: 0.55rem; align-items: flex-start; margin: 0 0 1.1rem; padding: 0.6rem 0.8rem; font-size: 0.88rem; line-height: 1.4; border-radius: 0.6rem;

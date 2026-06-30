@@ -1584,6 +1584,7 @@ collections:
             fields:
               - { name: days, label: "Days", widget: string, hint: "e.g. Mon–Fri" }
               - { name: hours, label: "Hours", widget: string, hint: "e.g. 08:00–17:00, or Closed" }
+              - { name: note, label: "Exception (optional)", widget: string, required: false, hint: "e.g. Closed 12:00–13:00 for lunch" }
           - name: holidayHours
             label: "Holiday / special hours"
             widget: list

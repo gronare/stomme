@@ -293,14 +293,30 @@
     var cityLine = [nested(e, 'address', 'postcode'), nested(e, 'address', 'city')].filter(Boolean).join(' ');
     var country = nested(e, 'address', 'country');
     var hasAddr = st || cityLine || country;
+    var lat = e.getIn(['data', 'address', 'lat']), lng = e.getIn(['data', 'address', 'lng']);
+    var hasMap = lat != null && lat !== '' && lng != null && lng !== '';
+    var dd = 0.006;
+    var mapSrc = hasMap ? 'https://www.openstreetmap.org/export/embed.html?bbox=' + (lng - dd) + '%2C' + (lat - dd) + '%2C' + (lng + dd) + '%2C' + (lat + dd) + '&layer=mapnik&marker=' + lat + '%2C' + lng : '';
+    var mapFrame = function (ht) { return h('iframe', { src: mapSrc, loading: 'lazy', title: 'Map', style: { width: '100%', height: ht, border: 0, display: 'block' } }); };
     var awayOn = e.getIn(['data', 'away', 'enabled']), awayMsg = nested(e, 'away', 'message');
     var sec = function (title, body) {
       return h('div', { style: { marginTop: '1.2rem' } },
         h('p', { style: { fontFamily: fMono, fontSize: '.6rem', letterSpacing: '.12em', textTransform: 'uppercase', color: cMuted, margin: '0 0 .45rem' } }, title), body);
     };
+    var lab = function (t) { return h('p', { style: { fontFamily: fMono, fontSize: '.62rem', letterSpacing: '.14em', textTransform: 'uppercase', color: cMuted, margin: '0 0 10px' } }, t); };
     var notice = function (text) {
       return h('p', { style: { display: 'flex', gap: '.5rem', alignItems: 'flex-start', background: 'color-mix(in srgb, ' + cHigh + ' 14%, ' + cPaper + ')', border: '1px solid color-mix(in srgb, ' + cHigh + ' 35%, ' + cPaper + ')', borderRadius: '.6rem', padding: '.55rem .75rem', fontSize: '.85rem', margin: '0 0 1rem' } },
         h('span', { style: { width: '8px', height: '8px', borderRadius: '50%', background: cHigh, marginTop: '.35rem', flex: '0 0 auto' } }), h('span', null, text));
+    };
+    var hoursBlock = function () {
+      return h('div', null,
+        holiday.map(function (hl, i) { return h('p', { key: 'h' + i, style: { margin: '0 0 .4rem', fontSize: '.85rem' } }, h('b', null, hl.when), hl.note ? ' — ' + hl.note : ''); }),
+        hours.map(function (r, i) {
+          return h('div', { key: i, style: { display: 'flex', flexWrap: 'wrap', columnGap: '.9rem', fontSize: '.9rem', marginBottom: '.15rem' } },
+            h('span', { style: { color: cMuted, minWidth: '5.5em' } }, r.days),
+            h('span', null, r.hours),
+            r.note ? h('span', { style: { flexBasis: '100%', paddingLeft: '5.5em', color: cMuted, fontSize: '.8rem' } }, r.note) : null);
+        }));
     };
     return h('div', { className: 'bk' },
       h('div', { style: { maxWidth: '420px', border: '1px solid ' + cLine, borderRadius: '18px', padding: '1.6rem 1.8rem', background: 'color-mix(in srgb, ' + cBrand + ' 7%, ' + cPaper + ')' } },
@@ -308,14 +324,23 @@
         h('p', { className: 'bk-eyebrow' }, 'Direct contact'),
         phone ? h('p', { style: { fontFamily: 'var(--bk-font-display,' + SANS + ')', fontSize: '1.5rem', fontWeight: 800, color: cBrand, margin: 0 } }, phone) : null,
         email ? h('p', { style: { fontWeight: 600, margin: '.5rem 0 0' } }, email) : null,
-        (hours.length || holiday.length) ? sec('Opening hours',
-          h('div', null,
-            holiday.map(function (hl, i) { return h('p', { key: 'h' + i, style: { margin: '0 0 .4rem', fontSize: '.85rem' } }, h('b', null, hl.when), hl.note ? ' — ' + hl.note : ''); }),
-            hours.map(function (r, i) { return h('div', { key: i, style: { display: 'flex', justifyContent: 'space-between', gap: '1rem', fontSize: '.9rem' } }, h('span', { style: { color: cMuted } }, r.days), h('span', null, r.hours)); }))) : null,
+        (hours.length || holiday.length) ? sec('Opening hours', hoursBlock()) : null,
         hasAddr ? sec('Visit', h('p', { style: { margin: 0, fontSize: '.92rem', lineHeight: 1.5 } }, st, st ? h('br') : null, cityLine, cityLine ? h('br') : null, country)) : null,
+        hasMap ? sec('Map', h('div', { style: { borderRadius: '.6rem', overflow: 'hidden', border: '1px solid ' + cLine, height: '130px' } }, mapFrame('130px'))) : null,
         socials.length ? sec('Follow', h('div', { style: { display: 'flex', gap: '.4rem', flexWrap: 'wrap' } },
           socials.map(function (s, i) { return h('span', { key: i, style: { fontFamily: fMono, fontSize: '.66rem', border: '1px solid ' + cLine, borderRadius: '.5rem', padding: '.25rem .55rem', background: cPaper, color: cBrand } }, s.platform); }))) : null),
-      note('The direct-contact card — contact page · /thanks · footer · the contactCard + findUs blocks. Each placement toggles which parts show.'));
+
+      (hasMap || hasAddr) ? h('div', { style: { marginTop: '1.8rem', maxWidth: '540px' } },
+        lab('As a “Find us” block'),
+        h('div', { style: { display: 'grid', gridTemplateColumns: hasMap ? '1.3fr 1fr' : '1fr', border: '1px solid ' + cLine, borderRadius: '16px', overflow: 'hidden', background: cPaper } },
+          hasMap ? h('div', { style: { minHeight: '180px' } }, mapFrame('100%')) : null,
+          h('div', { style: { padding: '1.1rem 1.3rem', display: 'flex', flexDirection: 'column', gap: '.7rem' } },
+            h('h3', { style: { margin: 0, fontFamily: 'var(--bk-font-display,' + SANS + ')', fontWeight: 800, fontSize: '1.15rem', letterSpacing: '-.02em' } }, 'Find us'),
+            hasAddr ? h('p', { style: { margin: 0, fontSize: '.88rem', lineHeight: 1.5 } }, st, st ? h('br') : null, cityLine) : null,
+            phone ? h('p', { style: { margin: 0, color: cBrand, fontWeight: 800, fontSize: '1.05rem' } }, phone) : null,
+            hours.length ? hoursBlock() : null))) : null,
+
+      note('The direct-contact card (top) + the Find-us block, both auto-filled from here. Each placement toggles which parts show.'));
   };
 
   var arr = function (e, k) { var x = e.getIn(['data', k]); x = x && x.toJS ? x.toJS() : x; return Array.isArray(x) ? x : []; };

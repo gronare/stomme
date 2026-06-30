@@ -73,7 +73,13 @@ const slug = (p: string) => p.toLowerCase().replace(/[^a-z]/g, '');
         <p class="direct-card__holiday"><span class="direct-card__away-dot" aria-hidden="true"></span><span><b>{hl.when}</b>{hl.note ? ` — ${hl.note}` : ''}</span></p>
       ))}
       {hours.length > 0 && (
-        <dl class="direct-card__hours">{hours.map((h) => (<><dt>{h.days}</dt><dd>{h.hours}</dd></>))}</dl>
+        <div class="direct-card__hours">{hours.map((h: any) => (
+          <div class="direct-card__hrow">
+            <span class="direct-card__days">{h.days}</span>
+            <span class="direct-card__hval">{h.hours}</span>
+            {h.note && <span class="direct-card__hnote">{h.note}</span>}
+          </div>
+        ))}</div>
       )}
     </div>
   )}
