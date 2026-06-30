@@ -237,20 +237,38 @@
   var FooterPreview = ChromePreview('footer');
 
   var nested = function (e, a, b) { var x = e.getIn(['data', a, b]); return x == null ? '' : x; };
-  // Identity — the logo (mark + wordmark) as it shows in the header, + the business name.
+  // Identity — what each field becomes: the header logo, the browser-tab favicon, the
+  // home-screen icon, and the business name (footer © / contact / structured data).
   var IdentityPreview = function (props) {
     var e = props.entry;
-    var name = v(e, 'name');
+    var asset = function (p) { try { return p && props.getAsset ? String(props.getAsset(p)) : ''; } catch (_e) { return ''; } };
+    var name = v(e, 'name') || 'Your business';
     var pre = nested(e, 'logo', 'textPre'), accent = nested(e, 'logo', 'textAccent');
-    var img = nested(e, 'logo', 'image');
-    var imgUrl = ''; try { if (img && props.getAsset) imgUrl = String(props.getAsset(img)); } catch (_e) {}
+    var imgUrl = asset(nested(e, 'logo', 'image'));
+    var favUrl = asset(v(e, 'favicon')) || '/favicon.svg';
+    var appleUrl = asset(v(e, 'appleIcon'));
+    var lab = function (t) { return h('p', { style: { fontFamily: fMono, fontSize: '.62rem', letterSpacing: '.14em', textTransform: 'uppercase', color: cMuted, margin: '0 0 10px' } }, t); };
     return h('div', { className: 'bk' },
-      (imgUrl || pre) ? h('div', { style: { display: 'flex', alignItems: 'center', gap: '12px' } },
-        imgUrl ? h('img', { src: imgUrl, alt: '', style: { height: '36px', width: 'auto', display: 'block' } }) : null,
-        pre ? h('span', { style: { fontFamily: 'var(--bk-font-display,' + SANS + ')', fontWeight: 800, fontSize: '1.7rem', letterSpacing: '-.02em' } },
-          pre, accent ? h('span', { style: { color: cBrand } }, accent) : null) : null) : null,
-      name ? h('p', { style: { margin: '14px 0 0', color: cMuted, fontSize: '.92rem' } }, 'Business name: ', h('span', { style: { color: cInk } }, name)) : null,
-      note('Logo shows in the header + footer (blank wordmark = no text). Business name is used in the footer ©, contact card and search structured data — not as a page title.'));
+      lab('Logo'),
+      (imgUrl || pre)
+        ? h('div', { style: { display: 'flex', alignItems: 'center', gap: '12px' } },
+            imgUrl ? h('img', { src: imgUrl, alt: '', style: { height: '34px', width: 'auto', display: 'block' } }) : null,
+            pre ? h('span', { style: { fontFamily: 'var(--bk-font-display,' + SANS + ')', fontWeight: 800, fontSize: '1.6rem', letterSpacing: '-.02em' } },
+              pre, accent ? h('span', { style: { color: cBrand } }, accent) : null) : null)
+        : h('p', { style: { color: cMuted, margin: 0 } }, 'No logo set'),
+
+      h('div', { style: { marginTop: '24px' } }, lab('Browser tab'),
+        h('div', { style: { display: 'inline-flex', alignItems: 'center', gap: '8px', maxWidth: '260px', background: cPaper, border: '1px solid ' + cLine, borderRadius: '9px 9px 0 0', padding: '8px 13px' } },
+          h('img', { src: favUrl, alt: '', style: { width: '16px', height: '16px', display: 'block', flex: '0 0 auto' } }),
+          h('span', { style: { fontSize: '.8rem', color: cInk, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' } }, name))),
+
+      appleUrl ? h('div', { style: { marginTop: '24px' } }, lab('Home-screen icon'),
+        h('div', { style: { display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '7px' } },
+          h('img', { src: appleUrl, alt: '', style: { width: '56px', height: '56px', borderRadius: '13px', display: 'block', boxShadow: '0 2px 8px rgba(0,0,0,.18)' } }),
+          h('span', { style: { fontSize: '.72rem', color: cMuted } }, name))) : null,
+
+      h('p', { style: { margin: '24px 0 0', color: cMuted, fontSize: '.9rem' } }, 'Business name: ', h('span', { style: { color: cInk, fontWeight: 600 } }, name)),
+      note('Logo → header/footer · favicon → browser tab · home-screen icon → saved-to-home · business name → footer ©, contact card, structured data.'));
   };
   // Contact — the direct-contact card look (contact page + form confirmation + footer line).
   var ContactPreview = function (props) {
