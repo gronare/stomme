@@ -103,11 +103,23 @@
     for (var i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
     return btoa(bin);
   }
+  // Keep the preview iframe MOUNTED across edits: render it once with the initial data in
+  // its src (so it SSR-renders), then on each re-render push the new draft via postMessage.
+  // The /preview page swaps its #preview-root in place — no navigation, no reload, no
+  // per-keystroke flicker. Returning the existing iframe's src UNCHANGED is what stops the
+  // CMS's React from reloading it; the visible update rides on the message instead.
+  var FRAME_STYLE = { width: '100%', height: '100vh', border: '0', display: 'block', background: '#fff' };
+  function liveFrame(id, baseSrc, data) {
+    var existing = document.getElementById(id);
+    if (existing) {
+      if (existing.contentWindow) existing.contentWindow.postMessage({ type: 'stomme:preview', data: data }, '*');
+      return h('iframe', { id: id, src: existing.getAttribute('src'), style: FRAME_STYLE });
+    }
+    var sep = baseSrc.indexOf('?') >= 0 ? '&' : '?';
+    return h('iframe', { id: id, src: baseSrc + sep + 'data=' + encodeURIComponent(data), style: FRAME_STYLE });
+  }
   var PagePreview = function (props) {
-    return h('iframe', {
-      src: '/preview?data=' + encodeURIComponent(b64(jsBlocks(props.entry))),
-      style: { width: '100%', height: '100vh', border: '0', display: 'block', background: '#fff' },
-    });
+    return liveFrame('stomme-preview', '/preview', b64(jsBlocks(props.entry)));
   };
 
   // ── Rich collection / settings / chrome mockups ─────────────────────────────
@@ -227,10 +239,7 @@
     return function (props) {
       var data = props.entry.get('data');
       data = data && data.toJS ? data.toJS() : data || {};
-      return h('iframe', {
-        src: '/preview?kind=' + kind + '&data=' + encodeURIComponent(b64(data)),
-        style: { width: '100%', height: '100vh', border: '0', display: 'block', background: '#fff' },
-      });
+      return liveFrame('stomme-preview-' + kind, '/preview?kind=' + kind, b64(data));
     };
   };
   var HeaderPreview = ChromePreview('header');

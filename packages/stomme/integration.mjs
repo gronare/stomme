@@ -93,39 +93,52 @@ if (kind === 'thanks') {
 const contactDraft = kind === 'contact' && draft && typeof draft === 'object' ? draft : null;
 ---
 {kind === 'header' ? (
-  <Base title="Preview" chrome={false}><Header nav={navDraft} /></Base>
+  <Base title="Preview" chrome={false}><div id="preview-root"><Header nav={navDraft} /></div></Base>
 ) : kind === 'footer' ? (
-  <Base title="Preview" chrome={false}><Footer footer={footerDraft} towns={towns} townsHref={site.routes?.towns ?? '/areas'} /></Base>
+  <Base title="Preview" chrome={false}><div id="preview-root"><Footer footer={footerDraft} towns={towns} townsHref={site.routes?.towns ?? '/areas'} /></div></Base>
 ) : kind === 'thanks' ? (
-  <Base title="Preview"><Thanks {...thanks} /></Base>
+  <Base title="Preview"><div id="preview-root"><Thanks {...thanks} /></div></Base>
 ) : kind === 'contact' ? (
-  <Base title="Preview">
+  <Base title="Preview"><div id="preview-root">
     <div style="display:flex;flex-direction:column;gap:2.25rem;padding:2.25rem 1.5rem">
       <div class="contact-card-block"><DirectContact data={contactDraft} tint={true} show={{ phone: true, email: true, hours: true, address: true, socials: true, map: true }} /></div>
       <FindUs data={contactDraft} showHours={true} />
     </div>
-  </Base>
+  </div></Base>
 ) : (
   <Base title="Preview"><div id="preview-root"><BlockRenderer blocks={blocks} config={site} /></div></Base>
 )}
 <script is:inline>
-  // Each edit re-points this iframe at a new ?data=, so it reloads. Persist + restore
-  // the scroll position so the preview doesn't jump back to the top on every keystroke.
+  // Live updates without reloading: the CMS keeps this iframe mounted (stable src) and
+  // posts the new draft as it's typed. We re-fetch just this page's HTML and swap the
+  // #preview-root contents in place — no navigation, so CSS, scroll and focus are kept
+  // and there's no per-keystroke flicker. Single-flight + trailing: at most one fetch in
+  // flight, and we always converge to the latest data (no fixed debounce lag).
   (function () {
-    var KEY = 'stomme:previewScroll';
-    try {
-      var saved = sessionStorage.getItem(KEY);
-      if (saved) window.addEventListener('load', function () { window.scrollTo(0, +saved); });
-      window.addEventListener('scroll', function () { sessionStorage.setItem(KEY, String(window.scrollY)); }, { passive: true });
-    } catch (e) {}
-  })();
-  window.addEventListener('message', (e) => {
-    if (e.data && e.data.type === 'stomme:preview' && typeof e.data.data === 'string') {
-      const u = new URL(location.href);
-      u.searchParams.set('data', e.data.data);
-      location.replace(u.toString());
+    var inflight = false, pending = null, applied = null;
+    function swap(data) {
+      if (data === applied) return;
+      if (inflight) { pending = data; return; }
+      inflight = true; applied = data;
+      var u = new URL(location.href);
+      u.searchParams.set('data', data);
+      fetch(u.toString(), { headers: { 'X-Preview-Swap': '1' } })
+        .then(function (r) { return r.text(); })
+        .then(function (html) {
+          var cur = document.getElementById('preview-root');
+          var fresh = new DOMParser().parseFromString(html, 'text/html').getElementById('preview-root');
+          if (cur && fresh) cur.innerHTML = fresh.innerHTML;
+        })
+        .catch(function () {})
+        .then(function () {
+          inflight = false;
+          if (pending !== null) { var d = pending; pending = null; swap(d); }
+        });
     }
-  });
+    window.addEventListener('message', function (e) {
+      if (e.data && e.data.type === 'stomme:preview' && typeof e.data.data === 'string') swap(e.data.data);
+    });
+  })();
 </script>
 `;
 }
