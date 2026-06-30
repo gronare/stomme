@@ -386,4 +386,26 @@ export const defaultBlocks: BlockDef[] = [
       { name: 'showDirectContact', label: 'Show the direct-contact card', widget: 'boolean', required: false, default: true, hint: 'Off → the form fills the width (no phone/email card).' },
     ],
   },
+  {
+    type: 'contactCard', label: 'Contact card', group: 'Calls to action', shape: 'box',
+    summary: 'The direct-contact card, auto-filled from Contact settings. Toggle which parts show here.',
+    fields: [
+      { name: 'label', label: 'Card heading', widget: 'string', required: false, default: 'Direct contact' },
+      { name: 'tint', label: 'Tinted background', widget: 'boolean', required: false, default: true },
+      { name: 'showPhone', label: 'Show phone', widget: 'boolean', required: false, default: true },
+      { name: 'showEmail', label: 'Show email', widget: 'boolean', required: false, default: true },
+      { name: 'showHours', label: 'Show opening hours', widget: 'boolean', required: false, default: false },
+      { name: 'showAddress', label: 'Show address', widget: 'boolean', required: false, default: false },
+      { name: 'showSocials', label: 'Show social links', widget: 'boolean', required: false, default: false },
+      { name: 'showMap', label: 'Show mini map', widget: 'boolean', required: false, default: false, hint: 'Needs latitude/longitude on the Contact address.' },
+    ],
+  },
+  {
+    type: 'findUs', label: 'Find us (map)', group: 'Calls to action', shape: 'split',
+    summary: 'A map beside the address, contact and hours — auto-filled from Contact settings. Needs lat/lng on the address.',
+    fields: [
+      { name: 'heading', label: 'Heading', widget: 'string', required: false, default: 'Find us' },
+      { name: 'showHours', label: 'Show opening hours', widget: 'boolean', required: false, default: true },
+    ],
+  },
 ];

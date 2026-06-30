@@ -1,0 +1,25 @@
+---
+// Drop-in direct-contact card — auto-filled from the Contact settings; each placement
+// toggles which parts show. Just a thin placement wrapper around DirectContact.
+import DirectContact from '../DirectContact.astro';
+interface Props {
+  label?: string;
+  tint?: boolean;
+  showPhone?: boolean;
+  showEmail?: boolean;
+  showHours?: boolean;
+  showAddress?: boolean;
+  showSocials?: boolean;
+  showMap?: boolean;
+}
+const { label, tint, showPhone, showEmail, showHours, showAddress, showSocials, showMap } = Astro.props;
+---
+<section class="section">
+  <div class="contact-card-block">
+    <DirectContact
+      label={label}
+      tint={tint !== false}
+      show={{ phone: showPhone, email: showEmail, hours: showHours, address: showAddress, socials: showSocials, map: showMap }}
+    />
+  </div>
+</section>

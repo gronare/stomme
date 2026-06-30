@@ -1,0 +1,39 @@
+---
+// "Find us" — a larger section: a map beside the address, contact and hours, all
+// auto-filled from the Contact settings. The map needs lat/lng on the address.
+import { getEntry } from 'astro:content';
+interface Props { heading?: string; showHours?: boolean }
+const { heading = 'Find us', showHours } = Astro.props;
+const c = ((await getEntry('contact', 'contact').catch(() => null))?.data ?? {}) as any;
+const a = c.address ?? {};
+const hasMap = a.lat != null && a.lng != null;
+const d = 0.006;
+const mapSrc = hasMap
+  ? `https://www.openstreetmap.org/export/embed.html?bbox=${a.lng - d}%2C${a.lat - d}%2C${a.lng + d}%2C${a.lat + d}&layer=mapnik&marker=${a.lat}%2C${a.lng}`
+  : '';
+const cityLine = [a.postcode, a.city].filter(Boolean).join(' ');
+const hasAddr = !!(a.street || cityLine || a.country);
+const hours = (c.hours ?? []) as { days: string; hours: string }[];
+---
+<section class="findus-block">
+  <div class="findus">
+    {hasMap && (
+      <div class="findus__map"><iframe src={mapSrc} loading="lazy" title="Map" referrerpolicy="no-referrer-when-downgrade"></iframe></div>
+    )}
+    <div class:list={['findus__info', !hasMap && 'findus__info--solo']}>
+      {heading && <h2 class="findus__h">{heading}</h2>}
+      {hasAddr && (
+        <p class="findus__addr">{a.street}{a.street && <br />}{cityLine}{cityLine && <br />}{a.country}</p>
+      )}
+      {(c.phone || c.email) && (
+        <p class="findus__reach">
+          {c.phone && <a class="findus__phone" href={`tel:${c.phoneE164 || c.phone}`}>{c.phone}</a>}
+          {c.email && <a class="findus__email" href={`mailto:${c.email}`}>{c.email}</a>}
+        </p>
+      )}
+      {showHours !== false && hours.length > 0 && (
+        <dl class="direct-card__hours findus__hours">{hours.map((h) => (<><dt>{h.days}</dt><dd>{h.hours}</dd></>))}</dl>
+      )}
+    </div>
+  </div>
+</section>

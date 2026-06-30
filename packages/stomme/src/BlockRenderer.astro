@@ -28,6 +28,8 @@ import Faq from '../blocks/Faq.astro';
 import StatsBar from '../blocks/StatsBar.astro';
 import LogoStrip from '../blocks/LogoStrip.astro';
 import ContactForm from '../blocks/ContactForm.astro';
+import ContactCard from '../blocks/ContactCard.astro';
+import FindUs from '../blocks/FindUs.astro';
 import { resolveSite, type SiteConfig } from './config';
 
 const defaults: Record<string, any> = {
@@ -57,6 +59,8 @@ const defaults: Record<string, any> = {
   statsBar: StatsBar,
   logoStrip: LogoStrip,
   contactForm: ContactForm,
+  contactCard: ContactCard,
+  findUs: FindUs,
 };
 
 interface Props {
