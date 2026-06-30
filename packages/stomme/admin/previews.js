@@ -286,16 +286,36 @@
   // Contact — the direct-contact card look (contact page + form confirmation + footer line).
   var ContactPreview = function (props) {
     var e = props.entry;
-    var phone = v(e, 'phone'), email = v(e, 'email'), hours = v(e, 'openingHours');
-    var org = [v(e, 'hq'), v(e, 'orgNr') ? 'Org.nr ' + v(e, 'orgNr') : ''].filter(Boolean).join('  ·  ');
+    var cHigh = 'var(--color-highlight,' + HIGHLIGHT + ')';
+    var phone = v(e, 'phone'), email = v(e, 'email');
+    var hours = arr(e, 'hours'), holiday = arr(e, 'holidayHours'), socials = arr(e, 'socials');
+    var st = nested(e, 'address', 'street');
+    var cityLine = [nested(e, 'address', 'postcode'), nested(e, 'address', 'city')].filter(Boolean).join(' ');
+    var country = nested(e, 'address', 'country');
+    var hasAddr = st || cityLine || country;
+    var awayOn = e.getIn(['data', 'away', 'enabled']), awayMsg = nested(e, 'away', 'message');
+    var sec = function (title, body) {
+      return h('div', { style: { marginTop: '1.2rem' } },
+        h('p', { style: { fontFamily: fMono, fontSize: '.6rem', letterSpacing: '.12em', textTransform: 'uppercase', color: cMuted, margin: '0 0 .45rem' } }, title), body);
+    };
+    var notice = function (text) {
+      return h('p', { style: { display: 'flex', gap: '.5rem', alignItems: 'flex-start', background: 'color-mix(in srgb, ' + cHigh + ' 14%, ' + cPaper + ')', border: '1px solid color-mix(in srgb, ' + cHigh + ' 35%, ' + cPaper + ')', borderRadius: '.6rem', padding: '.55rem .75rem', fontSize: '.85rem', margin: '0 0 1rem' } },
+        h('span', { style: { width: '8px', height: '8px', borderRadius: '50%', background: cHigh, marginTop: '.35rem', flex: '0 0 auto' } }), h('span', null, text));
+    };
     return h('div', { className: 'bk' },
       h('div', { style: { maxWidth: '420px', border: '1px solid ' + cLine, borderRadius: '18px', padding: '1.6rem 1.8rem', background: 'color-mix(in srgb, ' + cBrand + ' 7%, ' + cPaper + ')' } },
+        (awayOn && awayMsg) ? notice(awayMsg) : null,
         h('p', { className: 'bk-eyebrow' }, 'Direct contact'),
         phone ? h('p', { style: { fontFamily: 'var(--bk-font-display,' + SANS + ')', fontSize: '1.5rem', fontWeight: 800, color: cBrand, margin: 0 } }, phone) : null,
         email ? h('p', { style: { fontWeight: 600, margin: '.5rem 0 0' } }, email) : null,
-        hours ? h('p', { style: { color: cMuted, fontSize: '.92rem', margin: '1rem 0 0' } }, hours) : null,
-        org ? h('p', { style: { fontFamily: fMono, fontSize: '.7rem', letterSpacing: '.14em', textTransform: 'uppercase', color: cMuted, margin: '1.4rem 0 0' } }, org) : null),
-      note('The direct-contact card (contact page + form confirmation) and the footer contact line.'));
+        (hours.length || holiday.length) ? sec('Opening hours',
+          h('div', null,
+            holiday.map(function (hl, i) { return h('p', { key: 'h' + i, style: { margin: '0 0 .4rem', fontSize: '.85rem' } }, h('b', null, hl.when), hl.note ? ' — ' + hl.note : ''); }),
+            hours.map(function (r, i) { return h('div', { key: i, style: { display: 'flex', justifyContent: 'space-between', gap: '1rem', fontSize: '.9rem' } }, h('span', { style: { color: cMuted } }, r.days), h('span', null, r.hours)); }))) : null,
+        hasAddr ? sec('Visit', h('p', { style: { margin: 0, fontSize: '.92rem', lineHeight: 1.5 } }, st, st ? h('br') : null, cityLine, cityLine ? h('br') : null, country)) : null,
+        socials.length ? sec('Follow', h('div', { style: { display: 'flex', gap: '.4rem', flexWrap: 'wrap' } },
+          socials.map(function (s, i) { return h('span', { key: i, style: { fontFamily: fMono, fontSize: '.66rem', border: '1px solid ' + cLine, borderRadius: '.5rem', padding: '.25rem .55rem', background: cPaper, color: cBrand } }, s.platform); }))) : null),
+      note('The direct-contact card — contact page · /thanks · footer · the contactCard + findUs blocks. Each placement toggles which parts show.'));
   };
 
   var arr = function (e, k) { var x = e.getIn(['data', k]); x = x && x.toJS ? x.toJS() : x; return Array.isArray(x) ? x : []; };

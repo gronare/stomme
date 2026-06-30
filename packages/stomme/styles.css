@@ -570,7 +570,24 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
   .direct-card__email { margin: 0.5rem 0 0; }
   .direct-card__email a { font-weight: 600; color: var(--color-ink); text-decoration: none; }
   .direct-card__email a:hover { color: var(--color-brand); }
-  .direct-card__hours { margin: 1rem 0 0; color: var(--color-muted); font-size: 0.92rem; }
+  /* sections (hours / visit / follow) */
+  .direct-card__sec { margin-top: 1.25rem; }
+  .direct-card__h { font-size: 0.62rem; letter-spacing: 0.12em; color: var(--color-muted); margin: 0 0 0.5rem; font-weight: 600; }
+  .direct-card__hours { margin: 0; display: grid; grid-template-columns: max-content 1fr; gap: 0.25rem 1.1rem; font-size: 0.92rem; font-variant-numeric: tabular-nums; }
+  .direct-card__hours dt { color: var(--color-muted); }
+  .direct-card__hours dd { margin: 0; }
+  .direct-card__addr { margin: 0; font-size: 0.95rem; line-height: 1.5; }
+  /* away + holiday notice — highlight-tinted */
+  .direct-card__away, .direct-card__holiday { display: flex; gap: 0.55rem; align-items: flex-start; margin: 0 0 1.1rem; padding: 0.6rem 0.8rem; font-size: 0.88rem; line-height: 1.4; border-radius: 0.6rem;
+    background: color-mix(in srgb, var(--color-highlight) 14%, var(--color-paper)); border: 1px solid color-mix(in srgb, var(--color-highlight) 35%, var(--color-paper)); }
+  .direct-card__holiday { margin: 0 0 0.6rem; }
+  .direct-card__away-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--color-highlight); margin-top: 0.4rem; flex: 0 0 auto; }
+  .direct-card__map { margin-top: 1.25rem; border-radius: 0.75rem; overflow: hidden; border: 1px solid var(--color-line); aspect-ratio: 16 / 10; }
+  .direct-card__map iframe { width: 100%; height: 100%; border: 0; display: block; filter: saturate(0.92); }
+  .direct-card__socials { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+  .direct-card__socials a { width: 36px; height: 36px; border-radius: 0.55rem; display: grid; place-items: center; color: var(--color-brand); background: var(--color-paper); border: 1px solid var(--color-line); text-decoration: none; font-size: 0.72rem; padding: 0 0.4rem; }
+  .direct-card__socials a:hover { border-color: var(--color-brand); }
+  .direct-card__socials svg { width: 18px; height: 18px; }
   .direct-card__footer { margin: 1.6rem 0 0; color: var(--color-muted); }
 
   /* Form block header (heading + intro own by the block) */

@@ -8,7 +8,7 @@ import { resolveLink } from '../src/href';
 interface NavData {}
 interface FooterData { dark?: boolean; tagline?: string; showLinks?: boolean; linksHeading?: string; links?: { label: string; link?: unknown }[]; showTowns?: boolean; townsHeading?: string; legal?: { label: string; link?: unknown }[]; note?: string; showLogo?: boolean; showWordmark?: boolean }
 interface SettingsData { name?: string; logo?: { textPre?: string; textAccent?: string; image?: string; alt?: string } }
-interface ContactData { email?: string; phone?: string; phoneE164?: string; hq?: string; orgNr?: string; founded?: string }
+interface ContactData { email?: string; phone?: string; phoneE164?: string; address?: { city?: string }; orgNr?: string; founded?: string }
 // `towns` + `townsHref` are optional: pass them (the site reads its towns collection
 // and forwards site.routes.towns) to render a service-area column when footer.showTowns.
 // Towns-less sites simply don't pass them, so nothing extra renders.
@@ -25,7 +25,7 @@ const showMark = footer.showLogo !== false && !!logo.image;
 const showWord = footer.showWordmark !== false && !!logo.textPre;
 const links = footer.links ?? [];
 const legal = footer.legal ?? [];
-const tagline = [footer.tagline, contact.hq].filter(Boolean).join(' · ');
+const tagline = [footer.tagline, contact.address?.city].filter(Boolean).join(' · ');
 const orgLine = [contact.orgNr && `Org.nr ${contact.orgNr}`, contact.founded && `Est. ${contact.founded}`].filter(Boolean).join(' · ');
 const year = new Date().getFullYear();
 ---

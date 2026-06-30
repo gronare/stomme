@@ -26,12 +26,8 @@ const ts: any = (await getEntry('thanks', 'thanks').catch(() => null))?.data ?? 
     primaryHref={resolveLink(ts.button?.link, '/')}
     secondaryLabel={ts.button2?.label ?? ''}
     secondaryHref={resolveLink(ts.button2?.link, '/')}
-    showContact={ts.showContact !== false}
+    showContact={ts.showContact !== false && !!(contact.phone || contact.email)}
     talkLabel={t.talkLabel}
-    phone={contact.phone}
-    phoneE164={contact.phoneE164}
-    email={contact.email}
-    hours={contact.openingHours}
     who={settings.name}
   />
 </Base>

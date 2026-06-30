@@ -27,7 +27,7 @@ const showAside = showDirectContact !== false; // default on; off → full-width
 
 const settings = (await getEntry('settings', 'site'))!.data;
 const contact = ((await getEntry('contact', 'contact').catch(() => null))?.data ?? {}) as any;
-const contactLine = [settings.name, contact.hq, contact.orgNr && `Org.nr ${contact.orgNr}`]
+const contactLine = [settings.name, contact.address?.city, contact.orgNr && `Org.nr ${contact.orgNr}`]
   .filter(Boolean)
   .join(' · ');
 
@@ -55,7 +55,7 @@ const thanksData = {
   showContact: showAside,
   direct: {
     phone: contact.phone || '', phoneE164: contact.phoneE164 || '',
-    email: contact.email || '', hours: contact.openingHours || '', who: settings.name || '',
+    email: contact.email || '', who: settings.name || '',
   },
 };
 ---
@@ -91,14 +91,7 @@ const thanksData = {
     </form>
 
     {showAside && (
-      <DirectContact
-        label={L.direct}
-        phone={contact.phone}
-        phoneE164={contact.phoneE164}
-        email={contact.email}
-        hours={contact.openingHours}
-        footer={contactLine}
-      />
+      <DirectContact label={L.direct} show={{ phone: true, email: true, hours: true }} footer={contactLine} />
     )}
   </div>
   <script is:inline>
@@ -159,8 +152,7 @@ const thanksData = {
             aside.appendChild(el('p', 'mono eyebrow direct-card__label', t.talkLabel || 'Prefer to talk?'));
             if (d.phone) { var pp = el('p', 'direct-card__phone'); var pa = el('a', null, d.phone); pa.href = 'tel:' + (d.phoneE164 || d.phone); pp.appendChild(pa); aside.appendChild(pp); }
             if (d.email) { var ep = el('p', 'direct-card__email'); var ea = el('a', null, d.email); ea.href = 'mailto:' + d.email; ep.appendChild(ea); aside.appendChild(ep); }
-            if (d.hours) aside.appendChild(el('p', 'direct-card__hours', d.hours));
-            if (d.who) aside.appendChild(el('p', 'direct-card__footer', d.who));
+            if (d.who) aside.appendChild(el('p', 'mono direct-card__footer', d.who));
             cols.appendChild(aside);
           }
 

@@ -1563,8 +1563,54 @@ collections:
           - { name: phone, label: "Phone", widget: string, required: false }
           - { name: phoneE164, label: "Phone (tel: link)", widget: string, required: false, hint: "Digits with country code, e.g. +46701234567 — used for the click-to-call link." }
           - { name: email, label: "Email", widget: string, required: false }
-          - { name: openingHours, label: "Opening hours", widget: string, required: false, hint: "e.g. Mon–Fri 08–17. Shown on the contact card." }
-          - { name: hq, label: "Location / HQ", widget: string, required: false, hint: "City or address — shown in the footer + contact line." }
+          - name: address
+            label: "Address"
+            widget: object
+            collapsed: true
+            hint: "Shown on the card + Find-us block, powers the map, and feeds local-search data."
+            fields:
+              - { name: street, label: "Street", widget: string, required: false }
+              - { name: postcode, label: "Postcode", widget: string, required: false }
+              - { name: city, label: "City", widget: string, required: false }
+              - { name: country, label: "Country", widget: string, required: false }
+              - { name: lat, label: "Latitude (map)", widget: number, required: false, value_type: float, hint: "From Google Maps: right-click the spot → the coordinates. e.g. 57.7089" }
+              - { name: lng, label: "Longitude (map)", widget: number, required: false, value_type: float }
+          - name: hours
+            label: "Opening hours"
+            widget: list
+            required: false
+            label_singular: "hours line"
+            summary: "{{fields.days}} · {{fields.hours}}"
+            fields:
+              - { name: days, label: "Days", widget: string, hint: "e.g. Mon–Fri" }
+              - { name: hours, label: "Hours", widget: string, hint: "e.g. 08:00–17:00, or Closed" }
+          - name: holidayHours
+            label: "Holiday / special hours"
+            widget: list
+            required: false
+            label_singular: "holiday line"
+            summary: "{{fields.when}} · {{fields.note}}"
+            fields:
+              - { name: when, label: "When", widget: string, hint: "e.g. Dec 24–26" }
+              - { name: note, label: "Note", widget: string, hint: "e.g. Closed for the holidays" }
+          - name: away
+            label: "Away banner"
+            widget: object
+            collapsed: true
+            hint: "Shows a notice on every contact card. Auto-hides after the date."
+            fields:
+              - { name: enabled, label: "Show the away banner", widget: boolean, required: false, default: false }
+              - { name: message, label: "Message", widget: string, required: false, hint: "e.g. Away until Jan 8 — leave a message and we'll reply then." }
+              - { name: until, label: "Auto-hide after", widget: datetime, date_format: "YYYY-MM-DD", time_format: false, required: false }
+          - name: socials
+            label: "Social profiles"
+            widget: list
+            required: false
+            label_singular: "profile"
+            summary: "{{fields.platform}}"
+            fields:
+              - { name: platform, label: "Platform", widget: string, hint: "Instagram, LinkedIn, Facebook…" }
+              - { name: url, label: "URL", widget: string }
           - { name: orgNr, label: "Org. number", widget: string, required: false }
           - { name: founded, label: "Founded (year)", widget: string, required: false }
       - name: theme

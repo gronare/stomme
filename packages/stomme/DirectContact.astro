@@ -1,22 +1,122 @@
 ---
-// Direct-contact card — ONE component shared by the contact-form aside, the /thanks page,
-// and the inline confirmation (built to match in ContactForm's script). Phone in the brand
-// colour + display font, email in ink; `tint` gives the soft brand-tinted variant.
+import { getEntry } from 'astro:content';
+// Direct-contact card — ONE component, fed by the Contact settings, with per-placement
+// display toggles (show). Used by the contact-form aside, /thanks, the contactCard block,
+// and the findUs block. Phone in the brand colour; an optional away banner (global, from
+// settings) shows on top and auto-hides past its date (client-side).
+interface Address { street?: string; postcode?: string; city?: string; country?: string; lat?: number; lng?: number }
+interface Show { phone?: boolean; email?: boolean; hours?: boolean; address?: boolean; socials?: boolean; map?: boolean }
 interface Props {
-  label: string;
-  phone?: string;
-  phoneE164?: string;
-  email?: string;
-  hours?: string;
-  footer?: string;
+  label?: string;
   tint?: boolean;
+  phone?: string; phoneE164?: string; email?: string;
+  address?: Address;
+  hours?: { days: string; hours: string }[];
+  holiday?: { when: string; note: string }[];
+  away?: { enabled?: boolean; message?: string; until?: string };
+  socials?: { platform: string; url: string }[];
+  footer?: string;
+  show?: Show;
 }
-const { label, phone, phoneE164, email, hours, footer, tint } = Astro.props;
+// Fed from the Contact settings by default; any prop can override (e.g. a CMS preview draft).
+const p = Astro.props as Props & { data?: any };
+const c = (p.data ?? (await getEntry('contact', 'contact').catch(() => null))?.data ?? {}) as any;
+const label = p.label ?? 'Direct contact';
+const tint = p.tint;
+const phone = p.phone ?? c.phone;
+const phoneE164 = p.phoneE164 ?? c.phoneE164;
+const email = p.email ?? c.email;
+const address = p.address ?? c.address ?? {};
+const hours = p.hours ?? c.hours ?? [];
+const holiday = p.holiday ?? c.holidayHours ?? [];
+const away = p.away ?? c.away ?? {};
+const socials = p.socials ?? c.socials ?? [];
+const footer = p.footer;
+const show = p.show ?? {};
+
+// Phone + email default on; the richer parts default off (a placement opts into them).
+const s = {
+  phone: show.phone !== false, email: show.email !== false,
+  hours: !!show.hours, address: !!show.address, socials: !!show.socials, map: !!show.map,
+};
+const addrLine2 = [address.postcode, address.city].filter(Boolean).join(' ');
+const hasAddr = !!(address.street || addrLine2 || address.country);
+const hasMap = s.map && address.lat != null && address.lng != null;
+const d = 0.006;
+const mapSrc = hasMap
+  ? `https://www.openstreetmap.org/export/embed.html?bbox=${address.lng! - d}%2C${address.lat! - d}%2C${address.lng! + d}%2C${address.lat! + d}&layer=mapnik&marker=${address.lat}%2C${address.lng}`
+  : '';
+const showAway = !!(away.enabled && away.message);
+
+const ICONS: Record<string, string> = {
+  instagram: 'M12 8a4 4 0 100 8 4 4 0 000-8zm5.5-1.6a1 1 0 100 2 1 1 0 000-2z M3 8a5 5 0 015-5h8a5 5 0 015 5v8a5 5 0 01-5 5H8a5 5 0 01-5-5z',
+  linkedin: 'M4.98 3.5A2.5 2.5 0 105 8.5a2.5 2.5 0 000-5zM3 9.5h4V21H3zM9 9.5h3.8v1.6h.05c.53-.95 1.83-1.95 3.77-1.95C20.4 9.15 21 11 21 14v7h-4v-6.2c0-1.48-.03-3.38-2.06-3.38-2.06 0-2.38 1.6-2.38 3.27V21H9z',
+  facebook: 'M13.5 21v-8h2.7l.4-3.1h-3.1V7.9c0-.9.25-1.5 1.55-1.5h1.65V3.6c-.8-.1-1.6-.15-2.4-.15-2.4 0-4.05 1.46-4.05 4.15v2.3H7.8V13h2.4v8z',
+};
+const slug = (p: string) => p.toLowerCase().replace(/[^a-z]/g, '');
 ---
 <aside class:list={['direct-card', tint && 'direct-card--tint']}>
-  <p class="mono eyebrow direct-card__label">{label}</p>
-  {phone && <p class="direct-card__phone"><a href={`tel:${phoneE164 || phone}`}>{phone}</a></p>}
-  {email && <p class="direct-card__email"><a href={`mailto:${email}`}>{email}</a></p>}
-  {hours && <p class="direct-card__hours">{hours}</p>}
+  {showAway && (
+    <p class="direct-card__away" data-until={away.until}>
+      <span class="direct-card__away-dot" aria-hidden="true"></span>
+      <span>{away.message}</span>
+    </p>
+  )}
+  {label && <p class="mono eyebrow direct-card__label">{label}</p>}
+  {s.phone && phone && <p class="direct-card__phone"><a href={`tel:${phoneE164 || phone}`}>{phone}</a></p>}
+  {s.email && email && <p class="direct-card__email"><a href={`mailto:${email}`}>{email}</a></p>}
+
+  {s.hours && (hours.length > 0 || holiday.length > 0) && (
+    <div class="direct-card__sec">
+      <h4 class="mono direct-card__h">Opening hours</h4>
+      {holiday.map((hl) => (
+        <p class="direct-card__holiday"><span class="direct-card__away-dot" aria-hidden="true"></span><span><b>{hl.when}</b>{hl.note ? ` — ${hl.note}` : ''}</span></p>
+      ))}
+      {hours.length > 0 && (
+        <dl class="direct-card__hours">{hours.map((h) => (<><dt>{h.days}</dt><dd>{h.hours}</dd></>))}</dl>
+      )}
+    </div>
+  )}
+
+  {s.address && hasAddr && (
+    <div class="direct-card__sec">
+      <h4 class="mono direct-card__h">Visit</h4>
+      <p class="direct-card__addr">
+        {address.street}{address.street && <br />}
+        {addrLine2}{addrLine2 && <br />}
+        {address.country}
+      </p>
+    </div>
+  )}
+
+  {hasMap && <div class="direct-card__map"><iframe src={mapSrc} loading="lazy" title="Map" referrerpolicy="no-referrer-when-downgrade"></iframe></div>}
+
+  {s.socials && socials.length > 0 && (
+    <div class="direct-card__sec">
+      <h4 class="mono direct-card__h">Follow</h4>
+      <div class="direct-card__socials">
+        {socials.map((soc) => (
+          <a href={soc.url} aria-label={soc.platform} target="_blank" rel="noopener">
+            {ICONS[slug(soc.platform)]
+              ? <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d={ICONS[slug(soc.platform)]} /></svg>
+              : <span>{soc.platform}</span>}
+          </a>
+        ))}
+      </div>
+    </div>
+  )}
+
   {footer && <p class="mono direct-card__footer">{footer}</p>}
 </aside>
+{showAway && (
+  <script is:inline>
+    // Away banner auto-hides once its date has passed (build is static, so do it in the browser).
+    (function () {
+      if (window.__stommeAway) return; window.__stommeAway = 1;
+      document.querySelectorAll('.direct-card__away[data-until]').forEach(function (el) {
+        var u = el.getAttribute('data-until'); if (!u) return;
+        var t = Date.parse(u); if (!isNaN(t) && Date.now() > t + 864e5) el.hidden = true;
+      });
+    })();
+  </script>
+)}

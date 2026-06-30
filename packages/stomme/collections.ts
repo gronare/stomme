@@ -67,8 +67,25 @@ export function stommeCollections(listings?: Listing[]) {
         phone: z.string().default(''),
         phoneE164: z.string().default(''),
         email: z.string().default(''),
-        openingHours: z.string().default(''),
-        hq: z.string().default(''),
+        // Structured address — feeds the card, the footer, the map, and the LocalBusiness schema.
+        address: z.object({
+          street: z.string().default(''),
+          postcode: z.string().default(''),
+          city: z.string().default(''),
+          country: z.string().default(''),
+          lat: z.number().optional(),
+          lng: z.number().optional(),
+        }).default({}),
+        // Weekly hours as editable lines (days + hours text), plus special/holiday lines.
+        hours: z.array(z.object({ days: z.string(), hours: z.string() })).default([]),
+        holidayHours: z.array(z.object({ when: z.string(), note: z.string() })).default([]),
+        // Global "we're away" banner — shows on every card; auto-hides past `until` (client-side).
+        away: z.object({
+          enabled: z.boolean().default(false),
+          message: z.string().default(''),
+          until: z.string().default(''),
+        }).default({}),
+        socials: z.array(z.object({ platform: z.string(), url: z.string() })).default([]),
         orgNr: z.string().default(''),
         founded: z.string().default(''),
       }),

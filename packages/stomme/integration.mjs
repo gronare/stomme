@@ -80,12 +80,8 @@ if (kind === 'thanks') {
       phoneLabel: c.phone, phone: ct.phone || '070 123 45 67',
       messageLabel: c.message, message: 'Hi! I would like to book a meeting next week if that works for you.',
     },
-    showContact: td.showContact !== false,
+    showContact: td.showContact !== false && !!(ct.phone || ct.email),
     talkLabel: t.talkLabel,
-    phone: ct.phone,
-    phoneE164: ct.phoneE164,
-    email: ct.email,
-    hours: ct.openingHours,
     who: settings.name,
   };
 }

@@ -22,21 +22,17 @@ interface Props {
   recap?: Recap | null;
   showContact?: boolean;
   talkLabel?: string;
-  phone?: string;
-  phoneE164?: string;
-  email?: string;
-  hours?: string;
   who?: string;
 }
 const {
   eyebrow = 'Message sent', heading, message,
   primaryLabel, primaryHref = '/', secondaryLabel, secondaryHref = '/',
   recapLabel = 'What you sent', recap = null,
-  showContact, talkLabel = 'Prefer to talk?', phone, phoneE164, email, hours, who,
+  showContact, talkLabel = 'Prefer to talk?', who,
 } = Astro.props;
 
 const hasRecap = !!recap && !!(recap.email || recap.phone || recap.message);
-const hasDirect = showContact !== false && !!(phone || email);
+const hasDirect = showContact !== false; // the route gates this on contact actually existing
 const twoCol = hasRecap && hasDirect;
 ---
 <section class="section thanks-confirm">
@@ -70,7 +66,7 @@ const twoCol = hasRecap && hasDirect;
       </section>
     )}
     {hasDirect && (
-      <DirectContact label={talkLabel} phone={phone} phoneE164={phoneE164} email={email} hours={hours} footer={who} tint />
+      <DirectContact label={talkLabel} show={{ phone: true, email: true }} footer={who} tint />
     )}
   </div>
 )}
