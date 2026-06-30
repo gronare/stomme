@@ -191,6 +191,7 @@ export default {
   'Site & contact': 'Webbplats & kontakt',
   'Site name': 'Webbplatsnamn',
   'Navigation': 'Navigering',
+  'Header': 'Sidhuvud',
   'Menu links': 'Menylänkar',
   'Footer': 'Sidfot',
   // footer pane fields + hints

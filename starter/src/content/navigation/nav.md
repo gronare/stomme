@@ -1,4 +1,6 @@
 ---
+showLogo: true
+showWordmark: true
 items:
   - label: Home
     link:

@@ -1634,7 +1634,7 @@ collections:
           - { name: fontCustomBodyFile, label: "Custom body font file", widget: file, required: false, hint: "Used when Body font = Custom. Leave empty to reuse the heading font for body." }
           - { name: fontCustomName, label: "Custom font note", widget: string, required: false, hint: "Optional — just a reminder of which font(s) these are." }
       - name: nav
-        label: "Navigation"
+        label: "Header"
         file: "src/content/navigation/nav.md"
         fields:
           - { name: sticky, label: "Sticky header", widget: boolean, required: false, default: false, hint: "Header stays fixed at the top while scrolling. Default: it scrolls away with the page." }
