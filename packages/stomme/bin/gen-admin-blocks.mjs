@@ -618,7 +618,21 @@ try {
 try {
   const libCss = readFileSync(resolve(here, '../styles.css'), 'utf8');
   const siteCss = readFileSync(resolve(root, 'src/styles/global.css'), 'utf8').replace(/@import\s+["']stomme\/styles\.css["'];?/, libCss);
-  writeFileSync(resolve(root, 'public/admin/stomme-site.css'), siteCss);
+  // Theme tokens from theme.md → :root, so the INLINE preview mockups (Identity, Contact,
+  // …) use the site's actual colours, not the build-time defaults baked into styles.css.
+  // (iframe previews already load the real themed page.) Mirrors Base.astro's themeVars.
+  let themeRoot = '';
+  try {
+    const tm = readFileSync(resolve(root, 'src/content/theme/theme.md'), 'utf8');
+    const tv = (k) => { const m = tm.match(new RegExp(`^${k}:\\s*["']?([^"'\\n]+?)["']?\\s*$`, 'm')); return m ? m[1].trim() : null; };
+    const map = { brand: '--color-brand', ink: '--color-ink', onDark: '--color-on-dark', surface: '--color-surface', paper: '--color-paper', line: '--color-line', highlight: '--color-highlight', secondary: '--color-secondary', dark: '--color-dark', darkInk: '--color-dark-ink', darkLine: '--color-dark-line' };
+    const vars = [];
+    for (const [k, cssVar] of Object.entries(map)) { const v = tv(k); if (v) vars.push(`${cssVar}:${v}`); }
+    const eb = tv('eyebrowColor');
+    vars.push(`--eyebrow-accent:var(--color-${eb === 'highlight' ? 'highlight' : eb === 'secondary' ? 'secondary' : 'brand'})`);
+    themeRoot = `\n/* theme.md tokens (for inline CMS previews) */\n:root{${vars.join(';')}}\n`;
+  } catch {}
+  writeFileSync(resolve(root, 'public/admin/stomme-site.css'), siteCss + themeRoot);
 } catch (e) {
   console.warn('  (stomme-site.css skipped:', e.message + ')');
 }

@@ -237,17 +237,21 @@
   var FooterPreview = ChromePreview('footer');
 
   var nested = function (e, a, b) { var x = e.getIn(['data', a, b]); return x == null ? '' : x; };
-  // Identity — name + logo wordmark + the SEO description (inline, like the theme pane).
+  // Identity — the logo (mark + wordmark) as it shows in the header, + the SEO description.
   var IdentityPreview = function (props) {
     var e = props.entry;
     var name = v(e, 'name') || 'Site name';
     var pre = nested(e, 'logo', 'textPre'), accent = nested(e, 'logo', 'textAccent');
+    var img = nested(e, 'logo', 'image');
+    var imgUrl = ''; try { if (img && props.getAsset) imgUrl = String(props.getAsset(img)); } catch (_e) {}
     var desc = v(e, 'description');
     return h('div', { className: 'bk' },
-      h('div', { style: { fontFamily: 'var(--bk-font-display,' + SANS + ')', fontWeight: 800, fontSize: '1.7rem', letterSpacing: '-.02em' } },
-        (pre || name), accent ? h('span', { style: { color: cBrand } }, accent) : null),
-      desc ? h('p', { className: 'bk-intro', style: { margin: '12px 0 0' } }, desc) : null,
-      note('Logo + name appear in the header and footer; the description is the default SEO text.'));
+      h('div', { style: { display: 'flex', alignItems: 'center', gap: '12px' } },
+        imgUrl ? h('img', { src: imgUrl, alt: '', style: { height: '36px', width: 'auto', display: 'block' } }) : null,
+        h('span', { style: { fontFamily: 'var(--bk-font-display,' + SANS + ')', fontWeight: 800, fontSize: '1.7rem', letterSpacing: '-.02em' } },
+          (pre || name), accent ? h('span', { style: { color: cBrand } }, accent) : null)),
+      desc ? h('p', { className: 'bk-intro', style: { margin: '14px 0 0' } }, desc) : null,
+      note('Logo (mark + wordmark) appears in the header and footer; the description is the default SEO text.'));
   };
   // Contact — the direct-contact card look (contact page + form confirmation + footer line).
   var ContactPreview = function (props) {

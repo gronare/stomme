@@ -577,8 +577,10 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
   .contact-head { margin-bottom: 2.5rem; }
   .contact-head .contact-h1 { font-family: var(--bk-font-display); color: var(--color-ink); font-size: clamp(2rem, 4vw, 2.7rem); font-weight: 800; letter-spacing: -.02em; line-height: 1.08; margin: 0; max-width: 16ch; }
   .contact-head .contact-intro { color: var(--color-muted); font-size: 1.12rem; margin: 1rem 0 0; max-width: 52ch; }
-  /* Direct-contact off → single, centered column */
-  .contact-grid--solo { grid-template-columns: 1fr; max-width: 580px; }
+  /* Direct-contact card sits centred against the (taller) form, not pinned to the top. */
+  @media (min-width: 1024px) { .contact-grid .direct-card { align-self: center; } }
+  /* Direct-contact off → single column, centred in the section. */
+  .contact-grid--solo { grid-template-columns: 1fr; max-width: 580px; margin-inline: auto; }
 
 /* Contact confirmation — the inline "what you sent" (after submit) + the /thanks page */
   .confirm-badge { width: 68px; height: 68px; border-radius: 999px; display: grid; place-items: center; margin-bottom: 1.4rem;
