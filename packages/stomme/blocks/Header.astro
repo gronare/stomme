@@ -29,9 +29,11 @@ if (!nav) nav = (await getEntry('navigation', 'nav'))!.data as NavData;
 if (!settings) settings = (await getEntry('settings', 'site'))!.data as SiteData;
 
 // Logo is site identity (settings); the header chooses what to show via its toggles.
+// The wordmark is the literal textPre/textAccent — blank means no wordmark (no site-name
+// fallback), so a logo with embedded text can stand alone.
 const logo = settings.logo ?? {};
 const showMark = nav.showLogo !== false && !!logo.image;
-const showWord = nav.showWordmark !== false && (!!logo.textPre || !logo.image);
+const showWord = nav.showWordmark !== false && !!logo.textPre;
 const items = nav.items ?? [];
 const homeHref = '/';
 
@@ -62,7 +64,7 @@ const resolved = await Promise.all(
   <div class="inner">
     <a class="logo" href={homeHref} aria-label={settings.name}>
       {showMark && <img class="logo-mark" src={logo.image} alt="" />}
-      {showWord && <span class="logo-word">{logo.textPre || settings.name}<span class="accent">{logo.textAccent}</span></span>}
+      {showWord && <span class="logo-word">{logo.textPre}<span class="accent">{logo.textAccent}</span></span>}
     </a>
     <nav class="site-nav" id="site-nav">
       {resolved.map((i) => i.children.length ? (

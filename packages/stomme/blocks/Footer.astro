@@ -22,7 +22,7 @@ if (!contact) contact = (((await getEntry('contact', 'contact').catch(() => null
 
 const logo = settings.logo ?? {};
 const showMark = footer.showLogo !== false && !!logo.image;
-const showWord = footer.showWordmark !== false && (!!logo.textPre || !logo.image);
+const showWord = footer.showWordmark !== false && !!logo.textPre;
 const links = footer.links ?? [];
 const legal = footer.legal ?? [];
 const tagline = [footer.tagline, contact.hq].filter(Boolean).join(' · ');
@@ -35,7 +35,7 @@ const year = new Date().getFullYear();
       <div>
         <div class="logo" style="margin:0">
           {showMark && <img class="logo-mark" src={logo.image} alt="" />}
-          {showWord && <span class="logo-word">{logo.textPre || settings.name}<span class="accent">{logo.textAccent}</span></span>}
+          {showWord && <span class="logo-word">{logo.textPre}<span class="accent">{logo.textAccent}</span></span>}
         </div>
         {tagline && <p style="margin:0.5rem 0 0;max-width:36rem">{tagline}</p>}
         {(contact.phone || contact.email) && (
