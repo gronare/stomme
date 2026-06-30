@@ -501,7 +501,199 @@ function emitCms(indent) {
   return L.join('\n');
 }
 
-const EMITTERS = { blocks: emitWidget, collections: emitCollections, navlinks: emitNavLinks, thanksbuttons: emitThanksButtons, cms: emitCms };
+// ── Settings file-collection panes (generated) ──────────────────────────────
+// Identity / Contact / Theme / Header / Footer / Form-confirmation — the standard
+// settings panes. Generated (were hand-authored per site = the #8 propagation gap), so
+// engine changes here now flow to every site on `pnpm cms:gen`. The nav menu links +
+// thanks buttons reuse the same emitters as before (per-site $pages / $menus options).
+// Written at the canonical absolute indent (the `settings` collection sits at indent 2).
+function emitSettings() {
+  return `  - name: settings
+    label: "Settings"
+    files:
+      - name: site
+        label: "Identity"
+        file: "src/content/settings/site.md"
+        fields:
+          - { name: name, label: "Business name", widget: string, hint: "Company name — used in the footer ©, the contact card, and search structured data. Not a page title." }
+          - name: logo
+            label: "Logo"
+            widget: object
+            hint: "Shown in the header and footer (each chooses what to display)."
+            fields:
+              - { name: image, label: "Logo mark (shown beside the text)", widget: image, required: false, hint: "An icon/mark. The wordmark is the text below, set in your display font." }
+              - { name: alt, label: "Logo alt text", widget: string, required: false }
+              - { name: textPre, label: "Wordmark text", widget: string, required: false }
+              - { name: textAccent, label: "Wordmark accent (in brand colour)", widget: string, required: false }
+          - { name: favicon, label: "Favicon", widget: image, required: false, hint: "Browser-tab icon — SVG recommended (scales to any size). Defaults to the shipped mark when empty." }
+          - { name: appleIcon, label: "Home-screen icon", widget: image, required: false, hint: "iOS home-screen icon — a 180×180 PNG. Optional." }
+          - { name: ogImage, label: "Social share image", widget: image, required: false, hint: "Shown when a page is shared (iMessage, Slack, social). Use ~1200×630px." }
+      - name: contact
+        label: "Contact"
+        file: "src/content/contact/contact.md"
+        fields:
+          - { name: phone, label: "Phone", widget: string, required: false }
+          - { name: phoneE164, label: "Phone (tel: link)", widget: string, required: false, hint: "Digits with country code, e.g. +46701234567 — used for the click-to-call link." }
+          - { name: email, label: "Email", widget: string, required: false }
+          - { name: protectContact, label: "Hide phone & email from scrapers", widget: boolean, required: false, default: false, hint: "Reveals them in the browser instead of putting them in the page source. Visitors still see and tap them; harvesters that don't run JavaScript get nothing." }
+          - name: address
+            label: "Address"
+            widget: object
+            collapsed: true
+            hint: "Shown on the card + Find-us block, powers the map, and feeds local-search data."
+            fields:
+              - { name: street, label: "Street", widget: string, required: false }
+              - { name: postcode, label: "Postcode", widget: string, required: false }
+              - { name: city, label: "City", widget: string, required: false }
+              - { name: country, label: "Country", widget: string, required: false }
+              - { name: lat, label: "Latitude (map)", widget: number, required: false, value_type: float, hint: "From Google Maps: right-click the spot → the coordinates. e.g. 57.7089" }
+              - { name: lng, label: "Longitude (map)", widget: number, required: false, value_type: float }
+          - name: hours
+            label: "Opening hours"
+            widget: list
+            required: false
+            label_singular: "hours line"
+            summary: "{{fields.days}} · {{fields.hours}}"
+            fields:
+              - { name: days, label: "Days", widget: string, hint: "e.g. Mon–Fri" }
+              - { name: hours, label: "Hours", widget: string, hint: "e.g. 08:00–17:00, or Closed" }
+          - { name: hoursNote, label: "Note under the hours", widget: string, required: false, hint: "Small print under the list — e.g. Closed 12:00–13:00 for lunch." }
+          - name: holidayHours
+            label: "Holiday / special hours"
+            widget: list
+            required: false
+            label_singular: "holiday line"
+            summary: "{{fields.when}} · {{fields.note}}"
+            fields:
+              - { name: when, label: "When", widget: string, hint: "e.g. Dec 24–26" }
+              - { name: note, label: "Note", widget: string, hint: "e.g. Closed for the holidays" }
+          - name: away
+            label: "Away banner"
+            widget: object
+            collapsed: true
+            hint: "Shows a notice on every contact card. Auto-hides after the date."
+            fields:
+              - { name: enabled, label: "Show the away banner", widget: boolean, required: false, default: false }
+              - { name: message, label: "Message", widget: string, required: false, hint: "e.g. Away until Jan 8 — leave a message and we'll reply then." }
+              - { name: until, label: "Auto-hide after", widget: datetime, date_format: "YYYY-MM-DD", time_format: false, required: false }
+          - name: socials
+            label: "Social profiles"
+            widget: list
+            required: false
+            label_singular: "profile"
+            summary: "{{fields.platform}}"
+            fields:
+              - { name: platform, label: "Platform", widget: string, hint: "Instagram, LinkedIn, Facebook…" }
+              - { name: url, label: "URL", widget: string }
+          - { name: orgNr, label: "Org. number", widget: string, required: false }
+          - { name: founded, label: "Founded (year)", widget: string, required: false }
+      - name: theme
+        label: "Theme colours"
+        file: "src/content/theme/theme.md"
+        fields:
+          - { name: brand, label: "Primary", widget: color, default: "#4338ca", hint: "Buttons, links and key accents." }
+          - { name: ink, label: "Text", widget: color, default: "#1f2937", hint: "Default body-text colour." }
+          - { name: onDark, label: "Text on primary", widget: color, default: "#ffffff", hint: "Button labels and text on dark/brand bands." }
+          - { name: surface, label: "Tinted surface", widget: color, default: "#e0e7ff", hint: "Soft background for highlighted sections." }
+          - { name: paper, label: "Page background", widget: color, default: "#ffffff", hint: "The main page background." }
+          - { name: line, label: "Borders & lines", widget: color, default: "#e5e7eb", hint: "Card borders, dividers, rules." }
+          - { name: secondary, label: "Secondary", widget: color, required: false, default: "#3b82f6", hint: "A second accent you deploy by choice (eyebrow, callout)." }
+          - { name: highlight, label: "Highlight", widget: color, default: "#f59e0b", hint: "Attention accent — tags, badges, status. Used in isolation." }
+          - name: eyebrow
+            label: "Eyebrow style"
+            widget: select
+            required: false
+            default: dash
+            hint: "The small label above headings (e.g. “OUR SERVICES”) — site-wide."
+            options:
+              - { label: "Dash", value: dash }
+              - { label: "Bullet", value: bullet }
+              - { label: "Bold (no marker)", value: bold }
+          - name: eyebrowColor
+            label: "Eyebrow colour"
+            widget: select
+            required: false
+            default: brand
+            hint: "Which accent the eyebrow marker uses."
+            options:
+              - { label: "Brand", value: brand }
+              - { label: "Secondary", value: secondary }
+              - { label: "Highlight", value: highlight }
+          - { name: dark, label: "Dark section background", widget: color, required: false, hint: "Background for blocks set to the Dark surface. Empty = derived from Primary." }
+          - { name: darkInk, label: "Dark section text", widget: color, required: false, hint: "Text colour on dark sections. Empty = a light off-white." }
+          - { name: darkLine, label: "Dark section borders", widget: color, required: false, hint: "Card borders / dividers on dark sections. Empty = a faint light rule." }
+          - name: fontDisplay
+            label: "Heading font"
+            widget: select
+            required: false
+            hint: "Font for headings. Empty = system default."
+            options:
+              - { label: "System (default)", value: "system" }
+              - { label: "Serif (elegant headlines)", value: "serif" }
+              - { label: "Grotesk (clean sans)", value: "grotesk" }
+              - { label: "Rounded", value: "rounded" }
+              - { label: "Slab serif", value: "slab" }
+              - { label: "Custom (uploaded below)", value: "custom" }
+          - name: fontBody
+            label: "Body font"
+            widget: select
+            required: false
+            hint: "Font for body text. Empty = system default."
+            options:
+              - { label: "System (default)", value: "system" }
+              - { label: "Serif (elegant headlines)", value: "serif" }
+              - { label: "Grotesk (clean sans)", value: "grotesk" }
+              - { label: "Rounded", value: "rounded" }
+              - { label: "Slab serif", value: "slab" }
+              - { label: "Custom (uploaded below)", value: "custom" }
+          - { name: fontCustomFile, label: "Custom heading font file", widget: file, required: false, hint: "Used when Heading font = Custom. A .woff2 / .woff / .ttf / .otf file (a font file, not an SVG)." }
+          - { name: fontCustomBodyFile, label: "Custom body font file", widget: file, required: false, hint: "Used when Body font = Custom. Leave empty to reuse the heading font for body." }
+      - name: nav
+        label: "Header"
+        file: "src/content/navigation/nav.md"
+        fields:
+          - { name: sticky, label: "Sticky header", widget: boolean, required: false, default: false, hint: "Header stays fixed at the top while scrolling. Default: it scrolls away with the page." }
+          - { name: showLogo, label: "Show logo mark", widget: boolean, required: false, default: true, hint: "Show the logo image (set under Identity) in the header." }
+          - { name: showWordmark, label: "Show wordmark text", widget: boolean, required: false, default: true, hint: "Show the wordmark text (set under Identity) in the header." }
+${emitNavLinks(10)}
+      - name: footer
+        label: "Footer"
+        file: "src/content/footer/footer.md"
+        fields:
+          - { name: dark, label: "Dark footer", widget: boolean, required: false, default: false, hint: "Use the dark surface for the footer." }
+          - { name: showLogo, label: "Show logo mark", widget: boolean, required: false, default: true, hint: "Show the logo image (set under Identity) in the footer." }
+          - { name: showWordmark, label: "Show wordmark text", widget: boolean, required: false, default: true, hint: "Show the wordmark text (set under Identity) in the footer." }
+          - { name: tagline, label: "Tagline", widget: string, required: false, hint: "A line under the logo." }
+          - { name: showLinks, label: "Show quick links", widget: boolean, required: false, default: true }
+          - { name: linksHeading, label: "Quick links · heading", widget: string, required: false, default: "Links" }
+          - name: links
+            label: "Quick links"
+            widget: list
+            required: false
+            fields:
+              - { name: label, label: "Label", widget: string }
+              - { name: link, label: "Link", widget: string, hint: "A path like /about, or a full URL." }
+          - { name: showTowns, label: "Show service areas", widget: boolean, required: false, default: false, hint: "Adds a column linking every entry in the Areas collection." }
+          - { name: townsHeading, label: "Service areas · heading", widget: string, required: false, default: "Areas" }
+          - name: legal
+            label: "Legal links (bottom bar)"
+            widget: list
+            required: false
+            fields:
+              - { name: label, label: "Label", widget: string }
+              - { name: link, label: "Link", widget: string, hint: "A path like /privacy, or a full URL." }
+          - { name: note, label: "Note", widget: string, required: false, hint: "Appended to the © line." }
+      - label: "Form confirmation"
+        name: thanks
+        file: "src/content/thanks/thanks.md"
+        fields:
+          - { name: heading, label: "Heading", widget: string, required: false, hint: "Big confirmation headline. Blank = localized default." }
+          - { name: message, label: "Message", widget: text, required: false, hint: "Reassurance line under the heading. Blank = default." }
+${emitThanksButtons(10)}
+          - { name: showContact, label: "Show the direct-contact card", widget: boolean, required: false, default: true, hint: "Phone / email / hours from Site & contact." }`;
+}
+
+const EMITTERS = { blocks: emitWidget, collections: emitCollections, navlinks: emitNavLinks, thanksbuttons: emitThanksButtons, settings: emitSettings, cms: emitCms };
 
 // Fill every `# >>> NAME:generated … # <<< NAME:generated` region (idempotent).
 const lines = readFileSync(configPath, 'utf8').split('\n');
