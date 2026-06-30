@@ -248,6 +248,7 @@
     var favUrl = asset(v(e, 'favicon')) || '/favicon.svg';
     var appleUrl = asset(v(e, 'appleIcon'));
     var ogUrl = asset(v(e, 'ogImage'));
+    var domain = ''; try { domain = window.location.hostname.replace(/^www\./, ''); } catch (_e) {}
     var lab = function (t) { return h('p', { style: { fontFamily: fMono, fontSize: '.62rem', letterSpacing: '.14em', textTransform: 'uppercase', color: cMuted, margin: '0 0 10px' } }, t); };
     return h('div', { className: 'bk' },
       lab('Logo'),
@@ -268,12 +269,16 @@
           h('img', { src: appleUrl, alt: '', style: { width: '56px', height: '56px', borderRadius: '13px', display: 'block', boxShadow: '0 2px 8px rgba(0,0,0,.18)' } }),
           h('span', { style: { fontSize: '.72rem', color: cMuted } }, name))) : null,
 
-      ogUrl ? h('div', { style: { marginTop: '24px' } }, lab('Social share'),
-        h('div', { style: { maxWidth: '320px', border: '1px solid ' + cLine, borderRadius: '12px', overflow: 'hidden', background: cPaper } },
-          h('img', { src: ogUrl, alt: '', style: { width: '100%', aspectRatio: '1200 / 630', objectFit: 'cover', display: 'block' } }),
-          h('div', { style: { padding: '10px 13px' } },
-            h('p', { style: { margin: 0, fontFamily: fMono, fontSize: '.62rem', letterSpacing: '.06em', textTransform: 'uppercase', color: cMuted } }, 'shared link'),
-            h('p', { style: { margin: '3px 0 0', color: cInk, fontWeight: 600, fontSize: '.92rem' } }, name)))) : null,
+      h('div', { style: { marginTop: '24px' } }, lab('Social share'),
+        ogUrl
+          ? h('div', { style: { maxWidth: '340px', border: '1px solid ' + cLine, borderRadius: '14px', overflow: 'hidden', background: cPaper, boxShadow: '0 4px 16px rgba(0,0,0,.08)' } },
+              h('img', { src: ogUrl, alt: '', style: { width: '100%', aspectRatio: '1200 / 630', objectFit: 'cover', display: 'block' } }),
+              h('div', { style: { padding: '11px 14px', borderTop: '1px solid ' + cLine, background: 'color-mix(in srgb, ' + cSurface + ' 40%, ' + cPaper + ')' } },
+                domain ? h('p', { style: { margin: 0, fontFamily: fMono, fontSize: '.62rem', letterSpacing: '.1em', textTransform: 'uppercase', color: cMuted } }, domain) : null,
+                h('p', { style: { margin: '4px 0 0', color: cInk, fontWeight: 700, fontSize: '.95rem', lineHeight: 1.25 } }, name),
+                h('p', { style: { margin: '3px 0 0', color: cMuted, fontSize: '.8rem' } }, 'Per-page title + description show here when shared.')))
+          : h('div', { style: { maxWidth: '340px', border: '1px dashed ' + cLine, borderRadius: '14px', padding: '20px 22px', color: cMuted, fontSize: '.85rem', lineHeight: 1.45 } },
+              'No social image set — links share as a small text card. Add one (≈1200×630) for a large-image card.')),
 
       h('p', { style: { margin: '24px 0 0', color: cMuted, fontSize: '.9rem' } }, 'Business name: ', h('span', { style: { color: cInk, fontWeight: 600 } }, name)),
       note('Logo → header/footer · favicon → browser tab · home-screen icon → saved-to-home · social share → og:image · business name → footer ©, contact, structured data.'));
