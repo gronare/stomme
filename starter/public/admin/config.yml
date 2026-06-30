@@ -49,8 +49,9 @@ collections:
                         hint: "Pick a page on the site."
                         options:
                           - { label: "— No page —", value: "" }
-                          - { label: "Startsida (/)", value: "/" }
+                          - { label: "Home (/)", value: "/" }
                           - { label: "About (/about)", value: "/about" }
+                          - { label: "Contact (/contact)", value: "/contact" }
                       - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
                   - name: media
                     label: "Right-side media"
@@ -142,8 +143,9 @@ collections:
                         hint: "Pick a page on the site."
                         options:
                           - { label: "— No page —", value: "" }
-                          - { label: "Startsida (/)", value: "/" }
+                          - { label: "Home (/)", value: "/" }
                           - { label: "About (/about)", value: "/about" }
+                          - { label: "Contact (/contact)", value: "/contact" }
                       - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
                   - { name: cta2Label, label: "Second button label", widget: string, required: false }
                   - name: cta2Href
@@ -158,8 +160,9 @@ collections:
                         hint: "Pick a page on the site."
                         options:
                           - { label: "— No page —", value: "" }
-                          - { label: "Startsida (/)", value: "/" }
+                          - { label: "Home (/)", value: "/" }
                           - { label: "About (/about)", value: "/about" }
+                          - { label: "Contact (/contact)", value: "/contact" }
                       - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
                   - name: media
                     label: "Background"
@@ -239,8 +242,9 @@ collections:
                         hint: "Pick a page on the site."
                         options:
                           - { label: "— No page —", value: "" }
-                          - { label: "Startsida (/)", value: "/" }
+                          - { label: "Home (/)", value: "/" }
                           - { label: "About (/about)", value: "/about" }
+                          - { label: "Contact (/contact)", value: "/contact" }
                       - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
                   - name: surface
                     label: "Background"
@@ -377,8 +381,9 @@ collections:
                             hint: "Pick a page on the site."
                             options:
                               - { label: "— No page —", value: "" }
-                              - { label: "Startsida (/)", value: "/" }
+                              - { label: "Home (/)", value: "/" }
                               - { label: "About (/about)", value: "/about" }
+                              - { label: "Contact (/contact)", value: "/contact" }
                           - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
                       - { name: linkLabel, label: "Link label", widget: string, required: false, hint: "E.g. \"Read more\". Shown only if the card has a link." }
                   - { name: numbered, label: "Numbered (01/02/03 instead of icons)", widget: boolean, required: false, default: false }
@@ -624,12 +629,22 @@ collections:
                 widget: object
                 fields:
                   - name: items
-                    label: "Facts (optional — defaults to the site’s settings facts)"
+                    label: "Facts (label + value)"
                     widget: list
                     required: false
                     fields:
                       - { name: label, label: "Label", widget: string }
                       - { name: value, label: "Value", widget: string }
+              - name: logoStrip
+                label: "Logo strip"
+                widget: object
+                fields:
+                  - { name: lead, label: "Lead-in", widget: string, required: false, hint: "e.g. “Trusted by” or “Built on”." }
+                  - name: logos
+                    label: "Names"
+                    widget: list
+                    required: false
+                    field: { name: name, label: "Name", widget: string }
               - name: faq
                 label: "FAQ"
                 widget: object
@@ -662,8 +677,9 @@ collections:
                         hint: "Pick a page on the site."
                         options:
                           - { label: "— No page —", value: "" }
-                          - { label: "Startsida (/)", value: "/" }
+                          - { label: "Home (/)", value: "/" }
                           - { label: "About (/about)", value: "/about" }
+                          - { label: "Contact (/contact)", value: "/contact" }
                       - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
                   - name: surface
                     label: "Background"
@@ -697,8 +713,9 @@ collections:
                         hint: "Pick a page on the site."
                         options:
                           - { label: "— No page —", value: "" }
-                          - { label: "Startsida (/)", value: "/" }
+                          - { label: "Home (/)", value: "/" }
                           - { label: "About (/about)", value: "/about" }
+                          - { label: "Contact (/contact)", value: "/contact" }
                       - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
               - name: ctaBox
                 label: "Call to action (box)"
@@ -719,8 +736,9 @@ collections:
                         hint: "Pick a page on the site."
                         options:
                           - { label: "— No page —", value: "" }
-                          - { label: "Startsida (/)", value: "/" }
+                          - { label: "Home (/)", value: "/" }
                           - { label: "About (/about)", value: "/about" }
+                          - { label: "Contact (/contact)", value: "/contact" }
                       - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
                   - name: surface
                     label: "Background"
@@ -734,16 +752,18 @@ collections:
                       - { label: "Accent band", value: "band" }
                       - { label: "Dark", value: "dark" }
                       - { label: "Gradient", value: "gradient" }
-              - name: logoStrip
-                label: "Logo strip"
-                widget: object
-                fields:
-                  - { name: _auto, label: "Auto", widget: hidden }
               - name: contactForm
                 label: "Contact form"
                 widget: object
                 fields:
-                  - { name: _auto, label: "Auto", widget: hidden }
+                  - { name: heading, label: "Heading", widget: string, required: false, hint: "Blank uses the page title." }
+                  - { name: intro, label: "Intro / description", widget: text, required: false, hint: "Optional line under the heading. Blank = hidden." }
+                  - { name: labelName, label: "Field label — name", widget: string, required: false, default: "Name" }
+                  - { name: labelEmail, label: "Field label — email", widget: string, required: false, default: "Email" }
+                  - { name: labelPhone, label: "Field label — phone", widget: string, required: false, default: "Phone" }
+                  - { name: labelMessage, label: "Field label — message", widget: string, required: false, default: "Describe your project", hint: "e.g. \"What can we help you with?\" — word it for your business." }
+                  - { name: submitLabel, label: "Submit button text", widget: string, required: false, default: "Send request", hint: "The form's submit button." }
+                  - { name: showDirectContact, label: "Show the direct-contact card", widget: boolean, required: false, default: true, hint: "Off → the form fills the width (no phone/email card)." }
           # <<< blocks:generated
   - name: pages
     label: "Pages"
@@ -788,8 +808,9 @@ collections:
                     hint: "Pick a page on the site."
                     options:
                       - { label: "— No page —", value: "" }
-                      - { label: "Startsida (/)", value: "/" }
+                      - { label: "Home (/)", value: "/" }
                       - { label: "About (/about)", value: "/about" }
+                      - { label: "Contact (/contact)", value: "/contact" }
                   - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
               - name: media
                 label: "Right-side media"
@@ -881,8 +902,9 @@ collections:
                     hint: "Pick a page on the site."
                     options:
                       - { label: "— No page —", value: "" }
-                      - { label: "Startsida (/)", value: "/" }
+                      - { label: "Home (/)", value: "/" }
                       - { label: "About (/about)", value: "/about" }
+                      - { label: "Contact (/contact)", value: "/contact" }
                   - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
               - { name: cta2Label, label: "Second button label", widget: string, required: false }
               - name: cta2Href
@@ -897,8 +919,9 @@ collections:
                     hint: "Pick a page on the site."
                     options:
                       - { label: "— No page —", value: "" }
-                      - { label: "Startsida (/)", value: "/" }
+                      - { label: "Home (/)", value: "/" }
                       - { label: "About (/about)", value: "/about" }
+                      - { label: "Contact (/contact)", value: "/contact" }
                   - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
               - name: media
                 label: "Background"
@@ -978,8 +1001,9 @@ collections:
                     hint: "Pick a page on the site."
                     options:
                       - { label: "— No page —", value: "" }
-                      - { label: "Startsida (/)", value: "/" }
+                      - { label: "Home (/)", value: "/" }
                       - { label: "About (/about)", value: "/about" }
+                      - { label: "Contact (/contact)", value: "/contact" }
                   - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
               - name: surface
                 label: "Background"
@@ -1116,8 +1140,9 @@ collections:
                         hint: "Pick a page on the site."
                         options:
                           - { label: "— No page —", value: "" }
-                          - { label: "Startsida (/)", value: "/" }
+                          - { label: "Home (/)", value: "/" }
                           - { label: "About (/about)", value: "/about" }
+                          - { label: "Contact (/contact)", value: "/contact" }
                       - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
                   - { name: linkLabel, label: "Link label", widget: string, required: false, hint: "E.g. \"Read more\". Shown only if the card has a link." }
               - { name: numbered, label: "Numbered (01/02/03 instead of icons)", widget: boolean, required: false, default: false }
@@ -1363,12 +1388,22 @@ collections:
             widget: object
             fields:
               - name: items
-                label: "Facts (optional — defaults to the site’s settings facts)"
+                label: "Facts (label + value)"
                 widget: list
                 required: false
                 fields:
                   - { name: label, label: "Label", widget: string }
                   - { name: value, label: "Value", widget: string }
+          - name: logoStrip
+            label: "Logo strip"
+            widget: object
+            fields:
+              - { name: lead, label: "Lead-in", widget: string, required: false, hint: "e.g. “Trusted by” or “Built on”." }
+              - name: logos
+                label: "Names"
+                widget: list
+                required: false
+                field: { name: name, label: "Name", widget: string }
           - name: faq
             label: "FAQ"
             widget: object
@@ -1401,8 +1436,9 @@ collections:
                     hint: "Pick a page on the site."
                     options:
                       - { label: "— No page —", value: "" }
-                      - { label: "Startsida (/)", value: "/" }
+                      - { label: "Home (/)", value: "/" }
                       - { label: "About (/about)", value: "/about" }
+                      - { label: "Contact (/contact)", value: "/contact" }
                   - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
               - name: surface
                 label: "Background"
@@ -1436,8 +1472,9 @@ collections:
                     hint: "Pick a page on the site."
                     options:
                       - { label: "— No page —", value: "" }
-                      - { label: "Startsida (/)", value: "/" }
+                      - { label: "Home (/)", value: "/" }
                       - { label: "About (/about)", value: "/about" }
+                      - { label: "Contact (/contact)", value: "/contact" }
                   - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
           - name: ctaBox
             label: "Call to action (box)"
@@ -1458,8 +1495,9 @@ collections:
                     hint: "Pick a page on the site."
                     options:
                       - { label: "— No page —", value: "" }
-                      - { label: "Startsida (/)", value: "/" }
+                      - { label: "Home (/)", value: "/" }
                       - { label: "About (/about)", value: "/about" }
+                      - { label: "Contact (/contact)", value: "/contact" }
                   - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
               - name: surface
                 label: "Background"
@@ -1473,16 +1511,18 @@ collections:
                   - { label: "Accent band", value: "band" }
                   - { label: "Dark", value: "dark" }
                   - { label: "Gradient", value: "gradient" }
-          - name: logoStrip
-            label: "Logo strip"
-            widget: object
-            fields:
-              - { name: _auto, label: "Auto", widget: hidden }
           - name: contactForm
             label: "Contact form"
             widget: object
             fields:
-              - { name: _auto, label: "Auto", widget: hidden }
+              - { name: heading, label: "Heading", widget: string, required: false, hint: "Blank uses the page title." }
+              - { name: intro, label: "Intro / description", widget: text, required: false, hint: "Optional line under the heading. Blank = hidden." }
+              - { name: labelName, label: "Field label — name", widget: string, required: false, default: "Name" }
+              - { name: labelEmail, label: "Field label — email", widget: string, required: false, default: "Email" }
+              - { name: labelPhone, label: "Field label — phone", widget: string, required: false, default: "Phone" }
+              - { name: labelMessage, label: "Field label — message", widget: string, required: false, default: "Describe your project", hint: "e.g. \"What can we help you with?\" — word it for your business." }
+              - { name: submitLabel, label: "Submit button text", widget: string, required: false, default: "Send request", hint: "The form's submit button." }
+              - { name: showDirectContact, label: "Show the direct-contact card", widget: boolean, required: false, default: true, hint: "Off → the form fills the width (no phone/email card)." }
       # <<< blocks:generated
   # >>> collections:generated (run: pnpm cms:gen — do not edit between markers)
   - name: faq
@@ -1619,8 +1659,9 @@ collections:
                     hint: "Pick a page on the site. Leave blank for a dropdown-only header (the label just opens its menu)."
                     options:
                       - { label: "— No page —", value: "" }
-                      - { label: "Startsida (/)", value: "/" }
+                      - { label: "Home (/)", value: "/" }
                       - { label: "About (/about)", value: "/about" }
+                      - { label: "Contact (/contact)", value: "/contact" }
                   - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto: — overrides the page above." }
               - name: menu
                 label: "Dropdown from collection"
@@ -1646,8 +1687,9 @@ collections:
                         hint: "Pick a page on the site. Leave blank for a dropdown-only header (the label just opens its menu)."
                         options:
                           - { label: "— No page —", value: "" }
-                          - { label: "Startsida (/)", value: "/" }
+                          - { label: "Home (/)", value: "/" }
                           - { label: "About (/about)", value: "/about" }
+                          - { label: "Contact (/contact)", value: "/contact" }
                       - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto: — overrides the page above." }
           - name: cta
             label: "Button"
@@ -1667,8 +1709,9 @@ collections:
                     hint: "Pick a page on the site. Leave blank for a dropdown-only header (the label just opens its menu)."
                     options:
                       - { label: "— No page —", value: "" }
-                      - { label: "Startsida (/)", value: "/" }
+                      - { label: "Home (/)", value: "/" }
                       - { label: "About (/about)", value: "/about" }
+                      - { label: "Contact (/contact)", value: "/contact" }
                   - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto: — overrides the page above." }
           # <<< navlinks:generated
       - name: footer
@@ -1705,5 +1748,49 @@ collections:
           - { name: heading, label: "Heading", widget: string, required: false, hint: "Big confirmation headline. Blank = localized default." }
           - { name: message, label: "Message", widget: text, required: false, hint: "Reassurance line under the heading. Blank = default." }
           # >>> thanksbuttons:generated (run: pnpm cms:gen — do not edit between markers)
+          - name: button
+            label: "Primary button"
+            widget: object
+            required: false
+            fields:
+              - { name: label, label: "Label", widget: string, required: false, hint: "Blank = localized default (\"Back to home\")." }
+              - name: link
+                label: "Link"
+                widget: object
+                required: false
+                fields:
+                  - name: page
+                    label: "Page"
+                    widget: select
+                    required: false
+                    hint: "Pick a page on the site. Leave blank for a dropdown-only header (the label just opens its menu)."
+                    options:
+                      - { label: "— No page —", value: "" }
+                      - { label: "Home (/)", value: "/" }
+                      - { label: "About (/about)", value: "/about" }
+                      - { label: "Contact (/contact)", value: "/contact" }
+                  - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto: — overrides the page above." }
+          - name: button2
+            label: "Second button (optional)"
+            widget: object
+            required: false
+            fields:
+              - { name: label, label: "Label", widget: string, required: false, hint: "Leave blank for a single button." }
+              - name: link
+                label: "Link"
+                widget: object
+                required: false
+                fields:
+                  - name: page
+                    label: "Page"
+                    widget: select
+                    required: false
+                    hint: "Pick a page on the site. Leave blank for a dropdown-only header (the label just opens its menu)."
+                    options:
+                      - { label: "— No page —", value: "" }
+                      - { label: "Home (/)", value: "/" }
+                      - { label: "About (/about)", value: "/about" }
+                      - { label: "Contact (/contact)", value: "/contact" }
+                  - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto: — overrides the page above." }
           # <<< thanksbuttons:generated
           - { name: showContact, label: "Show the direct-contact card", widget: boolean, required: false, default: true, hint: "Phone / email / hours from Site & contact." }

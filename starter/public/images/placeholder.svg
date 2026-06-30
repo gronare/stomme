@@ -1,6 +1,9 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="#64748b" role="img" aria-label="Placeholder">
-  <rect width="200" height="200" fill="#64748b" opacity=".06"/>
-  <rect x="40" y="40" width="120" height="120" rx="28" fill="none" stroke="#64748b" stroke-width="9" opacity=".5"/>
-  <rect x="80" y="80" width="62" height="62" rx="16" opacity="1"/>
-  <circle cx="62" cy="62" r="6"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" role="img" aria-label="Placeholder">
+  <!-- The brand mark: the outline of a page (one canonical grid). Used as a CSS
+       mask (.ph-tint), so only alpha matters — headings tint full brand, body
+       lines at 0.5 read as the muted slate. Logo + placeholder share one shape. -->
+  <rect x="24" y="22" width="34" height="11" rx="5.5"/>
+  <rect x="24" y="39" width="54" height="8" rx="4" opacity="0.5"/>
+  <rect x="40" y="53" width="28" height="11" rx="5.5"/>
+  <rect x="40" y="70" width="36" height="8" rx="4" opacity="0.5"/>
 </svg>
