@@ -1679,7 +1679,6 @@ collections:
               - { label: "Custom (uploaded below)", value: "custom" }
           - { name: fontCustomFile, label: "Custom heading font file", widget: file, required: false, hint: "Used when Heading font = Custom. A .woff2 / .woff / .ttf / .otf file (a font file, not an SVG)." }
           - { name: fontCustomBodyFile, label: "Custom body font file", widget: file, required: false, hint: "Used when Body font = Custom. Leave empty to reuse the heading font for body." }
-          - { name: fontCustomName, label: "Custom font note", widget: string, required: false, hint: "Optional — just a reminder of which font(s) these are." }
       - name: nav
         label: "Header"
         file: "src/content/navigation/nav.md"

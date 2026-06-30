@@ -257,8 +257,6 @@ export default {
   'Custom body font file': 'Eget brödtextstypsnitt (fil)',
   'Used when Heading font = Custom. A .woff2 / .woff / .ttf / .otf file (a font file, not an SVG).': 'Används när Rubriktypsnitt = Eget. En .woff2 / .woff / .ttf / .otf-fil (en typsnittsfil, inte en SVG).',
   'Used when Body font = Custom. Leave empty to reuse the heading font for body.': 'Används när Brödtextstypsnitt = Eget. Lämna tomt för att återanvända rubriktypsnittet.',
-  'Optional — just a reminder of which font(s) these are.': 'Valfritt — bara en påminnelse om vilka typsnitt det är.',
-  'Custom font note': 'Eget typsnitt · notering',
   // logo text size/weight
   'Logo text size': 'Logotyp · textstorlek',
   'Logo text weight': 'Logotyp · textvikt',
