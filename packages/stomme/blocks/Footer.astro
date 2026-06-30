@@ -1,6 +1,7 @@
 ---
 import { getEntry } from 'astro:content';
 import { resolveLink } from '../src/href';
+import ContactLink from '../ContactLink.astro';
 
 // Themeable site chrome (footer). Reads the navigation/footer/settings collections
 // by default; accepts them as optional props (CMS preview drafts). Renders a links
@@ -8,7 +9,7 @@ import { resolveLink } from '../src/href';
 interface NavData {}
 interface FooterData { dark?: boolean; tagline?: string; showLinks?: boolean; linksHeading?: string; links?: { label: string; link?: unknown }[]; showTowns?: boolean; townsHeading?: string; legal?: { label: string; link?: unknown }[]; note?: string; showLogo?: boolean; showWordmark?: boolean }
 interface SettingsData { name?: string; logo?: { textPre?: string; textAccent?: string; image?: string; alt?: string } }
-interface ContactData { email?: string; phone?: string; phoneE164?: string; address?: { city?: string }; orgNr?: string; founded?: string }
+interface ContactData { email?: string; phone?: string; phoneE164?: string; protectContact?: boolean; address?: { city?: string }; orgNr?: string; founded?: string }
 // `towns` + `townsHref` are optional: pass them (the site reads its towns collection
 // and forwards site.routes.towns) to render a service-area column when footer.showTowns.
 // Towns-less sites simply don't pass them, so nothing extra renders.
@@ -40,9 +41,9 @@ const year = new Date().getFullYear();
         {tagline && <p style="margin:0.5rem 0 0;max-width:36rem">{tagline}</p>}
         {(contact.phone || contact.email) && (
           <p style="margin:0.75rem 0 0">
-            {contact.phone && <a href={`tel:${contact.phoneE164}`} class="footer-link">{contact.phone}</a>}
+            {contact.phone && <ContactLink kind="tel" class="footer-link" target={contact.phoneE164 || contact.phone} display={contact.phone} protect={!!contact.protectContact} />}
             {contact.phone && contact.email && <span> · </span>}
-            {contact.email && <a href={`mailto:${contact.email}`} class="footer-link">{contact.email}</a>}
+            {contact.email && <ContactLink kind="mailto" class="footer-link" target={contact.email} display={contact.email} protect={!!contact.protectContact} />}
           </p>
         )}
         {orgLine && <p class="mono" style="margin-top:1rem">{orgLine}</p>}

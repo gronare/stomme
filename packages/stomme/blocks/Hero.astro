@@ -3,6 +3,7 @@ import { getEntry } from 'astro:content';
 import { resolveLink } from '../src/href';
 import Cover from '../src/Cover.astro';
 import Icon from '../src/Icon.astro';
+import ContactLink from '../ContactLink.astro';
 
 // Library hero: a universal left column + a swappable, generic media slot:
 //   none        — text only
@@ -42,7 +43,7 @@ const hasMedia = showImage || showHighlights || showMotif;
       {(ctaLabel || contact.phone) && (
         <div class="btn-row">
           {ctaLabel && <a href={href} class="btn">{ctaLabel}</a>}
-          {contact.phone && <a href={`tel:${contact.phoneE164}`} class="btn-ghost">{contact.phone} →</a>}
+          {contact.phone && <ContactLink kind="tel" class="btn-ghost" target={contact.phoneE164 || contact.phone} display={contact.phone} suffix=" →" protect={!!contact.protectContact} />}
         </div>
       )}
     </div>

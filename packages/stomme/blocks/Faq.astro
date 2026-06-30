@@ -2,6 +2,7 @@
 import { getCollection, getEntry } from 'astro:content';
 import Icon from '../src/Icon.astro';
 import { resolveLink } from '../src/href';
+import ContactLink from '../ContactLink.astro';
 
 // Collection-backed: Q&A from the `faq` collection; chrome + the contact aside
 // are editable fields (CMS defaults supply the starting copy). Needs a `faq`
@@ -27,7 +28,10 @@ interface Props {
 const { variant = 'list', eyebrow, heading, intro, asideHeading, asideBody, asideCtaLabel, asideHref, asideCtaHref } = Astro.props;
 const items = (await getCollection('faq')).sort((a, b) => a.data.order - b.data.order);
 const contact = ((await getEntry('contact', 'contact').catch(() => null))?.data ?? {}) as any;
-const aHref = resolveLink(asideHref ?? asideCtaHref, contact.email ? `mailto:${contact.email}` : '/');
+const emailFallback = contact.email ? `mailto:${contact.email}` : '/';
+const aHref = resolveLink(asideHref ?? asideCtaHref, emailFallback);
+// Only the email fallback leaks an address; a custom CTA href is left as-is.
+const protectAside = !!contact.protectContact && !!contact.email && aHref === emailFallback;
 const hasAside = !!(asideHeading || asideBody || asideCtaLabel);
 const n = (i: number) => String(i + 1).padStart(2, '0');
 ---
@@ -50,7 +54,9 @@ const n = (i: number) => String(i + 1).padStart(2, '0');
           <span class="ico-badge"><Icon name="headset" /></span>
           {asideHeading && <h3 class="faq-aside__h">{asideHeading}</h3>}
           {asideBody && <p class="faq-aside__body">{asideBody}</p>}
-          {asideCtaLabel && <p style="margin-top:1.25rem;margin-bottom:0"><a href={aHref} class="btn">{asideCtaLabel}</a></p>}
+          {asideCtaLabel && <p style="margin-top:1.25rem;margin-bottom:0">{protectAside
+            ? <ContactLink kind="mailto" class="btn" target={contact.email} label={asideCtaLabel} protect={true} />
+            : <a href={aHref} class="btn">{asideCtaLabel}</a>}</p>}
         </aside>
       )}
     </div>
@@ -75,7 +81,9 @@ const n = (i: number) => String(i + 1).padStart(2, '0');
           <span class="ico-badge"><Icon name="headset" /></span>
           {asideHeading && <h3 class="faq-aside__h">{asideHeading}</h3>}
           {asideBody && <p class="faq-aside__body">{asideBody}</p>}
-          {asideCtaLabel && <p style="margin-top:1.25rem;margin-bottom:0"><a href={aHref} class="btn">{asideCtaLabel}</a></p>}
+          {asideCtaLabel && <p style="margin-top:1.25rem;margin-bottom:0">{protectAside
+            ? <ContactLink kind="mailto" class="btn" target={contact.email} label={asideCtaLabel} protect={true} />
+            : <a href={aHref} class="btn">{asideCtaLabel}</a>}</p>}
         </aside>
       )}
     </div>

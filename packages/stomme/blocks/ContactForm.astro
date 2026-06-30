@@ -1,6 +1,7 @@
 ---
 import { getEntry } from 'astro:content';
 import { resolveLink } from '../src/href';
+import { encodeContact } from '../src/protect';
 import DirectContact from '../DirectContact.astro';
 
 // Contact form block — self-contained: heading, intro, field labels, submit text and the
@@ -27,6 +28,7 @@ const showAside = showDirectContact !== false; // default on; off → full-width
 
 const settings = (await getEntry('settings', 'site'))!.data;
 const contact = ((await getEntry('contact', 'contact').catch(() => null))?.data ?? {}) as any;
+const protect = !!contact.protectContact;
 const contactLine = [settings.name, contact.address?.city, contact.orgNr && `Org.nr ${contact.orgNr}`]
   .filter(Boolean)
   .join(' · ');
@@ -53,9 +55,14 @@ const thanksData = {
   talkLabel: tk.talkLabel ?? 'Prefer to talk?',
   emailLabel: L.email, phoneLabel: L.phone, messageLabel: L.message,
   showContact: showAside,
+  // When scraper-protection is on, the recap aside's number/email are obfuscated here
+  // too (this JSON ships in the HTML) and decoded client-side before the links are built.
+  protect,
   direct: {
-    phone: contact.phone || '', phoneE164: contact.phoneE164 || '',
-    email: contact.email || '', who: settings.name || '',
+    phone: protect ? encodeContact(contact.phone || '') : (contact.phone || ''),
+    phoneE164: protect ? encodeContact(contact.phoneE164 || '') : (contact.phoneE164 || ''),
+    email: protect ? encodeContact(contact.email || '') : (contact.email || ''),
+    who: settings.name || '',
   },
 };
 ---
@@ -113,6 +120,10 @@ const thanksData = {
           if (!res.ok) throw new Error('send failed');
           var t = {}; try { t = JSON.parse(form.dataset.thanks || '{}'); } catch (e) {}
           var d = t.direct || {};
+          if (t.protect) {
+            var dec = function (s) { return s ? atob(s).split('').reverse().join('') : ''; };
+            d = { phone: dec(d.phone), phoneE164: dec(d.phoneE164), email: dec(d.email), who: d.who };
+          }
           var name = (fd.get('name') || '').trim();
 
           var confirm = el('div', 'thanks-confirm');

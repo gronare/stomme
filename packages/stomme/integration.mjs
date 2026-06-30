@@ -38,6 +38,8 @@ import BlockRenderer from '@gronare/stomme/BlockRenderer.astro';
 import Header from '@gronare/stomme/Header.astro';
 import Footer from '@gronare/stomme/Footer.astro';
 import Thanks from '@gronare/stomme/Thanks.astro';
+import DirectContact from '@gronare/stomme/DirectContact.astro';
+import FindUs from '@gronare/stomme/blocks/FindUs.astro';
 
 const kind = Astro.url.searchParams.get('kind');
 const raw = Astro.url.searchParams.get('data');
@@ -85,6 +87,10 @@ if (kind === 'thanks') {
     who: settings.name,
   };
 }
+
+// Contact settings: render the REAL components fed the draft settings, so the
+// preview is the live card + Find-us block (no hand-built mockup that can drift).
+const contactDraft = kind === 'contact' && draft && typeof draft === 'object' ? draft : null;
 ---
 {kind === 'header' ? (
   <Base title="Preview" chrome={false}><Header nav={navDraft} /></Base>
@@ -92,6 +98,13 @@ if (kind === 'thanks') {
   <Base title="Preview" chrome={false}><Footer footer={footerDraft} towns={towns} townsHref={site.routes?.towns ?? '/areas'} /></Base>
 ) : kind === 'thanks' ? (
   <Base title="Preview"><Thanks {...thanks} /></Base>
+) : kind === 'contact' ? (
+  <Base title="Preview">
+    <div style="display:flex;flex-direction:column;gap:2.25rem;padding:2.25rem 1.5rem">
+      <div class="contact-card-block"><DirectContact data={contactDraft} tint={true} show={{ phone: true, email: true, hours: true, address: true, socials: true, map: true }} /></div>
+      <FindUs data={contactDraft} showHours={true} />
+    </div>
+  </Base>
 ) : (
   <Base title="Preview"><div id="preview-root"><BlockRenderer blocks={blocks} config={site} /></div></Base>
 )}
@@ -138,6 +151,26 @@ const { entry } = Astro.props;
 `;
 }
 
+// Injected on every page (deferred module). Reveals scraper-protected contact links:
+// the real tel:/mailto: + the number/email are reversed+base64 in data-t/data-d on a
+// `.js-contact` anchor (Contact `protectContact` toggle), never in the served HTML.
+// Decode mirrors src/protect.ts encodeContact — keep the two in sync. No-op when the
+// page has no protected links.
+const REVEAL = `
+(function () {
+  function dec(s) { return s ? atob(s).split('').reverse().join('') : ''; }
+  document.querySelectorAll('a.js-contact').forEach(function (a) {
+    var t = dec(a.getAttribute('data-t'));
+    if (t) a.setAttribute('href', a.getAttribute('data-k') + ':' + t);
+    var slot = a.querySelector('.js-contact-val');
+    var d = dec(a.getAttribute('data-d'));
+    if (slot && d) slot.textContent = d;
+    a.classList.remove('js-contact');
+    a.removeAttribute('data-t'); a.removeAttribute('data-d'); a.removeAttribute('data-k');
+  });
+})();
+`;
+
 export default function stomme(options = {}) {
   const features = options.features || {};
   const routes = options.routes || {};
@@ -153,7 +186,7 @@ export default function stomme(options = {}) {
   return {
     name: 'stomme',
     hooks: {
-      'astro:config:setup': ({ config, injectRoute, updateConfig, logger }) => {
+      'astro:config:setup': ({ config, injectRoute, injectScript, updateConfig, logger }) => {
         const root = fileURLToPath(config.root);
         // Let the package route entrypoints import the SITE's Base + config.
         updateConfig({
@@ -166,6 +199,9 @@ export default function stomme(options = {}) {
             },
           },
         });
+
+        // Reveal scraper-protected phone/email links in the browser (see REVEAL).
+        injectScript('page', REVEAL);
 
         const enabled = [];
         const outDir = resolve(root, '.astro/stomme');

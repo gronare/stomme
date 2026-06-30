@@ -1,10 +1,13 @@
 ---
 // "Find us" — a larger section: a map beside the address, contact and hours, all
 // auto-filled from the Contact settings. The map needs lat/lng on the address.
+// `data` overrides the settings lookup so the CMS preview can render a draft.
 import { getEntry } from 'astro:content';
-interface Props { heading?: string; showHours?: boolean }
-const { heading = 'Find us', showHours } = Astro.props;
-const c = ((await getEntry('contact', 'contact').catch(() => null))?.data ?? {}) as any;
+import ContactLink from '../ContactLink.astro';
+interface Props { heading?: string; showHours?: boolean; data?: any }
+const { heading = 'Find us', showHours, data } = Astro.props;
+const c = (data ?? (await getEntry('contact', 'contact').catch(() => null))?.data ?? {}) as any;
+const protect = !!c.protectContact;
 const a = c.address ?? {};
 const hasMap = a.lat != null && a.lng != null;
 const d = 0.006;
@@ -14,11 +17,16 @@ const mapSrc = hasMap
 const cityLine = [a.postcode, a.city].filter(Boolean).join(' ');
 const hasAddr = !!(a.street || cityLine || a.country);
 const hours = (c.hours ?? []) as { days: string; hours: string }[];
+const hoursNote = c.hoursNote ?? '';
+const showHrs = showHours !== false;
 ---
 <section class="findus-block">
   <div class="findus">
     {hasMap && (
-      <div class="findus__map"><iframe src={mapSrc} loading="lazy" title="Map" referrerpolicy="no-referrer-when-downgrade"></iframe></div>
+      <div class="findus__map">
+        <iframe src={mapSrc} loading="lazy" title="Map" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        <p class="findus__attrib">© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a></p>
+      </div>
     )}
     <div class:list={['findus__info', !hasMap && 'findus__info--solo']}>
       {heading && <h2 class="findus__h">{heading}</h2>}
@@ -27,19 +35,19 @@ const hours = (c.hours ?? []) as { days: string; hours: string }[];
       )}
       {(c.phone || c.email) && (
         <p class="findus__reach">
-          {c.phone && <a class="findus__phone" href={`tel:${c.phoneE164 || c.phone}`}>{c.phone}</a>}
-          {c.email && <a class="findus__email" href={`mailto:${c.email}`}>{c.email}</a>}
+          {c.phone && <ContactLink kind="tel" class="findus__phone" target={c.phoneE164 || c.phone} display={c.phone} protect={protect} />}
+          {c.email && <ContactLink kind="mailto" class="findus__email" target={c.email} display={c.email} protect={protect} />}
         </p>
       )}
-      {showHours !== false && hours.length > 0 && (
+      {showHrs && hours.length > 0 && (
         <div class="direct-card__hours findus__hours">{hours.map((h: any) => (
           <div class="direct-card__hrow">
             <span class="direct-card__days">{h.days}</span>
             <span class="direct-card__hval">{h.hours}</span>
-            {h.note && <span class="direct-card__hnote">{h.note}</span>}
           </div>
         ))}</div>
       )}
+      {showHrs && hoursNote && <p class="direct-card__hnote">{hoursNote}</p>}
     </div>
   </div>
 </section>

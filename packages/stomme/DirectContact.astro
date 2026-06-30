@@ -1,5 +1,6 @@
 ---
 import { getEntry } from 'astro:content';
+import ContactLink from './ContactLink.astro';
 // Direct-contact card — ONE component, fed by the Contact settings, with per-placement
 // display toggles (show). Used by the contact-form aside, /thanks, the contactCard block,
 // and the findUs block. Phone in the brand colour; an optional away banner (global, from
@@ -12,6 +13,7 @@ interface Props {
   phone?: string; phoneE164?: string; email?: string;
   address?: Address;
   hours?: { days: string; hours: string }[];
+  hoursNote?: string;
   holiday?: { when: string; note: string }[];
   away?: { enabled?: boolean; message?: string; until?: string };
   socials?: { platform: string; url: string }[];
@@ -28,11 +30,13 @@ const phoneE164 = p.phoneE164 ?? c.phoneE164;
 const email = p.email ?? c.email;
 const address = p.address ?? c.address ?? {};
 const hours = p.hours ?? c.hours ?? [];
+const hoursNote = p.hoursNote ?? c.hoursNote ?? '';
 const holiday = p.holiday ?? c.holidayHours ?? [];
 const away = p.away ?? c.away ?? {};
 const socials = p.socials ?? c.socials ?? [];
 const footer = p.footer;
 const show = p.show ?? {};
+const protect = !!c.protectContact;
 
 // Phone + email default on; the richer parts default off (a placement opts into them).
 const s = {
@@ -63,8 +67,8 @@ const slug = (p: string) => p.toLowerCase().replace(/[^a-z]/g, '');
     </p>
   )}
   {label && <p class="mono eyebrow direct-card__label">{label}</p>}
-  {s.phone && phone && <p class="direct-card__phone"><a href={`tel:${phoneE164 || phone}`}>{phone}</a></p>}
-  {s.email && email && <p class="direct-card__email"><a href={`mailto:${email}`}>{email}</a></p>}
+  {s.phone && phone && <p class="direct-card__phone"><ContactLink kind="tel" target={phoneE164 || phone} display={phone} protect={protect} /></p>}
+  {s.email && email && <p class="direct-card__email"><ContactLink kind="mailto" target={email} display={email} protect={protect} /></p>}
 
   {s.hours && (hours.length > 0 || holiday.length > 0) && (
     <div class="direct-card__sec">
@@ -77,10 +81,10 @@ const slug = (p: string) => p.toLowerCase().replace(/[^a-z]/g, '');
           <div class="direct-card__hrow">
             <span class="direct-card__days">{h.days}</span>
             <span class="direct-card__hval">{h.hours}</span>
-            {h.note && <span class="direct-card__hnote">{h.note}</span>}
           </div>
         ))}</div>
       )}
+      {hoursNote && <p class="direct-card__hnote">{hoursNote}</p>}
     </div>
   )}
 
@@ -95,7 +99,12 @@ const slug = (p: string) => p.toLowerCase().replace(/[^a-z]/g, '');
     </div>
   )}
 
-  {hasMap && <div class="direct-card__map"><iframe src={mapSrc} loading="lazy" title="Map" referrerpolicy="no-referrer-when-downgrade"></iframe></div>}
+  {hasMap && (
+    <div class="direct-card__sec">
+      <div class="direct-card__map"><iframe src={mapSrc} loading="lazy" title="Map" referrerpolicy="no-referrer-when-downgrade"></iframe></div>
+      <p class="map-attrib">© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a></p>
+    </div>
+  )}
 
   {s.socials && socials.length > 0 && (
     <div class="direct-card__sec">

@@ -577,28 +577,40 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
   .direct-card__hrow { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 0.9rem; row-gap: 0.1rem; }
   .direct-card__days { color: var(--color-muted); min-width: 5.5em; }
   .direct-card__hval { color: var(--color-ink); }
-  .direct-card__hnote { flex-basis: 100%; padding-left: 5.5em; color: var(--color-muted); font-size: 0.82rem; }
+  .direct-card__hnote { margin: 0.4rem 0 0; color: var(--color-muted); font-size: 0.82rem; }
   .direct-card__addr { margin: 0; font-size: 0.95rem; line-height: 1.5; }
   /* away + holiday notice — highlight-tinted */
   .direct-card__away, .direct-card__holiday { display: flex; gap: 0.55rem; align-items: flex-start; margin: 0 0 1.1rem; padding: 0.6rem 0.8rem; font-size: 0.88rem; line-height: 1.4; border-radius: 0.6rem;
     background: color-mix(in srgb, var(--color-highlight) 14%, var(--color-paper)); border: 1px solid color-mix(in srgb, var(--color-highlight) 35%, var(--color-paper)); }
   .direct-card__holiday { margin: 0 0 0.6rem; }
   .direct-card__away-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--color-highlight); margin-top: 0.4rem; flex: 0 0 auto; }
-  .direct-card__map { margin-top: 1.25rem; border-radius: 0.75rem; overflow: hidden; border: 1px solid var(--color-line); aspect-ratio: 16 / 10; }
-  .direct-card__map iframe { width: 100%; height: 100%; border: 0; display: block; filter: saturate(0.92); }
+  /* Map: the OSM embed paints its own attribution/links bar (Report a problem · ©
+     OpenStreetMap · Make a Donation) pinned to the bottom edge of the iframe. We can't
+     reach across the iframe boundary, so the wrapper clips it — the iframe is grown
+     120px taller and offset -60px, so an equal slice is cut off top + bottom: the
+     bottom takes the links bar with it (whatever it wraps to), while the centred marker
+     stays centred. Attribution is restored as our own small caption (.map-attrib). */
+  .direct-card__map { position: relative; overflow: hidden; margin-top: 1.25rem; border-radius: 0.75rem; border: 1px solid var(--color-line); aspect-ratio: 16 / 10; }
+  .direct-card__map iframe { position: absolute; top: -60px; left: 0; width: 100%; height: calc(100% + 120px); border: 0; display: block; filter: saturate(0.92); }
+  .map-attrib { margin: 0.4rem 0 0; font-size: 0.66rem; color: var(--color-muted); }
+  .map-attrib a { color: inherit; }
   .direct-card__socials { display: flex; gap: 0.5rem; flex-wrap: wrap; }
   .direct-card__socials a { width: 36px; height: 36px; border-radius: 0.55rem; display: grid; place-items: center; color: var(--color-brand); background: var(--color-paper); border: 1px solid var(--color-line); text-decoration: none; font-size: 0.72rem; padding: 0 0.4rem; }
   .direct-card__socials a:hover { border-color: var(--color-brand); }
   .direct-card__socials svg { width: 18px; height: 18px; }
   .direct-card__footer { margin: 1.6rem 0 0; color: var(--color-muted); }
-  /* contactCard block — a standalone, centred placement of the card */
-  .contact-card-block { max-width: 460px; margin-inline: auto; }
+  /* contactCard block — a standalone, centred placement of the card. width:100% so it
+     fills up to its max in any container (incl. a flex/centred parent like the CMS
+     preview), instead of collapsing to its content width. */
+  .contact-card-block { width: 100%; max-width: 460px; margin-inline: auto; }
   /* findUs block — map beside address/contact/hours */
   .findus-block { width: min(72rem, 100% - 3rem); margin-inline: auto; padding: clamp(2.5rem, 6vw, 4rem) 0; }
   .findus { display: grid; grid-template-columns: 1.3fr 1fr; border: 1px solid var(--color-line); border-radius: 18px; overflow: hidden; background: var(--color-paper); }
   @media (max-width: 760px) { .findus { grid-template-columns: 1fr; } }
-  .findus__map { min-height: 320px; }
-  .findus__map iframe { width: 100%; height: 100%; min-height: 320px; border: 0; display: block; }
+  .findus__map { position: relative; overflow: hidden; min-height: 320px; }
+  .findus__map iframe { position: absolute; top: -60px; left: 0; width: 100%; height: calc(100% + 120px); min-height: calc(320px + 120px); border: 0; display: block; }
+  .findus__attrib { position: absolute; right: 0.45rem; bottom: 0.4rem; z-index: 1; margin: 0; padding: 0.1rem 0.45rem; font-size: 0.6rem; color: var(--color-muted); background: color-mix(in srgb, var(--color-paper) 82%, transparent); border-radius: 0.3rem; }
+  .findus__attrib a { color: inherit; }
   .findus__info { padding: clamp(1.8rem, 3vw, 2.4rem); display: flex; flex-direction: column; gap: 1.05rem; align-self: center; }
   .findus__h { font-family: var(--bk-font-display); font-weight: 800; font-size: clamp(1.4rem, 2.5vw, 1.9rem); letter-spacing: -0.02em; margin: 0; }
   .findus__addr { margin: 0; color: var(--color-ink); line-height: 1.5; }

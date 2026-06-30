@@ -1,0 +1,38 @@
+---
+// One contact link, used everywhere phone/email is shown (card, footer, Find-us,
+// Hero/PageHeader CTAs, FAQ aside). With `protect` off it's a plain tel:/mailto:
+// anchor. With `protect` on, the real value never reaches the HTML: it's obfuscated
+// into data attributes on a `.js-contact` link and rebuilt in-browser by the page
+// script the integration injects. See src/protect.ts for the encode/decode contract.
+//
+//   target  — the sensitive href value (E.164 number or email address)
+//   display — the sensitive visible text (the human-readable phone / email); masked
+//             until revealed. Omit when using `label`.
+//   label   — non-sensitive visible text (e.g. a CTA's own wording). Shown as-is, not
+//             masked; only the href is protected. Takes precedence over `display`.
+import { encodeContact, maskContact } from './src/protect';
+interface Props {
+  kind: 'tel' | 'mailto';
+  target: string;
+  display?: string;
+  label?: string;
+  protect?: boolean;
+  class?: string;
+  prefix?: string;
+  suffix?: string;
+}
+const { kind, target, display = '', label, protect = false, class: className, prefix = '', suffix = '' } = Astro.props;
+const visible = label ?? display;
+---
+{protect ? (
+  <a
+    class:list={[className, 'js-contact']}
+    href="#"
+    data-k={kind}
+    data-t={encodeContact(target)}
+    data-d={label ? undefined : encodeContact(display)}
+    aria-label="Contact details — enable JavaScript to reveal"
+  >{prefix}{label ? label : <span class="js-contact-val">{maskContact(display)}</span>}{suffix}</a>
+) : (
+  <a class:list={[className]} href={`${kind}:${target}`}>{prefix}{visible}{suffix}</a>
+)}
