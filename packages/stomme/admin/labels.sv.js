@@ -379,6 +379,7 @@ export default {
   'Field label — name': 'Fältetikett — namn',
   'Field label — email': 'Fältetikett — e-post',
   'Field label — phone': 'Fältetikett — telefon',
+  'Show the phone field': 'Visa telefonfältet',
   'Field label — message': 'Fältetikett — meddelande',
   'Submit button text': 'Text på skicka-knappen',
   'Show the direct-contact card': 'Visa direktkontaktkortet',

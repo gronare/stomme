@@ -376,11 +376,13 @@ export const defaultBlocks: BlockDef[] = [
     fields: [
       { name: 'heading', label: 'Heading', widget: 'string', required: false, hint: 'Blank uses the page title.' },
       { name: 'intro', label: 'Intro / description', widget: 'text', required: false, hint: 'Optional line under the heading. Blank = hidden.' },
-      { name: 'labelName', label: 'Field label — name', widget: 'string', required: false, default: 'Name' },
-      { name: 'labelEmail', label: 'Field label — email', widget: 'string', required: false, default: 'Email' },
-      { name: 'labelPhone', label: 'Field label — phone', widget: 'string', required: false, default: 'Phone' },
-      { name: 'labelMessage', label: 'Field label — message', widget: 'string', required: false, default: 'Describe your project', hint: 'e.g. "What can we help you with?" — word it for your business.' },
-      { name: 'submitLabel', label: 'Submit button text', widget: 'string', required: false, default: 'Send request', hint: 'The form\'s submit button.' },
+      // Field labels: required (so they never read as "optional"), editable, with defaults.
+      // Empty falls back to the localized default at render. Phone is a show/hide toggle.
+      { name: 'labelName', label: 'Field label — name', widget: 'string', default: 'Name' },
+      { name: 'labelEmail', label: 'Field label — email', widget: 'string', default: 'Email' },
+      { name: 'showPhone', label: 'Show the phone field', widget: 'boolean', required: false, default: true },
+      { name: 'labelMessage', label: 'Field label — message', widget: 'string', default: 'Describe your project', hint: 'e.g. "What can we help you with?" — word it for your business.' },
+      { name: 'submitLabel', label: 'Submit button text', widget: 'string', default: 'Send request', hint: 'The form\'s submit button.' },
       { name: 'showDirectContact', label: 'Show the direct-contact card', widget: 'boolean', required: false, default: true, hint: 'Off → the form fills the width (no phone/email card).' },
     ],
   },

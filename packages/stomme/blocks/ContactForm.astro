@@ -8,19 +8,21 @@ import DirectContact from '../DirectContact.astro';
 // confirmation + /thanks) is the single source in the "Thank-you" settings, localized.
 interface Props {
   site?: any; heading?: string; intro?: string;
-  labelName?: string; labelEmail?: string; labelPhone?: string; labelMessage?: string;
-  submitLabel?: string; showDirectContact?: boolean;
+  labelName?: string; labelEmail?: string; labelMessage?: string;
+  submitLabel?: string; showPhone?: boolean; showDirectContact?: boolean;
 }
-const { site, heading, intro, labelName, labelEmail, labelPhone, labelMessage, submitLabel, showDirectContact } = Astro.props;
+const { site, heading, intro, labelName, labelEmail, labelMessage, submitLabel, showPhone, showDirectContact } = Astro.props;
 const c = site?.strings?.contact ?? {};
+// Labels are editable but never empty: a blank field falls back to the localized default.
 const L = {
   name: labelName || (c.name ?? 'Name'),
   email: labelEmail || (c.email ?? 'Email'),
-  phone: labelPhone || (c.phone ?? 'Phone'),
+  phone: c.phone ?? 'Phone',
   message: labelMessage || (c.message ?? 'Describe your project'),
   submit: submitLabel || (c.submit ?? 'Send request'),
   direct: c.direct ?? 'Direct contact',
 };
+const showPhoneField = showPhone !== false; // default on; a toggle, not a label
 const showAside = showDirectContact !== false; // default on; off → full-width form
 
 const settings = (await getEntry('settings', 'site'))!.data;
@@ -75,10 +77,12 @@ const thanksData = {
         <label for="email" class="mono">{L.email}</label>
         <input id="email" name="email" type="email" required />
       </div>
-      <div class="field">
-        <label for="phone" class="mono">{L.phone}</label>
-        <input id="phone" name="phone" type="tel" />
-      </div>
+      {showPhoneField && (
+        <div class="field">
+          <label for="phone" class="mono">{L.phone}</label>
+          <input id="phone" name="phone" type="tel" />
+        </div>
+      )}
       <div class="field">
         <label for="message" class="mono">{L.message}</label>
         <textarea id="message" name="message" rows="5" required></textarea>
