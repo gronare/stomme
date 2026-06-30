@@ -169,7 +169,12 @@ const thanksData = {
 
           var out = el('section', 'section');
           out.appendChild(confirm); out.appendChild(cols);
+          // Focused success state: hide the page's other blocks (header above, Find-us
+          // below, …) so only the confirmation shows — like the standalone /thanks page.
+          var parent = root.parentNode;
+          if (parent) Array.prototype.forEach.call(parent.children, function (c) { if (c !== root) c.hidden = true; });
           root.replaceWith(out);
+          window.scrollTo(0, 0);
         } catch (err) {
           if (btn) btn.disabled = false;
           var msg = form.querySelector('.contact-error');
