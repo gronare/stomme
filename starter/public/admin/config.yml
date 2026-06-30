@@ -1555,6 +1555,7 @@ collections:
               - { name: textAccent, label: "Wordmark accent (in brand colour)", widget: string, required: false }
           - { name: favicon, label: "Favicon", widget: image, required: false, hint: "Browser-tab icon — SVG recommended (scales to any size). Defaults to the shipped mark when empty." }
           - { name: appleIcon, label: "Home-screen icon", widget: image, required: false, hint: "iOS home-screen icon — a 180×180 PNG. Optional." }
+          - { name: ogImage, label: "Social share image", widget: image, required: false, hint: "Shown when a page is shared (iMessage, Slack, social). Use ~1200×630px." }
       - name: contact
         label: "Contact"
         file: "src/content/contact/contact.md"

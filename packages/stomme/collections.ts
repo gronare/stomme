@@ -54,6 +54,8 @@ export function stommeCollections(listings?: Listing[]) {
         // the shipped /favicon.svg when unset. `appleIcon` is the iOS home-screen PNG (180×180).
         favicon: z.string().optional(),
         appleIcon: z.string().optional(),
+        // Social-share image (og:image / Twitter card) — shown when a page is shared.
+        ogImage: z.string().optional(),
       }),
     }),
 

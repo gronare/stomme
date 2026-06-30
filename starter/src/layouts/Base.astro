@@ -34,6 +34,14 @@ const faviconType = favicon.endsWith('.svg') ? 'image/svg+xml'
   : favicon.endsWith('.png') ? 'image/png'
   : favicon.endsWith('.ico') ? 'image/x-icon' : undefined;
 
+// Social-share card (og:image / Twitter). Absolute URL when the site URL is configured —
+// social scrapers need absolute. Falls back to the raw value otherwise.
+const ogTitle = title ?? settings.name;
+const ogImage = settings.ogImage
+  ? (Astro.site ? new URL(settings.ogImage, Astro.site).href : settings.ogImage)
+  : undefined;
+const ogUrl = Astro.site ? new URL(Astro.url.pathname, Astro.site).href : undefined;
+
 // Inject the owner-editable theme tokens as CSS vars on <html>, overriding the
 // build-time defaults in global.css.
 const themeVars = [
@@ -62,6 +70,14 @@ const themeVars = [
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title ?? settings.name}</title>
     {description && <meta name="description" content={description} />}
+    <meta property="og:title" content={ogTitle} />
+    {description && <meta property="og:description" content={description} />}
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={settings.name} />
+    {ogUrl && <meta property="og:url" content={ogUrl} />}
+    {ogImage && <meta property="og:image" content={ogImage} />}
+    <meta name="twitter:card" content={ogImage ? 'summary_large_image' : 'summary'} />
+    {ogImage && <meta name="twitter:image" content={ogImage} />}
     <link rel="icon" href={favicon} type={faviconType} />
     <link rel="icon" href="/favicon.ico" sizes="32x32" />
     {settings.appleIcon && <link rel="apple-touch-icon" href={settings.appleIcon} />}
