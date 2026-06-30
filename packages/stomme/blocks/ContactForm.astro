@@ -1,12 +1,11 @@
 ---
 import { getEntry } from 'astro:content';
-import { resolveLink } from '../src/href';
-import { encodeContact } from '../src/protect';
 import DirectContact from '../DirectContact.astro';
 
 // Contact form block — self-contained: heading, intro, field labels, submit text and the
-// direct-contact toggle are all editable on the block. The thank-you copy (inline
-// confirmation + /thanks) is the single source in the "Thank-you" settings, localized.
+// direct-contact toggle are all editable on the block. On submit it stashes a recap of
+// what was sent in sessionStorage and goes to /thanks, which renders the confirmation +
+// recap (one place — no inline duplicate). No-JS posts to the endpoint, which 303s to /thanks.
 interface Props {
   site?: any; heading?: string; intro?: string;
   labelName?: string; labelEmail?: string; labelMessage?: string;
@@ -28,7 +27,6 @@ const showAside = showDirectContact !== false; // default on; off → full-width
 
 const settings = (await getEntry('settings', 'site'))!.data;
 const contact = ((await getEntry('contact', 'contact').catch(() => null))?.data ?? {}) as any;
-const protect = !!contact.protectContact;
 const contactLine = [settings.name, contact.address?.city, contact.orgNr && `Org.nr ${contact.orgNr}`]
   .filter(Boolean)
   .join(' · ');
@@ -37,34 +35,8 @@ const contactLine = [settings.name, contact.address?.city, contact.orgNr && `Org
 // Falls back to the per-site /api/contact endpoint if the site isn't CMS/gateway-wired.
 const contactAction = site?.cms?.baseUrl ? `${site.cms.baseUrl}/contact` : '/api/contact';
 
-// Thank-you copy: editable content from the "Thank-you" settings (pre-seeded in the starter,
-// removable in the CMS — blank renders nothing). UI chrome (eyebrow, the recap/direct labels)
-// stays on the localized strings. Same shape the /thanks page + CMS preview use, so the inline
-// confirmation matches.
-const tset: any = (await getEntry('thanks', 'thanks').catch(() => null))?.data ?? {};
-const tk = (site?.strings?.thanks ?? {}) as Record<string, string>;
-const thanksData = {
-  eyebrow: tk.eyebrow ?? 'Message sent',
-  heading: tset.heading || '',
-  lead: tset.message || '',
-  primaryLabel: tset.button?.label || '',
-  primaryHref: resolveLink(tset.button?.link, '/'),
-  secondaryLabel: tset.button2?.label || '',
-  secondaryHref: resolveLink(tset.button2?.link, '/'),
-  recapLabel: tk.recapLabel ?? 'What you sent',
-  talkLabel: tk.talkLabel ?? 'Prefer to talk?',
-  emailLabel: L.email, phoneLabel: L.phone, messageLabel: L.message,
-  showContact: showAside,
-  // When scraper-protection is on, the recap aside's number/email are obfuscated here
-  // too (this JSON ships in the HTML) and decoded client-side before the links are built.
-  protect,
-  direct: {
-    phone: protect ? encodeContact(contact.phone || '') : (contact.phone || ''),
-    phoneE164: protect ? encodeContact(contact.phoneE164 || '') : (contact.phoneE164 || ''),
-    email: protect ? encodeContact(contact.email || '') : (contact.email || ''),
-    who: settings.name || '',
-  },
-};
+// The "what you sent" recap on /thanks is labelled with this form's own field labels.
+const recapLabels = JSON.stringify({ email: L.email, phone: L.phone, message: L.message });
 ---
 <section class="section">
   {(heading || intro) && (
@@ -74,7 +46,7 @@ const thanksData = {
     </div>
   )}
   <div class:list={['contact-grid', !showAside && 'contact-grid--solo']}>
-    <form method="POST" action={contactAction} class="contact-form" data-thanks={JSON.stringify(thanksData)}>
+    <form method="POST" action={contactAction} class="contact-form" data-recap-labels={recapLabels}>
       <p class="hp" aria-hidden="true"><label>Don’t fill this in: <input name="bot-field" tabindex="-1" autocomplete="off" /></label></p>
       <div class="field">
         <label for="name" class="mono">{L.name}</label>
@@ -102,14 +74,12 @@ const thanksData = {
     )}
   </div>
   <script is:inline>
-    // Progressive enhancement: submit via fetch and swap the whole form/aside block for a
-    // confirmation (centered success + "what you sent" recap + direct-contact card), matching
-    // the /thanks page. No-JS falls back to a plain POST → /thanks.
+    // Progressive enhancement: submit via fetch, stash a recap of what was sent in
+    // sessionStorage, then go to /thanks (it renders the confirmation + recap — one place,
+    // no inline duplicate). No-JS just POSTs and the endpoint 303s to /thanks.
     (function () {
-      var root = document.currentScript.closest('section');
-      var form = root && root.querySelector('.contact-form');
+      var form = document.currentScript.closest('section').querySelector('.contact-form');
       if (!form) return;
-      var el = function (tag, cls, text) { var n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; };
       form.addEventListener('submit', async function (e) {
         e.preventDefault();
         var btn = form.querySelector('button[type=submit]');
@@ -118,67 +88,17 @@ const thanksData = {
         try {
           var res = await fetch(form.action, { method: 'POST', body: fd, headers: { Accept: 'application/json', 'X-Requested-With': 'fetch' } });
           if (!res.ok) throw new Error('send failed');
-          var t = {}; try { t = JSON.parse(form.dataset.thanks || '{}'); } catch (e) {}
-          var d = t.direct || {};
-          if (t.protect) {
-            var dec = function (s) { return s ? atob(s).split('').reverse().join('') : ''; };
-            d = { phone: dec(d.phone), phoneE164: dec(d.phoneE164), email: dec(d.email), who: d.who };
-          }
-          var name = (fd.get('name') || '').trim();
-
-          var confirm = el('div', 'thanks-confirm');
-          var badge = el('div', 'confirm-badge');
-          badge.innerHTML = '<svg viewBox="0 0 56 56" aria-hidden="true"><circle cx="28" cy="28" r="26"/><path d="M17 29.5 L24.5 37 L40 20"/></svg>';
-          confirm.appendChild(badge);
-          confirm.appendChild(el('span', 'mono eyebrow confirm-eyebrow', t.eyebrow || 'Message sent'));
-          if (t.heading) confirm.appendChild(el('h2', 'confirm-head', t.heading.replace('{name}', name ? ', ' + name : '')));
-          if (t.lead) confirm.appendChild(el('p', 'confirm-lead', t.lead));
-          if (t.primaryLabel || t.secondaryLabel) {
-            var actions = el('div', 'confirm-actions');
-            if (t.primaryLabel) { var primary = el('a', 'btn', t.primaryLabel); primary.href = t.primaryHref || '/'; actions.appendChild(primary); }
-            if (t.secondaryLabel) { var sec = el('a', 'btn btn-outline', t.secondaryLabel); sec.href = t.secondaryHref || '/'; actions.appendChild(sec); }
-            confirm.appendChild(actions);
-          }
-
-          var hasDirect = t.showContact !== false && (d.phone || d.email);
-          var cols = el('div', 'thanks-cols' + (hasDirect ? '' : ' thanks-cols--solo'));
-
-          var recap = el('section', 'confirm-card');
-          recap.appendChild(el('p', 'mono eyebrow confirm-label', t.recapLabel || 'What you sent'));
-          var dl = el('dl', 'confirm-recap-dl');
-          [[t.emailLabel || 'Email', fd.get('email')], [t.phoneLabel || 'Phone', fd.get('phone')]].forEach(function (row) {
-            if (!row[1]) return;
-            dl.appendChild(el('dt', null, row[0])); dl.appendChild(el('dd', null, row[1]));
-          });
-          if (fd.get('message')) {
-            var msgWrap = el('div', 'confirm-msg');
-            msgWrap.appendChild(el('dt', null, t.messageLabel || 'Message'));
-            msgWrap.appendChild(el('dd', null, fd.get('message')));
-            dl.appendChild(msgWrap);
-          }
-          recap.appendChild(dl); cols.appendChild(recap);
-
-          if (hasDirect) {
-            var aside = el('aside', 'direct-card direct-card--tint');
-            aside.appendChild(el('p', 'mono eyebrow direct-card__label', t.talkLabel || 'Prefer to talk?'));
-            if (d.phone) { var pp = el('p', 'direct-card__phone'); var pa = el('a', null, d.phone); pa.href = 'tel:' + (d.phoneE164 || d.phone); pp.appendChild(pa); aside.appendChild(pp); }
-            if (d.email) { var ep = el('p', 'direct-card__email'); var ea = el('a', null, d.email); ea.href = 'mailto:' + d.email; ep.appendChild(ea); aside.appendChild(ep); }
-            if (d.who) aside.appendChild(el('p', 'mono direct-card__footer', d.who));
-            cols.appendChild(aside);
-          }
-
-          var out = el('section', 'section');
-          out.appendChild(confirm); out.appendChild(cols);
-          // Focused success state: hide the page's other blocks (header above, Find-us
-          // below, …) so only the confirmation shows — like the standalone /thanks page.
-          var parent = root.parentNode;
-          if (parent) Array.prototype.forEach.call(parent.children, function (c) { if (c !== root) c.hidden = true; });
-          root.replaceWith(out);
-          window.scrollTo(0, 0);
+          try {
+            var labels = null; try { labels = JSON.parse(form.dataset.recapLabels || 'null'); } catch (e) {}
+            sessionStorage.setItem('stomme:recap', JSON.stringify({
+              email: fd.get('email') || '', phone: fd.get('phone') || '', message: fd.get('message') || '', labels: labels,
+            }));
+          } catch (e) {}
+          window.location.assign('/thanks');
         } catch (err) {
           if (btn) btn.disabled = false;
           var msg = form.querySelector('.contact-error');
-          if (!msg) { msg = el('p', 'contact-error'); form.appendChild(msg); }
+          if (!msg) { msg = document.createElement('p'); msg.className = 'contact-error'; form.appendChild(msg); }
           msg.textContent = 'Sorry — could not send. Please try again or email us directly.';
         }
       });
