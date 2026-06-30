@@ -601,8 +601,10 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
   .confirm-recap .confirm-msg { grid-column: 1 / -1; border-top: 1px solid var(--color-line); padding-top: 1rem; }
   .confirm-recap .confirm-msg dt { margin-bottom: .35rem; }
   .confirm-actions { margin-top: 1.6rem; display: flex; gap: .8rem; flex-wrap: wrap; align-items: center; }
-  .btn-ghost { background: var(--color-paper); color: var(--color-brand); border: 1px solid var(--color-line); }
-  .btn-ghost:hover { border-color: color-mix(in srgb, var(--color-brand) 40%, var(--color-line)); }
+  /* Secondary/outline button (confirmation's optional 2nd button) — distinct from .btn-ghost,
+     which is the text-link phone CTA used in heroes. */
+  .btn-outline { background: var(--color-paper); color: var(--color-brand); border: 1px solid var(--color-line); }
+  .btn-outline:hover { border-color: color-mix(in srgb, var(--color-brand) 40%, var(--color-line)); }
   /* /thanks page + Thank-you preview — centered confirmation, then a two-up of the
      "what you sent" recap and a tinted direct-contact card (confirmation mockup parity). */
   .thanks-confirm { max-width: 760px; margin-inline: auto; text-align: center; padding-bottom: clamp(2.5rem, 6vw, 4.5rem); animation: confirm-rise .55s cubic-bezier(.2,.7,.3,1) both; }

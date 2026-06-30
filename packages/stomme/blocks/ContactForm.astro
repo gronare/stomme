@@ -132,7 +132,7 @@ const thanksData = {
           if (t.primaryLabel || t.secondaryLabel) {
             var actions = el('div', 'confirm-actions');
             if (t.primaryLabel) { var primary = el('a', 'btn', t.primaryLabel); primary.href = t.primaryHref || '/'; actions.appendChild(primary); }
-            if (t.secondaryLabel) { var sec = el('a', 'btn btn-ghost', t.secondaryLabel); sec.href = t.secondaryHref || '/'; actions.appendChild(sec); }
+            if (t.secondaryLabel) { var sec = el('a', 'btn btn-outline', t.secondaryLabel); sec.href = t.secondaryHref || '/'; actions.appendChild(sec); }
             confirm.appendChild(actions);
           }
 
