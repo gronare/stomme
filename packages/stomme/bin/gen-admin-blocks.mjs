@@ -232,7 +232,8 @@ function emitField(f, indent) {
     const out = [`${p}- name: ${f.name}`, `${p}  label: ${q(f.label)}`, `${p}  widget: select`];
     if (f.multiple) out.push(`${p}  multiple: true`);
     if (f.required === false) out.push(`${p}  required: false`);
-    if (f.default !== undefined) out.push(`${p}  default: ${q(f.default)}`);
+    // A multi-select default is a list of values, not a comma-joined string.
+    if (f.default !== undefined) out.push(`${p}  default: ${Array.isArray(f.default) ? `[${f.default.map(q).join(', ')}]` : q(f.default)}`);
     if (f.hint) out.push(`${p}  hint: ${q(f.hint)}`);
     if (opts.length === 0) {
       out.push(`${p}  options: []`);

@@ -1,25 +1,22 @@
 ---
-// Drop-in direct-contact card — auto-filled from the Contact settings; each placement
-// toggles which parts show. Just a thin placement wrapper around DirectContact.
+// Drop-in direct-contact card — auto-filled from the Contact settings. A single "Show"
+// list (multi-select on the block) picks which parts appear; a part with no data in the
+// Contact settings is skipped. Thin placement wrapper around DirectContact.
 import DirectContact from '../DirectContact.astro';
 interface Props {
   label?: string;
   tint?: boolean;
-  showPhone?: boolean;
-  showEmail?: boolean;
-  showHours?: boolean;
-  showAddress?: boolean;
-  showSocials?: boolean;
-  showMap?: boolean;
+  show?: string[];
 }
-const { label, tint, showPhone, showEmail, showHours, showAddress, showSocials, showMap } = Astro.props;
+const { label, tint, show = [] } = Astro.props;
+const on = (k: string) => show.includes(k);
 ---
 <section class="section">
   <div class="contact-card-block">
     <DirectContact
       label={label}
       tint={tint !== false}
-      show={{ phone: showPhone, email: showEmail, hours: showHours, address: showAddress, socials: showSocials, map: showMap }}
+      show={{ phone: on('phone'), email: on('email'), hours: on('hours'), address: on('address'), socials: on('socials'), map: on('map') }}
     />
   </div>
 </section>

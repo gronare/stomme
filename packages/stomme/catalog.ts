@@ -388,16 +388,21 @@ export const defaultBlocks: BlockDef[] = [
   },
   {
     type: 'contactCard', label: 'Contact card', group: 'Calls to action', shape: 'box',
-    summary: 'The direct-contact card, auto-filled from Contact settings. Toggle which parts show here.',
+    summary: 'A contact card placed anywhere, auto-filled from Contact settings. Tick what it shows.',
     fields: [
+      { name: 'show', label: 'Show', widget: 'select', multiple: true, required: false,
+        default: ['phone', 'email'],
+        hint: 'Tick the parts to display. Anything with no info in Contact settings is skipped (e.g. the map needs an address with lat/lng).',
+        options: [
+          { label: 'Phone', value: 'phone' },
+          { label: 'Email', value: 'email' },
+          { label: 'Opening hours', value: 'hours' },
+          { label: 'Address', value: 'address' },
+          { label: 'Mini-map', value: 'map' },
+          { label: 'Social links', value: 'socials' },
+        ] },
       { name: 'label', label: 'Card heading', widget: 'string', required: false, default: 'Direct contact' },
       { name: 'tint', label: 'Tinted background', widget: 'boolean', required: false, default: true },
-      { name: 'showPhone', label: 'Show phone', widget: 'boolean', required: false, default: true },
-      { name: 'showEmail', label: 'Show email', widget: 'boolean', required: false, default: true },
-      { name: 'showHours', label: 'Show opening hours', widget: 'boolean', required: false, default: false },
-      { name: 'showAddress', label: 'Show address', widget: 'boolean', required: false, default: false },
-      { name: 'showSocials', label: 'Show social links', widget: 'boolean', required: false, default: false },
-      { name: 'showMap', label: 'Show mini map', widget: 'boolean', required: false, default: false, hint: 'Needs latitude/longitude on the Contact address.' },
     ],
   },
   {
