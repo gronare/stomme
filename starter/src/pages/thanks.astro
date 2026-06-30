@@ -14,8 +14,8 @@ import { site as siteConfig } from '../site.config';
 const site = resolveSite(siteConfig);
 const t = site.strings.thanks;
 const settings = (await getEntry('settings', 'site'))!.data;
-const contact: any = (await getEntry('contact', 'contact').catch(() => null))?.data ?? {};
-const ts: any = (await getEntry('thanks', 'thanks').catch(() => null))?.data ?? {};
+const contact: any = (await getEntry('contact', 'contact')?.catch(() => null))?.data ?? {};
+const ts: any = (await getEntry('thanks', 'thanks')?.catch(() => null))?.data ?? {};
 ---
 <Base title="Thank you" description={ts.message || t.lead}>
   <Thanks
