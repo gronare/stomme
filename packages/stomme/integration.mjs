@@ -110,13 +110,46 @@ const contactDraft = kind === 'contact' && draft && typeof draft === 'object' ? 
 )}
 <script is:inline>
   // Live updates without reloading: the CMS keeps this iframe mounted (stable src) and
-  // posts the new draft as it's typed. We re-fetch just this page's HTML and swap the
-  // #preview-root contents in place — no navigation, so CSS, scroll and focus are kept
-  // and there's no per-keystroke flicker. Single-flight + trailing: at most one fetch in
-  // flight, and we always converge to the latest data (no fixed debounce lag).
+  // posts the new draft as it's typed. We re-fetch this page's HTML and MORPH it into the
+  // existing #preview-root — patching only what changed — so there's no navigation and
+  // unchanged nodes are left in place (no white flash, scroll/focus kept, and one-shot
+  // animations like the confirmation badge don't replay). Single-flight + trailing: one
+  // fetch at a time, always converging to the latest data (no fixed debounce lag).
   (function () {
+    // Minimal DOM morph: align children by index, patch text/attributes in place, keep
+    // matching elements. Good enough for live editing — text edits touch only text nodes;
+    // structural changes (adding/reordering blocks) patch more but still never reload.
+    function morph(from, to) {
+      if (from.nodeType !== to.nodeType || from.nodeName !== to.nodeName) {
+        from.parentNode.replaceChild(to.cloneNode(true), from);
+        return;
+      }
+      if (from.nodeType === 3 || from.nodeType === 8) { // text / comment
+        if (from.nodeValue !== to.nodeValue) from.nodeValue = to.nodeValue;
+        return;
+      }
+      if (from.nodeType === 1) { // element
+        var i, name, attrs = to.attributes;
+        for (i = from.attributes.length - 1; i >= 0; i--) {
+          name = from.attributes[i].name;
+          if (!to.hasAttribute(name)) from.removeAttribute(name);
+        }
+        for (i = 0; i < attrs.length; i++) {
+          if (from.getAttribute(attrs[i].name) !== attrs[i].value) from.setAttribute(attrs[i].name, attrs[i].value);
+        }
+        morphChildren(from, to);
+      }
+    }
+    function morphChildren(from, to) {
+      var toKids = to.childNodes;
+      while (from.childNodes.length > toKids.length) from.removeChild(from.lastChild);
+      for (var i = 0; i < toKids.length; i++) {
+        if (from.childNodes[i]) morph(from.childNodes[i], toKids[i]);
+        else from.appendChild(toKids[i].cloneNode(true));
+      }
+    }
     var inflight = false, pending = null, applied = null;
-    function swap(data) {
+    function update(data) {
       if (data === applied) return;
       if (inflight) { pending = data; return; }
       inflight = true; applied = data;
@@ -127,16 +160,16 @@ const contactDraft = kind === 'contact' && draft && typeof draft === 'object' ? 
         .then(function (html) {
           var cur = document.getElementById('preview-root');
           var fresh = new DOMParser().parseFromString(html, 'text/html').getElementById('preview-root');
-          if (cur && fresh) cur.innerHTML = fresh.innerHTML;
+          if (cur && fresh) morphChildren(cur, fresh);
         })
         .catch(function () {})
         .then(function () {
           inflight = false;
-          if (pending !== null) { var d = pending; pending = null; swap(d); }
+          if (pending !== null) { var d = pending; pending = null; update(d); }
         });
     }
     window.addEventListener('message', function (e) {
-      if (e.data && e.data.type === 'stomme:preview' && typeof e.data.data === 'string') swap(e.data.data);
+      if (e.data && e.data.type === 'stomme:preview' && typeof e.data.data === 'string') update(e.data.data);
     });
   })();
 </script>

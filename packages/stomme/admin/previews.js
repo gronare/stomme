@@ -109,14 +109,23 @@
   // per-keystroke flicker. Returning the existing iframe's src UNCHANGED is what stops the
   // CMS's React from reloading it; the visible update rides on the message instead.
   var FRAME_STYLE = { width: '100%', height: '100vh', border: '0', display: 'block', background: '#fff' };
+  // Per-id frame state. A React ref captures the real <iframe> node (Decap renders the
+  // preview inside its own frame, so document.getElementById from here wouldn't find it).
+  var FRAMES = {};
   function liveFrame(id, baseSrc, data) {
-    var existing = document.getElementById(id);
-    if (existing) {
-      if (existing.contentWindow) existing.contentWindow.postMessage({ type: 'stomme:preview', data: data }, '*');
-      return h('iframe', { id: id, src: existing.getAttribute('src'), style: FRAME_STYLE });
+    var rec = FRAMES[id] || (FRAMES[id] = {});
+    if (!rec.ref) rec.ref = function (el) { rec.el = el; if (!el) rec.src = null; };
+    if (!rec.src) {
+      // First mount (or after unmount): bake the current data into the src so it
+      // SSR-renders correctly immediately.
+      var sep = baseSrc.indexOf('?') >= 0 ? '&' : '?';
+      rec.src = baseSrc + sep + 'data=' + encodeURIComponent(data);
+    } else if (rec.el && rec.el.contentWindow) {
+      // Already mounted: push the new draft; /preview swaps #preview-root in place. The
+      // src is unchanged, so the CMS's React keeps the iframe mounted — no reload.
+      rec.el.contentWindow.postMessage({ type: 'stomme:preview', data: data }, '*');
     }
-    var sep = baseSrc.indexOf('?') >= 0 ? '&' : '?';
-    return h('iframe', { id: id, src: baseSrc + sep + 'data=' + encodeURIComponent(data), style: FRAME_STYLE });
+    return h('iframe', { src: rec.src, style: FRAME_STYLE, ref: rec.ref });
   }
   var PagePreview = function (props) {
     return liveFrame('stomme-preview', '/preview', b64(jsBlocks(props.entry)));
