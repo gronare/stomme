@@ -69,7 +69,7 @@ const year = new Date().getFullYear();
       )}
     </div>
     <div class="footer-bar">
-      <p class="mono" style="margin:0">© {settings.founded ? `${settings.founded}–` : ''}{year} {settings.name}{footer.note ? ` · ${footer.note}` : ''}</p>
+      <p class="mono" style="margin:0">© {contact.founded ? `${contact.founded}–` : ''}{year} {settings.name}{footer.note ? ` · ${footer.note}` : ''}</p>
       {legal.length > 0 && (
         <ul class="footer-legal">
           {legal.map((l) => <li><a href={resolveLink(l.link, '/')} class="footer-link">{l.label}</a></li>)}
