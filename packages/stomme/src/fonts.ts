@@ -9,6 +9,10 @@ export const FONT_STACKS: Record<string, string> = {
   grotesk: '"Helvetica Neue", Helvetica, Arial, "Segoe UI", system-ui, sans-serif',
   rounded: 'ui-rounded, "SF Pro Rounded", "Hiragino Maru Gothic ProN", "Segoe UI", system-ui, sans-serif',
   slab: 'Rockwell, "Rockwell Nova", "Roboto Slab", "DejaVu Serif", Georgia, serif',
+  // Geometric sans (Futura family). Web-safe stack: Futura on macOS/iOS, Century Gothic on
+  // Windows, else a generic geometric fallback. For pixel-consistent rendering everywhere,
+  // upload a self-hosted geometric (e.g. Jost) via the Custom font picker.
+  geometric: 'Futura, "Futura PT", "Century Gothic", "Avenir Next", "URW Geometric", ui-sans-serif, system-ui, sans-serif',
   mono: 'ui-monospace, "SF Mono", Menlo, Consolas, monospace',
 };
 

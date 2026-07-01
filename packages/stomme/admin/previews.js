@@ -52,6 +52,7 @@
     grotesk: '"Helvetica Neue",Helvetica,Arial,"Segoe UI",system-ui,sans-serif',
     rounded: 'ui-rounded,"SF Pro Rounded","Hiragino Maru Gothic ProN","Segoe UI",system-ui,sans-serif',
     slab: 'Rockwell,"Rockwell Nova","Roboto Slab","DejaVu Serif",Georgia,serif',
+    geometric: 'Futura,"Futura PT","Century Gothic","Avenir Next","URW Geometric",ui-sans-serif,system-ui,sans-serif',
     mono: MONO,
   };
   var fontFor = function (key) { return key && FONT_STACKS[key] ? FONT_STACKS[key] : SANS; };

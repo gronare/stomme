@@ -278,6 +278,7 @@ export default {
   'System (default)': 'System (standard)',
   'Serif (elegant headlines)': 'Serif (eleganta rubriker)',
   'Grotesk (clean sans)': 'Grotesk (ren sans)',
+  'Geometric (Futura)': 'Geometrisk (Futura)',
   'Rounded': 'Rundad',
   'Custom (uploaded below)': 'Eget (uppladdat nedan)',
   'Font for headings. Empty = system default.': 'Typsnitt för rubriker. Tom = systemstandard.',
