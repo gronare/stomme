@@ -232,15 +232,15 @@
         h('h2', { style: { fontFamily: dispFont, color: brand, fontSize: '1.5rem', fontWeight: 800, margin: '10px 0 8px' } }, 'Heading on the accent surface'),
         h('p', { style: { color: ink, maxWidth: '48ch', margin: 0 } }, 'Accent sections and the footer use the accent surface.')),
       h('div', { style: { background: dk, color: dkInk, borderRadius: '16px', padding: '28px' } },
-        eyebrowSample('Dark section', ebAccent),
+        eyebrowSample('Dark section', dkInk),
         h('h2', { style: { fontFamily: dispFont, color: dkInk, fontSize: '1.5rem', fontWeight: 800, margin: '10px 0 8px' } }, 'Heading on a dark section'),
         h('p', { style: { color: dkMuted, maxWidth: '48ch', margin: '0 0 18px' } }, 'Any block can switch to the Dark surface — text turns light, cards become raised, accents stay vivid.'),
-        h('div', { style: { marginBottom: '16px' } }, btn('Primary button', brand, onDark)),
+        h('div', { style: { marginBottom: '16px' } }, btn('Primary button', dkInk, dk)),
         h('div', { style: { background: dkCard, border: '1px solid ' + dkLine, borderRadius: '12px', padding: '18px 20px', color: dkInk } },
           h('div', { style: { fontFamily: MONO, fontSize: '10px', letterSpacing: '.1em', textTransform: 'uppercase', color: dkMuted, marginBottom: '6px' } }, 'Raised card'),
           h('div', { style: { fontSize: '14px' } }, 'On a dark section, cards lift with a raised fill + faint border instead of a hard outline.'))),
       h('div', { style: { background: 'linear-gradient(120deg, #12151d, #222a3a 60%, #10131a)', color: '#e9ebf1', borderRadius: '16px', padding: '28px', marginTop: '24px' } },
-        eyebrowSample('Gradient surface', ebAccent),
+        eyebrowSample('Gradient surface', '#e9ebf1'),
         h('h2', { style: { fontFamily: dispFont, color: '#e9ebf1', fontSize: '1.5rem', fontWeight: 800, margin: '10px 0 8px' } }, 'Heading on a gradient'),
         h('p', { style: { color: '#aab0bd', maxWidth: '48ch', margin: 0 } }, 'The gradient surface — a slate backdrop, good behind a tall or dark hero.')));
   };

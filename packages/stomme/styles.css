@@ -90,6 +90,12 @@ body > main { flex: 1 0 auto; } /* sticky footer: main grows so the footer sits 
 /* StatPanel is already dark by design — let the wrapper show through instead of
    painting its (now light) --color-ink ground over it. */
 .surface-dark .stat-panel { background: transparent; }
+/* Brand-coloured interactive bits stay legible on dark/gradient surfaces even when the
+   brand itself is dark (a near-black brand would otherwise vanish here): light eyebrow
+   marker + a light-filled primary button. */
+.surface-dark, .surface-gradient { --eyebrow-accent: var(--color-dark-ink); }
+.surface-dark .btn, .surface-gradient .btn { background: var(--color-dark-ink); color: var(--color-dark); }
+.surface-dark .btn:hover, .surface-gradient .btn:hover { background: color-mix(in srgb, var(--color-dark-ink) 82%, var(--color-dark)); color: var(--color-dark); }
 
 /* Gradient surface — the cover's slate gradient (+ brand glow) as a full-bleed section
    background with light text. Same token remap as .surface-dark; headings go light. */
