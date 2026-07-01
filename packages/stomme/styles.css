@@ -381,6 +381,9 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
 body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header.solid,
 body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header.nav-open {
   background: color-mix(in srgb, var(--color-paper) 96%, transparent);
+  /* reset the base #fff (set for the transparent state) so inherited bits like the
+     dropdown caret (currentColor) turn dark too, not just the explicitly-reset links */
+  color: var(--color-ink);
   -webkit-backdrop-filter: saturate(1.2) blur(8px); backdrop-filter: saturate(1.2) blur(8px);
   border-bottom-color: var(--color-line); box-shadow: 0 12px 30px -24px rgba(0,0,0,0.5);
 }
