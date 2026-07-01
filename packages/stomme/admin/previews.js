@@ -9,17 +9,20 @@
  * A site adds bespoke previews for its own collections in public/admin/previews.js
  * (loaded after this) — re-registering a name overrides the generic one.
  */
-// Editors log in via email (Cloudflare Access), not GitHub — relabel Decap's
-// "Login with GitHub" button. Standalone (doesn't need the CMS globals); runs in
-// every site because stomme-gen copies this file into /admin.
+// Editors log in via email (Cloudflare Access), not GitHub — relabel Decap's login
+// button. Its text contains "GitHub" in every UI language ("Login with GitHub",
+// "Logga in med GitHub", …), so match that; LOGIN_LABEL is localized by stomme-gen
+// from the site's cmsLocale. Standalone (no CMS globals); copied into every /admin.
 (function () {
+  var LOGIN_LABEL = 'Log in'; // stomme:login-label (localized by stomme-gen)
   function relabel() {
     document.querySelectorAll('button').forEach(function (b) {
-      if (/login with github/i.test(b.textContent)) b.textContent = 'Log in';
+      if (/github/i.test(b.textContent || '')) b.textContent = LOGIN_LABEL;
     });
   }
   new MutationObserver(relabel).observe(document.documentElement, { subtree: true, childList: true });
   document.addEventListener('DOMContentLoaded', relabel);
+  relabel();
 })();
 
 // NOTE: the same-window auth handoff (Arc etc.) lives in /admin/index.html <head>, NOT

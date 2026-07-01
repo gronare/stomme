@@ -748,6 +748,10 @@ try {
   const previewsDest = resolve(root, 'public/admin/stomme-previews.js');
   mkdirSync(dirname(previewsDest), { recursive: true });
   let previewsSrc = readFileSync(resolve(here, '../admin/previews.js'), 'utf8');
+  // Localize the login-button relabel (previews.js ships the English default label).
+  const LOGIN_LABELS = { en: 'Log in', sv: 'Logga in', da: 'Log ind', nb_no: 'Logg inn', nb: 'Logg inn', nn: 'Logg inn', de: 'Anmelden', fr: 'Se connecter', es: 'Iniciar sesión', it: 'Accedi', nl: 'Inloggen', pt: 'Entrar', fi: 'Kirjaudu sisään' };
+  const loginLabel = LOGIN_LABELS[CMS_LOCALE] || LOGIN_LABELS[String(CMS_LOCALE).split(/[-_]/)[0]] || 'Log in';
+  previewsSrc = previewsSrc.replace(/var LOGIN_LABEL = '[^']*'; \/\/ stomme:login-label/, `var LOGIN_LABEL = ${JSON.stringify(loginLabel)}; // stomme:login-label`);
   // Register a styled preview for each config-defined listing collection (article →
   // post preview, catalog → catalog preview); otherwise Decap shows a raw field dump.
   if (LISTINGS.length) {
