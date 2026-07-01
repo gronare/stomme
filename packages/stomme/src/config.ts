@@ -65,6 +65,7 @@ export interface StommeFeatures {
   services?: boolean; // services collection + /<services> routes + serviceGrid block
   testimonials?: boolean; // testimonials collection + testimonials block
   faq?: boolean; // faq collection + faq block
+  tracking?: boolean; // analytics (GTM/GA4/Meta) + cookie-consent banner + the Tracking settings pane
 }
 export const FEATURE_DEFAULTS: Required<StommeFeatures> = {
   blog: false,
@@ -72,6 +73,7 @@ export const FEATURE_DEFAULTS: Required<StommeFeatures> = {
   services: false,
   testimonials: false,
   faq: false,
+  tracking: false,
 };
 // Resolve a site's flags over the all-false defaults. Unknown keys are ignored;
 // known-but-omitted keys are false.
@@ -157,6 +159,14 @@ const STRINGS_EN = {
     lead: "The page you're looking for doesn't exist or may have moved.",
     home: 'Back to home',
   },
+  // Cookie-consent banner (only shown when tracking is enabled).
+  consent: {
+    text: 'We use cookies for statistics and to improve the site.',
+    accept: 'Accept',
+    decline: 'Decline',
+    more: 'Read more',
+    settings: 'Cookie settings',
+  },
 };
 
 const STRINGS_SV: typeof STRINGS_EN = {
@@ -192,6 +202,13 @@ const STRINGS_SV: typeof STRINGS_EN = {
     lead: 'Sidan du letar efter finns inte eller kan ha flyttats.',
     home: 'Till startsidan',
   },
+  consent: {
+    text: 'Vi använder cookies för statistik och för att förbättra sajten.',
+    accept: 'Acceptera',
+    decline: 'Avböj',
+    more: 'Läs mer',
+    settings: 'Cookie-inställningar',
+  },
 };
 
 const STRINGS_BY_LANG: Record<string, typeof STRINGS_EN> = { en: STRINGS_EN, sv: STRINGS_SV };
@@ -210,6 +227,7 @@ function baseStrings(locale?: string, cmsLocale?: string) {
     listingStatus: { ...STRINGS_EN.listingStatus, ...b.listingStatus },
     thanks: { ...STRINGS_EN.thanks, ...b.thanks },
     notFound: { ...STRINGS_EN.notFound, ...b.notFound },
+    consent: { ...STRINGS_EN.consent, ...b.consent },
   };
 }
 
@@ -239,6 +257,7 @@ export function resolveSite(c?: SiteConfig) {
       listingCta: (s && s.listingCta) || base.listingCta,
       thanks: { ...base.thanks, ...((s && (s as any).thanks) || {}) },
       notFound: { ...base.notFound, ...((s && (s as any).notFound) || {}) },
+      consent: { ...base.consent, ...((s && (s as any).consent) || {}) },
     },
     listings: resolveListings(c && c.listings),
     cms: c && c.cms, // forwarded so blocks (e.g. ContactForm) can reach the gateway baseUrl

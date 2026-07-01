@@ -1,0 +1,51 @@
+---
+// Cookie-consent banner — a slim bottom bar, shown only when tracking is enabled and
+// the visitor hasn't chosen yet. Accepting flips Google Consent Mode + Meta pixel to
+// granted (see Tracking.astro); declining leaves everything denied. The choice is
+// remembered; a footer link with [data-consent-reopen] reopens it. No tracking → this
+// renders nothing (no cookies means no banner is needed).
+import { getEntry } from 'astro:content';
+import { resolveSite, resolveFeatures } from './src/config';
+import { site as siteConfig, features } from '@stomme/config';
+
+const t: any = (await getEntry('tracking', 'tracking')?.catch(() => null))?.data ?? {};
+const on = resolveFeatures(features).tracking && !!(t.gtmId || t.ga4Id || t.metaPixelId);
+const c = resolveSite(siteConfig).strings.consent;
+const privacyUrl = t.privacyUrl || '';
+---
+{on && (
+  <Fragment>
+    <div id="stomme-consent" class="consent" role="dialog" aria-label="Cookies" hidden>
+      <p class="consent__text">
+        {c.text}
+        {privacyUrl && <a href={privacyUrl} class="consent__link">{c.more}</a>}
+      </p>
+      <div class="consent__actions">
+        <button type="button" data-consent="denied" class="consent__btn consent__btn--ghost">{c.decline}</button>
+        <button type="button" data-consent="granted" class="consent__btn">{c.accept}</button>
+      </div>
+    </div>
+    <script is:inline set:html={`
+      (function(){
+        var KEY='stomme-consent', el=document.getElementById('stomme-consent');
+        if(!el) return;
+        function apply(v){
+          try{localStorage.setItem(KEY,v);}catch(e){}
+          if(v==='granted'){
+            if(window.gtag) gtag('consent','update',{ad_storage:'granted',ad_user_data:'granted',ad_personalization:'granted',analytics_storage:'granted'});
+            if(window.fbq) fbq('consent','grant');
+          }
+          el.hidden=true;
+        }
+        var saved=null; try{saved=localStorage.getItem(KEY);}catch(e){}
+        if(saved!=='granted' && saved!=='denied'){ el.hidden=false; }
+        el.addEventListener('click',function(e){
+          var b=e.target.closest('[data-consent]'); if(b) apply(b.getAttribute('data-consent'));
+        });
+        document.addEventListener('click',function(e){
+          if(e.target.closest('[data-consent-reopen]')){ e.preventDefault(); el.hidden=false; }
+        });
+      })();
+    `} />
+  </Fragment>
+)}

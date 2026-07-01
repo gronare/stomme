@@ -49,7 +49,7 @@ try {
   if (mod.site && mod.site.routes) ROUTES = { ...ROUTES, ...mod.site.routes };
   if (mod.site && mod.site.cmsLocale) CMS_LOCALE = mod.site.cmsLocale;
   if (mod.site && mod.site.cms) CMS = mod.site.cms;
-  if (mod.features) FEATURES = { blog: false, areas: false, services: false, testimonials: false, faq: false, ...mod.features };
+  if (mod.features) FEATURES = { blog: false, areas: false, services: false, testimonials: false, faq: false, tracking: false, ...mod.features };
   if (Array.isArray(mod.listings))
     LISTINGS = mod.listings
       .filter((x) => x && x.id && x.route && (x.preset === 'article' || x.preset === 'catalog'))
@@ -508,6 +508,7 @@ function emitCms(indent) {
 // thanks buttons reuse the same emitters as before (per-site $pages / $menus options).
 // Written at the canonical absolute indent (the `settings` collection sits at indent 2).
 function emitSettings() {
+  const tp = emitTrackingPane(6);
   return `  - name: settings
     label: "Settings"
     files:
@@ -690,10 +691,31 @@ ${emitNavLinks(10)}
           - { name: heading, label: "Heading", widget: string, required: false, hint: "Big confirmation headline. Blank = localized default." }
           - { name: message, label: "Message", widget: text, required: false, hint: "Reassurance line under the heading. Blank = default." }
 ${emitThanksButtons(10)}
-          - { name: showContact, label: "Show the direct-contact card", widget: boolean, required: false, default: true, hint: "Phone / email / hours from Site & contact." }`;
+          - { name: showContact, label: "Show the direct-contact card", widget: boolean, required: false, default: true, hint: "Phone / email / hours from Site & contact." }${tp ? '\n' + tp : ''}`;
 }
 
-const EMITTERS = { blocks: emitWidget, collections: emitCollections, navlinks: emitNavLinks, thanksbuttons: emitThanksButtons, settings: emitSettings, cms: emitCms };
+// Tracking & cookies settings pane — only when the `tracking` feature is on (toggle with
+// stomme-enable). Emitted into a `tracking:generated` region on static-pane sites and folded
+// into emitSettings on generated-settings sites. The feature flag is the master switch; this
+// pane just holds the IDs. No IDs → the pane shows but nothing tracks.
+function trackingPaneYaml(indent) {
+  const p = ' '.repeat(indent);
+  return [
+    `${p}- label: "Tracking & cookies"`,
+    `${p}  name: tracking`,
+    `${p}  file: "src/content/tracking/tracking.md"`,
+    `${p}  fields:`,
+    `${p}    - { name: gtmId, label: "Google Tag Manager ID", widget: string, required: false, hint: "GTM-XXXXXX. Covers GA4 and most pixels via your container." }`,
+    `${p}    - { name: ga4Id, label: "Google Analytics 4 ID", widget: string, required: false, hint: "G-XXXXXXX. Only if you load GA4 directly (not via GTM)." }`,
+    `${p}    - { name: metaPixelId, label: "Meta (Facebook) Pixel ID", widget: string, required: false }`,
+    `${p}    - { name: privacyUrl, label: "Privacy policy URL", widget: string, required: false, hint: "Linked from the cookie banner, e.g. /integritetspolicy." }`,
+  ].join('\n');
+}
+function emitTrackingPane(indent) {
+  return FEATURES && FEATURES.tracking ? trackingPaneYaml(indent) : '';
+}
+
+const EMITTERS = { blocks: emitWidget, collections: emitCollections, navlinks: emitNavLinks, thanksbuttons: emitThanksButtons, settings: emitSettings, cms: emitCms, tracking: emitTrackingPane };
 
 // Fill every `# >>> NAME:generated … # <<< NAME:generated` region (idempotent).
 const lines = readFileSync(configPath, 'utf8').split('\n');

@@ -1840,3 +1840,5 @@ collections:
                   - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto: — overrides the page above." }
           # <<< thanksbuttons:generated
           - { name: showContact, label: "Show the direct-contact card", widget: boolean, required: false, default: true, hint: "Phone / email / hours from Site & contact." }
+      # >>> tracking:generated (run: pnpm cms:gen — do not edit between markers)
+      # <<< tracking:generated

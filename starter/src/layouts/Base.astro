@@ -4,6 +4,8 @@ import { getEntry, getCollection } from 'astro:content';
 import { resolveFonts } from '@gronare/stomme/fonts';
 import Header from '@gronare/stomme/Header.astro';
 import Footer from '@gronare/stomme/Footer.astro';
+import Tracking from '@gronare/stomme/Tracking.astro';
+import ConsentBanner from '@gronare/stomme/ConsentBanner.astro';
 import { site } from '../site.config';
 
 // Uploaded font files → served URLs (Vite hashes them), for a custom theme font.
@@ -83,10 +85,12 @@ const themeVars = [
     {settings.appleIcon && <link rel="apple-touch-icon" href={settings.appleIcon} />}
     {fonts.preloads.map((p) => <link rel="preload" as="font" type={p.type} href={p.href} crossorigin />)}
     {fonts.fontFace && <style is:inline set:html={fonts.fontFace}></style>}
+    {chrome && <Tracking />}
   </head>
   <body>
     {chrome && <Header />}
     <main><slot /></main>
     {chrome && <Footer towns={towns} townsHref={site.routes?.towns ?? '/areas'} />}
+    {chrome && <ConsentBanner />}
   </body>
 </html>

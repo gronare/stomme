@@ -30,6 +30,8 @@
     "./Header.astro": "./blocks/Header.astro",
     "./Footer.astro": "./blocks/Footer.astro",
     "./Thanks.astro": "./Thanks.astro",
+    "./Tracking.astro": "./Tracking.astro",
+    "./ConsentBanner.astro": "./ConsentBanner.astro",
     "./DirectContact.astro": "./DirectContact.astro",
     "./ContactLink.astro": "./ContactLink.astro",
     "./TownPage.astro": "./TownPage.astro",

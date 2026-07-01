@@ -1,0 +1,48 @@
+---
+// Analytics injection with Google Consent Mode v2. Rendered in the site's <head> (via
+// Base.astro). Active only when the `tracking` feature is ON (toggle with stomme-enable) —
+// off = nothing injected, no cookies, no banner. Consent defaults to DENIED; nothing tracks
+// or sets non-essential cookies until the visitor accepts in the banner (ConsentBanner.astro).
+// IDs come from the CMS Tracking pane. GTM covers GA4 + most pixels; GA4/Meta load them directly.
+import { getEntry } from 'astro:content';
+import { resolveFeatures } from './src/config';
+import { features } from '@stomme/config';
+
+const t: any = (await getEntry('tracking', 'tracking')?.catch(() => null))?.data ?? {};
+const on = resolveFeatures(features).tracking && !!(t.gtmId || t.ga4Id || t.metaPixelId);
+---
+{on && (
+  <Fragment>
+    <script is:inline set:html={`
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('consent', 'default', {
+        ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied',
+        analytics_storage: 'denied', functionality_storage: 'granted', security_storage: 'granted',
+        wait_for_update: 500
+      });
+      try {
+        if (localStorage.getItem('stomme-consent') === 'granted') {
+          gtag('consent', 'update', { ad_storage:'granted', ad_user_data:'granted', ad_personalization:'granted', analytics_storage:'granted' });
+        }
+      } catch (e) {}
+    `} />
+    {t.gtmId && (
+      <script is:inline set:html={`(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','${t.gtmId}');`} />
+    )}
+    {t.ga4Id && (
+      <Fragment>
+        <script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${t.ga4Id}`} />
+        <script is:inline set:html={`gtag('js', new Date()); gtag('config', '${t.ga4Id}');`} />
+      </Fragment>
+    )}
+    {t.metaPixelId && (
+      <script is:inline set:html={`
+        !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+        fbq('consent','revoke');
+        try { if (localStorage.getItem('stomme-consent')==='granted') fbq('consent','grant'); } catch(e){}
+        fbq('init','${t.metaPixelId}'); fbq('track','PageView');
+      `} />
+    )}
+  </Fragment>
+)}
