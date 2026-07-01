@@ -150,6 +150,13 @@ const STRINGS_EN = {
     talkLabel: 'Prefer to talk?',
     home: 'Back to home',
   },
+  // 404 page (engine-injected /404 route).
+  notFound: {
+    title: 'Page not found',
+    heading: 'Page not found',
+    lead: "The page you're looking for doesn't exist or may have moved.",
+    home: 'Back to home',
+  },
 };
 
 const STRINGS_SV: typeof STRINGS_EN = {
@@ -179,6 +186,12 @@ const STRINGS_SV: typeof STRINGS_EN = {
     talkLabel: 'Hellre prata?',
     home: 'Till startsidan',
   },
+  notFound: {
+    title: 'Sidan hittades inte',
+    heading: 'Sidan hittades inte',
+    lead: 'Sidan du letar efter finns inte eller kan ha flyttats.',
+    home: 'Till startsidan',
+  },
 };
 
 const STRINGS_BY_LANG: Record<string, typeof STRINGS_EN> = { en: STRINGS_EN, sv: STRINGS_SV };
@@ -196,6 +209,7 @@ function baseStrings(locale?: string, cmsLocale?: string) {
     service: { ...STRINGS_EN.service, ...b.service },
     listingStatus: { ...STRINGS_EN.listingStatus, ...b.listingStatus },
     thanks: { ...STRINGS_EN.thanks, ...b.thanks },
+    notFound: { ...STRINGS_EN.notFound, ...b.notFound },
   };
 }
 
@@ -224,6 +238,7 @@ export function resolveSite(c?: SiteConfig) {
       listingStatus: { ...base.listingStatus, ...(s && s.listingStatus) },
       listingCta: (s && s.listingCta) || base.listingCta,
       thanks: { ...base.thanks, ...((s && (s as any).thanks) || {}) },
+      notFound: { ...base.notFound, ...((s && (s as any).notFound) || {}) },
     },
     listings: resolveListings(c && c.listings),
     cms: c && c.cms, // forwarded so blocks (e.g. ContactForm) can reach the gateway baseUrl

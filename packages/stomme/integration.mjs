@@ -268,6 +268,18 @@ export default function stomme(options = {}) {
           enabled.push(`/preview${isStatic ? ' (static)' : ''}`);
         }
 
+        // 0b. 404 page — a real not-found (the host serves dist/404.html with a 404 status)
+        // instead of the soft-404 where unmatched paths fall back to the home page with 200.
+        // Skip if the site ships its own src/pages/404.*.
+        const site404 = ['404.astro', '404.md', '404.mdx', '404.html']
+          .some((f) => existsSync(resolve(root, 'src/pages', f)));
+        if (site404) {
+          logger.info("using the site's own /404 (skipped the generated one)");
+        } else {
+          injectRoute({ pattern: '/404', entrypoint: '@gronare/stomme/routes/notfound.astro' });
+          enabled.push('/404');
+        }
+
         // 1. Fixed feature routes (areas/services). Blog is handled as a listing below.
         const routed = [
           { on: features.areas, prefix: routes.towns || '/areas', entrypoint: '@gronare/stomme/routes/town.astro' },

@@ -1,0 +1,27 @@
+---
+// Injected by the stomme integration at /404 (unless the site ships its own src/pages/404.*).
+// Prerendered to dist/404.html so the host serves a real 404 for unmatched paths instead of the
+// soft-404 fallback (unmatched → home page with 200). Themed via the site's Base layout; the
+// copy is localized from site.strings.notFound (English base, Swedish override, per-site override).
+export const prerender = true;
+import Base from '@stomme/base';
+import { site } from '@stomme/config';
+import { resolveSite } from '../src/config';
+
+const t = resolveSite(site).strings.notFound;
+---
+<Base title={t.title} description={t.lead}>
+  <section class="section nf-section">
+    <span class="mono eyebrow">404</span>
+    <h1 class="display display--hero nf-heading">{t.heading}</h1>
+    <p class="intro nf-lead">{t.lead}</p>
+    <div class="btn-row nf-actions"><a href="/" class="btn">{t.home}</a></div>
+  </section>
+</Base>
+
+<style>
+  .nf-section { min-height: 46vh; display: flex; flex-direction: column; justify-content: center; }
+  .nf-heading { margin-top: 1rem; }
+  .nf-lead { margin-top: 1rem; max-width: 40rem; }
+  .nf-actions { margin-top: 2rem; }
+</style>
