@@ -40,6 +40,8 @@ import Footer from '@gronare/stomme/Footer.astro';
 import Thanks from '@gronare/stomme/Thanks.astro';
 import DirectContact from '@gronare/stomme/DirectContact.astro';
 import FindUs from '@gronare/stomme/blocks/FindUs.astro';
+import ServicePage from '@gronare/stomme/ServicePage.astro';
+import { renderMarkdown } from '@gronare/stomme/markdown';
 
 const kind = Astro.url.searchParams.get('kind');
 const raw = Astro.url.searchParams.get('data');
@@ -91,6 +93,11 @@ if (kind === 'thanks') {
 // Contact settings: render the REAL components fed the draft settings, so the
 // preview is the live card + Find-us block (no hand-built mockup that can drift).
 const contactDraft = kind === 'contact' && draft && typeof draft === 'object' ? draft : null;
+
+// Service entry: render the REAL ServicePage (template chrome + the entry's composed
+// blocks) from the draft, with the markdown body pre-rendered.
+const serviceDraft = kind === 'service' && draft && typeof draft === 'object' ? draft : null;
+const serviceHtml = serviceDraft ? await renderMarkdown(serviceDraft.body || '') : '';
 ---
 {kind === 'header' ? (
   <Base title="Preview" chrome={false}><div id="preview-root"><Header nav={navDraft} /></div></Base>
@@ -105,6 +112,8 @@ const contactDraft = kind === 'contact' && draft && typeof draft === 'object' ? 
       <FindUs data={contactDraft} showHours={true} />
     </div>
   </div></Base>
+) : kind === 'service' ? (
+  <Base title="Preview"><div id="preview-root"><ServicePage data={serviceDraft ?? {}} bodyHtml={serviceHtml} config={site} /></div></Base>
 ) : (
   <Base title="Preview"><div id="preview-root"><BlockRenderer blocks={blocks} config={site} /></div></Base>
 )}

@@ -330,19 +330,9 @@
       note('Service-area landing page (TownPage); links from the link-chips block.'));
   };
 
-  // Service detail (the services collection → ServicePage). Card chrome + the
-  // markdown body (rendered live via widgetFor).
-  var ServicePreview = function (props) {
-    var e = props.entry;
-    var bullets = arr(e, 'bullets');
-    return h('div', { className: 'bk' },
-      h('span', { className: 'bk-eyebrow' }, v(e, 'navLabel') || 'Service'),
-      h('h1', { className: 'bk-h1' }, v(e, 'title')),
-      v(e, 'summary') ? h('p', { className: 'bk-intro' }, v(e, 'summary')) : null,
-      bullets.length ? h('ul', { className: 'bk-bullets' }, bullets.map(function (b, i) { return h('li', { key: i }, b); })) : null,
-      h('div', { style: { marginTop: '20px', maxWidth: '62ch', color: cMuted } }, props.widgetFor ? props.widgetFor('body') : null),
-      note('Service detail page (ServicePage); shown as a card in the Service-cards block.'));
-  };
+  // Service detail: render the REAL ServicePage (template chrome + the entry's composed
+  // blocks + rendered body) via /preview?kind=service — no hand-built mockup to drift.
+  var ServicePreview = ChromePreview('service');
 
   // Catalog (for-sale) listing item → CatalogPage. Price, status pill, category,
   // a spec table, and the markdown body.

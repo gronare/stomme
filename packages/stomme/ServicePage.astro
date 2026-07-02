@@ -13,15 +13,17 @@ import { resolveSite, type SiteConfig } from './src/config';
 // imageAlt?, seo? + a markdown body + optional `blocks` (composed sections, same
 // picker as pages — rendered between the intro and the quote CTA).
 interface Props {
-  service: any; // CollectionEntry<'services'>
+  service?: any; // CollectionEntry<'services'> (the live route)
+  data?: any; // OR draft frontmatter (the CMS preview) …
+  bodyHtml?: string; // … with the markdown body pre-rendered to HTML
   config?: SiteConfig;
 }
-const { service, config } = Astro.props;
-const { data } = service;
+const { service, data: draftData, bodyHtml, config } = Astro.props;
+const data = service ? service.data : (draftData ?? {});
 const site = resolveSite(config);
 const t = site.strings.service;
 const contact = site.routes.contact ?? '/contact';
-const { Content } = await render(service);
+const Content = service ? (await render(service)).Content : null;
 ---
 <section class="section service-page">
   <span class="mono eyebrow">{t.eyebrow}</span>
@@ -30,7 +32,7 @@ const { Content } = await render(service);
     <Cover src={data.image} alt={data.imageAlt ?? data.title} placeholder="/images/placeholders/service.svg" width={1200} height={675} loading="eager" class="service-img" />
   )}
   <div class="service-prose">
-    <Content />
+    {Content ? <Content /> : <Fragment set:html={bodyHtml ?? ''} />}
   </div>
   {data.bullets?.length > 0 && (
     <ul class="service-bullets">{data.bullets.map((b: string) => <li><span class="service-tick">✓</span><span>{b}</span></li>)}</ul>

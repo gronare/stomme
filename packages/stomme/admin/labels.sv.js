@@ -39,6 +39,7 @@ export default {
   'Second link group': 'Andra länkgruppen',
   'Optional extra column, e.g. your services.': 'Valfri extra kolumn, t.ex. dina tjänster.',
   'Extra narrow': 'Extra smal',
+  'Intro (below the title)': 'Intro (under rubriken)',
   'Alignment': 'Justering',
   'Left': 'Vänster',
   'Centered': 'Centrerad',
