@@ -28,6 +28,14 @@ const jiti = createJiti(import.meta.url);
 const schemaPath = resolve(root, process.env.BLOCKKIT_SCHEMA || 'src/blocks/schema.ts');
 const configPath = resolve(root, process.env.BLOCKKIT_CONFIG || 'public/admin/config.yml');
 
+// CMS-less site (public/admin removed — e.g. handed over to a customer who edits the
+// markdown directly): everything this generator produces lives under public/admin, so
+// there is nothing to do. Graceful no-op keeps `pnpm build` (which runs stomme-gen) working.
+if (!existsSync(configPath)) {
+  console.log(`stomme-gen: no ${process.env.BLOCKKIT_CONFIG || 'public/admin/config.yml'} — CMS-less site, nothing to generate`);
+  process.exit(0);
+}
+
 // The site's catalog. Loaded via jiti so its bare '@gronare/stomme/kit' import resolves
 // against the consumer's node_modules and transpiles cleanly even when installed there.
 const { BLOCKS } = await jiti.import(schemaPath);
