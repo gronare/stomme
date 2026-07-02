@@ -1,4 +1,6 @@
 ---
+import Emph from '../src/Emph.astro';
+
 // Pull-quote / standout statement to break up body text. A coloured left rule and
 // an oversized display quote. `accent` picks which token the rule + eyebrow marker use.
 // `width` sizes the quote column (narrow reads best; extra narrow for short punchlines;
@@ -19,7 +21,7 @@ const accentVar = accent === 'secondary' ? 'var(--color-secondary)' : accent ===
     {/* narrow constrains the SECTION (identical box to a narrow hero); xnarrow/full size the figure */}
     <figure class:list={['callout', `callout--${width}`, `callout--${align}`]} style={`--block-accent:${accentVar}`}>
       {eyebrow && <span class="mono eyebrow">{eyebrow}</span>}
-      <blockquote class="display callout__quote">{quote}</blockquote>
+      <blockquote class="display callout__quote"><Emph text={quote} /></blockquote>
     </figure>
   </section>
 )}

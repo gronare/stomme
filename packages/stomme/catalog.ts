@@ -299,7 +299,7 @@ export const defaultBlocks: BlockDef[] = [
     shape: 'quote',
     fields: [
       { name: 'eyebrow', label: 'Eyebrow', widget: 'string', required: false },
-      { name: 'quote', label: 'Quote / statement', widget: 'text' },
+      { name: 'quote', label: 'Quote / statement', widget: 'text', hint: 'Wrap words in *asterisks* to underline them.' },
       {
         name: 'width', label: 'Width', widget: 'select', required: false, default: 'narrow',
         hint: 'How wide the quote column is. Narrow reads best.',

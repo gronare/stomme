@@ -48,6 +48,8 @@ body > main { flex: 1 0 auto; } /* sticky footer: main grows so the footer sits 
 .section-head { max-width: 52rem; }
 
 .display { font-family: var(--bk-font-display); font-weight: 800; letter-spacing: -0.02em; color: var(--color-brand); font-size: clamp(1.6rem, 3vw, 2.25rem); line-height: 1.1; margin: 0; }
+/* `*words*` in heading fields → underlined emphasis (see src/Emph.astro), not italics. */
+.display em { font-style: normal; border-bottom: 2px solid currentColor; }
 .display--hero { font-size: clamp(2rem, 4.5vw, 3.5rem); line-height: 1.06; }
 .intro { margin-top: 1rem; color: var(--color-muted); font-size: 1.1rem; max-width: 38rem; }
 
@@ -84,6 +86,9 @@ body > main { flex: 1 0 auto; } /* sticky footer: main grows so the footer sits 
   --color-line: var(--color-dark-line);
 }
 /* Spots that hardcode light values the token remap can't reach. */
+/* Headings use the brand colour, which can be dark — force them light on the dark surface
+   (the gradient surface already does this). */
+.surface-dark .display { color: var(--color-dark-ink); }
 .surface-dark .hl-row { background: color-mix(in srgb, var(--color-dark-ink) 6%, var(--color-dark)); border-color: var(--color-dark-line); }
 .surface-dark .hl-ic { background: color-mix(in srgb, var(--color-brand) 22%, transparent); }
 .surface-dark .ico-badge { background: color-mix(in srgb, var(--color-brand) 28%, transparent); }

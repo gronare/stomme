@@ -3,6 +3,7 @@ import { getEntry } from 'astro:content';
 import { resolveLink } from '../src/href';
 import Cover from '../src/Cover.astro';
 import Icon from '../src/Icon.astro';
+import Emph from '../src/Emph.astro';
 import ContactLink from '../ContactLink.astro';
 
 // Library hero: a universal left column + a swappable, generic media slot:
@@ -42,7 +43,7 @@ const hasMedia = showImage || showHighlights || showMotif;
   <div class:list={['hero-grid', { 'has-media': hasMedia }]}>
     <div>
       {eyebrow && <span class="mono eyebrow">{eyebrow}</span>}
-      <h1 class="display display--hero" style="margin-top:1rem">{heading}</h1>
+      <h1 class="display display--hero" style="margin-top:1rem"><Emph text={heading} /></h1>
       {intro && <p class="intro">{intro}</p>}
       {(ctaLabel || cta2Label || contact.phone) && (
         <div class="btn-row">

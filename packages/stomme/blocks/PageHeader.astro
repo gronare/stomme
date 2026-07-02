@@ -2,6 +2,7 @@
 import { getEntry } from 'astro:content';
 import { resolveLink } from '../src/href';
 import ContactLink from '../ContactLink.astro';
+import Emph from '../src/Emph.astro';
 
 // Generic page header for prose pages. `light` = plain header; `dark` = a
 // band/glow hero with CTA + phone (good for a landing/service page top).
@@ -26,7 +27,7 @@ const contact = ((await getEntry('contact', 'contact').catch(() => null))?.data 
     <div class="page-header__glow" aria-hidden="true"></div>
     <div class:list={['section', 'page-header__inner', { 'section--read': read }]}>
       {eyebrow && <span class="mono eyebrow">{eyebrow}</span>}
-      <h1 class="display display--hero page-header__heading">{heading}</h1>
+      <h1 class="display display--hero page-header__heading"><Emph text={heading} /></h1>
       {intro && <p class="intro page-header__intro">{intro}</p>}
       {ctaLabel && (
         <div class="btn-row">
@@ -39,7 +40,7 @@ const contact = ((await getEntry('contact', 'contact').catch(() => null))?.data 
 ) : (
   <section class:list={['section', 'page-header', 'page-header--light', { 'section--read': read }]}>
     {eyebrow && <span class="mono eyebrow">{eyebrow}</span>}
-    <h1 class="display display--hero page-header__heading">{heading}</h1>
+    <h1 class="display display--hero page-header__heading"><Emph text={heading} /></h1>
     {intro && <p class="intro page-header__intro">{intro}</p>}
     {ctaLabel && <div class="btn-row"><a href={href} class="btn">{ctaLabel}</a></div>}
   </section>
