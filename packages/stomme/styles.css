@@ -118,6 +118,12 @@ body > main { flex: 1 0 auto; } /* sticky footer: main grows so the footer sits 
 .surface-gradient .stat-panel { background: transparent; }
 /* Tall hero (the height option) — fills the viewport; text position is selectable. */
 .section--hero-tall { display: flex; flex-direction: column; min-height: 100vh; min-height: 100dvh; }
+/* Print: viewport-height sections explode into pages of solid background (and can kill
+   the print job) — collapse them to their content when printing. */
+@media print {
+  .section--hero-tall, .cover--h-tall, .cover--h-medium { min-height: 0; }
+  body { min-height: 0; }
+}
 .section--hero-top { justify-content: flex-start; }
 .section--hero-center { justify-content: center; }
 .section--hero-bottom { justify-content: flex-end; }
