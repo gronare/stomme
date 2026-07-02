@@ -166,7 +166,7 @@ export function stommeCollections(listings?: Listing[]) {
     }),
 
     // ── Optional (gated by features for admin/blocks/routes; always defined here) ──
-    faq: defineCollection({ loader: md('faq'), schema: z.object({ question: z.string(), answer: z.string(), order: z.number().default(0) }) }),
+    faq: defineCollection({ loader: md('faq'), schema: z.object({ question: z.string(), answer: z.string(), order: z.number().default(0), tags: z.array(z.string()).default([]) }) }),
     // Contact-form confirmation copy (the "Thank-you" settings pane + /thanks page). All
     // optional — blank falls back to the localized defaults.
     thanks: defineCollection({ loader: md('thanks'), schema: z.object({ heading: z.string().optional(), message: z.string().optional(), buttonLabel: z.string().optional(), button: link, button2Label: z.string().optional(), button2: link, showContact: z.boolean().default(true) }) }),

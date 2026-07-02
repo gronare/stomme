@@ -19,14 +19,26 @@ interface Props {
   eyebrow?: string;
   heading?: string;
   intro?: string;
+  entries?: string[]; // picked question slugs (in order); empty = all, by `order`
+  tag?: string; // …or filter by an entry tag (a service slug, a town, any label)
   asideHeading?: string;
   asideBody?: string;
   asideCtaLabel?: string;
   asideHref?: unknown;
   asideCtaHref?: unknown; // plain-string alias accepted from content
 }
-const { variant = 'list', eyebrow, heading, intro, asideHeading, asideBody, asideCtaLabel, asideHref, asideCtaHref } = Astro.props;
-const items = (await getCollection('faq')).sort((a, b) => a.data.order - b.data.order);
+const { variant = 'list', eyebrow, heading, intro, entries, tag, asideHeading, asideBody, asideCtaLabel, asideHref, asideCtaHref } = Astro.props;
+const all = await getCollection('faq');
+// Page-scoped FAQs, two ways (picked entries win over the tag filter):
+//   entries — hand-picked question slugs, shown in the picked order.
+//   tag     — every question carrying this tag (a service slug, a town, any label), by
+//             `order` — new questions with the tag flow to the page automatically.
+// Neither set = the whole collection.
+const items = Array.isArray(entries) && entries.length
+  ? (entries.map((id) => all.find((e) => e.id === id)).filter((e) => e != null) as typeof all)
+  : [...all]
+      .filter((e) => !tag || ((e.data as any).tags ?? []).includes(tag))
+      .sort((a, b) => a.data.order - b.data.order);
 const contact = ((await getEntry('contact', 'contact').catch(() => null))?.data ?? {}) as any;
 const emailFallback = contact.email ? `mailto:${contact.email}` : '/';
 const aHref = resolveLink(asideHref ?? asideCtaHref, emailFallback);

@@ -21,8 +21,9 @@ export type Field = {
   field?: Field; // for a simple (single-field) list
   multiple?: boolean; // select: allow choosing several values
   // For select widgets: a literal option list, or a sentinel the generator
-  // expands — '$pages' (all internal page routes) or '$services' (service slugs).
-  options?: '$pages' | '$services' | { label: string; value: string }[];
+  // expands — '$pages' (all internal page routes), '$services' (service slugs) or
+  // '$faq' (faq question slugs).
+  options?: '$pages' | '$services' | '$faq' | { label: string; value: string }[];
   // For image widgets: override where uploads are stored. Point photos at
   // /src/assets/uploads so Astro optimises them at build (see Cover.astro).
   media_folder?: string;

@@ -155,7 +155,22 @@ function serviceOptions() {
 }
 const SERVICE_OPTIONS = serviceOptions();
 
-const OPTION_SOURCES = { '$pages': PAGE_OPTIONS, '$services': SERVICE_OPTIONS };
+// FAQ question slugs (label = the question) for the faq block's entry picker.
+function faqOptions() {
+  let files = [];
+  try {
+    files = readdirSync(resolve(root, 'src/content/faq')).filter((f) => f.endsWith('.md'));
+  } catch {
+    return [];
+  }
+  return files.sort().map((f) => {
+    const slug = f.replace(/\.md$/, '');
+    return { label: labelFromFrontmatter(resolve(root, 'src/content/faq', f), 'question') || slug, value: slug };
+  });
+}
+const FAQ_OPTIONS = faqOptions();
+
+const OPTION_SOURCES = { '$pages': PAGE_OPTIONS, '$services': SERVICE_OPTIONS, '$faq': FAQ_OPTIONS };
 
 // Optional collection kit: a block may declare a source `collection` (schema.ts).
 // A collection maps to src/content/<name>/ (its glob base). If that folder is
@@ -347,7 +362,13 @@ const COLLECTION_EDITORS = {
   fields:
     - { name: question, label: "Question", widget: string }
     - { name: answer, label: "Answer", widget: text }
-    - { name: order, label: "Order", widget: number, required: false, default: 0 }`,
+    - { name: order, label: "Order", widget: number, required: false, default: 0 }
+    - name: tags
+      label: "Tags"
+      widget: list
+      required: false
+      hint: "Scope the question to pages: an FAQ block filtered on a tag (e.g. a service or town) shows every question carrying it."
+      field: { name: tag, label: "Tag", widget: string }`,
   testimonials: `- name: testimonials
   label: "Testimonials"
   label_singular: "Testimonial"
