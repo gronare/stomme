@@ -242,18 +242,91 @@ export default function stomme(options = {}) {
   const layout = options.layout || 'src/layouts/Base.astro';
   const configPath = options.config || 'src/site.config.ts';
 
+// Theme-coverage lookbook (/lookbook): renders EVERY block from the site's catalog (via the
+// samples on each BlockDef), a surface sweep, and the shared templates — so a custom theme
+// can be validated against 100% of the engine ("does anything look unthemed?"). Always on in
+// `astro dev`; included in builds only with STOMME_LOOKBOOK=1.
+function lookbookEntrypoint() {
+  return `---
+export const prerender = true;
+import Base from '@stomme/base';
+import { site } from '@stomme/config';
+import { BLOCKS } from '@stomme/catalog';
+import BlockRenderer from '@stomme/renderer';
+import Thanks from '@gronare/stomme/Thanks.astro';
+import ServicePage from '@gronare/stomme/ServicePage.astro';
+import TownPage from '@gronare/stomme/TownPage.astro';
+import { resolveSite } from '@gronare/stomme/config';
+
+const rs = resolveSite(site);
+const sections = [];
+for (const b of BLOCKS) {
+  const list = Array.isArray(b.samples) && b.samples.length ? b.samples : b.sample ? [b.sample] : [];
+  if (!list.length) { sections.push({ label: b.type + ' — NO SAMPLE (add one in the catalog)', missing: true, blocks: [] }); continue; }
+  for (const s of list) {
+    const data = { ...s };
+    delete data._label;
+    sections.push({ label: b.type + (s._label ? ' · ' + s._label : ''), blocks: [{ type: b.type, ...data }] });
+  }
+}
+// Surface sweep: one representative block on every surface.
+const fg = BLOCKS.find((b) => b.type === 'featureGrid');
+const fgS = fg && (fg.sample || (Array.isArray(fg.samples) && fg.samples[0]));
+const surfaces = fgS ? ['tint', 'band', 'dark', 'gradient'].map((s) => {
+  const data = { ...fgS }; delete data._label;
+  return { label: 'surface · ' + s, blocks: [{ type: 'featureGrid', ...data, heading: 'On the ' + s + ' surface', surface: s }] };
+}) : [];
+const all = sections.concat(surfaces);
+const missing = all.filter((s) => s.missing).length;
+
+const t = rs.strings.thanks;
+const thanksProps = {
+  eyebrow: t.eyebrow, heading: 'Thanks — a heading with an *emphasised* clause.', message: 'The confirmation lead line.',
+  primaryLabel: 'Primary', primaryHref: '#lookbook', secondaryLabel: 'Secondary', secondaryHref: '#lookbook',
+  recapLabel: t.recapLabel, recap: { email: 'anna@example.com', phone: '070-123 45 67', message: 'A short sample message, as submitted.' },
+  showContact: false, talkLabel: t.talkLabel, who: 'Lookbook', town: 'Sampletown', toLabel: t.to, fromLabel: t.from,
+};
+const serviceFixture = { title: 'Service title', navLabel: 'service', summary: 'The service lede under the title.', bullets: ['Included one', 'Included two'], blocks: [] };
+const townFixture = { id: 'sampletown', data: { name: 'Sampletown', heroSubtitle: 'A local landing-page fixture.', problems: ['First local problem', 'Second one'], districts: ['North', 'South'], services: ['Service one', 'Service two'] } };
+const lb = 'max-width:74rem;margin:0 auto;padding:2.75rem 1.5rem 0.5rem;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;border-bottom:1px dashed #bbb;';
+---
+<Base title="Lookbook" description="Theme-coverage lookbook — every block, variant, surface and template.">
+  <div style={lb + 'color:#888'}>stomme lookbook · {all.length} sections{missing ? ' · ' + missing + ' MISSING SAMPLES' : ''} — anything unthemed is a gap</div>
+  {all.map((s) => (
+    <Fragment>
+      <div style={lb + (s.missing ? 'color:#b00020;font-weight:700' : 'color:#999')}>{s.label}</div>
+      {s.blocks.length > 0 && <BlockRenderer blocks={s.blocks} config={site} />}
+    </Fragment>
+  ))}
+  <div style={lb + 'color:#999'}>template · thanks — classic</div>
+  <Thanks {...thanksProps} />
+  <div style={lb + 'color:#999'}>template · thanks — letter</div>
+  <Thanks {...thanksProps} variant="letter" />
+  <div style={lb + 'color:#999'}>template · service page (ServicePage)</div>
+  <ServicePage data={serviceFixture} bodyHtml="<p>A service body paragraph, rendered from markdown.</p>" config={site} />
+  <div style={lb + 'color:#999'}>template · area page (TownPage)</div>
+  <TownPage town={townFixture} config={site} />
+</Base>
+`;
+}
+
   return {
     name: 'stomme',
     hooks: {
-      'astro:config:setup': ({ config, injectRoute, injectScript, updateConfig, logger }) => {
+      'astro:config:setup': ({ command, config, injectRoute, injectScript, updateConfig, logger }) => {
         const root = fileURLToPath(config.root);
-        // Let the package route entrypoints import the SITE's Base + config.
+        const pkgDir = dirname(fileURLToPath(import.meta.url));
+        // Let the package route entrypoints import the SITE's Base + config — and, for the
+        // lookbook, the site's block catalog + renderer (so site-custom blocks render too).
+        const siteRenderer = resolve(root, 'src/blocks/BlockRenderer.astro');
         updateConfig({
           vite: {
             resolve: {
               alias: {
                 '@stomme/base': resolve(root, layout),
                 '@stomme/config': resolve(root, configPath),
+                '@stomme/catalog': resolve(root, 'src/blocks/schema.ts'),
+                '@stomme/renderer': existsSync(siteRenderer) ? siteRenderer : resolve(pkgDir, 'src/BlockRenderer.astro'),
               },
             },
           },
@@ -291,6 +364,16 @@ export default function stomme(options = {}) {
         } else {
           injectRoute({ pattern: '/404', entrypoint: '@gronare/stomme/routes/notfound.astro' });
           enabled.push('/404');
+        }
+
+        // 0c. Lookbook — the theme-coverage page (every block/variant/surface/template).
+        // Always available in dev; included in builds only when STOMME_LOOKBOOK=1.
+        if (command === 'dev' || process.env.STOMME_LOOKBOOK) {
+          const lookbookFile = resolve(outDir, 'lookbook.astro');
+          mkdirSync(outDir, { recursive: true });
+          writeFileSync(lookbookFile, lookbookEntrypoint());
+          injectRoute({ pattern: '/lookbook', entrypoint: lookbookFile });
+          enabled.push('/lookbook');
         }
 
         // 1. Fixed feature routes (areas/services). Blog is handled as a listing below.

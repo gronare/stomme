@@ -53,6 +53,11 @@ export type BlockDef = {
   group?: string;
   summary?: string;
   shape?: string;
+  // Lookbook fixtures: representative content the /lookbook route renders so a theme can be
+  // validated against EVERY block. `samples` lists variants (`_label` annotates each).
+  // stomme-gen warns when a block has neither — keep them current with the fields.
+  sample?: Record<string, unknown>;
+  samples?: ({ _label?: string } & Record<string, unknown>)[];
 };
 
 // A link: pick a page from the dropdown OR type a custom URL (external / tel: /

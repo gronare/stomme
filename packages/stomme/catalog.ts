@@ -2,7 +2,7 @@
 // directly or extend it: `export const BLOCKS = [...defaultBlocks, ...mine]`.
 import { headingFields, headingFieldsWith, linkField, imageField, iconField, surfaceField, accentField, widthField, cardListField, linkedCardListField, type BlockDef } from './src/kit.ts';
 
-export const defaultBlocks: BlockDef[] = [
+const RAW_BLOCKS: BlockDef[] = [
   {
     type: 'hero',
     label: 'Hero',
@@ -554,3 +554,95 @@ export const defaultBlocks: BlockDef[] = [
     ],
   },
 ];
+
+// ── Lookbook samples ─────────────────────────────────────────────────────────
+// Representative fixtures per block, rendered by the /lookbook route so a theme can be
+// validated against EVERY block and its variants. Keyed by type; an array = one lookbook
+// section per entry (`_label` names the variant). Collection-backed blocks (serviceGrid,
+// faq, testimonials, linkChips, postList, catalogList) render the SITE's real entries —
+// their samples only set chrome. stomme-gen warns when a block lacks a sample.
+const LOREM = 'A short supporting line of body copy, long enough to wrap on narrow columns.';
+const SAMPLES: Record<string, ({ _label?: string } & Record<string, unknown>)[]> = {
+  hero: [
+    { _label: 'narrow · two buttons', eyebrow: 'Eyebrow label', heading: 'A heading that states the offer.', intro: 'One supporting sentence that earns the click below.', ctaLabel: 'Primary action', ctaHref: { url: '#' }, cta2Label: 'Quiet link', cta2Href: { url: '#' }, media: 'none', width: 'narrow' },
+    { _label: 'highlights media', eyebrow: 'Eyebrow', heading: 'Hero beside highlights.', intro: LOREM, ctaLabel: 'Action', ctaHref: { url: '#' }, media: 'highlights', highlights: [{ icon: 'bolt', title: 'Fast', body: 'Loads instantly.' }, { icon: 'shield', title: 'Safe', body: 'Nothing to hack.' }] },
+    { _label: 'motif · tall dark', heading: 'Tall hero on the dark surface.', intro: LOREM, ctaLabel: 'Action', ctaHref: { url: '#' }, media: 'motif', height: 'tall', surface: 'dark' },
+  ],
+  cover: [
+    { _label: 'gradient', eyebrow: 'Eyebrow', heading: 'Full-bleed cover heading', intro: LOREM, ctaLabel: 'Primary', ctaHref: { url: '#' }, cta2Label: 'Secondary', cta2Href: { url: '#' }, media: 'gradient' },
+    { _label: 'animated', heading: 'Animated cover', media: 'animated', height: 'medium' },
+  ],
+  pageHeader: [
+    { _label: 'light', eyebrow: 'Eyebrow', heading: 'Page heading', intro: 'The intro line under a page title.', ctaLabel: 'Optional button', ctaHref: { url: '#' } },
+    { _label: 'band (dark)', variant: 'dark', eyebrow: 'Eyebrow', heading: 'Dark page band', intro: LOREM },
+  ],
+  prose: [
+    { _label: 'with heading (split on themed sites)', eyebrow: 'Eyebrow', heading: 'A prose section heading', body: `**Bold**, *emphasis* and a [link](#) inside markdown body copy. ${LOREM}\n\nA second paragraph to show rhythm.` },
+    { _label: 'plain reading column', body: `${LOREM} ${LOREM}` },
+  ],
+  featureGrid: [{ eyebrow: 'Eyebrow', heading: 'Feature cards heading', items: [
+    { icon: 'bolt', title: 'First feature', body: LOREM, link: { url: '#' } },
+    { icon: 'shield', title: 'Second feature', body: 'A shorter line.' },
+    { icon: 'wrench', title: 'Third feature', body: LOREM },
+  ] }],
+  serviceGrid: [{ _label: 'from the services collection', eyebrow: 'Services', heading: 'Service cards' }],
+  pillars: [{ eyebrow: 'Eyebrow', heading: 'Principles', items: [
+    { title: 'First principle', body: LOREM }, { title: 'Second', body: 'Short.' }, { title: 'Third', body: LOREM },
+  ] }],
+  plans: [{ eyebrow: 'Pricing — one-off', plans: [
+    { name: 'Basic', price: '6 900 kr', period: 'one-off', description: LOREM },
+    { name: 'Standard', price: '12 900 kr', period: 'one-off', badge: 'Popular', highlight: true, description: 'The default pick.', features: [{ text: 'Everything in Basic' }, { text: 'One more thing' }] },
+    { name: 'Plus', pricePrefix: 'from', price: '19 900 kr', period: 'one-off', description: 'For the works.', ctaLabel: 'Choose', ctaHref: { url: '#' } },
+  ] }],
+  specialistGrid: [{ eyebrow: 'Team', heading: 'Specialists', items: [
+    { title: 'Role one', body: LOREM }, { title: 'Role two', body: 'Short line.' },
+  ] }],
+  steps: [{ eyebrow: 'Process', heading: 'How it works', items: [
+    { kicker: 'talk', title: 'We talk', body: LOREM },
+    { kicker: 'build', title: 'We build', body: 'A shorter step.' },
+    { kicker: 'live', title: 'You launch', body: LOREM },
+  ] }],
+  checklist: [
+    { _label: 'two columns', eyebrow: 'Included', columns: 2, items: [{ text: 'First item' }, { text: 'Second item', note: 'With a supporting note.' }, { text: 'Third item' }, { text: 'Fourth item' }] },
+    { _label: 'single + heading (split on themed sites)', eyebrow: 'Included', heading: 'A checklist with a heading', columns: 1, items: [{ text: 'One' }, { text: 'Two' }] },
+  ],
+  gallery: [{ eyebrow: 'Gallery', heading: 'Image grid (placeholders)', columns: 3, images: [{ alt: 'One' }, { alt: 'Two' }, { alt: 'Three' }] }],
+  beforeAfter: [{ eyebrow: 'Before & after', heading: 'Drag the divider' }],
+  textImage: [{ heading: 'Text beside an image', body: `${LOREM}\n\nSecond paragraph.`, flip: false }],
+  textQuote: [{ body: `${LOREM} ${LOREM}`, quote: 'A pulled-out line that carries the point.', attribution: 'Someone, Somewhere' }],
+  callout: [
+    { _label: 'narrow (reading column)', eyebrow: 'Eyebrow', quote: 'A highlighted statement at reading width, with an *emphasised* clause.' },
+    { _label: 'xnarrow · centered · dark', quote: 'Short statement on the dark band.', width: 'xnarrow', align: 'center', surface: 'dark' },
+  ],
+  definition: [{ eyebrow: 'The word', term: 'ex·am·ple', wordClass: 'noun · from latin exemplum', senses: [
+    { text: 'a thing characteristic of its kind.' }, { text: '*of a theme:* every block, accounted for.', note: 'the lookbook, 2026.' },
+  ] }],
+  fragment: [
+    { _label: 'left', eyebrow: 'A story', statement: 'It starts on the left.', body: LOREM, placement: 'left' },
+    { _label: 'right', statement: 'Drifts to the right.', body: LOREM, placement: 'right' },
+    { _label: 'indent + link', statement: 'And lands *indented*.', body: LOREM, linkLabel: 'Read on', link: { url: '#' }, placement: 'indent' },
+  ],
+  statPanel: [
+    { _label: 'single big number', eyebrow: 'Eyebrow', heading: 'A statement with a *underlined* clause.', body: LOREM, badges: ['Badge one', 'Badge two'], statValue: '98%', statLabel: 'of something measured' },
+    { _label: 'compare columns', eyebrow: 'Compare', heading: 'Them versus us.', stats: [{ label: 'Them', value: '1 500 kr', note: 'per month, locked in.' }, { label: 'Us', value: '595 kr', note: 'per month, leave anytime.' }] },
+  ],
+  testimonials: [{ _label: 'from the testimonials collection', eyebrow: 'Customers', heading: 'What they say' }],
+  linkChips: [{ _label: 'from the areas collection', eyebrow: 'Areas', heading: 'Where we work' }],
+  postList: [{ _label: 'from the posts collection', eyebrow: 'Blog', heading: 'Latest posts', featured: true, showImages: true }],
+  catalogList: [{ _label: 'from a catalog listing', eyebrow: 'For sale', heading: 'Catalog items', filters: true, showImages: true }],
+  ctaPanel: [{ eyebrow: 'Eyebrow', heading: 'A call-to-action band', intro: LOREM, label: 'Do the thing', href: { url: '#' } }],
+  ctaBox: [{ surface: 'dark', eyebrow: 'Next step', heading: 'A boxed call to action.', label: 'Primary', href: { url: '#' }, label2: 'quiet second link', href2: { url: '#' } }],
+  faq: [
+    { _label: 'list', eyebrow: 'FAQ', heading: 'Questions (list)', asideHeading: 'More questions?', asideBody: 'Get in touch.', asideCtaLabel: 'Contact' },
+    { _label: 'accordion', variant: 'accordion', heading: 'Questions (accordion)' },
+    { _label: 'cards', variant: 'cards', heading: 'Questions (cards)' },
+    { _label: 'split', variant: 'split', heading: 'Questions (split)' },
+  ],
+  statsBar: [{ items: [{ label: 'Projects', value: '142+' }, { label: 'Uptime', value: '100%' }, { label: 'Rating', value: '5.0' }] }],
+  logoStrip: [{ lead: 'Trusted by', logos: ['Alpha', 'Beta', 'Gamma', 'Delta'] }],
+  contactForm: [{ eyebrow: 'Contact', heading: 'Get in touch', intro: 'The real form, themed.', showPhone: true, showDirectContact: true }],
+  contactCard: [{ show: ['phone', 'email', 'hours'], label: 'Direct contact', tint: true }],
+  findUs: [{ heading: 'Find us', showHours: true }],
+};
+
+export const defaultBlocks: BlockDef[] = RAW_BLOCKS.map((b) => (SAMPLES[b.type] ? { ...b, samples: SAMPLES[b.type] } : b));
