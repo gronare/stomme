@@ -123,6 +123,10 @@ body > main { flex: 1 0 auto; } /* sticky footer: main grows so the footer sits 
 @media print {
   .section--hero-tall, .cover--h-tall, .cover--h-medium { min-height: 0; }
   body { min-height: 0; }
+  /* Entry animations never run in print — their pre-start `both` state (opacity 0 /
+     undrawn strokes) would leave the element invisible on paper. */
+  .thanks-confirm, .letter-sheet, .letter-ink, .letter-postmark { animation: none; }
+  .confirm-badge circle, .confirm-badge path { animation: none; stroke-dashoffset: 0; }
 }
 .section--hero-top { justify-content: flex-start; }
 .section--hero-center { justify-content: center; }
@@ -516,7 +520,8 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
   .definition__senses li { display: grid; grid-template-columns: 2rem 1fr; gap: 1rem; }
   .definition__n { font-family: var(--bk-font-mono); font-size: 0.72rem; letter-spacing: 0.2em; color: var(--color-muted); font-weight: 700; padding-top: 0.35rem; }
   .definition__text { font-size: 1.15rem; color: var(--color-ink); }
-  .definition__note { color: var(--color-muted); }
+  /* margin, not template whitespace, separates the note — Astro collapses the gap */
+  .definition__note { color: var(--color-muted); margin-left: 0.35em; }
 
 /* Fragment — placed editorial aside; consecutive fragments drift across the page */
 .fragment { max-width: 28rem; }
@@ -1217,7 +1222,9 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
   .letter-rules i { display: block; border-top: 1px solid var(--color-line); }
   .letter-rules i:nth-child(2) { width: 92%; }
   .letter-rules i:nth-child(3) { width: 64%; }
-  .letter-postmark { position: absolute; top: -1.6rem; right: clamp(0.5rem, 4vw, 2.2rem); width: clamp(7rem, 16vw, 9.5rem); color: var(--color-ink); animation: letter-stampdown 0.55s 0.95s cubic-bezier(0.3, 1.6, 0.4, 1) both; }
+  /* The tilt lives on the base rule (the animation ends at the same transform) so the
+     stamp stays rotated when animations are off — reduced motion and print. */
+  .letter-postmark { position: absolute; top: -1.6rem; right: clamp(0.5rem, 4vw, 2.2rem); width: clamp(7rem, 16vw, 9.5rem); color: var(--color-ink); transform: rotate(-11deg); animation: letter-stampdown 0.55s 0.95s cubic-bezier(0.3, 1.6, 0.4, 1) both; }
   .letter-after { margin-top: clamp(3rem, 7vw, 4.5rem); }
   .letter-after .confirm-head { margin-top: 1.25rem; }
   @media (prefers-reduced-motion: reduce) { .letter-sheet, .letter-ink, .letter-postmark { animation: none !important; } }
