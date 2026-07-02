@@ -1,16 +1,22 @@
 ---
 // Contact-form confirmation — the real /thanks page AND the CMS "Thank-you" preview render
 // this (via /preview?kind=thanks), so the preview shows the live page with the site theme.
-// Presentational: the caller resolves copy/links/recap and passes them in. Matches the
-// confirmation mockup — centered success, then a two-up of the "what you sent" recap and the
-// shared direct-contact card (DirectContact.astro, same as the contact page).
+// Presentational: the caller resolves copy/links/recap and passes them in.
+//
+// Two layouts (thanks settings `variant`):
+//   classic — centered success + the "what you sent" recap card + direct-contact card.
+//   letter  — the submission rendered as a POSTMARKED LETTER: the visitor's message on a
+//             tilted paper sheet with a perforated stamp, and a circular postal
+//             cancellation (site · town, the eyebrow word, year) that stamps down.
 import DirectContact from './DirectContact.astro';
+import Emph from './src/Emph.astro';
 interface Recap {
   emailLabel?: string; email?: string;
   phoneLabel?: string; phone?: string;
   messageLabel?: string; message?: string;
 }
 interface Props {
+  variant?: 'classic' | 'letter';
   eyebrow?: string;
   heading: string;
   message: string;
@@ -23,32 +29,84 @@ interface Props {
   showContact?: boolean;
   talkLabel?: string;
   who?: string;
+  town?: string;
+  toLabel?: string;
+  fromLabel?: string;
 }
 const {
+  variant = 'classic',
   eyebrow = 'Message sent', heading, message,
   primaryLabel, primaryHref = '/', secondaryLabel, secondaryHref = '/',
   recapLabel = 'What you sent', recap = null,
-  showContact, talkLabel = 'Prefer to talk?', who,
+  showContact, talkLabel = 'Prefer to talk?', who, town, toLabel = 'to', fromLabel = 'from',
 } = Astro.props;
 
 const hasRecap = !!recap && !!(recap.email || recap.phone || recap.message);
 const hasDirect = showContact === true; // opt-in (rule zero); the route gates this on contact actually existing
 const twoCol = hasRecap && hasDirect;
----
-<section class="section thanks-confirm" data-recap-label={recapLabel}>
-  <div class="confirm-badge"><svg viewBox="0 0 56 56" aria-hidden="true"><circle cx="28" cy="28" r="26"></circle><path d="M17 29.5 L24.5 37 L40 20"></path></svg></div>
-  <span class="mono eyebrow confirm-eyebrow">{eyebrow}</span>
-  {heading && <h1 class="confirm-head">{heading}</h1>}
-  {message && <p class="confirm-lead">{message}</p>}
-  {(primaryLabel || secondaryLabel) && (
-    <div class="confirm-actions">
-      {primaryLabel && <a class="btn" href={primaryHref}>{primaryLabel}</a>}
-      {secondaryLabel && <a class="btn btn-outline" href={secondaryHref}>{secondaryLabel}</a>}
-    </div>
-  )}
-</section>
 
-{(hasRecap || hasDirect) && (
+// Letter chrome: the postmark ring reads "<site> · <town>", its centre is the eyebrow word
+// ("Skickat"), the frimärke carries the site's initial. Year is stamped at build time.
+const ring = [who, town].filter(Boolean).join(' · ').toUpperCase();
+const stampInitial = (who || 'g').trim().charAt(0).toLowerCase();
+const toLine = [who, town].filter(Boolean).join(', ').toLowerCase();
+const year = new Date().getFullYear();
+---
+{variant === 'letter' ? (
+  <section class="section thanks-confirm thanks-letter" data-recap-label={recapLabel}>
+    <div class="letter-wrap">
+      <div class="letter-sheet">
+        <div class="letter-stamp" aria-hidden="true"><div><span>{stampInitial}</span></div></div>
+        <div class="letter-meta letter-ink">
+          {toLine && <p class="mono">{toLabel}: {toLine}</p>}
+          <p class="mono" data-letter-from data-prefix={fromLabel} hidden={!recap?.email}>{fromLabel}: {recap?.email ?? ''}</p>
+          <p class="mono" data-letter-phone hidden={!recap?.phone}>{recap?.phone ?? ''}</p>
+        </div>
+        <p class="letter-body letter-ink" data-letter-message hidden={!recap?.message}>{recap?.message ?? ''}</p>
+        <div class="letter-rules letter-ink" aria-hidden="true"><i></i><i></i><i></i></div>
+        <svg class="letter-postmark" viewBox="0 0 150 100" fill="none" aria-hidden="true">
+          <g stroke="currentColor" opacity="0.88">
+            <circle cx="50" cy="50" r="44" stroke-width="2"></circle>
+            <circle cx="50" cy="50" r="33" stroke-width="1"></circle>
+            <path d="M100 32 H148 M100 44 H144 M100 56 H148 M100 68 H140" stroke-width="2.5"></path>
+          </g>
+          <g fill="currentColor" opacity="0.88" font-family="var(--bk-font-display)">
+            {ring && <text font-size="9.5" letter-spacing="2.5"><textPath href="#letterArc" startOffset="6%">{ring}</textPath></text>}
+            <text x="50" y="47" text-anchor="middle" font-size="11" font-weight="600" letter-spacing="3">{eyebrow.toUpperCase()}</text>
+            <text x="50" y="62" text-anchor="middle" font-size="8" letter-spacing="1.5">{year}</text>
+          </g>
+          <defs><path id="letterArc" d="M 50 89 A 39 39 0 1 1 50.01 89" transform="rotate(-125 50 50)"></path></defs>
+        </svg>
+      </div>
+    </div>
+    <div class="letter-after">
+      <span class="mono eyebrow confirm-eyebrow">{eyebrow}</span>
+      {heading && <h1 class="confirm-head"><Emph text={heading} /></h1>}
+      {message && <p class="confirm-lead">{message}</p>}
+      {(primaryLabel || secondaryLabel) && (
+        <div class="confirm-actions">
+          {primaryLabel && <a class="btn" href={primaryHref}>{primaryLabel}</a>}
+          {secondaryLabel && <a class="btn btn-outline" href={secondaryHref}>{secondaryLabel}</a>}
+        </div>
+      )}
+    </div>
+  </section>
+) : (
+  <section class="section thanks-confirm" data-recap-label={recapLabel}>
+    <div class="confirm-badge"><svg viewBox="0 0 56 56" aria-hidden="true"><circle cx="28" cy="28" r="26"></circle><path d="M17 29.5 L24.5 37 L40 20"></path></svg></div>
+    <span class="mono eyebrow confirm-eyebrow">{eyebrow}</span>
+    {heading && <h1 class="confirm-head"><Emph text={heading} /></h1>}
+    {message && <p class="confirm-lead">{message}</p>}
+    {(primaryLabel || secondaryLabel) && (
+      <div class="confirm-actions">
+        {primaryLabel && <a class="btn" href={primaryHref}>{primaryLabel}</a>}
+        {secondaryLabel && <a class="btn btn-outline" href={secondaryHref}>{secondaryLabel}</a>}
+      </div>
+    )}
+  </section>
+)}
+
+{variant !== 'letter' && (hasRecap || hasDirect) && (
   <div class:list={['thanks-cols', !twoCol && 'thanks-cols--solo']}>
     {hasRecap && (
       <section class="confirm-card" aria-label={recapLabel}>
@@ -71,40 +129,59 @@ const twoCol = hasRecap && hasDirect;
   </div>
 )}
 
-<script is:inline>
-  // A real form submit lands here from /thanks with a recap of what was sent stashed in
-  // sessionStorage (the page is static — it ships no submitted data). Build the "what you
-  // sent" card from it, drop it into the two-up, then clear it so a refresh won't re-show.
-  // No stash (direct visit / no-JS) → nothing happens, the generic thank-you stands alone.
-  (function () {
-    var raw; try { raw = sessionStorage.getItem('stomme:recap'); } catch (e) { return; }
-    if (!raw) return;
-    var d; try { d = JSON.parse(raw); } catch (e) { return; }
-    try { sessionStorage.removeItem('stomme:recap'); } catch (e) {}
-    if (!d || !(d.email || d.phone || d.message)) return;
+{variant === 'letter' ? (
+  <script is:inline>
+    // The letter variant writes the visitor's own submission ONTO the sheet: from-line,
+    // phone (its own line — never wrapped mid-number) and the message body. A direct
+    // visit has no stash → the ruled-lines letter stands on its own.
+    (function () {
+      var raw; try { raw = sessionStorage.getItem('stomme:recap'); } catch (e) { return; }
+      if (!raw) return;
+      var d; try { d = JSON.parse(raw); } catch (e) { return; }
+      try { sessionStorage.removeItem('stomme:recap'); } catch (e) {}
+      if (!d || !(d.email || d.phone || d.message)) return;
+      var el = function (s) { return document.querySelector(s); };
+      if (d.email && el('[data-letter-from]')) { el('[data-letter-from]').textContent = (el('[data-letter-from]').getAttribute('data-prefix') || 'from') + ': ' + d.email; el('[data-letter-from]').hidden = false; }
+      if (d.phone && el('[data-letter-phone]')) { el('[data-letter-phone]').textContent = d.phone; el('[data-letter-phone]').hidden = false; }
+      if (d.message && el('[data-letter-message]')) { el('[data-letter-message]').textContent = d.message; el('[data-letter-message]').hidden = false; }
+    })();
+  </script>
+) : (
+  <script is:inline>
+    // A real form submit lands here from /thanks with a recap of what was sent stashed in
+    // sessionStorage (the page is static — it ships no submitted data). Build the "what you
+    // sent" card from it, drop it into the two-up, then clear it so a refresh won't re-show.
+    // No stash (direct visit / no-JS) → nothing happens, the generic thank-you stands alone.
+    (function () {
+      var raw; try { raw = sessionStorage.getItem('stomme:recap'); } catch (e) { return; }
+      if (!raw) return;
+      var d; try { d = JSON.parse(raw); } catch (e) { return; }
+      try { sessionStorage.removeItem('stomme:recap'); } catch (e) {}
+      if (!d || !(d.email || d.phone || d.message)) return;
 
-    var confirmEl = document.querySelector('.thanks-confirm');
-    if (!confirmEl) return;
-    var cols = confirmEl.nextElementSibling;
-    if (!cols || !cols.classList || !cols.classList.contains('thanks-cols')) {
-      cols = document.createElement('div');
-      cols.className = 'thanks-cols thanks-cols--solo';
-      confirmEl.insertAdjacentElement('afterend', cols);
-    }
-    if (cols.querySelector('.confirm-card')) return; // already rendered server-side
+      var confirmEl = document.querySelector('.thanks-confirm');
+      if (!confirmEl) return;
+      var cols = confirmEl.nextElementSibling;
+      if (!cols || !cols.classList || !cols.classList.contains('thanks-cols')) {
+        cols = document.createElement('div');
+        cols.className = 'thanks-cols thanks-cols--solo';
+        confirmEl.insertAdjacentElement('afterend', cols);
+      }
+      if (cols.querySelector('.confirm-card')) return; // already rendered server-side
 
-    var L = d.labels || {};
-    var esc = function (s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); };
-    var rows = '';
-    if (d.email) rows += '<dt>' + esc(L.email || 'Email') + '</dt><dd>' + esc(d.email) + '</dd>';
-    if (d.phone) rows += '<dt>' + esc(L.phone || 'Phone') + '</dt><dd>' + esc(d.phone) + '</dd>';
-    if (d.message) rows += '<div class="confirm-msg"><dt>' + esc(L.message || 'Message') + '</dt><dd>' + esc(d.message) + '</dd></div>';
+      var L = d.labels || {};
+      var esc = function (s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); };
+      var rows = '';
+      if (d.email) rows += '<dt>' + esc(L.email || 'Email') + '</dt><dd>' + esc(d.email) + '</dd>';
+      if (d.phone) rows += '<dt>' + esc(L.phone || 'Phone') + '</dt><dd>' + esc(d.phone) + '</dd>';
+      if (d.message) rows += '<div class="confirm-msg"><dt>' + esc(L.message || 'Message') + '</dt><dd>' + esc(d.message) + '</dd></div>';
 
-    var card = document.createElement('section');
-    card.className = 'confirm-card';
-    card.innerHTML = '<p class="mono eyebrow confirm-label">' + esc(confirmEl.getAttribute('data-recap-label') || 'What you sent') +
-      '</p><dl class="confirm-recap-dl">' + rows + '</dl>';
-    cols.insertAdjacentElement('afterbegin', card);
-    if (cols.children.length > 1) cols.classList.remove('thanks-cols--solo');
-  })();
-</script>
+      var card = document.createElement('section');
+      card.className = 'confirm-card';
+      card.innerHTML = '<p class="mono eyebrow confirm-label">' + esc(confirmEl.getAttribute('data-recap-label') || 'What you sent') +
+        '</p><dl class="confirm-recap-dl">' + rows + '</dl>';
+      cols.insertAdjacentElement('afterbegin', card);
+      if (cols.children.length > 1) cols.classList.remove('thanks-cols--solo');
+    })();
+  </script>
+)}

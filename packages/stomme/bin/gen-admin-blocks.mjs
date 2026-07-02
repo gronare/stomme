@@ -740,6 +740,15 @@ ${emitFooterLinks(10)}
         name: thanks
         file: "src/content/thanks/thanks.md"
         fields:
+          - name: variant
+            label: "Layout"
+            widget: select
+            required: false
+            default: classic
+            hint: "Letter renders the visitor's message as a postmarked letter."
+            options:
+              - { label: "Classic", value: "classic" }
+              - { label: "Letter (postmarked)", value: "letter" }
           - { name: heading, label: "Heading", widget: string, required: false, hint: "Big confirmation headline. Blank = localized default." }
           - { name: message, label: "Message", widget: text, required: false, hint: "Reassurance line under the heading. Blank = default." }
 ${emitThanksButtons(10)}

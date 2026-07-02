@@ -19,6 +19,10 @@ const ts: any = (await getEntry('thanks', 'thanks')?.catch(() => null))?.data ??
 ---
 <Base title="Thank you" description={ts.message || t.lead}>
   <Thanks
+    variant={ts.variant}
+    town={contact.address?.city}
+    toLabel={t.to}
+    fromLabel={t.from}
     eyebrow={t.eyebrow}
     heading={(ts.heading ?? '').replace('{name}', '')}
     message={ts.message ?? ''}

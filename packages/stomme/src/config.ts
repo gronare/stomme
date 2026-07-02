@@ -151,6 +151,8 @@ const STRINGS_EN = {
     recapLabel: 'What you sent',
     talkLabel: 'Prefer to talk?',
     home: 'Back to home',
+    to: 'to',
+    from: 'from',
   },
   // 404 page (engine-injected /404 route).
   notFound: {
@@ -195,6 +197,8 @@ const STRINGS_SV: typeof STRINGS_EN = {
     recapLabel: 'Det du skickade',
     talkLabel: 'Hellre prata?',
     home: 'Till startsidan',
+    to: 'till',
+    from: 'från',
   },
   notFound: {
     title: 'Sidan hittades inte',

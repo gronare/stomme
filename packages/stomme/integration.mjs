@@ -71,6 +71,10 @@ if (kind === 'thanks') {
   const settings = (await getEntry('settings', 'site'))?.data ?? {};
   const ct = (await getEntry('contact', 'contact'))?.data ?? {};
   thanks = {
+    variant: td.variant,
+    town: (ct.address && ct.address.city) || undefined,
+    toLabel: t.to,
+    fromLabel: t.from,
     eyebrow: t.eyebrow,
     heading: (td.heading || '').replace('{name}', ''),
     message: td.message || '',
