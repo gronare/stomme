@@ -151,7 +151,7 @@ export const defaultBlocks: BlockDef[] = [
     group: 'Text',
     summary: 'A block of rich (markdown) text with an optional heading.',
     shape: 'prose',
-    fields: [{ name: 'heading', label: 'Heading (optional)', widget: 'string', required: false }, { name: 'body', label: 'Body', widget: 'markdown', required: false }, widthField, surfaceField],
+    fields: [{ name: 'eyebrow', label: 'Eyebrow', widget: 'string', required: false, hint: 'Small uppercase label above the heading.' }, { name: 'heading', label: 'Heading (optional)', widget: 'string', required: false }, { name: 'body', label: 'Body', widget: 'markdown', required: false }, widthField, surfaceField],
   },
   {
     type: 'featureGrid',
