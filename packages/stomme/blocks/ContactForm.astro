@@ -21,6 +21,7 @@ const L = {
   message: labelMessage || (c.message ?? 'Describe your project'),
   submit: submitLabel || (c.submit ?? 'Send request'),
   direct: c.direct ?? 'Direct contact',
+  honeypot: c.honeypot ?? 'Leave this field empty',
 };
 const showPhoneField = showPhone === true; // opt-in (rule zero): absent = hidden
 const showAside = showDirectContact === true; // opt-in: absent or off → full-width form
@@ -48,7 +49,8 @@ const recapLabels = JSON.stringify({ email: L.email, phone: L.phone, message: L.
   )}
   <div class:list={['contact-grid', !showAside && 'contact-grid--solo']}>
     <form method="POST" action={contactAction} class="contact-form" data-recap-labels={recapLabels}>
-      <p class="hp" aria-hidden="true"><label>Don’t fill this in: <input name="bot-field" tabindex="-1" autocomplete="off" /></label></p>
+      {/* Honeypot — hidden INLINE so no stylesheet-subset context (CMS preview) can show it. */}
+      <p class="hp" aria-hidden="true" style="display:none"><label>{L.honeypot} <input name="bot-field" tabindex="-1" autocomplete="off" /></label></p>
       <div class="field">
         <label for="name" class="mono">{L.name}</label>
         <input id="name" name="name" required />

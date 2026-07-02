@@ -16,7 +16,7 @@ export interface SiteConfig {
   strings?: {
     readMore?: string;
     latest?: string; // "Latest" tag on the featured post
-    contact?: { name?: string; email?: string; phone?: string; message?: string; submit?: string; direct?: string };
+    contact?: { name?: string; email?: string; phone?: string; message?: string; submit?: string; direct?: string; honeypot?: string };
     // TownPage chrome. Strings may contain `{name}` — replaced with the town name.
     town?: {
       eyebrow?: string;
@@ -127,7 +127,7 @@ export function resolveListings(l?: Listing[]): (Omit<Listing, 'specs'> & { spec
 const STRINGS_EN = {
   readMore: 'Read more',
   latest: 'Latest',
-  contact: { name: 'Name', email: 'Email', phone: 'Phone', message: 'Describe your project', submit: 'Send request', direct: 'Direct contact' },
+  contact: { name: 'Name', email: 'Email', phone: 'Phone', message: 'Describe your project', submit: 'Send request', direct: 'Direct contact', honeypot: 'Leave this field empty' },
   town: {
     eyebrow: 'Local service: {name}',
     heading: '{name}',
@@ -174,7 +174,7 @@ const STRINGS_EN = {
 const STRINGS_SV: typeof STRINGS_EN = {
   readMore: 'Läs mer',
   latest: 'Senaste',
-  contact: { name: 'Namn', email: 'E-post', phone: 'Telefon', message: 'Beskriv ditt projekt', submit: 'Skicka förfrågan', direct: 'Direktkontakt' },
+  contact: { name: 'Namn', email: 'E-post', phone: 'Telefon', message: 'Beskriv ditt projekt', submit: 'Skicka förfrågan', direct: 'Direktkontakt', honeypot: 'Lämna fältet tomt' },
   town: {
     eyebrow: 'Lokal tjänst: {name}',
     heading: '{name}',
