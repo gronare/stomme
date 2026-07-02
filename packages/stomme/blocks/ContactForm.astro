@@ -7,11 +7,11 @@ import DirectContact from '../DirectContact.astro';
 // what was sent in sessionStorage and goes to /thanks, which renders the confirmation +
 // recap (one place — no inline duplicate). No-JS posts to the endpoint, which 303s to /thanks.
 interface Props {
-  site?: any; heading?: string; intro?: string;
+  site?: any; eyebrow?: string; heading?: string; intro?: string;
   labelName?: string; labelEmail?: string; labelMessage?: string;
   submitLabel?: string; showPhone?: boolean; showDirectContact?: boolean;
 }
-const { site, heading, intro, labelName, labelEmail, labelMessage, submitLabel, showPhone, showDirectContact } = Astro.props;
+const { site, eyebrow, heading, intro, labelName, labelEmail, labelMessage, submitLabel, showPhone, showDirectContact } = Astro.props;
 const c = site?.strings?.contact ?? {};
 // Labels are editable but never empty: a blank field falls back to the localized default.
 const L = {
@@ -41,7 +41,8 @@ const recapLabels = JSON.stringify({ email: L.email, phone: L.phone, message: L.
 <section class="section">
   {(heading || intro) && (
     <div class="contact-head">
-      {heading && <h1 class="contact-h1">{heading}</h1>}
+      {eyebrow && <span class="mono eyebrow">{eyebrow}</span>}
+      {heading && <h1 class="contact-h1" style={eyebrow ? 'margin-top:0.75rem' : ''}>{heading}</h1>}
       {intro && <p class="contact-intro">{intro}</p>}
     </div>
   )}

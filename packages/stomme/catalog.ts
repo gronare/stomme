@@ -465,6 +465,7 @@ export const defaultBlocks: BlockDef[] = [
     type: 'contactForm', label: 'Contact form', group: 'Calls to action',
     summary: 'A contact form with an optional direct-contact card. Heading, intro, field labels and layout are all editable.', shape: 'band',
     fields: [
+      { name: 'eyebrow', label: 'Eyebrow', widget: 'string', required: false, hint: 'Small uppercase label above the heading.' },
       { name: 'heading', label: 'Heading', widget: 'string', required: false, hint: 'Blank uses the page title.' },
       { name: 'intro', label: 'Intro / description', widget: 'text', required: false, hint: 'Optional line under the heading. Blank = hidden.' },
       // Field labels: required (so they never read as "optional"), editable, with defaults.
