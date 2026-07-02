@@ -170,7 +170,28 @@ function faqOptions() {
 }
 const FAQ_OPTIONS = faqOptions();
 
-const OPTION_SOURCES = { '$pages': PAGE_OPTIONS, '$services': SERVICE_OPTIONS, '$faq': FAQ_OPTIONS };
+// Every distinct tag used across FAQ entries — the faq block's tag filter picks from
+// what's actually in use (add tags on the questions first, then filter by them here).
+function faqTagOptions() {
+  let files = [];
+  try {
+    files = readdirSync(resolve(root, 'src/content/faq')).filter((f) => f.endsWith('.md'));
+  } catch {
+    return [];
+  }
+  const tags = new Set();
+  for (const f of files) {
+    const src = readFileSync(resolve(root, 'src/content/faq', f), 'utf8');
+    const block = src.match(/^tags:\s*\n((?:[ \t]+-[ \t]+.*\n)+)/m);
+    if (block) for (const m of block[1].matchAll(/-[ \t]+["']?([^"'\n]+?)["']?\s*$/gm)) tags.add(m[1].trim());
+    const inline = src.match(/^tags:\s*\[([^\]]*)\]/m);
+    if (inline) for (const t of inline[1].split(',')) { const v = t.trim().replace(/^["']|["']$/g, ''); if (v) tags.add(v); }
+  }
+  return [...tags].sort().map((t) => ({ label: t, value: t }));
+}
+const FAQ_TAG_OPTIONS = faqTagOptions();
+
+const OPTION_SOURCES = { '$pages': PAGE_OPTIONS, '$services': SERVICE_OPTIONS, '$faq': FAQ_OPTIONS, '$faqTags': FAQ_TAG_OPTIONS };
 
 // Optional collection kit: a block may declare a source `collection` (schema.ts).
 // A collection maps to src/content/<name>/ (its glob base). If that folder is

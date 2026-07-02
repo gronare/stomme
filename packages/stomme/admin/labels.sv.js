@@ -43,7 +43,7 @@ export default {
   'Questions shown': 'Frågor som visas',
   'Pick specific questions (in order). Leave empty to use the tag filter or show all.': 'Välj specifika frågor (i ordning). Tomt = taggfiltret eller alla.',
   'Tag filter': 'Taggfilter',
-  'Show every question carrying this tag (e.g. a service or town). Ignored when questions are picked above.': 'Visa alla frågor med denna tagg (t.ex. en tjänst eller ort). Ignoreras när frågor valts ovan.',
+  'Show every question carrying this tag (tags are set on the questions). Ignored when questions are picked above.': 'Visa alla frågor med denna tagg (taggar sätts på frågorna). Ignoreras när frågor valts ovan.',
   'Tags': 'Taggar',
   'Tag': 'Tagg',
   'Scope the question to pages: an FAQ block filtered on a tag (e.g. a service or town) shows every question carrying it.': 'Koppla frågan till sidor: ett FAQ-block med ett taggfilter (t.ex. en tjänst eller ort) visar alla frågor med taggen.',

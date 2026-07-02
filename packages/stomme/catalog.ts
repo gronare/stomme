@@ -434,7 +434,7 @@ export const defaultBlocks: BlockDef[] = [
       { name: 'variant', label: 'Layout', widget: 'select', required: false, default: 'list', options: [{ label: 'List', value: 'list' }, { label: 'Accordion', value: 'accordion' }, { label: 'Cards', value: 'cards' }, { label: 'Split (index + reader)', value: 'split' }] },
       ...headingFields,
       { name: 'entries', label: 'Questions shown', widget: 'select', options: '$faq', multiple: true, required: false, hint: 'Pick specific questions (in order). Leave empty to use the tag filter or show all.' },
-      { name: 'tag', label: 'Tag filter', widget: 'string', required: false, hint: 'Show every question carrying this tag (e.g. a service or town). Ignored when questions are picked above.' },
+      { name: 'tag', label: 'Tag filter', widget: 'select', options: '$faqTags', required: false, hint: 'Show every question carrying this tag (tags are set on the questions). Ignored when questions are picked above.' },
       { name: 'asideHeading', label: 'Aside · heading', widget: 'string', required: false, default: 'Still have questions?' },
       { name: 'asideBody', label: 'Aside · text', widget: 'text', required: false, default: "Get in touch and we'll help you out." },
       { name: 'asideCtaLabel', label: 'Aside · button label', widget: 'string', required: false, default: 'Contact' },
