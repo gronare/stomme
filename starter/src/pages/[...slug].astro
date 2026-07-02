@@ -2,6 +2,7 @@
 import Base from '../layouts/Base.astro';
 import BlockRenderer from '@gronare/stomme/BlockRenderer.astro';
 import { getCollection } from 'astro:content';
+import { site } from '../site.config';
 
 export async function getStaticPaths() {
   // Unpublished pages (published: false) aren't built — the owner can hide a page (e.g.
@@ -12,5 +13,5 @@ export async function getStaticPaths() {
 const { page } = Astro.props;
 ---
 <Base title={page.data.seo.title} description={page.data.seo.description}>
-  <BlockRenderer blocks={page.data.blocks} />
+  <BlockRenderer blocks={page.data.blocks} config={site} />
 </Base>
