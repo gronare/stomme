@@ -15,12 +15,6 @@ collections:
         label: "Home"
         file: "src/content/home/home.md"
         fields:
-          - label: "SEO"
-            name: seo
-            widget: object
-            fields:
-              - { name: title, label: "SEO title", widget: string }
-              - { name: description, label: "SEO description", widget: text }
           # >>> blocks:generated (run: pnpm cms:gen — do not edit between markers)
           - name: blocks
             label: "Sections · build the page (drag to reorder)"
@@ -765,6 +759,13 @@ collections:
                   - { name: submitLabel, label: "Submit button text", widget: string, required: false, default: "Send request", hint: "The form's submit button." }
                   - { name: showDirectContact, label: "Show the direct-contact card", widget: boolean, required: false, default: true, hint: "Off → the form fills the width (no phone/email card)." }
           # <<< blocks:generated
+          - label: "SEO"
+            name: seo
+            widget: object
+            collapsed: true
+            fields:
+              - { name: title, label: "SEO title", widget: string }
+              - { name: description, label: "SEO description", widget: text }
   - name: pages
     label: "Pages"
     label_singular: "Page"
@@ -774,12 +775,6 @@ collections:
     fields:
       - { name: title, label: "Title", widget: string }
       - { name: published, label: "Published (uncheck to hide this page from the site)", widget: boolean, default: true, required: false }
-      - label: "SEO"
-        name: seo
-        widget: object
-        fields:
-          - { name: title, label: "SEO title", widget: string }
-          - { name: description, label: "SEO description", widget: text }
       # >>> blocks:generated (run: pnpm cms:gen — do not edit between markers)
       - name: blocks
         label: "Sections · build the page (drag to reorder)"
@@ -1524,6 +1519,13 @@ collections:
               - { name: submitLabel, label: "Submit button text", widget: string, required: false, default: "Send request", hint: "The form's submit button." }
               - { name: showDirectContact, label: "Show the direct-contact card", widget: boolean, required: false, default: true, hint: "Off → the form fills the width (no phone/email card)." }
       # <<< blocks:generated
+      - label: "SEO"
+        name: seo
+        widget: object
+        collapsed: true
+        fields:
+          - { name: title, label: "SEO title", widget: string }
+          - { name: description, label: "SEO description", widget: text }
   # >>> collections:generated (run: pnpm cms:gen — do not edit between markers)
   - name: faq
     label: "FAQ"

@@ -24,32 +24,41 @@ const site = resolveSite(config);
 const t = site.strings.service;
 const contact = site.routes.contact ?? '/contact';
 const Content = service ? (await render(service)).Content : null;
+// Composed entries own the whole page below the header (everything is a section);
+// the template's body/bullets/image + the quote-CTA band are the LEGACY layout, kept
+// for entries without blocks so existing sites render unchanged.
+const hasBlocks = Array.isArray(data.blocks) && data.blocks.length > 0;
 ---
 <section class="section service-page">
   <span class="mono eyebrow">{t.eyebrow}</span>
   <h1 class="display display--hero service-h1">{data.title}</h1>
-  {data.image && (
+  {data.summary && <p class="intro service-lede">{data.summary}</p>}
+  {!hasBlocks && data.image && (
     <Cover src={data.image} alt={data.imageAlt ?? data.title} placeholder="/images/placeholders/service.svg" width={1200} height={675} loading="eager" class="service-img" />
   )}
-  <div class="service-prose">
-    {Content ? <Content /> : <Fragment set:html={bodyHtml ?? ''} />}
-  </div>
-  {data.bullets?.length > 0 && (
+  {!hasBlocks && (
+    <div class="service-prose">
+      {Content ? <Content /> : <Fragment set:html={bodyHtml ?? ''} />}
+    </div>
+  )}
+  {!hasBlocks && data.bullets?.length > 0 && (
     <ul class="service-bullets">{data.bullets.map((b: string) => <li><span class="service-tick">✓</span><span>{b}</span></li>)}</ul>
   )}
 </section>
 
-{data.blocks?.length > 0 && <BlockRenderer blocks={data.blocks} config={config} />}
+{hasBlocks && <BlockRenderer blocks={data.blocks} config={config} />}
 
-<section class="band">
-  <div class="service-cta">
-    <div>
-      <span class="mono">{t.quoteEyebrow}</span>
-      <p class="display service-cta__h">{t.quoteHeading}</p>
+{!hasBlocks && (
+  <section class="band">
+    <div class="service-cta">
+      <div>
+        <span class="mono">{t.quoteEyebrow}</span>
+        <p class="display service-cta__h">{t.quoteHeading}</p>
+      </div>
+      <a href={contact} class="btn">{t.cta}</a>
     </div>
-    <a href={contact} class="btn">{t.cta}</a>
-  </div>
-</section>
+  </section>
+)}
 
 <style>
   .service-page { max-width: 48rem; }

@@ -393,6 +393,8 @@ const COLLECTION_EDITORS = {
     - name: seo
       label: "SEO"
       widget: object
+      collapsed: true
+      required: false
       fields:
         - { name: title, label: "Title", widget: string }
         - { name: description, label: "Description", widget: text }`,
@@ -405,23 +407,17 @@ const COLLECTION_EDITORS = {
   fields:
     - { name: title, label: "Title (H1)", widget: string }
     - { name: navLabel, label: "Short label (menus/cards)", widget: string }
+    - { name: summary, label: "Summary", widget: text, required: false, hint: "The lede under the title — also the card text in service lists." }
+    - { name: order, label: "Order", widget: number, required: false, default: 0 }
+${emitWidget(4)}
     - name: seo
       label: "SEO"
       widget: object
+      collapsed: true
+      required: false
       fields:
         - { name: title, label: "Title", widget: string }
-        - { name: description, label: "Description", widget: text }
-    - { name: order, label: "Order", widget: number, required: false, default: 0 }
-    - { name: summary, label: "Summary", widget: text, required: false }
-    - { name: body, label: "Intro (below the title)", widget: markdown }
-${emitWidget(4)}
-    - name: bullets
-      label: "Bullets"
-      widget: list
-      required: false
-      field: { name: item, label: "Bullet", widget: string }
-    - ${IMG}
-    - { name: imageAlt, label: "Image alt text", widget: string, required: false }`,
+        - { name: description, label: "Description", widget: text }`,
 };
 
 // A CMS editor for a config-defined listing, from its preset's field set.
