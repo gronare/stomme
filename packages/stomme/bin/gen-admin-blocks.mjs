@@ -845,7 +845,13 @@ try {
 // Re-run cms:gen after editing global.css to refresh it.
 try {
   const libCss = readFileSync(resolve(here, '../styles.css'), 'utf8');
-  const siteCss = readFileSync(resolve(root, 'src/styles/global.css'), 'utf8').replace(/@import\s+["']stomme\/styles\.css["'];?/, libCss);
+  // Inline the engine stylesheet (scoped @gronare/stomme or bare specifier — the raw import
+  // can't resolve in the browser and 404s under /admin/). The engine's body layout rules
+  // (flex column + full height, for the sticky footer) would shift the inline preview
+  // panes, so neutralize them right after the inlined block.
+  const PREVIEW_BODY_RESET = '\n/* admin preview: undo the sticky-footer body layout */\nbody{display:block;min-height:auto}\n';
+  const siteCss = readFileSync(resolve(root, 'src/styles/global.css'), 'utf8')
+    .replace(/@import\s+["'](?:@[\w-]+\/)?stomme\/styles\.css["'];?/, libCss + PREVIEW_BODY_RESET);
   // Theme tokens from theme.md → :root, so the INLINE preview mockups (Identity, Contact,
   // …) use the site's actual colours, not the build-time defaults baked into styles.css.
   // (iframe previews already load the real themed page.) Mirrors Base.astro's themeVars.

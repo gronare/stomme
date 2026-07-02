@@ -7,7 +7,7 @@
 // reset to the default so a bumped port never leaks into a commit.
 import { spawn, spawnSync } from 'node:child_process';
 import { createServer } from 'node:net';
-import { readFileSync, writeFileSync } from 'node:fs';
+import { readFileSync, writeFileSync, rmSync } from 'node:fs';
 import { resolve } from 'node:path';
 
 const CONFIG = resolve(process.cwd(), 'public/admin/config.yml');
@@ -42,6 +42,12 @@ const setLocalBackend = (value) => {
 // Regenerate the CMS config + preview assets from the current catalog, content and
 // theme before starting, so /admin always reflects the live site (build does the same).
 spawnSync('npx', ['stomme-gen'], { stdio: 'inherit' });
+
+// Clear Astro's content-schema cache: it goes stale when the (linked) engine's collection
+// schemas change, and a stale schema silently strips new fields from entries — content
+// looks "dead" for no visible reason. Cheap to rebuild, so clear it on every dev start.
+rmSync(resolve(process.cwd(), '.astro'), { recursive: true, force: true });
+rmSync(resolve(process.cwd(), 'node_modules/.astro'), { recursive: true, force: true });
 
 const desired = Number(process.env.CMS_PROXY_PORT) || DEFAULT_PORT;
 const proxyPort = await firstFreePort(desired);
