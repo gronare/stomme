@@ -36,8 +36,8 @@ const { eyebrow, heading, intro, plans = [] } = Astro.props;
     <div class="plans">
       {plans.map((p) => (
         <div class:list={['plan', { 'plan--highlight': p.highlight }]}>
-          {p.badge && <span class="plan__badge">{p.badge}</span>}
-          {p.name && <h3 class="plan__name">{p.name}</h3>}
+          {p.name && <h3 class="plan__name">{p.name}{p.badge && <span class="plan__badge">{p.badge}</span>}</h3>}
+          {!p.name && p.badge && <span class="plan__badge">{p.badge}</span>}
           {p.price && (
             <div class="plan__price">
               {p.price}

@@ -1026,6 +1026,13 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
   .stat-panel__body { margin-top: 1.25rem; max-width: 34rem; color: color-mix(in srgb, var(--color-on-dark) 75%, transparent); }
   .stat-panel__badges { margin-top: 1.75rem; display: flex; flex-wrap: wrap; gap: 0.625rem; }
   .stat-panel__pill { font-family: var(--bk-font-mono); font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; border: 1px solid color-mix(in srgb, var(--color-on-dark) 25%, transparent); border-radius: 999px; padding: 8px 14px; color: var(--color-on-dark); }
+  /* Optional stat columns (a comparison) — used instead of the single giant number. */
+  .stat-panel__cols { margin-top: 2.5rem; display: grid; gap: 1.5rem; max-width: 34rem; }
+  @media (min-width: 640px) { .stat-panel__cols { grid-template-columns: 1fr 1fr; } }
+  .stat-panel__col { border-top: 1px solid color-mix(in srgb, var(--color-on-dark) 22%, transparent); padding-top: 1rem; }
+  .stat-panel__col-label { display: block; font-size: 0.66rem; letter-spacing: 0.2em; margin-bottom: 0.5rem; }
+  .stat-panel__col-value { display: block; font-family: var(--bk-font-display); font-weight: 700; font-size: 1.9rem; line-height: 1.1; color: var(--color-on-dark); font-variant-numeric: tabular-nums; }
+  .stat-panel__col-note { margin: 0.35rem 0 0; color: color-mix(in srgb, var(--color-on-dark) 72%, transparent); font-size: 0.95rem; }
   .stat-panel__stat { text-align: center; }
   .stat-panel__value { display: block; font-family: var(--bk-font-display); font-weight: 900; line-height: 1; font-size: clamp(5rem, 14vw, 11rem); letter-spacing: -0.05em; color: var(--block-accent, var(--color-brand)); }
 

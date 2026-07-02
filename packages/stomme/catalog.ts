@@ -15,6 +15,8 @@ export const defaultBlocks: BlockDef[] = [
       { name: 'intro', label: 'Intro', widget: 'text', required: false },
       { name: 'ctaLabel', label: 'Button label', widget: 'string', required: false },
       linkField('ctaHref', 'Button link'),
+      { name: 'cta2Label', label: 'Second button label', widget: 'string', required: false, hint: 'Shown as a quiet text link beside the button.' },
+      linkField('cta2Href', 'Second button link'),
       {
         name: 'media',
         label: 'Right-side media',
@@ -294,6 +296,18 @@ export const defaultBlocks: BlockDef[] = [
       { name: 'badges', label: 'Badges', widget: 'list', required: false, field: { name: 'badge', label: 'Badge', widget: 'string' } },
       { name: 'statValue', label: 'Big number', widget: 'string', required: false },
       { name: 'statLabel', label: 'Number label', widget: 'string', required: false },
+      {
+        name: 'stats',
+        label: 'Stat columns',
+        widget: 'list',
+        required: false,
+        hint: 'Two or three side-by-side figures (e.g. a comparison). Replaces the single big number when filled.',
+        fields: [
+          { name: 'label', label: 'Label', widget: 'string', required: false },
+          { name: 'value', label: 'Value', widget: 'string' },
+          { name: 'note', label: 'Note', widget: 'text', required: false },
+        ],
+      },
       accentField,
     ],
   },

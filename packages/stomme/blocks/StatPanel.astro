@@ -3,6 +3,7 @@
 // body) and a row of badge pills on one side, a single giant stat on the other.
 // Generic version of a trust/safety beat; all copy is editable. Always dark
 // (uses --color-ink + --color-on-dark) regardless of surface, for contrast.
+interface Stat { label?: string; value?: string; note?: string }
 interface Props {
   eyebrow?: string;
   heading?: string;
@@ -10,9 +11,10 @@ interface Props {
   badges?: string[];
   statValue?: string;
   statLabel?: string;
+  stats?: Stat[];
   accent?: 'brand' | 'secondary' | 'highlight';
 }
-const { eyebrow, heading, body, badges = [], statValue, statLabel, accent = 'brand' } = Astro.props;
+const { eyebrow, heading, body, badges = [], statValue, statLabel, stats = [], accent = 'brand' } = Astro.props;
 const accentVar = accent === 'secondary' ? 'var(--color-secondary)' : accent === 'highlight' ? 'var(--color-highlight)' : 'var(--color-brand)';
 ---
 <section class="stat-panel" style={`--block-accent:${accentVar}`}>
@@ -26,8 +28,19 @@ const accentVar = accent === 'secondary' ? 'var(--color-secondary)' : accent ===
           {badges.map((b) => <span class="stat-panel__pill">{b}</span>)}
         </div>
       )}
+      {stats.length > 0 && (
+        <div class="stat-panel__cols">
+          {stats.map((s) => (
+            <div class="stat-panel__col">
+              {s.label && <span class="mono stat-panel__col-label">{s.label}</span>}
+              {s.value && <span class="stat-panel__col-value">{s.value}</span>}
+              {s.note && <p class="stat-panel__col-note">{s.note}</p>}
+            </div>
+          ))}
+        </div>
+      )}
     </div>
-    {statValue && (
+    {stats.length === 0 && statValue && (
       <div class="stat-panel__stat">
         <span class="stat-panel__value">{statValue}</span>
         {statLabel && <span class="mono">{statLabel}</span>}
