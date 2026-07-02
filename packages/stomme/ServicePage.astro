@@ -1,5 +1,6 @@
 ---
 import Cover from './src/Cover.astro';
+import BlockRenderer from './src/BlockRenderer.astro';
 import { render } from 'astro:content';
 import { resolveSite, type SiteConfig } from './src/config';
 
@@ -9,7 +10,8 @@ import { resolveSite, type SiteConfig } from './src/config';
 //   <Base title=... description=...><ServicePage service={entry} config={site} /></Base>
 // Chrome strings come from site.strings.service; CTA links to site.routes.contact.
 // Expects a `services` schema with: title, navLabel, summary?, bullets?, image?,
-// imageAlt?, seo? + a markdown body.
+// imageAlt?, seo? + a markdown body + optional `blocks` (composed sections, same
+// picker as pages — rendered between the intro and the quote CTA).
 interface Props {
   service: any; // CollectionEntry<'services'>
   config?: SiteConfig;
@@ -34,6 +36,8 @@ const { Content } = await render(service);
     <ul class="service-bullets">{data.bullets.map((b: string) => <li><span class="service-tick">✓</span><span>{b}</span></li>)}</ul>
   )}
 </section>
+
+{data.blocks?.length > 0 && <BlockRenderer blocks={data.blocks} config={config} />}
 
 <section class="band">
   <div class="service-cta">

@@ -206,6 +206,10 @@ export function stommeCollections(listings?: Listing[]) {
         image: z.string().optional(),
         imageAlt: z.string().optional(),
         seo: seo.optional(),
+        // Optional composed sections (same block picker as pages) — rendered by
+        // ServicePage between the intro and the quote CTA, so a service detail can
+        // be fleshed out beyond the template (feature rows, steps, CTA bands…).
+        blocks,
       }),
     }),
   };

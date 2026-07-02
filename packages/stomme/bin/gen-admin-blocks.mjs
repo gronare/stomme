@@ -420,7 +420,8 @@ const COLLECTION_EDITORS = {
       fields:
         - { name: title, label: "Title", widget: string }
         - { name: description, label: "Description", widget: text }
-    - { name: body, label: "Body", widget: markdown }`,
+    - { name: body, label: "Body", widget: markdown }
+${emitWidget(4)}`,
 };
 
 // A CMS editor for a config-defined listing, from its preset's field set.
