@@ -34,8 +34,8 @@ if (!settings) settings = (await getEntry('settings', 'site'))!.data as SiteData
 // The wordmark is the literal textPre/textAccent — blank means no wordmark (no site-name
 // fallback), so a logo with embedded text can stand alone.
 const logo = settings.logo ?? {};
-const showMark = nav.showLogo !== false && !!logo.image;
-const showWord = nav.showWordmark !== false && !!logo.textPre;
+const showMark = nav.showLogo === true && !!logo.image;
+const showWord = nav.showWordmark === true && !!logo.textPre;
 // An uploaded logo (/src/assets/uploads/…) goes through Astro's image optimizer; a
 // public-path logo (e.g. /logo.svg) renders as a plain <img>. Mirrors Cover.astro —
 // without this the raw /src/assets path 404s in the build (that path isn't served).

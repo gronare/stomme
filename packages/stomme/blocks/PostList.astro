@@ -19,7 +19,7 @@ interface Props {
   base?: string;
   site?: any;
 }
-const { eyebrow, heading, intro, showImages = true, featured = true, columns = 3, source = 'posts', base, site } = Astro.props;
+const { eyebrow, heading, intro, showImages = false, featured = false, columns = 3, source = 'posts', base, site } = Astro.props;
 const prefix = base ?? site?.routes?.blog ?? '/blog';
 const locale = site?.locale ?? 'en-US';
 const readMore = site?.strings?.readMore ?? 'Read more';

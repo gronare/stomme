@@ -40,7 +40,7 @@ const protect = !!c.protectContact;
 
 // Phone + email default on; the richer parts default off (a placement opts into them).
 const s = {
-  phone: show.phone !== false, email: show.email !== false,
+  phone: show.phone === true, email: show.email === true,
   hours: !!show.hours, address: !!show.address, socials: !!show.socials, map: !!show.map,
 };
 const addrLine2 = [address.postcode, address.city].filter(Boolean).join(' ');

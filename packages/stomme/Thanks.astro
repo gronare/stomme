@@ -32,7 +32,7 @@ const {
 } = Astro.props;
 
 const hasRecap = !!recap && !!(recap.email || recap.phone || recap.message);
-const hasDirect = showContact !== false; // the route gates this on contact actually existing
+const hasDirect = showContact === true; // opt-in (rule zero); the route gates this on contact actually existing
 const twoCol = hasRecap && hasDirect;
 ---
 <section class="section thanks-confirm" data-recap-label={recapLabel}>

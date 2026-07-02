@@ -18,7 +18,7 @@ const cityLine = [a.postcode, a.city].filter(Boolean).join(' ');
 const hasAddr = !!(a.street || cityLine || a.country);
 const hours = (c.hours ?? []) as { days: string; hours: string }[];
 const hoursNote = c.hoursNote ?? '';
-const showHrs = showHours !== false;
+const showHrs = showHours === true;
 ---
 <section class="findus-block">
   <div class="findus">

@@ -11,4 +11,5 @@ blocks:
     # site renders it ON (Decap applies `default:` to new entries only).
     showPhone: true
     showDirectContact: true
+published: true
 ---

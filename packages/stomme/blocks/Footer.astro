@@ -22,8 +22,8 @@ if (!settings) settings = (await getEntry('settings', 'site'))!.data as Settings
 if (!contact) contact = (((await getEntry('contact', 'contact').catch(() => null))?.data) ?? {}) as ContactData;
 
 const logo = settings.logo ?? {};
-const showMark = footer.showLogo !== false && !!logo.image;
-const showWord = footer.showWordmark !== false && !!logo.textPre;
+const showMark = footer.showLogo === true && !!logo.image;
+const showWord = footer.showWordmark === true && !!logo.textPre;
 const links = footer.links ?? [];
 const links2 = footer.links2 ?? [];
 const legal = footer.legal ?? [];
@@ -49,9 +49,9 @@ const year = new Date().getFullYear();
         )}
         {orgLine && <p class="mono" style="margin-top:1rem">{orgLine}</p>}
       </div>
-      {((footer.showLinks !== false && links.length > 0) || links2.length > 0 || (footer.showTowns && towns && towns.length > 0)) && (
+      {((footer.showLinks === true && links.length > 0) || links2.length > 0 || (footer.showTowns && towns && towns.length > 0)) && (
         <div class="footer-cols">
-          {footer.showLinks !== false && links.length > 0 && (
+          {footer.showLinks === true && links.length > 0 && (
             <nav>
               <p class="mono eyebrow">{footer.linksHeading ?? 'Links'}</p>
               <ul class="footer-links">

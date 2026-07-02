@@ -26,7 +26,7 @@ const ts: any = (await getEntry('thanks', 'thanks')?.catch(() => null))?.data ??
     primaryHref={resolveLink(ts.button?.link, '/')}
     secondaryLabel={ts.button2?.label ?? ''}
     secondaryHref={resolveLink(ts.button2?.link, '/')}
-    showContact={ts.showContact !== false && !!(contact.phone || contact.email)}
+    showContact={ts.showContact === true && !!(contact.phone || contact.email)}
     talkLabel={t.talkLabel}
     who={settings.name}
   />

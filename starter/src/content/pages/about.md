@@ -20,4 +20,5 @@ blocks:
     label: Email us
     href:
       url: "mailto:hello@example.com"
+published: true
 ---

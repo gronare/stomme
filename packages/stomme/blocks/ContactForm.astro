@@ -22,8 +22,8 @@ const L = {
   submit: submitLabel || (c.submit ?? 'Send request'),
   direct: c.direct ?? 'Direct contact',
 };
-const showPhoneField = showPhone !== false; // default on; a toggle, not a label
-const showAside = showDirectContact !== false; // default on; off → full-width form
+const showPhoneField = showPhone === true; // opt-in (rule zero): absent = hidden
+const showAside = showDirectContact === true; // opt-in: absent or off → full-width form
 
 const settings = (await getEntry('settings', 'site'))!.data;
 const contact = ((await getEntry('contact', 'contact').catch(() => null))?.data ?? {}) as any;

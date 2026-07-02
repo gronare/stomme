@@ -15,7 +15,7 @@ const on = (k: string) => show.includes(k);
   <div class="contact-card-block">
     <DirectContact
       label={label}
-      tint={tint !== false}
+      tint={tint === true}
       show={{ phone: on('phone'), email: on('email'), hours: on('hours'), address: on('address'), socials: on('socials'), map: on('map') }}
     />
   </div>
