@@ -249,6 +249,20 @@ const GROUP_ORDER = ['Hero & headers', 'Text', 'Cards & lists', 'Media', 'Quote 
 const groupRank = (b) => { const i = GROUP_ORDER.indexOf(b.group); return i === -1 ? GROUP_ORDER.length : i; };
 AVAILABLE_BLOCKS.sort((a, b) => groupRank(a) - groupRank(b));
 
+// Collapsed-row label for list items: Decap defaults to the FIRST field's value (an
+// empty icon picker reads "No icon"). Derive a summary — eyebrow first when present,
+// then the item's identifying field. Empty placeholders render as nothing, so whichever
+// fields are filled show. An explicit `summary` on the Field def wins.
+const SUMMARY_PRIORITY = ['title', 'name', 'label', 'question', 'quote', 'heading', 'statement', 'term', 'caption', 'text', 'alt', 'value'];
+function listSummary(fields) {
+  const names = fields.map((f) => f.name);
+  const parts = [];
+  if (names.includes('eyebrow')) parts.push('{{fields.eyebrow}}');
+  const main = SUMMARY_PRIORITY.find((n) => names.includes(n));
+  if (main) parts.push(`{{fields.${main}}}`);
+  return parts.length ? parts.join(' ') : null;
+}
+
 // Emit a single field. Leaf widgets use flow style; list/object widgets expand.
 function emitField(f, indent) {
   const p = pad(indent);
@@ -260,8 +274,10 @@ function emitField(f, indent) {
   if (f.public_folder) parts.push(`public_folder: ${q(f.public_folder)}`);
 
   if (f.widget === 'list' && f.fields) {
+    const sum = f.summary || listSummary(f.fields);
     return [`${p}- name: ${f.name}`, `${p}  label: ${q(f.label)}`, `${p}  widget: list`,
       ...(f.required === false ? [`${p}  required: false`] : []),
+      ...(sum ? [`${p}  summary: ${q(sum)}`] : []),
       `${p}  fields:`, ...f.fields.map((sf) => emitField(sf, indent + 4))].join('\n');
   }
   if (f.widget === 'list' && f.field) {
@@ -311,7 +327,7 @@ function emitWidget(indent) {
     `${p}  required: false`,
     // Collapsed-item label: show the block's heading (or quote) so several of the same
     // type are distinguishable at a glance; falls back to the type name when both empty.
-    `${p}  summary: "{{fields.heading}}{{fields.quote}}"`,
+    `${p}  summary: "{{fields.eyebrow}} {{fields.heading}}{{fields.quote}}"`,
     `${p}  types:`,
   ];
   for (const b of AVAILABLE_BLOCKS) {

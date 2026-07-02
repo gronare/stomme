@@ -26,6 +26,7 @@ export type Field = {
   hint?: string;
   fields?: Field[]; // for object / typed list
   field?: Field; // for a simple (single-field) list
+  summary?: string; // list widgets: collapsed-row label template (default: derived — eyebrow, then title/name/label/…)
   multiple?: boolean; // select: allow choosing several values
   // For select widgets: a literal option list, or a sentinel the generator
   // expands — '$pages' (all internal page routes), '$services' (service slugs),
