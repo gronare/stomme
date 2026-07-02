@@ -38,6 +38,13 @@ export default {
   'Second link group · heading': 'Andra länkgruppen · rubrik',
   'Second link group': 'Andra länkgruppen',
   'Optional extra column, e.g. your services.': 'Valfri extra kolumn, t.ex. dina tjänster.',
+  'Extra narrow': 'Extra smal',
+  'Alignment': 'Justering',
+  'Left': 'Vänster',
+  'Centered': 'Centrerad',
+  'Right': 'Höger',
+  'How wide the quote column is. Narrow reads best.': 'Hur bred citatkolumnen är. Smal läses bäst.',
+  'Where the quote column sits in the section (the text stays left-aligned).': 'Var citatkolumnen sitter i sektionen (texten förblir vänsterställd).',
   // ── tracking & cookies pane ──
   'Tracking & cookies': 'Spårning & cookies',
   'Enable tracking': 'Aktivera spårning',

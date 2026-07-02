@@ -485,6 +485,12 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
     font-size: clamp(1.5rem, 3.5vw, 2.25rem);
     line-height: 1.3;
   }
+  /* width of the quote column + where it sits in the section */
+  .callout--narrow { max-width: 53rem; }
+  .callout--xnarrow { max-width: 34rem; }
+  .callout--full { max-width: none; }
+  .callout--center { margin-inline: auto; }
+  .callout--right { margin-left: auto; }
 
 /* Checklist */
 .checklist {

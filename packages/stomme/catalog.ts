@@ -299,6 +299,24 @@ export const defaultBlocks: BlockDef[] = [
     fields: [
       { name: 'eyebrow', label: 'Eyebrow', widget: 'string', required: false },
       { name: 'quote', label: 'Quote / statement', widget: 'text' },
+      {
+        name: 'width', label: 'Width', widget: 'select', required: false, default: 'narrow',
+        hint: 'How wide the quote column is. Narrow reads best.',
+        options: [
+          { label: 'Narrow (reading column)', value: 'narrow' },
+          { label: 'Extra narrow', value: 'xnarrow' },
+          { label: 'Full width', value: 'full' },
+        ],
+      },
+      {
+        name: 'align', label: 'Alignment', widget: 'select', required: false, default: 'left',
+        hint: 'Where the quote column sits in the section (the text stays left-aligned).',
+        options: [
+          { label: 'Left', value: 'left' },
+          { label: 'Centered', value: 'center' },
+          { label: 'Right', value: 'right' },
+        ],
+      },
       accentField,
       surfaceField,
     ],

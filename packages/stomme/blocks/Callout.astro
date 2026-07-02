@@ -1,18 +1,22 @@
 ---
 // Pull-quote / standout statement to break up body text. A coloured left rule and
 // an oversized display quote. `accent` picks which token the rule + eyebrow marker use.
+// `width` sizes the quote column (narrow reads best; extra narrow for short punchlines;
+// full spans the section) and `align` places the column in the section.
 interface Props {
   eyebrow?: string;
   quote?: string;
   accent?: 'brand' | 'secondary' | 'highlight';
+  width?: 'narrow' | 'xnarrow' | 'full';
+  align?: 'left' | 'center' | 'right';
 }
-const { eyebrow, quote, accent = 'brand' } = Astro.props;
+const { eyebrow, quote, accent = 'brand', width = 'narrow', align = 'left' } = Astro.props;
 const accentVar = accent === 'secondary' ? 'var(--color-secondary)' : accent === 'highlight' ? 'var(--color-highlight)' : 'var(--color-brand)';
 ---
 
 {quote && (
   <section class="section">
-    <figure class="callout" style={`--block-accent:${accentVar}`}>
+    <figure class:list={['callout', `callout--${width}`, `callout--${align}`]} style={`--block-accent:${accentVar}`}>
       {eyebrow && <span class="mono eyebrow">{eyebrow}</span>}
       <blockquote class="display callout__quote">{quote}</blockquote>
     </figure>
