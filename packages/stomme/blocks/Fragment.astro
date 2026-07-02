@@ -1,0 +1,29 @@
+---
+import Emph from '../src/Emph.astro';
+import { resolveLink } from '../src/href';
+
+// Editorial story fragment — a big lead line, a short body and an optional quiet link,
+// placed left / right / indented so consecutive fragments drift across the page
+// (asymmetry as a layout tool; whitespace does the narration).
+interface Props {
+  eyebrow?: string;
+  statement?: string;
+  body?: string;
+  linkLabel?: string;
+  link?: unknown;
+  placement?: 'left' | 'right' | 'indent';
+}
+const { eyebrow, statement, body, linkLabel, link, placement = 'left' } = Astro.props;
+const href = resolveLink(link, '/');
+---
+
+{(statement || body) && (
+  <section class="section">
+    <div class:list={['fragment', `fragment--${placement}`]}>
+      {eyebrow && <span class="mono eyebrow fragment__eyebrow">{eyebrow}</span>}
+      {statement && <p class="display fragment__statement"><Emph text={statement} /></p>}
+      {body && <p class="fragment__body">{body}</p>}
+      {linkLabel && <p class="fragment__link"><a href={href} class="btn-ghost">{linkLabel} →</a></p>}
+    </div>
+  </section>
+)}

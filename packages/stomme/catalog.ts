@@ -292,6 +292,54 @@ export const defaultBlocks: BlockDef[] = [
     ],
   },
   {
+    type: 'definition',
+    label: 'Dictionary entry',
+    group: 'Quote & highlight',
+    summary: 'A dictionary-style word entry — term, word class and numbered senses.',
+    shape: 'prose',
+    fields: [
+      { name: 'eyebrow', label: 'Eyebrow', widget: 'string', required: false },
+      { name: 'term', label: 'Term', widget: 'string', hint: 'The word being defined, e.g. "grö·na·re" (use · for syllables).' },
+      { name: 'wordClass', label: 'Word class / etymology line', widget: 'string', required: false, hint: 'The italic line under the term, e.g. "komparativ av grön".' },
+      {
+        name: 'senses', label: 'Senses', widget: 'list', required: false,
+        fields: [
+          { name: 'text', label: 'Sense', widget: 'string', hint: 'Wrap words in *asterisks* to underline them.' },
+          { name: 'note', label: 'Note (muted)', widget: 'string', required: false, hint: 'A quiet addendum after the sense, e.g. an example or year.' },
+        ],
+      },
+      {
+        name: 'width', label: 'Width', widget: 'select', required: false, default: 'xnarrow',
+        options: [{ label: 'Extra narrow', value: 'xnarrow' }, { label: 'Narrow (reading column)', value: 'narrow' }, { label: 'Full width', value: 'full' }],
+      },
+      {
+        name: 'align', label: 'Alignment', widget: 'select', required: false, default: 'left',
+        options: [{ label: 'Left', value: 'left' }, { label: 'Centered', value: 'center' }, { label: 'Right', value: 'right' }],
+      },
+      surfaceField,
+    ],
+  },
+  {
+    type: 'fragment',
+    label: 'Story fragment',
+    group: 'Text',
+    summary: 'A placed editorial fragment — big lead line, short body, optional link. Consecutive fragments drift across the page.',
+    shape: 'prose',
+    fields: [
+      { name: 'eyebrow', label: 'Eyebrow', widget: 'string', required: false, hint: 'Usually only on the first fragment of a story.' },
+      { name: 'statement', label: 'Statement (big line)', widget: 'string', hint: 'Wrap words in *asterisks* to underline them.' },
+      { name: 'body', label: 'Text', widget: 'text', required: false },
+      { name: 'linkLabel', label: 'Link label', widget: 'string', required: false },
+      linkField('link', 'Link'),
+      {
+        name: 'placement', label: 'Placement', widget: 'select', required: false, default: 'left',
+        hint: 'Where the fragment sits — alternate placements to break the grid.',
+        options: [{ label: 'Left', value: 'left' }, { label: 'Right', value: 'right' }, { label: 'Indented', value: 'indent' }],
+      },
+      surfaceField,
+    ],
+  },
+  {
     type: 'callout',
     label: 'Highlighted quote',
     group: 'Quote & highlight',

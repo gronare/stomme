@@ -1,0 +1,42 @@
+---
+import Emph from '../src/Emph.astro';
+
+// Dictionary-style word entry — term, a word-class/etymology line, and numbered senses.
+// Lets a brand define its own name (or a site define a trade term — good for featured
+// snippets). `width`/`align` size and place the entry like the callout block.
+interface Sense { text?: string; note?: string }
+interface Props {
+  eyebrow?: string;
+  term?: string;
+  wordClass?: string;
+  senses?: Sense[];
+  width?: 'xnarrow' | 'narrow' | 'full';
+  align?: 'left' | 'center' | 'right';
+}
+const { eyebrow, term, wordClass, senses = [], width = 'xnarrow', align = 'left' } = Astro.props;
+---
+
+{term && (
+  <section class:list={['section', { 'section--read': width === 'narrow' }]}>
+    <div class:list={['definition', `definition--${width}`, `definition--${align}`]}>
+      {eyebrow && <span class="mono eyebrow definition__eyebrow">{eyebrow}</span>}
+      <div class="definition__entry">
+        <h2 class="definition__term">{term}</h2>
+        {wordClass && <p class="definition__class">{wordClass}</p>}
+        {senses.length > 0 && (
+          <ol class="definition__senses">
+            {senses.filter((s) => s && s.text).map((s, i) => (
+              <li>
+                <span class="definition__n">{i + 1}</span>
+                <span class="definition__text">
+                  <Emph text={s.text} />
+                  {s.note && <span class="definition__note"> {s.note}</span>}
+                </span>
+              </li>
+            ))}
+          </ol>
+        )}
+      </div>
+    </div>
+  </section>
+)}

@@ -497,6 +497,30 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
   .callout--center { margin-inline: auto; }
   .callout--right { margin-left: auto; }
 
+/* Definition — dictionary-style word entry */
+.definition--xnarrow { max-width: 34rem; }
+  .definition--full { max-width: none; }
+  .definition--center { margin-inline: auto; }
+  .definition--right { margin-left: auto; }
+  .definition__eyebrow { display: block; margin-bottom: 2rem; }
+  .definition__entry { border-top: 1px solid var(--color-ink); padding-top: 1.75rem; }
+  .definition__term { font-family: var(--bk-font-display); font-weight: 700; color: var(--color-ink); font-size: clamp(2rem, 1.2rem + 3vw, 3.2rem); line-height: 1.1; letter-spacing: 0.02em; margin: 0; }
+  .definition__class { margin: 0.5rem 0 0; color: var(--color-muted); font-size: 0.95rem; font-style: italic; }
+  .definition__senses { margin: 1.75rem 0 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 1.25rem; }
+  .definition__senses li { display: grid; grid-template-columns: 2rem 1fr; gap: 1rem; }
+  .definition__n { font-family: var(--bk-font-mono); font-size: 0.72rem; letter-spacing: 0.2em; color: var(--color-muted); font-weight: 700; padding-top: 0.35rem; }
+  .definition__text { font-size: 1.15rem; color: var(--color-ink); }
+  .definition__note { color: var(--color-muted); }
+
+/* Fragment — placed editorial aside; consecutive fragments drift across the page */
+.fragment { max-width: 28rem; }
+  .fragment--right { margin-left: auto; margin-right: clamp(0rem, 6vw, 5rem); }
+  .fragment--indent { margin-left: clamp(4rem, 18vw, 16rem); }
+  .fragment__eyebrow { display: block; margin-bottom: 2rem; }
+  .fragment__statement { font-size: clamp(1.2rem, 1rem + 1vw, 1.7rem); line-height: 1.4; }
+  .fragment__body { margin: 1rem 0 0; color: var(--color-muted); }
+  .fragment__link { margin: 1.5rem 0 0; }
+
 /* Checklist */
 .checklist {
     list-style: none;
