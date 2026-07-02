@@ -15,7 +15,8 @@ const accentVar = accent === 'secondary' ? 'var(--color-secondary)' : accent ===
 ---
 
 {quote && (
-  <section class="section">
+  <section class:list={['section', { 'section--read': width === 'narrow' }]}>
+    {/* narrow constrains the SECTION (identical box to a narrow hero); xnarrow/full size the figure */}
     <figure class:list={['callout', `callout--${width}`, `callout--${align}`]} style={`--block-accent:${accentVar}`}>
       {eyebrow && <span class="mono eyebrow">{eyebrow}</span>}
       <blockquote class="display callout__quote">{quote}</blockquote>
