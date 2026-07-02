@@ -27,8 +27,9 @@ interface Props {
   highlights?: Highlight[];
   height?: 'normal' | 'tall';
   align?: 'top' | 'center' | 'bottom';
+  width?: 'narrow' | 'full';
 }
-const { eyebrow, heading, intro, ctaLabel, ctaHref, cta2Label, cta2Href, media = 'none', image, imageAlt, highlights = [], height = 'normal', align = 'center' } = Astro.props;
+const { eyebrow, heading, intro, ctaLabel, ctaHref, cta2Label, cta2Href, media = 'none', image, imageAlt, highlights = [], height = 'normal', align = 'center', width = 'full' } = Astro.props;
 const href = resolveLink(ctaHref, '/');
 const href2 = resolveLink(cta2Href, '/');
 const contact = ((await getEntry('contact', 'contact').catch(() => null))?.data ?? {}) as any;
@@ -37,7 +38,7 @@ const showHighlights = media === 'highlights' && highlights.length > 0;
 const showMotif = media === 'motif';
 const hasMedia = showImage || showHighlights || showMotif;
 ---
-<section class:list={['section', { 'section--hero-tall': height === 'tall' }, height === 'tall' && `section--hero-${align}`]}>
+<section class:list={['section', { 'section--hero-tall': height === 'tall', 'section--read': width === 'narrow' }, height === 'tall' && `section--hero-${align}`]}>
   <div class:list={['hero-grid', { 'has-media': hasMedia }]}>
     <div>
       {eyebrow && <span class="mono eyebrow">{eyebrow}</span>}

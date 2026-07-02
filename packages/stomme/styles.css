@@ -715,6 +715,8 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
     text-decoration: none;
   }
   .ctabox-btn:hover { background: color-mix(in srgb, var(--color-on-dark) 88%, var(--color-brand)); }
+  .ctabox-link2 { display: inline-block; margin: 1.75rem 0 0 1.5rem; }
+  .ctabox .btn-ghost, .ctabox .btn-ghost:hover { color: var(--color-on-dark); }
 
 /* Gallery */
 .gallery-grid { display: grid; gap: 1.25rem; grid-template-columns: 1fr; margin-top: 2.5rem; }
@@ -1023,6 +1025,7 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
   @media (min-width: 1024px) { .stat-panel__inner { grid-template-columns: 1.1fr 0.9fr; } }
   .stat-panel .mono { color: color-mix(in srgb, var(--color-on-dark) 65%, transparent); }
   .stat-panel__h { color: var(--color-on-dark); margin-top: 0.75rem; font-size: clamp(2rem, 4vw, 3rem); }
+  .stat-panel__h em { font-style: normal; border-bottom: 2px solid currentColor; }
   .stat-panel__body { margin-top: 1.25rem; max-width: 34rem; color: color-mix(in srgb, var(--color-on-dark) 75%, transparent); }
   .stat-panel__badges { margin-top: 1.75rem; display: flex; flex-wrap: wrap; gap: 0.625rem; }
   .stat-panel__pill { font-family: var(--bk-font-mono); font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; border: 1px solid color-mix(in srgb, var(--color-on-dark) 25%, transparent); border-radius: 999px; padding: 8px 14px; color: var(--color-on-dark); }

@@ -16,12 +16,15 @@ interface Props {
 }
 const { eyebrow, heading, body, badges = [], statValue, statLabel, stats = [], accent = 'brand' } = Astro.props;
 const accentVar = accent === 'secondary' ? 'var(--color-secondary)' : accent === 'highlight' ? 'var(--color-highlight)' : 'var(--color-brand)';
+// `*words*` in the heading render underlined (an <em> with an underline, not italics) —
+// lets the editor emphasise the payoff clause ("we *don't*.").
+const headingParts = (heading ?? '').split(/\*([^*]+)\*/);
 ---
 <section class="stat-panel" style={`--block-accent:${accentVar}`}>
   <div class="stat-panel__inner">
     <div class="stat-panel__main">
       {eyebrow && <span class="mono eyebrow">{eyebrow}</span>}
-      {heading && <h2 class="display stat-panel__h">{heading}</h2>}
+      {heading && <h2 class="display stat-panel__h">{headingParts.map((part, i) => (i % 2 ? <em>{part}</em> : part))}</h2>}
       {body && <p class="stat-panel__body">{body}</p>}
       {badges.length > 0 && (
         <div class="stat-panel__badges">

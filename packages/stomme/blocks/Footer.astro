@@ -7,7 +7,7 @@ import ContactLink from '../ContactLink.astro';
 // by default; accepts them as optional props (CMS preview drafts). Renders a links
 // column + org line only when those fields are present, so a minimal site stays simple.
 interface NavData {}
-interface FooterData { dark?: boolean; tagline?: string; showLinks?: boolean; linksHeading?: string; links?: { label: string; link?: unknown }[]; showTowns?: boolean; townsHeading?: string; legal?: { label: string; link?: unknown }[]; note?: string; showLogo?: boolean; showWordmark?: boolean }
+interface FooterData { dark?: boolean; tagline?: string; showLinks?: boolean; linksHeading?: string; links?: { label: string; link?: unknown }[]; links2Heading?: string; links2?: { label: string; link?: unknown }[]; showTowns?: boolean; townsHeading?: string; legal?: { label: string; link?: unknown }[]; note?: string; showLogo?: boolean; showWordmark?: boolean }
 interface SettingsData { name?: string; logo?: { textPre?: string; textAccent?: string; image?: string; alt?: string } }
 interface ContactData { email?: string; phone?: string; phoneE164?: string; protectContact?: boolean; address?: { city?: string }; orgNr?: string; founded?: string }
 // `towns` + `townsHref` are optional: pass them (the site reads its towns collection
@@ -25,6 +25,7 @@ const logo = settings.logo ?? {};
 const showMark = footer.showLogo !== false && !!logo.image;
 const showWord = footer.showWordmark !== false && !!logo.textPre;
 const links = footer.links ?? [];
+const links2 = footer.links2 ?? [];
 const legal = footer.legal ?? [];
 const tagline = [footer.tagline, contact.address?.city].filter(Boolean).join(' · ');
 const orgLine = [contact.orgNr && `Org.nr ${contact.orgNr}`, contact.founded && `Est. ${contact.founded}`].filter(Boolean).join(' · ');
@@ -48,13 +49,21 @@ const year = new Date().getFullYear();
         )}
         {orgLine && <p class="mono" style="margin-top:1rem">{orgLine}</p>}
       </div>
-      {((footer.showLinks !== false && links.length > 0) || (footer.showTowns && towns && towns.length > 0)) && (
+      {((footer.showLinks !== false && links.length > 0) || links2.length > 0 || (footer.showTowns && towns && towns.length > 0)) && (
         <div class="footer-cols">
           {footer.showLinks !== false && links.length > 0 && (
             <nav>
               <p class="mono eyebrow">{footer.linksHeading ?? 'Links'}</p>
               <ul class="footer-links">
                 {links.map((l) => <li><a href={resolveLink(l.link, '/')} class="footer-link">{l.label}</a></li>)}
+              </ul>
+            </nav>
+          )}
+          {links2.length > 0 && (
+            <nav>
+              <p class="mono eyebrow">{footer.links2Heading ?? ''}</p>
+              <ul class="footer-links">
+                {links2.map((l) => <li><a href={resolveLink(l.link, '/')} class="footer-link">{l.label}</a></li>)}
               </ul>
             </nav>
           )}

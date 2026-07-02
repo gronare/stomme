@@ -152,6 +152,9 @@ export function stommeCollections(listings?: Listing[]) {
         showLinks: z.boolean().default(true),
         linksHeading: z.string().default(''),
         links: z.array(z.object({ label: z.string(), link })).default([]),
+        // Optional second link group (e.g. a services column beside the shortcuts).
+        links2Heading: z.string().default(''),
+        links2: z.array(z.object({ label: z.string(), link })).default([]),
         showTowns: z.boolean().default(false),
         townsHeading: z.string().default(''),
         legal: z.array(z.object({ label: z.string(), link })).default([]),

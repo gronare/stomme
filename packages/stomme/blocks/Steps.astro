@@ -5,7 +5,7 @@ interface Props {
   eyebrow?: string;
   heading?: string;
   intro?: string;
-  items?: { title: string; body: string }[];
+  items?: { title: string; body: string; kicker?: string }[];
   width?: 'narrow' | 'full';
 }
 const { eyebrow, heading, intro, items = [], width = 'narrow' } = Astro.props;
@@ -23,8 +23,9 @@ const { eyebrow, heading, intro, items = [], width = 'narrow' } = Astro.props;
     <ol class="steps-track">
       {items.map((s, i) => (
         <li class="step">
-          <span class="step__n">{i + 1}</span>
+          <span class="step__n">{String(i + 1).padStart(2, '0')}</span>
           <div>
+            {s.kicker && <span class="mono step__kicker">{s.kicker}</span>}
             <h3 class="step__title">{s.title}</h3>
             <p class="step__body">{s.body}</p>
           </div>

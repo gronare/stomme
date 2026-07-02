@@ -674,6 +674,14 @@ ${emitNavLinks(10)}
             fields:
               - { name: label, label: "Label", widget: string }
               - { name: link, label: "Link", widget: string, hint: "A path like /about, or a full URL." }
+          - { name: links2Heading, label: "Second link group · heading", widget: string, required: false, hint: "Optional extra column, e.g. your services." }
+          - name: links2
+            label: "Second link group"
+            widget: list
+            required: false
+            fields:
+              - { name: label, label: "Label", widget: string }
+              - { name: link, label: "Link", widget: string, hint: "A path like /about, or a full URL." }
           - { name: showTowns, label: "Show service areas", widget: boolean, required: false, default: false, hint: "Adds a column linking every entry in the Areas collection." }
           - { name: townsHeading, label: "Service areas · heading", widget: string, required: false, default: "Areas" }
           - name: legal

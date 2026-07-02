@@ -51,6 +51,11 @@ export const defaultBlocks: BlockDef[] = [
         hint: 'Where the text sits in a Tall hero.',
         options: [{ label: 'Top', value: 'top' }, { label: 'Center', value: 'center' }, { label: 'Bottom', value: 'bottom' }],
       },
+      {
+        name: 'width', label: 'Width', widget: 'select', required: false, default: 'full',
+        hint: 'Narrow centers the hero in a reading column (best without side media).',
+        options: [{ label: 'Full width', value: 'full' }, { label: 'Narrow (reading column)', value: 'narrow' }],
+      },
       surfaceField,
     ],
   },
@@ -205,7 +210,22 @@ export const defaultBlocks: BlockDef[] = [
     ],
   },
   { type: 'specialistGrid', label: 'Specialist grid', group: 'Cards & lists', summary: 'Grid of specialist / team profile cards.', shape: 'grid', fields: [...headingFields, cardListField, surfaceField] },
-  { type: 'steps', label: 'Process / steps', group: 'Cards & lists', summary: 'Numbered process — a sequence of steps.', shape: 'steps', fields: [...headingFields, cardListField, widthField, surfaceField] },
+  {
+    type: 'steps', label: 'Process / steps', group: 'Cards & lists', summary: 'Numbered process — a sequence of steps.', shape: 'steps',
+    fields: [
+      ...headingFields,
+      {
+        name: 'items', label: 'Steps', widget: 'list', required: false,
+        fields: [
+          { name: 'title', label: 'Title', widget: 'string' },
+          { name: 'kicker', label: 'Tag after the number', widget: 'string', required: false, hint: 'Short word shown with the number, e.g. "talk".' },
+          { name: 'body', label: 'Text', widget: 'text' },
+        ],
+      },
+      widthField,
+      surfaceField,
+    ],
+  },
   {
     type: 'checklist',
     label: 'Checklist',
@@ -291,7 +311,7 @@ export const defaultBlocks: BlockDef[] = [
     shape: 'panel',
     fields: [
       { name: 'eyebrow', label: 'Eyebrow', widget: 'string', required: false },
-      { name: 'heading', label: 'Heading', widget: 'string', required: false },
+      { name: 'heading', label: 'Heading', widget: 'string', required: false, hint: 'Wrap words in *asterisks* to underline them.' },
       { name: 'body', label: 'Body', widget: 'text', required: false },
       { name: 'badges', label: 'Badges', widget: 'list', required: false, field: { name: 'badge', label: 'Badge', widget: 'string' } },
       { name: 'statValue', label: 'Big number', widget: 'string', required: false },
@@ -375,7 +395,15 @@ export const defaultBlocks: BlockDef[] = [
     group: 'Calls to action',
     summary: 'A boxed call-to-action: heading, text and a button.',
     shape: 'box',
-    fields: [{ name: 'eyebrow', label: 'Eyebrow', widget: 'string', required: false }, { name: 'heading', label: 'Heading', widget: 'string' }, { name: 'label', label: 'Button label', widget: 'string' }, linkField('href', 'Button link'), surfaceField],
+    fields: [
+      { name: 'eyebrow', label: 'Eyebrow', widget: 'string', required: false },
+      { name: 'heading', label: 'Heading', widget: 'string' },
+      { name: 'label', label: 'Button label', widget: 'string' },
+      linkField('href', 'Button link'),
+      { name: 'label2', label: 'Second button label', widget: 'string', required: false, hint: 'Shown as a quiet text link beside the button.' },
+      linkField('href2', 'Second button link'),
+      surfaceField,
+    ],
   },
   {
     type: 'faq',
