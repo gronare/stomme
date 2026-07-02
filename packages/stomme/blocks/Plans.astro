@@ -46,7 +46,7 @@ const anyPrefix = plans.some((p) => p.pricePrefix);
           {p.price && (
             <div class="plan__price">
               {anyPrefix && <span class="plan__prefix">{p.pricePrefix ?? ' '}</span>}
-              {p.price}
+              <span class="plan__amount">{p.price}</span>
               {p.period && <span class="plan__period"> {p.period}</span>}
             </div>
           )}
