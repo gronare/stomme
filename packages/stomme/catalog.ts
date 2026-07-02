@@ -196,7 +196,8 @@ export const defaultBlocks: BlockDef[] = [
         required: false,
         fields: [
           { name: 'name', label: 'Plan name', widget: 'string' },
-          { name: 'price', label: 'Price', widget: 'string', hint: 'e.g. "595 kr", "från 19 900 kr", "0 kr".' },
+          { name: 'pricePrefix', label: 'Price prefix', widget: 'string', required: false, hint: 'Small word above the price, e.g. "från".' },
+          { name: 'price', label: 'Price', widget: 'string', hint: 'e.g. "595 kr", "19 900 kr", "0 kr".' },
           { name: 'period', label: 'Period', widget: 'string', required: false, hint: 'e.g. "/mån" or "engångspris". Blank for none.' },
           { name: 'description', label: 'Description', widget: 'text', required: false },
           { name: 'features', label: 'Features', widget: 'list', required: false, fields: [{ name: 'text', label: 'Feature', widget: 'string' }] },

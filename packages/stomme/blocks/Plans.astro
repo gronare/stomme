@@ -6,6 +6,7 @@ import { resolveLink } from '../src/href';
 
 interface Plan {
   name?: string;
+  pricePrefix?: string;
   price?: string;
   period?: string;
   description?: string;
@@ -40,6 +41,7 @@ const { eyebrow, heading, intro, plans = [] } = Astro.props;
           {!p.name && p.badge && <span class="plan__badge">{p.badge}</span>}
           {p.price && (
             <div class="plan__price">
+              {p.pricePrefix && <span class="plan__prefix">{p.pricePrefix}</span>}
               {p.price}
               {p.period && <span class="plan__period"> {p.period}</span>}
             </div>
