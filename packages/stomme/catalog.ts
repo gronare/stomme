@@ -562,6 +562,12 @@ const RAW_BLOCKS: BlockDef[] = [
 // faq, testimonials, linkChips, postList, catalogList) render the SITE's real entries —
 // their samples only set chrome. stomme-gen warns when a block lacks a sample.
 const LOREM = 'A short supporting line of body copy, long enough to wrap on narrow columns.';
+// Shared faq fixtures — every variant sample renders the same three questions.
+const FAQ_FIX = [
+  { id: 'q1', data: { question: 'A first sample question?', answer: LOREM, order: 1 } },
+  { id: 'q2', data: { question: 'A second, longer sample question to wrap the row?', answer: 'A short answer.', order: 2 } },
+  { id: 'q3', data: { question: 'A third?', answer: LOREM, order: 3 } },
+];
 const SAMPLES: Record<string, ({ _label?: string } & Record<string, unknown>)[]> = {
   hero: [
     { _label: 'narrow · two buttons', eyebrow: 'Eyebrow label', heading: 'A heading that states the offer.', intro: 'One supporting sentence that earns the click below.', ctaLabel: 'Primary action', ctaHref: { url: '#' }, cta2Label: 'Quiet link', cta2Href: { url: '#' }, media: 'none', width: 'narrow' },
@@ -585,7 +591,11 @@ const SAMPLES: Record<string, ({ _label?: string } & Record<string, unknown>)[]>
     { icon: 'shield', title: 'Second feature', body: 'A shorter line.' },
     { icon: 'wrench', title: 'Third feature', body: LOREM },
   ] }],
-  serviceGrid: [{ _label: 'from the services collection', eyebrow: 'Services', heading: 'Service cards' }],
+  serviceGrid: [{ _label: 'fixture entries', eyebrow: 'Services', heading: 'Service cards', items: [
+    { id: 'one', data: { navLabel: 'First service', summary: LOREM, order: 1 } },
+    { id: 'two', data: { navLabel: 'Second service', summary: 'A shorter summary.', order: 2 } },
+    { id: 'three', data: { navLabel: 'Third service', summary: LOREM, order: 3 } },
+  ] }],
   pillars: [{ eyebrow: 'Eyebrow', heading: 'Principles', items: [
     { title: 'First principle', body: LOREM }, { title: 'Second', body: 'Short.' }, { title: 'Third', body: LOREM },
   ] }],
@@ -626,17 +636,32 @@ const SAMPLES: Record<string, ({ _label?: string } & Record<string, unknown>)[]>
     { _label: 'single big number', eyebrow: 'Eyebrow', heading: 'A statement with a *underlined* clause.', body: LOREM, badges: ['Badge one', 'Badge two'], statValue: '98%', statLabel: 'of something measured' },
     { _label: 'compare columns', eyebrow: 'Compare', heading: 'Them versus us.', stats: [{ label: 'Them', value: '1 500 kr', note: 'per month, locked in.' }, { label: 'Us', value: '595 kr', note: 'per month, leave anytime.' }] },
   ],
-  testimonials: [{ _label: 'from the testimonials collection', eyebrow: 'Customers', heading: 'What they say' }],
-  linkChips: [{ _label: 'from the areas collection', eyebrow: 'Areas', heading: 'Where we work' }],
-  postList: [{ _label: 'from the posts collection', eyebrow: 'Blog', heading: 'Latest posts', featured: true, showImages: true }],
-  catalogList: [{ _label: 'from a catalog listing', eyebrow: 'For sale', heading: 'Catalog items', filters: true, showImages: true }],
+  // Collection-backed blocks carry fixture `items` (the component's lookbook-only
+  // override) so the theme is exercised even on a site with no collection content.
+  testimonials: [{ _label: 'fixture entries', eyebrow: 'Customers', heading: 'What they say', items: [
+    { data: { name: 'Anna A.', role: 'Café owner', quote: 'A pulled-out customer line, long enough to wrap and show the quote type.' } },
+    { data: { name: 'Bo B.', role: 'Builder', quote: 'A shorter one.' } },
+  ] }],
+  linkChips: [{ _label: 'fixture entries', eyebrow: 'Areas', heading: 'Where we work', items: [
+    { id: 'north', data: { name: 'Northtown' } }, { id: 'south', data: { name: 'Southville' } }, { id: 'east', data: { name: 'East End' } },
+  ] }],
+  postList: [{ _label: 'fixture entries · featured + images', eyebrow: 'Blog', heading: 'Latest posts', featured: true, showImages: true, items: [
+    { id: 'first', data: { title: 'The featured lead post', date: '2026-05-01', excerpt: LOREM, showCover: true } },
+    { id: 'second', data: { title: 'A text-only card', date: '2026-04-01', excerpt: 'A shorter excerpt.' } },
+    { id: 'third', data: { title: 'A card with the placeholder cover', date: '2026-03-01', excerpt: LOREM, showCover: true } },
+  ] }],
+  catalogList: [{ _label: 'fixture entries · filters + images', eyebrow: 'For sale', heading: 'Catalog items', filters: true, showImages: true, items: [
+    { id: 'one', data: { title: 'First item', price: '12 500 kr', status: 'available', category: 'Alpha', date: '2026-05-01' } },
+    { id: 'two', data: { title: 'Second item', price: '8 900 kr', status: 'reserved', category: 'Beta', date: '2026-04-01' } },
+    { id: 'three', data: { title: 'Third item', price: '4 200 kr', status: 'sold', category: 'Alpha', date: '2026-03-01' } },
+  ] }],
   ctaPanel: [{ eyebrow: 'Eyebrow', heading: 'A call-to-action band', intro: LOREM, label: 'Do the thing', href: { url: '#' } }],
   ctaBox: [{ surface: 'dark', eyebrow: 'Next step', heading: 'A boxed call to action.', label: 'Primary', href: { url: '#' }, label2: 'quiet second link', href2: { url: '#' } }],
   faq: [
-    { _label: 'list', eyebrow: 'FAQ', heading: 'Questions (list)', asideHeading: 'More questions?', asideBody: 'Get in touch.', asideCtaLabel: 'Contact' },
-    { _label: 'accordion', variant: 'accordion', heading: 'Questions (accordion)' },
-    { _label: 'cards', variant: 'cards', heading: 'Questions (cards)' },
-    { _label: 'split', variant: 'split', heading: 'Questions (split)' },
+    { _label: 'list', eyebrow: 'FAQ', heading: 'Questions (list)', asideHeading: 'More questions?', asideBody: 'Get in touch.', asideCtaLabel: 'Contact', items: FAQ_FIX },
+    { _label: 'accordion', variant: 'accordion', heading: 'Questions (accordion)', items: FAQ_FIX },
+    { _label: 'cards', variant: 'cards', heading: 'Questions (cards)', items: FAQ_FIX },
+    { _label: 'split', variant: 'split', heading: 'Questions (split)', items: FAQ_FIX },
   ],
   statsBar: [{ items: [{ label: 'Projects', value: '142+' }, { label: 'Uptime', value: '100%' }, { label: 'Rating', value: '5.0' }] }],
   logoStrip: [{ lead: 'Trusted by', logos: ['Alpha', 'Beta', 'Gamma', 'Delta'] }],

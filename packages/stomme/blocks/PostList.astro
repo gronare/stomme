@@ -8,6 +8,8 @@ import Cover from '../src/Cover.astro';
 //
 // Route prefix, date locale and the "read more" string come from the site config
 // (`site`, forwarded by BlockRenderer); the prefix must match the route under src/pages/.
+// `items` is a fixture override (lookbook samples) — not a CMS field. When given,
+// the collection is never queried; live pages always take the collection path.
 interface Props {
   eyebrow?: string;
   heading?: string;
@@ -17,6 +19,7 @@ interface Props {
   columns?: number;
   source?: string;
   base?: string;
+  items?: { id: string; data: Record<string, any> }[];
   site?: any;
 }
 const { eyebrow, heading, intro, showImages = false, featured = false, columns = 3, source = 'posts', base, site } = Astro.props;
@@ -24,7 +27,7 @@ const prefix = base ?? site?.routes?.blog ?? '/blog';
 const locale = site?.locale ?? 'en-US';
 const readMore = site?.strings?.readMore ?? 'Read more';
 const latest = site?.strings?.latest ?? 'Latest';
-const all = (await getCollection(source)).sort((a, b) => (a.data.date < b.data.date ? 1 : -1));
+const all = Astro.props.items ?? (await getCollection(source)).sort((a, b) => (a.data.date < b.data.date ? 1 : -1));
 const fmt = (d: string) => new Date(d).toLocaleDateString(locale, { year: 'numeric', month: 'long', day: 'numeric' });
 const lead = featured && all.length > 1 ? all[0] : null;
 const rest = lead ? all.slice(1) : all;

@@ -5,13 +5,16 @@ import { getCollection } from 'astro:content';
 // section head renders only when given; CMS defaults pre-fill a new block.
 // Needs a `testimonials` collection in the consuming site (fields: name, role,
 // quote, order).
+// `items` is a fixture override (lookbook samples) — not a CMS field. When given,
+// the collection is never queried; live pages always take the collection path.
 interface Props {
   eyebrow?: string;
   heading?: string;
   intro?: string;
+  items?: { data: { name: string; role?: string; quote: string } }[];
 }
 const { eyebrow, heading, intro } = Astro.props;
-const items = (await getCollection('testimonials')).sort((a, b) => a.data.order - b.data.order);
+const items = Astro.props.items ?? (await getCollection('testimonials')).sort((a, b) => a.data.order - b.data.order);
 ---
 <section class="section">
   {(eyebrow || heading || intro) && (

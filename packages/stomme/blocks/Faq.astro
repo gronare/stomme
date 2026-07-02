@@ -26,9 +26,13 @@ interface Props {
   asideCtaLabel?: string;
   asideHref?: unknown;
   asideCtaHref?: unknown; // plain-string alias accepted from content
+  // Fixture override (lookbook samples) — not a CMS field. When given, the collection
+  // is never queried; live pages always take the collection path.
+  items?: { id: string; data: { question: string; answer: string } }[];
 }
 const { variant = 'list', eyebrow, heading, intro, entries, tag, asideHeading, asideBody, asideCtaLabel, asideHref, asideCtaHref } = Astro.props;
-const all = await getCollection('faq');
+const fixture = Astro.props.items;
+const all = fixture ?? (await getCollection('faq'));
 // Page-scoped FAQs, two ways (picked entries win over the tag filter):
 //   entries — hand-picked question slugs, shown in the picked order.
 //   tag     — every question carrying this tag (a service slug, a town, any label), by

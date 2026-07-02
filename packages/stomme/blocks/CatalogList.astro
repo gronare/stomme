@@ -7,6 +7,8 @@ import { resolveListings, listingSpecRows } from '../src/config';
 // (`source`) and renders a filterable card grid: cover + status badge, price, a few specs.
 // `base` is the detail-link prefix (the listing route). Newest first. Category filtering
 // is client-side. Status labels come from site.strings.listingStatus (English default).
+// `items` is a fixture override (lookbook samples) — not a CMS field. When given,
+// the collection is never queried; live pages always take the collection path.
 interface Props {
   eyebrow?: string;
   heading?: string;
@@ -16,6 +18,7 @@ interface Props {
   columns?: number;
   showImages?: boolean;
   filters?: boolean;
+  items?: { id: string; data: Record<string, any> }[];
   site?: any;
 }
 const { eyebrow, heading, intro, source = '', base, columns = 3, showImages = false, filters = false, site } = Astro.props;
@@ -23,9 +26,10 @@ const prefix = base ?? (source ? `/${source}` : '');
 const readMore = site?.strings?.readMore ?? 'Read more';
 const sl = { available: 'Available', reserved: 'Reserved', sold: 'Sold', all: 'All', ...(site?.strings?.listingStatus || {}) };
 const ST = { available: 'avail', reserved: 'res', sold: 'sold' };
-const items = source
-  ? (await getCollection(source)).sort((a, b) => ((a.data.date ?? '') < (b.data.date ?? '') ? 1 : -1))
-  : [];
+const items = Astro.props.items
+  ?? (source
+    ? (await getCollection(source)).sort((a, b) => ((a.data.date ?? '') < (b.data.date ?? '') ? 1 : -1))
+    : []);
 // The listing's config-defined specs (labels) — from the site config forwarded via the
 // `site` prop — paired per-item with keyed values below.
 const listing = resolveListings(site?.listings).find((l) => l.id === source);

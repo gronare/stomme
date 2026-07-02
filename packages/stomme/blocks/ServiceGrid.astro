@@ -8,17 +8,20 @@ import { getCollection } from 'astro:content';
 // collection (fields: navLabel, summary, order, image?, imageAlt?) in the consuming
 // site + a matching route folder (see stomme/ServicePage.astro). Each card shows
 // the service image, falling back to the service.svg placeholder when none is set.
+// `items` is a fixture override (lookbook samples) — not a CMS field. When given,
+// the collection is never queried; live pages always take the collection path.
 interface Props {
   eyebrow?: string;
   heading?: string;
   intro?: string;
   services?: string[];
+  items?: { id: string; data: Record<string, any> }[];
   site?: any;
 }
 const { eyebrow, heading, intro, services: picked, site } = Astro.props;
 const prefix = site?.routes?.services ?? '/services';
 const readMore = site?.strings?.readMore ?? 'Read more';
-const all = await getCollection('services');
+const all = Astro.props.items ?? (await getCollection('services'));
 const services = (
   Array.isArray(picked) && picked.length
     ? picked.map((id) => all.find((s) => s.id === id)).filter((s) => s != null)

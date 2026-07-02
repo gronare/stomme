@@ -6,15 +6,18 @@ import { getCollection } from 'astro:content';
 // `towns` collection in the consuming site (fields: name, order). The detail-page
 // route prefix comes from the site config (`site.routes.towns`, forwarded by
 // BlockRenderer) and must match the actual route folder under src/pages/.
+// `items` is a fixture override (lookbook samples) — not a CMS field. When given,
+// the collection is never queried; live pages always take the collection path.
 interface Props {
   eyebrow?: string;
   heading?: string;
   intro?: string;
+  items?: { id: string; data: { name: string } }[];
   site?: any;
 }
 const { eyebrow, heading, intro, site } = Astro.props;
 const prefix = site?.routes?.towns ?? '/areas';
-const towns = (await getCollection('towns')).sort((a, b) => a.data.order - b.data.order);
+const towns = Astro.props.items ?? (await getCollection('towns')).sort((a, b) => a.data.order - b.data.order);
 ---
 <section class="section">
   {(eyebrow || heading || intro) && (
