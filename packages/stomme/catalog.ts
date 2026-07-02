@@ -207,6 +207,7 @@ const RAW_BLOCKS: BlockDef[] = [
           linkField('ctaHref', 'Button link'),
         ],
       },
+      { name: 'footnote', label: 'Footnote', widget: 'text', required: false, hint: 'Small note under the cards — e.g. what every plan includes.' },
       surfaceField,
     ],
   },
@@ -603,7 +604,7 @@ const SAMPLES: Record<string, ({ _label?: string } & Record<string, unknown>)[]>
     { name: 'Basic', price: '6 900 kr', period: 'one-off', description: LOREM },
     { name: 'Standard', price: '12 900 kr', period: 'one-off', badge: 'Popular', highlight: true, description: 'The default pick.', features: [{ text: 'Everything in Basic' }, { text: 'One more thing' }] },
     { name: 'Plus', pricePrefix: 'from', price: '19 900 kr', period: 'one-off', description: 'For the works.', ctaLabel: 'Choose', ctaHref: { url: '#' } },
-  ] }],
+  ], footnote: 'Every plan includes a shared line like this one — the footnote field.' }],
   specialistGrid: [{ eyebrow: 'Team', heading: 'Specialists', items: [
     { title: 'Role one', body: LOREM }, { title: 'Role two', body: 'Short line.' },
   ] }],

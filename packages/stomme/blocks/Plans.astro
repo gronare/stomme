@@ -21,8 +21,9 @@ interface Props {
   heading?: string;
   intro?: string;
   plans?: Plan[];
+  footnote?: string;
 }
-const { eyebrow, heading, intro, plans = [] } = Astro.props;
+const { eyebrow, heading, intro, plans = [], footnote } = Astro.props;
 // If any plan carries a price prefix ("från"), every card reserves the prefix line so the
 // big numbers stay horizontally aligned across the group.
 const anyPrefix = plans.some((p) => p.pricePrefix);
@@ -61,5 +62,6 @@ const anyPrefix = plans.some((p) => p.pricePrefix);
         </div>
       ))}
     </div>
+    {footnote && <p class="plans__footnote">{footnote}</p>}
   </section>
 )}
