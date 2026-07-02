@@ -1773,31 +1773,10 @@ collections:
           - { name: showWordmark, label: "Show wordmark text", widget: boolean, required: false, default: true, hint: "Show the wordmark text (set under Identity) in the footer." }
           - { name: tagline, label: "Tagline", widget: string, required: false, hint: "A line under the logo." }
           - { name: showLinks, label: "Show quick links", widget: boolean, required: false, default: true }
-          - { name: linksHeading, label: "Quick links · heading", widget: string, required: false, default: "Links" }
-          - name: links
-            label: "Quick links"
-            widget: list
-            required: false
-            fields:
-              - { name: label, label: "Label", widget: string }
-              - { name: link, label: "Link", widget: string, hint: "A path like /about, or a full URL." }
-          - { name: links2Heading, label: "Second link group · heading", widget: string, required: false, hint: "Optional extra column, e.g. your services." }
-          - name: links2
-            label: "Second link group"
-            widget: list
-            required: false
-            fields:
-              - { name: label, label: "Label", widget: string }
-              - { name: link, label: "Link", widget: string, hint: "A path like /about, or a full URL." }
+          # >>> footerlinks:generated (run: pnpm cms:gen — do not edit between markers)
+          # <<< footerlinks:generated
           - { name: showTowns, label: "Show service areas", widget: boolean, required: false, default: false, hint: "Adds a column linking every entry in the Areas collection." }
           - { name: townsHeading, label: "Service areas · heading", widget: string, required: false, default: "Areas" }
-          - name: legal
-            label: "Legal links (bottom bar)"
-            widget: list
-            required: false
-            fields:
-              - { name: label, label: "Label", widget: string }
-              - { name: link, label: "Link", widget: string, hint: "A path like /privacy, or a full URL." }
           - { name: note, label: "Note", widget: string, required: false, hint: "Appended to the © line." }
       - label: "Form confirmation"
         name: thanks

@@ -325,6 +325,31 @@ function navLinkField() {
     ],
   };
 }
+
+// Footer link groups (quick links, the optional second group, legal) — each link gets the
+// standard page-dropdown + custom-URL pair, so they're generated (the page options are).
+function emitFooterLinks(indent) {
+  const footerLink = () => ({
+    name: 'link', label: 'Link', widget: 'object', required: false, fields: [
+      { name: 'page', label: 'Page', widget: 'select', options: '$pages', required: false, hint: 'Pick a page on the site.' },
+      { name: 'url', label: '…or a custom URL', widget: 'string', required: false, hint: 'External link, tel: or mailto: — overrides the page above.' },
+    ],
+  });
+  const linkList = (name, label) => ({
+    name, label, widget: 'list', required: false, fields: [
+      { name: 'label', label: 'Label', widget: 'string' },
+      footerLink(),
+    ],
+  });
+  const fields = [
+    { name: 'linksHeading', label: 'Quick links · heading', widget: 'string', required: false, default: 'Links' },
+    linkList('links', 'Quick links'),
+    { name: 'links2Heading', label: 'Second link group · heading', widget: 'string', required: false, hint: 'Optional extra column, e.g. your services.' },
+    linkList('links2', 'Second link group'),
+    linkList('legal', 'Legal links (bottom bar)'),
+  ];
+  return fields.map((f) => emitField(f, indent)).join('\n');
+}
 function emitNavLinks(indent) {
   const items = {
     name: 'items', label: 'Menu links', widget: 'list', required: false, fields: [
@@ -707,31 +732,9 @@ ${emitNavLinks(10)}
           - { name: showWordmark, label: "Show wordmark text", widget: boolean, required: false, default: true, hint: "Show the wordmark text (set under Identity) in the footer." }
           - { name: tagline, label: "Tagline", widget: string, required: false, hint: "A line under the logo." }
           - { name: showLinks, label: "Show quick links", widget: boolean, required: false, default: true }
-          - { name: linksHeading, label: "Quick links · heading", widget: string, required: false, default: "Links" }
-          - name: links
-            label: "Quick links"
-            widget: list
-            required: false
-            fields:
-              - { name: label, label: "Label", widget: string }
-              - { name: link, label: "Link", widget: string, hint: "A path like /about, or a full URL." }
-          - { name: links2Heading, label: "Second link group · heading", widget: string, required: false, hint: "Optional extra column, e.g. your services." }
-          - name: links2
-            label: "Second link group"
-            widget: list
-            required: false
-            fields:
-              - { name: label, label: "Label", widget: string }
-              - { name: link, label: "Link", widget: string, hint: "A path like /about, or a full URL." }
+${emitFooterLinks(10)}
           - { name: showTowns, label: "Show service areas", widget: boolean, required: false, default: false, hint: "Adds a column linking every entry in the Areas collection." }
           - { name: townsHeading, label: "Service areas · heading", widget: string, required: false, default: "Areas" }
-          - name: legal
-            label: "Legal links (bottom bar)"
-            widget: list
-            required: false
-            fields:
-              - { name: label, label: "Label", widget: string }
-              - { name: link, label: "Link", widget: string, hint: "A path like /privacy, or a full URL." }
           - { name: note, label: "Note", widget: string, required: false, hint: "Appended to the © line." }
       - label: "Form confirmation"
         name: thanks
@@ -764,7 +767,7 @@ function emitTrackingPane(indent) {
   return FEATURES && FEATURES.tracking ? trackingPaneYaml(indent) : '';
 }
 
-const EMITTERS = { blocks: emitWidget, collections: emitCollections, navlinks: emitNavLinks, thanksbuttons: emitThanksButtons, settings: emitSettings, cms: emitCms, tracking: emitTrackingPane };
+const EMITTERS = { blocks: emitWidget, collections: emitCollections, navlinks: emitNavLinks, thanksbuttons: emitThanksButtons, footerlinks: emitFooterLinks, settings: emitSettings, cms: emitCms, tracking: emitTrackingPane };
 
 // Fill every `# >>> NAME:generated … # <<< NAME:generated` region (idempotent).
 const lines = readFileSync(configPath, 'utf8').split('\n');
