@@ -23,6 +23,9 @@ interface Props {
   plans?: Plan[];
 }
 const { eyebrow, heading, intro, plans = [] } = Astro.props;
+// If any plan carries a price prefix ("från"), every card reserves the prefix line so the
+// big numbers stay horizontally aligned across the group.
+const anyPrefix = plans.some((p) => p.pricePrefix);
 ---
 
 {(heading || plans.length > 0) && (
@@ -41,7 +44,7 @@ const { eyebrow, heading, intro, plans = [] } = Astro.props;
           {!p.name && p.badge && <span class="plan__badge">{p.badge}</span>}
           {p.price && (
             <div class="plan__price">
-              {p.pricePrefix && <span class="plan__prefix">{p.pricePrefix}</span>}
+              {anyPrefix && <span class="plan__prefix">{p.pricePrefix ?? ' '}</span>}
               {p.price}
               {p.period && <span class="plan__period"> {p.period}</span>}
             </div>
