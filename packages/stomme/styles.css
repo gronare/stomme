@@ -857,7 +857,7 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
     color: var(--color-ink); font-variant-numeric: tabular-nums; letter-spacing: -0.01em;
     margin-top: 0.35rem;
   }
-  .plan__period { font-size: 0.95rem; font-weight: 400; color: var(--color-muted); }
+  .plan__period { font-size: 0.95rem; font-weight: 400; color: var(--color-muted); margin-left: 0.35em; white-space: nowrap; }
   .plan__desc { margin: 0.5rem 0 0; color: var(--color-muted); font-size: 0.95rem; }
   .plan__features { list-style: none; margin: 1.1rem 0 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; }
   .plan__features li { position: relative; padding-left: 1.5rem; color: var(--color-ink); font-size: 0.95rem; }
