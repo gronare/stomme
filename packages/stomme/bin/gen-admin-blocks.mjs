@@ -388,6 +388,8 @@ const COLLECTION_EDITORS = {
       label: "Tags"
       widget: list
       required: false
+      collapsed: false
+      summary: "{{fields.tag}}"
       hint: "Scope the question to pages: an FAQ block filtered on a tag (e.g. a service or town) shows every question carrying it."
       field: { name: tag, label: "Tag", widget: string }`,
   testimonials: `- name: testimonials
