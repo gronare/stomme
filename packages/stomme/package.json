@@ -43,7 +43,8 @@
   },
   "bin": {
     "stomme-gen": "bin/gen-admin-blocks.mjs",
-    "stomme-new-block": "bin/new-block.mjs"
+    "stomme-new-block": "bin/new-block.mjs",
+    "stomme-lint-styles": "bin/lint-styles.mjs"
   },
   "files": [
     "src",

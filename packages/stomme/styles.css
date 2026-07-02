@@ -124,9 +124,15 @@ body > main { flex: 1 0 auto; } /* sticky footer: main grows so the footer sits 
   .section--hero-tall, .cover--h-tall, .cover--h-medium { min-height: 0; }
   body { min-height: 0; }
   /* Entry animations never run in print — their pre-start `both` state (opacity 0 /
-     undrawn strokes) would leave the element invisible on paper. */
-  .thanks-confirm, .letter-sheet, .letter-ink, .letter-postmark { animation: none; }
-  .confirm-badge circle, .confirm-badge path { animation: none; stroke-dashoffset: 0; }
+     undrawn strokes) would leave the element invisible on paper. !important because the
+     base rules come later in the file (source order would silently win otherwise). */
+  .thanks-confirm, .letter-sheet, .letter-ink, .letter-postmark { animation: none !important; }
+  .confirm-badge circle, .confirm-badge path { animation: none !important; stroke-dashoffset: 0; }
+  /* Looping decorative animations print at whatever phase the timer happens to be on —
+     freeze them so the same page always prints the same pixels (lookbook snapshots).
+     .cover__motion's SVG is inlined, so its internal .rise/.drift rules are reachable. */
+  .cover__media--gradient, .hero-motif .hm-rise, .hero-motif .hm-float,
+  .cover__motion .rise, .cover__motion .drift { animation: none !important; }
 }
 .section--hero-top { justify-content: flex-start; }
 .section--hero-center { justify-content: center; }
