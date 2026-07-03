@@ -12,6 +12,10 @@ export interface SiteConfig {
     formSuccess?: string; // contactForm success page
   };
   locale?: string; // date/number formatting (BCP47, e.g. 'sv-SE')
+  // Operator-owned analytics — lives in code (site.config.ts), NOT in CMS content, so an
+  // editor can't disable it (Decap rewrites managed files on save and would drop it).
+  // cfToken = Cloudflare Web Analytics beacon token: cookieless, no consent banner needed.
+  analytics?: { cfToken?: string };
   cmsLocale?: string; // Decap admin UI language (e.g. 'en', 'sv'); written to config.yml by stomme-gen
   strings?: {
     readMore?: string;

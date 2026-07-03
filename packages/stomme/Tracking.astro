@@ -6,14 +6,15 @@
 // IDs come from the CMS Tracking pane. GTM covers GA4 + most pixels; GA4/Meta load them directly.
 import { getEntry } from 'astro:content';
 import { resolveFeatures } from './src/config';
-import { features } from '@stomme/config';
+import { features, site } from '@stomme/config';
 
 const t: any = (await getEntry('tracking', 'tracking')?.catch(() => null))?.data ?? {};
 const on = resolveFeatures(features).tracking && !!(t.gtmId || t.ga4Id || t.metaPixelId);
 // Cloudflare Web Analytics — COOKIELESS: no cookies, no fingerprinting, no cross-site
-// tracking, so it needs neither the consent banner nor the tracking feature flag.
-// The banner-gated stack above stays for GA/GTM/Meta. Empty token = nothing injected.
-const cfToken = String(t.cfAnalyticsToken || '').trim();
+// tracking, so it needs neither the consent banner nor the tracking feature flag. The
+// token lives in site.config.ts (operator-owned code, not CMS content) so editors can't
+// switch the measurement off. Empty/absent = nothing injected.
+const cfToken = String((site as any)?.analytics?.cfToken || '').trim();
 ---
 {cfToken && (
   <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon={JSON.stringify({ token: cfToken })} is:inline />

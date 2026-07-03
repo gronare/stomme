@@ -800,7 +800,6 @@ function trackingPaneYaml(indent) {
     `${p}    - { name: gtmId, label: "Google Tag Manager ID", widget: string, required: false, hint: "GTM-XXXXXX. Covers GA4 and most pixels via your container." }`,
     `${p}    - { name: ga4Id, label: "Google Analytics 4 ID", widget: string, required: false, hint: "G-XXXXXXX. Only if you load GA4 directly (not via GTM)." }`,
     `${p}    - { name: metaPixelId, label: "Meta (Facebook) Pixel ID", widget: string, required: false }`,
-    `${p}    - { name: cfAnalyticsToken, label: "Cloudflare Web Analytics token", widget: string, required: false, hint: "Cookieless visitor stats — no cookies, no consent banner needed. Loads whenever set, independent of the IDs above." }`,
     `${p}    - { name: privacyUrl, label: "Privacy policy URL", widget: string, required: false, hint: "Linked from the cookie banner, e.g. /integritetspolicy." }`,
   ].join('\n');
 }
