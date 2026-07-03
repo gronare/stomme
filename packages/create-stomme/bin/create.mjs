@@ -7,7 +7,7 @@
 // Copies the starter into <dir>, names it, and prints next steps. The template is
 // bundled at publish time (./template); in this monorepo it falls back to ../../../starter.
 import { cpSync, existsSync, readFileSync, writeFileSync } from 'node:fs';
-import { resolve, dirname, basename } from 'node:path';
+import { resolve, relative, dirname, basename } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -39,15 +39,22 @@ cpSync(template, dest, {
   filter: (src) => !SKIP.has(basename(src)),
 });
 
-// Name the package after the target directory, and switch the engine dependency
-// from the monorepo's `workspace:*` to a registry version — a scaffolded app lives
-// outside the workspace and resolves @gronare/stomme from the package registry.
+// Name the package after the target directory and point the engine dependency right.
+// Inside this monorepo (cloned repo): a relative `link:` to packages/stomme — it is
+// path-based, so it survives the scaffold's own pnpm-workspace.yaml (which makes the
+// site its own workspace root and breaks `workspace:*`). Outside the repo: a registry
+// version, resolved from the package registry once @gronare/stomme is published.
 try {
   const pkgPath = resolve(dest, 'package.json');
   const pkg = JSON.parse(readFileSync(pkgPath, 'utf8'));
   pkg.name = basename(dest).replace(/[^a-z0-9-]/gi, '-').toLowerCase();
   if (pkg.dependencies && '@gronare/stomme' in pkg.dependencies) {
-    pkg.dependencies['@gronare/stomme'] = 'latest';
+    const repoRoot = resolve(here, '../../..');
+    const enginePkg = resolve(repoRoot, 'packages/stomme');
+    const inMonorepo = template === starter && (dest === repoRoot || dest.startsWith(repoRoot + '/'));
+    pkg.dependencies['@gronare/stomme'] = inMonorepo
+      ? 'link:' + relative(dest, enginePkg).split('\\').join('/')
+      : 'latest';
   }
   writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + '\n');
 } catch {

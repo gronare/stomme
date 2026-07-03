@@ -87,7 +87,7 @@ version for that type — custom keys win on clash. Use this for site-specific
 functionality the core shouldn't carry (a domain hero media, a bespoke card, …).
 
 To extend rather than replace, delegate the cases you don't handle back to the
-engine block. The `an example site` / `a live site` examples do exactly this — they add a
+engine block. A branded site typically does exactly this — it adds a
 hero media (an energy-flow diagram / a drone scene) and pass everything else through:
 
 ```astro

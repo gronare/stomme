@@ -72,5 +72,6 @@
   },
   "peerDependencies": {
     "astro": ">=5"
-  }
+  },
+  "license": "AGPL-3.0-only"
 }

@@ -23,5 +23,6 @@
   },
   "devDependencies": {
     "decap-server": "^3.1.4"
-  }
+  },
+  "license": "AGPL-3.0-only"
 }

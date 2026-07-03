@@ -33,28 +33,44 @@ blocks:
 | Path | What it is |
 |---|---|
 | `packages/stomme` | The engine + component library (the dependency). |
+| `packages/create-stomme` | The scaffolder — copies `starter` into a new site. |
 | `starter` | A brand-neutral site that consumes it — the scaffold template. |
-| `examples/an example site-new` | A real branded site built on the library. |
 
 ## Quickstart
 
-The engine `@gronare/stomme` is **private** (GitHub Packages). Two ways to start a site:
-
 ```bash
-# A) inside this monorepo (today) — uses the local workspace copy, nothing published
-node packages/create-stomme/bin/create.mjs examples/my-site   # or sites/my-site
-pnpm install
-cd examples/my-site && pnpm dev        # site on :4321 + CMS on /admin
+git clone https://github.com/gronare/stomme.git
+cd stomme && pnpm install
 
-# B) standalone repo (once @gronare/stomme is published — see Publishing below)
-pnpm dlx create-stomme my-site
+node packages/create-stomme/bin/create.mjs sites/my-site
+cd sites/my-site
+pnpm install
+pnpm dev          # site on :4321 + CMS on /admin (local file backend)
 ```
 
-Then: edit content under `src/content/`, recolor in `src/content/theme/theme.md`
-(or the `:root` tokens in `src/styles/global.css`), and compose pages at `/admin`.
+Edit content in `src/content/`, recolor `src/content/theme/theme.md`, compose
+pages at `/admin`.
 
-`/admin` needs no login locally — `pnpm dev` runs the Decap proxy alongside Astro.
-In production, Decap authenticates via Netlify Identity (git-gateway).
+## Deploying
+
+Every deploy target is a build script — the output is a mostly-static site with
+two on-demand routes (`/api/contact`, `/preview`):
+
+```bash
+pnpm build              # Netlify (adapter preinstalled) — deploy dist/ + the generated function
+pnpm build:cloudflare   # Cloudflare Pages (pnpm add @astrojs/cloudflare first)
+pnpm build:vercel       # Vercel          (pnpm add @astrojs/vercel first)
+pnpm build:node         # your own server (pnpm add @astrojs/node first)
+```
+
+On Netlify: connect the repo (or `netlify deploy`), build command `pnpm build`,
+publish directory `dist` — the contact endpoint and CMS preview ship as a
+serverless function automatically. Set `RESEND_API_KEY`, `CONTACT_FROM` and
+`CONTACT_TO` in the site's environment to make the contact form deliver.
+
+> `pnpm build:static` produces a fully static `dist/` (no adapter), but the
+> contact endpoint and live preview need a server — use one of the adapter
+> targets if you want the form.
 
 ## Commands (in a site)
 
@@ -76,26 +92,11 @@ pnpm block:new -- MyBlock   # scaffold a custom block component
   override the CSS variables to rebrand.
 - **Config** (`src/site.config.ts`) — route prefixes, date locale, fixed strings.
 
-## Publishing (private, GitHub Packages)
+## License
 
-`@gronare/stomme` is scoped to GitHub Packages (see its `publishConfig`). Nothing is
-public. To cut a release:
-
-```bash
-# 1. Authenticate (once). A GitHub PAT with `write:packages` (read:packages to install):
-#    ~/.npmrc
-#      @gronare:registry=https://npm.pkg.github.com
-#      //npm.pkg.github.com/:_authToken=YOUR_GITHUB_PAT
-# 2. Bump the version, then publish from the package:
-cd packages/stomme
-npm version patch
-npm publish            # → https://npm.pkg.github.com (private to the gronare scope)
-```
-
-A **separate** site repo then installs it with an `.npmrc` declaring the scope registry
-(`@gronare:registry=https://npm.pkg.github.com` + the token), and depends on
-`"@gronare/stomme": "^x.y.z"` instead of `workspace:*`. Until you publish, sites live in
-this monorepo and resolve the package locally — fully private, no registry needed.
+[AGPL-3.0-only](LICENSE). You can use, modify and self-host stomme freely —
+including for client work. If you distribute it, or run a modified version as
+a network service, the same freedoms must be passed on.
 
 ## Docs
 
