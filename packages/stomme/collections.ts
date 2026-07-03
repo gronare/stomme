@@ -8,12 +8,25 @@
 // exists. Schemas are the superset the templates + generated CMS editors expect.
 import { defineCollection, z } from 'astro:content';
 import { glob } from 'astro/loaders';
+import { readdirSync } from 'node:fs';
 import { resolveListings, type Listing } from './src/config.ts';
 
 const seo = z.object({ title: z.string(), description: z.string() });
 const blocks = z.array(z.object({ type: z.string() }).passthrough()).default([]);
 const link = z.any().optional();
-const md = (name: string) => glob({ pattern: '**/*.md', base: `./src/content/${name}` });
+// A collection with no content on this site (missing folder, or a scaffolded folder
+// holding only .gitkeep) loads empty via a no-op loader instead of a glob — same
+// result (getCollection → []), but without the glob-loader "No files found" warning
+// on every build. The first real entry (committed via CMS) flips it back to the glob
+// on the next build; a running dev server needs a restart.
+const hasMd = (dir: string) => {
+  try { return readdirSync(dir, { recursive: true }).some((f) => String(f).endsWith('.md')); }
+  catch { return false; }
+};
+const md = (name: string) =>
+  hasMd(`./src/content/${name}`)
+    ? glob({ pattern: '**/*.md', base: `./src/content/${name}` })
+    : { name: 'stomme-empty', load: async () => {} };
 const dateField = z.union([z.string(), z.date()]).transform((d) => (d instanceof Date ? d.toISOString().slice(0, 10) : d));
 
 // Listing preset schemas — `article` (blog/news) and `catalog` (for-sale of anything).

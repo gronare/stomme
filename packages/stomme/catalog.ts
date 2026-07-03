@@ -466,6 +466,7 @@ const RAW_BLOCKS: BlockDef[] = [
     fields: [
       { name: 'eyebrow', label: 'Eyebrow', widget: 'string', required: false },
       { name: 'heading', label: 'Heading', widget: 'string' },
+      { name: 'intro', label: 'Intro', widget: 'text', required: false, hint: 'A short line under the heading.' },
       { name: 'label', label: 'Button label', widget: 'string' },
       linkField('href', 'Button link'),
       { name: 'label2', label: 'Second button label', widget: 'string', required: false, hint: 'Shown as a quiet text link beside the button.' },
@@ -657,7 +658,7 @@ const SAMPLES: Record<string, ({ _label?: string } & Record<string, unknown>)[]>
     { id: 'three', data: { title: 'Third item', price: '4 200 kr', status: 'sold', category: 'Alpha', date: '2026-03-01' } },
   ] }],
   ctaPanel: [{ eyebrow: 'Eyebrow', heading: 'A call-to-action band', intro: LOREM, label: 'Do the thing', href: { url: '#' } }],
-  ctaBox: [{ surface: 'dark', eyebrow: 'Next step', heading: 'A boxed call to action.', label: 'Primary', href: { url: '#' }, label2: 'quiet second link', href2: { url: '#' } }],
+  ctaBox: [{ surface: 'dark', eyebrow: 'Next step', heading: 'A boxed call to action.', intro: 'A short supporting line under the heading.', label: 'Primary', href: { url: '#' }, label2: 'quiet second link', href2: { url: '#' } }],
   faq: [
     { _label: 'list', eyebrow: 'FAQ', heading: 'Questions (list)', asideHeading: 'More questions?', asideBody: 'Get in touch.', asideCtaLabel: 'Contact', items: FAQ_FIX },
     { _label: 'accordion', variant: 'accordion', heading: 'Questions (accordion)', items: FAQ_FIX },

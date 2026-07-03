@@ -9,12 +9,13 @@ import Emph from '../src/Emph.astro';
 interface Props {
   eyebrow?: string;
   heading: string;
+  intro?: string;
   label: string;
   href?: unknown;
   label2?: string;
   href2?: unknown;
 }
-const { eyebrow, heading, label, href, label2, href2 } = Astro.props;
+const { eyebrow, heading, intro, label, href, label2, href2 } = Astro.props;
 const url = resolveLink(href, '/');
 const url2 = resolveLink(href2, '/');
 ---
@@ -23,6 +24,7 @@ const url2 = resolveLink(href2, '/');
   <div class="ctabox">
     {eyebrow && <span class="mono ctabox-eyebrow">{eyebrow}</span>}
     <h2 class="display ctabox-heading"><Emph text={heading} /></h2>
+    {intro && <p class="ctabox-intro">{intro}</p>}
     <a href={url} class="ctabox-btn">{label}</a>
     {label2 && <a href={url2} class="btn-ghost ctabox-link2">{label2} →</a>}
   </div>

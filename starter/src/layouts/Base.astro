@@ -20,10 +20,15 @@ const { title, description, chrome = true } = Astro.props;
 
 const settings = (await getEntry('settings', 'site'))!.data;
 const theme = (await getEntry('theme', 'theme'))!.data;
-// Service areas for the footer's areas column (rendered only when footer.showTowns).
-const towns = (await getCollection('towns'))
-  .sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0))
-  .map((t) => ({ id: t.id, name: t.data.name }));
+// Service areas for the footer's areas column — queried only when the footer
+// actually shows them (an unconditional getCollection warns on every page when
+// the site has no towns content).
+const footerCfg = ((await getEntry('footer', 'footer'))?.data ?? {}) as any;
+const towns = footerCfg.showTowns === true
+  ? (await getCollection('towns'))
+      .sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0))
+      .map((t) => ({ id: t.id, name: t.data.name }))
+  : [];
 const ff = fontFiles as Record<string, string>;
 const customDisplayUrl = theme.fontCustomFile ? ff[theme.fontCustomFile] : null;
 const customBodyUrl = theme.fontCustomBodyFile ? ff[theme.fontCustomBodyFile] : null;
