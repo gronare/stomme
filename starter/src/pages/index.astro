@@ -6,6 +6,6 @@ import { site } from '../site.config';
 
 const { data } = (await getEntry('home', 'home'))!;
 ---
-<Base title={data.seo.title} description={data.seo.description}>
+<Base title={data.seo.title} description={data.seo.description} image={data.seo.image}>
   <BlockRenderer blocks={data.blocks} config={site} />
 </Base>

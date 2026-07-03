@@ -495,7 +495,8 @@ const COLLECTION_EDITORS = {
       required: false
       fields:
         - { name: title, label: "Title", widget: string }
-        - { name: description, label: "Description", widget: text }`,
+        - { name: description, label: "Description", widget: text }
+        - { name: image, label: "Share image", widget: image, required: false, hint: "Social-share card (og:image), 1200×630. Site default used when empty." }`,
   services: `- name: services
   label: "Services"
   label_singular: "Service"
@@ -515,7 +516,8 @@ ${emitWidget(4)}
       required: false
       fields:
         - { name: title, label: "Title", widget: string }
-        - { name: description, label: "Description", widget: text }`,
+        - { name: description, label: "Description", widget: text }
+        - { name: image, label: "Share image", widget: image, required: false, hint: "Social-share card (og:image), 1200×630. Site default used when empty." }`,
 };
 
 // A CMS editor for a config-defined listing, from its preset's field set.

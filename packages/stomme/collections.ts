@@ -11,7 +11,7 @@ import { glob } from 'astro/loaders';
 import { readdirSync } from 'node:fs';
 import { resolveListings, type Listing } from './src/config.ts';
 
-const seo = z.object({ title: z.string(), description: z.string() });
+const seo = z.object({ title: z.string(), description: z.string(), image: z.string().optional() });
 const blocks = z.array(z.object({ type: z.string() }).passthrough()).default([]);
 const link = z.any().optional();
 // A collection with no content on this site (missing folder, or a scaffolded folder
