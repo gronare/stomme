@@ -46,8 +46,10 @@ const anyPrefix = plans.some((p) => p.pricePrefix);
           {p.price && (
             <div class="plan__price">
               {anyPrefix && <span class="plan__prefix">{p.pricePrefix ?? ' '}</span>}
-              <span class="plan__amount">{p.price}</span>
-              {p.period && <span class="plan__period"> {p.period}</span>}
+              {/* One source line, no template whitespace: the zero-width space is the ONLY
+                  break point between the two no-break spans (period gap = its margin), so
+                  the period stays on the line when it fits and wraps cleanly when not. */}
+              <span class="plan__amount">{p.price}</span>{p.period && '\u200b'}{p.period && <span class="plan__period">{p.period}</span>}
             </div>
           )}
           {p.description && <p class="plan__desc">{p.description}</p>}
