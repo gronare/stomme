@@ -1,0 +1,11 @@
+---
+import Base from '../layouts/Base.astro';
+import BlockRenderer from '@gronare/stomme/BlockRenderer.astro';
+import { getEntry } from 'astro:content';
+import { site } from '../site.config';
+
+const { data } = (await getEntry('home', 'home'))!;
+---
+<Base title={data.seo.title} description={data.seo.description} image={data.seo.image}>
+  <BlockRenderer blocks={data.blocks} config={site} />
+</Base>

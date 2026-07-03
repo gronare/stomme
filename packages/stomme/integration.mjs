@@ -342,6 +342,16 @@ const lb = 'max-width:74rem;margin:0 auto;padding:2.75rem 1.5rem 0.5rem;font-siz
         // Skip it if the site ships its own src/pages/preview.astro (a richer preview
         // that can use the site's renderer + custom blocks); that one wins, no collision.
         const isStatic = (process.env.STOMME_TARGET || 'netlify') === 'static';
+
+        // Contact endpoint: injected on adapter builds so a `static` build stays truly
+        // adapterless (an SSR route without an adapter fails the whole build). A site
+        // that ships its own src/pages/api/contact.ts keeps it — we skip to avoid a
+        // duplicate route (rule zero for existing sites).
+        const siteContact = resolve(root, 'src/pages/api/contact.ts');
+        if (!isStatic && !existsSync(siteContact)) {
+          injectRoute({ pattern: '/api/contact', entrypoint: resolve(pkgDir, 'routes/contact.ts') });
+          enabled.push('/api/contact');
+        }
         const sitePreview = ['preview.astro', 'preview.ts', 'preview.js', 'preview.mdx']
           .some((f) => existsSync(resolve(root, 'src/pages', f)));
         if (sitePreview) {

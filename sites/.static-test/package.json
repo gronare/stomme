@@ -1,0 +1,28 @@
+{
+  "name": "-static-test",
+  "type": "module",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "dev:web": "astro dev",
+    "build": "stomme-gen && astro build",
+    "preview": "astro preview",
+    "cms:gen": "stomme-gen",
+    "block:new": "stomme-new-block",
+    "build:static": "STOMME_TARGET=static pnpm run build",
+    "build:cloudflare": "STOMME_TARGET=cloudflare pnpm run build",
+    "build:vercel": "STOMME_TARGET=vercel pnpm run build",
+    "build:node": "STOMME_TARGET=node pnpm run build"
+  },
+  "dependencies": {
+    "@astrojs/netlify": "^6.6.5",
+    "@astrojs/sitemap": "^3.2.1",
+    "astro": "^5.2.5",
+    "@gronare/stomme": "link:../../packages/stomme"
+  },
+  "devDependencies": {
+    "decap-server": "^3.1.4"
+  },
+  "license": "AGPL-3.0-only"
+}

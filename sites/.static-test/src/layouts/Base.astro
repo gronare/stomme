@@ -1,0 +1,102 @@
+---
+import '../styles/global.css';
+import { getEntry, getCollection } from 'astro:content';
+import { resolveFonts } from '@gronare/stomme/fonts';
+import Header from '@gronare/stomme/Header.astro';
+import Footer from '@gronare/stomme/Footer.astro';
+import Tracking from '@gronare/stomme/Tracking.astro';
+import ConsentBanner from '@gronare/stomme/ConsentBanner.astro';
+import { site } from '../site.config';
+
+// Uploaded font files → served URLs (Vite hashes them), for a custom theme font.
+const fontFiles = import.meta.glob('/src/assets/uploads/**/*.{woff2,woff,ttf,otf}', {
+  query: '?url', import: 'default', eager: true,
+});
+
+// `chrome` (default true) renders the site Header/Footer. The CMS chrome previews
+// set it false so they can render a single component in isolation, still themed.
+interface Props { title?: string; description?: string; image?: string; chrome?: boolean }
+const { title, description, image, chrome = true } = Astro.props;
+
+const settings = (await getEntry('settings', 'site'))!.data;
+const theme = (await getEntry('theme', 'theme'))!.data;
+// Service areas for the footer's areas column — queried only when the footer
+// actually shows them (an unconditional getCollection warns on every page when
+// the site has no towns content).
+const footerCfg = ((await getEntry('footer', 'footer'))?.data ?? {}) as any;
+const towns = footerCfg.showTowns === true
+  ? (await getCollection('towns'))
+      .sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0))
+      .map((t) => ({ id: t.id, name: t.data.name }))
+  : [];
+const ff = fontFiles as Record<string, string>;
+const customDisplayUrl = theme.fontCustomFile ? ff[theme.fontCustomFile] : null;
+const customBodyUrl = theme.fontCustomBodyFile ? ff[theme.fontCustomBodyFile] : null;
+const fonts = resolveFonts(theme, customDisplayUrl, customBodyUrl);
+
+// Favicon: site-set (settings.favicon) or the shipped default; an SVG scales to
+// any tab size. settings.appleIcon is the optional iOS home-screen PNG.
+const favicon = settings.favicon || '/favicon.svg';
+const faviconType = favicon.endsWith('.svg') ? 'image/svg+xml'
+  : favicon.endsWith('.png') ? 'image/png'
+  : favicon.endsWith('.ico') ? 'image/x-icon' : undefined;
+
+// Social-share card (og:image / Twitter). Absolute URL when the site URL is configured —
+// social scrapers need absolute. Falls back to the raw value otherwise.
+const ogTitle = title ?? settings.name;
+const shareImage = image ?? settings.ogImage;
+const ogImage = shareImage
+  ? (Astro.site ? new URL(shareImage, Astro.site).href : shareImage)
+  : undefined;
+const ogUrl = Astro.site ? new URL(Astro.url.pathname, Astro.site).href : undefined;
+
+// Inject the owner-editable theme tokens as CSS vars on <html>, overriding the
+// build-time defaults in global.css.
+const themeVars = [
+  `--color-brand:${theme.brand}`,
+  `--color-ink:${theme.ink}`,
+  `--color-on-dark:${theme.onDark}`,
+  `--color-surface:${theme.surface}`,
+  `--color-paper:${theme.paper}`,
+  `--color-line:${theme.line}`,
+  `--color-highlight:${theme.highlight}`,
+  ...(theme.secondary ? [`--color-secondary:${theme.secondary}`] : []),
+  // Which accent the eyebrow marker uses (theme.eyebrowColor → brand/secondary/highlight).
+  `--eyebrow-accent:var(--color-${theme.eyebrowColor === 'highlight' ? 'highlight' : theme.eyebrowColor === 'secondary' ? 'secondary' : 'brand'})`,
+  // Dark-section tokens only when set — otherwise the brand-derived defaults apply.
+  ...(theme.dark ? [`--color-dark:${theme.dark}`] : []),
+  ...(theme.darkInk ? [`--color-dark-ink:${theme.darkInk}`] : []),
+  ...(theme.darkLine ? [`--color-dark-line:${theme.darkLine}`] : []),
+  // Fonts (display / body), with an optional uploaded custom font.
+  ...fonts.vars,
+].join(';');
+---
+<!doctype html>
+<html lang="en" style={themeVars} data-eyebrow={theme.eyebrow}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title ?? settings.name}</title>
+    {description && <meta name="description" content={description} />}
+    <meta property="og:title" content={ogTitle} />
+    {description && <meta property="og:description" content={description} />}
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={settings.name} />
+    {ogUrl && <meta property="og:url" content={ogUrl} />}
+    {ogImage && <meta property="og:image" content={ogImage} />}
+    <meta name="twitter:card" content={ogImage ? 'summary_large_image' : 'summary'} />
+    {ogImage && <meta name="twitter:image" content={ogImage} />}
+    <link rel="icon" href={favicon} type={faviconType} />
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    {settings.appleIcon && <link rel="apple-touch-icon" href={settings.appleIcon} />}
+    {fonts.preloads.map((p) => <link rel="preload" as="font" type={p.type} href={p.href} crossorigin />)}
+    {fonts.fontFace && <style is:inline set:html={fonts.fontFace}></style>}
+    {chrome && <Tracking />}
+  </head>
+  <body>
+    {chrome && <Header />}
+    <main><slot /></main>
+    {chrome && <Footer towns={towns} townsHref={site.routes?.towns ?? '/areas'} />}
+    {chrome && <ConsentBanner />}
+  </body>
+</html>

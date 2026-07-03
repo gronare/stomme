@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 750" fill="currentColor" role="img" aria-label="After — built">
+  <line x1="96" y1="646" x2="1104" y2="646" stroke="currentColor" stroke-width="5" opacity=".35"/>
+  <rect x="204" y="369" width="204" height="277" rx="42" opacity=".5"/>
+  <rect x="480" y="254" width="228" height="392" rx="46" opacity="1"/>
+  <rect x="780" y="415" width="204" height="231" rx="40" opacity=".5"/>
+</svg>

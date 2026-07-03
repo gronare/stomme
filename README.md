@@ -68,9 +68,9 @@ publish directory `dist` — the contact endpoint and CMS preview ship as a
 serverless function automatically. Set `RESEND_API_KEY`, `CONTACT_FROM` and
 `CONTACT_TO` in the site's environment to make the contact form deliver.
 
-> `pnpm build:static` produces a fully static `dist/` (no adapter), but the
-> contact endpoint and live preview need a server — use one of the adapter
-> targets if you want the form.
+> `pnpm build:static` produces a fully static `dist/` (no adapter) — the
+> contact endpoint and live preview are skipped, since they need a server.
+> Use one of the adapter targets if you want the form.
 
 ## Commands (in a site)
 

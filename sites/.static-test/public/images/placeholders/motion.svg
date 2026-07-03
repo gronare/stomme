@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" fill="currentColor" role="img" aria-label="Animated background">
+  <style>
+    .rise { transform-box: fill-box; transform-origin: center bottom; animation: sRise 3.6s ease-in-out infinite; }
+    .d1 { animation-delay: 0s; } .d2 { animation-delay: .3s; } .d3 { animation-delay: .6s; }
+    .d4 { animation-delay: .9s; } .d5 { animation-delay: 1.2s; }
+    .drift { transform-box: fill-box; animation: sDrift 5s ease-in-out infinite; }
+    @keyframes sRise { 0%, 100% { transform: scaleY(.84) translateY(8px); } 50% { transform: scaleY(1) translateY(0); } }
+    @keyframes sDrift { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+    @media (prefers-reduced-motion: reduce) { .rise, .drift { animation: none; } }
+  </style>
+  <line x1="170" y1="540" x2="1030" y2="540" stroke="currentColor" stroke-width="3" opacity=".35"/>
+  <rect class="rise d1" x="200" y="360" width="120" height="180" rx="20" opacity=".5"/>
+  <rect class="rise d2" x="360" y="250" width="140" height="290" rx="22" opacity="1"/>
+  <rect class="rise d3" x="540" y="400" width="120" height="140" rx="18" opacity=".22"/>
+  <rect class="rise d4" x="700" y="320" width="130" height="220" rx="20" opacity=".5"/>
+  <rect class="rise d5" x="870" y="380" width="120" height="160" rx="18" opacity=".5"/>
+  <rect class="drift" x="880" y="160" width="150" height="100" rx="18" opacity=".8"/>
+  <circle cx="430" cy="250" r="10"/>
+</svg>
