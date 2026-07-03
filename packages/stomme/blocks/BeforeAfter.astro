@@ -17,8 +17,14 @@ interface Props {
   after?: string;
   beforeAlt?: string;
   afterAlt?: string;
+  site?: any;
 }
-const { eyebrow, heading, intro, before, after, beforeAlt = 'Before', afterAlt = 'After' } = Astro.props;
+const { eyebrow, heading, intro, before, after, site } = Astro.props;
+const ba = site?.strings?.beforeAfter ?? {};
+const tagBefore = ba.before ?? 'Before';
+const tagAfter = ba.after ?? 'After';
+const beforeAlt = Astro.props.beforeAlt ?? tagBefore;
+const afterAlt = Astro.props.afterAlt ?? tagAfter;
 ---
 
 <section class="section">
@@ -39,8 +45,8 @@ const { eyebrow, heading, intro, before, after, beforeAlt = 'Before', afterAlt =
         : <div class="ba-img ba-art" set:html={beforeArt} />}
     </div>
     <div class="ba-line" aria-hidden="true"><span class="ba-handle">⇄</span></div>
-    <span class="ba-tag ba-tag-before" aria-hidden="true">Before</span>
-    <span class="ba-tag ba-tag-after" aria-hidden="true">After</span>
+    <span class="ba-tag ba-tag-before" aria-hidden="true">{tagBefore}</span>
+    <span class="ba-tag ba-tag-after" aria-hidden="true">{tagAfter}</span>
     <input class="ba-range" type="range" min="0" max="100" value="50"
       aria-label="Drag to compare before and after" />
   </figure>
