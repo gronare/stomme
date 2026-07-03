@@ -8,9 +8,6 @@
     "url": "git+https://github.com/gronare/stomme.git",
     "directory": "packages/create-stomme"
   },
-  "publishConfig": {
-    "registry": "https://npm.pkg.github.com"
-  },
   "bin": {
     "create-stomme": "./bin/create.mjs"
   },

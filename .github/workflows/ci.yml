@@ -6,7 +6,7 @@ on:
   pull_request:
 
 jobs:
-  # Build + typecheck the starter and both example sites. This is the regression
+  # Build + typecheck the starter. This is the regression
   # net: a broken block, a type error, or a failing image/Astro build shows up here.
   sites:
     name: build + check (${{ matrix.site }})
