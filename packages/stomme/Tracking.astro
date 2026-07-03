@@ -10,7 +10,14 @@ import { features } from '@stomme/config';
 
 const t: any = (await getEntry('tracking', 'tracking')?.catch(() => null))?.data ?? {};
 const on = resolveFeatures(features).tracking && !!(t.gtmId || t.ga4Id || t.metaPixelId);
+// Cloudflare Web Analytics — COOKIELESS: no cookies, no fingerprinting, no cross-site
+// tracking, so it needs neither the consent banner nor the tracking feature flag.
+// The banner-gated stack above stays for GA/GTM/Meta. Empty token = nothing injected.
+const cfToken = String(t.cfAnalyticsToken || '').trim();
 ---
+{cfToken && (
+  <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon={JSON.stringify({ token: cfToken })} is:inline />
+)}
 {on && (
   <Fragment>
     <script is:inline set:html={`
