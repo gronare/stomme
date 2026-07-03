@@ -1,4 +1,5 @@
 ---
+import Emph from '../src/Emph.astro';
 import Icon from '../src/Icon.astro';
 import { resolveLink } from '../src/href';
 
@@ -19,7 +20,7 @@ const accentVar = accent === 'secondary' ? 'var(--color-secondary)' : accent ===
   {(eyebrow || heading || intro) && (
     <div class="section-head">
       {eyebrow && <span class="mono eyebrow">{eyebrow}</span>}
-      {heading && <h2 class="display" style="margin-top:0.75rem">{heading}</h2>}
+      {heading && <h2 class="display" style="margin-top:0.75rem"><Emph text={heading} /></h2>}
       {intro && <p class="intro">{intro}</p>}
     </div>
   )}
