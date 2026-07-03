@@ -357,6 +357,9 @@ body > main { flex: 1 0 auto; } /* sticky footer: main grows so the footer sits 
     padding: 0.9rem 0; border-bottom: 1px solid color-mix(in srgb, var(--color-line) 65%, transparent); }
   .nav-item--menu { display: flex; flex-wrap: wrap; align-items: center; width: 100%;
     border-bottom: 1px solid color-mix(in srgb, var(--color-line) 65%, transparent); }
+  /* the panel's own bottom edge closes the list — a divider under the last row is noise */
+  .site-header.nav-open .site-nav > a:last-child,
+  .site-header.nav-open .site-nav > .nav-item--menu:last-child { border-bottom: 0; }
   .nav-top { flex: 1; padding: 0.9rem 0; }
   .nav-caret-btn { padding: 0.9rem 0.4rem; margin: 0 -0.4rem 0 0; }
   .nav-caret-btn .nav-caret { width: 9px; height: 9px; opacity: 0.7; }
