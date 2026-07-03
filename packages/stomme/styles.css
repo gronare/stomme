@@ -756,7 +756,7 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
   }
   .ctabox-eyebrow { color: color-mix(in srgb, var(--color-on-dark) 85%, transparent); }
   .ctabox-heading { margin-top: 0.75rem; color: var(--color-on-dark); }
-  .ctabox-intro { margin: 1rem 0 0; max-width: 34rem; color: color-mix(in srgb, var(--color-on-dark, #fff) 75%, transparent); }
+  .ctabox-intro { margin: 1rem 0 0; max-width: 34rem; color: color-mix(in srgb, var(--color-on-dark) 75%, transparent); }
   .ctabox-btn {
     display: inline-block;
     margin-top: 1.75rem;
