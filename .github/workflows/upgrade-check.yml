@@ -48,25 +48,4 @@ jobs:
             echo "status=check" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Setup pnpm
-        if: steps.pin.outputs.status == 'check'
-        uses: pnpm/action-setup@v4
-        with:
-          version: 11.8.0
-
-      - name: Setup Node
-        if: steps.pin.outputs.status == 'check'
-        uses: actions/setup-node@v4
-        with:
-          node-version: 24
-
-      - name: Install render deps
-        if: steps.pin.outputs.status == 'check'
-        run: sudo apt-get update -qq && sudo apt-get install -y -qq poppler-utils
-
-      - name: Install site deps
-        if: steps.pin.outputs.status == 'check'
-        working-directory: site
-        run: pnpm install --frozen-lockfile
-
-      - run: echo "halva-1 ok"
+      - run: echo "kvart-1 ok"
