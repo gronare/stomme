@@ -1,15 +1,19 @@
-# Fleet upgrade check (steg 2) — anropas från sajtrepon (weekly cron + manuellt
-# från the control plane). Baseline-lös A/B i SAMMA runner: bygg sajtens lookbook med
-# den pinnade motor-SHA:n och med senaste release, rendera till sidbilder och
-# hash-jämför. Identiskt ⇒ pinnen bumpas automatiskt (redaktörsbyggen får nya
-# motorn nästa publicering). Diff ⇒ artefakter (sida-vid-sida) + röd körning som
-# väntar på operatörsgodkännande. Resultatet rapporteras till the control plane (HMAC).
+# Fleet upgrade check — reusable workflow called from site repos (weekly cron +
+# manual dispatch). Baseline-less A/B in the SAME runner: build the site's
+# lookbook with the pinned engine SHA and with the latest release, render both
+# to page images and hash-compare. Identical ⇒ the pin is bumped automatically
+# (editor builds pick up the new engine on their next publish). Different ⇒
+# side-by-side artifacts + a red run awaiting operator approval. The result is
+# reported to an optional control-plane webhook (HMAC-signed; URL and secret
+# are provided by the caller — nothing operator-specific lives in this file).
 name: Upgrade check
 
 on:
   workflow_call:
     secrets:
-      the control plane_hook_secret:
+      report_url:
+        required: false
+      report_secret:
         required: false
 
 jobs:
@@ -34,7 +38,7 @@ jobs:
         id: pin
         run: |
           DY=site/.github/workflows/deploy.yml
-          # Pinnen bor i .stomme-engine; äldre sajter har den kvar i deploy.yml.
+          # The pin lives in .stomme-engine; legacy sites may still have it in deploy.yml.
           if [ -f site/.stomme-engine ]; then
             PIN=$(awk '{print $1; exit}' site/.stomme-engine)
           else
@@ -44,7 +48,7 @@ jobs:
           echo "pin=$PIN" >> "$GITHUB_OUTPUT"
           echo "release=$RELEASE" >> "$GITHUB_OUTPUT"
           if grep -qs 'pinned at handover' "$DY" site/.stomme-engine; then
-            echo "status=follows_release" >> "$GITHUB_OUTPUT"   # handover — rörs aldrig
+            echo "status=follows_release" >> "$GITHUB_OUTPUT"   # handover pins are never touched
           elif [ "$PIN" = "release" ]; then
             echo "status=follows_release" >> "$GITHUB_OUTPUT"
           elif [ "$RELEASE" = "$PIN" ] || case "$RELEASE" in "$PIN"*) true;; *) false;; esac; then
@@ -74,22 +78,22 @@ jobs:
         working-directory: site
         run: pnpm install --frozen-lockfile
 
-      # Bygg + rendera lookbook två gånger i samma miljö — determinismen kommer
-      # av att A och B delar runner, fonter och Chrome-version.
-      - name: Render A (pinnad motor) och B (senaste release)
+      # Build + render the lookbook twice in one environment — determinism comes
+      # from A and B sharing the runner, fonts and Chrome version.
+      - name: Render A (pinned engine) and B (latest release)
         if: steps.pin.outputs.status == 'check'
         id: render
         run: |
           set -e
-          # Bygg med samma target som sajtens deploy kör — vi gatar det som shippas.
+          # Build with the same target the site's deploy uses — gate what ships.
           BUILD_CMD=$(grep -oE 'pnpm run build:[a-z]+' site/.github/workflows/deploy.yml | head -1)
           BUILD_CMD=${BUILD_CMD:-pnpm build}
-          render() {  # $1 = engine-sha, $2 = utkatalog
+          render() {  # $1 = engine sha, $2 = output dir
             git -C stomme checkout -q "$1"
             (cd stomme && pnpm install --frozen-lockfile --silent)
             rm -rf site/dist
             (cd site && STOMME_LOOKBOOK=1 $BUILD_CMD > /dev/null)
-            test -f site/dist/lookbook/index.html || { echo "ingen dist/lookbook"; exit 1; }
+            test -f site/dist/lookbook/index.html || { echo "no dist/lookbook"; exit 1; }
             mkdir -p "$2"
             pkill -f "http.server 4437" 2> /dev/null || true
             python3 -m http.server 4437 --directory site/dist > /dev/null 2>&1 &
@@ -113,18 +117,18 @@ jobs:
           done
           echo "diffpages=${diffpages# }" >> "$GITHUB_OUTPUT"
 
-      - name: Bump pin (identisk rendering)
+      - name: Bump pin (identical render)
         if: steps.pin.outputs.status == 'check' && steps.render.outputs.diffpages == ''
         id: bump
         working-directory: site
         run: |
           PIN="${{ steps.pin.outputs.pin }}"
           RELEASE="${{ steps.pin.outputs.release }}"
-          echo "$RELEASE # frozen $(date +%F) — upgrade-check" > .stomme-engine
+          echo "$RELEASE # frozen $(date +%F) - upgrade-check" > .stomme-engine
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add .stomme-engine
-          git commit -m "upgrade-check: bump engine $PIN -> ${RELEASE:0:10} (grön A/B)"
+          git commit -m "upgrade-check: bump engine $PIN -> ${RELEASE:0:10} (green A/B)"
           git push
 
       - name: Collect diff artifacts
@@ -143,12 +147,13 @@ jobs:
           name: lookbook-diff
           path: /tmp/diff
 
-      - name: Report to the control plane
+      - name: Report to control plane
         if: always()
         env:
-          SECRET: ${{ secrets.the control plane_hook_secret }}
+          REPORT_URL: ${{ secrets.report_url }}
+          SECRET: ${{ secrets.report_secret }}
         run: |
-          [ -z "$SECRET" ] && { echo "ingen hook-secret — hoppar rapportering"; exit 0; }
+          [ -z "$SECRET" ] || [ -z "$REPORT_URL" ] && { echo "no report url/secret - skipping report"; exit 0; }
           STATUS="${{ steps.pin.outputs.status }}"
           if [ "$STATUS" = "check" ]; then
             if [ "${{ job.status }}" != "success" ] && [ -z "${{ steps.render.outputs.diffpages }}" ]; then STATUS="error"
@@ -162,10 +167,10 @@ jobs:
           SIG=$(printf '%s' "$BODY" | openssl dgst -sha256 -hmac "$SECRET" | awk '{print $NF}')
           curl -sf -X POST -H "Content-Type: application/json" \
             -H "X-the control plane-Signature: $SIG" -d "$BODY" \
-            https://the control plane.gronare.se/hooks/upgrade_check || echo "rapportering misslyckades (icke-blockerande)"
+            "$REPORT_URL" || echo "report failed (non-blocking)"
 
-      - name: Fail on diff (väntar på godkännande)
+      - name: Fail on diff (awaiting approval)
         if: steps.pin.outputs.status == 'check' && steps.render.outputs.diffpages != ''
         run: |
-          echo "::error::Visuell diff mellan pinnad motor och release — granska artefakten lookbook-diff. Godkänn genom att bumpa pinnen manuellt (the control plane/stomme-freeze) eller invänta nästa release."
+          echo "::error::Visual diff between pinned engine and release - review the lookbook-diff artifact. Approve by bumping the pin manually, or wait for the next release."
           exit 1
