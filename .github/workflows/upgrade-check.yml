@@ -34,11 +34,16 @@ jobs:
         id: pin
         run: |
           DY=site/.github/workflows/deploy.yml
-          PIN=$(grep -oE 'ref: *([0-9a-f]{7,40}|release)' "$DY" | head -1 | awk '{print $2}')
+          # Pinnen bor i .stomme-engine; äldre sajter har den kvar i deploy.yml.
+          if [ -f site/.stomme-engine ]; then
+            PIN=$(awk '{print $1; exit}' site/.stomme-engine)
+          else
+            PIN=$(grep -oE 'ref: *([0-9a-f]{7,40}|release)' "$DY" | head -1 | awk '{print $2}')
+          fi
           RELEASE=$(git -C stomme rev-parse origin/release)
           echo "pin=$PIN" >> "$GITHUB_OUTPUT"
           echo "release=$RELEASE" >> "$GITHUB_OUTPUT"
-          if grep -q 'pinned at handover' "$DY"; then
+          if grep -qs 'pinned at handover' "$DY" site/.stomme-engine; then
             echo "status=follows_release" >> "$GITHUB_OUTPUT"   # handover — rörs aldrig
           elif [ "$PIN" = "release" ]; then
             echo "status=follows_release" >> "$GITHUB_OUTPUT"
@@ -115,10 +120,10 @@ jobs:
         run: |
           PIN="${{ steps.pin.outputs.pin }}"
           RELEASE="${{ steps.pin.outputs.release }}"
-          sed -i -E "s|(ref: *)$PIN[^\n]*|\1$RELEASE # frozen $(date +%F) — upgrade-check|" .github/workflows/deploy.yml
+          echo "$RELEASE # frozen $(date +%F) — upgrade-check" > .stomme-engine
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add .github/workflows/deploy.yml
+          git add .stomme-engine
           git commit -m "upgrade-check: bump engine $PIN -> ${RELEASE:0:10} (grön A/B)"
           git push
 
