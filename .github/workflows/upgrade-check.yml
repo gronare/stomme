@@ -1,33 +1,13 @@
-# Fleet upgrade check (steg 2) — anropas från sajtrepon (weekly cron + manuellt
-# från the control plane). Baseline-lös A/B i SAMMA runner: bygg sajtens lookbook med
-# den pinnade motor-SHA:n och med senaste release, rendera till sidbilder och
-# hash-jämför. Identiskt ⇒ pinnen bumpas automatiskt (redaktörsbyggen får nya
-# motorn nästa publicering). Diff ⇒ artefakter (sida-vid-sida) + röd körning som
-# väntar på operatörsgodkännande. Resultatet rapporteras till the control plane (HMAC).
 name: Upgrade check
-
 on:
   workflow_call:
     secrets:
       the control plane_hook_secret:
         required: false
-
 jobs:
   check:
     runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
-      - name: Checkout site
-        uses: actions/checkout@v4
-        with:
-          path: site
-
-      - name: Checkout engine (full history)
-        uses: actions/checkout@v4
-        with:
-          repository: gronare/stomme
-          fetch-depth: 0
-          path: stomme
-
-      - run: echo "utan pin-steget"
+      - run: echo "minimal + permissions"
