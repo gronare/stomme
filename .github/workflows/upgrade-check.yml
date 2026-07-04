@@ -80,7 +80,7 @@ jobs:
             git -C stomme checkout -q "$1"
             (cd stomme && pnpm install --frozen-lockfile --silent)
             rm -rf site/dist
-            (cd site && STOMME_LOOKBOOK=1 pnpm build > /dev/null)
+            (cd site && STOMME_LOOKBOOK=1 STOMME_TARGET=static pnpm build > /dev/null)
             test -f site/dist/lookbook/index.html || { echo "ingen dist/lookbook"; exit 1; }
             mkdir -p "$2"
             (cd site/dist && python3 -m http.server 4437 & echo $! > /tmp/srv.pid)
