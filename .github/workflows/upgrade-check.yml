@@ -30,22 +30,4 @@ jobs:
           fetch-depth: 0
           path: stomme
 
-      - name: Read pin & release
-        id: pin
-        run: |
-          DY=site/.github/workflows/deploy.yml
-          PIN=$(grep -oE 'ref: *([0-9a-f]{7,40}|release)' "$DY" | head -1 | awk '{print $2}')
-          RELEASE=$(git -C stomme rev-parse origin/release)
-          echo "pin=$PIN" >> "$GITHUB_OUTPUT"
-          echo "release=$RELEASE" >> "$GITHUB_OUTPUT"
-          if grep -q 'pinned at handover' "$DY"; then
-            echo "status=follows_release" >> "$GITHUB_OUTPUT"   # handover — rörs aldrig
-          elif [ "$PIN" = "release" ]; then
-            echo "status=follows_release" >> "$GITHUB_OUTPUT"
-          elif [ "$RELEASE" = "$PIN" ] || case "$RELEASE" in "$PIN"*) true;; *) false;; esac; then
-            echo "status=up_to_date" >> "$GITHUB_OUTPUT"
-          else
-            echo "status=check" >> "$GITHUB_OUTPUT"
-          fi
-
-      - run: echo "kvart-1 ok"
+      - run: echo "utan pin-steget"
