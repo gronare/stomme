@@ -71,6 +71,7 @@ export interface SiteConfig {
 // Optional capabilities a site can switch on. A flag that's missing (or the whole
 // `features` object) resolves to false — so adding new features to the engine never
 // turns anything on for existing sites; they stay hidden until a site opts in.
+// The one exception is `contactForm` (see FEATURE_DEFAULTS below).
 export interface StommeFeatures {
   blog?: boolean; // posts collection + /<blog> routes + postList block
   areas?: boolean; // towns collection + /<towns> routes + linkChips block
@@ -78,6 +79,10 @@ export interface StommeFeatures {
   testimonials?: boolean; // testimonials collection + testimonials block
   faq?: boolean; // faq collection + faq block
   tracking?: boolean; // analytics (GTM/GA4/Meta) + cookie-consent banner + the Tracking settings pane
+  // DELIBERATE exception to the all-false convention: a contact form is on by DEFAULT.
+  // Existing sites that never set this keep their form (rule zero). Set it to `false`
+  // to remove the contactForm block from the site. Gated in BlockRenderer.
+  contactForm?: boolean;
 }
 export const FEATURE_DEFAULTS: Required<StommeFeatures> = {
   blog: false,
@@ -86,9 +91,11 @@ export const FEATURE_DEFAULTS: Required<StommeFeatures> = {
   testimonials: false,
   faq: false,
   tracking: false,
+  // ON by default — a site without the flag keeps its contact form; false removes it.
+  contactForm: true,
 };
-// Resolve a site's flags over the all-false defaults. Unknown keys are ignored;
-// known-but-omitted keys are false.
+// Resolve a site's flags over the defaults (all false except contactForm, which is on).
+// Unknown keys are ignored; known-but-omitted keys fall back to their default.
 export function resolveFeatures(f?: StommeFeatures): Required<StommeFeatures> {
   return { ...FEATURE_DEFAULTS, ...(f || {}) };
 }
