@@ -30,6 +30,7 @@ function previewEntrypoint(isStatic) {
   return `---
 export const prerender = ${isStatic ? 'true' : 'false'};
 import Base from '@stomme/base';
+import { Image } from 'astro:assets';
 import { site, features } from '@stomme/config';
 import { getCollection, getEntry } from 'astro:content';
 import { resolveSite } from '@gronare/stomme/config';
@@ -102,6 +103,15 @@ const contactDraft = kind === 'contact' && draft && typeof draft === 'object' ? 
 // blocks) from the draft, with the markdown body pre-rendered.
 const serviceDraft = kind === 'service' && draft && typeof draft === 'object' ? draft : null;
 const serviceHtml = serviceDraft ? await renderMarkdown(serviceDraft.body || '') : '';
+
+// Identity: render the composed logo (mark + wordmark) with the SAME uploaded-vs-public
+// resolution as Header — an uploaded logo (/src/assets/uploads/…) goes through Astro's
+// image optimizer, so the CMS Identity pane shows the real optimized image. A hand-built
+// mockup using Decap's getAsset only had the raw /src path, which isn't served (404s).
+const identityDraft = kind === 'identity' && draft && typeof draft === 'object' ? draft : null;
+const idLogo = (identityDraft && identityDraft.logo) || {};
+const idUploads = import.meta.glob('/src/assets/uploads/**/*.{jpg,jpeg,png,webp,avif}');
+const idOptimized = idLogo.image && idUploads[idLogo.image] ? idUploads[idLogo.image] : null;
 ---
 {kind === 'header' ? (
   <Base title="Preview" chrome={false}><div id="preview-root"><Header nav={navDraft} /></div></Base>
@@ -118,6 +128,15 @@ const serviceHtml = serviceDraft ? await renderMarkdown(serviceDraft.body || '')
   </div></Base>
 ) : kind === 'service' ? (
   <Base title="Preview"><div id="preview-root"><ServicePage data={serviceDraft ?? {}} bodyHtml={serviceHtml} config={site} /></div></Base>
+) : kind === 'identity' ? (
+  <Base title="Preview" chrome={false}><div id="preview-root">
+    <div class="logo" style="display:flex;align-items:center;gap:0.75rem;padding:1.5rem">
+      {idLogo.image && (idOptimized
+        ? <Image class="logo-mark" src={idOptimized()} alt={idLogo.alt ?? ''} />
+        : <img class="logo-mark" src={idLogo.image} alt={idLogo.alt ?? ''} />)}
+      {idLogo.textPre && <span class="logo-word">{idLogo.textPre}<span class="accent">{idLogo.textAccent}</span></span>}
+    </div>
+  </div></Base>
 ) : (
   <Base title="Preview"><div id="preview-root"><BlockRenderer blocks={blocks} config={site} features={features} /></div></Base>
 )}

@@ -116,10 +116,12 @@
   // per-keystroke flicker. Returning the existing iframe's src UNCHANGED is what stops the
   // CMS's React from reloading it; the visible update rides on the message instead.
   var FRAME_STYLE = { width: '100%', height: '100vh', border: '0', display: 'block', background: '#fff' };
+  // A short frame for an inline snippet (the Identity logo row) rather than a full page.
+  var LOGO_FRAME_STYLE = { width: '100%', height: '88px', border: '0', display: 'block', background: 'transparent' };
   // Per-id frame state. A React ref captures the real <iframe> node (Decap renders the
   // preview inside its own frame, so document.getElementById from here wouldn't find it).
   var FRAMES = {};
-  function liveFrame(id, baseSrc, data) {
+  function liveFrame(id, baseSrc, data, style) {
     var rec = FRAMES[id] || (FRAMES[id] = {});
     if (!rec.ref) rec.ref = function (el) { rec.el = el; if (!el) rec.src = null; };
     if (!rec.src) {
@@ -132,7 +134,7 @@
       // src is unchanged, so the CMS's React keeps the iframe mounted — no reload.
       rec.el.contentWindow.postMessage({ type: 'stomme:preview', data: data }, '*');
     }
-    return h('iframe', { src: rec.src, style: FRAME_STYLE, ref: rec.ref });
+    return h('iframe', { src: rec.src, style: style || FRAME_STYLE, ref: rec.ref });
   }
   var PagePreview = function (props) {
     return liveFrame('stomme-preview', '/preview', b64(jsBlocks(props.entry)));
@@ -261,15 +263,14 @@
   var HeaderPreview = ChromePreview('header');
   var FooterPreview = ChromePreview('footer');
 
-  var nested = function (e, a, b) { var x = e.getIn(['data', a, b]); return x == null ? '' : x; };
   // Identity — what each field becomes: the header logo, the browser-tab favicon, the
   // home-screen icon, and the business name (footer © / contact / structured data).
   var IdentityPreview = function (props) {
     var e = props.entry;
     var asset = function (p) { try { return p && props.getAsset ? String(props.getAsset(p)) : ''; } catch (_e) { return ''; } };
+    var data = e.get('data'); data = data && data.toJS ? data.toJS() : (data || {});
     var name = v(e, 'name') || 'Your business';
-    var pre = nested(e, 'logo', 'textPre'), accent = nested(e, 'logo', 'textAccent');
-    var imgUrl = asset(nested(e, 'logo', 'image'));
+    var hasLogo = !!(data.logo && (data.logo.image || data.logo.textPre));
     var favUrl = asset(v(e, 'favicon')) || '/favicon.svg';
     var appleUrl = asset(v(e, 'appleIcon'));
     var ogUrl = asset(v(e, 'ogImage'));
@@ -277,11 +278,11 @@
     var lab = function (t) { return h('p', { style: { fontFamily: fMono, fontSize: '.62rem', letterSpacing: '.14em', textTransform: 'uppercase', color: cMuted, margin: '0 0 10px' } }, t); };
     return h('div', { className: 'bk' },
       lab('Logo'),
-      (imgUrl || pre)
-        ? h('div', { style: { display: 'flex', alignItems: 'center', gap: '12px' } },
-            imgUrl ? h('img', { src: imgUrl, alt: '', style: { height: '34px', width: 'auto', display: 'block' } }) : null,
-            pre ? h('span', { style: { fontFamily: 'var(--bk-font-display,' + SANS + ')', fontWeight: 800, fontSize: '1.6rem', letterSpacing: '-.02em' } },
-              pre, accent ? h('span', { style: { color: cBrand } }, accent) : null) : null)
+      // Render the REAL composed logo via /preview (like header/footer) so an UPLOADED
+      // logo (/src/assets/uploads/…) shows as the served, Astro-optimized image. Decap's
+      // getAsset only yields the raw /src path, which isn't served → 404 in the iframe.
+      hasLogo
+        ? liveFrame('stomme-preview-identity', '/preview?kind=identity', b64(data), LOGO_FRAME_STYLE)
         : h('p', { style: { color: cMuted, margin: 0 } }, 'No logo set'),
 
       h('div', { style: { marginTop: '24px' } }, lab('Browser tab'),
