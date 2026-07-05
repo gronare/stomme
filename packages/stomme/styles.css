@@ -1080,22 +1080,27 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
   .specialist__body { margin: 0.5rem 0 0; font-size: 0.9rem; color: var(--color-muted); }
 
 /* StatPanel */
-.stat-panel { background: var(--color-ink); color: var(--color-on-dark); }
+/* Background/foreground go through theme-overridable vars that DEFAULT to the
+   historic values (ink bg, on-dark fg), so untouched builds are byte-identical.
+   A theme (notably a dark-first one, where on-dark is a dark ink) can recolour
+   the whole panel with a single-class rule: `.stat-panel { --stat-panel-bg: …;
+   --stat-panel-fg: …; }` — every label, pill and rule below follows the fg. */
+.stat-panel { --stat-panel-bg: var(--color-ink); --stat-panel-fg: var(--color-on-dark); background: var(--stat-panel-bg); color: var(--stat-panel-fg); }
   .stat-panel__inner { max-width: 72rem; margin-inline: auto; padding: 5rem 1.5rem; display: grid; gap: 2.5rem; align-items: center; }
   @media (min-width: 1024px) { .stat-panel__inner { grid-template-columns: 1.1fr 0.9fr; } }
-  .stat-panel .mono { color: color-mix(in srgb, var(--color-on-dark) 65%, transparent); }
-  .stat-panel__h { color: var(--color-on-dark); margin-top: 0.75rem; font-size: clamp(2rem, 4vw, 3rem); }
+  .stat-panel .mono { color: color-mix(in srgb, var(--stat-panel-fg) 65%, transparent); }
+  .stat-panel__h { color: var(--stat-panel-fg); margin-top: 0.75rem; font-size: clamp(2rem, 4vw, 3rem); }
   .stat-panel__h em { font-style: normal; border-bottom: 2px solid currentColor; }
-  .stat-panel__body { margin-top: 1.25rem; max-width: 34rem; color: color-mix(in srgb, var(--color-on-dark) 75%, transparent); }
+  .stat-panel__body { margin-top: 1.25rem; max-width: 34rem; color: color-mix(in srgb, var(--stat-panel-fg) 75%, transparent); }
   .stat-panel__badges { margin-top: 1.75rem; display: flex; flex-wrap: wrap; gap: 0.625rem; }
-  .stat-panel__pill { font-family: var(--bk-font-mono); font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; border: 1px solid color-mix(in srgb, var(--color-on-dark) 25%, transparent); border-radius: 999px; padding: 8px 14px; color: var(--color-on-dark); }
+  .stat-panel__pill { font-family: var(--bk-font-mono); font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; border: 1px solid color-mix(in srgb, var(--stat-panel-fg) 25%, transparent); border-radius: 999px; padding: 8px 14px; color: var(--stat-panel-fg); }
   /* Optional stat columns (a comparison) — used instead of the single giant number. */
   .stat-panel__cols { margin-top: 2.5rem; display: grid; gap: 1.5rem; max-width: 34rem; }
   @media (min-width: 640px) { .stat-panel__cols { grid-template-columns: 1fr 1fr; } }
-  .stat-panel__col { border-top: 1px solid color-mix(in srgb, var(--color-on-dark) 22%, transparent); padding-top: 1rem; }
+  .stat-panel__col { border-top: 1px solid color-mix(in srgb, var(--stat-panel-fg) 22%, transparent); padding-top: 1rem; }
   .stat-panel__col-label { display: block; font-size: 0.66rem; letter-spacing: 0.2em; margin-bottom: 0.5rem; }
-  .stat-panel__col-value { display: block; font-family: var(--bk-font-display); font-weight: 700; font-size: 1.9rem; line-height: 1.1; color: var(--color-on-dark); font-variant-numeric: tabular-nums; }
-  .stat-panel__col-note { margin: 0.35rem 0 0; color: color-mix(in srgb, var(--color-on-dark) 72%, transparent); font-size: 0.95rem; }
+  .stat-panel__col-value { display: block; font-family: var(--bk-font-display); font-weight: 700; font-size: 1.9rem; line-height: 1.1; color: var(--stat-panel-fg); font-variant-numeric: tabular-nums; }
+  .stat-panel__col-note { margin: 0.35rem 0 0; color: color-mix(in srgb, var(--stat-panel-fg) 72%, transparent); font-size: 0.95rem; }
   .stat-panel__stat { text-align: center; }
   .stat-panel__value { display: block; font-family: var(--bk-font-display); font-weight: 900; line-height: 1; font-size: clamp(5rem, 14vw, 11rem); letter-spacing: -0.05em; color: var(--block-accent, var(--color-brand)); }
 
