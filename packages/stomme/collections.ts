@@ -182,7 +182,7 @@ export function stommeCollections(listings?: Listing[]) {
     faq: defineCollection({ loader: md('faq'), schema: z.object({ question: z.string(), answer: z.string(), order: z.number().default(0), tags: z.array(z.string()).default([]) }) }),
     // Contact-form confirmation copy (the "Thank-you" settings pane + /thanks page). All
     // optional — blank falls back to the localized defaults.
-    thanks: defineCollection({ loader: md('thanks'), schema: z.object({ variant: z.string().optional(), heading: z.string().optional(), message: z.string().optional(), buttonLabel: z.string().optional(), button: link, button2Label: z.string().optional(), button2: link, showContact: z.boolean().default(false) }) }),
+    thanks: defineCollection({ loader: md('thanks'), schema: z.object({ variant: z.string().optional(), heading: z.string().optional(), message: z.string().optional(), button: link, button2: link, showContact: z.boolean().default(false) }) }),
     tracking: defineCollection({ loader: md('tracking'), schema: z.object({ gtmId: z.string().default(''), ga4Id: z.string().default(''), metaPixelId: z.string().default(''), privacyUrl: z.string().default('') }) }),
 
     testimonials: defineCollection({ loader: md('testimonials'), schema: z.object({ name: z.string(), role: z.string().default(''), quote: z.string(), order: z.number().default(0) }) }),
