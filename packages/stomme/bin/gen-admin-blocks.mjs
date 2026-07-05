@@ -751,8 +751,13 @@ function emitSettings() {
               - { label: "System (default)", value: "system" }
               - { label: "Serif (elegant headlines)", value: "serif" }
               - { label: "Grotesk (clean sans)", value: "grotesk" }
+              - { label: "Geometric (Futura-style)", value: "geometric" }
               - { label: "Rounded", value: "rounded" }
               - { label: "Slab serif", value: "slab" }
+              - { label: "Condensed (narrow headlines)", value: "condensed" }
+              - { label: "Humanist (open, legible)", value: "humanist" }
+              - { label: "Script (handwritten)", value: "script" }
+              - { label: "Monospace", value: "mono" }
               - { label: "Custom (uploaded below)", value: "custom" }
           - name: fontBody
             label: "Body font"
@@ -763,8 +768,13 @@ function emitSettings() {
               - { label: "System (default)", value: "system" }
               - { label: "Serif (elegant headlines)", value: "serif" }
               - { label: "Grotesk (clean sans)", value: "grotesk" }
+              - { label: "Geometric (Futura-style)", value: "geometric" }
               - { label: "Rounded", value: "rounded" }
               - { label: "Slab serif", value: "slab" }
+              - { label: "Condensed (narrow headlines)", value: "condensed" }
+              - { label: "Humanist (open, legible)", value: "humanist" }
+              - { label: "Script (handwritten)", value: "script" }
+              - { label: "Monospace", value: "mono" }
               - { label: "Custom (uploaded below)", value: "custom" }
           - { name: fontCustomFile, label: "Custom heading font file", widget: file, required: false, hint: "Used when Heading font = Custom. A .woff2 / .woff / .ttf / .otf file (a font file, not an SVG)." }
           - { name: fontCustomBodyFile, label: "Custom body font file", widget: file, required: false, hint: "Used when Body font = Custom. Leave empty to reuse the heading font for body." }

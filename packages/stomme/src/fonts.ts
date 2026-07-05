@@ -13,6 +13,12 @@ export const FONT_STACKS: Record<string, string> = {
   // Windows, else a generic geometric fallback. For pixel-consistent rendering everywhere,
   // upload a self-hosted geometric (e.g. Jost) via the Custom font picker.
   geometric: 'Futura, "Futura PT", "Century Gothic", "Avenir Next", "URW Geometric", ui-sans-serif, system-ui, sans-serif',
+  // Condensed sans — narrow, space-efficient headlines (posters, signage, tight nav).
+  condensed: '"Arial Narrow", "Helvetica Neue Condensed", "Roboto Condensed", "Liberation Sans Narrow", ui-sans-serif, sans-serif',
+  // Humanist sans — open, legible, warm; screen-first (Verdana family). Good for body-heavy sites.
+  humanist: 'Verdana, "Segoe UI", "Lucida Grande", "Lucida Sans Unicode", Geneva, Tahoma, ui-sans-serif, sans-serif',
+  // Script / handwritten — for wordmarks and accents only, never body copy.
+  script: '"Snell Roundhand", "Brush Script MT", "Segoe Script", "Bradley Hand", ui-rounded, cursive',
   mono: 'ui-monospace, "SF Mono", Menlo, Consolas, monospace',
 };
 

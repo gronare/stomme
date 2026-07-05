@@ -53,6 +53,9 @@
     rounded: 'ui-rounded,"SF Pro Rounded","Hiragino Maru Gothic ProN","Segoe UI",system-ui,sans-serif',
     slab: 'Rockwell,"Rockwell Nova","Roboto Slab","DejaVu Serif",Georgia,serif',
     geometric: 'Futura,"Futura PT","Century Gothic","Avenir Next","URW Geometric",ui-sans-serif,system-ui,sans-serif',
+    condensed: '"Arial Narrow","Helvetica Neue Condensed","Roboto Condensed","Liberation Sans Narrow",ui-sans-serif,sans-serif',
+    humanist: 'Verdana,"Segoe UI","Lucida Grande","Lucida Sans Unicode",Geneva,Tahoma,ui-sans-serif,sans-serif',
+    script: '"Snell Roundhand","Brush Script MT","Segoe Script","Bradley Hand",ui-rounded,cursive',
     mono: MONO,
   };
   var fontFor = function (key) { return key && FONT_STACKS[key] ? FONT_STACKS[key] : SANS; };
