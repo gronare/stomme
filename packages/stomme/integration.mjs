@@ -1,6 +1,6 @@
 import { fileURLToPath } from 'node:url';
 import { resolve, dirname } from 'node:path';
-import { mkdirSync, writeFileSync, existsSync } from 'node:fs';
+import { mkdirSync, writeFileSync, existsSync, readFileSync } from 'node:fs';
 
 // stomme Astro integration — injects collection-detail routes.
 //
@@ -230,10 +230,42 @@ const REVEAL = `
 })();
 `;
 
+// Theme "style" support (optional). When a site sets `style` (or STOMME_STYLE is set), the
+// engine splices a theme's tokens.css + theme.css into the site's own global.css, immediately
+// after the engine stylesheet @import and before the site's authored rules. The resulting
+// cascade is engine < tokens < theme < site — no !important anywhere. The theme directory is
+// resolved from STOMME_THEMES_DIR or a `stomme-themes/themes` checkout beside the engine repo.
+// A named style whose theme.css is missing throws at build (a silent neutral fallback would
+// ship unstyled pixels). Without a style this plugin is never registered — output is unchanged.
+const STYLE_IMPORT_RE = /@import\s+["'](?:@[\w-]+\/)?stomme\/styles\.css["'];?/;
+function styleThemePlugin(style, styleDir, globalCssPath) {
+  const tokensPath = resolve(styleDir, 'tokens.css');
+  const themePath = resolve(styleDir, 'theme.css');
+  return {
+    name: 'stomme:style',
+    enforce: 'pre',
+    transform(code, id) {
+      if (id.split('?')[0] !== globalCssPath) return null;
+      if (!STYLE_IMPORT_RE.test(code)) return null;
+      // Reload in dev when the theme files change.
+      if (existsSync(tokensPath)) this.addWatchFile(tokensPath);
+      this.addWatchFile(themePath);
+      const tokens = existsSync(tokensPath) ? readFileSync(tokensPath, 'utf8') : '';
+      const theme = readFileSync(themePath, 'utf8');
+      const injected =
+        `\n/* stomme style "${style}" — tokens (fonts + shape vars) */\n${tokens}` +
+        `\n/* stomme style "${style}" — theme (component layer) */\n${theme}\n`;
+      return { code: code.replace(STYLE_IMPORT_RE, (m) => m + injected), map: null };
+    },
+  };
+}
+
 export default function stomme(options = {}) {
   const features = options.features || {};
   const routes = options.routes || {};
   const listings = resolveListings(options.listings);
+  // Optional look & feel. `style` names a theme directory; unset ⇒ no theme layer added.
+  const style = options.style || process.env.STOMME_STYLE;
   // The blog is an article listing in all but name — fold it in so detail routes go
   // through the same generated entrypoint (PostPage) as any listing.
   if (features.blog && !listings.some((l) => l.id === 'posts')) {
@@ -337,6 +369,32 @@ const lb = 'max-width:74rem;margin:0 auto;padding:2.75rem 1.5rem 0.5rem;font-siz
 
         const enabled = [];
         const outDir = resolve(root, '.astro/stomme');
+
+        // Optional theme "style": splice the theme layer into the site's global.css.
+        // The themes directory is supplied entirely via STOMME_THEMES_DIR — the engine
+        // hardcodes no theme location or repo name, so any theme collection can be used.
+        if (style) {
+          const themesDir = process.env.STOMME_THEMES_DIR;
+          if (!themesDir) {
+            throw new Error(
+              `stomme: style "${style}" is set but STOMME_THEMES_DIR is not. ` +
+              `Point it at the directory that holds your theme folders — ` +
+              `a missing theme would silently ship unstyled pixels.`,
+            );
+          }
+          const styleDir = resolve(themesDir, style);
+          const themeCssPath = resolve(styleDir, 'theme.css');
+          if (!existsSync(themeCssPath)) {
+            throw new Error(
+              `stomme: style "${style}" has no theme.css at ${themeCssPath}. ` +
+              `Check STOMME_THEMES_DIR and the style name — ` +
+              `a missing theme would silently ship unstyled pixels.`,
+            );
+          }
+          const globalCssPath = resolve(root, 'src/styles/global.css');
+          updateConfig({ vite: { plugins: [styleThemePlugin(style, styleDir, globalCssPath)] } });
+          enabled.push(`style:${style}`);
+        }
 
         // 0. Live-preview route — generated with a literal prerender per target.
         // Skip it if the site ships its own src/pages/preview.astro (a richer preview
