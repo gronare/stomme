@@ -11,8 +11,7 @@
 // accept (the `contact.hq`-style drift). See the vault: stomme-fleet-drift-och-autoupdate.
 //
 // CONTRACT (the control plane depends on this exact shape):
-//   { "generatedFrom": "<git short sha or 'dev'>",
-//     "collections": { "<name>": { "fields": [...], "passthrough": <bool>, "nested"?: {...} } },
+//   { "collections": { "<name>": { "fields": [...], "passthrough": <bool>, "nested"?: {...} } },
 //     "presets":     { "<name>": { "fields": [...] } } }
 //
 // `passthrough: true` means the collection's schema carries a passthrough `blocks`
@@ -21,7 +20,6 @@
 import { writeFileSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { execFileSync } from 'node:child_process';
 import { createJiti } from 'jiti';
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -29,20 +27,6 @@ const pkgRoot = resolve(here, '..'); // packages/stomme (the engine source, wher
 const collectionsPath = resolve(pkgRoot, 'collections.ts');
 const outPath = resolve(pkgRoot, 'schema-manifest.json');
 const stubPath = resolve(here, '_astro-content-stub.mjs');
-
-// `git rev-parse` in the engine's own tree → the ref the control plane pins to. Falls back to
-// 'dev' when git is unavailable (e.g. inside a node_modules install with no .git).
-function shortSha() {
-  try {
-    const sha = execFileSync('git', ['rev-parse', '--short', 'HEAD'], {
-      cwd: pkgRoot,
-      stdio: ['ignore', 'pipe', 'ignore'],
-    }).toString().trim();
-    return sha || 'dev';
-  } catch {
-    return 'dev';
-  }
-}
 
 // Peel zod's modifier wrappers (default / optional / nullable / effects) off a field
 // type to reach the type it actually describes.
@@ -117,7 +101,7 @@ export async function generate({ write = true } = {}) {
     presets[name] = { fields: fieldsOf(schema) };
   }
 
-  const manifest = { generatedFrom: shortSha(), collections, presets };
+  const manifest = { collections, presets };
   if (write) writeFileSync(outPath, JSON.stringify(manifest, null, 2) + '\n');
   return manifest;
 }
@@ -127,6 +111,6 @@ const invokedDirectly = process.argv[1] && resolve(process.argv[1]) === fileURLT
 if (invokedDirectly) {
   const manifest = await generate();
   const names = Object.keys(manifest.collections);
-  console.log(`✓ schema-manifest: ${names.length} collections (${names.join(', ')}) · presets: ${Object.keys(manifest.presets).join(', ')} · from ${manifest.generatedFrom}`);
+  console.log(`✓ schema-manifest: ${names.length} collections (${names.join(', ')}) · presets: ${Object.keys(manifest.presets).join(', ')}`);
   console.log(`  → ${outPath}`);
 }
