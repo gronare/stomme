@@ -45,7 +45,7 @@ const accentVar = accent === 'secondary' ? 'var(--color-secondary)' : accent ===
     {stats.length === 0 && statValue && (
       <div class="stat-panel__stat">
         <span class="stat-panel__value">{statValue}</span>
-        {statLabel && <span class="mono">{statLabel}</span>}
+        {statLabel && <span class="mono stat-panel__stat-label">{statLabel}</span>}
       </div>
     )}
   </div>
