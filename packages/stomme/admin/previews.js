@@ -315,24 +315,11 @@
   var ContactPreview = ChromePreview('contact');
 
   var arr = function (e, k) { var x = e.getIn(['data', k]); x = x && x.toJS ? x.toJS() : x; return Array.isArray(x) ? x : []; };
-  var chipRow = function (items) { return h('div', { className: 'bk-chips' }, items.map(function (s, i) { return h('span', { className: 'bk-chip', key: i }, s); })); };
 
-  // Service-area landing (the towns collection → TownPage). Mirrors the rich town
-  // fields: hero subtitle, the districts + services offered locally.
-  var TownPreview = function (props) {
-    var e = props.entry;
-    var districts = arr(e, 'districts'), services = arr(e, 'services');
-    var sub = v(e, 'heroSubtitle') || v(e, 'intro');
-    return h('div', { className: 'bk' },
-      h('span', { className: 'bk-eyebrow' }, 'Local service: ' + (v(e, 'name') || 'City')),
-      h('h1', { className: 'bk-h1' }, v(e, 'title') || v(e, 'name')),
-      sub ? h('p', { className: 'bk-intro' }, sub) : null,
-      services.length ? h('p', { className: 'bk-section-label' }, 'Services offered here') : null,
-      services.length ? chipRow(services) : null,
-      districts.length ? h('p', { className: 'bk-section-label' }, 'Districts') : null,
-      districts.length ? chipRow(districts) : null,
-      note('Service-area landing page (TownPage); links from the link-chips block.'));
-  };
+  // Service-area landing (the towns collection → TownPage): render the REAL TownPage
+  // (hero + why body + districts + reasons + services as a ticked list) via
+  // /preview?kind=town, fed the draft — no hand-built mockup to drift.
+  var TownPreview = ChromePreview('town');
 
   // Service detail: render the REAL ServicePage (template chrome + the entry's composed
   // blocks + rendered body) via /preview?kind=service — no hand-built mockup to drift.
