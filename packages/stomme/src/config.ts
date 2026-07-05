@@ -12,6 +12,13 @@ export interface SiteConfig {
     formSuccess?: string; // contactForm success page
   };
   locale?: string; // date/number formatting (BCP47, e.g. 'sv-SE')
+  // Optional look & feel: the name of a theme directory supplied at build time. When set,
+  // the engine splices that theme's tokens.css + theme.css into the site's global.css
+  // (after the engine stylesheet import, before the site's own rules) and — via stomme-gen —
+  // into the CMS preview stylesheet, and seeds the theme colours once. The theme directory is
+  // found under STOMME_THEMES_DIR or a themes checkout beside the engine. Unset ⇒ no theme
+  // layer is added and the build is unchanged.
+  style?: string;
   // Operator-owned analytics — lives in code (site.config.ts), NOT in CMS content, so an
   // editor can't disable it (Decap rewrites managed files on save and would drop it).
   // cfToken = Cloudflare Web Analytics beacon token: cookieless, no consent banner needed.

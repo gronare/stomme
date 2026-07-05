@@ -34,5 +34,5 @@ const adapter = await loadAdapter();
 export default defineConfig({
   site: 'https://example.com',
   ...(adapter ? { adapter } : {}),
-  integrations: [stomme({ features, routes: site.routes, listings }), sitemap({ filter: (page) => !page.includes('/preview') })],
+  integrations: [stomme({ features, routes: site.routes, listings, style: site.style }), sitemap({ filter: (page) => !page.includes('/preview') })],
 });
