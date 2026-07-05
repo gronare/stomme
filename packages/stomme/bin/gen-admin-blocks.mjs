@@ -1054,7 +1054,7 @@ if (!here.includes('node_modules')) {
   try {
     const { generate } = await import('./gen-schema-manifest.mjs');
     const m = await generate();
-    console.log(`  ↳ schema-manifest.json refreshed (${Object.keys(m.collections).length} collections, from ${m.generatedFrom})`);
+    console.log(`  ↳ schema-manifest.json refreshed (${Object.keys(m.collections).length} collections)`);
   } catch (e) {
     console.warn('  (schema-manifest refresh skipped:', e.message + ')');
   }
