@@ -1045,6 +1045,21 @@ for (const l of LISTINGS) {
   }
 }
 
+// Keep the engine's schema-manifest.json current with collections.ts. It's derived from
+// the engine's OWN schema (not the site's), so regenerate only when running against the
+// engine SOURCE — i.e. a monorepo build with the engine linked (`link:`). In a real
+// node_modules install the shipped manifest is authoritative and read-only, so skip.
+// gen-schema-manifest writes relative to its own dir, always the engine package.
+if (!here.includes('node_modules')) {
+  try {
+    const { generate } = await import('./gen-schema-manifest.mjs');
+    const m = await generate();
+    console.log(`  ↳ schema-manifest.json refreshed (${Object.keys(m.collections).length} collections, from ${m.generatedFrom})`);
+  } catch (e) {
+    console.warn('  (schema-manifest refresh skipped:', e.message + ')');
+  }
+}
+
 console.log(`✓ stomme-gen: ${Object.entries(counts).map(([k, v]) => `${k}×${v}`).join(', ')} · ${AVAILABLE_BLOCKS.length} block types · ${PAGE_OPTIONS.length} link options`);
 if (counts.collections) {
   const editors = Object.keys(COLLECTION_EDITORS).filter(collectionEnabled);
