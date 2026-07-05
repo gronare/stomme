@@ -52,11 +52,13 @@ let FEATURES = null; // null = no `features` declared → fall back to folder-ex
 let CMS_LOCALE = 'en'; // Decap admin UI language (config.yml `locale:`); 'en' is Decap's default
 let CMS = null; // site.cms → generated `backend:` block (between # >>> cms:generated markers)
 let LISTINGS = []; // config-defined collections (news/for-sale/…) → editors + seeded index
+let STYLE = process.env.STOMME_STYLE || null; // optional look & feel (theme directory name)
 try {
   const mod = await jiti.import(resolve(root, 'src/site.config.ts'));
   if (mod.site && mod.site.routes) ROUTES = { ...ROUTES, ...mod.site.routes };
   if (mod.site && mod.site.cmsLocale) CMS_LOCALE = mod.site.cmsLocale;
   if (mod.site && mod.site.cms) CMS = mod.site.cms;
+  if (mod.site && mod.site.style) STYLE = mod.site.style;
   if (mod.features) FEATURES = { blog: false, areas: false, services: false, testimonials: false, faq: false, tracking: false, ...mod.features };
   if (Array.isArray(mod.listings))
     LISTINGS = mod.listings
@@ -74,6 +76,26 @@ const blogEnabled = FEATURES
   : (() => { try { return readdirSync(resolve(root, 'src/content/posts')).some((f) => f.endsWith('.md')); } catch { return false; } })();
 if (blogEnabled && !LISTINGS.some((l) => l.id === 'posts')) {
   LISTINGS.unshift({ id: 'posts', route: ROUTES.blog || '/blog', label: 'Blog', preset: 'article' });
+}
+
+// Optional look & feel ("style"). Resolve the theme directory the same way the integration
+// does: STOMME_THEMES_DIR or a `stomme-themes/themes` checkout beside the engine repo
+// (here = packages/stomme/bin, so ../../../.. reaches the projects dir). When a style is set
+// the theme's colour SEED is written to src/content/theme/theme.md ONCE, on a site that has no
+// theme.md yet — never overwriting an existing one, so an editor keeps ownership of the colours.
+const STYLE_DIR = STYLE
+  ? resolve(process.env.STOMME_THEMES_DIR || resolve(here, '../../../../stomme-themes/themes'), STYLE)
+  : null;
+if (STYLE_DIR) {
+  const themeMd = resolve(root, 'src/content/theme/theme.md');
+  const seed = resolve(STYLE_DIR, 'theme-seed.md');
+  if (existsSync(themeMd)) {
+    console.log(`stomme-gen: style "${STYLE}" — theme.md already exists, not overwriting (editor owns the colours)`);
+  } else if (existsSync(seed)) {
+    mkdirSync(dirname(themeMd), { recursive: true });
+    copyFileSync(seed, themeMd);
+    console.log(`stomme-gen: style "${STYLE}" — seeded src/content/theme/theme.md from theme-seed.md`);
+  }
 }
 
 // Load every shipped admin label dictionary (labels.<locale>.js). FORWARD is the active
@@ -933,8 +955,21 @@ try {
   // (flex column + full height, for the sticky footer) would shift the inline preview
   // panes, so neutralize them right after the inlined block.
   const PREVIEW_BODY_RESET = '\n/* admin preview: undo the sticky-footer body layout */\nbody{display:block;min-height:auto}\n';
+  // When a style is set, inline its tokens.css + theme.css right after the engine CSS and
+  // before the site's own rules — the same cascade position as the live build — so the CMS
+  // preview mockups are truthful. Reads are guarded: `astro build` (the integration) throws on
+  // a genuinely missing theme, so a warning here is enough.
+  let styleCss = '';
+  if (STYLE_DIR) {
+    const tokensP = resolve(STYLE_DIR, 'tokens.css');
+    const themeP = resolve(STYLE_DIR, 'theme.css');
+    const tokens = existsSync(tokensP) ? readFileSync(tokensP, 'utf8') : '';
+    const themeCss = existsSync(themeP) ? readFileSync(themeP, 'utf8') : '';
+    if (tokens || themeCss) styleCss = `\n/* stomme style "${STYLE}" — tokens + theme (CMS preview) */\n${tokens}\n${themeCss}\n`;
+    else console.warn(`  (stomme-gen: style "${STYLE}" has no tokens.css/theme.css at ${STYLE_DIR})`);
+  }
   const siteCss = readFileSync(resolve(root, 'src/styles/global.css'), 'utf8')
-    .replace(/@import\s+["'](?:@[\w-]+\/)?stomme\/styles\.css["'];?/, libCss + PREVIEW_BODY_RESET);
+    .replace(/@import\s+["'](?:@[\w-]+\/)?stomme\/styles\.css["'];?/, () => libCss + PREVIEW_BODY_RESET + styleCss);
   // Theme tokens from theme.md → :root, so the INLINE preview mockups (Identity, Contact,
   // …) use the site's actual colours, not the build-time defaults baked into styles.css.
   // (iframe previews already load the real themed page.) Mirrors Base.astro's themeVars.
