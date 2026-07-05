@@ -1,0 +1,260 @@
+{
+  "generatedFrom": "940d8a6",
+  "collections": {
+    "contact": {
+      "fields": [
+        "phone",
+        "phoneE164",
+        "email",
+        "protectContact",
+        "address",
+        "hours",
+        "hoursNote",
+        "holidayHours",
+        "away",
+        "socials",
+        "orgNr",
+        "founded"
+      ],
+      "passthrough": false,
+      "nested": {
+        "address": [
+          "street",
+          "postcode",
+          "city",
+          "country",
+          "lat",
+          "lng"
+        ],
+        "away": [
+          "enabled",
+          "message",
+          "until"
+        ]
+      }
+    },
+    "faq": {
+      "fields": [
+        "question",
+        "answer",
+        "order",
+        "tags"
+      ],
+      "passthrough": false
+    },
+    "footer": {
+      "fields": [
+        "dark",
+        "tagline",
+        "showLinks",
+        "linksHeading",
+        "links",
+        "links2Heading",
+        "links2",
+        "showTowns",
+        "townsHeading",
+        "legal",
+        "note",
+        "showLogo",
+        "showWordmark"
+      ],
+      "passthrough": false
+    },
+    "home": {
+      "fields": [
+        "seo",
+        "blocks"
+      ],
+      "passthrough": true,
+      "nested": {
+        "seo": [
+          "title",
+          "description",
+          "image"
+        ]
+      }
+    },
+    "navigation": {
+      "fields": [
+        "items",
+        "cta",
+        "sticky",
+        "showLogo",
+        "showWordmark"
+      ],
+      "passthrough": false,
+      "nested": {
+        "cta": [
+          "label",
+          "link"
+        ]
+      }
+    },
+    "pages": {
+      "fields": [
+        "title",
+        "seo",
+        "blocks",
+        "published"
+      ],
+      "passthrough": true,
+      "nested": {
+        "seo": [
+          "title",
+          "description",
+          "image"
+        ]
+      }
+    },
+    "posts": {
+      "fields": [
+        "title",
+        "date",
+        "excerpt",
+        "cover",
+        "showCover"
+      ],
+      "passthrough": false
+    },
+    "services": {
+      "fields": [
+        "title",
+        "navLabel",
+        "summary",
+        "order",
+        "bullets",
+        "image",
+        "imageAlt",
+        "seo",
+        "blocks"
+      ],
+      "passthrough": true,
+      "nested": {
+        "seo": [
+          "title",
+          "description",
+          "image"
+        ]
+      }
+    },
+    "settings": {
+      "fields": [
+        "name",
+        "logo",
+        "favicon",
+        "appleIcon",
+        "ogImage"
+      ],
+      "passthrough": false,
+      "nested": {
+        "logo": [
+          "image",
+          "alt",
+          "textPre",
+          "textAccent"
+        ]
+      }
+    },
+    "testimonials": {
+      "fields": [
+        "name",
+        "role",
+        "quote",
+        "order"
+      ],
+      "passthrough": false
+    },
+    "thanks": {
+      "fields": [
+        "variant",
+        "heading",
+        "message",
+        "buttonLabel",
+        "button",
+        "button2Label",
+        "button2",
+        "showContact"
+      ],
+      "passthrough": false
+    },
+    "theme": {
+      "fields": [
+        "brand",
+        "ink",
+        "onDark",
+        "surface",
+        "paper",
+        "line",
+        "secondary",
+        "highlight",
+        "dark",
+        "darkInk",
+        "darkLine",
+        "fontDisplay",
+        "fontBody",
+        "fontCustomFile",
+        "fontCustomBodyFile",
+        "eyebrow",
+        "eyebrowColor"
+      ],
+      "passthrough": false
+    },
+    "towns": {
+      "fields": [
+        "name",
+        "title",
+        "order",
+        "heroSubtitle",
+        "heroNote",
+        "why",
+        "problems",
+        "districts",
+        "localCase",
+        "services",
+        "image",
+        "imageAlt",
+        "seo"
+      ],
+      "passthrough": false,
+      "nested": {
+        "seo": [
+          "title",
+          "description",
+          "image"
+        ]
+      }
+    },
+    "tracking": {
+      "fields": [
+        "gtmId",
+        "ga4Id",
+        "metaPixelId",
+        "privacyUrl"
+      ],
+      "passthrough": false
+    }
+  },
+  "presets": {
+    "article": {
+      "fields": [
+        "title",
+        "date",
+        "excerpt",
+        "cover",
+        "showCover"
+      ]
+    },
+    "catalog": {
+      "fields": [
+        "title",
+        "price",
+        "status",
+        "category",
+        "cover",
+        "gallery",
+        "specs",
+        "date"
+      ]
+    }
+  }
+}

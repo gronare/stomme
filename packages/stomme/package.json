@@ -38,8 +38,12 @@
     "./routes/*": "./routes/*",
     "./blocks/*": "./blocks/*"
   },
+  "scripts": {
+    "gen:schema-manifest": "node bin/gen-schema-manifest.mjs"
+  },
   "bin": {
     "stomme-gen": "bin/gen-admin-blocks.mjs",
+    "stomme-gen-schema": "bin/gen-schema-manifest.mjs",
     "stomme-new-block": "bin/new-block.mjs",
     "stomme-lint-styles": "bin/lint-styles.mjs"
   },
@@ -52,6 +56,7 @@
     "routes",
     "catalog.ts",
     "collections.ts",
+    "schema-manifest.json",
     "integration.mjs",
     "integration.d.ts",
     "DirectContact.astro",
