@@ -370,17 +370,24 @@ const lb = 'max-width:74rem;margin:0 auto;padding:2.75rem 1.5rem 0.5rem;font-siz
         const enabled = [];
         const outDir = resolve(root, '.astro/stomme');
 
-        // Optional theme "style": splice the theme layer into the site's global.css. Resolve
-        // the themes dir from STOMME_THEMES_DIR or the sibling `stomme-themes/themes` checkout
-        // (relative to this integration's own location: packages/stomme → ../../../).
+        // Optional theme "style": splice the theme layer into the site's global.css.
+        // The themes directory is supplied entirely via STOMME_THEMES_DIR — the engine
+        // hardcodes no theme location or repo name, so any theme collection can be used.
         if (style) {
-          const themesDir = process.env.STOMME_THEMES_DIR || resolve(pkgDir, '../../../stomme-themes/themes');
+          const themesDir = process.env.STOMME_THEMES_DIR;
+          if (!themesDir) {
+            throw new Error(
+              `stomme: style "${style}" is set but STOMME_THEMES_DIR is not. ` +
+              `Point it at the directory that holds your theme folders — ` +
+              `a missing theme would silently ship unstyled pixels.`,
+            );
+          }
           const styleDir = resolve(themesDir, style);
           const themeCssPath = resolve(styleDir, 'theme.css');
           if (!existsSync(themeCssPath)) {
             throw new Error(
               `stomme: style "${style}" has no theme.css at ${themeCssPath}. ` +
-              `Set STOMME_THEMES_DIR to your themes checkout or fix the style name — ` +
+              `Check STOMME_THEMES_DIR and the style name — ` +
               `a missing theme would silently ship unstyled pixels.`,
             );
           }

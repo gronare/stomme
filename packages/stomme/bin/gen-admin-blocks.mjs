@@ -78,14 +78,18 @@ if (blogEnabled && !LISTINGS.some((l) => l.id === 'posts')) {
   LISTINGS.unshift({ id: 'posts', route: ROUTES.blog || '/blog', label: 'Blog', preset: 'article' });
 }
 
-// Optional look & feel ("style"). Resolve the theme directory the same way the integration
-// does: STOMME_THEMES_DIR or a `stomme-themes/themes` checkout beside the engine repo
-// (here = packages/stomme/bin, so ../../../.. reaches the projects dir). When a style is set
-// the theme's colour SEED is written to src/content/theme/theme.md ONCE, on a site that has no
-// theme.md yet — never overwriting an existing one, so an editor keeps ownership of the colours.
-const STYLE_DIR = STYLE
-  ? resolve(process.env.STOMME_THEMES_DIR || resolve(here, '../../../../stomme-themes/themes'), STYLE)
-  : null;
+// Optional look & feel ("style"). The theme directory is supplied entirely via
+// STOMME_THEMES_DIR (the engine hardcodes no theme location or repo name). When a style
+// is set the theme's colour SEED is written to src/content/theme/theme.md ONCE, on a site
+// that has no theme.md yet — never overwriting an existing one, so an editor keeps
+// ownership of the colours.
+if (STYLE && !process.env.STOMME_THEMES_DIR) {
+  throw new Error(
+    `stomme-gen: style "${STYLE}" is set but STOMME_THEMES_DIR is not. ` +
+    `Point it at the directory that holds your theme folders.`,
+  );
+}
+const STYLE_DIR = STYLE ? resolve(process.env.STOMME_THEMES_DIR, STYLE) : null;
 if (STYLE_DIR) {
   const themeMd = resolve(root, 'src/content/theme/theme.md');
   const seed = resolve(STYLE_DIR, 'theme-seed.md');
