@@ -42,6 +42,7 @@ import Thanks from '@gronare/stomme/Thanks.astro';
 import DirectContact from '@gronare/stomme/DirectContact.astro';
 import FindUs from '@gronare/stomme/blocks/FindUs.astro';
 import ServicePage from '@gronare/stomme/ServicePage.astro';
+import TownPage from '@gronare/stomme/TownPage.astro';
 import { renderMarkdown } from '@gronare/stomme/markdown';
 
 const kind = Astro.url.searchParams.get('kind');
@@ -104,6 +105,10 @@ const contactDraft = kind === 'contact' && draft && typeof draft === 'object' ? 
 const serviceDraft = kind === 'service' && draft && typeof draft === 'object' ? draft : null;
 const serviceHtml = serviceDraft ? await renderMarkdown(serviceDraft.body || '') : '';
 
+// Town entry: render the REAL TownPage (hero + why body + districts + reasons +
+// services as a ticked list) from the draft. TownPage takes town={ id, data }.
+const townDraft = kind === 'town' && draft && typeof draft === 'object' ? draft : null;
+
 // Identity: render the composed logo (mark + wordmark) with the SAME uploaded-vs-public
 // resolution as Header — an uploaded logo (/src/assets/uploads/…) goes through Astro's
 // image optimizer, so the CMS Identity pane shows the real optimized image. A hand-built
@@ -128,6 +133,8 @@ const idOptimized = idLogo.image && idUploads[idLogo.image] ? idUploads[idLogo.i
   </div></Base>
 ) : kind === 'service' ? (
   <Base title="Preview"><div id="preview-root"><ServicePage data={serviceDraft ?? {}} bodyHtml={serviceHtml} config={site} /></div></Base>
+) : kind === 'town' ? (
+  <Base title="Preview"><div id="preview-root"><TownPage town={{ id: 'preview', data: townDraft ?? {} }} config={site} /></div></Base>
 ) : kind === 'identity' ? (
   <Base title="Preview" chrome={false}><div id="preview-root">
     <div class="logo" style="display:flex;align-items:center;gap:0.75rem;padding:1.5rem">
