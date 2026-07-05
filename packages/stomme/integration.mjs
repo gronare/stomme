@@ -30,7 +30,7 @@ function previewEntrypoint(isStatic) {
   return `---
 export const prerender = ${isStatic ? 'true' : 'false'};
 import Base from '@stomme/base';
-import { site } from '@stomme/config';
+import { site, features } from '@stomme/config';
 import { getCollection, getEntry } from 'astro:content';
 import { resolveSite } from '@gronare/stomme/config';
 import { resolveLink } from '@gronare/stomme/href';
@@ -119,7 +119,7 @@ const serviceHtml = serviceDraft ? await renderMarkdown(serviceDraft.body || '')
 ) : kind === 'service' ? (
   <Base title="Preview"><div id="preview-root"><ServicePage data={serviceDraft ?? {}} bodyHtml={serviceHtml} config={site} /></div></Base>
 ) : (
-  <Base title="Preview"><div id="preview-root"><BlockRenderer blocks={blocks} config={site} /></div></Base>
+  <Base title="Preview"><div id="preview-root"><BlockRenderer blocks={blocks} config={site} features={features} /></div></Base>
 )}
 <script is:inline>
   // Live updates without reloading: the CMS keeps this iframe mounted (stable src) and

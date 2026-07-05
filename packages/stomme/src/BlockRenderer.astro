@@ -33,7 +33,7 @@ import LogoStrip from '../blocks/LogoStrip.astro';
 import ContactForm from '../blocks/ContactForm.astro';
 import ContactCard from '../blocks/ContactCard.astro';
 import FindUs from '../blocks/FindUs.astro';
-import { resolveSite, type SiteConfig } from './config';
+import { resolveSite, resolveFeatures, type SiteConfig, type StommeFeatures } from './config';
 
 const defaults: Record<string, any> = {
   hero: Hero,
@@ -73,17 +73,24 @@ interface Props {
   blocks?: { type: string; surface?: string; [key: string]: unknown }[];
   registry?: Record<string, any>;
   config?: SiteConfig;
+  features?: StommeFeatures;
 }
-const { blocks = [], registry = {}, config } = Astro.props;
+const { blocks = [], registry = {}, config, features } = Astro.props;
 const reg = { ...defaults, ...registry };
 // Resolved per-site config (routes/locale/strings), forwarded to every block as
 // `site` so blocks needn't be wired individually.
 const site = resolveSite(config);
+// Feature gating. contactForm is the only block gated here and it defaults ON, so a page
+// that passes no `features` (or doesn't set the flag) renders exactly as before (rule
+// zero). Only an explicit contactForm:false drops the block. Gating SKIPS existing blocks
+// — it never injects one — so a page with no contactForm block is unaffected.
+const feats = resolveFeatures(features);
+const rendered = feats.contactForm === false ? blocks.filter((b) => b.type !== 'contactForm') : blocks;
 
 const surfaceClass: Record<string, string> = { tint: 'surface-tint', band: 'band', dark: 'surface-dark', gradient: 'surface-gradient' };
 ---
 {
-  blocks.map((block) => {
+  rendered.map((block) => {
     const Component = reg[block.type];
     if (!Component) {
       return (
