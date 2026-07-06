@@ -1,0 +1,19 @@
+{
+  "scaffoldVersion": 1,
+  "files": [
+    {
+      "path": "src/blocks/schema.ts",
+      "requires": ["defaultBlocks"],
+      "severity": "warn",
+      "hint": "src/blocks/schema.ts ska bygga på [...defaultBlocks] så nya motorblock propagerar automatiskt vid ombygge.",
+      "fixable": false
+    },
+    {
+      "path": "astro.config.mjs",
+      "requires": ["stomme("],
+      "severity": "crit",
+      "hint": "astro.config.mjs måste anropa stomme(...) — annars injiceras inga motorrutter/features.",
+      "fixable": false
+    }
+  ]
+}
