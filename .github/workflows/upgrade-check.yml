@@ -135,7 +135,11 @@ jobs:
           # both A and B render with the site's real theme in place.
           if [ -d stomme-themes/themes ]; then export STOMME_THEMES_DIR="$PWD/stomme-themes/themes"; fi
           render() {  # $1 = engine sha, $2 = output dir
-            git -C stomme checkout -q "$1"
+            # -f + clean: a build can dirty the engine checkout (older engines
+            # regenerate manifest files in-tree), and a dirty tree makes the
+            # SECOND checkout fail with "local changes would be overwritten".
+            git -C stomme checkout -qf "$1"
+            git -C stomme clean -fdq -- packages/stomme
             (cd stomme && pnpm install --frozen-lockfile --silent)
             rm -rf site/dist
             (cd site && STOMME_LOOKBOOK=1 $BUILD_CMD > /dev/null)
