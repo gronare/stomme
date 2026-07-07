@@ -49,6 +49,27 @@ jobs:
             echo "status=promote" >> "$GITHUB_OUTPUT"
           fi
 
+      # Tell the control plane the promote has started, so it can show live
+      # run-state while the gates run. Only when there's a diff to promote — an
+      # up_to_date short-circuit never reports "started". Same HMAC-signed,
+      # non-blocking pattern as the final report below; skips silently when no
+      # webhook url/secret is supplied.
+      - name: Report start
+        if: steps.diff.outputs.status == 'promote'
+        env:
+          REPORT_URL: ${{ secrets.report_url }}
+          SECRET: ${{ secrets.report_secret }}
+        run: |
+          [ -z "$SECRET" ] || [ -z "$REPORT_URL" ] && { echo "no report url/secret - skipping report"; exit 0; }
+          BODY=$(jq -nc --arg repo "$GITHUB_REPOSITORY" --arg status "started" \
+            --arg from "${{ steps.diff.outputs.from }}" --arg to "${{ steps.diff.outputs.to }}" \
+            --arg run_url "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" \
+            '{repo:$repo,status:$status,from:$from,to:$to,run_url:$run_url}')
+          SIG=$(printf '%s' "$BODY" | openssl dgst -sha256 -hmac "$SECRET" | awk '{print $NF}')
+          curl -sf -X POST -H "Content-Type: application/json" \
+            -H "X-the control plane-Signature: $SIG" -d "$BODY" \
+            "$REPORT_URL" || echo "report failed (non-blocking)"
+
       - name: Setup pnpm
         if: steps.diff.outputs.status == 'promote'
         uses: pnpm/action-setup@v4

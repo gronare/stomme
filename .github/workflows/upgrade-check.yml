@@ -80,6 +80,26 @@ jobs:
             echo "status=check" >> "$GITHUB_OUTPUT"
           fi
 
+      # Tell the control plane the run has started, so it can show live run-state
+      # while the A/B render runs. Only when there's real work to do — an
+      # up_to_date/follows_release short-circuit never reports "started". Same
+      # HMAC-signed, non-blocking pattern as the report step below; skips silently
+      # when no webhook url/secret is supplied.
+      - name: Report start
+        if: steps.pin.outputs.status == 'check'
+        env:
+          REPORT_URL: ${{ secrets.report_url }}
+          SECRET: ${{ secrets.report_secret }}
+        run: |
+          [ -z "$SECRET" ] || [ -z "$REPORT_URL" ] && { echo "no report url/secret - skipping report"; exit 0; }
+          BODY=$(jq -nc --arg repo "$GITHUB_REPOSITORY" --arg status "started" \
+            --arg run_url "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" \
+            '{repo:$repo,status:$status,run_url:$run_url}')
+          SIG=$(printf '%s' "$BODY" | openssl dgst -sha256 -hmac "$SECRET" | awk '{print $NF}')
+          curl -sf -X POST -H "Content-Type: application/json" \
+            -H "X-the control plane-Signature: $SIG" -d "$BODY" \
+            "$REPORT_URL" || echo "report failed (non-blocking)"
+
       - name: Setup pnpm
         if: steps.pin.outputs.status == 'check'
         uses: pnpm/action-setup@v4
