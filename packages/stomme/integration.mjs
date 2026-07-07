@@ -1,6 +1,6 @@
 import { fileURLToPath } from 'node:url';
 import { resolve, dirname } from 'node:path';
-import { mkdirSync, writeFileSync, existsSync, readFileSync } from 'node:fs';
+import { mkdirSync, writeFileSync, existsSync, readFileSync, readdirSync } from 'node:fs';
 
 // stomme Astro integration — injects collection-detail routes.
 //
@@ -264,14 +264,30 @@ const REVEAL = `
 // A named style whose theme.css is missing throws at build (a silent neutral fallback would
 // ship unstyled pixels). Without a style this plugin is never registered — output is unchanged.
 const STYLE_IMPORT_RE = /@import\s+["'](?:@[\w-]+\/)?stomme\/styles\.css["'];?/;
-function styleThemePlugin(style, styleDir, globalCssPath) {
+// The site's stylesheet is `src/styles/global.css`; match by basename so a realpath'd id
+// (see below) still resolves. `?query` / backslash forms are normalized before the test.
+const GLOBAL_CSS_RE = /(^|\/)global\.css$/;
+// A custom property left in the spliced output. Unlike a CSS comment it survives
+// minification, so the astro:build:done guard can confirm the theme layer actually
+// reached the emitted CSS — a green build that silently shipped no theme is the failure
+// this whole path exists to prevent.
+const STYLE_SENTINEL = '--stomme-style';
+
+function styleThemePlugin(style, styleDir) {
   const tokensPath = resolve(styleDir, 'tokens.css');
   const themePath = resolve(styleDir, 'theme.css');
   return {
     name: 'stomme:style',
     enforce: 'pre',
     transform(code, id) {
-      if (id.split('?')[0] !== globalCssPath) return null;
+      // Identify the seam by the engine @import it carries + a global.css basename, NOT by
+      // an exact filesystem path. Vite resolves module ids to their realpath, which diverges
+      // from a `resolve(config.root, …)` path under symlinked / pnpm checkouts (notably Linux
+      // CI): the old `id === globalCssPath` check then silently no-ops and the site ships
+      // unthemed with a green build. Content + basename matching fires in every build pass
+      // (server AND client) and in dev, regardless of how the id was resolved.
+      const bare = id.split('?')[0].replace(/\\/g, '/');
+      if (!GLOBAL_CSS_RE.test(bare)) return null;
       if (!STYLE_IMPORT_RE.test(code)) return null;
       // Reload in dev when the theme files change.
       if (existsSync(tokensPath)) this.addWatchFile(tokensPath);
@@ -279,11 +295,30 @@ function styleThemePlugin(style, styleDir, globalCssPath) {
       const tokens = existsSync(tokensPath) ? readFileSync(tokensPath, 'utf8') : '';
       const theme = readFileSync(themePath, 'utf8');
       const injected =
+        `\n:root{${STYLE_SENTINEL}:${JSON.stringify(style)}}` +
         `\n/* stomme style "${style}" — tokens (fonts + shape vars) */\n${tokens}` +
         `\n/* stomme style "${style}" — theme (component layer) */\n${theme}\n`;
       return { code: code.replace(STYLE_IMPORT_RE, (m) => m + injected), map: null };
     },
   };
+}
+
+// Build-end assertion: when a style is set, at least one emitted stylesheet (or inlined
+// <style>) must carry the sentinel. Cheap + target-agnostic — only .css/.html are read.
+function emittedCssHasStyle(dir) {
+  const stack = [dir];
+  while (stack.length) {
+    const cur = stack.pop();
+    let entries;
+    try { entries = readdirSync(cur, { withFileTypes: true }); } catch { continue; }
+    for (const ent of entries) {
+      const p = resolve(cur, ent.name);
+      if (ent.isDirectory()) { stack.push(p); continue; }
+      if (!/\.(css|html)$/i.test(ent.name)) continue;
+      try { if (readFileSync(p, 'utf8').includes(STYLE_SENTINEL)) return true; } catch { /* skip */ }
+    }
+  }
+  return false;
 }
 
 export default function stomme(options = {}) {
@@ -417,8 +452,7 @@ const lb = 'max-width:74rem;margin:0 auto;padding:2.75rem 1.5rem 0.5rem;font-siz
               `a missing theme would silently ship unstyled pixels.`,
             );
           }
-          const globalCssPath = resolve(root, 'src/styles/global.css');
-          updateConfig({ vite: { plugins: [styleThemePlugin(style, styleDir, globalCssPath)] } });
+          updateConfig({ vite: { plugins: [styleThemePlugin(style, styleDir)] } });
           enabled.push(`style:${style}`);
         }
 
@@ -492,6 +526,25 @@ const lb = 'max-width:74rem;margin:0 auto;padding:2.75rem 1.5rem 0.5rem;font-siz
         }
 
         logger?.info(enabled.length ? `routes: ${enabled.join(', ')}` : 'no feature/listing routes enabled');
+      },
+
+      // When a style is configured, prove the theme layer reached the emitted CSS. The
+      // splice runs in a Vite transform whose reach varies by target/build-pass; if it ever
+      // silently no-ops (e.g. a realpath'd id, a future Astro change), the site would ship a
+      // GREEN build with no theme — the worst outcome. Hard-fail instead. Cheap: scans only
+      // the emitted .css/.html for the sentinel custom property.
+      'astro:build:done': ({ dir, logger }) => {
+        if (!style) return;
+        const outDir = fileURLToPath(dir);
+        if (emittedCssHasStyle(outDir)) {
+          logger?.info(`style "${style}" verified in emitted CSS`);
+          return;
+        }
+        throw new Error(
+          `stomme: style "${style}" is configured but the theme layer is missing from the ` +
+          `emitted CSS (no "${STYLE_SENTINEL}" sentinel under ${outDir}). The style splice ` +
+          `silently failed — the site would ship unstyled. Failing the build.`,
+        );
       },
     },
   };
