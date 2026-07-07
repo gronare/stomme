@@ -140,6 +140,25 @@ jobs:
           if [ -d stomme-themes/themes ]; then export STOMME_THEMES_DIR="$PWD/stomme-themes/themes"; fi
           (cd site && $BUILD_CMD)
 
+      # Progress report: gates are green, the fast-forward is about to happen —
+      # lets the control plane show "releasing" instead of a generic "running".
+      # Same non-blocking pattern as the other reports.
+      - name: Report releasing
+        if: steps.diff.outputs.status == 'promote'
+        env:
+          REPORT_URL: ${{ secrets.report_url }}
+          SECRET: ${{ secrets.report_secret }}
+        run: |
+          [ -z "$SECRET" ] || [ -z "$REPORT_URL" ] && { echo "no report url/secret - skipping report"; exit 0; }
+          BODY=$(jq -nc --arg repo "$GITHUB_REPOSITORY" --arg status "releasing" \
+            --arg from "${{ steps.diff.outputs.from }}" --arg to "${{ steps.diff.outputs.to }}" \
+            --arg run_url "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" \
+            '{repo:$repo,status:$status,from:$from,to:$to,run_url:$run_url}')
+          SIG=$(printf '%s' "$BODY" | openssl dgst -sha256 -hmac "$SECRET" | awk '{print $NF}')
+          curl -sf -X POST -H "Content-Type: application/json" \
+            -H "X-the control plane-Signature: $SIG" -d "$BODY" \
+            "$REPORT_URL" || echo "report failed (non-blocking)"
+
       # Only reached when the lint AND canary above succeeded (a custom if without
       # a status function is implicitly ANDed with success()). Plain fast-forward
       # — never force.
