@@ -7,15 +7,13 @@
 # canary/sidecar repos and the report webhook come from repo vars/secrets.
 name: Promote
 
-# Auto-promote: every push to main attempts a gated promote — green gates
-# advance release by themselves, a red gate leaves it untouched (and reports).
-# The dispatch trigger stays for the control plane's manual button/retries.
+# Dispatch-only, by operator decision: pushing main must NOT promote by
+# itself — the operator presses the button (the control plane), and THAT single
+# press runs every gate and advances release if nothing reports red.
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
 
-# One promote at a time; a newer push supersedes an in-flight attempt (the
+# One promote at a time; a second press supersedes an in-flight attempt (the
 # fast-forward always targets the CURRENT main tip, so cancelling is safe).
 concurrency:
   group: promote
