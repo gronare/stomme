@@ -1,0 +1,145 @@
+# Promote — advance the engine `release` branch (what every site's CI builds
+# from) up to `main`, gated by a style lint and a canary build of an operator's
+# showcase site against the current main engine. If a gate fails, `release` is
+# left untouched, so a broken engine commit never reaches customer sites. This
+# is the CI form of the local stomme-promote script, dispatchable by a control
+# plane (the control plane). Nothing operator-specific lives in this file — the
+# canary/sidecar repos and the report webhook come from repo vars/secrets.
+name: Promote
+
+on:
+  workflow_dispatch:
+
+jobs:
+  promote:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write   # needed to fast-forward release -> main
+    steps:
+      - name: Checkout engine (full history — needs both main and release)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          path: stomme
+
+      # from = current release tip, to = current main tip (HEAD when dispatched
+      # from main). Equal ⇒ nothing to promote: short-circuit to an up_to_date
+      # report and skip every gate below via the status output.
+      - name: Compute release..main
+        id: diff
+        run: |
+          FROM=$(git -C stomme rev-parse origin/release)
+          TO=$(git -C stomme rev-parse origin/main)
+          echo "from=$FROM" >> "$GITHUB_OUTPUT"
+          echo "to=$TO" >> "$GITHUB_OUTPUT"
+          if [ "$FROM" = "$TO" ]; then
+            echo "status=up_to_date" >> "$GITHUB_OUTPUT"
+          else
+            echo "status=promote" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Setup pnpm
+        if: steps.diff.outputs.status == 'promote'
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.8.0
+
+      - name: Setup Node
+        if: steps.diff.outputs.status == 'promote'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      # Sentinel-leak lint: no NEW hardcoded colors outside :root (themes can't
+      # recolor those). A real leak blocks the promote. Standalone node script,
+      # so it runs before any install.
+      - name: Style lint (blocks the promote)
+        if: steps.diff.outputs.status == 'promote'
+        working-directory: stomme
+        run: node packages/stomme/bin/lint-styles.mjs
+
+      # Canary is optional: set vars.PROMOTE_CANARY_REPO to an operator's showcase
+      # site to gate on a real build against the current main engine. Unset/empty
+      # ⇒ the canary steps below are all skipped and the promote is gated by the
+      # style lint ALONE.
+      - name: Checkout canary site (optional)
+        if: steps.diff.outputs.status == 'promote' && vars.PROMOTE_CANARY_REPO != ''
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ vars.PROMOTE_CANARY_REPO }}
+          token: ${{ secrets.REPOS_TOKEN }}
+          path: site
+
+      # Optional private themes checkout so the canary builds exactly like the
+      # site's own deploy. continue-on-error mirrors the deploy: a themeless site
+      # is never blocked by a failed optional checkout — a site that NEEDS the
+      # theme then fails the same way its deploy would.
+      - name: Checkout themes (optional)
+        if: steps.diff.outputs.status == 'promote' && vars.PROMOTE_THEMES_REPO != ''
+        continue-on-error: true
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ vars.PROMOTE_THEMES_REPO }}
+          token: ${{ secrets.REPOS_TOKEN }}
+          path: stomme-themes
+
+      # The canary pins the engine as link:../stomme/packages/stomme, so it
+      # resolves site/../stomme/packages/stomme — exactly the site/stomme layout
+      # checked out above. Install both like the deploy does.
+      - name: Install engine deps
+        if: steps.diff.outputs.status == 'promote' && vars.PROMOTE_CANARY_REPO != ''
+        working-directory: stomme
+        run: pnpm install --frozen-lockfile
+
+      - name: Install site deps
+        if: steps.diff.outputs.status == 'promote' && vars.PROMOTE_CANARY_REPO != ''
+        working-directory: site
+        run: pnpm install --frozen-lockfile
+
+      # Build the canary with the SAME target its own deploy uses — gate exactly
+      # what ships. A breaking engine change fails here and release is never
+      # advanced.
+      - name: Canary build (current main engine)
+        if: steps.diff.outputs.status == 'promote' && vars.PROMOTE_CANARY_REPO != ''
+        run: |
+          set -e
+          BUILD_CMD=$(grep -oE 'pnpm run build:[a-z]+' site/.github/workflows/deploy.yml | head -1)
+          BUILD_CMD=${BUILD_CMD:-pnpm build}
+          # Theme env only when the optional checkout landed (if/then/fi — a bare
+          # [ -d ] && chain would fail under set -e and kill the step).
+          if [ -d stomme-themes/themes ]; then export STOMME_THEMES_DIR="$PWD/stomme-themes/themes"; fi
+          (cd site && $BUILD_CMD)
+
+      # Only reached when the lint AND canary above succeeded (a custom if without
+      # a status function is implicitly ANDed with success()). Plain fast-forward
+      # — never force.
+      - name: Fast-forward release -> main
+        id: push
+        if: steps.diff.outputs.status == 'promote'
+        run: git -C stomme push origin main:release
+
+      # Report to the control plane (HMAC-signed, non-blocking) — same pattern as
+      # upgrade-check. Missing url/secret ⇒ skip. status: up_to_date short-circuit,
+      # else promoted iff the push succeeded, else canary_failed.
+      - name: Report to control plane
+        if: always()
+        env:
+          REPORT_URL: ${{ secrets.report_url }}
+          SECRET: ${{ secrets.report_secret }}
+        run: |
+          [ -z "$SECRET" ] || [ -z "$REPORT_URL" ] && { echo "no report url/secret - skipping report"; exit 0; }
+          STATUS="${{ steps.diff.outputs.status }}"
+          if [ "$STATUS" != "up_to_date" ]; then
+            if [ "${{ steps.push.outcome }}" = "success" ]; then STATUS="promoted"; else STATUS="canary_failed"; fi
+          fi
+          FROM="${{ steps.diff.outputs.from }}"
+          TO="${{ steps.diff.outputs.to }}"
+          COMMITS=$(git -C stomme rev-list --count "$FROM..$TO" 2>/dev/null || echo 0)
+          BODY=$(jq -nc --arg repo "$GITHUB_REPOSITORY" --arg status "$STATUS" \
+            --arg from "$FROM" --arg to "$TO" --argjson commits "${COMMITS:-0}" \
+            --arg run_url "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" \
+            '{repo:$repo,status:$status,from:$from,to:$to,commits:$commits,run_url:$run_url}')
+          SIG=$(printf '%s' "$BODY" | openssl dgst -sha256 -hmac "$SECRET" | awk '{print $NF}')
+          curl -sf -X POST -H "Content-Type: application/json" \
+            -H "X-the control plane-Signature: $SIG" -d "$BODY" \
+            "$REPORT_URL" || echo "report failed (non-blocking)"
