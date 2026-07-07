@@ -14,6 +14,13 @@
       "severity": "crit",
       "hint": "astro.config.mjs måste anropa stomme(...) — annars injiceras inga motorrutter/features.",
       "fixable": false
+    },
+    {
+      "path": ".github/workflows/deploy.yml",
+      "requires": ["STOMME_THEMES_DIR"],
+      "severity": "warn",
+      "hint": "deploy.yml ska checka ut temarepot (continue-on-error) och sätta STOMME_THEMES_DIR i byggsteget — annars når teman inte sajten.",
+      "fixable": false
     }
   ]
 }

@@ -10,7 +10,17 @@ name: Upgrade check
 
 on:
   workflow_call:
+    inputs:
+      # Optional private themes checkout, so A and B build exactly like the site's
+      # deploy does. The repo name is supplied by the CALLER — nothing
+      # operator-specific lives in this file.
+      themes_repo:
+        type: string
+        required: false
+        default: ""
     secrets:
+      repos_token:
+        required: false
       report_url:
         required: false
       report_secret:
@@ -33,6 +43,19 @@ jobs:
           repository: gronare/stomme
           fetch-depth: 0
           path: stomme
+
+      # continue-on-error mirrors the deploy: a themeless site must never be
+      # blocked by a failed optional checkout — and a site that NEEDS the theme
+      # then fails the same way its deploy would (the engine throws when a
+      # style is set without STOMME_THEMES_DIR).
+      - name: Checkout themes (optional)
+        if: inputs.themes_repo != ''
+        continue-on-error: true
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ inputs.themes_repo }}
+          token: ${{ secrets.repos_token }}
+          path: stomme-themes
 
       - name: Read pin & release
         id: pin
@@ -88,6 +111,9 @@ jobs:
           # Build with the same target the site's deploy uses — gate what ships.
           BUILD_CMD=$(grep -oE 'pnpm run build:[a-z]+' site/.github/workflows/deploy.yml | head -1)
           BUILD_CMD=${BUILD_CMD:-pnpm build}
+          # Same theme env as the deploy — set only when the checkout landed, so
+          # both A and B render with the site's real theme in place.
+          if [ -d stomme-themes/themes ]; then export STOMME_THEMES_DIR="$PWD/stomme-themes/themes"; fi
           render() {  # $1 = engine sha, $2 = output dir
             git -C stomme checkout -q "$1"
             (cd stomme && pnpm install --frozen-lockfile --silent)
