@@ -14,3 +14,6 @@ blocks.html
 
 # create-stomme bundles the starter here at publish time (prepack), removed after (postpack)
 packages/create-stomme/template/
+
+# Local AI-tooling workspace — never part of the engine
+.claude/
