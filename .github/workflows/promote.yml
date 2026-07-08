@@ -169,9 +169,11 @@ jobs:
 
       # Report to the control plane (HMAC-signed, non-blocking) — same pattern as
       # upgrade-check. Missing url/secret ⇒ skip. status: up_to_date short-circuit,
-      # else promoted iff the push succeeded, else canary_failed.
+      # else promoted iff the push succeeded, else canary_failed. !cancelled():
+      # a superseded run (concurrency cancel) must NOT report a false canary_failed
+      # and clear the NEW run's live state in the control plane.
       - name: Report to control plane
-        if: always()
+        if: always() && !cancelled()
         env:
           REPORT_URL: ${{ secrets.report_url }}
           SECRET: ${{ secrets.report_secret }}
