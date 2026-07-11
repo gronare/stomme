@@ -84,9 +84,12 @@ jobs:
       # recolor those). A real leak blocks the promote. Standalone node script,
       # so it runs before any install.
       - name: Style lint (blocks the promote)
+        id: lint
         if: steps.diff.outputs.status == 'promote'
         working-directory: stomme
-        run: node packages/stomme/bin/lint-styles.mjs
+        run: |
+          set -o pipefail
+          node packages/stomme/bin/lint-styles.mjs 2>&1 | tee "$GITHUB_WORKSPACE/lint.log"
 
       # Canary is optional: set vars.PROMOTE_CANARY_REPO to an operator's showcase
       # site to gate on a real build against the current main engine. Unset/empty
@@ -130,15 +133,16 @@ jobs:
       # what ships. A breaking engine change fails here and release is never
       # advanced.
       - name: Canary build (current main engine)
+        id: canary
         if: steps.diff.outputs.status == 'promote' && vars.PROMOTE_CANARY_REPO != ''
         run: |
-          set -e
+          set -eo pipefail
           BUILD_CMD=$(grep -oE 'pnpm run build:[a-z]+' site/.github/workflows/deploy.yml | head -1)
           BUILD_CMD=${BUILD_CMD:-pnpm build}
           # Theme env only when the optional checkout landed (if/then/fi — a bare
           # [ -d ] && chain would fail under set -e and kill the step).
           if [ -d stomme-themes/themes ]; then export STOMME_THEMES_DIR="$PWD/stomme-themes/themes"; fi
-          (cd site && $BUILD_CMD)
+          (cd site && $BUILD_CMD) 2>&1 | tee "$GITHUB_WORKSPACE/canary.log"
 
       # Progress report: gates are green, the fast-forward is about to happen —
       # lets the control plane show "releasing" instead of a generic "running".
@@ -169,9 +173,11 @@ jobs:
 
       # Report to the control plane (HMAC-signed, non-blocking) — same pattern as
       # upgrade-check. Missing url/secret ⇒ skip. status: up_to_date short-circuit,
-      # else promoted iff the push succeeded, else canary_failed. !cancelled():
-      # a superseded run (concurrency cancel) must NOT report a false canary_failed
-      # and clear the NEW run's live state in the control plane.
+      # else promoted iff the push succeeded; otherwise the failing gate is named
+      # (lint_failed vs canary_failed) with a short reason from that gate's log, so
+      # the control plane can show WHY without opening the run. !cancelled():
+      # a superseded run (concurrency cancel) must NOT report a false failure and
+      # clear the NEW run's live state in the control plane.
       - name: Report to control plane
         if: always() && !cancelled()
         env:
@@ -180,16 +186,28 @@ jobs:
         run: |
           [ -z "$SECRET" ] || [ -z "$REPORT_URL" ] && { echo "no report url/secret - skipping report"; exit 0; }
           STATUS="${{ steps.diff.outputs.status }}"
+          REASON=""
           if [ "$STATUS" != "up_to_date" ]; then
-            if [ "${{ steps.push.outcome }}" = "success" ]; then STATUS="promoted"; else STATUS="canary_failed"; fi
+            if [ "${{ steps.push.outcome }}" = "success" ]; then
+              STATUS="promoted"
+            elif [ "${{ steps.lint.outcome }}" = "failure" ]; then
+              STATUS="lint_failed"
+              REASON=$(sed -e 's/\x1b\[[0-9;]*m//g' "$GITHUB_WORKSPACE/lint.log" 2>/dev/null | grep -vE '^[[:space:]]*$' | tail -n 6 | tr '\n' ' ' | cut -c1-300)
+            elif [ "${{ steps.canary.outcome }}" = "failure" ]; then
+              STATUS="canary_failed"
+              REASON=$(sed -e 's/\x1b\[[0-9;]*m//g' "$GITHUB_WORKSPACE/canary.log" 2>/dev/null | grep -viE '^[[:space:]]*$|is deprecated|Deprecation' | tail -n 6 | tr '\n' ' ' | cut -c1-300)
+            else
+              STATUS="canary_failed"
+              REASON="Promote failed before the gates (checkout or install)."
+            fi
           fi
           FROM="${{ steps.diff.outputs.from }}"
           TO="${{ steps.diff.outputs.to }}"
           COMMITS=$(git -C stomme rev-list --count "$FROM..$TO" 2>/dev/null || echo 0)
-          BODY=$(jq -nc --arg repo "$GITHUB_REPOSITORY" --arg status "$STATUS" \
+          BODY=$(jq -nc --arg repo "$GITHUB_REPOSITORY" --arg status "$STATUS" --arg reason "$REASON" \
             --arg from "$FROM" --arg to "$TO" --argjson commits "${COMMITS:-0}" \
             --arg run_url "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" \
-            '{repo:$repo,status:$status,from:$from,to:$to,commits:$commits,run_url:$run_url}')
+            '{repo:$repo,status:$status,reason:$reason,from:$from,to:$to,commits:$commits,run_url:$run_url}')
           SIG=$(printf '%s' "$BODY" | openssl dgst -sha256 -hmac "$SECRET" | awk '{print $NF}')
           curl -sf -X POST -H "Content-Type: application/json" \
             -H "X-the control plane-Signature: $SIG" -d "$BODY" \
