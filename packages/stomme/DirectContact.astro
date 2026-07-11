@@ -72,7 +72,7 @@ const slug = (p: string) => p.toLowerCase().replace(/[^a-z]/g, '');
 
   {s.hours && (hours.length > 0 || holiday.length > 0) && (
     <div class="direct-card__sec">
-      <h4 class="mono direct-card__h">Opening hours</h4>
+      <h2 class="mono direct-card__h">Opening hours</h2>
       {holiday.map((hl) => (
         <p class="direct-card__holiday"><span class="direct-card__away-dot" aria-hidden="true"></span><span><b>{hl.when}</b>{hl.note ? ` — ${hl.note}` : ''}</span></p>
       ))}
@@ -90,7 +90,7 @@ const slug = (p: string) => p.toLowerCase().replace(/[^a-z]/g, '');
 
   {s.address && hasAddr && (
     <div class="direct-card__sec">
-      <h4 class="mono direct-card__h">Visit</h4>
+      <h2 class="mono direct-card__h">Visit</h2>
       <p class="direct-card__addr">
         {address.street}{address.street && <br />}
         {addrLine2}{addrLine2 && <br />}
@@ -108,7 +108,7 @@ const slug = (p: string) => p.toLowerCase().replace(/[^a-z]/g, '');
 
   {s.socials && socials.length > 0 && (
     <div class="direct-card__sec">
-      <h4 class="mono direct-card__h">Follow</h4>
+      <h2 class="mono direct-card__h">Follow</h2>
       <div class="direct-card__socials">
         {socials.map((soc) => (
           <a href={soc.url} aria-label={soc.platform} target="_blank" rel="noopener">

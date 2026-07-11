@@ -22,6 +22,9 @@ interface Props {
   site?: any;
 }
 const { eyebrow, heading, intro, source = '', base, columns = 3, showImages = false, filters = false, site } = Astro.props;
+// Item titles are h3 under a section heading, else h2 under the page h1 — no skipped
+// level (see PostList). Astro renders a Capitalized string var as that HTML tag.
+const ItemHeading = heading ? 'h3' : 'h2';
 const prefix = base ?? (source ? `/${source}` : '');
 const readMore = site?.strings?.readMore ?? 'Read more';
 const sl = { available: 'Available', reserved: 'Reserved', sold: 'Sold', all: 'All', ...(site?.strings?.listingStatus || {}) };
@@ -63,7 +66,7 @@ const PLACE = '/images/placeholders/service.svg';
             </div>
           )}
           <div class="listing-body">
-            <h3 class="listing-title">{it.data.title}</h3>
+            <ItemHeading class="listing-title">{it.data.title}</ItemHeading>
             {it.data.price && <p class="listing-price">{it.data.price}</p>}
             {listingSpecRows(it.data, listing).length > 0 && (
               <div class="listing-specs">
