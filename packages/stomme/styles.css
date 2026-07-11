@@ -184,7 +184,7 @@ body > main { flex: 1 0 auto; } /* sticky footer: main grows so the footer sits 
 /* Dark base so the always-white cover text keeps contrast even when the media layer is
    semi-transparent (the animated motion motif) or absent — opaque image/video/gradient
    media sit on top of it, so it only shows through where there's nothing dark to read on. */
-.cover { position: relative; display: flex; overflow: hidden; isolation: isolate; color: #fff; background: var(--color-dark, #141821); }
+.cover { position: relative; display: flex; overflow: hidden; isolation: isolate; color: #fff; background: var(--color-dark); }
 .cover--h-tall { min-height: 100vh; min-height: 100dvh; }
 .cover--h-medium { min-height: 58vh; }
 .cover__media { position: absolute; inset: 0; z-index: -2; }
