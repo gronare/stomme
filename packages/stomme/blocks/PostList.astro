@@ -23,6 +23,10 @@ interface Props {
   site?: any;
 }
 const { eyebrow, heading, intro, showImages = false, featured = false, columns = 3, source = 'posts', base, site } = Astro.props;
+// Item titles sit one level below the section heading when there is one (h2 → h3),
+// but directly below the page h1 when the list has no heading (→ h2), so the heading
+// outline never skips a level. Astro renders a Capitalized string var as that HTML tag.
+const ItemHeading = heading ? 'h3' : 'h2';
 const prefix = base ?? site?.routes?.blog ?? '/blog';
 const locale = site?.locale ?? 'en-US';
 const readMore = site?.strings?.readMore ?? 'Read more';
@@ -54,7 +58,7 @@ const hasImg = (p: any) => !!(showImages && p.data.showCover);
         )}
         <div class="post-feature__body">
           <p class="mono">{fmt(lead.data.date)}</p>
-          <h3 class="post-feature__title">{lead.data.title}</h3>
+          <ItemHeading class="post-feature__title">{lead.data.title}</ItemHeading>
           {lead.data.excerpt && <p class="post-excerpt">{lead.data.excerpt}</p>}
           <span class="mono post-more">{readMore} →</span>
         </div>
@@ -69,7 +73,7 @@ const hasImg = (p: any) => !!(showImages && p.data.showCover);
             )}
             <div class="post-card__body">
               <p class="mono">{fmt(p.data.date)}</p>
-              <h3 class="post-title">{p.data.title}</h3>
+              <ItemHeading class="post-title">{p.data.title}</ItemHeading>
               {p.data.excerpt && <p class="post-excerpt">{p.data.excerpt}</p>}
               <span class="mono post-more">{readMore} →</span>
             </div>
