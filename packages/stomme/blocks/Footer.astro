@@ -4,6 +4,11 @@ import { Image } from 'astro:assets';
 import type { ImageMetadata } from 'astro';
 import { resolveLink } from '../src/href';
 import ContactLink from '../ContactLink.astro';
+// Slot at the end of the footer (STOMME_SLOTS_DIR seam): the site build aliases this to
+// the supplied slot component when one exists, else to a noop that renders nothing. Sits
+// flush after .inner's close tag — on its own line it would add a byte of whitespace to
+// every page of every site (newlines collapse to a space).
+import SlotFooterEnd from '@stomme/slot-footer-end';
 
 // Themeable site chrome (footer). Reads the navigation/footer/settings collections
 // by default; accepts them as optional props (CMS preview drafts). Renders a links
@@ -96,5 +101,5 @@ const year = new Date().getFullYear();
         </ul>
       )}
     </div>
-  </div>
+  </div><SlotFooterEnd />
 </footer>

@@ -412,6 +412,24 @@ const lb = 'max-width:74rem;margin:0 auto;padding:2.75rem 1.5rem 0.5rem;font-siz
         // Let the package route entrypoints import the SITE's Base + config — and, for the
         // lookbook, the site's block catalog + renderer (so site-custom blocks render too).
         const siteRenderer = resolve(root, 'src/blocks/BlockRenderer.astro');
+
+        // Component slots — optional components mounted at named engine extension points,
+        // supplied entirely via STOMME_SLOTS_DIR (mirrors STOMME_THEMES_DIR; the engine
+        // hardcodes no slot location or repo name). Each slot aliases to the supplied file
+        // when present, else to a noop that renders nothing, so a site with no slots dir
+        // builds exactly as before.
+        const SLOT_NAMES = ['footer-end', 'footer-legal-end', 'header-end', 'head-end', 'body-end'];
+        const slotsDir = process.env.STOMME_SLOTS_DIR;
+        const slotNoop = resolve(pkgDir, 'src/SlotNoop.astro');
+        const slotAlias = {};
+        const slotsOn = [];
+        for (const name of SLOT_NAMES) {
+          const file = slotsDir ? resolve(slotsDir, `${name}.astro`) : null;
+          const on = !!(file && existsSync(file));
+          slotAlias[`@stomme/slot-${name}`] = on ? file : slotNoop;
+          if (on) slotsOn.push(name);
+        }
+
         updateConfig({
           vite: {
             resolve: {
@@ -420,8 +438,11 @@ const lb = 'max-width:74rem;margin:0 auto;padding:2.75rem 1.5rem 0.5rem;font-siz
                 '@stomme/config': resolve(root, configPath),
                 '@stomme/catalog': resolve(root, 'src/blocks/schema.ts'),
                 '@stomme/renderer': existsSync(siteRenderer) ? siteRenderer : resolve(pkgDir, 'src/BlockRenderer.astro'),
+                ...slotAlias,
               },
             },
+            // Dev server must be allowed to read slot files outside the project root.
+            ...(slotsDir ? { server: { fs: { allow: [slotsDir] } } } : {}),
           },
         });
 
@@ -429,6 +450,7 @@ const lb = 'max-width:74rem;margin:0 auto;padding:2.75rem 1.5rem 0.5rem;font-siz
         injectScript('page', REVEAL);
 
         const enabled = [];
+        for (const name of slotsOn) enabled.push(`slot:${name}`);
         const outDir = resolve(root, '.astro/stomme');
 
         // Optional theme "style": splice the theme layer into the site's global.css.
