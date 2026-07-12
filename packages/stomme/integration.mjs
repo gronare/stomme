@@ -45,6 +45,19 @@ import ServicePage from '@gronare/stomme/ServicePage.astro';
 import TownPage from '@gronare/stomme/TownPage.astro';
 import { renderMarkdown } from '@gronare/stomme/markdown';
 
+// Reflected-XSS hardening. /preview renders attacker-controlled ?data= (markdown body,
+// block content) through set:html; on SSR it is an unauthenticated public GET. A strict,
+// per-response nonce'd CSP means an injected inline <script> or on*= handler cannot run:
+// only scripts carrying this request's nonce (the morph script below) and same-origin
+// bundled scripts ('self' — the hoisted page/reveal script, block accordion/slider) are
+// allowed; there is no 'unsafe-inline' for scripts. Styles keep 'unsafe-inline' (components
+// author inline style=, which is not script execution). frame-src allows the OpenStreetMap
+// embed the contact/FindUs components render. On SSR the header is authoritative; a
+// <meta http-equiv> in <head> is the fallback for prerendered/static output.
+const nonce = crypto.randomUUID().replace(/-/g, '');
+const csp = "default-src 'self'; script-src 'self' 'nonce-" + nonce + "'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self'; frame-src 'self' https://www.openstreetmap.org; object-src 'none'; base-uri 'none'; frame-ancestors 'self'; form-action 'self'";
+Astro.response.headers.set('Content-Security-Policy', csp);
+
 const kind = Astro.url.searchParams.get('kind');
 const raw = Astro.url.searchParams.get('data');
 function decode() {
@@ -118,6 +131,10 @@ const idLogo = (identityDraft && identityDraft.logo) || {};
 const idUploads = import.meta.glob('/src/assets/uploads/**/*.{jpg,jpeg,png,webp,avif}');
 const idOptimized = idLogo.image && idUploads[idLogo.image] ? idUploads[idLogo.image] : null;
 ---
+{/* Static/prerendered fallback: no response header is emitted, so carry the CSP in a
+    <meta http-equiv>. Astro relocates a leading <meta> in a page that renders a layout
+    into the document <head>. Harmless (redundant) alongside the SSR header. */}
+<meta http-equiv="Content-Security-Policy" content={csp} />
 {kind === 'header' ? (
   <Base title="Preview" chrome={false}><div id="preview-root"><Header nav={navDraft} /></div></Base>
 ) : kind === 'footer' ? (
@@ -147,7 +164,7 @@ const idOptimized = idLogo.image && idUploads[idLogo.image] ? idUploads[idLogo.i
 ) : (
   <Base title="Preview"><div id="preview-root"><BlockRenderer blocks={blocks} config={site} features={features} /></div></Base>
 )}
-<script is:inline>
+<script is:inline nonce={nonce}>
   // Live updates without reloading: the CMS keeps this iframe mounted (stable src) and
   // posts the new draft as it's typed. We re-fetch this page's HTML and MORPH it into the
   // existing #preview-root — patching only what changed — so there's no navigation and
