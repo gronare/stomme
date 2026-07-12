@@ -41,6 +41,8 @@ export interface SiteConfig {
       reasons?: { title: string; body: string }[]; // shown as cards on every town; `{name}` interpolated
       servicesHeading?: string;
       servicesCta?: string;
+      ctaEyebrow?: string; // closing CTA band
+      ctaHeading?: string; // closing CTA heading; `{name}` interpolated
     };
     // ServicePage chrome.
     service?: { eyebrow?: string; quoteEyebrow?: string; quoteHeading?: string; cta?: string };
@@ -159,6 +161,8 @@ const STRINGS_EN = {
     reasons: [] as { title: string; body: string }[],
     servicesHeading: 'Our services in {name}',
     servicesCta: 'Contact us today',
+    ctaEyebrow: 'Free quote',
+    ctaHeading: 'Get a quote in {name}',
   },
   service: { eyebrow: 'Service', quoteEyebrow: 'Free quote', quoteHeading: 'Want to know what it costs?', cta: 'Get a quote' },
   listingStatus: { available: 'Available', reserved: 'Reserved', sold: 'Sold', all: 'All' },
@@ -207,6 +211,8 @@ const STRINGS_SV: typeof STRINGS_EN = {
     reasons: [],
     servicesHeading: 'Våra tjänster i {name}',
     servicesCta: 'Kontakta oss idag',
+    ctaEyebrow: 'Kostnadsfri offert',
+    ctaHeading: 'Begär offert i {name}',
   },
   service: { eyebrow: 'Tjänst', quoteEyebrow: 'Kostnadsfri offert', quoteHeading: 'Vill du veta vad det kostar?', cta: 'Begär offert' },
   listingStatus: { available: 'Tillgänglig', reserved: 'Reserverad', sold: 'Såld', all: 'Alla' },

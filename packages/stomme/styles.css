@@ -777,6 +777,61 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
   .ctabox-link2 { display: inline-block; margin: 1.75rem 0 0 1.5rem; }
   .ctabox .btn-ghost, .ctabox .btn-ghost:hover { color: var(--color-on-dark); }
 
+  /* Split — copy beside a dark facts card (facts render as chips). */
+  .ctabox--split {
+    text-align: left;
+    display: grid; gap: 2rem; grid-template-columns: 1fr; align-items: center;
+    padding: clamp(2rem, 4vw, 3rem) clamp(1.5rem, 4vw, 3rem);
+  }
+  @media (min-width: 800px) {
+    .ctabox--split { grid-template-columns: 1.1fr 0.9fr; gap: clamp(2rem, 4vw, 3.5rem); }
+  }
+  .ctabox-aside {
+    list-style: none; margin: 0; padding: 1.25rem 1.4rem;
+    display: flex; flex-direction: column;
+    background: var(--color-ink); border-radius: 14px;
+  }
+  .ctabox-chip {
+    display: flex; justify-content: space-between; align-items: baseline; gap: 1rem;
+    font-family: var(--bk-font-mono); text-transform: uppercase; letter-spacing: 0.1em;
+    font-size: 0.72rem; padding-block: 0.55rem;
+    color: color-mix(in srgb, var(--color-on-dark) 70%, transparent);
+    border-bottom: 1px solid color-mix(in srgb, var(--color-on-dark) 14%, transparent);
+  }
+  .ctabox-chip:last-child { border-bottom: 0; }
+  .ctabox-chip b { color: var(--color-on-dark); font-weight: 700; letter-spacing: 0.06em; }
+
+  /* Panel — a dark box with the copy plus a mono key/value readout. */
+  .ctabox--panel {
+    text-align: left;
+    background: var(--color-ink); color: var(--color-on-dark);
+    display: grid; gap: 2.25rem; grid-template-columns: 1fr; align-items: center;
+    padding: clamp(2.2rem, 4.5vw, 3.5rem) clamp(1.5rem, 4vw, 3rem);
+  }
+  @media (min-width: 820px) {
+    .ctabox--panel { grid-template-columns: 1.15fr 0.85fr; gap: clamp(2.5rem, 5vw, 4.5rem); }
+  }
+  .ctabox--panel .ctabox-eyebrow { color: color-mix(in srgb, var(--color-on-dark) 70%, transparent); }
+  .ctabox--panel .ctabox-heading { color: var(--color-on-dark); }
+  .ctabox--panel .ctabox-heading em { font-style: normal; color: var(--color-brand); }
+  .ctabox--panel .ctabox-intro { color: color-mix(in srgb, var(--color-on-dark) 75%, transparent); }
+  .ctabox-readout { margin: 0; display: flex; flex-direction: column; }
+  .ctabox-readout > div {
+    display: flex; justify-content: space-between; align-items: baseline; gap: 1rem;
+    padding-block: 0.7rem;
+    border-bottom: 1px dashed color-mix(in srgb, var(--color-on-dark) 18%, transparent);
+  }
+  .ctabox-readout > div:first-child { border-top: 1px dashed color-mix(in srgb, var(--color-on-dark) 18%, transparent); }
+  .ctabox-readout dt {
+    font-family: var(--bk-font-mono); text-transform: uppercase; letter-spacing: 0.14em;
+    font-size: 0.66rem; color: color-mix(in srgb, var(--color-on-dark) 70%, transparent);
+  }
+  .ctabox-readout dd {
+    margin: 0; font-family: var(--bk-font-mono); font-weight: 700; font-size: 0.85rem;
+    letter-spacing: 0.06em; text-transform: uppercase; color: var(--color-on-dark);
+    font-variant-numeric: tabular-nums;
+  }
+
 /* Gallery */
 .gallery-grid { display: grid; gap: 1.25rem; grid-template-columns: 1fr; margin-top: 2.5rem; }
   @media (min-width: 640px) {

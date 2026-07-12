@@ -1,5 +1,6 @@
 ---
 import Cover from './src/Cover.astro';
+import CtaBox from './blocks/CtaBox.astro';
 import { getEntry } from 'astro:content';
 import { resolveSite, type SiteConfig } from './src/config';
 
@@ -10,6 +11,11 @@ import { resolveSite, type SiteConfig } from './src/config';
 // `{name}` is interpolated); the CTAs link to site.routes.contact. Expects a `towns`
 // schema with: name, title?, heroSubtitle?, heroNote?, why?, problems?, districts?,
 // localCase?, services?, image?, imageAlt?, seo?.
+//
+// The sections below map 1:1 to engine blocks, so a later "towns as blocks" migration
+// (giving the collection a `blocks` field) is a straight field→block conversion with no
+// visual change:  hero→hero · why→prose · problems→featureGrid · districts→(chips, dark)
+// · reasons→featureGrid · localCase→statPanel/quote · services→checklist · close→ctaBox.
 interface Props {
   town: { id: string; data: any };
   config?: SiteConfig;
@@ -35,86 +41,147 @@ const jsonLd = {
 };
 ---
 <section class="section town-hero">
-  <span class="mono eyebrow">{fill(t.eyebrow)}</span>
-  <h1 class="display display--hero town-h1">{data.title ?? fill(t.heading)}</h1>
-  {data.heroSubtitle && <p class="intro town-sub">{data.heroSubtitle}</p>}
-  {data.heroNote && <p class="town-note">{data.heroNote}</p>}
-  <a href={contact} class="btn town-cta">{fill(t.cta)}</a>
-  {data.image && (
-    <Cover src={data.image} alt={data.imageAlt ?? fill(t.eyebrow)} placeholder="/images/placeholders/town.svg" width={1600} height={700} loading="eager" class="town-img" />
-  )}
+  <div class:list={['town-hero__grid', { 'town-hero__grid--media': !!data.image }]}>
+    <div class="town-hero__copy">
+      <span class="mono eyebrow">{fill(t.eyebrow)}</span>
+      <h1 class="display display--hero town-h1">{data.title ?? fill(t.heading)}</h1>
+      {data.heroSubtitle && <p class="intro town-sub">{data.heroSubtitle}</p>}
+      {data.heroNote && (
+        <p class="town-fieldnote"><span class="town-fieldnote__k mono">Fältnotis</span><span>{data.heroNote}</span></p>
+      )}
+      <div class="town-hero__cta">
+        <a href={contact} class="btn">{fill(t.cta)}</a>
+        {data.services?.length > 0 && <a href="#tjanster" class="town-jump">{fill(t.servicesHeading)} ↓</a>}
+      </div>
+    </div>
+    {data.image && (
+      <Cover src={data.image} alt={data.imageAlt ?? fill(t.eyebrow)} placeholder="/images/placeholders/town.svg" width={1200} height={900} loading="eager" class="town-img" />
+    )}
+  </div>
 </section>
 
-<section class="section town-body">
-  {whyParagraphs.length > 0 && (
-    <div class="town-block">
-      <h2 class="display town-h2">{fill(t.whyHeading)}</h2>
-      <div class="town-why">{whyParagraphs.map((p: string) => <p>{p}</p>)}</div>
+{whyParagraphs.length > 0 && (
+  <section class="section town-why">
+    <div class="town-why__grid">
+      <div><span class="mono eyebrow">{fill(t.whyHeading)}</span><h2 class="display town-h2">{fill(t.whyHeading)}</h2></div>
+      <div class="town-prose">{whyParagraphs.map((p: string) => <p>{p}</p>)}</div>
     </div>
-  )}
+  </section>
+)}
 
-  {data.problems?.length > 0 && (
-    <div class="town-block">
-      <span class="mono">{fill(t.problemsHeading)}</span>
-      <ul class="town-list">{data.problems.map((p: string) => <li><span class="town-mark">›</span><span>{p}</span></li>)}</ul>
+{data.problems?.length > 0 && (
+  <section class="section town-problems">
+    <span class="mono eyebrow">{fill(t.problemsHeading)}</span>
+    <div class="town-prob-grid">
+      {data.problems.map((p: string) => <div class="town-prob"><p>{p}</p></div>)}
     </div>
-  )}
+  </section>
+)}
 
-  {data.districts?.length > 0 && (
-    <div class="town-block">
-      <span class="mono">{fill(t.districtsHeading)}</span>
+{data.districts?.length > 0 && (
+  <div class="surface-dark">
+    <section class="section town-districts">
+      <span class="mono eyebrow">{fill(t.districtsHeading)}</span>
       <div class="town-chips">{data.districts.map((d: string) => <span class="town-chip">{d}</span>)}</div>
-    </div>
-  )}
+    </section>
+  </div>
+)}
 
-  {reasons.length > 0 && (
+{reasons.length > 0 && (
+  <section class="section town-reasons-sec">
     <div class="town-reasons">
       {reasons.map((r) => (
         <div class="town-reason"><h3>{r.title}</h3><p>{r.body}</p></div>
       ))}
     </div>
-  )}
+  </section>
+)}
 
-  {data.localCase && (
+{data.localCase && (
+  <section class="section town-case-sec">
     <div class="town-case">
-      <span class="mono">{fill(t.caseHeading)}</span>
-      <p>{data.localCase}</p>
+      <span class="mono eyebrow">{fill(t.caseHeading)}</span>
+      <blockquote class="display town-case__quote">{data.localCase}</blockquote>
     </div>
-  )}
+  </section>
+)}
 
-  {data.services?.length > 0 && (
-    <div class="town-block">
-      <h2 class="display town-h2">{fill(t.servicesHeading)}</h2>
-      <ul class="town-services">{data.services.map((s: string) => <li><span class="town-mark town-mark--tick">✓</span><span>{s}</span></li>)}</ul>
-      <a href={contact} class="btn town-cta">{fill(t.servicesCta)}</a>
-    </div>
-  )}
-</section>
+{data.services?.length > 0 && (
+  <section class="section town-services-sec" id="tjanster">
+    <h2 class="display town-h2">{fill(t.servicesHeading)}</h2>
+    <ul class="town-svc">{data.services.map((s: string) => <li><span class="town-svc__tick" aria-hidden="true">✓</span><span>{s}</span></li>)}</ul>
+  </section>
+)}
+
+<CtaBox variant="classic" eyebrow={fill(t.ctaEyebrow)} heading={fill(t.ctaHeading)} label={fill(t.servicesCta)} href={{ url: contact }} />
 
 <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
 
 <style>
+  /* Hero — copy beside the town image (stacks on narrow). */
   .town-hero { padding-bottom: 1rem; }
-  .town-h1 { margin-top: 1rem; }
-  .town-sub { color: var(--color-ink); font-size: 1.15rem; max-width: 42rem; }
-  .town-note { margin-top: 0.5rem; color: var(--color-muted); max-width: 42rem; }
-  .town-cta { margin-top: 2rem; }
-  .town-img { margin-top: 2.5rem; aspect-ratio: 16 / 7; width: 100%; border: 1px solid var(--color-line); border-radius: 1rem; object-fit: cover; display: block; }
-  .town-body { padding-top: 1rem; display: flex; flex-direction: column; gap: 2.5rem; }
-  .town-h2 { font-size: clamp(1.4rem, 2.5vw, 1.875rem); }
-  .town-why { margin-top: 1.25rem; display: flex; flex-direction: column; gap: 1rem; color: var(--color-muted); }
-  .town-list { margin: 1rem 0 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 0.625rem; }
-  .town-list li, .town-services li { display: flex; gap: 0.75rem; color: var(--color-ink); }
-  .town-mark { color: var(--color-brand); font-weight: 700; }
-  .town-chips { margin-top: 1rem; display: flex; flex-wrap: wrap; gap: 0.625rem; }
-  .town-chip { font-family: var(--bk-font-mono); font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; border: 1px solid var(--color-line); border-radius: 999px; padding: 8px 14px; color: var(--color-muted); background: var(--color-paper); }
-  .town-reasons { display: grid; gap: 1.25rem; grid-template-columns: 1fr; }
-  @media (min-width: 640px) { .town-reasons { grid-template-columns: repeat(3, 1fr); } }
-  .town-reason { border: 1px solid var(--color-line); border-radius: 1rem; padding: 1.5rem; }
-  .town-reason h3 { margin: 0; font-weight: 700; color: var(--color-brand); }
-  .town-reason p { margin: 0.5rem 0 0; font-size: 0.9rem; color: var(--color-muted); }
-  .town-case { border-radius: 1rem; padding: 1.5rem; background: color-mix(in srgb, var(--color-surface) 40%, var(--color-paper)); }
-  .town-case p { margin: 0.5rem 0 0; color: var(--color-ink); }
-  .town-services { margin: 1.25rem 0 0; padding: 0; list-style: none; display: grid; gap: 0.625rem; grid-template-columns: 1fr; }
-  @media (min-width: 640px) { .town-services { grid-template-columns: repeat(2, 1fr); } }
+  .town-hero__grid { display: grid; gap: 2.75rem; align-items: center; grid-template-columns: 1fr; }
+  @media (min-width: 920px) { .town-hero__grid--media { grid-template-columns: 1.08fr 0.92fr; } }
+  .town-h1 { margin-top: 1rem; max-width: 15ch; }
+  .town-sub { color: var(--color-ink); font-size: 1.15rem; max-width: 42rem; margin-top: 1.2rem; }
+  .town-fieldnote { margin-top: 1.4rem; max-width: 34rem; display: flex; gap: 0.8rem; align-items: baseline;
+    background: color-mix(in srgb, var(--color-surface) 55%, var(--color-paper));
+    border: 1px solid color-mix(in srgb, var(--color-surface) 70%, var(--color-line));
+    border-radius: 0.9rem; padding: 0.9rem 1.1rem; color: var(--color-ink); }
+  .town-fieldnote__k { flex: none; font-size: 0.64rem; letter-spacing: 0.14em; color: var(--color-ink); }
+  .town-hero__cta { margin-top: 1.9rem; display: flex; gap: 1.25rem; align-items: center; flex-wrap: wrap; }
+  .town-jump { color: var(--color-ink); text-decoration: none; font-weight: 600; font-size: 0.95rem; border-bottom: 2px solid var(--color-brand); padding-bottom: 2px; }
+  .town-jump:hover { color: var(--color-brand); }
+  .town-img { aspect-ratio: 4 / 3.4; width: 100%; border: 1px solid var(--color-line); border-radius: 1rem; object-fit: cover; display: block; }
+
+  .town-h2 { font-size: clamp(1.6rem, 3vw, 2.4rem); }
+
+  /* Why — split heading | prose. */
+  .town-why { border-top: 1px solid var(--color-line); }
+  .town-why__grid { display: grid; gap: 2.5rem; grid-template-columns: 1fr; align-items: start; }
+  @media (min-width: 920px) { .town-why__grid { grid-template-columns: 0.9fr 1.1fr; } }
+  .town-why__grid .town-h2 { margin-top: 0.8rem; max-width: 15ch; }
+  .town-prose { display: flex; flex-direction: column; gap: 1.1rem; max-width: 40rem; font-size: 1.05rem; color: var(--color-ink); }
+  .town-prose p:first-child { font-size: 1.12rem; font-weight: 500; }
+  .town-prose p:not(:first-child) { color: var(--color-muted); }
+
+  /* Problems — annotated cards with a brand top-bar. */
+  .town-problems { padding-top: 0; }
+  .town-prob-grid { display: grid; gap: 1.1rem; grid-template-columns: 1fr; margin-top: 1.75rem; }
+  @media (min-width: 820px) { .town-prob-grid { grid-template-columns: repeat(3, 1fr); } }
+  .town-prob { border: 1px solid var(--color-line); border-radius: 1rem; background: var(--color-paper); padding: 1.4rem 1.5rem; position: relative; overflow: hidden; }
+  .town-prob::before { content: ""; position: absolute; top: 0; left: 1.5rem; width: 34px; height: 5px; background: var(--color-brand); border-radius: 0 0 4px 4px; }
+  .town-prob p { margin-top: 0.4rem; color: var(--color-ink); font-size: 0.98rem; }
+
+  /* Districts — full-bleed dark coverage band (tokens remapped by .surface-dark). */
+  .town-chips { margin-top: 1.5rem; display: flex; flex-wrap: wrap; gap: 0.7rem; }
+  .town-chip { font-family: var(--bk-font-mono); font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase;
+    border: 1px solid var(--color-line); border-radius: 999px; padding: 10px 18px; color: var(--color-ink);
+    background: color-mix(in srgb, var(--color-ink) 4%, var(--color-paper)); display: inline-flex; align-items: center; gap: 0.6rem; }
+  .town-chip::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--color-brand); flex: none; }
+
+  /* Reasons — 3-up cards. */
+  .town-reasons { display: grid; gap: 1.1rem; grid-template-columns: 1fr; }
+  @media (min-width: 820px) { .town-reasons { grid-template-columns: repeat(3, 1fr); } }
+  .town-reason { border: 1px solid var(--color-line); border-radius: 1rem; background: var(--color-paper); padding: 1.6rem; }
+  /* Brand heading on light: keep it ≥18.66px/700 so it qualifies as large text (3:1),
+     matching how the engine keeps vivid brands legible without recolouring. */
+  .town-reason h3 { margin: 0; font-weight: 700; color: var(--color-brand); font-size: 1.25rem; }
+  .town-reason p { margin: 0.55rem 0 0; font-size: 0.95rem; color: var(--color-muted); }
+
+  /* Local case — pale surface panel with a pulled quote. */
+  .town-case-sec { padding-top: 0; }
+  .town-case { background: color-mix(in srgb, var(--color-surface) 60%, var(--color-paper));
+    border: 1px solid color-mix(in srgb, var(--color-surface) 70%, var(--color-line));
+    border-radius: 1.5rem; padding: clamp(1.75rem, 4vw, 2.75rem); }
+  .town-case__quote { margin: 1rem 0 0; font-weight: 700; text-transform: none; letter-spacing: 0;
+    font-size: clamp(1.2rem, 2.2vw, 1.55rem); line-height: 1.3; color: var(--color-ink); max-width: 46rem; }
+
+  /* Services — carded tick grid. */
+  .town-services-sec { padding-top: 0; }
+  .town-svc { margin: 1.75rem 0 0; padding: 0; list-style: none; display: grid; gap: 0.7rem; grid-template-columns: 1fr; }
+  @media (min-width: 640px) { .town-svc { grid-template-columns: repeat(2, 1fr); } }
+  .town-svc li { display: flex; gap: 0.85rem; align-items: center; border: 1px solid var(--color-line); background: var(--color-paper); border-radius: 0.8rem; padding: 0.85rem 1.1rem; color: var(--color-ink); font-weight: 500; }
+  .town-svc__tick { flex: none; width: 26px; height: 26px; border-radius: 8px; display: grid; place-items: center; color: var(--color-brand); font-weight: 800; font-size: 0.85rem;
+    background: color-mix(in srgb, var(--color-brand) 10%, var(--color-paper)); border: 1px solid color-mix(in srgb, var(--color-brand) 22%, var(--color-paper)); }
 </style>
