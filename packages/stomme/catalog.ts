@@ -464,6 +464,7 @@ const RAW_BLOCKS: BlockDef[] = [
     summary: 'A boxed call-to-action: heading, text and a button.',
     shape: 'box',
     fields: [
+      { name: 'variant', label: 'Layout', widget: 'select', required: false, default: 'classic', options: [{ label: 'Classic (centered panel)', value: 'classic' }, { label: 'Split (copy + facts card)', value: 'split' }, { label: 'Panel (dark, with readout)', value: 'panel' }] },
       { name: 'eyebrow', label: 'Eyebrow', widget: 'string', required: false },
       { name: 'heading', label: 'Heading', widget: 'string' },
       { name: 'intro', label: 'Intro', widget: 'text', required: false, hint: 'A short line under the heading.' },
@@ -471,6 +472,7 @@ const RAW_BLOCKS: BlockDef[] = [
       linkField('href', 'Button link'),
       { name: 'label2', label: 'Second button label', widget: 'string', required: false, hint: 'Shown as a quiet text link beside the button.' },
       linkField('href2', 'Second button link'),
+      { name: 'facts', label: 'Facts (label + value)', widget: 'list', required: false, hint: 'Shown as chips (Split) or a mono readout (Panel). Ignored in Classic.', fields: [{ name: 'label', label: 'Label', widget: 'string' }, { name: 'value', label: 'Value', widget: 'string' }] },
       surfaceField,
     ],
   },

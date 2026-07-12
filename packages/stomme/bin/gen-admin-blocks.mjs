@@ -535,6 +535,7 @@ const COLLECTION_EDITORS = {
     - { name: summary, label: "Summary", widget: text, required: false, hint: "The lede under the title — also the card text in service lists." }
     - { name: order, label: "Order", widget: number, required: false, default: 0 }
 ${emitWidget(4)}
+    - { name: body, label: "Long-form text (fallback)", widget: markdown, required: false, hint: "Only shown when no sections are built above. Prefer sections; this is the simple prose fallback." }
     - name: seo
       label: "SEO"
       widget: object
