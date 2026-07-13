@@ -195,6 +195,7 @@ export const linkedCardListField: Field = {
     iconField(),
     { name: 'title', label: 'Title', widget: 'string' },
     { name: 'body', label: 'Text', widget: 'text' },
+    { name: 'tag', label: 'Tag (footer label)', widget: 'string', required: false, hint: 'Small uppercase label at the card foot, e.g. a method term.' },
     linkField('link', 'Link (optional)'),
     { name: 'linkLabel', label: 'Link label', widget: 'string', required: false, hint: 'E.g. "Read more". Shown only if the card has a link.' },
   ],

@@ -125,6 +125,7 @@
         "image",
         "imageAlt",
         "seo",
+        "hero",
         "blocks"
       ],
       "passthrough": true,
@@ -133,6 +134,16 @@
           "title",
           "description",
           "image"
+        ],
+        "hero": [
+          "media",
+          "image",
+          "imageAlt",
+          "ticks",
+          "ctaLabel",
+          "ctaHref",
+          "cta2Label",
+          "cta2Href"
         ]
       }
     },

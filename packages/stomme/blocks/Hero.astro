@@ -26,11 +26,12 @@ interface Props {
   image?: string;
   imageAlt?: string;
   highlights?: Highlight[];
+  ticks?: string[];
   height?: 'normal' | 'tall';
   align?: 'top' | 'center' | 'bottom';
   width?: 'narrow' | 'full';
 }
-const { eyebrow, heading, intro, ctaLabel, ctaHref, cta2Label, cta2Href, media = 'none', image, imageAlt, highlights = [], height = 'normal', align = 'center', width = 'full' } = Astro.props;
+const { eyebrow, heading, intro, ctaLabel, ctaHref, cta2Label, cta2Href, media = 'none', image, imageAlt, highlights = [], ticks = [], height = 'normal', align = 'center', width = 'full' } = Astro.props;
 const href = resolveLink(ctaHref, '/');
 const href2 = resolveLink(cta2Href, '/');
 const contact = ((await getEntry('contact', 'contact').catch(() => null))?.data ?? {}) as any;
@@ -45,10 +46,17 @@ const hasMedia = showImage || showHighlights || showMotif;
       {eyebrow && <span class="mono eyebrow">{eyebrow}</span>}
       <h1 class="display display--hero" style="margin-top:1rem"><Emph text={heading} /></h1>
       {intro && <p class="intro">{intro}</p>}
+      {ticks.length > 0 && (
+        <ul class="hero-ticks">
+          {ticks.map((t) => (
+            <li><span class="hero-ticks__check" aria-hidden="true">✓</span><span>{t}</span></li>
+          ))}
+        </ul>
+      )}
       {(ctaLabel || cta2Label || contact.phone) && (
         <div class="btn-row">
           {ctaLabel && <a href={href} class="btn">{ctaLabel}</a>}
-          {cta2Label && <a href={href2} class="btn-ghost">{cta2Label} →</a>}
+          {cta2Label && <a href={href2} class="btn-ghost">{`${cta2Label} ${href2.startsWith('#') ? '↓' : '→'}`}</a>}
           {!cta2Label && contact.phone && <ContactLink kind="tel" class="btn-ghost" target={contact.phoneE164 || contact.phone} display={contact.phone} suffix=" →" protect={!!contact.protectContact} />}
         </div>
       )}
