@@ -480,7 +480,7 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
 
 /* Prose pull-stat — a single inline figure under the text (Prose statValue/statLabel).
    Big enough that the brand colour counts as large text (AA 3:1). */
-.prose-stat { margin: 1.6rem 0 0; max-width: 72ch; border-top: 1px solid var(--color-line); padding-top: 1.4rem; display: flex; gap: 1.25rem; align-items: baseline; flex-wrap: wrap; }
+.prose-stat { margin: 1.6rem 0 0; max-width: 72ch; border-top: 1px solid var(--color-line); padding-top: 1.4rem; display: flex; gap: 1.25rem; align-items: center; flex-wrap: wrap; }
 .prose-stat__n { font-family: var(--bk-font-display); font-weight: 800; font-size: clamp(2.4rem, 4vw, 3.2rem); line-height: 1; letter-spacing: -0.01em; color: var(--color-brand); font-variant-numeric: tabular-nums; }
 .prose-stat__l { color: var(--color-muted); font-size: 0.95rem; max-width: 22rem; }
 
