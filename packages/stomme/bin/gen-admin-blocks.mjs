@@ -775,6 +775,8 @@ function emitSettings() {
               - { label: "System (default)", value: "system" }
               - { label: "Serif (elegant headlines)", value: "serif" }
               - { label: "Grotesk (clean sans)", value: "grotesk" }
+              - { label: "Inter", value: "inter" }
+              - { label: "Inter Tight", value: "inter-tight" }
               - { label: "Geometric (Futura-style)", value: "geometric" }
               - { label: "Rounded", value: "rounded" }
               - { label: "Slab serif", value: "slab" }
@@ -792,6 +794,8 @@ function emitSettings() {
               - { label: "System (default)", value: "system" }
               - { label: "Serif (elegant headlines)", value: "serif" }
               - { label: "Grotesk (clean sans)", value: "grotesk" }
+              - { label: "Inter", value: "inter" }
+              - { label: "Inter Tight", value: "inter-tight" }
               - { label: "Geometric (Futura-style)", value: "geometric" }
               - { label: "Rounded", value: "rounded" }
               - { label: "Slab serif", value: "slab" }
