@@ -215,6 +215,17 @@ body > main { flex: 1 0 auto; } /* sticky footer: main grows so the footer sits 
 .cover--ov-light .cover__scrim { background: linear-gradient(90deg, rgba(8,9,14,.5), transparent 70%), linear-gradient(0deg, rgba(8,9,14,.42), transparent 45%); }
 .cover--ov-medium .cover__scrim { background: linear-gradient(0deg, rgba(8,9,14,.7), transparent 55%), linear-gradient(90deg, rgba(8,9,14,.5), transparent 65%); }
 .cover--ov-strong .cover__scrim { background: linear-gradient(90deg, rgba(8,9,14,.9), rgba(8,9,14,.6) 50%, rgba(8,9,14,.32)), linear-gradient(0deg, rgba(8,9,14,.72), transparent 55%); }
+/* Header-legibility top scrim — when the page OPENS with the cover, the transparent
+   overlay header (white logo/nav) floats over uncontrolled footage, so darken the top
+   of the media too. It lives on the cover (not the header): the cover is full-bleed
+   from y=0, so the gradient starts under whatever overlays it (header, a site's own
+   strip) with no seam, and it MUST fade to the same colour at zero alpha —
+   rgba(8,9,14,0), never `transparent` or a box edge, both of which read as a hard
+   horizontal line over bright video. Mid-page covers have no header and skip it. */
+main .cover:first-child .cover__scrim::before {
+  content: ""; position: absolute; inset: 0 0 auto 0; height: min(30vh, 320px);
+  background: linear-gradient(180deg, rgba(8,9,14,.6), rgba(8,9,14,.26) 55%, rgba(8,9,14,0));
+}
 .cover__inner { position: relative; z-index: 2; align-self: flex-end; max-width: 72rem; width: 100%; margin-inline: auto; padding: 0 1.5rem 4rem; }
 @media (min-width: 768px) { .cover__inner { padding-bottom: 5rem; } }
 .cover--center { text-align: center; }
