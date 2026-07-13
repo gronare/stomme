@@ -57,6 +57,10 @@
     humanist: 'Verdana,"Segoe UI","Lucida Grande","Lucida Sans Unicode",Geneva,Tahoma,ui-sans-serif,sans-serif',
     script: '"Snell Roundhand","Brush Script MT","Segoe Script","Bradley Hand",ui-rounded,cursive',
     mono: MONO,
+    // Curated webfonts (src/fonts.ts WEBFONTS). The woff2 isn't loaded in the admin
+    // preview — the stack falls to system here, same as custom uploads behave.
+    inter: '"Inter Variable",' + SANS,
+    'inter-tight': '"Inter Tight Variable",' + SANS,
   };
   var fontFor = function (key) { return key && FONT_STACKS[key] ? FONT_STACKS[key] : SANS; };
   var cBrand = 'var(--color-brand,' + BRAND + ')', cInk = 'var(--color-ink,' + INK + ')',
