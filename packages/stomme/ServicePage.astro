@@ -1,6 +1,10 @@
 ---
 import Cover from './src/Cover.astro';
-import BlockRenderer from './src/BlockRenderer.astro';
+// The renderer comes through the @stomme/renderer alias (the site's wrapper when
+// src/blocks/BlockRenderer.astro exists, else the engine renderer) so a service's
+// blocks — including the synthesized hero below — get the site's custom blocks
+// (e.g. a hero media override). Same resolution the lookbook route uses.
+import BlockRenderer from '@stomme/renderer';
 import { render } from 'astro:content';
 import { resolveSite, type SiteConfig } from './src/config';
 
@@ -12,6 +16,12 @@ import { resolveSite, type SiteConfig } from './src/config';
 // Expects a `services` schema with: title, navLabel, summary?, bullets?, image?,
 // imageAlt?, seo? + a markdown body + optional `blocks` (composed sections, same
 // picker as pages — rendered between the intro and the quote CTA).
+//
+// A block-composed entry may additionally carry a `hero` frontmatter group
+// (media/ticks/CTA overrides). That renders a REAL hero block — eyebrow (service
+// string), H1 = title, lede = summary, ✓ ticks, primary CTA (contact) and an
+// optional quiet second link (e.g. a "#process" jump) — instead of the plain
+// header. No `hero` → the plain header, exactly as before (fleet-safe).
 interface Props {
   service?: any; // CollectionEntry<'services'> (the live route)
   data?: any; // OR draft frontmatter (the CMS preview) …
@@ -28,7 +38,26 @@ const Content = service ? (await render(service)).Content : null;
 // the template's body/bullets/image + the quote-CTA band are the LEGACY layout, kept
 // for entries without blocks so existing sites render unchanged.
 const hasBlocks = Array.isArray(data.blocks) && data.blocks.length > 0;
+// The hero group only upgrades block-composed entries — the legacy layout already
+// renders bullets/image itself and must not double them.
+const hero = hasBlocks && data.hero && typeof data.hero === 'object' ? data.hero : null;
+const heroBlock = hero
+  ? {
+      type: 'hero',
+      ...hero, // passthrough extras (surface, height, site-custom fields…) ride along
+      eyebrow: t.eyebrow,
+      heading: data.title,
+      intro: data.summary,
+      media: hero.media ?? (data.image ? 'image' : 'none'),
+      image: hero.image ?? data.image,
+      imageAlt: hero.imageAlt ?? data.imageAlt,
+      ticks: Array.isArray(hero.ticks) && hero.ticks.length > 0 ? hero.ticks : (data.bullets ?? []),
+      ctaLabel: hero.ctaLabel ?? t.cta,
+      ctaHref: hero.ctaHref ?? contact,
+    }
+  : null;
 ---
+{!heroBlock && (
 <section class="section service-page">
   <span class="mono eyebrow">{t.eyebrow}</span>
   <h1 class="display display--hero service-h1">{data.title}</h1>
@@ -45,8 +74,9 @@ const hasBlocks = Array.isArray(data.blocks) && data.blocks.length > 0;
     <ul class="service-bullets">{data.bullets.map((b: string) => <li><span class="service-tick">✓</span><span>{b}</span></li>)}</ul>
   )}
 </section>
+)}
 
-{hasBlocks && <BlockRenderer blocks={data.blocks} config={config} />}
+{hasBlocks && <BlockRenderer blocks={heroBlock ? [heroBlock, ...data.blocks] : data.blocks} config={config} />}
 
 {!hasBlocks && (
   <section class="band">

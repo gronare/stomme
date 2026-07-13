@@ -7,12 +7,13 @@ interface Props {
   intro?: string;
   items?: { title: string; body: string; kicker?: string }[];
   width?: 'narrow' | 'full';
+  anchor?: string;
 }
-const { eyebrow, heading, intro, items = [], width = 'narrow' } = Astro.props;
+const { eyebrow, heading, intro, items = [], width = 'narrow', anchor } = Astro.props;
 ---
 
 {(heading || items.length > 0) && (
-  <section class:list={['section', { 'section--read': width !== 'full' }]}>
+  <section id={anchor || undefined} class:list={['section', { 'section--read': width !== 'full' }]}>
     {(eyebrow || heading || intro) && (
       <div class="section-head">
         {eyebrow && <span class="mono eyebrow">{eyebrow}</span>}

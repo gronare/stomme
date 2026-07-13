@@ -7,7 +7,7 @@ interface Props {
   eyebrow?: string;
   heading?: string;
   intro?: string;
-  items?: { icon?: string; title: string; body?: string; link?: unknown; linkLabel?: string }[];
+  items?: { icon?: string; title: string; body?: string; tag?: string; link?: unknown; linkLabel?: string }[];
   numbered?: boolean;
   accent?: 'brand' | 'secondary' | 'highlight';
   site?: any;
@@ -38,6 +38,7 @@ const accentVar = accent === 'secondary' ? 'var(--color-secondary)' : accent ===
           <h3>{it.title}</h3>
           {it.body && <p>{it.body}</p>}
           {href && <span class="mono" style="display:inline-block;margin-top:1rem;color:var(--color-brand)">{it.linkLabel ?? readMore} →</span>}
+          {it.tag && <span class="mono card-tag">{it.tag}</span>}
         </Tag>
       );
     })}

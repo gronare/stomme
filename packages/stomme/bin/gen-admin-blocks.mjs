@@ -534,6 +534,24 @@ const COLLECTION_EDITORS = {
     - { name: navLabel, label: "Short label (menus/cards)", widget: string }
     - { name: summary, label: "Summary", widget: text, required: false, hint: "The lede under the title — also the card text in service lists." }
     - { name: order, label: "Order", widget: number, required: false, default: 0 }
+    - name: hero
+      label: "Hero (composed pages)"
+      widget: object
+      collapsed: true
+      required: false
+      hint: "Only used when the page is built from sections below: renders a full hero (title + summary + these extras) instead of the plain header."
+      fields:
+        - { name: media, label: "Media", widget: string, required: false, hint: "What shows beside the heading — e.g. image, highlights, motif, or a site-specific media like ops." }
+        - name: ticks
+          label: "Ticks (checkmark lines)"
+          widget: list
+          required: false
+          hint: "Short ✓ lines under the summary — key reassurances."
+          field: { name: text, label: "Line", widget: string }
+        - { name: ctaLabel, label: "Button label", widget: string, required: false, hint: "Blank uses the site's quote-button text." }
+        - { name: ctaHref, label: "Button link", widget: string, required: false, hint: "Blank links to the contact page." }
+        - { name: cta2Label, label: "Second link label", widget: string, required: false, hint: "A quiet text link beside the button." }
+        - { name: cta2Href, label: "Second link target", widget: string, required: false, hint: "E.g. #process to jump to a section with that anchor." }
 ${emitWidget(4)}
     - { name: body, label: "Long-form text (fallback)", widget: markdown, required: false, hint: "Only shown when no sections are built above. Prefer sections; this is the simple prose fallback." }
     - name: seo

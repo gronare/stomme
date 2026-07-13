@@ -42,6 +42,14 @@ const RAW_BLOCKS: BlockDef[] = [
         fields: [iconField(), { name: 'title', label: 'Title', widget: 'string' }, { name: 'body', label: 'Text', widget: 'string', required: false }],
       },
       {
+        name: 'ticks',
+        label: 'Ticks (checkmark lines)',
+        widget: 'list',
+        required: false,
+        hint: 'Short ✓ lines under the intro — key reassurances.',
+        field: { name: 'text', label: 'Line', widget: 'string' },
+      },
+      {
         name: 'height', label: 'Height', widget: 'select', required: false, default: 'normal',
         hint: 'Tall fills the viewport (good with a Gradient or Dark background).',
         options: [{ label: 'Normal', value: 'normal' }, { label: 'Tall', value: 'tall' }],
@@ -224,6 +232,7 @@ const RAW_BLOCKS: BlockDef[] = [
           { name: 'body', label: 'Text', widget: 'text' },
         ],
       },
+      { name: 'anchor', label: 'Anchor id', widget: 'string', required: false, hint: 'Lets links jump here — anchor "process" makes "#process" scroll to this section.' },
       widthField,
       surfaceField,
     ],
@@ -574,7 +583,7 @@ const FAQ_FIX = [
 ];
 const SAMPLES: Record<string, ({ _label?: string } & Record<string, unknown>)[]> = {
   hero: [
-    { _label: 'narrow · two buttons', eyebrow: 'Eyebrow label', heading: 'A heading that states the offer.', intro: 'One supporting sentence that earns the click below.', ctaLabel: 'Primary action', ctaHref: { url: '#' }, cta2Label: 'Quiet link', cta2Href: { url: '#' }, media: 'none', width: 'narrow' },
+    { _label: 'narrow · two buttons · ticks', eyebrow: 'Eyebrow label', heading: 'A heading that states the offer.', intro: 'One supporting sentence that earns the click below.', ticks: ['A first checkmark reassurance.', 'A second, slightly longer one to wrap.'], ctaLabel: 'Primary action', ctaHref: { url: '#' }, cta2Label: 'Quiet link', cta2Href: { url: '#' }, media: 'none', width: 'narrow' },
     { _label: 'highlights media', eyebrow: 'Eyebrow', heading: 'Hero beside highlights.', intro: LOREM, ctaLabel: 'Action', ctaHref: { url: '#' }, media: 'highlights', highlights: [{ icon: 'bolt', title: 'Fast', body: 'Loads instantly.' }, { icon: 'shield', title: 'Safe', body: 'Nothing to hack.' }] },
     { _label: 'motif · tall dark', heading: 'Tall hero on the dark surface.', intro: LOREM, ctaLabel: 'Action', ctaHref: { url: '#' }, media: 'motif', height: 'tall', surface: 'dark' },
   ],
@@ -592,7 +601,7 @@ const SAMPLES: Record<string, ({ _label?: string } & Record<string, unknown>)[]>
   ],
   featureGrid: [{ eyebrow: 'Eyebrow', heading: 'Feature cards heading', items: [
     { icon: 'bolt', title: 'First feature', body: LOREM, link: { url: '#' } },
-    { icon: 'shield', title: 'Second feature', body: 'A shorter line.' },
+    { icon: 'shield', title: 'Second feature', body: 'A shorter line.', tag: 'Mono foot tag' },
     { icon: 'wrench', title: 'Third feature', body: LOREM },
   ] }],
   serviceGrid: [{ _label: 'fixture entries', eyebrow: 'Services', heading: 'Service cards', items: [

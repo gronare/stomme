@@ -219,6 +219,24 @@ export function stommeCollections(listings?: Listing[]) {
         image: z.string().optional(),
         imageAlt: z.string().optional(),
         seo: seo.optional(),
+        // Optional rich hero for BLOCK-COMPOSED entries: ServicePage turns this into
+        // a real hero block (H1 = title, lede = summary) instead of the plain header.
+        // All fields optional — media names any hero media the site's registry knows
+        // (image/highlights/motif, or a site-custom one); ticks default to `bullets`;
+        // the primary CTA defaults to the service strings + contact route.
+        hero: z
+          .object({
+            media: z.string().optional(),
+            image: z.string().optional(),
+            imageAlt: z.string().optional(),
+            ticks: z.array(z.string()).default([]),
+            ctaLabel: z.string().optional(),
+            ctaHref: link,
+            cta2Label: z.string().optional(),
+            cta2Href: link,
+          })
+          .passthrough() // extra keys flow into the hero block (surface, height, site-custom fields…)
+          .optional(),
         // Optional composed sections (same block picker as pages) — rendered by
         // ServicePage between the intro and the quote CTA, so a service detail can
         // be fleshed out beyond the template (feature rows, steps, CTA bands…).
