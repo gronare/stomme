@@ -422,7 +422,7 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
   background: linear-gradient(180deg, rgba(8, 9, 14, 0.55), transparent);
 }
 /* The dropdown panel is always a light popup, so its links keep the normal dark colour. */
-body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header .logo .accent { color: color-mix(in srgb, var(--color-brand) 45%, #fff); }
+body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header .logo .accent { color: var(--color-brand); }
 /* solid state — sticky header scrolled past the hero, or the mobile menu is open */
 body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header.solid,
 body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header.nav-open {
