@@ -229,18 +229,23 @@ jobs:
       # Only a SHA-pinned site has a local pin to bump. In freeze-on-diff ab_mode
       # (a follows-release site A/B'ing a release transition) there is no pin here
       # — the control plane pins the site itself — so this step is skipped.
-      - name: Bump pin (identical render)
+      # Green A/B ⇒ no unresolved diff, so a pinned site RETURNS TO FOLLOWING
+      # release — pins exist only for an open diff or handover ("born-following,
+      # pin on diff"). Writing `release` (not a SHA) unfreezes it; the control
+      # plane is told follows_release. Skipped in ab_mode (a follows-release site
+      # has no local pin here) and for handover (its status is follows_release,
+      # never 'check', so this never runs).
+      - name: Follow release again (identical render)
         if: steps.pin.outputs.status == 'check' && steps.render.outputs.diffpages == '' && steps.pin.outputs.ab_mode != '1'
         id: bump
         working-directory: site
         run: |
           PIN="${{ steps.pin.outputs.pin }}"
-          RELEASE="${{ steps.pin.outputs.release }}"
-          echo "$RELEASE # frozen $(date +%F) - upgrade-check" > .stomme-engine
+          echo "release" > .stomme-engine
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add .stomme-engine
-          git commit -m "upgrade-check: bump engine $PIN -> ${RELEASE:0:10} (green A/B)"
+          git commit -m "upgrade-check: follow release again (green A/B, was $PIN)"
           git push
 
       - name: Collect diff artifacts
@@ -271,7 +276,7 @@ jobs:
             if [ "${{ job.status }}" != "success" ] && [ -z "${{ steps.render.outputs.diffpages }}" ]; then STATUS="error"
             elif [ -n "${{ steps.render.outputs.diffpages }}" ]; then STATUS="diff"
             elif [ "${{ steps.pin.outputs.ab_mode }}" = "1" ]; then STATUS="up_to_date"  # follows-release, identical release SHAs ⇒ keep following
-            else STATUS="upgraded"; fi
+            else STATUS="follows_release"; fi  # pinned site, green A/B ⇒ unfreeze, follow release again
           fi
           BODY=$(jq -nc --arg repo "$GITHUB_REPOSITORY" --arg status "$STATUS" \
             --arg from "${{ steps.pin.outputs.pin }}" --arg to "${{ steps.pin.outputs.release }}" \
