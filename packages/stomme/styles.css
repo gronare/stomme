@@ -478,6 +478,12 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
 .prose-fig--right.prose-fig--small, .prose-fig--left.prose-fig--small { width: 30%; }
 .prose::after { content: ""; display: block; clear: both; }
 
+/* Prose pull-stat — a single inline figure under the text (Prose statValue/statLabel).
+   Big enough that the brand colour counts as large text (AA 3:1). */
+.prose-stat { margin: 1.6rem 0 0; max-width: 72ch; border-top: 1px solid var(--color-line); padding-top: 1.4rem; display: flex; gap: 1.25rem; align-items: baseline; flex-wrap: wrap; }
+.prose-stat__n { font-family: var(--bk-font-display); font-weight: 800; font-size: clamp(2.4rem, 4vw, 3.2rem); line-height: 1; letter-spacing: -0.01em; color: var(--color-brand); font-variant-numeric: tabular-nums; }
+.prose-stat__l { color: var(--color-muted); font-size: 0.95rem; max-width: 22rem; }
+
 /* ───────────────────────────────────────────────────────────────────────
    Block component styles (moved out of scoped <style> so a site can override
    any of them from its own global.css). Class-scoped; no bare element selectors.
@@ -792,20 +798,30 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
   @media (min-width: 800px) {
     .ctabox--split { grid-template-columns: 1.1fr 0.9fr; gap: clamp(2rem, 4vw, 3.5rem); }
   }
+  /* The facts card is a dark ops-style scene: the facts pinned top-left as mono
+     chip pills over a subtle brand glow. It is decorative (aria-hidden; the copy
+     carries the message) — sites can layer more scene art on it via ::before /
+     ::after (e.g. a live site adds a flight path + drone in its global.css). */
   .ctabox-aside {
-    list-style: none; margin: 0; padding: 1.25rem 1.4rem;
-    display: flex; flex-direction: column;
-    background: var(--color-ink); border-radius: 14px;
+    list-style: none; margin: 0; padding: 0.85rem;
+    position: relative; overflow: hidden; aspect-ratio: 16 / 9.5;
+    display: flex; flex-direction: column; align-items: flex-start; gap: 7px;
+    background:
+      radial-gradient(120% 90% at 72% -10%, color-mix(in srgb, var(--color-brand) 18%, transparent), transparent 60%),
+      var(--color-ink);
+    border-radius: 14px;
+    box-shadow: 0 24px 48px -28px color-mix(in srgb, var(--color-ink) 55%, transparent);
   }
   .ctabox-chip {
-    display: flex; justify-content: space-between; align-items: baseline; gap: 1rem;
-    font-family: var(--bk-font-mono); text-transform: uppercase; letter-spacing: 0.1em;
-    font-size: 0.72rem; padding-block: 0.55rem;
-    color: color-mix(in srgb, var(--color-on-dark) 70%, transparent);
-    border-bottom: 1px solid color-mix(in srgb, var(--color-on-dark) 14%, transparent);
+    position: relative; z-index: 1;
+    display: inline-flex; gap: 0.6rem; align-items: baseline;
+    font-family: var(--bk-font-mono); text-transform: uppercase; letter-spacing: 0.12em;
+    font-size: 0.66rem; padding: 4px 9px; border-radius: 6px; white-space: nowrap;
+    color: color-mix(in srgb, var(--color-on-dark) 78%, transparent);
+    background: color-mix(in srgb, var(--color-on-dark) 6%, transparent);
+    border: 1px solid color-mix(in srgb, var(--color-on-dark) 10%, transparent);
   }
-  .ctabox-chip:last-child { border-bottom: 0; }
-  .ctabox-chip b { color: var(--color-on-dark); font-weight: 700; letter-spacing: 0.06em; }
+  .ctabox-chip b { color: var(--color-brand); font-weight: 600; letter-spacing: 0.06em; }
 
   /* Panel — a dark box with the copy plus a mono key/value readout. */
   .ctabox--panel {

@@ -2,10 +2,10 @@
 import Cover from './src/Cover.astro';
 // The renderer comes through the @stomme/renderer alias (the site's wrapper when
 // src/blocks/BlockRenderer.astro exists, else the engine renderer) so a service's
-// blocks — including the synthesized hero below — get the site's custom blocks
-// (e.g. a hero media override). Same resolution the lookbook route uses.
+// blocks get the site's custom blocks. Same resolution the lookbook route uses.
 import BlockRenderer from '@stomme/renderer';
 import { render } from 'astro:content';
+import { resolveLink } from './src/href';
 import { resolveSite, type SiteConfig } from './src/config';
 
 // Service detail page rendered from a `services` collection entry (its markdown
@@ -17,11 +17,13 @@ import { resolveSite, type SiteConfig } from './src/config';
 // imageAlt?, seo? + a markdown body + optional `blocks` (composed sections, same
 // picker as pages — rendered between the intro and the quote CTA).
 //
-// A block-composed entry may additionally carry a `hero` frontmatter group
-// (media/ticks/CTA overrides). That renders a REAL hero block — eyebrow (service
-// string), H1 = title, lede = summary, ✓ ticks, primary CTA (contact) and an
-// optional quiet second link (e.g. a "#process" jump) — instead of the plain
-// header. No `hero` → the plain header, exactly as before (fleet-safe).
+// A block-composed entry may additionally carry a `hero` frontmatter group. That
+// renders a COMPACT page-header instead of the plain one: eyebrow (service string),
+// H1 = title, lede = summary, ✓ ticks, primary CTA (contact) plus an optional quiet
+// second link (e.g. a "#process" jump), with the service image beside the text.
+// Deliberately lighter than the hero block — the big landing-page hero belongs to
+// the homepage; a detail page opens like a section, not another landing page.
+// No `hero` → the plain header, exactly as before (fleet-safe).
 interface Props {
   service?: any; // CollectionEntry<'services'> (the live route)
   data?: any; // OR draft frontmatter (the CMS preview) …
@@ -41,23 +43,41 @@ const hasBlocks = Array.isArray(data.blocks) && data.blocks.length > 0;
 // The hero group only upgrades block-composed entries — the legacy layout already
 // renders bullets/image itself and must not double them.
 const hero = hasBlocks && data.hero && typeof data.hero === 'object' ? data.hero : null;
-const heroBlock = hero
-  ? {
-      type: 'hero',
-      ...hero, // passthrough extras (surface, height, site-custom fields…) ride along
-      eyebrow: t.eyebrow,
-      heading: data.title,
-      intro: data.summary,
-      media: hero.media ?? (data.image ? 'image' : 'none'),
-      image: hero.image ?? data.image,
-      imageAlt: hero.imageAlt ?? data.imageAlt,
-      ticks: Array.isArray(hero.ticks) && hero.ticks.length > 0 ? hero.ticks : (data.bullets ?? []),
-      ctaLabel: hero.ctaLabel ?? t.cta,
-      ctaHref: hero.ctaHref ?? contact,
-    }
-  : null;
+const hdTicks: string[] = hero
+  ? (Array.isArray(hero.ticks) && hero.ticks.length > 0 ? hero.ticks : (data.bullets ?? []))
+  : [];
+const hdImage = hero ? (hero.image ?? data.image) : undefined;
+const hdCta = hero ? resolveLink(hero.ctaHref, contact) : contact;
+const hdCta2 = hero?.cta2Label ? resolveLink(hero.cta2Href, '/') : null;
 ---
-{!heroBlock && (
+{hero && (
+<section class="section service-hd">
+  <div class:list={['service-hd__grid', { 'has-media': !!hdImage }]}>
+    <div>
+      <span class="mono eyebrow">{t.eyebrow}</span>
+      <h1 class="display service-hd__h1">{data.title}</h1>
+      {data.summary && <p class="intro service-hd__lede">{data.summary}</p>}
+      {hdTicks.length > 0 && (
+        <ul class="service-hd__ticks">
+          {hdTicks.map((tick: string) => (
+            <li><span class="service-hd__check" aria-hidden="true">✓</span><span>{tick}</span></li>
+          ))}
+        </ul>
+      )}
+      <div class="service-hd__cta">
+        <a href={hdCta} class="btn">{hero.ctaLabel ?? t.cta}</a>
+        {hero.cta2Label && hdCta2 && (
+          <a href={hdCta2} class="btn-ghost">{`${hero.cta2Label} ${hdCta2.startsWith('#') ? '↓' : '→'}`}</a>
+        )}
+      </div>
+    </div>
+    {hdImage && (
+      <Cover src={hdImage} alt={hero.imageAlt ?? data.imageAlt ?? ''} placeholder="/images/placeholders/service.svg" width={800} height={600} loading="eager" class="service-hd__img" />
+    )}
+  </div>
+</section>
+)}
+{!hero && (
 <section class="section service-page">
   <span class="mono eyebrow">{t.eyebrow}</span>
   <h1 class="display display--hero service-h1">{data.title}</h1>
@@ -76,7 +96,7 @@ const heroBlock = hero
 </section>
 )}
 
-{hasBlocks && <BlockRenderer blocks={heroBlock ? [heroBlock, ...data.blocks] : data.blocks} config={config} />}
+{hasBlocks && <BlockRenderer blocks={data.blocks} config={config} />}
 
 {!hasBlocks && (
   <section class="band">
@@ -91,6 +111,24 @@ const heroBlock = hero
 )}
 
 <style>
+  /* Compact page-header (block-composed entries with a `hero` group). Reads as a
+     section intro: section-level heading size (not the hero scale), tighter bottom
+     padding, image in the side column. */
+  .service-hd { padding-bottom: 1.5rem; }
+  @media (min-width: 768px) { .service-hd { padding-block: 3rem 2.25rem; } }
+  .service-hd__grid { display: grid; grid-template-columns: 1fr; gap: 2rem; align-items: center; }
+  @media (min-width: 920px) { .service-hd__grid.has-media { grid-template-columns: 1.1fr 0.9fr; gap: clamp(2rem, 4vw, 3.5rem); } }
+  /* :global — the image comes out of the Cover child component, so it doesn't
+     carry this component's scope attribute. */
+  .service-hd__grid > :global(*) { min-width: 0; }
+  .service-hd__h1 { margin-top: 1rem; }
+  .service-hd__lede { max-width: 36rem; }
+  .service-hd__ticks { list-style: none; margin: 1.25rem 0 0; padding: 0; display: flex; flex-direction: column; gap: 0.45rem; }
+  .service-hd__ticks li { display: flex; gap: 0.7rem; align-items: baseline; color: var(--color-ink); font-size: 0.98rem; }
+  .service-hd__check { color: var(--color-brand); font-weight: 800; flex: none; }
+  .service-hd__cta { margin-top: 1.75rem; display: flex; gap: 1.25rem; align-items: center; flex-wrap: wrap; }
+  .service-hd__grid :global(.service-hd__img) { width: 100%; height: auto; aspect-ratio: 4 / 3; border-radius: 1rem; border: 1px solid var(--color-line); object-fit: cover; display: block; }
+
   .service-page { max-width: 48rem; }
   .service-h1 { margin-top: 1rem; }
   .service-img { margin-top: 2rem; aspect-ratio: 16 / 9; width: 100%; border: 1px solid var(--color-line); border-radius: 1rem; object-fit: cover; display: block; }

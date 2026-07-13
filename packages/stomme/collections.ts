@@ -219,14 +219,14 @@ export function stommeCollections(listings?: Listing[]) {
         image: z.string().optional(),
         imageAlt: z.string().optional(),
         seo: seo.optional(),
-        // Optional rich hero for BLOCK-COMPOSED entries: ServicePage turns this into
-        // a real hero block (H1 = title, lede = summary) instead of the plain header.
-        // All fields optional — media names any hero media the site's registry knows
-        // (image/highlights/motif, or a site-custom one); ticks default to `bullets`;
-        // the primary CTA defaults to the service strings + contact route.
+        // Optional COMPACT page-header for block-composed entries: ServicePage
+        // renders eyebrow + H1 (= title) + lede (= summary) + ✓ ticks + CTA with
+        // the image beside the text — lighter than a hero (that belongs to the
+        // homepage). All fields optional — ticks default to `bullets`; the primary
+        // CTA defaults to the service strings + contact route; image defaults to
+        // the entry's own `image` (the same art as its card in service lists).
         hero: z
           .object({
-            media: z.string().optional(),
             image: z.string().optional(),
             imageAlt: z.string().optional(),
             ticks: z.array(z.string()).default([]),
@@ -235,7 +235,7 @@ export function stommeCollections(listings?: Listing[]) {
             cta2Label: z.string().optional(),
             cta2Href: link,
           })
-          .passthrough() // extra keys flow into the hero block (surface, height, site-custom fields…)
+          .passthrough() // tolerate older content (e.g. a leftover hero `media` key)
           .optional(),
         // Optional composed sections (same block picker as pages) — rendered by
         // ServicePage between the intro and the quote CTA, so a service detail can
