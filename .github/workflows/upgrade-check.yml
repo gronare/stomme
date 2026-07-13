@@ -149,7 +149,10 @@ jobs:
 
       - name: Install render deps
         if: steps.pin.outputs.status == 'check'
-        run: sudo apt-get update -qq && sudo apt-get install -y -qq poppler-utils
+        # imagemagick (compare/identify) backs the pixel-tolerant comparison in
+        # same_png(); preinstalled on ubuntu-latest, but pinned here so a runner-
+        # image change can't silently drop it (same_png would then go byte-strict).
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq poppler-utils imagemagick
 
       - name: Install site deps
         if: steps.pin.outputs.status == 'check'
@@ -214,11 +217,34 @@ jobs:
           else
             PAT="page-*.png"
           fi
+          # Visual-equality gate (replaces byte-exact cmp): byte-identical is same
+          # (fast path); otherwise count "really different" pixels with ImageMagick
+          # `compare -metric AE -fuzz 2%`. Rationale: PNG re-encoding and sub-pixel
+          # antialiasing jitter can make visually identical renders byte-differ
+          # (false-positive diffs — a live site page-21); a real change (text, color,
+          # layout) flips thousands of pixels. SAME iff AE <= pixels/2000 — 0.05%,
+          # ~250 px on a 595x842 A4 page @72dpi, proportionally less for small block
+          # pages. Deliberately conservative so it can never mask a real change:
+          # dimension mismatch, any compare error, or missing ImageMagick all count
+          # as DIFFERENT (byte-strict behavior, as before).
+          same_png() {  # $1 = A png, $2 = B png; exit 0 = visually same
+            cmp -s "$1" "$2" && return 0
+            command -v compare > /dev/null && command -v identify > /dev/null || return 1
+            local wh w h px ae
+            wh=$(identify -format '%wx%h' "$1" 2> /dev/null) || return 1
+            w=${wh%%x*}; h=${wh##*x}
+            case "$w$h" in (''|*[!0-9]*) return 1 ;; esac
+            px=$(( w * h ))
+            ae=$(compare -metric AE -fuzz 2% "$1" "$2" null: 2>&1) || true
+            case "$ae" in (''|*[!0-9.eE+-]*) return 1 ;; esac
+            ae=$(awk -v v="$ae" 'BEGIN { printf "%d", v + 0 }')  # 1.2e+03 -> 1200
+            [ "$ae" -le $(( px / 2000 )) ]
+          }
           diffpages=""
           for a in /tmp/a/$PAT; do
             [ -f "$a" ] || continue
             b="/tmp/b/$(basename "$a")"
-            if [ ! -f "$b" ] || ! cmp -s "$a" "$b"; then diffpages="$diffpages $(basename "$a")"; fi
+            if [ ! -f "$b" ] || ! same_png "$a" "$b"; then diffpages="$diffpages $(basename "$a")"; fi
           done
           for b in /tmp/b/$PAT; do
             [ -f "$b" ] || continue
