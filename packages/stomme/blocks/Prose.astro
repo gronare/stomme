@@ -1,12 +1,28 @@
 ---
 import { renderMarkdown } from '../src/markdown';
 
-interface Props { eyebrow?: string; heading?: string; body?: string; width?: 'narrow' | 'full' }
-const { eyebrow, heading, body = '', width = 'narrow' } = Astro.props;
+// Long-form text section. An optional pull-stat (statValue + statLabel) renders as
+// a compact inline figure under the prose — a big brand number with a short label —
+// for the one headline figure a text section earns (use statsBar for a row of many).
+interface Props {
+  eyebrow?: string;
+  heading?: string;
+  body?: string;
+  statValue?: string;
+  statLabel?: string;
+  width?: 'narrow' | 'full';
+}
+const { eyebrow, heading, body = '', statValue, statLabel, width = 'narrow' } = Astro.props;
 const html = await renderMarkdown(body);
 ---
 <section class:list={['section', { 'section--read': width !== 'full' }]}>
   {eyebrow && <span class="mono eyebrow">{eyebrow}</span>}
   {heading && <h2 class="display" style={eyebrow ? 'margin-top:0.75rem' : ''}>{heading}</h2>}
   <div class="prose" style={heading ? 'margin-top:1.5rem' : ''} set:html={html} />
+  {statValue && (
+    <p class="prose-stat">
+      <span class="prose-stat__n">{statValue}</span>
+      {statLabel && <span class="prose-stat__l">{statLabel}</span>}
+    </p>
+  )}
 </section>

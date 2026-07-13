@@ -159,7 +159,7 @@ const RAW_BLOCKS: BlockDef[] = [
     group: 'Text',
     summary: 'A block of rich (markdown) text with an optional heading.',
     shape: 'prose',
-    fields: [{ name: 'eyebrow', label: 'Eyebrow', widget: 'string', required: false, hint: 'Small uppercase label above the heading.' }, { name: 'heading', label: 'Heading (optional)', widget: 'string', required: false }, { name: 'body', label: 'Body', widget: 'markdown', required: false }, widthField, surfaceField],
+    fields: [{ name: 'eyebrow', label: 'Eyebrow', widget: 'string', required: false, hint: 'Small uppercase label above the heading.' }, { name: 'heading', label: 'Heading (optional)', widget: 'string', required: false }, { name: 'body', label: 'Body', widget: 'markdown', required: false }, { name: 'statValue', label: 'Pull-stat number', widget: 'string', required: false, hint: 'One headline figure shown big under the text (e.g. +50 %). Use a Stats block for a row of many.' }, { name: 'statLabel', label: 'Pull-stat label', widget: 'string', required: false, hint: 'The short line beside the number.' }, widthField, surfaceField],
   },
   {
     type: 'featureGrid',
@@ -598,6 +598,7 @@ const SAMPLES: Record<string, ({ _label?: string } & Record<string, unknown>)[]>
   prose: [
     { _label: 'with heading (split on themed sites)', eyebrow: 'Eyebrow', heading: 'A prose section heading', body: `**Bold**, *emphasis* and a [link](#) inside markdown body copy. ${LOREM}\n\nA second paragraph to show rhythm.` },
     { _label: 'plain reading column', body: `${LOREM} ${LOREM}` },
+    { _label: 'pull-stat figure', eyebrow: 'Why', heading: 'Prose with a pull-stat', body: `${LOREM}\n\nA second paragraph before the headline figure below.`, statValue: '+50 %', statLabel: 'a short label that explains what the number measures.' },
   ],
   featureGrid: [{ eyebrow: 'Eyebrow', heading: 'Feature cards heading', items: [
     { icon: 'bolt', title: 'First feature', body: LOREM, link: { url: '#' } },
@@ -669,7 +670,11 @@ const SAMPLES: Record<string, ({ _label?: string } & Record<string, unknown>)[]>
     { id: 'three', data: { title: 'Third item', price: '4 200 kr', status: 'sold', category: 'Alpha', date: '2026-03-01' } },
   ] }],
   ctaPanel: [{ eyebrow: 'Eyebrow', heading: 'A call-to-action band', intro: LOREM, label: 'Do the thing', href: { url: '#' } }],
-  ctaBox: [{ surface: 'dark', eyebrow: 'Next step', heading: 'A boxed call to action.', intro: 'A short supporting line under the heading.', label: 'Primary', href: { url: '#' }, label2: 'quiet second link', href2: { url: '#' } }],
+  ctaBox: [
+    { _label: 'classic', surface: 'dark', eyebrow: 'Next step', heading: 'A boxed call to action.', intro: 'A short supporting line under the heading.', label: 'Primary', href: { url: '#' }, label2: 'quiet second link', href2: { url: '#' } },
+    { _label: 'split · facts card', variant: 'split', eyebrow: 'Next step', heading: 'Split call to action.', intro: 'Copy on the left, a dark facts card on the right.', label: 'Primary', href: { url: '#' }, facts: [{ label: 'Analysis', value: 'Free' }, { label: 'Reply', value: '< 24 h' }] },
+    { _label: 'panel · readout', variant: 'panel', eyebrow: 'Next step', heading: 'Panel call to *action*.', intro: 'Dark panel with a mono key/value readout.', label: 'Primary', href: { url: '#' }, facts: [{ label: 'Reply', value: '< 24 h' }, { label: 'Analysis', value: 'Free' }, { label: 'Method', value: 'Softwash' }] },
+  ],
   faq: [
     { _label: 'list', eyebrow: 'FAQ', heading: 'Questions (list)', asideHeading: 'More questions?', asideBody: 'Get in touch.', asideCtaLabel: 'Contact', items: FAQ_FIX },
     { _label: 'accordion', variant: 'accordion', heading: 'Questions (accordion)', items: FAQ_FIX },

@@ -534,14 +534,15 @@ const COLLECTION_EDITORS = {
     - { name: navLabel, label: "Short label (menus/cards)", widget: string }
     - { name: summary, label: "Summary", widget: text, required: false, hint: "The lede under the title — also the card text in service lists." }
     - { name: order, label: "Order", widget: number, required: false, default: 0 }
+    - { name: image, label: "Image", widget: image, required: false, hint: "Shown on the service card in lists and beside the page header." }
+    - { name: imageAlt, label: "Image alt text", widget: string, required: false, hint: "Leave empty for decorative art." }
     - name: hero
-      label: "Hero (composed pages)"
+      label: "Page header (composed pages)"
       widget: object
       collapsed: true
       required: false
-      hint: "Only used when the page is built from sections below: renders a full hero (title + summary + these extras) instead of the plain header."
+      hint: "Only used when the page is built from sections below: renders a compact page header (title + summary + these extras, image beside the text) instead of the plain one."
       fields:
-        - { name: media, label: "Media", widget: string, required: false, hint: "What shows beside the heading — e.g. image, highlights, motif, or a site-specific media like ops." }
         - name: ticks
           label: "Ticks (checkmark lines)"
           widget: list
