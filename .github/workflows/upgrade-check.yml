@@ -46,7 +46,7 @@ on:
 
 jobs:
   check:
-    runs-on: ubuntu-latest
+    runs-on: stomme-ci # was: ubuntu-latest — homelab ARC scale set; ARC matches the scale-set NAME only (no [self-hosted, ...] arrays)
     permissions:
       contents: write
     steps:
