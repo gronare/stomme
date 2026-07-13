@@ -184,20 +184,44 @@ jobs:
             python3 -m http.server 4437 --directory site/dist > /dev/null 2>&1 &
             SRV=$!
             sleep 1
+            # Whole book (page-NN) — always captured: it is the comparison unit against
+            # an engine that predates the per-section lookbook, so the transition release
+            # itself doesn't flag every site (block-* would exist on one side only).
             google-chrome --headless=new --disable-gpu --no-pdf-header-footer \
               --print-to-pdf="$2/lookbook.pdf" --virtual-time-budget=8000 \
               "http://localhost:4437/lookbook/" 2> /dev/null
-            kill "$SRV" 2> /dev/null || true
             pdftoppm -png -r 72 "$2/lookbook.pdf" "$2/page"
+            # Per-section pages (block-<slug>) — each lookbook section on its own page,
+            # so a height change in one block can't shift the captures of the others
+            # (the whole-book PDF cascades one change into "every page after it differs").
+            for f in site/dist/lookbook/*/index.html; do
+              [ -f "$f" ] || continue
+              slug=$(basename "$(dirname "$f")")
+              google-chrome --headless=new --disable-gpu --no-pdf-header-footer \
+                --print-to-pdf="$2/$slug.pdf" --virtual-time-budget=8000 \
+                "http://localhost:4437/lookbook/$slug/" 2> /dev/null
+              pdftoppm -png -r 72 "$2/$slug.pdf" "$2/block-$slug"
+              rm -f "$2/$slug.pdf"
+            done
+            kill "$SRV" 2> /dev/null || true
           }
           render "${{ steps.pin.outputs.pin }}" /tmp/a
           render "${{ steps.pin.outputs.release }}" /tmp/b
+          # Diff per block when BOTH engines emitted per-section pages; otherwise fall
+          # back to the whole-book pages (legacy engine on at least one side).
+          if compgen -G "/tmp/a/block-*.png" > /dev/null && compgen -G "/tmp/b/block-*.png" > /dev/null; then
+            PAT="block-*.png"
+          else
+            PAT="page-*.png"
+          fi
           diffpages=""
-          for a in /tmp/a/page*.png; do
+          for a in /tmp/a/$PAT; do
+            [ -f "$a" ] || continue
             b="/tmp/b/$(basename "$a")"
             if [ ! -f "$b" ] || ! cmp -s "$a" "$b"; then diffpages="$diffpages $(basename "$a")"; fi
           done
-          for b in /tmp/b/page*.png; do
+          for b in /tmp/b/$PAT; do
+            [ -f "$b" ] || continue
             [ -f "/tmp/a/$(basename "$b")" ] || diffpages="$diffpages $(basename "$b")"
           done
           echo "diffpages=${diffpages# }" >> "$GITHUB_OUTPUT"
