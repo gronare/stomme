@@ -414,6 +414,13 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
 body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header .site-nav > a,
 body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header .nav-top,
 body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header .nav-toggle { color: #fff; }
+/* Legibility scrim: a soft top-down gradient behind the transparent header so the white
+   logo/nav read over ANY cover — incl. footage that is bright at the top. Only in the
+   transparent state; the solid state paints its own background. */
+body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header:not(.solid):not(.nav-open)::before {
+  content: ""; position: absolute; left: 0; right: 0; top: 0; height: 220%; z-index: -1; pointer-events: none;
+  background: linear-gradient(180deg, rgba(8, 9, 14, 0.55), transparent);
+}
 /* The dropdown panel is always a light popup, so its links keep the normal dark colour. */
 body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header .logo .accent { color: color-mix(in srgb, var(--color-brand) 45%, #fff); }
 /* solid state — sticky header scrolled past the hero, or the mobile menu is open */
