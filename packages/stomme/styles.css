@@ -417,7 +417,7 @@ main .cover:first-child .cover__scrim::before {
    goes solid over an open mobile panel (.nav-open). */
 body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header {
   position: absolute; top: 0; left: 0; right: 0; z-index: 50;
-  background: transparent; border-bottom-color: transparent; color: #fff;
+  background: transparent; border-bottom-width: 0; color: #fff;
   transition: background 0.3s, box-shadow 0.3s, border-color 0.3s, color 0.3s;
 }
 body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header.is-sticky { position: fixed; }
@@ -435,7 +435,7 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
      dropdown caret (currentColor) turn dark too, not just the explicitly-reset links */
   color: var(--color-ink);
   -webkit-backdrop-filter: saturate(1.2) blur(8px); backdrop-filter: saturate(1.2) blur(8px);
-  border-bottom-color: var(--color-line); box-shadow: 0 12px 30px -24px rgba(0,0,0,0.5);
+  border-bottom: 1px solid var(--color-line); box-shadow: 0 12px 30px -24px rgba(0,0,0,0.5);
 }
 body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header.solid .logo,
 body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header.solid .site-nav > a,
