@@ -40,7 +40,8 @@
     "./blocks/*": "./blocks/*"
   },
   "scripts": {
-    "gen:schema-manifest": "node bin/gen-schema-manifest.mjs"
+    "gen:schema-manifest": "node bin/gen-schema-manifest.mjs",
+    "test:preview-workerd": "node test/smoke-preview-workerd.mjs"
   },
   "bin": {
     "stomme-gen": "bin/gen-admin-blocks.mjs",

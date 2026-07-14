@@ -18,11 +18,13 @@
   "dependencies": {
     "@astrojs/netlify": "^6.6.5",
     "@astrojs/sitemap": "^3.2.1",
-    "astro": "^5.2.5",
-    "@gronare/stomme": "workspace:*"
+    "@gronare/stomme": "workspace:*",
+    "astro": "^5.2.5"
   },
   "devDependencies": {
-    "decap-server": "^3.1.4"
+    "@astrojs/cloudflare": "^12.6.13",
+    "decap-server": "^3.1.4",
+    "wrangler": "^4.110.0"
   },
   "license": "AGPL-3.0-only"
 }
