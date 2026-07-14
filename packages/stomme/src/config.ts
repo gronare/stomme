@@ -299,5 +299,6 @@ export function resolveSite(c?: SiteConfig) {
     },
     listings: resolveListings(c && c.listings),
     cms: c && c.cms, // forwarded so blocks (e.g. ContactForm) can reach the gateway baseUrl
+    contact: c && c.contact, // forwarded so ContactForm posts to the dedicated form worker
   };
 }
