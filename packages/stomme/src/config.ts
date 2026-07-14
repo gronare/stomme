@@ -68,6 +68,13 @@ export interface SiteConfig {
     gatewayUrl?: string; // git-gateway gateway URL (DecapBridge / self-hosted)
     identityUrl?: string; // git-gateway identity URL (DecapBridge / GoTrue)
   };
+  // The public contact-form gateway — a thin edge Worker (spam-gate + rate limit) that
+  // hands off to the control plane (which stores + sends). Kept separate from `cms`: the CMS proxy
+  // moved to the control plane, but the form endpoint stays at the edge for portability. When unset,
+  // ContactForm falls back to cms.baseUrl (legacy, pre-consolidation sites).
+  contact?: {
+    endpoint?: string; // form worker origin, e.g. 'https://forms.gronare.se'
+  };
 }
 
 // Optional capabilities a site can switch on. A flag that's missing (or the whole

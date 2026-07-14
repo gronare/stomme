@@ -32,9 +32,15 @@ const contactLine = [settings.name, contact.address?.city, contact.orgNr && `Org
   .filter(Boolean)
   .join(' · ');
 
-// Send through the gateway (Resend key + rate limit live there, one place for all sites).
-// Falls back to the per-site /api/contact endpoint if the site isn't CMS/gateway-wired.
-const contactAction = site?.cms?.baseUrl ? `${site.cms.baseUrl}/contact` : '/api/contact';
+// Post to the form gateway (spam-gate + rate limit at the edge; the control plane stores + sends).
+// `contact.endpoint` is the dedicated form worker; falls back to the legacy cms.baseUrl for
+// sites not yet migrated, then to the per-site /api/contact if un-wired.
+const contactAction = site?.contact?.endpoint
+  ? `${site.contact.endpoint}/contact`
+  : site?.cms?.baseUrl ? `${site.cms.baseUrl}/contact` : '/api/contact';
+// No-JS fallback: the worker 303s here after a successful submit (KV is gone, so the
+// success path travels with the form). JS submits ignore this and go to /thanks themselves.
+const successPath = site?.routes?.formSuccess ?? '/thanks';
 
 // The "what you sent" recap on /thanks is labelled with this form's own field labels.
 const recapLabels = JSON.stringify({ email: L.email, phone: L.phone, message: L.message });
@@ -51,6 +57,8 @@ const recapLabels = JSON.stringify({ email: L.email, phone: L.phone, message: L.
     <form method="POST" action={contactAction} class="contact-form" data-recap-labels={recapLabels}>
       {/* Honeypot — hidden INLINE so no stylesheet-subset context (CMS preview) can show it. */}
       <p class="hp" aria-hidden="true" style="display:none"><label>{L.honeypot} <input name="bot-field" tabindex="-1" autocomplete="off" /></label></p>
+      {/* No-JS success path — the form worker 303s to this on the site's own origin. */}
+      <input type="hidden" name="_success" value={successPath} />
       <div class="field">
         <label for="name" class="mono">{L.name}</label>
         <input id="name" name="name" required />
