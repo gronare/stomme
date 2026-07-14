@@ -396,7 +396,7 @@
   // round-trips back into the fields when editing.
   var ALIGN = ['center', 'left', 'right', 'wide'];
   var SIZE = ['small', 'large'];
-  window.CMS.registerEditorComponent({
+  var IMAGE_COMPONENT = {
     id: 'image',
     label: 'Image',
     fields: [
@@ -428,5 +428,12 @@
     toPreview: function (d) {
       return '<img src="' + (d.image || '') + '" alt="' + (d.alt || '') + '" style="max-width:100%" />';
     },
-  });
+  };
+  window.CMS.registerEditorComponent(IMAGE_COMPONENT);
+  // Sveltia's rich-text image button resolves the component named `linked-image` when
+  // `linked_images` is on (its default). Register the same definition under that id too so
+  // OUR caption/placement/size dialog is used instead of the built-in src/alt/title one.
+  // (Decap ignores the extra registration — it has no `linked-image` built-in.) The stored
+  // markdown is unchanged: `![alt](src "align size")`.
+  try { window.CMS.registerEditorComponent(Object.assign({}, IMAGE_COMPONENT, { id: 'linked-image' })); } catch (e) {}
 })();
