@@ -12,6 +12,6 @@ export async function getStaticPaths() {
 const { service } = Astro.props;
 const { data } = service;
 ---
-<Base title={data.seo?.title ?? data.title} description={data.seo?.description ?? ''}>
+<Base title={data.seo?.title ?? data.title} description={data.seo?.description ?? ''} image={data.seo?.image ?? data.image}>
   <ServicePage service={service} config={site} />
 </Base>
