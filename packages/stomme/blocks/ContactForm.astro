@@ -54,7 +54,7 @@ const recapLabels = JSON.stringify({ email: L.email, phone: L.phone, message: L.
     </div>
   )}
   <div class:list={['contact-grid', !showAside && 'contact-grid--solo']}>
-    <form method="POST" action={contactAction} class="contact-form" data-recap-labels={recapLabels}>
+    <form method="POST" action={contactAction} class="contact-form" data-recap-labels={recapLabels} data-success={successPath}>
       {/* Honeypot — hidden INLINE so no stylesheet-subset context (CMS preview) can show it. */}
       <p class="hp" aria-hidden="true" style="display:none"><label>{L.honeypot} <input name="bot-field" tabindex="-1" autocomplete="off" /></label></p>
       {/* No-JS success path — the form worker 303s to this on the site's own origin. */}
@@ -105,7 +105,7 @@ const recapLabels = JSON.stringify({ email: L.email, phone: L.phone, message: L.
               email: fd.get('email') || '', phone: fd.get('phone') || '', message: fd.get('message') || '', labels: labels,
             }));
           } catch (e) {}
-          window.location.assign('/thanks');
+          window.location.assign(form.dataset.success || '/thanks');
         } catch (err) {
           if (btn) btn.disabled = false;
           var msg = form.querySelector('.contact-error');
