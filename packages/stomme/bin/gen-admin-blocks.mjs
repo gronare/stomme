@@ -18,6 +18,11 @@ import { renderGallery } from '../admin/blocks-gallery.mjs';
 const root = process.cwd();
 const here = dirname(fileURLToPath(import.meta.url));
 
+// CMS bundle: Sveltia CMS, pinned. Swapped into each site's public/admin/index.html on
+// build (replacing the legacy Decap CDN tag). Bump deliberately — Sveltia is pre-1.0.
+// Override for a local/vendored copy with STOMME_SVELTIA_SRC (e.g. /admin/sveltia-cms.js).
+const SVELTIA_CMS_SRC = process.env.STOMME_SVELTIA_SRC || 'https://unpkg.com/@sveltia/cms@0.170.8/dist/sveltia-cms.js';
+
 // Load the site's TS config/catalog through jiti rather than a bare dynamic import.
 // Node's built-in type-stripping refuses any .ts file under node_modules, so a plain
 // import of schema.ts / site.config.ts breaks the moment their import graph reaches the
@@ -639,6 +644,9 @@ function emitCms(indent) {
   if (c.baseUrl) L.push(`${p}  base_url: ${c.baseUrl}`);
   if (c.authEndpoint) L.push(`${p}  auth_endpoint: ${c.authEndpoint}`);
   if (c.apiRoot) L.push(`${p}  api_root: ${c.apiRoot}`);
+  // Sveltia sends the OAuth `site_id` from `site_domain`; the gateway's same-window
+  // (Arc/mobile) fallback keys off it to find the site in KV. Defaults to the deploy host.
+  if (c.siteDomain) L.push(`${p}  site_domain: ${c.siteDomain}`);
   if (c.gatewayUrl) L.push(`${p}  gateway_url: ${c.gatewayUrl}`);
   if (c.identityUrl) L.push(`${p}  identity_url: ${c.identityUrl}`);
   return L.join('\n');
@@ -907,11 +915,20 @@ function translateLabels(text) {
   });
 }
 
-// Set Decap's admin UI language from the site's cmsLocale (top-level config.yml `locale:`).
-// Upsert keeps it idempotent: replace the line if present, else prepend it.
+// Sveltia CMS config normalization. Sveltia ignores Decap's top-level `locale:` (that
+// only set Decap's UI language) and `local_backend:` (Sveltia's local edits use the File
+// System Access API, no proxy) — both emit console warnings, so strip them. Field LABELS
+// are still localized below via `translateLabels` (driven by CMS_LOCALE), independent of
+// the removed `locale:` line.
 let yaml = out.join('\n');
-const localeLine = `locale: ${CMS_LOCALE}`;
-yaml = /^locale:.*$/m.test(yaml) ? yaml.replace(/^locale:.*$/m, localeLine) : `${localeLine}\n${yaml}`;
+yaml = yaml.replace(/^locale:.*$\n?/m, '');
+yaml = yaml.replace(/^local_backend:.*$\n?/m, '');
+// `output.omit_empty_optional_fields: true` — Sveltia otherwise writes every optional
+// field explicitly on save (e.g. `cta2Label: ''`). Our field policy is "absent = off"
+// (rule zero), so keep saved files minimal. Idempotent upsert at the top of the config.
+if (!/^output:/m.test(yaml)) {
+  yaml = `output:\n  omit_empty_optional_fields: true\n${yaml}`;
+}
 yaml = translateLabels(yaml);
 writeFileSync(configPath, yaml);
 
@@ -960,7 +977,7 @@ const AUTH_SHIM = `      (function () {
             b += '==='.slice((b.length + 3) % 4);
             email = (JSON.parse(atob(b)) || {}).email || '';
           } catch (e) {}
-          localStorage.setItem('decap-cms-user', JSON.stringify({ name: email, login: email, email: email, token: token, backendName: 'github' }));
+          localStorage.setItem('sveltia-cms.user', JSON.stringify({ name: email, login: email, email: email, token: token, backendName: 'github' }));
           history.replaceState(null, '', location.pathname + location.search);
           location.reload();
         } catch (e) {}
@@ -977,6 +994,13 @@ try {
   } else if (html.includes('</head>')) {
     html = html.replace('</head>', `    ${region}\n  </head>`); // inject once
   }
+  // Swap the CMS bundle to Sveltia (pinned) if the site still ships the Decap CDN tag.
+  // Idempotent: the regex only matches the Decap unpkg tag, so re-runs are no-ops once
+  // swapped. `type="module"` is intentionally omitted — Sveltia warns if it's present.
+  html = html.replace(
+    /<script\s+src="https:\/\/unpkg\.com\/decap-cms@[^"]*"><\/script>/,
+    `<script src="${SVELTIA_CMS_SRC}"></script>`,
+  );
   writeFileSync(indexPath, html);
 } catch (e) {
   console.warn('  (admin auth shim skipped:', e.message + ')');
