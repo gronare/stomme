@@ -247,7 +247,7 @@ export async function getStaticPaths() {
 }
 const { entry } = Astro.props;
 ---
-<Base title={entry.data.title} description={entry.data.excerpt ?? entry.data.title}>
+<Base title={entry.data.title} description={entry.data.excerpt ?? entry.data.title} image={entry.data.seo?.image ?? entry.data.image ?? entry.data.cover}>
   <Detail ${prop}={entry} config={{ ...site, listings }} />
 </Base>
 `;
