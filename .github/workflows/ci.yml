@@ -31,6 +31,27 @@ jobs:
         working-directory: ${{ matrix.site }}
         run: pnpm run build
 
+  # Production-runtime guard: build the starter with the Cloudflare adapter and
+  # serve dist/ on workerd (wrangler pages dev — no deploy), then assert /preview
+  # actually renders. Catches the class of bug that is invisible on the Node dev
+  # server, e.g. decoding ?data= with Node's Buffer (absent on workerd → an empty
+  # #preview-root on every deployed site). Core HTTP checks only — no browser; the
+  # optional CSP detector needs Playwright and is run locally (see the script header).
+  preview-workerd:
+    name: preview smoke (workerd)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      # The script builds:cloudflare + serves dist/ on workerd + asserts /preview.
+      - name: smoke /preview on workerd
+        run: pnpm --filter @gronare/stomme test:preview-workerd -- --no-csp
+
   # Catch syntax errors in the engine's plain-JS scripts (bins, integration,
   # the Decap previews module) — none of these go through astro check.
   engine-scripts:
@@ -47,3 +68,4 @@ jobs:
           node --check packages/stomme/bin/new-block.mjs
           node --check packages/stomme/integration.mjs
           node --check packages/stomme/admin/previews.js
+          node --check packages/stomme/test/smoke-preview-workerd.mjs

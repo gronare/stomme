@@ -62,7 +62,9 @@ const kind = Astro.url.searchParams.get('kind');
 const raw = Astro.url.searchParams.get('data');
 function decode() {
   if (!raw) return null;
-  try { return JSON.parse(Buffer.from(raw, 'base64').toString('utf8')); }
+  // workerd (Cloudflare SSR) has no Node Buffer — decode with atob + TextDecoder,
+  // mirroring b64()'s btoa(TextEncoder) encode so UTF-8 round-trips on every runtime.
+  try { return JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(raw), (c) => c.charCodeAt(0)))); }
   catch { return null; }
 }
 const draft = decode();
