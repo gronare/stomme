@@ -1,6 +1,6 @@
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { resolve, dirname } from 'node:path';
-import { mkdirSync, writeFileSync, existsSync, readFileSync, readdirSync, cpSync, rmSync } from 'node:fs';
+import { mkdirSync, writeFileSync, existsSync, readFileSync, readdirSync, cpSync, rmSync, statSync } from 'node:fs';
 
 // stomme Astro integration — injects collection-detail routes.
 //
@@ -827,8 +827,21 @@ const { thanksProps, serviceFixture, townFixture } = templateFixtures(rs);
       // GREEN build with no theme — the worst outcome. Hard-fail instead. Cheap: scans only
       // the emitted .css/.html for the sentinel custom property.
       'astro:build:done': ({ dir, logger }) => {
-        if (!style) return;
         const outDir = fileURLToPath(dir);
+        // favicon/apple-touch-icon must serve from the ROOT (Apple/iOS); they upload into the
+        // scoped /media/icons folder (keeps the CMS browser clean), so copy them to root here.
+        try {
+          const iconsDir = resolve(outDir, 'media/icons');
+          if (existsSync(iconsDir)) {
+            for (const f of readdirSync(iconsDir)) {
+              const s = resolve(iconsDir, f);
+              if (statSync(s).isFile()) cpSync(s, resolve(outDir, f));
+            }
+          }
+        } catch (e) {
+          logger?.warn(`media icons→root skipped: ${e?.message || e}`);
+        }
+        if (!style) return;
         if (emittedCssHasStyle(outDir)) {
           logger?.info(`style "${style}" verified in emitted CSS`);
           return;

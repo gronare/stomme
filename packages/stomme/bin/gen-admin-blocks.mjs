@@ -21,7 +21,7 @@ const here = dirname(fileURLToPath(import.meta.url));
 // CMS bundle: Sveltia CMS, pinned. Swapped into each site's public/admin/index.html on
 // build (replacing the legacy Decap CDN tag). Bump deliberately — Sveltia is pre-1.0.
 // Override for a local/vendored copy with STOMME_SVELTIA_SRC (e.g. /admin/sveltia-cms.js).
-const SVELTIA_CMS_SRC = process.env.STOMME_SVELTIA_SRC || 'https://unpkg.com/@sveltia/cms@0.170.8/dist/sveltia-cms.js';
+const SVELTIA_CMS_SRC = process.env.STOMME_SVELTIA_SRC || 'https://unpkg.com/@sveltia/cms@0.170.9/dist/sveltia-cms.js';
 
 // Load the site's TS config/catalog through jiti rather than a bare dynamic import.
 // Node's built-in type-stripping refuses any .ts file under node_modules, so a plain
@@ -755,8 +755,8 @@ function emitSettings() {
               - { name: alt, label: "Logo alt text", widget: string, required: false }
               - { name: textPre, label: "Wordmark text", widget: string, required: false }
               - { name: textAccent, label: "Wordmark accent (in brand colour)", widget: string, required: false }
-          - { name: favicon, label: "Favicon", widget: image, required: false, media_folder: "/public/media/identity", public_folder: "/media/identity", hint: "Browser-tab icon — SVG recommended (scales to any size). Defaults to the shipped mark when empty." }
-          - { name: appleIcon, label: "Home-screen icon", widget: image, required: false, media_folder: "/public/media/identity", public_folder: "/media/identity", hint: "iOS home-screen icon — a 180×180 PNG. Optional." }
+          - { name: favicon, label: "Favicon", widget: image, required: false, media_folder: "/public/media/icons", public_folder: "/", hint: "Browser-tab icon — SVG recommended (scales to any size). Defaults to the shipped mark when empty." }
+          - { name: appleIcon, label: "Home-screen icon", widget: image, required: false, media_folder: "/public/media/icons", public_folder: "/", hint: "iOS home-screen icon — a 180×180 PNG. Optional." }
 ${emitShareCards(6)}
       - name: contact
         label: "Contact"
@@ -1104,11 +1104,11 @@ try {
   } else if (html.includes('</head>')) {
     html = html.replace('</head>', `    ${region}\n  </head>`); // inject once
   }
-  // Swap the CMS bundle to Sveltia (pinned) if the site still ships the Decap CDN tag.
-  // Idempotent: the regex only matches the Decap unpkg tag, so re-runs are no-ops once
-  // swapped. `type="module"` is intentionally omitted — Sveltia warns if it's present.
+  // Pin the CMS bundle to Sveltia: swap a legacy Decap CDN tag AND re-pin an existing
+  // Sveltia tag at any version (so a version bump propagates on cms:gen). Idempotent once at
+  // the pinned URL. `type="module"` is intentionally omitted — Sveltia warns if it's present.
   html = html.replace(
-    /<script\s+src="https:\/\/unpkg\.com\/decap-cms@[^"]*"><\/script>/,
+    /<script\s+src="https:\/\/unpkg\.com\/(?:decap-cms|@sveltia\/cms)@[^"]*"><\/script>/,
     `<script src="${SVELTIA_CMS_SRC}"></script>`,
   );
   writeFileSync(indexPath, html);
