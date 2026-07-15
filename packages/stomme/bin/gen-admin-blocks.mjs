@@ -1002,6 +1002,11 @@ function translateLabels(text) {
 let yaml = out.join('\n');
 yaml = yaml.replace(/^locale:.*$\n?/m, '');
 yaml = yaml.replace(/^local_backend:.*$\n?/m, '');
+// A RELATIVE global media_folder ("src/assets/uploads") is a Decap-era legacy — Decap
+// tolerated it, but Sveltia needs an ABSOLUTE repo path or it can't resolve assets
+// (empty public_url + blank thumbnails in the media library). Normalize to absolute so
+// the media library works; idempotent (the lookahead skips an already-absolute value).
+yaml = yaml.replace(/^media_folder: "(?!\/)/m, 'media_folder: "/');
 // `output.omit_empty_optional_fields: true` — Sveltia otherwise writes every optional
 // field explicitly on save (e.g. `cta2Label: ''`). Our field policy is "absent = off"
 // (rule zero), so keep saved files minimal. Idempotent upsert at the top of the config.
