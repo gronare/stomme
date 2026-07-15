@@ -221,7 +221,7 @@ jobs:
           # (fast path); otherwise count "really different" pixels with ImageMagick
           # `compare -metric AE -fuzz 2%`. Rationale: PNG re-encoding and sub-pixel
           # antialiasing jitter can make visually identical renders byte-differ
-          # (false-positive diffs — a live site page-21); a real change (text, color,
+          # (false-positive diffs — one fleet page); a real change (text, color,
           # layout) flips thousands of pixels. SAME iff AE <= pixels/2000 — 0.05%,
           # ~250 px on a 595x842 A4 page @72dpi, proportionally less for small block
           # pages. Deliberately conservative so it can never mask a real change:

@@ -4,7 +4,7 @@
 // The TownPage/ServicePage templates take the same `site`.
 // Defaults are neutral English; override only what differs.
 export interface SiteConfig {
-  // Canonical absolute site URL (e.g. 'https://a live site.se') — drives Astro.site,
+  // Canonical absolute site URL (e.g. 'https://example.com') — drives Astro.site,
   // which Head.astro uses for og:image (absolute), og:url, <link canonical> and the
   // sitemap. the control plane-managed: set per site to the canonical host (custom domain when
   // live, *.pages.dev while in demo/review) and updated at go-live. The site's

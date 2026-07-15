@@ -2,7 +2,7 @@
 // Engine-owned <head> meta: title, description, Open Graph, Twitter card, favicon +
 // apple-touch-icon links (and, when a site emits them, a web manifest + theme-color).
 // Encapsulated here so the social/SEO head is the stomme DEFAULT — engine-owned, so it
-// can't be silently dropped when a site customizes its Base (the a live site failure
+// can't be silently dropped when a site customizes its Base (a real past failure
 // mode), and so head improvements ship fleet-wide via promote. Renders the SAME markup
 // a site Base previously inlined; migrate a Base by replacing that block with
 //   <StommeHead title={title} description={description} image={image} />
@@ -10,7 +10,7 @@
 // og:image resolution: image ?? settings.ogImage, made absolute via Astro.site (social
 // scrapers need absolute URLs). Unset ⇒ no og:image and twitter:card=summary (no broken
 // image). manifest/themeColor are optional and render only when passed — the template
-// omits both (identical output); a PWA/branded site (e.g. a live site) supplies them.
+// omits both (identical output); a PWA/branded site supplies them.
 import { getEntry } from 'astro:content';
 // The integration-wired alias to the site's src/site.config.ts. Every stomme site runs
 // the integration, so this resolves in any real build; it's only needed to scope the
