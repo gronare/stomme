@@ -1,4 +1,4 @@
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { resolve, dirname } from 'node:path';
 import { mkdirSync, writeFileSync, existsSync, readFileSync, readdirSync } from 'node:fs';
 
@@ -614,7 +614,18 @@ const { thanksProps, serviceFixture, townFixture } = templateFixtures(rs);
           enabled.push('/404');
         }
 
-        // 0c. Lookbook — the theme-coverage page (every block/variant/surface/template).
+        // 0c. Generated OG cards (/og/<page>.png) — prerendered, branded 1200×630 share
+        // cards (routes/og.ts). Always injected: the master switch is CONTENT
+        // (settings.og.enabled), which doesn't exist yet at config-setup time, so the
+        // endpoint gates itself — disabled ⇒ getStaticPaths returns [] ⇒ zero pages
+        // emitted and the renderer's native deps (satori/resvg/sharp) are never loaded.
+        // The renderer (src/og.mjs) must NOT go through the site bundle (native deps) —
+        // the endpoint runtime-imports it from its real package location via this define.
+        updateConfig({ vite: { define: { __STOMME_OG_RENDERER__: JSON.stringify(pathToFileURL(resolve(pkgDir, 'src/og.mjs')).href) } } });
+        injectRoute({ pattern: '/og/[...slug]', entrypoint: '@gronare/stomme/routes/og.ts' });
+        enabled.push('/og/[...slug]');
+
+        // 0d. Lookbook — the theme-coverage page (every block/variant/surface/template).
         // Always available in dev; included in builds only when STOMME_LOOKBOOK=1.
         if (command === 'dev' || process.env.STOMME_LOOKBOOK) {
           mkdirSync(outDir, { recursive: true });

@@ -527,7 +527,8 @@ const COLLECTION_EDITORS = {
       fields:
         - { name: title, label: "Title", widget: string }
         - { name: description, label: "Description", widget: text }
-        - { name: image, label: "Share image", widget: image, required: false, hint: "Social-share card (og:image), 1200×630. Site default used when empty." }`,
+        - { name: image, label: "Share image", widget: image, required: false, hint: "Social-share card (og:image), 1200×630. Site default used when empty." }
+        - { name: ogRaw, label: "Share the image as-is", widget: boolean, required: false, default: false, hint: "Only matters when generated share cards are on (Identity settings): skip the card for this page and share the plain image instead." }`,
   services: `- name: services
   label: "Services"
   label_singular: "Service"
@@ -568,7 +569,8 @@ ${emitWidget(4)}
       fields:
         - { name: title, label: "Title", widget: string }
         - { name: description, label: "Description", widget: text }
-        - { name: image, label: "Share image", widget: image, required: false, hint: "Social-share card (og:image), 1200×630. Site default used when empty." }`,
+        - { name: image, label: "Share image", widget: image, required: false, hint: "Social-share card (og:image), 1200×630. Site default used when empty." }
+        - { name: ogRaw, label: "Share the image as-is", widget: boolean, required: false, default: false, hint: "Only matters when generated share cards are on (Identity settings): skip the card for this page and share the plain image instead." }`,
 };
 
 // A CMS editor for a config-defined listing, from its preset's field set.
@@ -683,6 +685,28 @@ function emitSettings() {
           - { name: favicon, label: "Favicon", widget: image, required: false, hint: "Browser-tab icon — SVG recommended (scales to any size). Defaults to the shipped mark when empty." }
           - { name: appleIcon, label: "Home-screen icon", widget: image, required: false, hint: "iOS home-screen icon — a 180×180 PNG. Optional." }
           - { name: ogImage, label: "Social share image", widget: image, required: false, hint: "Shown when a page is shared (iMessage, Slack, social). Use ~1200×630px." }
+          - name: og
+            label: "Generated share cards"
+            widget: object
+            collapsed: true
+            required: false
+            hint: "Build a branded share card for every page — its photo with your headline, tagline and wordmark on top. When on, this replaces the plain share image above (which stays as the fallback)."
+            fields:
+              - { name: enabled, label: "Generate share cards", widget: boolean, required: false, default: false }
+              - name: style
+                label: "Card style"
+                widget: select
+                required: false
+                default: editorial
+                options:
+                  - { label: "Editorial — text over a gradient at the bottom", value: editorial }
+                  - { label: "Ops — text panel on the left", value: ops }
+                  - { label: "Bold — big centred statement", value: bold }
+              - { name: scrim, label: "Scrim strength", widget: number, value_type: int, min: 0, max: 100, default: 55, required: false, hint: "How dark the gradient over the photo is (0–100). More = better text contrast, less photo." }
+              - { name: showWordmark, label: "Show the wordmark", widget: boolean, required: false, default: true }
+              - { name: showTagline, label: "Show the tagline", widget: boolean, required: false, default: true }
+              - { name: tagline, label: "Tagline", widget: string, required: false, hint: "One line under the headline. Empty falls back to the footer tagline, then the business name." }
+              - { name: accent, label: "Accent colour", widget: color, required: false, hint: "The accent rule and wordmark accent. Empty uses your brand colour." }
       - name: contact
         label: "Contact"
         file: "src/content/contact/contact.md"

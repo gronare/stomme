@@ -12,6 +12,12 @@
 // image). manifest/themeColor are optional and render only when passed — the template
 // omits both (identical output); a PWA/branded site (e.g. a live site) supplies them.
 import { getEntry } from 'astro:content';
+// The integration-wired alias to the site's src/site.config.ts. Every stomme site runs
+// the integration, so this resolves in any real build; it's only needed to scope the
+// generated-OG-card lookup below.
+// @ts-expect-error — virtual alias, no static types.
+import { site, features, listings } from '@stomme/config';
+import { ogCardFor } from './src/og-pages.ts';
 
 interface Props {
   title?: string;
@@ -33,8 +39,17 @@ const faviconType = favicon.endsWith('.svg') ? 'image/svg+xml'
 
 // Social-share card (og:image / Twitter). Absolute URL when the site URL is configured —
 // social scrapers need absolute. Falls back to the raw value otherwise.
+//
+// Generated cards (settings.og.enabled): og:image points at this page's build-time
+// branded card, /og/<page>.png (routes/og.ts). ogCardFor uses the SAME enumeration as
+// the endpoint's getStaticPaths, so a card URL is only emitted when that card exists;
+// pages outside the set — and pages opted out via seo.ogRaw — keep the Phase-1
+// behaviour (raw image ?? settings.ogImage), as does everything when og is off.
 const ogTitle = title ?? settings.name;
-const shareImage = image ?? settings.ogImage;
+const ogCard = settings.og?.enabled
+  ? await ogCardFor(Astro.url.pathname, { features, routes: site.routes, listings })
+  : null;
+const shareImage = ogCard ?? image ?? settings.ogImage;
 const ogImage = shareImage
   ? (Astro.site ? new URL(shareImage, Astro.site).href : shareImage)
   : undefined;
