@@ -282,8 +282,10 @@ if (shareDraft && scOg.enabled) {
 
       <p style={idLabel + ';margin-top:26px'}>Generated cards</p>
       {scExample ? (
-        <div style="position:relative;max-width:420px;aspect-ratio:1200 / 630;border-radius:14px;overflow:hidden;background:#0c0e13;box-shadow:0 8px 30px rgba(0,0,0,.22)">
-          {scDefaultImg && <img src={scDefaultImg} alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" />}
+        <>
+        <div style="position:relative;max-width:420px;aspect-ratio:1200 / 630;border-radius:14px;overflow:hidden;background:linear-gradient(135deg,#6b7a88 0%,#3a4552 55%,#232a33 100%);box-shadow:0 8px 30px rgba(0,0,0,.22)">
+          {/* A generated card's background is the ITEM's own photo — a neutral stand-in here,
+              NOT the finished site-default image (which already has baked-in text → double text). */}
           <div style={'position:absolute;inset:0;background:' + scExample.scrim}></div>
           {scExample.showLogo && <div style="position:absolute;top:7%;left:7%;font-weight:800;font-size:1rem;color:#fff">{scName}</div>}
           <div style={'position:absolute;inset:0;display:flex;flex-direction:column;justify-content:' + scExample.justify + ';align-items:' + scExample.align + ';padding:7%;box-sizing:border-box;color:#fff'}>
@@ -293,6 +295,8 @@ if (shareDraft && scOg.enabled) {
             {scExample.tagline && <div style={'margin-top:12px;font-size:.95rem;color:rgba(255,255,255,.85);text-align:' + scExample.textAlign}>{scExample.tagline}</div>}
           </div>
         </div>
+        <p style="margin-top:8px;color:#6b7280;font-size:.8rem">Exempel — det riktiga kortet byggs av objektets egen bild.</p>
+        </>
       ) : (
         <p style="color:#6b7280;font-size:.9rem;margin:0">Delningskort av — sidor delar standardbilden ovan.</p>
       )}
