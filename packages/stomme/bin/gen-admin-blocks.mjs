@@ -691,7 +691,6 @@ function emitShareType(t, indent) {
     `${p}  label: ${q(t.label)}`,
     `${p}  widget: object`,
     `${p}  collapsed: true`,
-    `${p}  required: false`,
     `${p}  fields:`,
     `${p}    - { name: enabled, label: "Generate cards for these", widget: boolean, required: false, default: false }`,
     `${p}    - name: style`,
@@ -716,7 +715,7 @@ function emitShareCards(indent) {
   const types = shareTypeList();
   const typeFields = types.length
     ? [`${p}        - name: types`, `${p}          label: "By content type"`, `${p}          widget: object`,
-       `${p}          collapsed: true`, `${p}          required: false`, `${p}          fields:`,
+       `${p}          collapsed: true`, `${p}          fields:`,
        ...types.map((t) => emitShareType(t, indent + 12))].join('\n')
     : `${p}        - { name: _notypes, label: "By content type", widget: hidden, required: false }`;
   return [
