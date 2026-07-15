@@ -27,12 +27,13 @@ export const OG_WIDTH = 1200;
 export const OG_HEIGHT = 630;
 
 // renderOgCard input:
-//   title           string (required)
+//   title           string (required) — the resolved OVERLAY TEXT (template already
+//                   substituted by routes/og.ts), used as the card headline
 //   tagline         string
 //   wordmark        string | { pre, accent } — settings.logo.textPre/textAccent
-//   bgImageBuffer   Buffer | null — page photo; null → brand background
-//   og              { style: 'ops'|'editorial'|'bold', scrim: 0–100, showWordmark,
-//                     showTagline, accent } (settings.og)
+//   bgImageBuffer   Buffer | null — item photo; null → solid brand background
+//   og              { style: 'editorial'|'bold'|'ops', scrim: 0–100, showLogo,
+//                     showTagline, accent } (a settings.og.types[<key>] config)
 //   theme           { brand, ink, onDark, dark } (theme collection)
 
 // ── fonts ────────────────────────────────────────────────────────────────────
@@ -85,18 +86,19 @@ function buildTree(input, bgDataUri) {
   const accent = og.accent || theme.brand || '#4338ca';
 
   const wm = typeof input.wordmark === 'string' ? { pre: input.wordmark, accent: '' } : (input.wordmark || {});
-  const hasWordmark = og.showWordmark !== false && !!(wm.pre || wm.accent);
+  const hasWordmark = og.showLogo !== false && !!(wm.pre || wm.accent);
   const tagline = og.showTagline !== false ? (input.tagline || '').trim() : '';
 
   const layers = [];
   if (bgDataUri) {
     layers.push({ type: 'img', props: { src: bgDataUri, width: OG_WIDTH, height: OG_HEIGHT, style: { position: 'absolute', top: 0, left: 0, width: OG_WIDTH, height: OG_HEIGHT, objectFit: 'cover' } } });
   } else {
-    // Brand background — no photo, but never blank: dark ink with a brand cast.
+    // Solid theme-brand background — no photo, but never blank. A faint dark wash from
+    // the bottom keeps the overlay text legible on a light brand colour.
     layers.push(el('div', {
       position: 'absolute', top: 0, left: 0, width: OG_WIDTH, height: OG_HEIGHT,
-      backgroundColor: rgba(ink, 1),
-      backgroundImage: `linear-gradient(135deg, ${rgba(brand, 0.5)} 0%, ${rgba(brand, 0)} 65%)`,
+      backgroundColor: rgba(brand, 1),
+      backgroundImage: `linear-gradient(150deg, ${rgba(ink, 0.28)} 0%, ${rgba(ink, 0)} 55%)`,
     }));
   }
 

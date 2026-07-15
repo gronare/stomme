@@ -17,7 +17,7 @@ import { getEntry } from 'astro:content';
 // generated-OG-card lookup below.
 // @ts-expect-error — virtual alias, no static types.
 import { site, features, listings } from '@stomme/config';
-import { ogCardFor } from './src/og-pages.ts';
+import { resolveShareImage } from './src/og-pages.ts';
 
 interface Props {
   title?: string;
@@ -40,16 +40,13 @@ const faviconType = favicon.endsWith('.svg') ? 'image/svg+xml'
 // Social-share card (og:image / Twitter). Absolute URL when the site URL is configured —
 // social scrapers need absolute. Falls back to the raw value otherwise.
 //
-// Generated cards (settings.og.enabled): og:image points at this page's build-time
-// branded card, /og/<page>.png (routes/og.ts). ogCardFor uses the SAME enumeration as
-// the endpoint's getStaticPaths, so a card URL is only emitted when that card exists;
-// pages outside the set — and pages opted out via seo.ogRaw — keep the Phase-1
-// behaviour (raw image ?? settings.ogImage), as does everything when og is off.
+// resolveShareImage owns the whole layered model (src/og-pages.ts), using the SAME
+// enumeration as the endpoint's getStaticPaths so a card URL is only produced when that
+// card is emitted. Master off → Phase-1 (this page's override ?? settings.ogImage); on →
+// per-page override → per-type generated card → site default (ogImage → home hero →
+// brand card). `image` is the page's own override (seo.image) passed by its route.
 const ogTitle = title ?? settings.name;
-const ogCard = settings.og?.enabled
-  ? await ogCardFor(Astro.url.pathname, { features, routes: site.routes, listings })
-  : null;
-const shareImage = ogCard ?? image ?? settings.ogImage;
+const shareImage = await resolveShareImage(Astro.url.pathname, image, { features, routes: site.routes, listings });
 const ogImage = shareImage
   ? (Astro.site ? new URL(shareImage, Astro.site).href : shareImage)
   : undefined;

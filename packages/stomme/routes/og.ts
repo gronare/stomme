@@ -1,7 +1,8 @@
 // Injected by the stomme integration at /og/[...slug] — the generated-OG-card
-// endpoint (settings.og, Phase 2). Prerendered: every OG-eligible page (see
-// src/og-pages.ts — the same enumeration Head.astro points og:image with) emits one
-// static 1200×630 PNG at /og/<page path>.png; home is /og/index.png.
+// endpoint (settings.og). Prerendered: each item of a TYPE-ENABLED collection (and the
+// site-default brand card when needed) emits one static 1200×630 PNG — see src/og-pages.ts,
+// the same enumeration Head.astro resolves og:image with. Slug carries the page path
+// (e.g. /og/nyheter/x.png); the site-default card is /og/default.png.
 //
 // The master switch is CONTENT (settings.og.enabled), which doesn't exist yet at
 // astro:config:setup — so the route is always injected and gates itself here:
@@ -30,7 +31,19 @@ export async function getStaticPaths() {
   const settings = (await getEntry('settings', 'site'))?.data;
   if (!settings?.og?.enabled) return [];
   const pages = await ogPages({ features, routes: site.routes, listings });
-  return pages.map((p) => ({ params: { slug: p.slug }, props: { page: p } }));
+  // Only entries that actually need a rendered card (a per-type item, or the site-default
+  // brand card). Raw-override / site-default entries carry a URL, not a PNG to emit.
+  return pages.filter((p) => p.card).map((p) => ({ params: { slug: p.slug }, props: { page: p } }));
+}
+
+// Fill {var} placeholders from the item's data; unknown/empty → '' and any dangling
+// separators an empty value leaves behind (e.g. "Title · " → "Title") are trimmed off.
+function fillTemplate(tpl: string, vars: Record<string, string>): string {
+  return tpl
+    .replace(/\{(\w+)\}/g, (_m, k: string) => (vars[k] != null ? vars[k] : ''))
+    .replace(/\s+/g, ' ')
+    .replace(/^[\s·•|,:–—-]+|[\s·•|,:–—-]+$/g, '')
+    .trim();
 }
 
 // Local last resort: og.ts exports EMPTY_PNG, but if that module itself fails to load
@@ -58,13 +71,24 @@ async function buildPng(page: OgPage): Promise<Buffer> {
   const settings = (await getEntry('settings', 'site'))?.data ?? ({} as Record<string, never>);
   const theme = (await getEntry('theme', 'theme'))?.data ?? {};
   const footer = (await getEntry('footer', 'footer'))?.data;
-  const cfg = settings.og ?? {};
   const logo = settings.logo ?? {};
+  const name = settings.name || '';
+  const vars: Record<string, string> = page.vars ?? {};
+
+  // The site-default brand card (no typeKey): the business name on the brand background,
+  // no wordmark/tagline (the name is already the headline). Otherwise the per-type config.
+  const isDefault = !page.typeKey;
+  const t = (page.typeKey && settings.og?.types?.[page.typeKey]) || {};
+  const template = (t.overlayText && t.overlayText.trim()) || page.overlayDefault || '{title}';
+  const overlay = fillTemplate(template, vars) || vars.title || name;
+  const showLogo = !isDefault && t.showLogo !== false;
+  const showTagline = !isDefault && t.showTagline !== false;
+
   const input = {
-    title: page.title || settings.name || '',
-    tagline: cfg.tagline || footer?.tagline || settings.name || '',
-    wordmark: logo.textPre || logo.textAccent ? { pre: logo.textPre, accent: logo.textAccent } : settings.name,
-    og: cfg,
+    title: overlay || name,
+    tagline: showTagline ? (t.tagline || footer?.tagline || '') : '',
+    wordmark: showLogo ? (logo.textPre || logo.textAccent ? { pre: logo.textPre, accent: logo.textAccent } : name) : null,
+    og: { style: t.style, scrim: t.scrim, showLogo, showTagline, accent: t.accent },
     theme,
   };
 

@@ -168,12 +168,7 @@
         ],
         "og": [
           "enabled",
-          "style",
-          "scrim",
-          "showWordmark",
-          "showTagline",
-          "tagline",
-          "accent"
+          "types"
         ]
       }
     },

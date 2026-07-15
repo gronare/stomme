@@ -663,6 +663,79 @@ function emitCms(indent) {
 // engine changes here now flow to every site on `pnpm cms:gen`. The nav menu links +
 // thanks buttons reuse the same emitters as before (per-site $pages / $menus options).
 // Written at the canonical absolute indent (the `settings` collection sits at indent 2).
+// ── "Delningskort" (share cards) settings pane (generated) ───────────────────
+// A SECOND file pane on site.md (Sveltia preserves each pane's other frontmatter on
+// save). Holds the site-default share image + the master switch + one section per
+// generatable type — a listing (article/catalog, blog folded), plus Service areas
+// (features.areas) and Services (features.services). The data lives at settings.ogImage
+// and settings.og.{enabled,types} (read by Head.astro / routes/og.ts / src/og-pages.ts).
+function shareTypeList() {
+  const out = [];
+  if (collectionEnabled('towns')) out.push({ key: 'towns', label: 'Service areas', kind: 'towns' });
+  if (collectionEnabled('services')) out.push({ key: 'services', label: 'Services', kind: 'services' });
+  for (const l of LISTINGS) out.push({ key: l.id, label: l.label || l.id, kind: l.preset });
+  return out;
+}
+// Default overlay template + the variable hint, by type kind.
+const SHARE_META = {
+  towns: { overlay: '{title}', vars: '{title} {name}' },
+  services: { overlay: '{title}', vars: '{title} {name}' },
+  article: { overlay: '{title}', vars: '{title} {date} {excerpt} {name}' },
+  catalog: { overlay: '{title} · {price}', vars: '{title} {price} {category} {status} {name}' },
+};
+function emitShareType(t, indent) {
+  const p = pad(indent);
+  const meta = SHARE_META[t.kind] || SHARE_META.article;
+  return [
+    `${p}- name: ${t.key}`,
+    `${p}  label: ${q(t.label)}`,
+    `${p}  widget: object`,
+    `${p}  collapsed: true`,
+    `${p}  required: false`,
+    `${p}  fields:`,
+    `${p}    - { name: enabled, label: "Generate cards for these", widget: boolean, required: false, default: false }`,
+    `${p}    - name: style`,
+    `${p}      label: "Card style"`,
+    `${p}      widget: select`,
+    `${p}      required: false`,
+    `${p}      default: editorial`,
+    `${p}      options:`,
+    `${p}        - { label: "Editorial — text over a gradient at the bottom", value: editorial }`,
+    `${p}        - { label: "Bold — big centred statement", value: bold }`,
+    `${p}        - { label: "Ops — text panel on the left", value: ops }`,
+    `${p}    - { name: overlayText, label: "Overlay text", widget: string, required: false, default: ${q(meta.overlay)}, hint: ${q('Text drawn on each card. Variables (filled per item): ' + meta.vars + '.')} }`,
+    `${p}    - { name: scrim, label: "Scrim strength", widget: number, value_type: int, min: 0, max: 100, default: 55, required: false, hint: "How dark the gradient over the photo is (0–100). More = better text contrast, less photo." }`,
+    `${p}    - { name: showLogo, label: "Show the wordmark", widget: boolean, required: false, default: true }`,
+    `${p}    - { name: showTagline, label: "Show the tagline", widget: boolean, required: false, default: true }`,
+    `${p}    - { name: tagline, label: "Tagline", widget: string, required: false, hint: "One line under the headline. Empty falls back to the footer tagline." }`,
+    `${p}    - { name: accent, label: "Accent colour", widget: color, required: false, hint: "The accent rule and wordmark accent. Empty uses your brand colour." }`,
+  ].join('\n');
+}
+function emitShareCards(indent) {
+  const p = pad(indent);
+  const types = shareTypeList();
+  const typeFields = types.length
+    ? [`${p}        - name: types`, `${p}          label: "By content type"`, `${p}          widget: object`,
+       `${p}          collapsed: true`, `${p}          required: false`, `${p}          fields:`,
+       ...types.map((t) => emitShareType(t, indent + 12))].join('\n')
+    : `${p}        - { name: _notypes, label: "By content type", widget: hidden, required: false }`;
+  return [
+    `${p}- name: sharecards`,
+    `${p}  label: "Share cards"`,
+    `${p}  file: "src/content/settings/site.md"`,
+    `${p}  fields:`,
+    `${p}    - { name: ogImage, label: "Site default share image", widget: image, required: false, hint: "Shown when a page is shared (iMessage, Slack, social) and it has no card of its own. Use ~1200×630px." }`,
+    `${p}    - name: og`,
+    `${p}      label: "Generated share cards"`,
+    `${p}      widget: object`,
+    `${p}      required: false`,
+    `${p}      hint: "Build a branded card per item — its photo with overlay text, wordmark and tagline. Off = share the site default image above."`,
+    `${p}      fields:`,
+    `${p}        - { name: enabled, label: "Generate share cards", widget: boolean, required: false, default: false, hint: "Master switch. Turn on, then enable the content types you want cards for below." }`,
+    typeFields,
+  ].join('\n');
+}
+
 function emitSettings() {
   const tp = emitTrackingPane(6);
   return `  - name: settings
@@ -684,29 +757,7 @@ function emitSettings() {
               - { name: textAccent, label: "Wordmark accent (in brand colour)", widget: string, required: false }
           - { name: favicon, label: "Favicon", widget: image, required: false, hint: "Browser-tab icon — SVG recommended (scales to any size). Defaults to the shipped mark when empty." }
           - { name: appleIcon, label: "Home-screen icon", widget: image, required: false, hint: "iOS home-screen icon — a 180×180 PNG. Optional." }
-          - { name: ogImage, label: "Social share image", widget: image, required: false, hint: "Shown when a page is shared (iMessage, Slack, social). Use ~1200×630px." }
-          - name: og
-            label: "Generated share cards"
-            widget: object
-            collapsed: true
-            required: false
-            hint: "Build a branded share card for every page — its photo with your headline, tagline and wordmark on top. When on, this replaces the plain share image above (which stays as the fallback)."
-            fields:
-              - { name: enabled, label: "Generate share cards", widget: boolean, required: false, default: false }
-              - name: style
-                label: "Card style"
-                widget: select
-                required: false
-                default: editorial
-                options:
-                  - { label: "Editorial — text over a gradient at the bottom", value: editorial }
-                  - { label: "Ops — text panel on the left", value: ops }
-                  - { label: "Bold — big centred statement", value: bold }
-              - { name: scrim, label: "Scrim strength", widget: number, value_type: int, min: 0, max: 100, default: 55, required: false, hint: "How dark the gradient over the photo is (0–100). More = better text contrast, less photo." }
-              - { name: showWordmark, label: "Show the wordmark", widget: boolean, required: false, default: true }
-              - { name: showTagline, label: "Show the tagline", widget: boolean, required: false, default: true }
-              - { name: tagline, label: "Tagline", widget: string, required: false, hint: "One line under the headline. Empty falls back to the footer tagline, then the business name." }
-              - { name: accent, label: "Accent colour", widget: color, required: false, hint: "The accent rule and wordmark accent. Empty uses your brand colour." }
+${emitShareCards(6)}
       - name: contact
         label: "Contact"
         file: "src/content/contact/contact.md"

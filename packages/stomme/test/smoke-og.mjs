@@ -43,10 +43,15 @@ for (const style of ['editorial', 'ops', 'bold']) {
   assertPng(`card-${style}-photo`, await og.renderOgCard({ ...base, bgImageBuffer: photo, og: { style, scrim: 55 } }));
   assertPng(`card-${style}-brand-bg`, await og.renderOgCard({ ...base, og: { style, scrim: 55 } }));
 }
-// Option toggles + a short title (large type path).
+// Option toggles + a short title (large type path). showLogo/showTagline off.
 assertPng('card-no-extras', await og.renderOgCard({
   title: 'Short title', wordmark: { pre: 'X' }, theme: base.theme,
-  bgImageBuffer: photo, og: { style: 'editorial', scrim: 80, showWordmark: false, showTagline: false, accent: '#f59e0b' },
+  bgImageBuffer: photo, og: { style: 'editorial', scrim: 80, showLogo: false, showTagline: false, accent: '#f59e0b' },
+}));
+// Site-default brand card: business name on the solid brand background, no photo/wordmark.
+assertPng('card-default-brand', await og.renderOgCard({
+  title: 'Acme Drone Services', wordmark: null, theme: base.theme,
+  og: { style: 'editorial', scrim: 55, showLogo: false, showTagline: false },
 }));
 // Fallback surfaces (routes/og.ts steps 3–4).
 assertPng('fallback-raw-image', await og.rawImagePng(photo));
