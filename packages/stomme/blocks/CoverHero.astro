@@ -36,13 +36,14 @@ const {
 const href = resolveLink(ctaHref, '/');
 const href2 = resolveLink(cta2Href, '/');
 
-// Resolve an uploaded video to a served URL (Vite hashes it); external URLs win.
-const videoFiles = import.meta.glob('/src/assets/uploads/**/*.{mp4,webm,mov}', {
+// Resolve an uploaded video to a hashed served URL; external URLs win.
+const videoFiles = import.meta.glob('/src/assets/media/**/*.{mp4,webm,mov}', {
   query: '?url', import: 'default', eager: true,
 });
+const videoKey = video && video.startsWith('/media/') ? `/src/assets/media/${video.slice('/media/'.length)}` : null;
 const videoSrc =
   media === 'video'
-    ? (videoUrl || (video && (videoFiles as Record<string, string>)[video]) || video || undefined)
+    ? (videoUrl || (videoKey && (videoFiles as Record<string, string>)[videoKey]) || video || undefined)
     : undefined;
 ---
 <section class:list={['cover', `cover--${align}`, `cover--h-${height}`, `cover--ov-${overlay}`]}>

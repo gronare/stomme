@@ -1,6 +1,6 @@
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { resolve, dirname } from 'node:path';
-import { mkdirSync, writeFileSync, existsSync, readFileSync, readdirSync } from 'node:fs';
+import { mkdirSync, writeFileSync, existsSync, readFileSync, readdirSync, cpSync, rmSync } from 'node:fs';
 
 // stomme Astro integration — injects collection-detail routes.
 //
@@ -125,19 +125,21 @@ const serviceHtml = serviceDraft ? await renderMarkdown(serviceDraft.body || '')
 const townDraft = kind === 'town' && draft && typeof draft === 'object' ? draft : null;
 
 // Identity: render the composed logo (mark + wordmark) with the SAME uploaded-vs-public
-// resolution as Header — an uploaded logo (/src/assets/uploads/…) goes through Astro's
-// image optimizer, so the CMS Identity pane shows the real optimized image. A hand-built
-// mockup using Decap's getAsset only had the raw /src path, which isn't served (404s).
+// resolution as Header — an uploaded logo (/media/… → /src/assets/media via the build-bridge)
+// goes through Astro's image optimizer, so the CMS Identity pane shows the real optimized
+// image. A hand-built mockup using Decap's getAsset only had a raw path, which isn't served.
 const identityDraft = kind === 'identity' && draft && typeof draft === 'object' ? draft : null;
 const idLogo = (identityDraft && identityDraft.logo) || {};
-const idUploads = import.meta.glob('/src/assets/uploads/**/*.{jpg,jpeg,png,webp,avif}');
-const idOptimized = idLogo.image && idUploads[idLogo.image] ? idUploads[idLogo.image] : null;
-// Favicon / apple-icon / social-share image the SAME way: an uploaded asset
-// (/src/assets/uploads/…) isn't served raw, so resolve it to its built URL; public-root
-// paths ('/favicon.svg', an /images/… default) are already served and pass through. This
-// is what the CMS Identity pane needs — getAsset only yields the unserved /src path (404).
-const idAssetUrls = import.meta.glob('/src/assets/uploads/**/*', { query: '?url', import: 'default', eager: true });
-const idAsset = (p) => (!p ? '' : (typeof p === 'string' && p.startsWith('/src/') ? (idAssetUrls[p] || p) : p));
+const idUploads = import.meta.glob('/src/assets/media/**/*.{jpg,jpeg,png,webp,avif}');
+// Content stores the served /media/… path; the optimizable copy lives at /src/assets/media/…
+// (synced from public/media by the build-bridge). Map one to the other.
+const idLogoKey = idLogo.image && idLogo.image.startsWith('/media/') ? '/src/assets/media/' + idLogo.image.slice(7) : null;
+const idOptimized = idLogoKey && idUploads[idLogoKey] ? idUploads[idLogoKey] : null;
+// Favicon / apple-icon / social-share image the SAME way: a /media/… asset resolves to its
+// built URL; public-root paths ('/favicon.svg', an /images/… default) are already served and
+// pass through. This is what the CMS Identity pane needs — getAsset yields only the raw path.
+const idAssetUrls = import.meta.glob('/src/assets/media/**/*', { query: '?url', import: 'default', eager: true });
+const idAsset = (p) => (!p ? '' : (typeof p === 'string' && p.startsWith('/media/') ? (idAssetUrls['/src/assets/media/' + p.slice(7)] || p) : p));
 const idName = (identityDraft && identityDraft.name) || 'Your business';
 const idFav = idAsset(identityDraft && identityDraft.favicon) || '/favicon.svg';
 const idApple = idAsset(identityDraft && identityDraft.appleIcon);
@@ -646,6 +648,22 @@ const { thanksProps, serviceFixture, townFixture } = templateFixtures(rs);
       'astro:config:setup': ({ command, config, injectRoute, injectScript, updateConfig, logger }) => {
         const root = fileURLToPath(config.root);
         const pkgDir = dirname(fileURLToPath(import.meta.url));
+
+        // Mirror served public/media → gitignored src/assets/media so Astro can optimize it (src/ only), before Vite resolves the globs.
+        try {
+          const mediaSrc = resolve(root, 'public/media');
+          const mediaDest = resolve(root, 'src/assets/media');
+          rmSync(mediaDest, { recursive: true, force: true });
+          if (existsSync(mediaSrc)) {
+            cpSync(mediaSrc, mediaDest, { recursive: true });
+            mkdirSync(mediaDest, { recursive: true });
+            writeFileSync(resolve(mediaDest, '.gitignore'), '*\n'); // build-generated; never commit
+
+            logger?.info('media: synced public/media → src/assets/media (build-bridge)');
+          }
+        } catch (e) {
+          logger?.warn(`media build-bridge skipped: ${e?.message || e}`);
+        }
         // Let the package route entrypoints import the SITE's Base + config — and, for the
         // lookbook, the site's block catalog + renderer (so site-custom blocks render too).
         const siteRenderer = resolve(root, 'src/blocks/BlockRenderer.astro');

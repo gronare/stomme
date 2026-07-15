@@ -31,12 +31,10 @@ if (!contact) contact = (((await getEntry('contact', 'contact').catch(() => null
 const logo = settings.logo ?? {};
 const showMark = footer.showLogo === true && !!logo.image;
 const showWord = footer.showWordmark === true && !!logo.textPre;
-// An uploaded logo (/src/assets/uploads/…) goes through Astro's image optimizer; a
-// public-path logo (e.g. /logo.svg) renders as a plain <img>. Mirrors Header.astro —
-// without this the raw /src/assets path 404s in the build (that path isn't served),
-// so an uploaded logo showed as a broken image in the footer.
-const logoUploads = import.meta.glob<{ default: ImageMetadata }>('/src/assets/uploads/**/*.{jpg,jpeg,png,webp,avif}');
-const logoOptimized = logo.image && logoUploads[logo.image] ? logoUploads[logo.image] : null;
+// Uploaded logo is optimized; a public-root logo (e.g. /logo.svg) renders as a plain <img>.
+const logoUploads = import.meta.glob<{ default: ImageMetadata }>('/src/assets/media/**/*.{jpg,jpeg,png,webp,avif}');
+const logoKey = logo.image && logo.image.startsWith('/media/') ? `/src/assets/media/${logo.image.slice('/media/'.length)}` : null;
+const logoOptimized = logoKey && logoUploads[logoKey] ? logoUploads[logoKey] : null;
 const links = footer.links ?? [];
 const links2 = footer.links2 ?? [];
 const legal = footer.legal ?? [];

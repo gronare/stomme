@@ -7,12 +7,11 @@ import type { ImageMetadata } from 'astro';
 // brödtext yet get controlled positioning:
 //   (none) → centred & contained   left / right → float, text wraps
 //   wide → breakout                 + small | large → size
-// Uploads (/src/assets/uploads/…) are optimised via Astro's image service; the
-// image's own dimensions decide orientation, so portraits are capped by height.
-// The alt text becomes the caption. Other srcs (external/public) pass through.
+// Uploads are optimised via Astro; alt → caption, title keyword → placement/size.
 const uploads = import.meta.glob<{ default: ImageMetadata }>(
-  '/src/assets/uploads/**/*.{jpg,jpeg,png,webp,avif}',
+  '/src/assets/media/**/*.{jpg,jpeg,png,webp,avif}',
 );
+const mediaKey = (s: string) => (s && s.startsWith('/media/') ? `/src/assets/media/${s.slice('/media/'.length)}` : null);
 
 const PLACEMENTS = new Set(['left', 'right', 'wide', 'center']);
 const SIZES = new Set(['small', 'large']);
@@ -31,7 +30,8 @@ export async function renderMarkdown(md = ''): Promise<string> {
 
     let out = src;
     let portrait = false;
-    const loader = uploads[src];
+    const k = mediaKey(src);
+    const loader = k ? uploads[k] : undefined;
     if (loader) {
       const mod = await loader();
       out = (await getImage({ src: mod.default })).src;

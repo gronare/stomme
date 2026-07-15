@@ -167,8 +167,8 @@ function buildTree(input, bgDataUri) {
 }
 
 // ── background sources ───────────────────────────────────────────────────────
-// Content image values are served paths: '/src/assets/uploads/…' (CMS media folder,
-// on disk as-is) or '/…' under public/ — plus the odd absolute URL. Returns the raw
+// Content image values are served paths: '/media/…' (CMS media folder, on disk under
+// public/media as-is) or '/…' under public/ — plus the odd absolute URL. Returns the raw
 // bytes, or null when unresolvable (caller falls to the brand background).
 export async function loadImageSource(src, root = process.cwd()) {
   if (!src) return null;
