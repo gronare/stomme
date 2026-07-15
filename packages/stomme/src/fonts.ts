@@ -46,20 +46,21 @@ const mimeOf = (path: string) =>
 const fontFace = (family: string, url: string) =>
   `@font-face{font-family:"${family}";src:url("${url}") format("${formatOf(url)}");font-display:swap;font-weight:100 900;}`;
 
-// Resolve the theme's font choices into CSS-var declarations, @font-face rules, and
-// preload descriptors (so Base fetches custom fonts before paint — avoids the FOUT flash).
-// Two independent custom uploads: one for the display (heading) picker, one for the body
-// picker — each used where its picker is set to 'custom'. URLs are the served upload paths
-// (Base resolves them via a glob).
-// `webfontUrls` maps a WEBFONTS key to its served latin-woff2 URL — the SITE provides it
-// (?url import of its @fontsource-variable dep), so only sites that wire a webfont ship
-// its file. A selected webfont without a wired URL degrades to the system stack.
+// Custom uploaded fonts resolve here (engine-owned, like Cover.astro's image glob): theme stores the served /media/fonts/… path, the build-bridge mirrors public/media → src/assets/media, Vite ?url-hashes it. Eager glob = URL strings only; a font is fetched only when its @font-face applies (unused uploads cost deploy bytes, not a page-load fetch).
+const uploadedFontUrls = import.meta.glob('/src/assets/media/**/*.{woff2,woff,ttf,otf}', { query: '?url', import: 'default', eager: true }) as Record<string, string>;
+const uploadFontUrl = (p?: string | null): string | null => {
+  if (!p) return null;
+  const key = p.startsWith('/media/') ? `/src/assets/media/${p.slice('/media/'.length)}` : null;
+  return key ? (uploadedFontUrls[key] ?? null) : null;
+};
+
+// Resolve the theme's fonts → CSS vars + @font-face + preloads. webfontUrls (curated-webfont key → served latin woff2) stays SITE-provided; custom uploads resolve via the glob above.
 export function resolveFonts(
-  theme: { fontDisplay?: string; fontBody?: string } = {},
-  customDisplayUrl?: string | null,
-  customBodyUrl?: string | null,
+  theme: { fontDisplay?: string; fontBody?: string; fontCustomFile?: string; fontCustomBodyFile?: string } = {},
   webfontUrls: Record<string, string> = {},
 ): { vars: string[]; fontFace: string | null; preloads: { href: string; type: string }[] } {
+  const customDisplayUrl = uploadFontUrl(theme.fontCustomFile);
+  const customBodyUrl = uploadFontUrl(theme.fontCustomBodyFile);
   const stack = (key: string | undefined, customFamily: string | null): string | null => {
     if (key === 'custom') return customFamily ? `${customFamily}, ${FONT_STACKS.system}` : null;
     if (key && WEBFONTS[key]) {

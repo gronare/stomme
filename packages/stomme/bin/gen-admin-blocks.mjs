@@ -890,8 +890,8 @@ ${emitShareCards(6)}
               - { label: "Script (handwritten)", value: "script" }
               - { label: "Monospace", value: "mono" }
               - { label: "Custom (uploaded below)", value: "custom" }
-          - { name: fontCustomFile, label: "Custom heading font file", widget: file, required: false, hint: "Used when Heading font = Custom. A .woff2 / .woff / .ttf / .otf file (a font file, not an SVG)." }
-          - { name: fontCustomBodyFile, label: "Custom body font file", widget: file, required: false, hint: "Used when Body font = Custom. Leave empty to reuse the heading font for body." }
+          - { name: fontCustomFile, label: "Custom heading font file", widget: file, required: false, media_folder: "/public/media/fonts", public_folder: "/media/fonts", hint: "Used when Heading font = Custom. A .woff2 / .woff / .ttf / .otf file (a font file, not an SVG)." }
+          - { name: fontCustomBodyFile, label: "Custom body font file", widget: file, required: false, media_folder: "/public/media/fonts", public_folder: "/media/fonts", hint: "Used when Body font = Custom. Leave empty to reuse the heading font for body." }
       - name: nav
         label: "Header"
         file: "src/content/navigation/nav.md"
