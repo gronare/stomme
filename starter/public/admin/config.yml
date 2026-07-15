@@ -2172,7 +2172,6 @@ collections:
           - name: og
             label: "Generated share cards"
             widget: object
-            required: false
             hint: "Build a branded card per item — its photo with overlay text, wordmark and tagline. Off = share the site default image above."
             fields:
               - { name: enabled, label: "Generate share cards", widget: boolean, required: false, default: false, hint: "Master switch. Turn on, then enable the content types you want cards for below." }

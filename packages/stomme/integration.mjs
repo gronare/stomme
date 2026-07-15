@@ -143,6 +143,64 @@ const idFav = idAsset(identityDraft && identityDraft.favicon) || '/favicon.svg';
 const idApple = idAsset(identityDraft && identityDraft.appleIcon);
 const idOg = idAsset(identityDraft && identityDraft.ogImage);
 const idLabel = 'font-family:ui-monospace,Menlo,monospace;font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;color:#6b7280;margin:0 0 10px';
+
+// Delningskort (share cards): render the SAME layered model the real system uses, from the
+// draft settings, so every image resolves on-site (no getAsset / broken img in the iframe).
+// Site default = ogImage → home-hero image → a brand-colour card with the business name.
+// When the master is on and a type is enabled, also show an example generated card built
+// from that type's overlayText/style/scrim/showLogo/tagline/accent + a sample title.
+const shareDraft = kind === 'sharecards' && draft && typeof draft === 'object' ? draft : null;
+const scName = (shareDraft && shareDraft.name) || 'Your business';
+const scOgImage = idAsset(shareDraft && shareDraft.ogImage);
+let scHomeHero = '';
+if (shareDraft && !scOgImage) {
+  try {
+    const home = (await getEntry('home', 'home'))?.data;
+    const hb = (home && Array.isArray(home.blocks) ? home.blocks : []).find((b) => (b.type === 'hero' || b.type === 'coverHero') && b.image);
+    scHomeHero = idAsset(hb && hb.image);
+  } catch (e) { /* no home entry — brand card */ }
+}
+const scDefaultImg = scOgImage || scHomeHero;
+const scBrand = ((await getEntry('theme', 'theme'))?.data || {}).brand || '#4338ca';
+const scOg = (shareDraft && shareDraft.og) || {};
+const scTypes = scOg.types || {};
+let scExample = null;
+if (shareDraft && scOg.enabled) {
+  const key = Object.keys(scTypes).find((k) => scTypes[k] && scTypes[k].enabled);
+  if (key) {
+    const t = scTypes[key] || {};
+    const tpl = (t.overlayText && String(t.overlayText).trim()) || '{title}';
+    const overlay = tpl
+      .split('{title}').join('Example item')
+      .split('{price}').join('12 000 kr')
+      .split('{category}').join('Kategori')
+      .split('{status}').join('Tillgänglig')
+      .split('{date}').join('2026-07-15')
+      .split('{excerpt}').join('En kort beskrivning.')
+      .split('{name}').join(scName)
+      .replace(/\\{[^}]+\\}/g, '')
+      .replace(/\\s+/g, ' ')
+      .replace(/^[\\s·•|,:.-]+|[\\s·•|,:.-]+$/g, '')
+      .trim() || scName;
+    const alpha = Math.min(100, Math.max(0, typeof t.scrim === 'number' ? t.scrim : 55)) / 100;
+    const style = t.style || 'editorial';
+    const scrim = style === 'bold'
+      ? 'linear-gradient(rgba(12,14,19,' + (alpha * 0.85).toFixed(3) + '),rgba(12,14,19,' + Math.min(1, alpha * 1.15).toFixed(3) + '))'
+      : style === 'ops'
+      ? 'linear-gradient(to right, rgba(12,14,19,' + Math.min(1, alpha * 1.2).toFixed(3) + ') 0%, rgba(12,14,19,' + (alpha * 0.9).toFixed(3) + ') 45%, rgba(12,14,19,0) 82%)'
+      : 'linear-gradient(to top, rgba(12,14,19,' + alpha.toFixed(3) + ') 0%, rgba(12,14,19,' + (alpha * 0.85).toFixed(3) + ') 30%, rgba(12,14,19,0) 66%)';
+    scExample = {
+      overlay,
+      tagline: t.tagline || '',
+      showLogo: t.showLogo !== false,
+      accent: t.accent || scBrand,
+      scrim,
+      justify: style === 'editorial' ? 'flex-end' : 'center',
+      align: style === 'bold' ? 'center' : 'flex-start',
+      textAlign: style === 'bold' ? 'center' : 'left',
+    };
+  }
+}
 ---
 {/* Static/prerendered fallback: no response header is emitted, so carry the CSP in a
     <meta http-equiv>. Astro relocates a leading <meta> in a page that renders a layout
@@ -204,6 +262,40 @@ const idLabel = 'font-family:ui-monospace,Menlo,monospace;font-size:.62rem;lette
       )}
 
       <p style="margin-top:26px;color:#6b7280;font-size:.9rem">Business name: <span style="color:var(--color-ink,#1f2937);font-weight:600">{idName}</span></p>
+    </div>
+  </div></Base>
+) : kind === 'sharecards' ? (
+  <Base title="Preview" chrome={false}><div id="preview-root">
+    <div style="padding:1.5rem;color:var(--color-ink,#1f2937);font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;line-height:1.5">
+      <p style={idLabel}>Site default share image</p>
+      {scDefaultImg ? (
+        <div style="max-width:420px;border:1px solid var(--color-line,#e5e7eb);border-radius:14px;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,.08)">
+          <img src={scDefaultImg} alt="" style="width:100%;aspect-ratio:1200 / 630;object-fit:cover;display:block" />
+        </div>
+      ) : (
+        <div style={'max-width:420px;aspect-ratio:1200 / 630;border-radius:14px;display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-end;color:#fff;box-sizing:border-box;padding:7%;background:' + scBrand}>
+          <div style="font-family:ui-monospace,Menlo,monospace;font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.75);margin-bottom:8px">Share card</div>
+          <div style="font-weight:800;font-size:1.7rem;line-height:1.08">{scName}</div>
+        </div>
+      )}
+      <p style="margin-top:8px;color:#6b7280;font-size:.8rem">{scOgImage ? 'Your uploaded default image.' : (scHomeHero ? 'No default set — using the home hero image.' : 'No default set — a brand-colour card with your business name.')}</p>
+
+      <p style={idLabel + ';margin-top:26px'}>Generated cards</p>
+      {scExample ? (
+        <div style="position:relative;max-width:420px;aspect-ratio:1200 / 630;border-radius:14px;overflow:hidden;background:#0c0e13;box-shadow:0 8px 30px rgba(0,0,0,.22)">
+          {scDefaultImg && <img src={scDefaultImg} alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" />}
+          <div style={'position:absolute;inset:0;background:' + scExample.scrim}></div>
+          {scExample.showLogo && <div style="position:absolute;top:7%;left:7%;font-weight:800;font-size:1rem;color:#fff">{scName}</div>}
+          <div style={'position:absolute;inset:0;display:flex;flex-direction:column;justify-content:' + scExample.justify + ';align-items:' + scExample.align + ';padding:7%;box-sizing:border-box;color:#fff'}>
+            <div style={'width:58px;height:5px;border-radius:3px;margin-bottom:16px;background:' + scExample.accent}></div>
+            <div style={'font-family:ui-monospace,Menlo,monospace;font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.7);margin-bottom:10px;text-align:' + scExample.textAlign}>{scName}</div>
+            <div style={'font-weight:800;font-size:1.6rem;line-height:1.08;text-align:' + scExample.textAlign}>{scExample.overlay}</div>
+            {scExample.tagline && <div style={'margin-top:12px;font-size:.95rem;color:rgba(255,255,255,.85);text-align:' + scExample.textAlign}>{scExample.tagline}</div>}
+          </div>
+        </div>
+      ) : (
+        <p style="color:#6b7280;font-size:.9rem;margin:0">Delningskort av — sidor delar standardbilden ovan.</p>
+      )}
     </div>
   </div></Base>
 ) : (
