@@ -725,10 +725,11 @@ function emitShareCards(indent) {
     `${p}  file: "src/content/settings/site.md"`,
     `${p}  fields:`,
     `${p}    - { name: ogImage, label: "Site default share image", widget: image, required: false, hint: "Shown when a page is shared (iMessage, Slack, social) and it has no card of its own. Use ~1200×630px." }`,
+    // Always-rendered object (no `required: false`) so the master toggle + per-type
+    // sections show inline — Sveltia wraps an optional object in an "Add …" button.
     `${p}    - name: og`,
     `${p}      label: "Generated share cards"`,
     `${p}      widget: object`,
-    `${p}      required: false`,
     `${p}      hint: "Build a branded card per item — its photo with overlay text, wordmark and tagline. Off = share the site default image above."`,
     `${p}      fields:`,
     `${p}        - { name: enabled, label: "Generate share cards", widget: boolean, required: false, default: false, hint: "Master switch. Turn on, then enable the content types you want cards for below." }`,

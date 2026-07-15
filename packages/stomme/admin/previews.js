@@ -279,40 +279,16 @@
     return liveFrame('stomme-preview-identity', '/preview?kind=identity', b64(data));
   };
 
-  // Delningskort (share cards) — a representative generated-card mock reflecting the pane:
-  // the master toggle, and (from the first enabled type) the overlay template, tagline,
-  // wordmark and accent. Dark card, brand accent rule, mono eyebrow — in the mockup spirit.
+  // Delningskort (share cards) — rendered via /preview?kind=sharecards (a full-height
+  // iframe), the SAME served-asset fix as IdentityPreview: the site-default image
+  // (settings.ogImage → home hero → brand card) and the example generated card resolve on
+  // the site origin, so a public-root path like '/og-image.png' shows instead of getAsset
+  // 404ing to a broken "?". The /preview page reflects the pane's master toggle + the first
+  // enabled type's overlayText/style/scrim/showLogo/tagline/accent.
   var ShareCardsPreview = function (props) {
-    var e = props.entry;
-    var data = e.get('data'); data = data && data.toJS ? data.toJS() : (data || {});
-    var name = data.name || 'Your business';
-    var og = data.og || {};
-    var enabled = !!og.enabled;
-    var ogImg = ''; try { if (data.ogImage && props.getAsset) ogImg = String(props.getAsset(data.ogImage)); } catch (_e) {}
-    var types = og.types || {};
-    var chosen = null;
-    Object.keys(types).forEach(function (k) { if (!chosen && types[k] && types[k].enabled) chosen = types[k]; });
-    var tpl = (chosen && chosen.overlayText) || '{title}';
-    var accent = (chosen && chosen.accent) || cBrand;
-    var tagline = (chosen && chosen.tagline) || '';
-    var showLogo = !chosen || chosen.showLogo !== false;
-    var headline = tpl
-      .replace(/\{title\}/g, 'Example item').replace(/\{price\}/g, '12 000 kr')
-      .replace(/\{[^}]+\}/g, '').replace(/\s+/g, ' ').replace(/^[\s·•|,:-]+|[\s·•|,:-]+$/g, '').trim() || name;
-    var lab = function (t) { return h('p', { style: { fontFamily: fMono, fontSize: '.62rem', letterSpacing: '.14em', textTransform: 'uppercase', color: cMuted, margin: '0 0 12px' } }, t); };
-    return h('div', { className: 'bk' },
-      lab('Share card preview'),
-      h('div', { style: { maxWidth: '520px', aspectRatio: '1200 / 630', borderRadius: '14px', overflow: 'hidden', position: 'relative', background: 'linear-gradient(150deg,#1a1f2b,#0c0e13)', boxShadow: '0 10px 34px rgba(0,0,0,.22)', color: '#fff', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', padding: '7% 7% 8%', boxSizing: 'border-box' } },
-        ogImg ? h('img', { src: ogImg, alt: '', style: { position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: 0.45 } }) : null,
-        showLogo ? h('div', { style: { position: 'absolute', top: '7%', left: '7%', fontWeight: 800, letterSpacing: '-.01em', fontSize: '1.05rem' } }, name) : null,
-        h('div', { style: { position: 'relative' } },
-          h('div', { style: { width: '58px', height: '5px', borderRadius: '3px', background: accent, marginBottom: '16px' } }),
-          h('div', { style: { fontFamily: MONO, fontSize: '.6rem', letterSpacing: '.16em', textTransform: 'uppercase', color: 'rgba(255,255,255,.68)', marginBottom: '10px' } }, name),
-          h('div', { style: { fontSize: '1.7rem', fontWeight: 800, lineHeight: 1.08 } }, headline),
-          tagline ? h('div', { style: { marginTop: '12px', fontSize: '.95rem', color: 'rgba(255,255,255,.85)' } }, tagline) : null)),
-      enabled
-        ? note('A branded card like this is generated per item for each content type you enabled. Items with their own share image, or a type left off, use the site default instead.')
-        : note('Share cards are OFF — every page shares the site default image. Turn on “Generate share cards”, then enable the content types you want cards for.'));
+    var data = props.entry.get('data');
+    data = data && data.toJS ? data.toJS() : (data || {});
+    return liveFrame('stomme-preview-sharecards', '/preview?kind=sharecards', b64(data));
   };
   // Contact — render the REAL direct-contact card + Find-us block via /preview, fed the
   // draft settings (the same live-render pattern as header/footer/thanks). No hand-built
