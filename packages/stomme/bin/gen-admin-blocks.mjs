@@ -723,7 +723,7 @@ function emitShareCards(indent) {
     `${p}  label: "Share cards"`,
     `${p}  file: "src/content/settings/site.md"`,
     `${p}  fields:`,
-    `${p}    - { name: ogImage, label: "Site default share image", widget: image, required: false, hint: "Shown when a page is shared (iMessage, Slack, social) and it has no card of its own. Use ~1200×630px." }`,
+    `${p}    - { name: ogImage, label: "Site default share image", widget: image, required: false, media_folder: "/public/media/share", public_folder: "/media/share", hint: "Shown when a page is shared (iMessage, Slack, social) and it has no card of its own. Use ~1200×630px." }`,
     // Always-rendered object (no `required: false`) so the master toggle + per-type
     // sections show inline — Sveltia wraps an optional object in an "Add …" button.
     `${p}    - name: og`,
@@ -751,12 +751,12 @@ function emitSettings() {
             widget: object
             hint: "Shown in the header and footer (each chooses what to display)."
             fields:
-              - { name: image, label: "Logo mark (shown beside the text)", widget: image, required: false, hint: "An icon/mark. The wordmark is the text below, set in your display font." }
+              - { name: image, label: "Logo mark (shown beside the text)", widget: image, required: false, media_folder: "/public/media/identity", public_folder: "/media/identity", hint: "An icon/mark. The wordmark is the text below, set in your display font." }
               - { name: alt, label: "Logo alt text", widget: string, required: false }
               - { name: textPre, label: "Wordmark text", widget: string, required: false }
               - { name: textAccent, label: "Wordmark accent (in brand colour)", widget: string, required: false }
-          - { name: favicon, label: "Favicon", widget: image, required: false, hint: "Browser-tab icon — SVG recommended (scales to any size). Defaults to the shipped mark when empty." }
-          - { name: appleIcon, label: "Home-screen icon", widget: image, required: false, hint: "iOS home-screen icon — a 180×180 PNG. Optional." }
+          - { name: favicon, label: "Favicon", widget: image, required: false, media_folder: "/public", public_folder: "/", hint: "Browser-tab icon — SVG recommended (scales to any size). Defaults to the shipped mark when empty." }
+          - { name: appleIcon, label: "Home-screen icon", widget: image, required: false, media_folder: "/public", public_folder: "/", hint: "iOS home-screen icon — a 180×180 PNG. Optional." }
 ${emitShareCards(6)}
       - name: contact
         label: "Contact"
@@ -1001,11 +1001,38 @@ function translateLabels(text) {
 let yaml = out.join('\n');
 yaml = yaml.replace(/^locale:.*$\n?/m, '');
 yaml = yaml.replace(/^local_backend:.*$\n?/m, '');
-// A RELATIVE global media_folder ("src/assets/uploads") is a Decap-era legacy — Decap
-// tolerated it, but Sveltia needs an ABSOLUTE repo path or it can't resolve assets
-// (empty public_url + blank thumbnails in the media library). Normalize to absolute so
-// the media library works; idempotent (the lookahead skips an already-absolute value).
-yaml = yaml.replace(/^media_folder: "(?!\/)/m, 'media_folder: "/');
+// Uploads live in served public/media (Sveltia resolves assets via public_folder URL; src/ isn't served).
+yaml = yaml.replace(/^media_folder: .*$/m, 'media_folder: "/public/media"');
+yaml = yaml.replace(/^public_folder: .*$/m, 'public_folder: "/media"');
+// Per-collection folders (absolute): per-entry collections use {{slug}}, flat/file a static folder.
+const mSlug = (dir) => ({ m: `/public/media/${dir}/{{slug}}`, p: `/media/${dir}/{{slug}}` });
+const mFlat = (dir) => ({ m: `/public/media/${dir}`, p: `/media/${dir}` });
+const COLLECTION_MEDIA = {
+  home: mFlat('home'), pages: mSlug('pages'), towns: mSlug('towns'), services: mSlug('services'),
+  faq: mFlat('faq'), testimonials: mFlat('testimonials'), settings: mFlat('settings'),
+};
+// Listings: catalog (for-sale) per item; article (news/blog) flat — kept apart, never mixed.
+for (const l of LISTINGS) COLLECTION_MEDIA[l.id] = l.preset === 'catalog' ? mSlug(l.id) : mFlat(l.id);
+{
+  const srcLines = yaml.split('\n');
+  const injected = [];
+  for (let i = 0; i < srcLines.length; i++) {
+    injected.push(srcLines[i]);
+    const cm = srcLines[i].match(/^ {2}- name: (\S+)\s*$/); // top-level collection (indent 2)
+    if (cm && COLLECTION_MEDIA[cm[1]] && !/^ {4}media_folder:/.test(srcLines[i + 1] || '')) {
+      injected.push(`    media_folder: ${JSON.stringify(COLLECTION_MEDIA[cm[1]].m)}`);
+      injected.push(`    public_folder: ${JSON.stringify(COLLECTION_MEDIA[cm[1]].p)}`);
+    }
+  }
+  yaml = injected.join('\n');
+}
+// Sveltia shrinks the master to webp on upload; Astro still builds the responsive variants.
+if (!/^media_libraries:/m.test(yaml)) {
+  yaml = yaml.replace(/^public_folder: .*$/m, (l) =>
+    `${l}\nmedia_libraries:\n  all:\n    slugify_filename: true\n    transformations:\n` +
+    `      raster_image: { format: webp, quality: 82, width: 2048, height: 2048 }\n` +
+    `      svg: { optimize: true }`);
+}
 // `output.omit_empty_optional_fields: true` — Sveltia otherwise writes every optional
 // field explicitly on save (e.g. `cta2Label: ''`). Our field policy is "absent = off"
 // (rule zero), so keep saved files minimal. Idempotent upsert at the top of the config.

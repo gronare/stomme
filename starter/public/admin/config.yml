@@ -5,10 +5,18 @@ backend:
   name: git-gateway
   branch: main
 # <<< cms:generated
-media_folder: "/src/assets/uploads"
-public_folder: "/src/assets/uploads"
+media_folder: "/public/media"
+public_folder: "/media"
+media_libraries:
+  all:
+    slugify_filename: true
+    transformations:
+      raster_image: { format: webp, quality: 82, width: 2048, height: 2048 }
+      svg: { optimize: true }
 collections:
   - name: home
+    media_folder: "/public/media/home"
+    public_folder: "/media/home"
     label: "Home page"
     files:
       - name: home
@@ -1066,6 +1074,8 @@ collections:
               - { name: title, label: "SEO title", widget: string }
               - { name: description, label: "SEO description", widget: text }
   - name: pages
+    media_folder: "/public/media/pages/{{slug}}"
+    public_folder: "/media/pages/{{slug}}"
     label: "Pages"
     label_singular: "Page"
     folder: "src/content/pages"
@@ -2126,6 +2136,8 @@ collections:
           - { name: description, label: "SEO description", widget: text }
   # >>> collections:generated (run: pnpm cms:gen — do not edit between markers)
   - name: faq
+    media_folder: "/public/media/faq"
+    public_folder: "/media/faq"
     label: "FAQ"
     label_singular: "Question"
     folder: "src/content/faq"
@@ -2146,6 +2158,8 @@ collections:
   # <<< collections:generated
   # >>> settings:generated (run: pnpm cms:gen — do not edit between markers)
   - name: settings
+    media_folder: "/public/media/settings"
+    public_folder: "/media/settings"
     label: "Settings"
     files:
       - name: site
@@ -2158,17 +2172,17 @@ collections:
             widget: object
             hint: "Shown in the header and footer (each chooses what to display)."
             fields:
-              - { name: image, label: "Logo mark (shown beside the text)", widget: image, required: false, hint: "An icon/mark. The wordmark is the text below, set in your display font." }
+              - { name: image, label: "Logo mark (shown beside the text)", widget: image, required: false, media_folder: "/public/media/identity", public_folder: "/media/identity", hint: "An icon/mark. The wordmark is the text below, set in your display font." }
               - { name: alt, label: "Logo alt text", widget: string, required: false }
               - { name: textPre, label: "Wordmark text", widget: string, required: false }
               - { name: textAccent, label: "Wordmark accent (in brand colour)", widget: string, required: false }
-          - { name: favicon, label: "Favicon", widget: image, required: false, hint: "Browser-tab icon — SVG recommended (scales to any size). Defaults to the shipped mark when empty." }
-          - { name: appleIcon, label: "Home-screen icon", widget: image, required: false, hint: "iOS home-screen icon — a 180×180 PNG. Optional." }
+          - { name: favicon, label: "Favicon", widget: image, required: false, media_folder: "/public", public_folder: "/", hint: "Browser-tab icon — SVG recommended (scales to any size). Defaults to the shipped mark when empty." }
+          - { name: appleIcon, label: "Home-screen icon", widget: image, required: false, media_folder: "/public", public_folder: "/", hint: "iOS home-screen icon — a 180×180 PNG. Optional." }
       - name: sharecards
         label: "Share cards"
         file: "src/content/settings/site.md"
         fields:
-          - { name: ogImage, label: "Site default share image", widget: image, required: false, hint: "Shown when a page is shared (iMessage, Slack, social) and it has no card of its own. Use ~1200×630px." }
+          - { name: ogImage, label: "Site default share image", widget: image, required: false, media_folder: "/public/media/share", public_folder: "/media/share", hint: "Shown when a page is shared (iMessage, Slack, social) and it has no card of its own. Use ~1200×630px." }
           - name: og
             label: "Generated share cards"
             widget: object

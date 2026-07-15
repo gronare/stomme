@@ -47,15 +47,10 @@ const faviconType = favicon.endsWith('.svg') ? 'image/svg+xml'
 // brand card). `image` is the page's own override (seo.image) passed by its route.
 const ogTitle = title ?? settings.name;
 const shareImage = await resolveShareImage(Astro.url.pathname, image, { features, routes: site.routes, listings });
-// A share image the editor UPLOADED (site default ogImage or a per-page override) lands in
-// the CMS media folder /src/assets/uploads/… — which Astro does NOT serve raw, so it must be
-// resolved to its built (hashed) URL, exactly like a logo or content image. Without this an
-// uploaded og-image 404s for social scrapers. Public-root defaults ('/og-image.png') and
-// already-built card paths ('/og/…png') pass through unchanged (they ARE served).
-const uploadedAssetUrls = import.meta.glob('/src/assets/uploads/**/*', { query: '?url', import: 'default', eager: true }) as Record<string, string>;
-const servedShareImage = shareImage && shareImage.startsWith('/src/assets/uploads/')
-  ? (uploadedAssetUrls[shareImage] ?? shareImage)
-  : shareImage;
+// Resolve an uploaded /media/… share image to its built URL (scrapers need a served URL); other paths pass through.
+const uploadedAssetUrls = import.meta.glob('/src/assets/media/**/*', { query: '?url', import: 'default', eager: true }) as Record<string, string>;
+const shareKey = shareImage && shareImage.startsWith('/media/') ? `/src/assets/media/${shareImage.slice('/media/'.length)}` : null;
+const servedShareImage = shareKey ? (uploadedAssetUrls[shareKey] ?? shareImage) : shareImage;
 const ogImage = servedShareImage
   ? (Astro.site ? new URL(servedShareImage, Astro.site).href : servedShareImage)
   : undefined;

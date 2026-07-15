@@ -36,11 +36,10 @@ if (!settings) settings = (await getEntry('settings', 'site'))!.data as SiteData
 const logo = settings.logo ?? {};
 const showMark = nav.showLogo === true && !!logo.image;
 const showWord = nav.showWordmark === true && !!logo.textPre;
-// An uploaded logo (/src/assets/uploads/…) goes through Astro's image optimizer; a
-// public-path logo (e.g. /logo.svg) renders as a plain <img>. Mirrors Cover.astro —
-// without this the raw /src/assets path 404s in the build (that path isn't served).
-const logoUploads = import.meta.glob<{ default: ImageMetadata }>('/src/assets/uploads/**/*.{jpg,jpeg,png,webp,avif}');
-const logoOptimized = logo.image && logoUploads[logo.image] ? logoUploads[logo.image] : null;
+// Uploaded logo is optimized; a public-root logo (e.g. /logo.svg) renders as a plain <img>.
+const logoUploads = import.meta.glob<{ default: ImageMetadata }>('/src/assets/media/**/*.{jpg,jpeg,png,webp,avif}');
+const logoKey = logo.image && logo.image.startsWith('/media/') ? `/src/assets/media/${logo.image.slice('/media/'.length)}` : null;
+const logoOptimized = logoKey && logoUploads[logoKey] ? logoUploads[logoKey] : null;
 const items = nav.items ?? [];
 const homeHref = '/';
 

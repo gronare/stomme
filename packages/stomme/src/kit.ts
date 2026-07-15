@@ -32,8 +32,8 @@ export type Field = {
   // expands — '$pages' (all internal page routes), '$services' (service slugs),
   // '$faq' (faq question slugs) or '$faqTags' (distinct tags used on faq entries).
   options?: '$pages' | '$services' | '$faq' | '$faqTags' | { label: string; value: string }[];
-  // For image widgets: override where uploads are stored. Point photos at
-  // /src/assets/uploads so Astro optimises them at build (see Cover.astro).
+  // For image widgets: override where uploads are stored (absolute repo path). The generator
+  // sets these per collection; a field overrides only for special cases (e.g. favicon → root).
   media_folder?: string;
   public_folder?: string;
 };
@@ -156,13 +156,12 @@ export const widthField: Field = {
   hint: 'Narrow keeps text legible; full uses the whole section width.',
 };
 
-// An image field. Uploads use the CMS's GLOBAL media_folder/public_folder
-// (`src/assets/uploads` + `/src/assets/uploads` in config.yml) so Astro's image
-// pipeline (via Cover.astro) optimises them at build. We intentionally do NOT set a
-// field-level media_folder: Decap resolves that relative to the entry, which breaks
-// uploads for entries in subfolders (e.g. a blog post in src/content/posts/ would
-// upload to src/content/posts/src/assets/uploads and show an empty picker). The
-// global setting is repo-root-relative and shows the whole media library.
+// An image field. Uploads land in the served public/media tree via the collection-level
+// media_folder/public_folder the generator emits (organized per collection/entry); the
+// build-bridge copies public/media → src/assets/media so Astro's image pipeline (via
+// Cover.astro) optimises them at build. No field-level media_folder here — the generator's
+// collection-level folders are absolute (repo-root) and organize the whole media library;
+// field-level is emitted only for special cases (e.g. favicon → public root).
 export const imageField = (name = 'image', label = 'Image', hint?: string): Field => ({
   name,
   label,
