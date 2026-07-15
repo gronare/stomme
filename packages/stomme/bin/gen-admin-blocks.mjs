@@ -644,6 +644,9 @@ function emitCms(indent) {
   if (c.baseUrl) L.push(`${p}  base_url: ${c.baseUrl}`);
   if (c.authEndpoint) L.push(`${p}  auth_endpoint: ${c.authEndpoint}`);
   if (c.apiRoot) L.push(`${p}  api_root: ${c.apiRoot}`);
+  // Disable Sveltia's built-in PAT sign-in on sites that use gateway OAuth (baseUrl set).
+  // Gated on baseUrl so solo/local sites with no auth server keep the token fallback.
+  if (c.baseUrl) L.push(`${p}  auth_methods: [oauth]`);
   // Sveltia sends the OAuth `site_id` from `site_domain`; the gateway's same-window
   // (Arc/mobile) fallback keys off it to find the site in KV. Defaults to the deploy host.
   if (c.siteDomain) L.push(`${p}  site_domain: ${c.siteDomain}`);
