@@ -69,7 +69,8 @@
         "seo": [
           "title",
           "description",
-          "image"
+          "image",
+          "ogRaw"
         ]
       }
     },
@@ -101,7 +102,8 @@
         "seo": [
           "title",
           "description",
-          "image"
+          "image",
+          "ogRaw"
         ]
       }
     },
@@ -133,7 +135,8 @@
         "seo": [
           "title",
           "description",
-          "image"
+          "image",
+          "ogRaw"
         ],
         "hero": [
           "image",
@@ -152,7 +155,8 @@
         "logo",
         "favicon",
         "appleIcon",
-        "ogImage"
+        "ogImage",
+        "og"
       ],
       "passthrough": false,
       "nested": {
@@ -161,6 +165,15 @@
           "alt",
           "textPre",
           "textAccent"
+        ],
+        "og": [
+          "enabled",
+          "style",
+          "scrim",
+          "showWordmark",
+          "showTagline",
+          "tagline",
+          "accent"
         ]
       }
     },
@@ -227,7 +240,8 @@
         "seo": [
           "title",
           "description",
-          "image"
+          "image",
+          "ogRaw"
         ]
       }
     },

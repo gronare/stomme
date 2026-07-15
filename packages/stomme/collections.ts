@@ -11,7 +11,9 @@ import { glob } from 'astro/loaders';
 import { readdirSync } from 'node:fs';
 import { resolveListings, type Listing } from './src/config.ts';
 
-const seo = z.object({ title: z.string(), description: z.string(), image: z.string().optional() });
+// `ogRaw` opts a page out of the generated share card (settings.og): its image is
+// shared untouched. Ignored when card generation is off.
+const seo = z.object({ title: z.string(), description: z.string(), image: z.string().optional(), ogRaw: z.boolean().optional() });
 const blocks = z.array(z.object({ type: z.string() }).passthrough()).default([]);
 const link = z.any().optional();
 // A collection with no content on this site (missing folder, or a scaffolded folder
@@ -69,6 +71,25 @@ export function stommeCollections(listings?: Listing[]) {
         appleIcon: z.string().optional(),
         // Social-share image (og:image / Twitter card) — shown when a page is shared.
         ogImage: z.string().optional(),
+        // Generated share cards (Phase 2): build-time branded OG cards — the page's photo
+        // cropped to 1200×630 with a scrim + title/tagline/wordmark composited on top
+        // (src/og.ts renders; routes/og.ts emits /og/<slug>.png). Optional with defaults so
+        // existing content validates unchanged; `enabled` defaults FALSE — zero behavior
+        // change until a site opts in. On failure the build falls back to `ogImage`.
+        og: z.object({
+          enabled: z.boolean().default(false),
+          // Card layout preset: ops (left panel), editorial (bottom gradient — default),
+          // bold (centered, heavy scrim).
+          style: z.enum(['ops', 'editorial', 'bold']).default('editorial'),
+          // Gradient opacity over the photo, 0–100.
+          scrim: z.number().min(0).max(100).default(55),
+          showWordmark: z.boolean().default(true),
+          showTagline: z.boolean().default(true),
+          // Falls back to the footer tagline, then the business name.
+          tagline: z.string().default(''),
+          // Accent colour (rule/bar + wordmark accent). Defaults to theme.brand.
+          accent: z.string().optional(),
+        }).default({}),
       }),
     }),
 

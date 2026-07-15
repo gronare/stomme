@@ -41,7 +41,8 @@
   },
   "scripts": {
     "gen:schema-manifest": "node bin/gen-schema-manifest.mjs",
-    "test:preview-workerd": "node test/smoke-preview-workerd.mjs"
+    "test:preview-workerd": "node test/smoke-preview-workerd.mjs",
+    "test:og": "node test/smoke-og.mjs"
   },
   "bin": {
     "stomme-gen": "bin/gen-admin-blocks.mjs",
@@ -72,8 +73,13 @@
     "styles.css"
   ],
   "dependencies": {
+    "@fontsource/inter": "^5.2.8",
+    "@fontsource/inter-tight": "^5.2.7",
+    "@resvg/resvg-js": "^2.6.2",
     "jiti": "^2.6.0",
-    "marked": "^18.0.5"
+    "marked": "^18.0.5",
+    "satori": "^0.26.0",
+    "sharp": "^0.35.3"
   },
   "peerDependencies": {
     "astro": ">=5"
