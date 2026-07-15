@@ -3,12 +3,12 @@
 # showcase site against the current main engine. If a gate fails, `release` is
 # left untouched, so a broken engine commit never reaches customer sites. This
 # is the CI form of the local stomme-promote script, dispatchable by a control
-# plane (the control plane). Nothing operator-specific lives in this file — the
+# plane. Nothing operator-specific lives in this file — the
 # canary/sidecar repos and the report webhook come from repo vars/secrets.
 name: Promote
 
 # Dispatch-only, by operator decision: pushing main must NOT promote by
-# itself — the operator presses the button (the control plane), and THAT single
+# itself — the operator presses the button, and THAT single
 # press runs every gate and advances release if nothing reports red.
 on:
   workflow_dispatch:
@@ -65,7 +65,7 @@ jobs:
             '{repo:$repo,status:$status,from:$from,to:$to,run_url:$run_url}')
           SIG=$(printf '%s' "$BODY" | openssl dgst -sha256 -hmac "$SECRET" | awk '{print $NF}')
           curl -sf -X POST -H "Content-Type: application/json" \
-            -H "X-the control plane-Signature: $SIG" -d "$BODY" \
+            -H "X-Stomme-Signature: $SIG" -d "$BODY" \
             "$REPORT_URL" || echo "report failed (non-blocking)"
 
       - name: Setup pnpm
@@ -160,7 +160,7 @@ jobs:
             '{repo:$repo,status:$status,from:$from,to:$to,run_url:$run_url}')
           SIG=$(printf '%s' "$BODY" | openssl dgst -sha256 -hmac "$SECRET" | awk '{print $NF}')
           curl -sf -X POST -H "Content-Type: application/json" \
-            -H "X-the control plane-Signature: $SIG" -d "$BODY" \
+            -H "X-Stomme-Signature: $SIG" -d "$BODY" \
             "$REPORT_URL" || echo "report failed (non-blocking)"
 
       # Only reached when the lint AND canary above succeeded (a custom if without
@@ -210,5 +210,5 @@ jobs:
             '{repo:$repo,status:$status,reason:$reason,from:$from,to:$to,commits:$commits,run_url:$run_url}')
           SIG=$(printf '%s' "$BODY" | openssl dgst -sha256 -hmac "$SECRET" | awk '{print $NF}')
           curl -sf -X POST -H "Content-Type: application/json" \
-            -H "X-the control plane-Signature: $SIG" -d "$BODY" \
+            -H "X-Stomme-Signature: $SIG" -d "$BODY" \
             "$REPORT_URL" || echo "report failed (non-blocking)"

@@ -132,7 +132,7 @@ jobs:
             '{repo:$repo,status:$status,from:$from,to:$to,run_url:$run_url}')
           SIG=$(printf '%s' "$BODY" | openssl dgst -sha256 -hmac "$SECRET" | awk '{print $NF}')
           curl -sf -X POST -H "Content-Type: application/json" \
-            -H "X-the control plane-Signature: $SIG" -d "$BODY" \
+            -H "X-Stomme-Signature: $SIG" -d "$BODY" \
             "$REPORT_URL" || echo "report failed (non-blocking)"
 
       - name: Setup pnpm
@@ -310,7 +310,7 @@ jobs:
             '{repo:$repo,status:$status,from:$from,to:$to,run_url:$run_url}')
           SIG=$(printf '%s' "$BODY" | openssl dgst -sha256 -hmac "$SECRET" | awk '{print $NF}')
           curl -sf -X POST -H "Content-Type: application/json" \
-            -H "X-the control plane-Signature: $SIG" -d "$BODY" \
+            -H "X-Stomme-Signature: $SIG" -d "$BODY" \
             "$REPORT_URL" || echo "report failed (non-blocking)"
 
       - name: Fail on diff (awaiting approval)
