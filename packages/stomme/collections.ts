@@ -11,8 +11,8 @@ import { glob } from 'astro/loaders';
 import { readdirSync } from 'node:fs';
 import { resolveListings, type Listing } from './src/config.ts';
 
-// `ogRaw` opts a page out of the generated share card (settings.og): its image is
-// shared untouched. Ignored when card generation is off.
+// `ogRaw` opts an item out of its generated share card (settings.og): the item's own
+// image is shared untouched instead of a card. Ignored when the master switch is off.
 const seo = z.object({ title: z.string(), description: z.string(), image: z.string().optional(), ogRaw: z.boolean().optional() });
 const blocks = z.array(z.object({ type: z.string() }).passthrough()).default([]);
 const link = z.any().optional();
@@ -69,26 +69,44 @@ export function stommeCollections(listings?: Listing[]) {
         // the shipped /favicon.svg when unset. `appleIcon` is the iOS home-screen PNG (180×180).
         favicon: z.string().optional(),
         appleIcon: z.string().optional(),
-        // Social-share image (og:image / Twitter card) — shown when a page is shared.
+        // Site default social-share image (og:image / Twitter card): the fallback shown
+        // for the start page and any page with no per-page override and no generated card.
         ogImage: z.string().optional(),
-        // Generated share cards (Phase 2): build-time branded OG cards — the page's photo
-        // cropped to 1200×630 with a scrim + title/tagline/wordmark composited on top
-        // (src/og.ts renders; routes/og.ts emits /og/<slug>.png). Optional with defaults so
-        // existing content validates unchanged; `enabled` defaults FALSE — zero behavior
-        // change until a site opts in. On failure the build falls back to `ogImage`.
+        // Generated share cards — a presence-driven, layered, per-type model.
+        //
+        //   `enabled` is the MASTER switch (default FALSE = zero behaviour change):
+        //     OFF → og:image = per-page override (image/seo.image) ?? ogImage (Phase-1).
+        //     ON  → the layered system: per-page override → per-type generated card →
+        //           site default (ogImage → home-hero image → a generated brand card).
+        //
+        //   `types` holds ONE config per generatable type (key = a listing id, or
+        //   "towns"/"services"). When a type's `enabled` is true (and the master is on)
+        //   each of its items gets a build-time card: the item photo cropped to 1200×630
+        //   with a scrim + overlay text (a template with {var} substitution) + optional
+        //   wordmark/tagline. All optional with defaults so existing content validates.
         og: z.object({
           enabled: z.boolean().default(false),
-          // Card layout preset: ops (left panel), editorial (bottom gradient — default),
-          // bold (centered, heavy scrim).
-          style: z.enum(['ops', 'editorial', 'bold']).default('editorial'),
-          // Gradient opacity over the photo, 0–100.
-          scrim: z.number().min(0).max(100).default(55),
-          showWordmark: z.boolean().default(true),
-          showTagline: z.boolean().default(true),
-          // Falls back to the footer tagline, then the business name.
-          tagline: z.string().default(''),
-          // Accent colour (rule/bar + wordmark accent). Defaults to theme.brand.
-          accent: z.string().optional(),
+          types: z
+            .record(
+              z.object({
+                enabled: z.boolean().default(false),
+                // Card layout preset: editorial (bottom gradient — default),
+                // bold (centred statement), ops (left panel).
+                style: z.enum(['editorial', 'bold', 'ops']).default('editorial'),
+                // Overlay text template — {var} substituted per item at build. Blank ⇒
+                // the sensible per-type default (catalog "{title} · {price}", else "{title}").
+                overlayText: z.string().default(''),
+                // Gradient opacity over the photo, 0–100.
+                scrim: z.number().min(0).max(100).default(55),
+                showLogo: z.boolean().default(true),
+                showTagline: z.boolean().default(true),
+                // Falls back to the footer tagline, then the business name.
+                tagline: z.string().default(''),
+                // Accent colour (rule/bar + wordmark accent). Defaults to theme.brand.
+                accent: z.string().optional(),
+              }).default({}),
+            )
+            .default({}),
         }).default({}),
       }),
     }),

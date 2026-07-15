@@ -132,6 +132,17 @@ const identityDraft = kind === 'identity' && draft && typeof draft === 'object' 
 const idLogo = (identityDraft && identityDraft.logo) || {};
 const idUploads = import.meta.glob('/src/assets/uploads/**/*.{jpg,jpeg,png,webp,avif}');
 const idOptimized = idLogo.image && idUploads[idLogo.image] ? idUploads[idLogo.image] : null;
+// Favicon / apple-icon / social-share image the SAME way: an uploaded asset
+// (/src/assets/uploads/…) isn't served raw, so resolve it to its built URL; public-root
+// paths ('/favicon.svg', an /images/… default) are already served and pass through. This
+// is what the CMS Identity pane needs — getAsset only yields the unserved /src path (404).
+const idAssetUrls = import.meta.glob('/src/assets/uploads/**/*', { query: '?url', import: 'default', eager: true });
+const idAsset = (p) => (!p ? '' : (typeof p === 'string' && p.startsWith('/src/') ? (idAssetUrls[p] || p) : p));
+const idName = (identityDraft && identityDraft.name) || 'Your business';
+const idFav = idAsset(identityDraft && identityDraft.favicon) || '/favicon.svg';
+const idApple = idAsset(identityDraft && identityDraft.appleIcon);
+const idOg = idAsset(identityDraft && identityDraft.ogImage);
+const idLabel = 'font-family:ui-monospace,Menlo,monospace;font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;color:#6b7280;margin:0 0 10px';
 ---
 {/* Static/prerendered fallback: no response header is emitted, so carry the CSP in a
     <meta http-equiv>. Astro relocates a leading <meta> in a page that renders a layout
@@ -156,11 +167,43 @@ const idOptimized = idLogo.image && idUploads[idLogo.image] ? idUploads[idLogo.i
   <Base title="Preview"><div id="preview-root"><TownPage town={{ id: 'preview', data: townDraft ?? {} }} config={site} /></div></Base>
 ) : kind === 'identity' ? (
   <Base title="Preview" chrome={false}><div id="preview-root">
-    <div class="logo" style="display:flex;align-items:center;gap:0.75rem;padding:1.5rem">
-      {idLogo.image && (idOptimized
-        ? <Image class="logo-mark" src={idOptimized()} alt={idLogo.alt ?? ''} />
-        : <img class="logo-mark" src={idLogo.image} alt={idLogo.alt ?? ''} />)}
-      {idLogo.textPre && <span class="logo-word">{idLogo.textPre}<span class="accent">{idLogo.textAccent}</span></span>}
+    <div style="padding:1.5rem;color:var(--color-ink,#1f2937);font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;line-height:1.5">
+      <p style={idLabel}>Logo</p>
+      <div class="logo" style="display:flex;align-items:center;gap:0.75rem">
+        {idLogo.image && (idOptimized
+          ? <Image class="logo-mark" src={idOptimized()} alt={idLogo.alt ?? ''} />
+          : <img class="logo-mark" src={idLogo.image} alt={idLogo.alt ?? ''} />)}
+        {idLogo.textPre && <span class="logo-word">{idLogo.textPre}<span class="accent">{idLogo.textAccent}</span></span>}
+        {!idLogo.image && !idLogo.textPre && <span style="color:#6b7280">No logo set</span>}
+      </div>
+
+      <p style={idLabel + ';margin-top:26px'}>Browser tab</p>
+      <div style="display:inline-flex;align-items:center;gap:8px;max-width:260px;background:var(--color-paper,#fff);border:1px solid var(--color-line,#e5e7eb);border-radius:9px 9px 0 0;padding:8px 13px">
+        <img src={idFav} alt="" style="width:16px;height:16px;display:block;flex:0 0 auto" />
+        <span style="font-size:.8rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{idName}</span>
+      </div>
+
+      {idApple && (
+        <div style="margin-top:26px">
+          <p style={idLabel}>Home-screen icon</p>
+          <img src={idApple} alt="" style="width:56px;height:56px;border-radius:13px;display:block;box-shadow:0 2px 8px rgba(0,0,0,.18)" />
+        </div>
+      )}
+
+      <p style={idLabel + ';margin-top:26px'}>Social share</p>
+      {idOg ? (
+        <div style="max-width:340px;border:1px solid var(--color-line,#e5e7eb);border-radius:14px;overflow:hidden;background:var(--color-paper,#fff);box-shadow:0 4px 16px rgba(0,0,0,.08)">
+          <img src={idOg} alt="" style="width:100%;aspect-ratio:1200 / 630;object-fit:cover;display:block" />
+          <div style="padding:11px 14px;border-top:1px solid var(--color-line,#e5e7eb)">
+            <p style="margin:0;color:var(--color-ink,#1f2937);font-weight:700;font-size:.95rem;line-height:1.25">{idName}</p>
+            <p style="margin:3px 0 0;color:#6b7280;font-size:.8rem">Per-page title + description show here when shared.</p>
+          </div>
+        </div>
+      ) : (
+        <div style="max-width:340px;border:1px dashed var(--color-line,#e5e7eb);border-radius:14px;padding:20px 22px;color:#6b7280;font-size:.85rem;line-height:1.45">No social image set — links share as a small text card. Add one (≈1200×630) for a large-image card.</div>
+      )}
+
+      <p style="margin-top:26px;color:#6b7280;font-size:.9rem">Business name: <span style="color:var(--color-ink,#1f2937);font-weight:600">{idName}</span></p>
     </div>
   </div></Base>
 ) : (

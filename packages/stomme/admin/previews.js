@@ -267,51 +267,52 @@
   var HeaderPreview = ChromePreview('header');
   var FooterPreview = ChromePreview('footer');
 
-  // Identity — what each field becomes: the header logo, the browser-tab favicon, the
-  // home-screen icon, and the business name (footer © / contact / structured data).
+  // Identity — the logo, browser-tab favicon, home-screen icon, social-share image and
+  // business name. Rendered ENTIRELY via /preview?kind=identity (a full-height iframe),
+  // so every asset is the SERVED file: an uploaded favicon/og image (/src/assets/uploads/…)
+  // and public-root defaults ('/favicon.svg') both resolve on the site origin. Decap's
+  // getAsset only yields the raw /src path (unserved → 404), which is why the logo already
+  // rendered via /preview; the favicon + social share now do the same instead of getAsset.
   var IdentityPreview = function (props) {
+    var data = props.entry.get('data');
+    data = data && data.toJS ? data.toJS() : (data || {});
+    return liveFrame('stomme-preview-identity', '/preview?kind=identity', b64(data));
+  };
+
+  // Delningskort (share cards) — a representative generated-card mock reflecting the pane:
+  // the master toggle, and (from the first enabled type) the overlay template, tagline,
+  // wordmark and accent. Dark card, brand accent rule, mono eyebrow — in the mockup spirit.
+  var ShareCardsPreview = function (props) {
     var e = props.entry;
-    var asset = function (p) { try { return p && props.getAsset ? String(props.getAsset(p)) : ''; } catch (_e) { return ''; } };
     var data = e.get('data'); data = data && data.toJS ? data.toJS() : (data || {});
-    var name = v(e, 'name') || 'Your business';
-    var hasLogo = !!(data.logo && (data.logo.image || data.logo.textPre));
-    var favUrl = asset(v(e, 'favicon')) || '/favicon.svg';
-    var appleUrl = asset(v(e, 'appleIcon'));
-    var ogUrl = asset(v(e, 'ogImage'));
-    var domain = ''; try { domain = window.location.hostname.replace(/^www\./, ''); } catch (_e) {}
-    var lab = function (t) { return h('p', { style: { fontFamily: fMono, fontSize: '.62rem', letterSpacing: '.14em', textTransform: 'uppercase', color: cMuted, margin: '0 0 10px' } }, t); };
+    var name = data.name || 'Your business';
+    var og = data.og || {};
+    var enabled = !!og.enabled;
+    var ogImg = ''; try { if (data.ogImage && props.getAsset) ogImg = String(props.getAsset(data.ogImage)); } catch (_e) {}
+    var types = og.types || {};
+    var chosen = null;
+    Object.keys(types).forEach(function (k) { if (!chosen && types[k] && types[k].enabled) chosen = types[k]; });
+    var tpl = (chosen && chosen.overlayText) || '{title}';
+    var accent = (chosen && chosen.accent) || cBrand;
+    var tagline = (chosen && chosen.tagline) || '';
+    var showLogo = !chosen || chosen.showLogo !== false;
+    var headline = tpl
+      .replace(/\{title\}/g, 'Example item').replace(/\{price\}/g, '12 000 kr')
+      .replace(/\{[^}]+\}/g, '').replace(/\s+/g, ' ').replace(/^[\s·•|,:-]+|[\s·•|,:-]+$/g, '').trim() || name;
+    var lab = function (t) { return h('p', { style: { fontFamily: fMono, fontSize: '.62rem', letterSpacing: '.14em', textTransform: 'uppercase', color: cMuted, margin: '0 0 12px' } }, t); };
     return h('div', { className: 'bk' },
-      lab('Logo'),
-      // Render the REAL composed logo via /preview (like header/footer) so an UPLOADED
-      // logo (/src/assets/uploads/…) shows as the served, Astro-optimized image. Decap's
-      // getAsset only yields the raw /src path, which isn't served → 404 in the iframe.
-      hasLogo
-        ? liveFrame('stomme-preview-identity', '/preview?kind=identity', b64(data), LOGO_FRAME_STYLE)
-        : h('p', { style: { color: cMuted, margin: 0 } }, 'No logo set'),
-
-      h('div', { style: { marginTop: '24px' } }, lab('Browser tab'),
-        h('div', { style: { display: 'inline-flex', alignItems: 'center', gap: '8px', maxWidth: '260px', background: cPaper, border: '1px solid ' + cLine, borderRadius: '9px 9px 0 0', padding: '8px 13px' } },
-          h('img', { src: favUrl, alt: '', style: { width: '16px', height: '16px', display: 'block', flex: '0 0 auto' } }),
-          h('span', { style: { fontSize: '.8rem', color: cInk, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' } }, name))),
-
-      appleUrl ? h('div', { style: { marginTop: '24px' } }, lab('Home-screen icon'),
-        h('div', { style: { display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '7px' } },
-          h('img', { src: appleUrl, alt: '', style: { width: '56px', height: '56px', borderRadius: '13px', display: 'block', boxShadow: '0 2px 8px rgba(0,0,0,.18)' } }),
-          h('span', { style: { fontSize: '.72rem', color: cMuted } }, name))) : null,
-
-      h('div', { style: { marginTop: '24px' } }, lab('Social share'),
-        ogUrl
-          ? h('div', { style: { maxWidth: '340px', border: '1px solid ' + cLine, borderRadius: '14px', overflow: 'hidden', background: cPaper, boxShadow: '0 4px 16px rgba(0,0,0,.08)' } },
-              h('img', { src: ogUrl, alt: '', style: { width: '100%', aspectRatio: '1200 / 630', objectFit: 'cover', display: 'block' } }),
-              h('div', { style: { padding: '11px 14px', borderTop: '1px solid ' + cLine, background: 'color-mix(in srgb, ' + cSurface + ' 40%, ' + cPaper + ')' } },
-                domain ? h('p', { style: { margin: 0, fontFamily: fMono, fontSize: '.62rem', letterSpacing: '.1em', textTransform: 'uppercase', color: cMuted } }, domain) : null,
-                h('p', { style: { margin: '4px 0 0', color: cInk, fontWeight: 700, fontSize: '.95rem', lineHeight: 1.25 } }, name),
-                h('p', { style: { margin: '3px 0 0', color: cMuted, fontSize: '.8rem' } }, 'Per-page title + description show here when shared.')))
-          : h('div', { style: { maxWidth: '340px', border: '1px dashed ' + cLine, borderRadius: '14px', padding: '20px 22px', color: cMuted, fontSize: '.85rem', lineHeight: 1.45 } },
-              'No social image set — links share as a small text card. Add one (≈1200×630) for a large-image card.')),
-
-      h('p', { style: { margin: '24px 0 0', color: cMuted, fontSize: '.9rem' } }, 'Business name: ', h('span', { style: { color: cInk, fontWeight: 600 } }, name)),
-      note('Logo → header/footer · favicon → browser tab · home-screen icon → saved-to-home · social share → og:image · business name → footer ©, contact, structured data.'));
+      lab('Share card preview'),
+      h('div', { style: { maxWidth: '520px', aspectRatio: '1200 / 630', borderRadius: '14px', overflow: 'hidden', position: 'relative', background: 'linear-gradient(150deg,#1a1f2b,#0c0e13)', boxShadow: '0 10px 34px rgba(0,0,0,.22)', color: '#fff', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', padding: '7% 7% 8%', boxSizing: 'border-box' } },
+        ogImg ? h('img', { src: ogImg, alt: '', style: { position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: 0.45 } }) : null,
+        showLogo ? h('div', { style: { position: 'absolute', top: '7%', left: '7%', fontWeight: 800, letterSpacing: '-.01em', fontSize: '1.05rem' } }, name) : null,
+        h('div', { style: { position: 'relative' } },
+          h('div', { style: { width: '58px', height: '5px', borderRadius: '3px', background: accent, marginBottom: '16px' } }),
+          h('div', { style: { fontFamily: MONO, fontSize: '.6rem', letterSpacing: '.16em', textTransform: 'uppercase', color: 'rgba(255,255,255,.68)', marginBottom: '10px' } }, name),
+          h('div', { style: { fontSize: '1.7rem', fontWeight: 800, lineHeight: 1.08 } }, headline),
+          tagline ? h('div', { style: { marginTop: '12px', fontSize: '.95rem', color: 'rgba(255,255,255,.85)' } }, tagline) : null)),
+      enabled
+        ? note('A branded card like this is generated per item for each content type you enabled. Items with their own share image, or a type left off, use the site default instead.')
+        : note('Share cards are OFF — every page shares the site default image. Turn on “Generate share cards”, then enable the content types you want cards for.'));
   };
   // Contact — render the REAL direct-contact card + Find-us block via /preview, fed the
   // draft settings (the same live-render pattern as header/footer/thanks). No hand-built
@@ -374,6 +375,7 @@
   window.CMS.registerPreviewTemplate('services', ServicePreview);
   window.CMS.registerPreviewTemplate('posts', PostPreview);
   window.CMS.registerPreviewTemplate('site', IdentityPreview);
+  window.CMS.registerPreviewTemplate('sharecards', ShareCardsPreview);
   window.CMS.registerPreviewTemplate('contact', ContactPreview);
   window.CMS.registerPreviewTemplate('theme', ThemePreview);
   window.CMS.registerPreviewTemplate('nav', HeaderPreview);
