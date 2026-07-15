@@ -39,9 +39,17 @@ const ogImage = shareImage
   ? (Astro.site ? new URL(shareImage, Astro.site).href : shareImage)
   : undefined;
 const ogUrl = Astro.site ? new URL(Astro.url.pathname, Astro.site).href : undefined;
+
+// Indexing + canonical. A site still on its *.pages.dev host is a pre-launch demo →
+// noindex so search engines never index it. Once live (Astro.site = the real domain)
+// it's indexable, and the canonical points at the real domain even when the same build
+// is served via the *.pages.dev shadow — so the pages.dev copy defers, not competes.
+const noindex = Astro.site ? new URL(Astro.site).hostname.endsWith('.pages.dev') : false;
 ---
 <title>{title ?? settings.name}</title>
 {description && <meta name="description" content={description} />}
+{noindex && <meta name="robots" content="noindex, nofollow" />}
+{ogUrl && <link rel="canonical" href={ogUrl} />}
 <meta property="og:title" content={ogTitle} />
 {description && <meta property="og:description" content={description} />}
 <meta property="og:type" content="website" />
