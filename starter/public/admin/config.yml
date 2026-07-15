@@ -5,7 +5,7 @@ backend:
   name: git-gateway
   branch: main
 # <<< cms:generated
-media_folder: "src/assets/uploads"
+media_folder: "/src/assets/uploads"
 public_folder: "/src/assets/uploads"
 collections:
   - name: home
