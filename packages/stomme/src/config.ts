@@ -4,6 +4,13 @@
 // The TownPage/ServicePage templates take the same `site`.
 // Defaults are neutral English; override only what differs.
 export interface SiteConfig {
+  // Canonical absolute site URL (e.g. 'https://a live site.se') — drives Astro.site,
+  // which Head.astro uses for og:image (absolute), og:url, <link canonical> and the
+  // sitemap. the control plane-managed: set per site to the canonical host (custom domain when
+  // live, *.pages.dev while in demo/review) and updated at go-live. The site's
+  // astro.config reads it directly (`site: site.url || process.env.SITE_URL || '<own host>'`),
+  // so it falls back to the SITE_URL env var, then the site's own hardcoded host.
+  url?: string;
   routes?: {
     services?: string; // serviceGrid + ServicePage detail-page prefix
     towns?: string; // linkChips + TownPage detail-page prefix
