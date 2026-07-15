@@ -9,10 +9,6 @@ import ConsentBanner from '@gronare/stomme/ConsentBanner.astro';
 import StommeHead from '@gronare/stomme/Head.astro';
 import { site } from '../site.config';
 
-// Uploaded font files → served URLs (Vite hashes them), for a custom theme font.
-const fontFiles = import.meta.glob('/src/assets/uploads/**/*.{woff2,woff,ttf,otf}', {
-  query: '?url', import: 'default', eager: true,
-});
 
 // `chrome` (default true) renders the site Header/Footer. The CMS chrome previews
 // set it false so they can render a single component in isolation, still themed.
@@ -29,10 +25,7 @@ const towns = footerCfg.showTowns === true
       .sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0))
       .map((t) => ({ id: t.id, name: t.data.name }))
   : [];
-const ff = fontFiles as Record<string, string>;
-const customDisplayUrl = theme.fontCustomFile ? ff[theme.fontCustomFile] : null;
-const customBodyUrl = theme.fontCustomBodyFile ? ff[theme.fontCustomBodyFile] : null;
-const fonts = resolveFonts(theme, customDisplayUrl, customBodyUrl);
+const fonts = resolveFonts(theme);
 
 // Inject the owner-editable theme tokens as CSS vars on <html>, overriding the
 // build-time defaults in global.css.
