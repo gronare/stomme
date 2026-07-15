@@ -812,7 +812,7 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
   /* The facts card is a dark ops-style scene: the facts pinned top-left as mono
      chip pills over a subtle brand glow. It is decorative (aria-hidden; the copy
      carries the message) — sites can layer more scene art on it via ::before /
-     ::after (e.g. a live site adds a flight path + drone in its global.css). */
+     ::after (e.g. a site adds bespoke scene art in its global.css). */
   .ctabox-aside {
     list-style: none; margin: 0; padding: 0.85rem;
     position: relative; overflow: hidden; aspect-ratio: 16 / 9.5;
