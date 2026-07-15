@@ -755,8 +755,8 @@ function emitSettings() {
               - { name: alt, label: "Logo alt text", widget: string, required: false }
               - { name: textPre, label: "Wordmark text", widget: string, required: false }
               - { name: textAccent, label: "Wordmark accent (in brand colour)", widget: string, required: false }
-          - { name: favicon, label: "Favicon", widget: image, required: false, media_folder: "/public", public_folder: "/", hint: "Browser-tab icon — SVG recommended (scales to any size). Defaults to the shipped mark when empty." }
-          - { name: appleIcon, label: "Home-screen icon", widget: image, required: false, media_folder: "/public", public_folder: "/", hint: "iOS home-screen icon — a 180×180 PNG. Optional." }
+          - { name: favicon, label: "Favicon", widget: image, required: false, media_folder: "/public/media/identity", public_folder: "/media/identity", hint: "Browser-tab icon — SVG recommended (scales to any size). Defaults to the shipped mark when empty." }
+          - { name: appleIcon, label: "Home-screen icon", widget: image, required: false, media_folder: "/public/media/identity", public_folder: "/media/identity", hint: "iOS home-screen icon — a 180×180 PNG. Optional." }
 ${emitShareCards(6)}
       - name: contact
         label: "Contact"
