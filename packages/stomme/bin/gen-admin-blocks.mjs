@@ -1176,6 +1176,9 @@ try {
   // softer radii. CSS custom properties only — they inherit through the shadow DOM, and
   // explicit colours would break the in-app light/dark toggle. Managed region, like the shim.
   // `!important` is load-bearing: Sveltia injects its own `:root,:host{--sui-…}` at runtime after this style, so equal-specificity later rules would otherwise win.
+  // Surfaces derive from a background/border ramp (per light/dark via [data-theme]); tinting it toward the brand hue and steepening the border contrast is what makes the editor legible rather than flat grey. Overridden per mode so the light/dark toggle still works.
+  const RAMP_LIGHT = `--sui-background-color-1-hsl: var(--sui-base-hue) 30% 99% !important; --sui-background-color-2-hsl: var(--sui-base-hue) 22% 97% !important; --sui-background-color-3-hsl: var(--sui-base-hue) 20% 94% !important; --sui-background-color-4-hsl: var(--sui-base-hue) 18% 91% !important; --sui-background-color-5-hsl: var(--sui-base-hue) 26% 81% !important; --sui-border-color-1-hsl: var(--sui-base-hue) 18% 55% !important; --sui-border-color-2-hsl: var(--sui-base-hue) 20% 80% !important; --sui-border-color-3-hsl: var(--sui-base-hue) 18% 84% !important;`;
+  const RAMP_DARK = `--sui-background-color-1-hsl: var(--sui-base-hue) 18% 9% !important; --sui-background-color-2-hsl: var(--sui-base-hue) 18% 11% !important; --sui-background-color-3-hsl: var(--sui-base-hue) 18% 14% !important; --sui-background-color-4-hsl: var(--sui-base-hue) 18% 17% !important; --sui-background-color-5-hsl: var(--sui-base-hue) 20% 27% !important; --sui-border-color-1-hsl: var(--sui-base-hue) 16% 42% !important; --sui-border-color-2-hsl: var(--sui-base-hue) 18% 30% !important; --sui-border-color-3-hsl: var(--sui-base-hue) 18% 26% !important;`;
   const THEME_STYLE = `<style>:root{
       --sui-base-hue: 152 !important; /* per site: brand hue */
       --sui-font-family-default: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif !important;
@@ -1186,7 +1189,10 @@ try {
       --sui-button-medium-border-radius: 6px !important;
       --sui-checkbox-border-radius: 4px !important;
       --sui-textbox-font-size: 15px !important;
-    }</style>`;
+    }
+    :root, :host, :root[data-theme=light], :host[data-theme=light] { ${RAMP_LIGHT} }
+    :root[data-theme=dark], :host[data-theme=dark] { ${RAMP_DARK} }
+    @media (prefers-color-scheme: dark) { :root:not([data-theme=light]), :host:not([data-theme=light]) { ${RAMP_DARK} } }</style>`;
   const T_START = '<!-- >>> stomme-theme:generated (managed by stomme-gen — do not edit) -->';
   const T_END = '<!-- <<< stomme-theme:generated -->';
   const themeRegion = `${T_START}\n    ${THEME_STYLE}\n    ${T_END}`;
