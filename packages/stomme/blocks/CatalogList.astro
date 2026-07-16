@@ -15,13 +15,15 @@ interface Props {
   intro?: string;
   source?: string;
   base?: string;
-  columns?: number;
-  showImages?: boolean;
-  filters?: boolean;
+  media?: { showImages?: boolean };
+  layout?: { filters?: boolean; columns?: number };
   items?: { id: string; data: Record<string, any> }[];
   site?: any;
 }
-const { eyebrow, heading, intro, source = '', base, columns = 3, showImages = false, filters = false, site } = Astro.props;
+const { eyebrow, heading, intro, source = '', base, site } = Astro.props;
+const showImages = Astro.props.media?.showImages ?? false;
+const filters = Astro.props.layout?.filters ?? false;
+const columns = Astro.props.layout?.columns ?? 3;
 // Item titles are h3 under a section heading, else h2 under the page h1 — no skipped
 // level (see PostList). Astro renders a Capitalized string var as that HTML tag.
 const ItemHeading = heading ? 'h3' : 'h2';

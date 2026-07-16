@@ -6,11 +6,13 @@ import Cover from '../src/Cover.astro';
 interface Props {
   heading?: string;
   body?: string;
-  image?: string;
-  imageAlt?: string;
-  flip?: boolean;
+  media?: { image?: string; imageAlt?: string };
+  layout?: { flip?: boolean };
 }
-const { heading, body = '', image, imageAlt, flip = false } = Astro.props;
+const { heading, body = '' } = Astro.props;
+const image = Astro.props.media?.image;
+const imageAlt = Astro.props.media?.imageAlt;
+const flip = Astro.props.layout?.flip ?? false;
 const html = await renderMarkdown(body);
 ---
 

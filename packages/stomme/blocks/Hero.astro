@@ -14,33 +14,40 @@ import ContactLink from '../ContactLink.astro';
 // Domain-specific media (e.g. an energy-flow diagram or a drone scene) live in the
 // consuming site as a custom hero registered over this one — see docs/customizing.md.
 interface Highlight { icon?: string; title: string; body?: string }
+// Grouped fields (block-field convention): `media` holds the kind picker (`kind`) +
+// its assets; `layout` holds size/placement; `style` holds surface + accent.
 interface Props {
   eyebrow?: string;
   heading: string;
   intro?: string;
+  ticks?: string[];
   ctaLabel?: string;
   ctaHref?: unknown;
   cta2Label?: string;
   cta2Href?: unknown;
-  media?: 'none' | 'image' | 'highlights' | 'motif';
-  image?: string;
-  imageAlt?: string;
-  highlights?: Highlight[];
-  ticks?: string[];
-  height?: 'normal' | 'tall';
-  align?: 'top' | 'center' | 'bottom';
-  width?: 'narrow' | 'full';
+  media?: { kind?: 'none' | 'image' | 'highlights' | 'motif'; image?: string; imageAlt?: string; highlights?: Highlight[] };
+  layout?: { height?: 'normal' | 'tall'; align?: 'top' | 'center' | 'bottom'; width?: 'narrow' | 'full' };
+  style?: { surface?: string; accent?: 'brand' | 'secondary' | 'highlight' };
 }
-const { eyebrow, heading, intro, ctaLabel, ctaHref, cta2Label, cta2Href, media = 'none', image, imageAlt, highlights = [], ticks = [], height = 'normal', align = 'center', width = 'full' } = Astro.props;
+const { eyebrow, heading, intro, ctaLabel, ctaHref, cta2Label, cta2Href, ticks = [] } = Astro.props;
+const kind = Astro.props.media?.kind ?? 'none';
+const image = Astro.props.media?.image;
+const imageAlt = Astro.props.media?.imageAlt;
+const highlights = Astro.props.media?.highlights ?? [];
+const height = Astro.props.layout?.height ?? 'normal';
+const align = Astro.props.layout?.align ?? 'center';
+const width = Astro.props.layout?.width ?? 'full';
+const accent = Astro.props.style?.accent ?? 'brand';
+const accentVar = accent === 'secondary' ? 'var(--color-secondary)' : accent === 'highlight' ? 'var(--color-highlight)' : 'var(--color-brand)';
 const href = resolveLink(ctaHref, '/');
 const href2 = resolveLink(cta2Href, '/');
 const contact = ((await getEntry('contact', 'contact').catch(() => null))?.data ?? {}) as any;
-const showImage = media === 'image' && !!image;
-const showHighlights = media === 'highlights' && highlights.length > 0;
-const showMotif = media === 'motif';
+const showImage = kind === 'image' && !!image;
+const showHighlights = kind === 'highlights' && highlights.length > 0;
+const showMotif = kind === 'motif';
 const hasMedia = showImage || showHighlights || showMotif;
 ---
-<section class:list={['section', { 'section--hero-tall': height === 'tall', 'section--read': width === 'narrow' }, height === 'tall' && `section--hero-${align}`]}>
+<section class:list={['section', { 'section--hero-tall': height === 'tall', 'section--read': width === 'narrow' }, height === 'tall' && `section--hero-${align}`]} style={`--block-accent:${accentVar}`}>
   <div class:list={['hero-grid', { 'has-media': hasMedia }]}>
     <div>
       {eyebrow && <span class="mono eyebrow">{eyebrow}</span>}

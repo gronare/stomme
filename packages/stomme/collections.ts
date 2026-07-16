@@ -239,8 +239,8 @@ export function stommeCollections(listings?: Listing[]) {
         districts: z.array(z.string()).default([]),
         localCase: z.string().optional(),
         services: z.array(z.string()).default([]),
-        image: z.string().optional(),
-        imageAlt: z.string().optional(),
+        // Grouped shape (block-field convention): the page photo lives in `media`.
+        media: z.object({ image: z.string().optional(), imageAlt: z.string().optional() }).optional(),
         seo: seo.optional(),
       }),
     }),
@@ -255,8 +255,8 @@ export function stommeCollections(listings?: Listing[]) {
         summary: z.string().default(''),
         order: z.number().default(0),
         bullets: z.array(z.string()).default([]),
-        image: z.string().optional(),
-        imageAlt: z.string().optional(),
+        // Grouped shape (block-field convention): the card/header photo lives in `media`.
+        media: z.object({ image: z.string().optional(), imageAlt: z.string().optional() }).optional(),
         seo: seo.optional(),
         // Optional COMPACT page-header for block-composed entries: ServicePage
         // renders eyebrow + H1 (= title) + lede (= summary) + ✓ ticks + CTA with

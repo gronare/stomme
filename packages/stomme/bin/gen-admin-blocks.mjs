@@ -469,7 +469,6 @@ function emitThanksButtons(indent) {
 // schemas (towns/services match the TownPage/ServicePage templates).
 // No field-level media_folder — Decap resolves it relative to the entry (breaks
 // uploads from subfolder entries); the global media_folder in config.yml is used.
-const IMG = '{ name: image, label: "Image", widget: image, required: false }';
 const COLLECTION_EDITORS = {
   faq: `- name: faq
   label: "FAQ"
@@ -549,8 +548,14 @@ const COLLECTION_EDITORS = {
       collapsed: true
       minimize_collapsed: true
       field: { name: item, label: "Service", widget: string }
-    - ${IMG}
-    - { name: imageAlt, label: "Image alt text", widget: string, required: false }`,
+    - name: media
+      label: "Media"
+      widget: object
+      collapsed: true
+      hint: "The photo beside the page heading."
+      fields:
+        - { name: image, label: "Image", widget: image, required: false }
+        - { name: imageAlt, label: "Image alt text", widget: string, required: false }`,
   services: `- name: services
   label: "Services"
   label_singular: "Service"
@@ -573,8 +578,14 @@ const COLLECTION_EDITORS = {
     - { name: navLabel, label: "Short label (menus/cards)", widget: string }
     - { name: summary, label: "Summary", widget: text, required: false, hint: "The lede under the title — also the card text in service lists." }
     - { name: order, label: "Order", widget: number, required: false, default: 0 }
-    - { name: image, label: "Image", widget: image, required: false, hint: "Shown on the service card in lists and beside the page header." }
-    - { name: imageAlt, label: "Image alt text", widget: string, required: false, hint: "Leave empty for decorative art." }
+    - name: media
+      label: "Media"
+      widget: object
+      collapsed: true
+      hint: "Shown on the service card in lists and beside the page header."
+      fields:
+        - { name: image, label: "Image", widget: image, required: false }
+        - { name: imageAlt, label: "Image alt text", widget: string, required: false, hint: "Leave empty for decorative art." }
     - name: hero
       label: "Page header (composed pages)"
       widget: object
@@ -1164,6 +1175,7 @@ try {
   // Editor theme (conservative): one hue drives Sveltia's light+dark schemes; system font;
   // softer radii. CSS custom properties only — they inherit through the shadow DOM, and
   // explicit colours would break the in-app light/dark toggle. Managed region, like the shim.
+  // `!important` is load-bearing: Sveltia injects its own `:root,:host{--sui-…}` at runtime after this style, so equal-specificity later rules would otherwise win.
   const THEME_STYLE = `<style>:root{
       --sui-base-hue: 152 !important; /* per site: brand hue */
       --sui-font-family-default: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif !important;
@@ -1266,8 +1278,8 @@ for (const l of LISTINGS) {
     const label = JSON.stringify(l.label || l.id);
     const block =
       l.preset === 'catalog'
-        ? `  - type: catalogList\n    source: ${l.id}\n    base: ${l.route}\n    filters: true\n    showImages: true\n    columns: 3`
-        : `  - type: postList\n    source: ${l.id}\n    base: ${l.route}\n    featured: true\n    showImages: true\n    columns: 3`;
+        ? `  - type: catalogList\n    source: ${l.id}\n    base: ${l.route}\n    media:\n      showImages: true\n    layout:\n      filters: true\n      columns: 3`
+        : `  - type: postList\n    source: ${l.id}\n    base: ${l.route}\n    media:\n      showImages: true\n    layout:\n      featured: true\n      columns: 3`;
     mkdirSync(dirname(pagePath), { recursive: true });
     writeFileSync(pagePath, `---\ntitle: ${label}\nseo:\n  title: ${label}\n  description: ${label}\nblocks:\n  - type: pageHeader\n    heading: ${label}\n${block}\n---\n`);
     console.log(`  ↳ seeded editable listing index: src/content/pages/${slug}.md (${l.id})`);

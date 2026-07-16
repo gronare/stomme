@@ -10,9 +10,10 @@ interface Props {
   body?: string;
   statValue?: string;
   statLabel?: string;
-  width?: 'narrow' | 'full';
+  layout?: { width?: 'narrow' | 'full' };
 }
-const { eyebrow, heading, body = '', statValue, statLabel, width = 'narrow' } = Astro.props;
+const { eyebrow, heading, body = '', statValue, statLabel } = Astro.props;
+const width = Astro.props.layout?.width ?? 'narrow';
 const html = await renderMarkdown(body);
 ---
 <section class:list={['section', { 'section--read': width !== 'full' }]}>

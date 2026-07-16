@@ -6,10 +6,11 @@ interface Props {
   heading?: string;
   intro?: string;
   items?: { title: string; body: string; kicker?: string }[];
-  width?: 'narrow' | 'full';
+  layout?: { width?: 'narrow' | 'full' };
   anchor?: string;
 }
-const { eyebrow, heading, intro, items = [], width = 'narrow', anchor } = Astro.props;
+const { eyebrow, heading, intro, items = [], anchor } = Astro.props;
+const width = Astro.props.layout?.width ?? 'narrow';
 ---
 
 {(heading || items.length > 0) && (

@@ -7,9 +7,10 @@ interface Props {
   heading?: string;
   intro?: string;
   items?: { text: string; note?: string }[];
-  columns?: number;
+  layout?: { columns?: number };
 }
-const { eyebrow, heading, intro, items = [], columns = 2 } = Astro.props;
+const { eyebrow, heading, intro, items = [] } = Astro.props;
+const columns = Astro.props.layout?.columns ?? 2;
 const single = columns === 1;
 ---
 

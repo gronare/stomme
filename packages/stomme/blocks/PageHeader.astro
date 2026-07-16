@@ -8,15 +8,16 @@ import Emph from '../src/Emph.astro';
 // band/glow hero with CTA + phone (good for a landing/service page top).
 // Reads phone from the `contact` collection; editor supplies copy + optional CTA.
 interface Props {
-  variant?: 'light' | 'dark';
-  width?: 'narrow' | 'full';
   eyebrow?: string;
   heading?: string;
   intro?: string;
   ctaLabel?: string;
   ctaHref?: unknown;
+  layout?: { variant?: 'light' | 'dark'; width?: 'narrow' | 'full' };
 }
-const { variant = 'light', width = 'narrow', eyebrow, heading, intro, ctaLabel, ctaHref } = Astro.props;
+const { eyebrow, heading, intro, ctaLabel, ctaHref } = Astro.props;
+const variant = Astro.props.layout?.variant ?? 'light';
+const width = Astro.props.layout?.width ?? 'narrow';
 const read = width !== 'full';
 const href = resolveLink(ctaHref, '/');
 const contact = ((await getEntry('contact', 'contact').catch(() => null))?.data ?? {}) as any;

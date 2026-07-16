@@ -8,11 +8,13 @@ interface Props {
   heading?: string;
   intro?: string;
   items?: { icon?: string; title: string; body?: string; tag?: string; link?: unknown; linkLabel?: string }[];
-  numbered?: boolean;
-  accent?: 'brand' | 'secondary' | 'highlight';
+  layout?: { numbered?: boolean };
+  style?: { surface?: string; accent?: 'brand' | 'secondary' | 'highlight' };
   site?: any;
 }
-const { eyebrow, heading, intro, items = [], numbered = false, accent = 'brand', site } = Astro.props;
+const { eyebrow, heading, intro, items = [], site } = Astro.props;
+const numbered = Astro.props.layout?.numbered ?? false;
+const accent = Astro.props.style?.accent ?? 'brand';
 const readMore = site?.strings?.readMore ?? 'Read more';
 const accentVar = accent === 'secondary' ? 'var(--color-secondary)' : accent === 'highlight' ? 'var(--color-highlight)' : 'var(--color-brand)';
 ---

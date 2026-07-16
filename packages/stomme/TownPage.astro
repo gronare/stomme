@@ -10,7 +10,7 @@ import { resolveSite, type SiteConfig } from './src/config';
 // All chrome strings come from site.strings.town (English defaults; override per-site,
 // `{name}` is interpolated); the CTAs link to site.routes.contact. Expects a `towns`
 // schema with: name, title?, heroSubtitle?, heroNote?, why?, problems?, districts?,
-// localCase?, services?, image?, imageAlt?, seo?.
+// localCase?, services?, media { image?, imageAlt? }, seo?.
 //
 // The sections below map 1:1 to engine blocks, so a later "towns as blocks" migration
 // (giving the collection a `blocks` field) is a straight field→block conversion with no
@@ -41,7 +41,7 @@ const jsonLd = {
 };
 ---
 <section class="section town-hero">
-  <div class:list={['town-hero__grid', { 'town-hero__grid--media': !!data.image }]}>
+  <div class:list={['town-hero__grid', { 'town-hero__grid--media': !!data.media?.image }]}>
     <div class="town-hero__copy">
       <span class="mono eyebrow">{fill(t.eyebrow)}</span>
       <h1 class="display display--hero town-h1">{data.title ?? fill(t.heading)}</h1>
@@ -54,8 +54,8 @@ const jsonLd = {
         {data.services?.length > 0 && <a href="#tjanster" class="town-jump">{fill(t.servicesHeading)} ↓</a>}
       </div>
     </div>
-    {data.image && (
-      <Cover src={data.image} alt={data.imageAlt ?? fill(t.eyebrow)} placeholder="/images/placeholders/town.svg" width={1200} height={900} loading="eager" class="town-img" />
+    {data.media?.image && (
+      <Cover src={data.media?.image} alt={data.media?.imageAlt ?? fill(t.eyebrow)} placeholder="/images/placeholders/town.svg" width={1200} height={900} loading="eager" class="town-img" />
     )}
   </div>
 </section>

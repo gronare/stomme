@@ -14,9 +14,10 @@ interface Props {
   statValue?: string;
   statLabel?: string;
   stats?: Stat[];
-  accent?: 'brand' | 'secondary' | 'highlight';
+  style?: { accent?: 'brand' | 'secondary' | 'highlight' };
 }
-const { eyebrow, heading, body, badges = [], statValue, statLabel, stats = [], accent = 'brand' } = Astro.props;
+const { eyebrow, heading, body, badges = [], statValue, statLabel, stats = [] } = Astro.props;
+const accent = Astro.props.style?.accent ?? 'brand';
 const accentVar = accent === 'secondary' ? 'var(--color-secondary)' : accent === 'highlight' ? 'var(--color-highlight)' : 'var(--color-brand)';
 ---
 <section class="stat-panel" style={`--block-accent:${accentVar}`}>

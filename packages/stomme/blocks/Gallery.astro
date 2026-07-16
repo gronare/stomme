@@ -10,9 +10,10 @@ interface Props {
   heading?: string;
   intro?: string;
   images?: GalleryImage[];
-  columns?: number;
+  layout?: { columns?: number };
 }
-const { eyebrow, heading, intro, images = [], columns = 3 } = Astro.props;
+const { eyebrow, heading, intro, images = [] } = Astro.props;
+const columns = Astro.props.layout?.columns ?? 3;
 const cols = columns === 2 ? 2 : 3;
 ---
 

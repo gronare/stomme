@@ -161,6 +161,35 @@ export const widthField: Field = {
   hint: 'Narrow keeps text legible; full uses the whole section width.',
 };
 
+// ── Grouping convention (block-field convention, Phase 2) ───────────────────
+// A collapsed `object` group. Groups are REQUIRED objects (no `required: false`)
+// so Sveltia renders them inline collapsed instead of behind an "Add …" button;
+// their children stay individually optional. The hint is the "when to open me" line.
+export const group = (name: string, label: string, hint: string, fields: Field[]): Field => ({
+  name,
+  label,
+  widget: 'object',
+  collapsed: true,
+  hint,
+  fields,
+});
+
+// The `media` zone — the block's accompanying asset(s) + per-kind config. Pass a
+// summary (e.g. '{{fields.kind}}') when the group has a kind picker worth showing.
+export const mediaGroup = (hint: string, fields: Field[], summary?: string): Field => ({
+  ...group('media', 'Media', hint, fields),
+  ...(summary ? { summary } : {}),
+});
+
+// The `layout` zone — size/placement fields (height, align, width, columns, image side).
+export const layoutGroup = (fields: Field[]): Field =>
+  group('layout', 'Layout', 'Size and placement — rarely needs changing.', fields);
+
+// The `style` zone — ALWAYS the last field of a block. Defaults to the engine pair
+// surface + accent; blocks that render only one pass the subset they actually use.
+export const styleGroup = (fields?: Field[]): Field =>
+  group('style', 'Appearance', 'Background and accent colour — set once when the page is designed.', fields ?? [surfaceField, accentField]);
+
 // An image field. Uploads land in the served public/media tree via the collection-level
 // media_folder/public_folder the generator emits (organized per collection/entry); the
 // build-bridge copies public/media → src/assets/media so Astro's image pipeline (via

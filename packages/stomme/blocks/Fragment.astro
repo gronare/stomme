@@ -11,9 +11,10 @@ interface Props {
   body?: string;
   linkLabel?: string;
   link?: unknown;
-  placement?: 'left' | 'right' | 'indent';
+  layout?: { placement?: 'left' | 'right' | 'indent' };
 }
-const { eyebrow, statement, body, linkLabel, link, placement = 'left' } = Astro.props;
+const { eyebrow, statement, body, linkLabel, link } = Astro.props;
+const placement = Astro.props.layout?.placement ?? 'left';
 const href = resolveLink(link, '/');
 ---
 

@@ -159,12 +159,12 @@ body > main { flex: 1 0 auto; } /* sticky footer: main grows so the footer sits 
 /* hero ticks — short checkmark lines under the intro (key points / reassurances) */
 .hero-ticks { list-style: none; margin: 1.5rem 0 0; padding: 0; display: flex; flex-direction: column; gap: 0.6rem; }
 .hero-ticks li { display: flex; gap: 0.75rem; align-items: baseline; color: var(--color-ink); }
-.hero-ticks__check { color: var(--color-brand); font-weight: 800; flex: none; }
+.hero-ticks__check { color: var(--block-accent, var(--color-brand)); font-weight: 800; flex: none; }
 
 /* hero highlights — an editable list of icon + title + line beside the heading */
 .hero-highlights { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
 .hero-highlights .hl-row { display: flex; gap: 14px; align-items: flex-start; background: var(--color-surface); border: 1px solid var(--color-line); border-radius: 14px; padding: 16px 18px; }
-.hero-highlights .hl-ic { flex: none; width: 42px; height: 42px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: var(--color-brand); background: color-mix(in srgb, var(--color-brand) 12%, var(--color-paper)); }
+.hero-highlights .hl-ic { flex: none; width: 42px; height: 42px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: var(--block-accent, var(--color-brand)); background: color-mix(in srgb, var(--block-accent, var(--color-brand)) 12%, var(--color-paper)); }
 .hero-highlights .hl-ic svg { width: 22px; height: 22px; }
 .hero-highlights .hl-t { font-weight: 800; color: var(--color-ink); letter-spacing: -.01em; overflow-wrap: break-word; }
 .hero-highlights .hl-d { font-size: .85rem; color: var(--color-muted); margin-top: 2px; overflow-wrap: break-word; }
@@ -173,7 +173,7 @@ body > main { flex: 1 0 auto; } /* sticky footer: main grows so the footer sits 
    Blocks rise and settle on a loop; reduced-motion freezes them. */
 .hero-motif { position: relative; border-radius: 18px; overflow: hidden; aspect-ratio: 4 / 3.2;
   background: radial-gradient(120% 100% at 72% 8%, color-mix(in srgb, var(--color-brand) 14%, transparent), transparent 58%), linear-gradient(160deg, #1b2230, #11151c);
-  color: color-mix(in srgb, var(--color-brand) 80%, #fff); display: grid; place-items: center; }
+  color: color-mix(in srgb, var(--block-accent, var(--color-brand)) 80%, #fff); display: grid; place-items: center; }
 .hero-motif svg { width: 84%; height: auto; display: block; fill: currentColor; }
 .hero-motif .hm-rise { transform-box: fill-box; transform-origin: center bottom; animation: hm-rise 3.6s ease-in-out infinite; }
 .hero-motif .hm-d1 { animation-delay: 0s; } .hero-motif .hm-d2 { animation-delay: .3s; } .hero-motif .hm-d3 { animation-delay: .6s; }
