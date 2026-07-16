@@ -142,9 +142,15 @@ async function main() {
   // 2. Serve dist/ on workerd via wrangler pages dev.
   const wrangler = [resolve(siteDir, 'node_modules/.bin/wrangler'), resolve(REPO_ROOT, 'node_modules/.bin/wrangler')]
     .find(existsSync) || 'wrangler';
-  log(`starting workerd: ${wrangler} pages dev dist --port ${PORT}`);
+  // Pin a fixed, supported compatibility date. `wrangler pages dev` otherwise defaults
+  // it to today, which the bundled workerd binary (a day or two behind the calendar)
+  // rejects — a calendar-triggered CI failure unrelated to the build. Any past date the
+  // binary supports works; this only needs workerd to boot and serve /preview.
+  const compatDate = process.env.SMOKE_COMPAT_DATE || '2025-11-01';
+  log(`starting workerd: ${wrangler} pages dev dist --port ${PORT} --compatibility-date ${compatDate}`);
   const workerLog = [];
-  child = spawn(wrangler, ['pages', 'dev', 'dist', '--port', String(PORT), '--ip', '127.0.0.1'],
+  child = spawn(wrangler, ['pages', 'dev', 'dist', '--port', String(PORT), '--ip', '127.0.0.1',
+    '--compatibility-date', compatDate],
     { cwd: siteDir, env: process.env });
   child.stdout.on('data', (d) => workerLog.push(d.toString()));
   child.stderr.on('data', (d) => workerLog.push(d.toString()));
