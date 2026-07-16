@@ -304,21 +304,33 @@ function emitField(f, indent) {
   if (f.media_folder) parts.push(`media_folder: ${q(f.media_folder)}`);
   if (f.public_folder) parts.push(`public_folder: ${q(f.public_folder)}`);
 
+  // Shared list/object collapse props (block-field convention, migration-free).
+  const collapseProps = () => [
+    ...(f.label_singular ? [`${p}  label_singular: ${q(f.label_singular)}`] : []),
+    ...(f.collapsed !== undefined ? [`${p}  collapsed: ${f.collapsed}`] : []),
+    ...(f.minimize_collapsed ? [`${p}  minimize_collapsed: true`] : []),
+  ];
   if (f.widget === 'list' && f.fields) {
     const sum = f.summary || listSummary(f.fields);
     return [`${p}- name: ${f.name}`, `${p}  label: ${q(f.label)}`, `${p}  widget: list`,
       ...(f.required === false ? [`${p}  required: false`] : []),
+      ...collapseProps(),
+      ...(f.hint ? [`${p}  hint: ${q(f.hint)}`] : []),
       ...(sum ? [`${p}  summary: ${q(sum)}`] : []),
       `${p}  fields:`, ...f.fields.map((sf) => emitField(sf, indent + 4))].join('\n');
   }
   if (f.widget === 'list' && f.field) {
     return [`${p}- name: ${f.name}`, `${p}  label: ${q(f.label)}`, `${p}  widget: list`,
       ...(f.required === false ? [`${p}  required: false`] : []),
+      ...collapseProps(),
+      ...(f.hint ? [`${p}  hint: ${q(f.hint)}`] : []),
       `${p}  field: ${emitFlow(f.field)}`].join('\n');
   }
   if (f.widget === 'object' && f.fields) {
     const head = [`${p}- name: ${f.name}`, `${p}  label: ${q(f.label)}`, `${p}  widget: object`];
     if (f.required === false) head.push(`${p}  required: false`);
+    if (f.collapsed !== undefined) head.push(`${p}  collapsed: ${f.collapsed}`);
+    if (f.summary) head.push(`${p}  summary: ${q(f.summary)}`);
     if (f.hint) head.push(`${p}  hint: ${q(f.hint)}`);
     head.push(`${p}  fields:`);
     return [...head, ...f.fields.map((sf) => emitField(sf, indent + 4))].join('\n');
@@ -497,6 +509,17 @@ const COLLECTION_EDITORS = {
   fields:
     - { name: name, label: "Town name", widget: string }
     - { name: title, label: "Page heading (H1)", widget: string, required: false }
+    - name: seo
+      label: "SEO"
+      widget: object
+      collapsed: true
+      required: false
+      summary: "{{fields.title}}"
+      fields:
+        - { name: title, label: "Title", widget: string }
+        - { name: description, label: "Description", widget: text }
+        - { name: image, label: "Share image", widget: image, required: false, hint: "Social-share card (og:image), 1200×630. Site default used when empty." }
+        - { name: ogRaw, label: "Share the image as-is", widget: boolean, required: false, default: false, hint: "Only matters when generated share cards are on (Identity settings): skip the card for this page and share the plain image instead." }
     - { name: order, label: "Order", widget: number, required: false, default: 0 }
     - { name: heroSubtitle, label: "Hero subtitle", widget: text, required: false }
     - { name: heroNote, label: "Hero note", widget: string, required: false }
@@ -505,30 +528,29 @@ const COLLECTION_EDITORS = {
       label: "Problems we solve"
       widget: list
       required: false
+      label_singular: "Problem"
+      collapsed: true
+      minimize_collapsed: true
       field: { name: item, label: "Problem", widget: string }
     - name: districts
       label: "Districts / areas"
       widget: list
       required: false
+      label_singular: "District"
+      collapsed: true
+      minimize_collapsed: true
       field: { name: item, label: "District", widget: string }
     - { name: localCase, label: "Local case", widget: text, required: false }
     - name: services
       label: "Services offered here"
       widget: list
       required: false
+      label_singular: "Service"
+      collapsed: true
+      minimize_collapsed: true
       field: { name: item, label: "Service", widget: string }
     - ${IMG}
-    - { name: imageAlt, label: "Image alt text", widget: string, required: false }
-    - name: seo
-      label: "SEO"
-      widget: object
-      collapsed: true
-      required: false
-      fields:
-        - { name: title, label: "Title", widget: string }
-        - { name: description, label: "Description", widget: text }
-        - { name: image, label: "Share image", widget: image, required: false, hint: "Social-share card (og:image), 1200×630. Site default used when empty." }
-        - { name: ogRaw, label: "Share the image as-is", widget: boolean, required: false, default: false, hint: "Only matters when generated share cards are on (Identity settings): skip the card for this page and share the plain image instead." }`,
+    - { name: imageAlt, label: "Image alt text", widget: string, required: false }`,
   services: `- name: services
   label: "Services"
   label_singular: "Service"
@@ -537,6 +559,17 @@ const COLLECTION_EDITORS = {
   slug: "{{slug}}"
   fields:
     - { name: title, label: "Title (H1)", widget: string }
+    - name: seo
+      label: "SEO"
+      widget: object
+      collapsed: true
+      required: false
+      summary: "{{fields.title}}"
+      fields:
+        - { name: title, label: "Title", widget: string }
+        - { name: description, label: "Description", widget: text }
+        - { name: image, label: "Share image", widget: image, required: false, hint: "Social-share card (og:image), 1200×630. Site default used when empty." }
+        - { name: ogRaw, label: "Share the image as-is", widget: boolean, required: false, default: false, hint: "Only matters when generated share cards are on (Identity settings): skip the card for this page and share the plain image instead." }
     - { name: navLabel, label: "Short label (menus/cards)", widget: string }
     - { name: summary, label: "Summary", widget: text, required: false, hint: "The lede under the title — also the card text in service lists." }
     - { name: order, label: "Order", widget: number, required: false, default: 0 }
@@ -553,6 +586,9 @@ const COLLECTION_EDITORS = {
           label: "Ticks (checkmark lines)"
           widget: list
           required: false
+          label_singular: "Line"
+          collapsed: true
+          minimize_collapsed: true
           hint: "Short ✓ lines under the summary — key reassurances."
           field: { name: text, label: "Line", widget: string }
         - { name: ctaLabel, label: "Button label", widget: string, required: false, hint: "Blank uses the site's quote-button text." }
@@ -560,17 +596,7 @@ const COLLECTION_EDITORS = {
         - { name: cta2Label, label: "Second link label", widget: string, required: false, hint: "A quiet text link beside the button." }
         - { name: cta2Href, label: "Second link target", widget: string, required: false, hint: "E.g. #process to jump to a section with that anchor." }
 ${emitWidget(4)}
-    - { name: body, label: "Long-form text (fallback)", widget: markdown, required: false, hint: "Only shown when no sections are built above. Prefer sections; this is the simple prose fallback." }
-    - name: seo
-      label: "SEO"
-      widget: object
-      collapsed: true
-      required: false
-      fields:
-        - { name: title, label: "Title", widget: string }
-        - { name: description, label: "Description", widget: text }
-        - { name: image, label: "Share image", widget: image, required: false, hint: "Social-share card (og:image), 1200×630. Site default used when empty." }
-        - { name: ogRaw, label: "Share the image as-is", widget: boolean, required: false, default: false, hint: "Only matters when generated share cards are on (Identity settings): skip the card for this page and share the plain image instead." }`,
+    - { name: body, label: "Long-form text (fallback)", widget: markdown, required: false, hint: "Only shown when no sections are built above. Prefer sections; this is the simple prose fallback." }`,
 };
 
 // A CMS editor for a config-defined listing, from its preset's field set.
@@ -1026,6 +1052,30 @@ for (const l of LISTINGS) COLLECTION_MEDIA[l.id] = l.preset === 'catalog' ? mSlu
   }
   yaml = injected.join('\n');
 }
+// Convention: collection-level `seo` groups render collapsed. Hand-authored panes (the
+// static home/pages SEO) predate this — normalize by inserting `collapsed: true` after
+// `widget: object` when the seo object doesn't set it. Idempotent.
+{
+  const srcLines = yaml.split('\n');
+  for (let i = 0; i < srcLines.length; i++) {
+    const m = srcLines[i].match(/^(\s*)(- )?name: seo\s*$/);
+    if (!m) continue;
+    const propIndent = m[1].length + (m[2] ? 2 : 0);
+    const prop = (j) => {
+      const mm = (srcLines[j] || '').match(/^(\s*)(- )?([\w-]+):/);
+      return mm && mm[1].length + (mm[2] ? 2 : 0) === propIndent ? mm[3] : null;
+    };
+    let widgetAt = -1, hasCollapsed = false;
+    for (let j = i + 1; j < srcLines.length; j++) {
+      const k = prop(j);
+      if (k === null || k === 'fields') break; // left the field's own props
+      if (k === 'widget' && /widget: object\s*$/.test(srcLines[j])) widgetAt = j;
+      if (k === 'collapsed') hasCollapsed = true;
+    }
+    if (widgetAt !== -1 && !hasCollapsed) srcLines.splice(widgetAt + 1, 0, `${' '.repeat(propIndent)}collapsed: true`);
+  }
+  yaml = srcLines.join('\n');
+}
 // Sveltia shrinks the master to webp on upload; Astro still builds the responsive variants.
 if (!/^media_libraries:/m.test(yaml)) {
   yaml = yaml.replace(/^public_folder: .*$/m, (l) =>
@@ -1111,6 +1161,29 @@ try {
     /<script\s+src="https:\/\/unpkg\.com\/(?:decap-cms|@sveltia\/cms)@[^"]*"><\/script>/,
     `<script src="${SVELTIA_CMS_SRC}"></script>`,
   );
+  // Editor theme (conservative): one hue drives Sveltia's light+dark schemes; system font;
+  // softer radii. CSS custom properties only — they inherit through the shadow DOM, and
+  // explicit colours would break the in-app light/dark toggle. Managed region, like the shim.
+  const THEME_STYLE = `<style>:root{
+      --sui-base-hue: 152; /* per site: brand hue */
+      --sui-font-family-default: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      --sui-font-weight-normal: 400;
+      --sui-font-weight-bold: 650;
+      --sui-control-medium-border-radius: 6px;
+      --sui-textbox-border-radius: 6px;
+      --sui-button-medium-border-radius: 6px;
+      --sui-checkbox-border-radius: 4px;
+      --sui-textbox-font-size: 15px;
+    }</style>`;
+  const T_START = '<!-- >>> stomme-theme:generated (managed by stomme-gen — do not edit) -->';
+  const T_END = '<!-- <<< stomme-theme:generated -->';
+  const themeRegion = `${T_START}\n    ${THEME_STYLE}\n    ${T_END}`;
+  const ts = html.indexOf(T_START), te = html.indexOf(T_END);
+  if (ts !== -1 && te !== -1) {
+    html = html.slice(0, ts) + themeRegion + html.slice(te + T_END.length); // refresh in place
+  } else if (html.includes('</head>')) {
+    html = html.replace('</head>', `    ${themeRegion}\n  </head>`); // inject once
+  }
   writeFileSync(indexPath, html);
 } catch (e) {
   console.warn('  (admin auth shim skipped:', e.message + ')');
