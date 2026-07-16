@@ -1165,15 +1165,15 @@ try {
   // softer radii. CSS custom properties only — they inherit through the shadow DOM, and
   // explicit colours would break the in-app light/dark toggle. Managed region, like the shim.
   const THEME_STYLE = `<style>:root{
-      --sui-base-hue: 152; /* per site: brand hue */
-      --sui-font-family-default: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-      --sui-font-weight-normal: 400;
-      --sui-font-weight-bold: 650;
-      --sui-control-medium-border-radius: 6px;
-      --sui-textbox-border-radius: 6px;
-      --sui-button-medium-border-radius: 6px;
-      --sui-checkbox-border-radius: 4px;
-      --sui-textbox-font-size: 15px;
+      --sui-base-hue: 152 !important; /* per site: brand hue */
+      --sui-font-family-default: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif !important;
+      --sui-font-weight-normal: 400 !important;
+      --sui-font-weight-bold: 650 !important;
+      --sui-control-medium-border-radius: 6px !important;
+      --sui-textbox-border-radius: 6px !important;
+      --sui-button-medium-border-radius: 6px !important;
+      --sui-checkbox-border-radius: 4px !important;
+      --sui-textbox-font-size: 15px !important;
     }</style>`;
   const T_START = '<!-- >>> stomme-theme:generated (managed by stomme-gen — do not edit) -->';
   const T_END = '<!-- <<< stomme-theme:generated -->';
