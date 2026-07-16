@@ -1,6 +1,7 @@
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { resolve, dirname } from 'node:path';
 import { mkdirSync, writeFileSync, existsSync, readFileSync, readdirSync, cpSync, rmSync, statSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 
 // stomme Astro integration — injects collection-detail routes.
 //
@@ -21,12 +22,45 @@ function resolveListings(l) {
     .map((x) => ({ ...x, route: x.route.startsWith('/') ? x.route : `/${x.route}` }));
 }
 
+// /preview CSP allow-list: sha256 hashes of every first-party `is:inline` script body
+// found in the given source trees (engine package, the site's src/, slots dir). The
+// Astro compiler emits `is:inline` bodies byte-for-byte (verified against built HTML,
+// compressHTML on), so a hash of the source text matches the rendered element and the
+// scripts execute under the preview's strict CSP without 'unsafe-inline'. Recomputed on
+// every build (the entrypoint is regenerated), so editing a script re-hashes it.
+// Skipped: set:html (dynamic content — tracking/consent stay CSP-blocked in preview by
+// design), src= (external file), define:vars (the compiler rewrites the body).
+function inlineScriptHashes(dirs) {
+  const hashes = new Set();
+  const stack = dirs.filter((d) => d && existsSync(d));
+  while (stack.length) {
+    const cur = stack.pop();
+    let entries;
+    try { entries = readdirSync(cur, { withFileTypes: true }); } catch { continue; }
+    for (const ent of entries) {
+      if (ent.name === 'node_modules' || ent.name.startsWith('.')) continue;
+      const p = resolve(cur, ent.name);
+      if (ent.isDirectory()) { stack.push(p); continue; }
+      if (!ent.name.endsWith('.astro')) continue;
+      let src;
+      try { src = readFileSync(p, 'utf8'); } catch { continue; }
+      for (const m of src.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/g)) {
+        if (!/\bis:inline\b/.test(m[1])) continue;
+        if (/set:html|define:vars|\bsrc\s*=/.test(m[1])) continue;
+        if (!m[2]) continue;
+        hashes.add(`'sha256-${createHash('sha256').update(m[2], 'utf8').digest('base64')}'`);
+      }
+    }
+  }
+  return [...hashes].sort();
+}
+
 // Live-preview target, injected at /preview (generated so prerender is a literal
 // Astro can statically resolve — a Vite `define` is substituted too late for the
 // route scanner, which then prerenders the route and freezes it with empty blocks).
 // SSR on server targets so the CMS draft (?data=) renders the real components;
 // prerendered on `static` builds, where SSR (and thus live preview) isn't available.
-function previewEntrypoint(isStatic) {
+function previewEntrypoint(isStatic, scriptHashes = []) {
   return `---
 export const prerender = ${isStatic ? 'true' : 'false'};
 import Base from '@stomme/base';
@@ -46,16 +80,19 @@ import TownPage from '@gronare/stomme/TownPage.astro';
 import { renderMarkdown } from '@gronare/stomme/markdown';
 
 // Reflected-XSS hardening. /preview renders attacker-controlled ?data= (markdown body,
-// block content) through set:html; on SSR it is an unauthenticated public GET. A strict,
-// per-response nonce'd CSP means an injected inline <script> or on*= handler cannot run:
-// only scripts carrying this request's nonce (the morph script below) and same-origin
-// bundled scripts ('self' — the hoisted page/reveal script, block accordion/slider) are
-// allowed; there is no 'unsafe-inline' for scripts. Styles keep 'unsafe-inline' (components
-// author inline style=, which is not script execution). frame-src allows the OpenStreetMap
-// embed the contact/FindUs components render. On SSR the header is authoritative; a
+// block content) through set:html; on SSR it is an unauthenticated public GET. A strict
+// CSP means an injected inline <script> or on*= handler cannot run — there is no
+// 'unsafe-inline' for scripts. Allowed to execute: same-origin bundled scripts ('self' —
+// hoisted component scripts are never inlined, see assetsInlineLimit in the integration),
+// the per-response nonce (the morph script below), and the build-time sha256 hashes of
+// the engine/site's own is:inline scripts (header toggle, thanks, contact reveal — see
+// inlineScriptHashes). An attacker can't mint a fitting hash or guess the nonce, so
+// injected script stays inert. Styles keep 'unsafe-inline' (components author inline
+// style=, which is not script execution). frame-src allows the OpenStreetMap embed the
+// contact/FindUs components render. On SSR the header is authoritative; a
 // <meta http-equiv> in <head> is the fallback for prerendered/static output.
 const nonce = crypto.randomUUID().replace(/-/g, '');
-const csp = "default-src 'self'; script-src 'self' 'nonce-" + nonce + "'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self'; frame-src 'self' https://www.openstreetmap.org; object-src 'none'; base-uri 'none'; frame-ancestors 'self'; form-action 'self'";
+const csp = "default-src 'self'; script-src 'self' 'nonce-" + nonce + "'${scriptHashes.length ? ' ' + scriptHashes.join(' ') : ''}; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self'; frame-src 'self' https://www.openstreetmap.org; object-src 'none'; base-uri 'none'; frame-ancestors 'self'; form-action 'self'";
 Astro.response.headers.set('Content-Security-Policy', csp);
 
 const kind = Astro.url.searchParams.get('kind');
@@ -698,6 +735,13 @@ const { thanksProps, serviceFixture, townFixture } = templateFixtures(rs);
             },
             // Dev server must be allowed to read slot files outside the project root.
             ...(slotsDir ? { server: { fs: { allow: [slotsDir] } } } : {}),
+            // Never inline hoisted component <script> chunks into the HTML (Astro inlines
+            // chunks under 4 KB by default). As external /_astro/*.js files they are
+            // covered by the /preview CSP's script-src 'self'; inlined they'd need
+            // per-build hashes the SSR route can't know. Functionally identical on live
+            // pages — larger scripts (page.js) were external already. Non-JS assets
+            // (images, css) return undefined → Vite's default limit still applies.
+            build: { assetsInlineLimit: (path) => (/\.m?js$/.test(path) ? false : undefined) },
           },
         });
 
@@ -754,7 +798,10 @@ const { thanksProps, serviceFixture, townFixture } = templateFixtures(rs);
         } else {
           const previewFile = resolve(outDir, 'preview.astro');
           mkdirSync(outDir, { recursive: true });
-          writeFileSync(previewFile, previewEntrypoint(isStatic));
+          // Hash sweep covers the engine's components, the site's own (custom blocks,
+          // Base chrome) and any slot components — everything that can render in /preview.
+          const cspHashes = inlineScriptHashes([pkgDir, resolve(root, 'src'), slotsDir]);
+          writeFileSync(previewFile, previewEntrypoint(isStatic, cspHashes));
           injectRoute({ pattern: '/preview', entrypoint: previewFile });
           enabled.push(`/preview${isStatic ? ' (static)' : ''}`);
         }
