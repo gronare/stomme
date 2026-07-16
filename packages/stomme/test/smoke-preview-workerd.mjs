@@ -30,12 +30,14 @@
  *
  *   CSP (optional, needs Playwright — a DETECTOR, off the exit code by default):
  *     4. Load /preview in a real browser and report Content-Security-Policy
- *        violations. `/preview` ships a strict nonce'd CSP (script-src 'self'
- *        'nonce-…', no unsafe-inline) that blocks Astro's inlined first-party
- *        component scripts (header scroll-toggle, FAQ accordion) — a known
- *        preview-interactivity regression whose fix is SEPARATE. Reported as a
- *        warning so it can't mask the core Buffer guard; pass --strict-csp to
- *        make violations fatal. Skips cleanly if Playwright isn't installed.
+ *        violations. `/preview` ships a strict CSP (script-src 'self' 'nonce-…'
+ *        + sha256 hashes of the first-party is:inline scripts, no unsafe-inline;
+ *        hoisted component scripts are never HTML-inlined — see integration.mjs).
+ *        First-party scripts (header scroll-toggle, FAQ accordion, morph) are
+ *        expected to run violation-free; any violation is a regression in the
+ *        hash sweep or inline-limit config. Reported as a warning so it can't
+ *        mask the core Buffer guard; pass --strict-csp to make violations fatal.
+ *        Skips cleanly if Playwright isn't installed.
  *
  * USAGE
  * -----
