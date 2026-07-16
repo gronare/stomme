@@ -14,15 +14,17 @@ interface Props {
   eyebrow?: string;
   heading?: string;
   intro?: string;
-  showImages?: boolean;
-  featured?: boolean;
-  columns?: number;
+  media?: { showImages?: boolean };
+  layout?: { featured?: boolean; columns?: number };
   source?: string;
   base?: string;
   items?: { id: string; data: Record<string, any> }[];
   site?: any;
 }
-const { eyebrow, heading, intro, showImages = false, featured = false, columns = 3, source = 'posts', base, site } = Astro.props;
+const { eyebrow, heading, intro, source = 'posts', base, site } = Astro.props;
+const showImages = Astro.props.media?.showImages ?? false;
+const featured = Astro.props.layout?.featured ?? false;
+const columns = Astro.props.layout?.columns ?? 3;
 // Item titles sit one level below the section heading when there is one (h2 → h3),
 // but directly below the page h1 when the list has no heading (→ h2), so the heading
 // outline never skips a level. Astro renders a Capitalized string var as that HTML tag.

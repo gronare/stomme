@@ -195,8 +195,8 @@ let scHomeHero = '';
 if (shareDraft && !scOgImage) {
   try {
     const home = (await getEntry('home', 'home'))?.data;
-    const hb = (home && Array.isArray(home.blocks) ? home.blocks : []).find((b) => (b.type === 'hero' || b.type === 'coverHero') && b.image);
-    scHomeHero = idAsset(hb && hb.image);
+    const hb = (home && Array.isArray(home.blocks) ? home.blocks : []).find((b) => (b.type === 'hero' || b.type === 'coverHero') && b.media && b.media.image);
+    scHomeHero = idAsset(hb && hb.media.image);
   } catch (e) { /* no home entry — brand card */ }
 }
 const scDefaultImg = scOgImage || scHomeHero;
@@ -562,7 +562,7 @@ export function buildSections(BLOCKS) {
   const fgS = fg && (fg.sample || (Array.isArray(fg.samples) && fg.samples[0]));
   if (fgS) for (const s of ['tint', 'band', 'dark', 'gradient']) {
     const data = { ...fgS }; delete data._label;
-    sections.push({ kind: 'blocks', label: 'surface · ' + s, blocks: [{ type: 'featureGrid', ...data, heading: 'On the ' + s + ' surface', surface: s }] });
+    sections.push({ kind: 'blocks', label: 'surface · ' + s, blocks: [{ type: 'featureGrid', ...data, heading: 'On the ' + s + ' surface', style: { ...(data.style || {}), surface: s } }] });
   }
   // Shared templates + the site chrome (header/footer render on the chrome page only —
   // per-slug pages are chrome-less so a header tweak diffs ONE capture, not all of them).

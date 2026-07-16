@@ -55,14 +55,14 @@ export function normalizePath(pathname: string): string {
 const slugFor = (path: string) => (path === '/' ? 'index' : path.replace(/^\//, '')) + '.png';
 
 // The item's main photo → card background. One chain across every collection shape
-// (catalog cover/gallery, article cover, towns/services image, services hero image).
+// (catalog cover/gallery, article cover, towns/services media.image, services hero image).
 type ItemData = {
   cover?: string;
   gallery?: { image: string }[];
   hero?: { image?: string };
-  image?: string;
+  media?: { image?: string };
 };
-const mainImage = (d: ItemData) => d.cover ?? d.gallery?.[0]?.image ?? d.hero?.image ?? d.image ?? undefined;
+const mainImage = (d: ItemData) => d.cover ?? d.gallery?.[0]?.image ?? d.hero?.image ?? d.media?.image ?? undefined;
 
 // Blog is an article listing in all but name — same folding as integration.mjs (kept
 // in sync by hand; integration.mjs is ESM-only and can't import this TS module).
@@ -79,9 +79,9 @@ function effectiveListings(cfg: OgConfig) {
 // The home entry composes blocks; the hero/cover blocks carry the lead photo in `image`.
 async function homeHeroImage(): Promise<string | undefined> {
   const home = await getEntry('home', 'home');
-  const blocks = (home?.data?.blocks ?? []) as { type?: string; image?: string }[];
-  const hit = blocks.find((b) => (b.type === 'hero' || b.type === 'coverHero') && !!b.image);
-  return hit?.image || undefined;
+  const blocks = (home?.data?.blocks ?? []) as { type?: string; media?: { image?: string } }[];
+  const hit = blocks.find((b) => (b.type === 'hero' || b.type === 'coverHero') && !!b.media?.image);
+  return hit?.media?.image || undefined;
 }
 
 // The site default share image (master ON): explicit upload → home-hero photo → the

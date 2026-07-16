@@ -10,6 +10,8 @@ import motionSvg from '../assets/images/placeholders/motion.svg?raw';
 // behind the video, so it doubles as the poster / reduced-motion fallback
 // (the video is hidden under prefers-reduced-motion). Generic by design — no
 // domain-specific media, unlike the hero's flow/ops panels.
+// Grouped fields (block-field convention): `media` holds the background kind picker
+// (`kind`) + its assets and the darkening overlay; `layout` holds placement.
 interface Props {
   eyebrow?: string;
   heading: string;
@@ -18,20 +20,25 @@ interface Props {
   ctaHref?: unknown;
   cta2Label?: string;
   cta2Href?: unknown;
-  media?: 'image' | 'video' | 'gradient' | 'animated';
-  image?: string;
-  imageAlt?: string;
-  video?: string;
-  videoUrl?: string;
-  overlay?: 'light' | 'medium' | 'strong';
-  align?: 'start' | 'center';
-  height?: 'tall' | 'medium';
+  media?: {
+    kind?: 'image' | 'video' | 'gradient' | 'animated';
+    image?: string;
+    imageAlt?: string;
+    video?: string;
+    videoUrl?: string;
+    overlay?: 'light' | 'medium' | 'strong';
+  };
+  layout?: { align?: 'start' | 'center'; height?: 'tall' | 'medium' };
 }
-const {
-  eyebrow, heading, intro, ctaLabel, ctaHref, cta2Label, cta2Href,
-  media = 'image', image, imageAlt, video, videoUrl,
-  overlay = 'medium', align = 'start', height = 'tall',
-} = Astro.props;
+const { eyebrow, heading, intro, ctaLabel, ctaHref, cta2Label, cta2Href } = Astro.props;
+const media = Astro.props.media?.kind ?? 'image';
+const image = Astro.props.media?.image;
+const imageAlt = Astro.props.media?.imageAlt;
+const video = Astro.props.media?.video;
+const videoUrl = Astro.props.media?.videoUrl;
+const overlay = Astro.props.media?.overlay ?? 'medium';
+const align = Astro.props.layout?.align ?? 'start';
+const height = Astro.props.layout?.height ?? 'tall';
 
 const href = resolveLink(ctaHref, '/');
 const href2 = resolveLink(cta2Href, '/');

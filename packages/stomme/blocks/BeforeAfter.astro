@@ -13,13 +13,14 @@ interface Props {
   eyebrow?: string;
   heading?: string;
   intro?: string;
-  before?: string;
-  after?: string;
+  media?: { before?: string; after?: string };
   beforeAlt?: string;
   afterAlt?: string;
   site?: any;
 }
-const { eyebrow, heading, intro, before, after, site } = Astro.props;
+const { eyebrow, heading, intro, site } = Astro.props;
+const before = Astro.props.media?.before;
+const after = Astro.props.media?.after;
 const ba = site?.strings?.beforeAfter ?? {};
 const tagBefore = ba.before ?? 'Before';
 const tagAfter = ba.after ?? 'After';

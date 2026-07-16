@@ -10,7 +10,6 @@ import Emph from '../src/Emph.astro';
 // it is ignored by classic. Distinct from ctaPanel (which sits on a surface band).
 interface Fact { label?: string; value?: string }
 interface Props {
-  variant?: 'classic' | 'split' | 'panel';
   eyebrow?: string;
   heading: string;
   intro?: string;
@@ -19,8 +18,10 @@ interface Props {
   label2?: string;
   href2?: unknown;
   facts?: Fact[];
+  layout?: { variant?: 'classic' | 'split' | 'panel' };
 }
-const { variant = 'classic', eyebrow, heading, intro, label, href, label2, href2, facts = [] } = Astro.props;
+const { eyebrow, heading, intro, label, href, label2, href2, facts = [] } = Astro.props;
+const variant = Astro.props.layout?.variant ?? 'classic';
 const url = resolveLink(href, '/');
 const url2 = resolveLink(href2, '/');
 const shownFacts = (facts ?? []).filter((f) => f && (f.label || f.value));

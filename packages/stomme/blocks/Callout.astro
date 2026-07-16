@@ -8,11 +8,13 @@ import Emph from '../src/Emph.astro';
 interface Props {
   eyebrow?: string;
   quote?: string;
-  accent?: 'brand' | 'secondary' | 'highlight';
-  width?: 'narrow' | 'xnarrow' | 'full';
-  align?: 'left' | 'center' | 'right';
+  layout?: { width?: 'narrow' | 'xnarrow' | 'full'; align?: 'left' | 'center' | 'right' };
+  style?: { surface?: string; accent?: 'brand' | 'secondary' | 'highlight' };
 }
-const { eyebrow, quote, accent = 'brand', width = 'narrow', align = 'left' } = Astro.props;
+const { eyebrow, quote } = Astro.props;
+const width = Astro.props.layout?.width ?? 'narrow';
+const align = Astro.props.layout?.align ?? 'left';
+const accent = Astro.props.style?.accent ?? 'brand';
 const accentVar = accent === 'secondary' ? 'var(--color-secondary)' : accent === 'highlight' ? 'var(--color-highlight)' : 'var(--color-brand)';
 ---
 

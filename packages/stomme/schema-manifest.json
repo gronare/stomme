@@ -124,14 +124,17 @@
         "summary",
         "order",
         "bullets",
-        "image",
-        "imageAlt",
+        "media",
         "seo",
         "hero",
         "blocks"
       ],
       "passthrough": true,
       "nested": {
+        "media": [
+          "image",
+          "imageAlt"
+        ],
         "seo": [
           "title",
           "description",
@@ -226,12 +229,15 @@
         "districts",
         "localCase",
         "services",
-        "image",
-        "imageAlt",
+        "media",
         "seo"
       ],
       "passthrough": false,
       "nested": {
+        "media": [
+          "image",
+          "imageAlt"
+        ],
         "seo": [
           "title",
           "description",

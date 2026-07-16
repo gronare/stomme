@@ -70,7 +70,7 @@ const defaults: Record<string, any> = {
 };
 
 interface Props {
-  blocks?: { type: string; surface?: string; [key: string]: unknown }[];
+  blocks?: { type: string; style?: { surface?: string }; [key: string]: unknown }[];
   registry?: Record<string, any>;
   config?: SiteConfig;
   features?: StommeFeatures;
@@ -99,7 +99,8 @@ const surfaceClass: Record<string, string> = { tint: 'surface-tint', band: 'band
         </div>
       );
     }
-    const surf = block.surface ? surfaceClass[block.surface] : undefined;
+    // Grouped shape (block-field convention): the surface lives at style.surface.
+    const surf = block.style?.surface ? surfaceClass[block.style.surface] : undefined;
     return surf ? (
       <div class={surf}>
         <Component {...block} site={site} />

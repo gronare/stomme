@@ -1,6 +1,12 @@
 // The default block catalog — field definitions for the library blocks. Use it
 // directly or extend it: `export const BLOCKS = [...defaultBlocks, ...mine]`.
-import { headingFields, headingFieldsWith, linkField, imageField, iconField, surfaceField, accentField, widthField, cardListField, linkedCardListField, type BlockDef } from './src/kit.ts';
+//
+// Field organization follows the block-field convention (see the skill/spec):
+// CONTENT is flat and first (in reading order); media/layout/style are collapsed
+// nested `object` groups (same names in every block); `style` is always last.
+// The stored frontmatter is NESTED for grouped fields (hero.media.image) — content
+// written before Phase 2 is migrated by the per-site codemod.
+import { headingFields, headingFieldsWith, linkField, imageField, iconField, surfaceField, accentField, widthField, cardListField, linkedCardListField, mediaGroup, layoutGroup, styleGroup, type BlockDef } from './src/kit.ts';
 
 const RAW_BLOCKS: BlockDef[] = [
   {
@@ -13,38 +19,6 @@ const RAW_BLOCKS: BlockDef[] = [
       { name: 'eyebrow', label: 'Eyebrow', widget: 'string', required: false, hint: 'Small uppercase label above the heading.' },
       { name: 'heading', label: 'Heading (H1)', widget: 'string' },
       { name: 'intro', label: 'Intro', widget: 'text', required: false },
-      { name: 'ctaLabel', label: 'Button label', widget: 'string', required: false },
-      linkField('ctaHref', 'Button link'),
-      { name: 'cta2Label', label: 'Second button label', widget: 'string', required: false, hint: 'Shown as a quiet text link beside the button.' },
-      linkField('cta2Href', 'Second button link'),
-      {
-        name: 'media',
-        label: 'Right-side media',
-        widget: 'select',
-        required: false,
-        default: 'none',
-        options: [
-          { label: 'None (text only)', value: 'none' },
-          { label: 'Image', value: 'image' },
-          { label: 'Highlights (icon + title + line)', value: 'highlights' },
-          { label: 'Motif (animated, no image)', value: 'motif' },
-        ],
-        hint: 'What shows beside the heading. Default: none.',
-      },
-      imageField('image', 'Image', 'Used when Right-side media = Image.'),
-      { name: 'imageAlt', label: 'Image alt text', widget: 'string', required: false },
-      {
-        name: 'highlights',
-        label: 'Highlights',
-        widget: 'list',
-        required: false,
-        collapsed: true,
-        minimize_collapsed: true,
-        label_singular: 'Key point',
-        summary: '{{fields.title}}',
-        hint: 'A few key points beside the heading. Used when Right-side media = Highlights.',
-        fields: [iconField(), { name: 'title', label: 'Title', widget: 'string' }, { name: 'body', label: 'Text', widget: 'string', required: false }],
-      },
       {
         name: 'ticks',
         label: 'Ticks (checkmark lines)',
@@ -56,22 +30,58 @@ const RAW_BLOCKS: BlockDef[] = [
         hint: 'Short ✓ lines under the intro — key reassurances.',
         field: { name: 'text', label: 'Line', widget: 'string' },
       },
-      {
-        name: 'height', label: 'Height', widget: 'select', required: false, default: 'normal',
-        hint: 'Tall fills the viewport (good with a Gradient or Dark background).',
-        options: [{ label: 'Normal', value: 'normal' }, { label: 'Tall', value: 'tall' }],
-      },
-      {
-        name: 'align', label: 'Text position', widget: 'select', required: false, default: 'center',
-        hint: 'Where the text sits in a Tall hero.',
-        options: [{ label: 'Top', value: 'top' }, { label: 'Center', value: 'center' }, { label: 'Bottom', value: 'bottom' }],
-      },
-      {
-        name: 'width', label: 'Width', widget: 'select', required: false, default: 'full',
-        hint: 'Narrow centers the hero in a reading column (best without side media).',
-        options: [{ label: 'Full width', value: 'full' }, { label: 'Narrow (reading column)', value: 'narrow' }],
-      },
-      surfaceField,
+      { name: 'ctaLabel', label: 'Button label', widget: 'string', required: false },
+      linkField('ctaHref', 'Button link'),
+      { name: 'cta2Label', label: 'Second button label', widget: 'string', required: false, hint: 'A quiet text link beside the button. Leave empty to hide.' },
+      linkField('cta2Href', 'Second button link'),
+      mediaGroup('What shows beside the text. Default: none.', [
+        {
+          name: 'kind',
+          label: 'Show',
+          widget: 'select',
+          required: false,
+          default: 'none',
+          options: [
+            { label: 'None (text only)', value: 'none' },
+            { label: 'Image', value: 'image' },
+            { label: 'Highlights (icon + title + line)', value: 'highlights' },
+            { label: 'Motif (animated, no image)', value: 'motif' },
+          ],
+          hint: 'What shows beside the heading: none, image, highlights or motif.',
+        },
+        imageField('image', 'Image', 'Used when Show = Image.'),
+        { name: 'imageAlt', label: 'Image alt text', widget: 'string', required: false, hint: 'Describe the image for screen readers and search engines.' },
+        {
+          name: 'highlights',
+          label: 'Highlights',
+          widget: 'list',
+          required: false,
+          collapsed: true,
+          minimize_collapsed: true,
+          label_singular: 'Key point',
+          summary: '{{fields.title}}',
+          hint: 'Panel with icon + title + line. Used when Show = Highlights.',
+          fields: [iconField(), { name: 'title', label: 'Title', widget: 'string' }, { name: 'body', label: 'Text', widget: 'string', required: false }],
+        },
+      ], '{{fields.kind}}'),
+      layoutGroup([
+        {
+          name: 'height', label: 'Height', widget: 'select', required: false, default: 'normal',
+          hint: 'Tall fills the screen — best with a Gradient or Dark background.',
+          options: [{ label: 'Normal', value: 'normal' }, { label: 'Tall', value: 'tall' }],
+        },
+        {
+          name: 'align', label: 'Text position', widget: 'select', required: false, default: 'center',
+          hint: 'Where the text sits when the hero is tall.',
+          options: [{ label: 'Top', value: 'top' }, { label: 'Center', value: 'center' }, { label: 'Bottom', value: 'bottom' }],
+        },
+        {
+          name: 'width', label: 'Width', widget: 'select', required: false, default: 'full',
+          hint: 'Narrow centers the hero in a reading column — best without side media.',
+          options: [{ label: 'Full width', value: 'full' }, { label: 'Narrow (reading column)', value: 'narrow' }],
+        },
+      ]),
+      styleGroup(),
     ],
   },
   {
@@ -88,61 +98,65 @@ const RAW_BLOCKS: BlockDef[] = [
       linkField('ctaHref', 'Button link'),
       { name: 'cta2Label', label: 'Second button label', widget: 'string', required: false },
       linkField('cta2Href', 'Second button link'),
-      {
-        name: 'media',
-        label: 'Background',
-        widget: 'select',
-        required: false,
-        default: 'image',
-        hint: 'A photo, a looping video, a generated gradient, or an animated block pattern — both gradient and animated follow your brand colour, no asset needed.',
-        options: [
-          { label: 'Image', value: 'image' },
-          { label: 'Video (looping)', value: 'video' },
-          { label: 'Gradient (no image)', value: 'gradient' },
-          { label: 'Animated (no image)', value: 'animated' },
-        ],
-      },
-      imageField('image', 'Background image / video poster'),
-      { name: 'imageAlt', label: 'Image alt text', widget: 'string', required: false },
-      { name: 'video', label: 'Video file', widget: 'file', required: false, hint: 'Used when Background = Video. Muted, looping MP4/WebM; the image shows until it plays.' },
-      { name: 'videoUrl', label: '…or video URL', widget: 'string', required: false, hint: 'External MP4/WebM URL. Used instead of an uploaded file if filled.' },
-      {
-        name: 'overlay',
-        label: 'Darken (overlay)',
-        widget: 'select',
-        required: false,
-        default: 'medium',
-        hint: 'How much to darken the media so the text stays readable.',
-        options: [
-          { label: 'Light', value: 'light' },
-          { label: 'Medium', value: 'medium' },
-          { label: 'Strong', value: 'strong' },
-        ],
-      },
-      {
-        name: 'align',
-        label: 'Text position',
-        widget: 'select',
-        required: false,
-        default: 'start',
-        hint: 'Where the text sits on the cover.',
-        options: [
-          { label: 'Bottom left', value: 'start' },
-          { label: 'Centered', value: 'center' },
-        ],
-      },
-      {
-        name: 'height',
-        label: 'Height',
-        widget: 'select',
-        required: false,
-        default: 'tall',
-        hint: 'Tall fills most of the screen; Medium is a shorter band.',
-        options: [
-          { label: 'Tall', value: 'tall' },
-          { label: 'Medium', value: 'medium' },
-        ],
-      },
+      mediaGroup('The full-bleed background — photo, looping video, gradient or animated pattern.', [
+        {
+          name: 'kind',
+          label: 'Background',
+          widget: 'select',
+          required: false,
+          default: 'image',
+          hint: 'A photo, a looping video, a generated gradient, or an animated block pattern — both gradient and animated follow your brand colour, no asset needed.',
+          options: [
+            { label: 'Image', value: 'image' },
+            { label: 'Video (looping)', value: 'video' },
+            { label: 'Gradient (no image)', value: 'gradient' },
+            { label: 'Animated (no image)', value: 'animated' },
+          ],
+        },
+        imageField('image', 'Background image / video poster'),
+        { name: 'imageAlt', label: 'Image alt text', widget: 'string', required: false },
+        { name: 'video', label: 'Video file', widget: 'file', required: false, hint: 'Used when Background = Video. Muted, looping MP4/WebM; the image shows until it plays.' },
+        { name: 'videoUrl', label: '…or video URL', widget: 'string', required: false, hint: 'External MP4/WebM URL. Used instead of an uploaded file if filled.' },
+        {
+          name: 'overlay',
+          label: 'Darken (overlay)',
+          widget: 'select',
+          required: false,
+          default: 'medium',
+          hint: 'How much to darken the media so the text stays readable.',
+          options: [
+            { label: 'Light', value: 'light' },
+            { label: 'Medium', value: 'medium' },
+            { label: 'Strong', value: 'strong' },
+          ],
+        },
+      ], '{{fields.kind}}'),
+      layoutGroup([
+        {
+          name: 'align',
+          label: 'Text position',
+          widget: 'select',
+          required: false,
+          default: 'start',
+          hint: 'Where the text sits on the cover.',
+          options: [
+            { label: 'Bottom left', value: 'start' },
+            { label: 'Centered', value: 'center' },
+          ],
+        },
+        {
+          name: 'height',
+          label: 'Height',
+          widget: 'select',
+          required: false,
+          default: 'tall',
+          hint: 'Tall fills most of the screen; Medium is a shorter band.',
+          options: [
+            { label: 'Tall', value: 'tall' },
+            { label: 'Medium', value: 'medium' },
+          ],
+        },
+      ]),
     ],
   },
   {
@@ -152,14 +166,16 @@ const RAW_BLOCKS: BlockDef[] = [
     summary: 'Page title band (light or dark): eyebrow, H1, intro and an optional button.',
     shape: 'band',
     fields: [
-      { name: 'variant', label: 'Style', widget: 'select', required: false, default: 'light', hint: 'Band puts the title on a dark full-width band.', options: [{ label: 'Light', value: 'light' }, { label: 'Band', value: 'dark' }] },
-      widthField,
       { name: 'eyebrow', label: 'Eyebrow', widget: 'string', required: false, hint: 'Small uppercase label above the heading.' },
       { name: 'heading', label: 'Heading (H1)', widget: 'string' },
       { name: 'intro', label: 'Intro', widget: 'text', required: false },
       { name: 'ctaLabel', label: 'Button label (optional)', widget: 'string', required: false },
       linkField('ctaHref', 'Button link'),
-      surfaceField,
+      layoutGroup([
+        { name: 'variant', label: 'Style', widget: 'select', required: false, default: 'light', hint: 'Band puts the title on a dark full-width band.', options: [{ label: 'Light', value: 'light' }, { label: 'Band', value: 'dark' }] },
+        widthField,
+      ]),
+      styleGroup([surfaceField]),
     ],
   },
   {
@@ -168,7 +184,15 @@ const RAW_BLOCKS: BlockDef[] = [
     group: 'Text',
     summary: 'A block of rich (markdown) text with an optional heading.',
     shape: 'prose',
-    fields: [{ name: 'eyebrow', label: 'Eyebrow', widget: 'string', required: false, hint: 'Small uppercase label above the heading.' }, { name: 'heading', label: 'Heading (optional)', widget: 'string', required: false }, { name: 'body', label: 'Body', widget: 'markdown', required: false }, { name: 'statValue', label: 'Pull-stat number', widget: 'string', required: false, hint: 'One headline figure shown big under the text (e.g. +50 %). Use a Stats block for a row of many.' }, { name: 'statLabel', label: 'Pull-stat label', widget: 'string', required: false, hint: 'The short line beside the number.' }, widthField, surfaceField],
+    fields: [
+      { name: 'eyebrow', label: 'Eyebrow', widget: 'string', required: false, hint: 'Small uppercase label above the heading.' },
+      { name: 'heading', label: 'Heading (optional)', widget: 'string', required: false },
+      { name: 'body', label: 'Body', widget: 'markdown', required: false },
+      { name: 'statValue', label: 'Pull-stat number', widget: 'string', required: false, hint: 'One headline figure shown big under the text (e.g. +50 %). Use a Stats block for a row of many.' },
+      { name: 'statLabel', label: 'Pull-stat label', widget: 'string', required: false, hint: 'The short line beside the number.' },
+      layoutGroup([widthField]),
+      styleGroup([surfaceField]),
+    ],
   },
   {
     type: 'featureGrid',
@@ -179,9 +203,10 @@ const RAW_BLOCKS: BlockDef[] = [
     fields: [
       ...headingFields,
       linkedCardListField,
-      { name: 'numbered', label: 'Numbered (01/02/03 instead of icons)', widget: 'boolean', required: false, default: false },
-      accentField,
-      surfaceField,
+      layoutGroup([
+        { name: 'numbered', label: 'Numbered (01/02/03 instead of icons)', widget: 'boolean', required: false, default: false },
+      ]),
+      styleGroup(),
     ],
   },
   {
@@ -194,10 +219,10 @@ const RAW_BLOCKS: BlockDef[] = [
     fields: [
       ...headingFields,
       { name: 'services', label: 'Services shown', widget: 'select', options: '$services', multiple: true, required: false, hint: 'Pick which services appear (in order). Leave empty to show all.' },
-      surfaceField,
+      styleGroup([surfaceField]),
     ],
   },
-  { type: 'pillars', label: 'Principles / values', group: 'Cards & lists', summary: 'Row of principle / value cards (icon, title, text).', shape: 'grid', fields: [...headingFields, cardListField, surfaceField] },
+  { type: 'pillars', label: 'Principles / values', group: 'Cards & lists', summary: 'Row of principle / value cards (icon, title, text).', shape: 'grid', fields: [...headingFields, cardListField, styleGroup([surfaceField])] },
   {
     type: 'plans',
     label: 'Pricing / plans',
@@ -229,10 +254,10 @@ const RAW_BLOCKS: BlockDef[] = [
         ],
       },
       { name: 'footnote', label: 'Footnote', widget: 'text', required: false, hint: 'Small note under the cards — e.g. what every plan includes.' },
-      surfaceField,
+      styleGroup([surfaceField]),
     ],
   },
-  { type: 'specialistGrid', label: 'Specialist grid', group: 'Cards & lists', summary: 'Grid of specialist / team profile cards.', shape: 'grid', fields: [...headingFields, cardListField, surfaceField] },
+  { type: 'specialistGrid', label: 'Specialist grid', group: 'Cards & lists', summary: 'Grid of specialist / team profile cards.', shape: 'grid', fields: [...headingFields, cardListField, styleGroup([surfaceField])] },
   {
     type: 'steps', label: 'Process / steps', group: 'Cards & lists', summary: 'Numbered process — a sequence of steps.', shape: 'steps',
     fields: [
@@ -247,8 +272,8 @@ const RAW_BLOCKS: BlockDef[] = [
         ],
       },
       { name: 'anchor', label: 'Anchor id', widget: 'string', required: false, hint: 'Lets links jump here — anchor "process" makes "#process" scroll to this section.' },
-      widthField,
-      surfaceField,
+      layoutGroup([widthField]),
+      styleGroup([surfaceField]),
     ],
   },
   {
@@ -260,8 +285,10 @@ const RAW_BLOCKS: BlockDef[] = [
     fields: [
       ...headingFields,
       { name: 'items', label: 'Items', widget: 'list', required: false, collapsed: true, minimize_collapsed: true, label_singular: 'Item', summary: '{{fields.text}}', fields: [{ name: 'text', label: 'Text', widget: 'string' }, { name: 'note', label: 'Sub-line (optional)', widget: 'text', required: false }] },
-      { name: 'columns', label: 'Columns', widget: 'number', required: false, default: 2, hint: '1 or 2.' },
-      surfaceField,
+      layoutGroup([
+        { name: 'columns', label: 'Columns', widget: 'number', required: false, default: 2, hint: '1 or 2.' },
+      ]),
+      styleGroup([surfaceField]),
     ],
   },
   {
@@ -273,8 +300,10 @@ const RAW_BLOCKS: BlockDef[] = [
     fields: [
       ...headingFields,
       { name: 'images', label: 'Images', widget: 'list', required: false, collapsed: true, minimize_collapsed: true, label_singular: 'Image', fields: [imageField('image', 'Image'), { name: 'alt', label: 'Alt text', widget: 'string', required: false }, { name: 'caption', label: 'Caption', widget: 'string', required: false }] },
-      { name: 'columns', label: 'Columns', widget: 'number', required: false, default: 3, hint: '2 or 3.' },
-      surfaceField,
+      layoutGroup([
+        { name: 'columns', label: 'Columns', widget: 'number', required: false, default: 3, hint: '2 or 3.' },
+      ]),
+      styleGroup([surfaceField]),
     ],
   },
   {
@@ -283,7 +312,11 @@ const RAW_BLOCKS: BlockDef[] = [
     group: 'Media',
     summary: 'A before / after image pair.',
     shape: 'split',
-    fields: [...headingFields, imageField('before', 'Before image'), imageField('after', 'After image'), surfaceField],
+    fields: [
+      ...headingFields,
+      mediaGroup('The two photos being compared.', [imageField('before', 'Before image'), imageField('after', 'After image')]),
+      styleGroup([surfaceField]),
+    ],
   },
   {
     type: 'textImage',
@@ -294,10 +327,14 @@ const RAW_BLOCKS: BlockDef[] = [
     fields: [
       { name: 'heading', label: 'Heading', widget: 'string', required: false },
       { name: 'body', label: 'Text', widget: 'markdown' },
-      imageField('image', 'Image'),
-      { name: 'imageAlt', label: 'Alt text', widget: 'string', required: false },
-      { name: 'flip', label: 'Image on left', widget: 'boolean', required: false, default: false },
-      surfaceField,
+      mediaGroup('The picture beside the text.', [
+        imageField('image', 'Image'),
+        { name: 'imageAlt', label: 'Alt text', widget: 'string', required: false },
+      ]),
+      layoutGroup([
+        { name: 'flip', label: 'Image on left', widget: 'boolean', required: false, default: false },
+      ]),
+      styleGroup([surfaceField]),
     ],
   },
   {
@@ -310,9 +347,10 @@ const RAW_BLOCKS: BlockDef[] = [
       { name: 'body', label: 'Body text', widget: 'markdown' },
       { name: 'quote', label: 'Quote', widget: 'text' },
       { name: 'attribution', label: 'Source / name', widget: 'string', required: false },
-      accentField,
-      { name: 'flip', label: 'Quote on left', widget: 'boolean', required: false, default: false },
-      surfaceField,
+      layoutGroup([
+        { name: 'flip', label: 'Quote on left', widget: 'boolean', required: false, default: false },
+      ]),
+      styleGroup(),
     ],
   },
   {
@@ -333,17 +371,19 @@ const RAW_BLOCKS: BlockDef[] = [
           { name: 'note', label: 'Note (muted)', widget: 'string', required: false, hint: 'A quiet addendum after the sense, e.g. an example or year.' },
         ],
       },
-      {
-        name: 'width', label: 'Width', widget: 'select', required: false, default: 'xnarrow',
-        hint: 'How wide the entry column is.',
-        options: [{ label: 'Extra narrow', value: 'xnarrow' }, { label: 'Narrow (reading column)', value: 'narrow' }, { label: 'Full width', value: 'full' }],
-      },
-      {
-        name: 'align', label: 'Alignment', widget: 'select', required: false, default: 'left',
-        hint: 'Where the entry sits in the section.',
-        options: [{ label: 'Left', value: 'left' }, { label: 'Centered', value: 'center' }, { label: 'Right', value: 'right' }],
-      },
-      surfaceField,
+      layoutGroup([
+        {
+          name: 'width', label: 'Width', widget: 'select', required: false, default: 'xnarrow',
+          hint: 'How wide the entry column is.',
+          options: [{ label: 'Extra narrow', value: 'xnarrow' }, { label: 'Narrow (reading column)', value: 'narrow' }, { label: 'Full width', value: 'full' }],
+        },
+        {
+          name: 'align', label: 'Alignment', widget: 'select', required: false, default: 'left',
+          hint: 'Where the entry sits in the section.',
+          options: [{ label: 'Left', value: 'left' }, { label: 'Centered', value: 'center' }, { label: 'Right', value: 'right' }],
+        },
+      ]),
+      styleGroup([surfaceField]),
     ],
   },
   {
@@ -358,12 +398,14 @@ const RAW_BLOCKS: BlockDef[] = [
       { name: 'body', label: 'Text', widget: 'text', required: false },
       { name: 'linkLabel', label: 'Link label', widget: 'string', required: false },
       linkField('link', 'Link'),
-      {
-        name: 'placement', label: 'Placement', widget: 'select', required: false, default: 'left',
-        hint: 'Where the fragment sits — alternate placements to break the grid.',
-        options: [{ label: 'Left', value: 'left' }, { label: 'Right', value: 'right' }, { label: 'Indented', value: 'indent' }],
-      },
-      surfaceField,
+      layoutGroup([
+        {
+          name: 'placement', label: 'Placement', widget: 'select', required: false, default: 'left',
+          hint: 'Where the fragment sits — alternate placements to break the grid.',
+          options: [{ label: 'Left', value: 'left' }, { label: 'Right', value: 'right' }, { label: 'Indented', value: 'indent' }],
+        },
+      ]),
+      styleGroup([surfaceField]),
     ],
   },
   {
@@ -375,26 +417,27 @@ const RAW_BLOCKS: BlockDef[] = [
     fields: [
       { name: 'eyebrow', label: 'Eyebrow', widget: 'string', required: false, hint: 'Small uppercase label above the heading.' },
       { name: 'quote', label: 'Quote / statement', widget: 'text', hint: 'Wrap words in *asterisks* to underline them.' },
-      {
-        name: 'width', label: 'Width', widget: 'select', required: false, default: 'narrow',
-        hint: 'How wide the quote column is. Narrow reads best.',
-        options: [
-          { label: 'Narrow (reading column)', value: 'narrow' },
-          { label: 'Extra narrow', value: 'xnarrow' },
-          { label: 'Full width', value: 'full' },
-        ],
-      },
-      {
-        name: 'align', label: 'Alignment', widget: 'select', required: false, default: 'left',
-        hint: 'Where the quote column sits in the section (the text stays left-aligned).',
-        options: [
-          { label: 'Left', value: 'left' },
-          { label: 'Centered', value: 'center' },
-          { label: 'Right', value: 'right' },
-        ],
-      },
-      accentField,
-      surfaceField,
+      layoutGroup([
+        {
+          name: 'width', label: 'Width', widget: 'select', required: false, default: 'narrow',
+          hint: 'How wide the quote column is. Narrow reads best.',
+          options: [
+            { label: 'Narrow (reading column)', value: 'narrow' },
+            { label: 'Extra narrow', value: 'xnarrow' },
+            { label: 'Full width', value: 'full' },
+          ],
+        },
+        {
+          name: 'align', label: 'Alignment', widget: 'select', required: false, default: 'left',
+          hint: 'Where the quote column sits in the section (the text stays left-aligned).',
+          options: [
+            { label: 'Left', value: 'left' },
+            { label: 'Centered', value: 'center' },
+            { label: 'Right', value: 'right' },
+          ],
+        },
+      ]),
+      styleGroup(),
     ],
   },
   {
@@ -426,7 +469,7 @@ const RAW_BLOCKS: BlockDef[] = [
           { name: 'note', label: 'Note', widget: 'text', required: false },
         ],
       },
-      accentField,
+      styleGroup([accentField]),
     ],
   },
   {
@@ -436,7 +479,7 @@ const RAW_BLOCKS: BlockDef[] = [
     summary: 'Customer testimonials from your Testimonials collection.',
     shape: 'quote',
     collection: 'testimonials',
-    fields: [...headingFieldsWith('Happy customers', 'References'), surfaceField],
+    fields: [...headingFieldsWith('Happy customers', 'References'), styleGroup([surfaceField])],
   },
   {
     type: 'linkChips',
@@ -445,7 +488,7 @@ const RAW_BLOCKS: BlockDef[] = [
     summary: 'Chip links from your Areas collection (e.g. towns you serve).',
     shape: 'chips',
     collection: 'towns',
-    fields: [...headingFieldsWith('Service areas', 'Where we work'), surfaceField],
+    fields: [...headingFieldsWith('Service areas', 'Where we work'), styleGroup([surfaceField])],
   },
   {
     type: 'postList',
@@ -457,10 +500,14 @@ const RAW_BLOCKS: BlockDef[] = [
       ...headingFields,
       { name: 'source', label: 'source', widget: 'hidden' },
       { name: 'base', label: 'base', widget: 'hidden' },
-      { name: 'featured', label: 'Featured first post', widget: 'boolean', required: false, default: true, hint: 'Show the newest post as a large lead card.' },
-      { name: 'showImages', label: 'Image previews', widget: 'boolean', required: false, default: true, hint: 'Show cover images on the cards.' },
-      { name: 'columns', label: 'Columns', widget: 'number', required: false, default: 3, hint: '2 or 3.' },
-      surfaceField,
+      mediaGroup('Cover images on the cards.', [
+        { name: 'showImages', label: 'Image previews', widget: 'boolean', required: false, default: true, hint: 'Show cover images on the cards.' },
+      ]),
+      layoutGroup([
+        { name: 'featured', label: 'Featured first post', widget: 'boolean', required: false, default: true, hint: 'Show the newest post as a large lead card.' },
+        { name: 'columns', label: 'Columns', widget: 'number', required: false, default: 3, hint: '2 or 3.' },
+      ]),
+      styleGroup([surfaceField]),
     ],
   },
   {
@@ -473,10 +520,14 @@ const RAW_BLOCKS: BlockDef[] = [
       ...headingFields,
       { name: 'source', label: 'source', widget: 'hidden' },
       { name: 'base', label: 'base', widget: 'hidden' },
-      { name: 'filters', label: 'Category filters', widget: 'boolean', required: false, default: true, hint: 'Show category filter chips above the grid.' },
-      { name: 'showImages', label: 'Image previews', widget: 'boolean', required: false, default: true, hint: 'Show cover images on the cards.' },
-      { name: 'columns', label: 'Columns', widget: 'number', required: false, default: 3, hint: '2 or 3.' },
-      surfaceField,
+      mediaGroup('Cover images on the cards.', [
+        { name: 'showImages', label: 'Image previews', widget: 'boolean', required: false, default: true, hint: 'Show cover images on the cards.' },
+      ]),
+      layoutGroup([
+        { name: 'filters', label: 'Category filters', widget: 'boolean', required: false, default: true, hint: 'Show category filter chips above the grid.' },
+        { name: 'columns', label: 'Columns', widget: 'number', required: false, default: 3, hint: '2 or 3.' },
+      ]),
+      styleGroup([surfaceField]),
     ],
   },
   {
@@ -494,7 +545,6 @@ const RAW_BLOCKS: BlockDef[] = [
     summary: 'A boxed call-to-action: heading, text and a button.',
     shape: 'box',
     fields: [
-      { name: 'variant', label: 'Layout', widget: 'select', required: false, default: 'classic', options: [{ label: 'Classic (centered panel)', value: 'classic' }, { label: 'Split (copy + facts card)', value: 'split' }, { label: 'Panel (dark, with readout)', value: 'panel' }] },
       { name: 'eyebrow', label: 'Eyebrow', widget: 'string', required: false, hint: 'Small uppercase label above the heading.' },
       { name: 'heading', label: 'Heading', widget: 'string' },
       { name: 'intro', label: 'Intro', widget: 'text', required: false, hint: 'A short line under the heading.' },
@@ -503,7 +553,10 @@ const RAW_BLOCKS: BlockDef[] = [
       { name: 'label2', label: 'Second button label', widget: 'string', required: false, hint: 'Shown as a quiet text link beside the button.' },
       linkField('href2', 'Second button link'),
       { name: 'facts', label: 'Facts (label + value)', widget: 'list', required: false, collapsed: true, minimize_collapsed: true, label_singular: 'Fact', summary: '{{fields.label}} {{fields.value}}', hint: 'Shown as chips (Split) or a mono readout (Panel). Ignored in Classic.', fields: [{ name: 'label', label: 'Label', widget: 'string' }, { name: 'value', label: 'Value', widget: 'string' }] },
-      surfaceField,
+      layoutGroup([
+        { name: 'variant', label: 'Layout', widget: 'select', required: false, default: 'classic', options: [{ label: 'Classic (centered panel)', value: 'classic' }, { label: 'Split (copy + facts card)', value: 'split' }, { label: 'Panel (dark, with readout)', value: 'panel' }] },
+      ]),
+      styleGroup([surfaceField]),
     ],
   },
   {
@@ -514,7 +567,6 @@ const RAW_BLOCKS: BlockDef[] = [
     shape: 'list',
     collection: 'faq',
     fields: [
-      { name: 'variant', label: 'Layout', widget: 'select', required: false, default: 'list', hint: 'How the questions are presented.', options: [{ label: 'List', value: 'list' }, { label: 'Accordion', value: 'accordion' }, { label: 'Cards', value: 'cards' }, { label: 'Split (index + reader)', value: 'split' }] },
       ...headingFields,
       { name: 'entries', label: 'Questions shown', widget: 'select', options: '$faq', multiple: true, required: false, hint: 'Pick specific questions (in order). Leave empty to use the tag filter or show all.' },
       { name: 'tag', label: 'Tag filter', widget: 'select', options: '$faqTags', required: false, hint: 'Show every question carrying this tag (tags are set on the questions). Ignored when questions are picked above.' },
@@ -522,7 +574,10 @@ const RAW_BLOCKS: BlockDef[] = [
       { name: 'asideBody', label: 'Aside · text', widget: 'text', required: false, default: "Get in touch and we'll help you out." },
       { name: 'asideCtaLabel', label: 'Aside · button label', widget: 'string', required: false, default: 'Contact' },
       linkField('asideHref', 'Aside · button link'),
-      surfaceField,
+      layoutGroup([
+        { name: 'variant', label: 'Layout', widget: 'select', required: false, default: 'list', hint: 'How the questions are presented.', options: [{ label: 'List', value: 'list' }, { label: 'Accordion', value: 'accordion' }, { label: 'Cards', value: 'cards' }, { label: 'Split (index + reader)', value: 'split' }] },
+      ]),
+      styleGroup([surfaceField]),
     ],
   },
   {
@@ -592,9 +647,10 @@ const RAW_BLOCKS: BlockDef[] = [
 // ── Lookbook samples ─────────────────────────────────────────────────────────
 // Representative fixtures per block, rendered by the /lookbook route so a theme can be
 // validated against EVERY block and its variants. Keyed by type; an array = one lookbook
-// section per entry (`_label` names the variant). Collection-backed blocks (serviceGrid,
-// faq, testimonials, linkChips, postList, catalogList) render the SITE's real entries —
-// their samples only set chrome. stomme-gen warns when a block lacks a sample.
+// section per entry (`_label` names the variant). Grouped fields use the NESTED shape
+// (media/layout/style), exactly like migrated content. Collection-backed blocks
+// (serviceGrid, faq, testimonials, linkChips, postList, catalogList) render the SITE's
+// real entries — their samples only set chrome. stomme-gen warns when a block lacks a sample.
 const LOREM = 'A short supporting line of body copy, long enough to wrap on narrow columns.';
 // Shared faq fixtures — every variant sample renders the same three questions.
 const FAQ_FIX = [
@@ -604,17 +660,17 @@ const FAQ_FIX = [
 ];
 const SAMPLES: Record<string, ({ _label?: string } & Record<string, unknown>)[]> = {
   hero: [
-    { _label: 'narrow · two buttons · ticks', eyebrow: 'Eyebrow label', heading: 'A heading that states the offer.', intro: 'One supporting sentence that earns the click below.', ticks: ['A first checkmark reassurance.', 'A second, slightly longer one to wrap.'], ctaLabel: 'Primary action', ctaHref: { url: '#' }, cta2Label: 'Quiet link', cta2Href: { url: '#' }, media: 'none', width: 'narrow' },
-    { _label: 'highlights media', eyebrow: 'Eyebrow', heading: 'Hero beside highlights.', intro: LOREM, ctaLabel: 'Action', ctaHref: { url: '#' }, media: 'highlights', highlights: [{ icon: 'bolt', title: 'Fast', body: 'Loads instantly.' }, { icon: 'shield', title: 'Safe', body: 'Nothing to hack.' }] },
-    { _label: 'motif · tall dark', heading: 'Tall hero on the dark surface.', intro: LOREM, ctaLabel: 'Action', ctaHref: { url: '#' }, media: 'motif', height: 'tall', surface: 'dark' },
+    { _label: 'narrow · two buttons · ticks', eyebrow: 'Eyebrow label', heading: 'A heading that states the offer.', intro: 'One supporting sentence that earns the click below.', ticks: ['A first checkmark reassurance.', 'A second, slightly longer one to wrap.'], ctaLabel: 'Primary action', ctaHref: { url: '#' }, cta2Label: 'Quiet link', cta2Href: { url: '#' }, media: { kind: 'none' }, layout: { width: 'narrow' } },
+    { _label: 'highlights media', eyebrow: 'Eyebrow', heading: 'Hero beside highlights.', intro: LOREM, ctaLabel: 'Action', ctaHref: { url: '#' }, media: { kind: 'highlights', highlights: [{ icon: 'bolt', title: 'Fast', body: 'Loads instantly.' }, { icon: 'shield', title: 'Safe', body: 'Nothing to hack.' }] } },
+    { _label: 'motif · tall dark', heading: 'Tall hero on the dark surface.', intro: LOREM, ctaLabel: 'Action', ctaHref: { url: '#' }, media: { kind: 'motif' }, layout: { height: 'tall' }, style: { surface: 'dark' } },
   ],
   cover: [
-    { _label: 'gradient', eyebrow: 'Eyebrow', heading: 'Full-bleed cover heading', intro: LOREM, ctaLabel: 'Primary', ctaHref: { url: '#' }, cta2Label: 'Secondary', cta2Href: { url: '#' }, media: 'gradient' },
-    { _label: 'animated', heading: 'Animated cover', media: 'animated', height: 'medium' },
+    { _label: 'gradient', eyebrow: 'Eyebrow', heading: 'Full-bleed cover heading', intro: LOREM, ctaLabel: 'Primary', ctaHref: { url: '#' }, cta2Label: 'Secondary', cta2Href: { url: '#' }, media: { kind: 'gradient' } },
+    { _label: 'animated', heading: 'Animated cover', media: { kind: 'animated' }, layout: { height: 'medium' } },
   ],
   pageHeader: [
     { _label: 'light', eyebrow: 'Eyebrow', heading: 'Page heading', intro: 'The intro line under a page title.', ctaLabel: 'Optional button', ctaHref: { url: '#' } },
-    { _label: 'band (dark)', variant: 'dark', eyebrow: 'Eyebrow', heading: 'Dark page band', intro: LOREM },
+    { _label: 'band (dark)', layout: { variant: 'dark' }, eyebrow: 'Eyebrow', heading: 'Dark page band', intro: LOREM },
   ],
   prose: [
     { _label: 'with heading (split on themed sites)', eyebrow: 'Eyebrow', heading: 'A prose section heading', body: `**Bold**, *emphasis* and a [link](#) inside markdown body copy. ${LOREM}\n\nA second paragraph to show rhythm.` },
@@ -648,24 +704,24 @@ const SAMPLES: Record<string, ({ _label?: string } & Record<string, unknown>)[]>
     { kicker: 'live', title: 'You launch', body: LOREM },
   ] }],
   checklist: [
-    { _label: 'two columns', eyebrow: 'Included', columns: 2, items: [{ text: 'First item' }, { text: 'Second item', note: 'With a supporting note.' }, { text: 'Third item' }, { text: 'Fourth item' }] },
-    { _label: 'single + heading (split on themed sites)', eyebrow: 'Included', heading: 'A checklist with a heading', columns: 1, items: [{ text: 'One' }, { text: 'Two' }] },
+    { _label: 'two columns', eyebrow: 'Included', layout: { columns: 2 }, items: [{ text: 'First item' }, { text: 'Second item', note: 'With a supporting note.' }, { text: 'Third item' }, { text: 'Fourth item' }] },
+    { _label: 'single + heading (split on themed sites)', eyebrow: 'Included', heading: 'A checklist with a heading', layout: { columns: 1 }, items: [{ text: 'One' }, { text: 'Two' }] },
   ],
-  gallery: [{ eyebrow: 'Gallery', heading: 'Image grid (placeholders)', columns: 3, images: [{ alt: 'One' }, { alt: 'Two' }, { alt: 'Three' }] }],
+  gallery: [{ eyebrow: 'Gallery', heading: 'Image grid (placeholders)', layout: { columns: 3 }, images: [{ alt: 'One' }, { alt: 'Two' }, { alt: 'Three' }] }],
   beforeAfter: [{ eyebrow: 'Before & after', heading: 'Drag the divider' }],
-  textImage: [{ heading: 'Text beside an image', body: `${LOREM}\n\nSecond paragraph.`, flip: false }],
+  textImage: [{ heading: 'Text beside an image', body: `${LOREM}\n\nSecond paragraph.`, layout: { flip: false } }],
   textQuote: [{ body: `${LOREM} ${LOREM}`, quote: 'A pulled-out line that carries the point.', attribution: 'Someone, Somewhere' }],
   callout: [
     { _label: 'narrow (reading column)', eyebrow: 'Eyebrow', quote: 'A highlighted statement at reading width, with an *emphasised* clause.' },
-    { _label: 'xnarrow · centered · dark', quote: 'Short statement on the dark band.', width: 'xnarrow', align: 'center', surface: 'dark' },
+    { _label: 'xnarrow · centered · dark', quote: 'Short statement on the dark band.', layout: { width: 'xnarrow', align: 'center' }, style: { surface: 'dark' } },
   ],
   definition: [{ eyebrow: 'The word', term: 'ex·am·ple', wordClass: 'noun · from latin exemplum', senses: [
     { text: 'a thing characteristic of its kind.' }, { text: '*of a theme:* every block, accounted for.', note: 'the lookbook, 2026.' },
   ] }],
   fragment: [
-    { _label: 'left', eyebrow: 'A story', statement: 'It starts on the left.', body: LOREM, placement: 'left' },
-    { _label: 'right', statement: 'Drifts to the right.', body: LOREM, placement: 'right' },
-    { _label: 'indent + link', statement: 'And lands *indented*.', body: LOREM, linkLabel: 'Read on', link: { url: '#' }, placement: 'indent' },
+    { _label: 'left', eyebrow: 'A story', statement: 'It starts on the left.', body: LOREM, layout: { placement: 'left' } },
+    { _label: 'right', statement: 'Drifts to the right.', body: LOREM, layout: { placement: 'right' } },
+    { _label: 'indent + link', statement: 'And lands *indented*.', body: LOREM, linkLabel: 'Read on', link: { url: '#' }, layout: { placement: 'indent' } },
   ],
   statPanel: [
     { _label: 'single big number', eyebrow: 'Eyebrow', heading: 'A statement with a *underlined* clause.', body: LOREM, badges: ['Badge one', 'Badge two'], statValue: '98%', statLabel: 'of something measured' },
@@ -680,27 +736,27 @@ const SAMPLES: Record<string, ({ _label?: string } & Record<string, unknown>)[]>
   linkChips: [{ _label: 'fixture entries', eyebrow: 'Areas', heading: 'Where we work', items: [
     { id: 'north', data: { name: 'Northtown' } }, { id: 'south', data: { name: 'Southville' } }, { id: 'east', data: { name: 'East End' } },
   ] }],
-  postList: [{ _label: 'fixture entries · featured + images', eyebrow: 'Blog', heading: 'Latest posts', featured: true, showImages: true, items: [
+  postList: [{ _label: 'fixture entries · featured + images', eyebrow: 'Blog', heading: 'Latest posts', layout: { featured: true }, media: { showImages: true }, items: [
     { id: 'first', data: { title: 'The featured lead post', date: '2026-05-01', excerpt: LOREM, showCover: true } },
     { id: 'second', data: { title: 'A text-only card', date: '2026-04-01', excerpt: 'A shorter excerpt.' } },
     { id: 'third', data: { title: 'A card with the placeholder cover', date: '2026-03-01', excerpt: LOREM, showCover: true } },
   ] }],
-  catalogList: [{ _label: 'fixture entries · filters + images', eyebrow: 'For sale', heading: 'Catalog items', filters: true, showImages: true, items: [
+  catalogList: [{ _label: 'fixture entries · filters + images', eyebrow: 'For sale', heading: 'Catalog items', layout: { filters: true }, media: { showImages: true }, items: [
     { id: 'one', data: { title: 'First item', price: '12 500 kr', status: 'available', category: 'Alpha', date: '2026-05-01' } },
     { id: 'two', data: { title: 'Second item', price: '8 900 kr', status: 'reserved', category: 'Beta', date: '2026-04-01' } },
     { id: 'three', data: { title: 'Third item', price: '4 200 kr', status: 'sold', category: 'Alpha', date: '2026-03-01' } },
   ] }],
   ctaPanel: [{ eyebrow: 'Eyebrow', heading: 'A call-to-action band', intro: LOREM, label: 'Do the thing', href: { url: '#' } }],
   ctaBox: [
-    { _label: 'classic', surface: 'dark', eyebrow: 'Next step', heading: 'A boxed call to action.', intro: 'A short supporting line under the heading.', label: 'Primary', href: { url: '#' }, label2: 'quiet second link', href2: { url: '#' } },
-    { _label: 'split · facts card', variant: 'split', eyebrow: 'Next step', heading: 'Split call to action.', intro: 'Copy on the left, a dark facts card on the right.', label: 'Primary', href: { url: '#' }, facts: [{ label: 'Analysis', value: 'Free' }, { label: 'Reply', value: '< 24 h' }] },
-    { _label: 'panel · readout', variant: 'panel', eyebrow: 'Next step', heading: 'Panel call to *action*.', intro: 'Dark panel with a mono key/value readout.', label: 'Primary', href: { url: '#' }, facts: [{ label: 'Reply', value: '< 24 h' }, { label: 'Analysis', value: 'Free' }, { label: 'Method', value: 'Softwash' }] },
+    { _label: 'classic', style: { surface: 'dark' }, eyebrow: 'Next step', heading: 'A boxed call to action.', intro: 'A short supporting line under the heading.', label: 'Primary', href: { url: '#' }, label2: 'quiet second link', href2: { url: '#' } },
+    { _label: 'split · facts card', layout: { variant: 'split' }, eyebrow: 'Next step', heading: 'Split call to action.', intro: 'Copy on the left, a dark facts card on the right.', label: 'Primary', href: { url: '#' }, facts: [{ label: 'Analysis', value: 'Free' }, { label: 'Reply', value: '< 24 h' }] },
+    { _label: 'panel · readout', layout: { variant: 'panel' }, eyebrow: 'Next step', heading: 'Panel call to *action*.', intro: 'Dark panel with a mono key/value readout.', label: 'Primary', href: { url: '#' }, facts: [{ label: 'Reply', value: '< 24 h' }, { label: 'Analysis', value: 'Free' }, { label: 'Method', value: 'Softwash' }] },
   ],
   faq: [
     { _label: 'list', eyebrow: 'FAQ', heading: 'Questions (list)', asideHeading: 'More questions?', asideBody: 'Get in touch.', asideCtaLabel: 'Contact', items: FAQ_FIX },
-    { _label: 'accordion', variant: 'accordion', heading: 'Questions (accordion)', items: FAQ_FIX },
-    { _label: 'cards', variant: 'cards', heading: 'Questions (cards)', items: FAQ_FIX },
-    { _label: 'split', variant: 'split', heading: 'Questions (split)', items: FAQ_FIX },
+    { _label: 'accordion', layout: { variant: 'accordion' }, heading: 'Questions (accordion)', items: FAQ_FIX },
+    { _label: 'cards', layout: { variant: 'cards' }, heading: 'Questions (cards)', items: FAQ_FIX },
+    { _label: 'split', layout: { variant: 'split' }, heading: 'Questions (split)', items: FAQ_FIX },
   ],
   statsBar: [{ items: [{ label: 'Projects', value: '142+' }, { label: 'Uptime', value: '100%' }, { label: 'Rating', value: '5.0' }] }],
   logoStrip: [{ lead: 'Trusted by', logos: ['Alpha', 'Beta', 'Gamma', 'Delta'] }],

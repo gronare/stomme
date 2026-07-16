@@ -90,7 +90,7 @@ const base = `http://127.0.0.1:${PORT}`;
 //    UTF-8 bytes of JSON.stringify), so the test exercises the real encoding the
 //    CMS uses. The heading carries non-ASCII to prove UTF-8 round-trips. ───────
 const MARKER = 'WORKERD-SMOKE ✓ Åäö 日本';
-const BLOCKS = [{ type: 'hero', eyebrow: 'SMOKE', heading: MARKER, intro: 'preview render probe', media: 'none' }];
+const BLOCKS = [{ type: 'hero', eyebrow: 'SMOKE', heading: MARKER, intro: 'preview render probe', media: { kind: 'none' } }];
 function b64(obj) {
   const bytes = new TextEncoder().encode(JSON.stringify(obj));
   let bin = '';

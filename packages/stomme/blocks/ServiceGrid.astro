@@ -40,8 +40,8 @@ const services = (
     {services.map((s) => (
       <a href={`${prefix}/${s.id}`} class="card service-card">
         <Cover
-          src={s.data.image}
-          alt={s.data.imageAlt ?? s.data.navLabel}
+          src={s.data.media?.image}
+          alt={s.data.media?.imageAlt ?? s.data.navLabel}
           placeholder="/images/placeholders/service.svg"
           width={800}
           height={600}

@@ -38,6 +38,15 @@ collections:
                   - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
                   - { name: heading, label: "Heading (H1)", widget: string }
                   - { name: intro, label: "Intro", widget: text, required: false }
+                  - name: ticks
+                    label: "Ticks (checkmark lines)"
+                    widget: list
+                    required: false
+                    label_singular: "Line"
+                    collapsed: true
+                    minimize_collapsed: true
+                    hint: "Short ✓ lines under the intro — key reassurances."
+                    field: { name: text, label: "Line", widget: string }
                   - { name: ctaLabel, label: "Button label", widget: string, required: false }
                   - name: ctaHref
                     label: "Button link"
@@ -57,7 +66,7 @@ collections:
                           - { label: "About (/about)", value: "/about" }
                           - { label: "Contact (/contact)", value: "/contact" }
                       - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
-                  - { name: cta2Label, label: "Second button label", widget: string, required: false, hint: "Shown as a quiet text link beside the button." }
+                  - { name: cta2Label, label: "Second button label", widget: string, required: false, hint: "A quiet text link beside the button. Leave empty to hide." }
                   - name: cta2Href
                     label: "Second button link"
                     widget: object
@@ -77,98 +86,118 @@ collections:
                           - { label: "Contact (/contact)", value: "/contact" }
                       - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
                   - name: media
-                    label: "Right-side media"
-                    widget: select
-                    required: false
-                    default: "none"
-                    hint: "What shows beside the heading. Default: none."
-                    options:
-                      - { label: "None (text only)", value: "none" }
-                      - { label: "Image", value: "image" }
-                      - { label: "Highlights (icon + title + line)", value: "highlights" }
-                      - { label: "Motif (animated, no image)", value: "motif" }
-                  - { name: image, label: "Image", widget: image, required: false, hint: "Used when Right-side media = Image." }
-                  - { name: imageAlt, label: "Image alt text", widget: string, required: false }
-                  - name: highlights
-                    label: "Highlights"
-                    widget: list
-                    required: false
-                    label_singular: "Key point"
+                    label: "Media"
+                    widget: object
                     collapsed: true
-                    minimize_collapsed: true
-                    hint: "A few key points beside the heading. Used when Right-side media = Highlights."
-                    summary: "{{fields.title}}"
+                    summary: "{{fields.kind}}"
+                    hint: "What shows beside the text. Default: none."
                     fields:
-                      - name: icon
-                        label: "Icon"
+                      - name: kind
+                        label: "Show"
                         widget: select
                         required: false
-                        hint: "Optional icon."
+                        default: "none"
+                        hint: "What shows beside the heading: none, image, highlights or motif."
                         options:
-                          - { label: "sun", value: "sun" }
-                          - { label: "panel", value: "panel" }
-                          - { label: "battery", value: "battery" }
-                          - { label: "home", value: "home" }
-                          - { label: "roof", value: "roof" }
-                          - { label: "leaf", value: "leaf" }
-                          - { label: "bolt", value: "bolt" }
-                          - { label: "shield", value: "shield" }
-                          - { label: "wrench", value: "wrench" }
-                          - { label: "headset", value: "headset" }
-                          - { label: "link", value: "link" }
-                          - { label: "phone", value: "phone" }
-                          - { label: "mail", value: "mail" }
-                      - { name: title, label: "Title", widget: string }
-                      - { name: body, label: "Text", widget: string, required: false }
-                  - name: ticks
-                    label: "Ticks (checkmark lines)"
-                    widget: list
-                    required: false
-                    label_singular: "Line"
+                          - { label: "None (text only)", value: "none" }
+                          - { label: "Image", value: "image" }
+                          - { label: "Highlights (icon + title + line)", value: "highlights" }
+                          - { label: "Motif (animated, no image)", value: "motif" }
+                      - { name: image, label: "Image", widget: image, required: false, hint: "Used when Show = Image." }
+                      - { name: imageAlt, label: "Image alt text", widget: string, required: false, hint: "Describe the image for screen readers and search engines." }
+                      - name: highlights
+                        label: "Highlights"
+                        widget: list
+                        required: false
+                        label_singular: "Key point"
+                        collapsed: true
+                        minimize_collapsed: true
+                        hint: "Panel with icon + title + line. Used when Show = Highlights."
+                        summary: "{{fields.title}}"
+                        fields:
+                          - name: icon
+                            label: "Icon"
+                            widget: select
+                            required: false
+                            hint: "Optional icon."
+                            options:
+                              - { label: "sun", value: "sun" }
+                              - { label: "panel", value: "panel" }
+                              - { label: "battery", value: "battery" }
+                              - { label: "home", value: "home" }
+                              - { label: "roof", value: "roof" }
+                              - { label: "leaf", value: "leaf" }
+                              - { label: "bolt", value: "bolt" }
+                              - { label: "shield", value: "shield" }
+                              - { label: "wrench", value: "wrench" }
+                              - { label: "headset", value: "headset" }
+                              - { label: "link", value: "link" }
+                              - { label: "phone", value: "phone" }
+                              - { label: "mail", value: "mail" }
+                          - { name: title, label: "Title", widget: string }
+                          - { name: body, label: "Text", widget: string, required: false }
+                  - name: layout
+                    label: "Layout"
+                    widget: object
                     collapsed: true
-                    minimize_collapsed: true
-                    hint: "Short ✓ lines under the intro — key reassurances."
-                    field: { name: text, label: "Line", widget: string }
-                  - name: height
-                    label: "Height"
-                    widget: select
-                    required: false
-                    default: "normal"
-                    hint: "Tall fills the viewport (good with a Gradient or Dark background)."
-                    options:
-                      - { label: "Normal", value: "normal" }
-                      - { label: "Tall", value: "tall" }
-                  - name: align
-                    label: "Text position"
-                    widget: select
-                    required: false
-                    default: "center"
-                    hint: "Where the text sits in a Tall hero."
-                    options:
-                      - { label: "Top", value: "top" }
-                      - { label: "Center", value: "center" }
-                      - { label: "Bottom", value: "bottom" }
-                  - name: width
-                    label: "Width"
-                    widget: select
-                    required: false
-                    default: "full"
-                    hint: "Narrow centers the hero in a reading column (best without side media)."
-                    options:
-                      - { label: "Full width", value: "full" }
-                      - { label: "Narrow (reading column)", value: "narrow" }
-                  - name: surface
-                    label: "Background"
-                    widget: select
-                    required: false
-                    default: "standard"
-                    hint: "The surface behind the section — for rhythm between blocks."
-                    options:
-                      - { label: "Standard (white)", value: "standard" }
-                      - { label: "Tinted", value: "tint" }
-                      - { label: "Accent band", value: "band" }
-                      - { label: "Dark", value: "dark" }
-                      - { label: "Gradient", value: "gradient" }
+                    hint: "Size and placement — rarely needs changing."
+                    fields:
+                      - name: height
+                        label: "Height"
+                        widget: select
+                        required: false
+                        default: "normal"
+                        hint: "Tall fills the screen — best with a Gradient or Dark background."
+                        options:
+                          - { label: "Normal", value: "normal" }
+                          - { label: "Tall", value: "tall" }
+                      - name: align
+                        label: "Text position"
+                        widget: select
+                        required: false
+                        default: "center"
+                        hint: "Where the text sits when the hero is tall."
+                        options:
+                          - { label: "Top", value: "top" }
+                          - { label: "Center", value: "center" }
+                          - { label: "Bottom", value: "bottom" }
+                      - name: width
+                        label: "Width"
+                        widget: select
+                        required: false
+                        default: "full"
+                        hint: "Narrow centers the hero in a reading column — best without side media."
+                        options:
+                          - { label: "Full width", value: "full" }
+                          - { label: "Narrow (reading column)", value: "narrow" }
+                  - name: style
+                    label: "Appearance"
+                    widget: object
+                    collapsed: true
+                    hint: "Background and accent colour — set once when the page is designed."
+                    fields:
+                      - name: surface
+                        label: "Background"
+                        widget: select
+                        required: false
+                        default: "standard"
+                        hint: "The surface behind the section — for rhythm between blocks."
+                        options:
+                          - { label: "Standard (white)", value: "standard" }
+                          - { label: "Tinted", value: "tint" }
+                          - { label: "Accent band", value: "band" }
+                          - { label: "Dark", value: "dark" }
+                          - { label: "Gradient", value: "gradient" }
+                      - name: accent
+                        label: "Accent"
+                        widget: select
+                        required: false
+                        default: "brand"
+                        hint: "This block's accent colour (rule, icon or number) — not the eyebrow."
+                        options:
+                          - { label: "Brand", value: "brand" }
+                          - { label: "Secondary", value: "secondary" }
+                          - { label: "Highlight", value: "highlight" }
               - name: cover
                 label: "Cover (full-bleed)"
                 widget: object
@@ -215,70 +244,65 @@ collections:
                           - { label: "Contact (/contact)", value: "/contact" }
                       - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
                   - name: media
-                    label: "Background"
-                    widget: select
-                    required: false
-                    default: "image"
-                    hint: "A photo, a looping video, a generated gradient, or an animated block pattern — both gradient and animated follow your brand colour, no asset needed."
-                    options:
-                      - { label: "Image", value: "image" }
-                      - { label: "Video (looping)", value: "video" }
-                      - { label: "Gradient (no image)", value: "gradient" }
-                      - { label: "Animated (no image)", value: "animated" }
-                  - { name: image, label: "Background image / video poster", widget: image, required: false }
-                  - { name: imageAlt, label: "Image alt text", widget: string, required: false }
-                  - { name: video, label: "Video file", widget: file, required: false, hint: "Used when Background = Video. Muted, looping MP4/WebM; the image shows until it plays." }
-                  - { name: videoUrl, label: "…or video URL", widget: string, required: false, hint: "External MP4/WebM URL. Used instead of an uploaded file if filled." }
-                  - name: overlay
-                    label: "Darken (overlay)"
-                    widget: select
-                    required: false
-                    default: "medium"
-                    hint: "How much to darken the media so the text stays readable."
-                    options:
-                      - { label: "Light", value: "light" }
-                      - { label: "Medium", value: "medium" }
-                      - { label: "Strong", value: "strong" }
-                  - name: align
-                    label: "Text position"
-                    widget: select
-                    required: false
-                    default: "start"
-                    hint: "Where the text sits on the cover."
-                    options:
-                      - { label: "Bottom left", value: "start" }
-                      - { label: "Centered", value: "center" }
-                  - name: height
-                    label: "Height"
-                    widget: select
-                    required: false
-                    default: "tall"
-                    hint: "Tall fills most of the screen; Medium is a shorter band."
-                    options:
-                      - { label: "Tall", value: "tall" }
-                      - { label: "Medium", value: "medium" }
+                    label: "Media"
+                    widget: object
+                    collapsed: true
+                    summary: "{{fields.kind}}"
+                    hint: "The full-bleed background — photo, looping video, gradient or animated pattern."
+                    fields:
+                      - name: kind
+                        label: "Background"
+                        widget: select
+                        required: false
+                        default: "image"
+                        hint: "A photo, a looping video, a generated gradient, or an animated block pattern — both gradient and animated follow your brand colour, no asset needed."
+                        options:
+                          - { label: "Image", value: "image" }
+                          - { label: "Video (looping)", value: "video" }
+                          - { label: "Gradient (no image)", value: "gradient" }
+                          - { label: "Animated (no image)", value: "animated" }
+                      - { name: image, label: "Background image / video poster", widget: image, required: false }
+                      - { name: imageAlt, label: "Image alt text", widget: string, required: false }
+                      - { name: video, label: "Video file", widget: file, required: false, hint: "Used when Background = Video. Muted, looping MP4/WebM; the image shows until it plays." }
+                      - { name: videoUrl, label: "…or video URL", widget: string, required: false, hint: "External MP4/WebM URL. Used instead of an uploaded file if filled." }
+                      - name: overlay
+                        label: "Darken (overlay)"
+                        widget: select
+                        required: false
+                        default: "medium"
+                        hint: "How much to darken the media so the text stays readable."
+                        options:
+                          - { label: "Light", value: "light" }
+                          - { label: "Medium", value: "medium" }
+                          - { label: "Strong", value: "strong" }
+                  - name: layout
+                    label: "Layout"
+                    widget: object
+                    collapsed: true
+                    hint: "Size and placement — rarely needs changing."
+                    fields:
+                      - name: align
+                        label: "Text position"
+                        widget: select
+                        required: false
+                        default: "start"
+                        hint: "Where the text sits on the cover."
+                        options:
+                          - { label: "Bottom left", value: "start" }
+                          - { label: "Centered", value: "center" }
+                      - name: height
+                        label: "Height"
+                        widget: select
+                        required: false
+                        default: "tall"
+                        hint: "Tall fills most of the screen; Medium is a shorter band."
+                        options:
+                          - { label: "Tall", value: "tall" }
+                          - { label: "Medium", value: "medium" }
               - name: pageHeader
                 label: "Page header"
                 widget: object
                 fields:
-                  - name: variant
-                    label: "Style"
-                    widget: select
-                    required: false
-                    default: "light"
-                    hint: "Band puts the title on a dark full-width band."
-                    options:
-                      - { label: "Light", value: "light" }
-                      - { label: "Band", value: "dark" }
-                  - name: width
-                    label: "Width"
-                    widget: select
-                    required: false
-                    default: "narrow"
-                    hint: "Narrow keeps text legible; full uses the whole section width."
-                    options:
-                      - { label: "Narrow (reading column)", value: "narrow" }
-                      - { label: "Full width", value: "full" }
                   - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
                   - { name: heading, label: "Heading (H1)", widget: string }
                   - { name: intro, label: "Intro", widget: text, required: false }
@@ -301,18 +325,48 @@ collections:
                           - { label: "About (/about)", value: "/about" }
                           - { label: "Contact (/contact)", value: "/contact" }
                       - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
-                  - name: surface
-                    label: "Background"
-                    widget: select
-                    required: false
-                    default: "standard"
-                    hint: "The surface behind the section — for rhythm between blocks."
-                    options:
-                      - { label: "Standard (white)", value: "standard" }
-                      - { label: "Tinted", value: "tint" }
-                      - { label: "Accent band", value: "band" }
-                      - { label: "Dark", value: "dark" }
-                      - { label: "Gradient", value: "gradient" }
+                  - name: layout
+                    label: "Layout"
+                    widget: object
+                    collapsed: true
+                    hint: "Size and placement — rarely needs changing."
+                    fields:
+                      - name: variant
+                        label: "Style"
+                        widget: select
+                        required: false
+                        default: "light"
+                        hint: "Band puts the title on a dark full-width band."
+                        options:
+                          - { label: "Light", value: "light" }
+                          - { label: "Band", value: "dark" }
+                      - name: width
+                        label: "Width"
+                        widget: select
+                        required: false
+                        default: "narrow"
+                        hint: "Narrow keeps text legible; full uses the whole section width."
+                        options:
+                          - { label: "Narrow (reading column)", value: "narrow" }
+                          - { label: "Full width", value: "full" }
+                  - name: style
+                    label: "Appearance"
+                    widget: object
+                    collapsed: true
+                    hint: "Background and accent colour — set once when the page is designed."
+                    fields:
+                      - name: surface
+                        label: "Background"
+                        widget: select
+                        required: false
+                        default: "standard"
+                        hint: "The surface behind the section — for rhythm between blocks."
+                        options:
+                          - { label: "Standard (white)", value: "standard" }
+                          - { label: "Tinted", value: "tint" }
+                          - { label: "Accent band", value: "band" }
+                          - { label: "Dark", value: "dark" }
+                          - { label: "Gradient", value: "gradient" }
               - name: prose
                 label: "Rich text"
                 widget: object
@@ -322,48 +376,78 @@ collections:
                   - { name: body, label: "Body", widget: markdown, required: false }
                   - { name: statValue, label: "Pull-stat number", widget: string, required: false, hint: "One headline figure shown big under the text (e.g. +50 %). Use a Stats block for a row of many." }
                   - { name: statLabel, label: "Pull-stat label", widget: string, required: false, hint: "The short line beside the number." }
-                  - name: width
-                    label: "Width"
-                    widget: select
-                    required: false
-                    default: "narrow"
-                    hint: "Narrow keeps text legible; full uses the whole section width."
-                    options:
-                      - { label: "Narrow (reading column)", value: "narrow" }
-                      - { label: "Full width", value: "full" }
-                  - name: surface
-                    label: "Background"
-                    widget: select
-                    required: false
-                    default: "standard"
-                    hint: "The surface behind the section — for rhythm between blocks."
-                    options:
-                      - { label: "Standard (white)", value: "standard" }
-                      - { label: "Tinted", value: "tint" }
-                      - { label: "Accent band", value: "band" }
-                      - { label: "Dark", value: "dark" }
-                      - { label: "Gradient", value: "gradient" }
+                  - name: layout
+                    label: "Layout"
+                    widget: object
+                    collapsed: true
+                    hint: "Size and placement — rarely needs changing."
+                    fields:
+                      - name: width
+                        label: "Width"
+                        widget: select
+                        required: false
+                        default: "narrow"
+                        hint: "Narrow keeps text legible; full uses the whole section width."
+                        options:
+                          - { label: "Narrow (reading column)", value: "narrow" }
+                          - { label: "Full width", value: "full" }
+                  - name: style
+                    label: "Appearance"
+                    widget: object
+                    collapsed: true
+                    hint: "Background and accent colour — set once when the page is designed."
+                    fields:
+                      - name: surface
+                        label: "Background"
+                        widget: select
+                        required: false
+                        default: "standard"
+                        hint: "The surface behind the section — for rhythm between blocks."
+                        options:
+                          - { label: "Standard (white)", value: "standard" }
+                          - { label: "Tinted", value: "tint" }
+                          - { label: "Accent band", value: "band" }
+                          - { label: "Dark", value: "dark" }
+                          - { label: "Gradient", value: "gradient" }
               - name: textImage
                 label: "Text + image"
                 widget: object
                 fields:
                   - { name: heading, label: "Heading", widget: string, required: false }
                   - { name: body, label: "Text", widget: markdown }
-                  - { name: image, label: "Image", widget: image, required: false }
-                  - { name: imageAlt, label: "Alt text", widget: string, required: false }
-                  - { name: flip, label: "Image on left", widget: boolean, required: false, default: false }
-                  - name: surface
-                    label: "Background"
-                    widget: select
-                    required: false
-                    default: "standard"
-                    hint: "The surface behind the section — for rhythm between blocks."
-                    options:
-                      - { label: "Standard (white)", value: "standard" }
-                      - { label: "Tinted", value: "tint" }
-                      - { label: "Accent band", value: "band" }
-                      - { label: "Dark", value: "dark" }
-                      - { label: "Gradient", value: "gradient" }
+                  - name: media
+                    label: "Media"
+                    widget: object
+                    collapsed: true
+                    hint: "The picture beside the text."
+                    fields:
+                      - { name: image, label: "Image", widget: image, required: false }
+                      - { name: imageAlt, label: "Alt text", widget: string, required: false }
+                  - name: layout
+                    label: "Layout"
+                    widget: object
+                    collapsed: true
+                    hint: "Size and placement — rarely needs changing."
+                    fields:
+                      - { name: flip, label: "Image on left", widget: boolean, required: false, default: false }
+                  - name: style
+                    label: "Appearance"
+                    widget: object
+                    collapsed: true
+                    hint: "Background and accent colour — set once when the page is designed."
+                    fields:
+                      - name: surface
+                        label: "Background"
+                        widget: select
+                        required: false
+                        default: "standard"
+                        hint: "The surface behind the section — for rhythm between blocks."
+                        options:
+                          - { label: "Standard (white)", value: "standard" }
+                          - { label: "Tinted", value: "tint" }
+                          - { label: "Accent band", value: "band" }
+                          - { label: "Dark", value: "dark" }
+                          - { label: "Gradient", value: "gradient" }
               - name: textQuote
                 label: "Text + quote"
                 widget: object
@@ -371,29 +455,41 @@ collections:
                   - { name: body, label: "Body text", widget: markdown }
                   - { name: quote, label: "Quote", widget: text }
                   - { name: attribution, label: "Source / name", widget: string, required: false }
-                  - name: accent
-                    label: "Accent"
-                    widget: select
-                    required: false
-                    default: "brand"
-                    hint: "This block's accent colour (rule, icon or number) — not the eyebrow."
-                    options:
-                      - { label: "Brand", value: "brand" }
-                      - { label: "Secondary", value: "secondary" }
-                      - { label: "Highlight", value: "highlight" }
-                  - { name: flip, label: "Quote on left", widget: boolean, required: false, default: false }
-                  - name: surface
-                    label: "Background"
-                    widget: select
-                    required: false
-                    default: "standard"
-                    hint: "The surface behind the section — for rhythm between blocks."
-                    options:
-                      - { label: "Standard (white)", value: "standard" }
-                      - { label: "Tinted", value: "tint" }
-                      - { label: "Accent band", value: "band" }
-                      - { label: "Dark", value: "dark" }
-                      - { label: "Gradient", value: "gradient" }
+                  - name: layout
+                    label: "Layout"
+                    widget: object
+                    collapsed: true
+                    hint: "Size and placement — rarely needs changing."
+                    fields:
+                      - { name: flip, label: "Quote on left", widget: boolean, required: false, default: false }
+                  - name: style
+                    label: "Appearance"
+                    widget: object
+                    collapsed: true
+                    hint: "Background and accent colour — set once when the page is designed."
+                    fields:
+                      - name: surface
+                        label: "Background"
+                        widget: select
+                        required: false
+                        default: "standard"
+                        hint: "The surface behind the section — for rhythm between blocks."
+                        options:
+                          - { label: "Standard (white)", value: "standard" }
+                          - { label: "Tinted", value: "tint" }
+                          - { label: "Accent band", value: "band" }
+                          - { label: "Dark", value: "dark" }
+                          - { label: "Gradient", value: "gradient" }
+                      - name: accent
+                        label: "Accent"
+                        widget: select
+                        required: false
+                        default: "brand"
+                        hint: "This block's accent colour (rule, icon or number) — not the eyebrow."
+                        options:
+                          - { label: "Brand", value: "brand" }
+                          - { label: "Secondary", value: "secondary" }
+                          - { label: "Highlight", value: "highlight" }
               - name: fragment
                 label: "Story fragment"
                 widget: object
@@ -420,28 +516,40 @@ collections:
                           - { label: "About (/about)", value: "/about" }
                           - { label: "Contact (/contact)", value: "/contact" }
                       - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
-                  - name: placement
-                    label: "Placement"
-                    widget: select
-                    required: false
-                    default: "left"
-                    hint: "Where the fragment sits — alternate placements to break the grid."
-                    options:
-                      - { label: "Left", value: "left" }
-                      - { label: "Right", value: "right" }
-                      - { label: "Indented", value: "indent" }
-                  - name: surface
-                    label: "Background"
-                    widget: select
-                    required: false
-                    default: "standard"
-                    hint: "The surface behind the section — for rhythm between blocks."
-                    options:
-                      - { label: "Standard (white)", value: "standard" }
-                      - { label: "Tinted", value: "tint" }
-                      - { label: "Accent band", value: "band" }
-                      - { label: "Dark", value: "dark" }
-                      - { label: "Gradient", value: "gradient" }
+                  - name: layout
+                    label: "Layout"
+                    widget: object
+                    collapsed: true
+                    hint: "Size and placement — rarely needs changing."
+                    fields:
+                      - name: placement
+                        label: "Placement"
+                        widget: select
+                        required: false
+                        default: "left"
+                        hint: "Where the fragment sits — alternate placements to break the grid."
+                        options:
+                          - { label: "Left", value: "left" }
+                          - { label: "Right", value: "right" }
+                          - { label: "Indented", value: "indent" }
+                  - name: style
+                    label: "Appearance"
+                    widget: object
+                    collapsed: true
+                    hint: "Background and accent colour — set once when the page is designed."
+                    fields:
+                      - name: surface
+                        label: "Background"
+                        widget: select
+                        required: false
+                        default: "standard"
+                        hint: "The surface behind the section — for rhythm between blocks."
+                        options:
+                          - { label: "Standard (white)", value: "standard" }
+                          - { label: "Tinted", value: "tint" }
+                          - { label: "Accent band", value: "band" }
+                          - { label: "Dark", value: "dark" }
+                          - { label: "Gradient", value: "gradient" }
               - name: featureGrid
                 label: "Feature cards"
                 widget: object
@@ -499,29 +607,41 @@ collections:
                               - { label: "Contact (/contact)", value: "/contact" }
                           - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
                       - { name: linkLabel, label: "Link label", widget: string, required: false, hint: "E.g. \"Read more\". Shown only if the card has a link." }
-                  - { name: numbered, label: "Numbered (01/02/03 instead of icons)", widget: boolean, required: false, default: false }
-                  - name: accent
-                    label: "Accent"
-                    widget: select
-                    required: false
-                    default: "brand"
-                    hint: "This block's accent colour (rule, icon or number) — not the eyebrow."
-                    options:
-                      - { label: "Brand", value: "brand" }
-                      - { label: "Secondary", value: "secondary" }
-                      - { label: "Highlight", value: "highlight" }
-                  - name: surface
-                    label: "Background"
-                    widget: select
-                    required: false
-                    default: "standard"
-                    hint: "The surface behind the section — for rhythm between blocks."
-                    options:
-                      - { label: "Standard (white)", value: "standard" }
-                      - { label: "Tinted", value: "tint" }
-                      - { label: "Accent band", value: "band" }
-                      - { label: "Dark", value: "dark" }
-                      - { label: "Gradient", value: "gradient" }
+                  - name: layout
+                    label: "Layout"
+                    widget: object
+                    collapsed: true
+                    hint: "Size and placement — rarely needs changing."
+                    fields:
+                      - { name: numbered, label: "Numbered (01/02/03 instead of icons)", widget: boolean, required: false, default: false }
+                  - name: style
+                    label: "Appearance"
+                    widget: object
+                    collapsed: true
+                    hint: "Background and accent colour — set once when the page is designed."
+                    fields:
+                      - name: surface
+                        label: "Background"
+                        widget: select
+                        required: false
+                        default: "standard"
+                        hint: "The surface behind the section — for rhythm between blocks."
+                        options:
+                          - { label: "Standard (white)", value: "standard" }
+                          - { label: "Tinted", value: "tint" }
+                          - { label: "Accent band", value: "band" }
+                          - { label: "Dark", value: "dark" }
+                          - { label: "Gradient", value: "gradient" }
+                      - name: accent
+                        label: "Accent"
+                        widget: select
+                        required: false
+                        default: "brand"
+                        hint: "This block's accent colour (rule, icon or number) — not the eyebrow."
+                        options:
+                          - { label: "Brand", value: "brand" }
+                          - { label: "Secondary", value: "secondary" }
+                          - { label: "Highlight", value: "highlight" }
               - name: pillars
                 label: "Principles / values"
                 widget: object
@@ -540,18 +660,24 @@ collections:
                     fields:
                       - { name: title, label: "Title", widget: string }
                       - { name: body, label: "Text", widget: text }
-                  - name: surface
-                    label: "Background"
-                    widget: select
-                    required: false
-                    default: "standard"
-                    hint: "The surface behind the section — for rhythm between blocks."
-                    options:
-                      - { label: "Standard (white)", value: "standard" }
-                      - { label: "Tinted", value: "tint" }
-                      - { label: "Accent band", value: "band" }
-                      - { label: "Dark", value: "dark" }
-                      - { label: "Gradient", value: "gradient" }
+                  - name: style
+                    label: "Appearance"
+                    widget: object
+                    collapsed: true
+                    hint: "Background and accent colour — set once when the page is designed."
+                    fields:
+                      - name: surface
+                        label: "Background"
+                        widget: select
+                        required: false
+                        default: "standard"
+                        hint: "The surface behind the section — for rhythm between blocks."
+                        options:
+                          - { label: "Standard (white)", value: "standard" }
+                          - { label: "Tinted", value: "tint" }
+                          - { label: "Accent band", value: "band" }
+                          - { label: "Dark", value: "dark" }
+                          - { label: "Gradient", value: "gradient" }
               - name: plans
                 label: "Pricing / plans"
                 widget: object
@@ -605,18 +731,24 @@ collections:
                               - { label: "Contact (/contact)", value: "/contact" }
                           - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
                   - { name: footnote, label: "Footnote", widget: text, required: false, hint: "Small note under the cards — e.g. what every plan includes." }
-                  - name: surface
-                    label: "Background"
-                    widget: select
-                    required: false
-                    default: "standard"
-                    hint: "The surface behind the section — for rhythm between blocks."
-                    options:
-                      - { label: "Standard (white)", value: "standard" }
-                      - { label: "Tinted", value: "tint" }
-                      - { label: "Accent band", value: "band" }
-                      - { label: "Dark", value: "dark" }
-                      - { label: "Gradient", value: "gradient" }
+                  - name: style
+                    label: "Appearance"
+                    widget: object
+                    collapsed: true
+                    hint: "Background and accent colour — set once when the page is designed."
+                    fields:
+                      - name: surface
+                        label: "Background"
+                        widget: select
+                        required: false
+                        default: "standard"
+                        hint: "The surface behind the section — for rhythm between blocks."
+                        options:
+                          - { label: "Standard (white)", value: "standard" }
+                          - { label: "Tinted", value: "tint" }
+                          - { label: "Accent band", value: "band" }
+                          - { label: "Dark", value: "dark" }
+                          - { label: "Gradient", value: "gradient" }
               - name: specialistGrid
                 label: "Specialist grid"
                 widget: object
@@ -635,18 +767,24 @@ collections:
                     fields:
                       - { name: title, label: "Title", widget: string }
                       - { name: body, label: "Text", widget: text }
-                  - name: surface
-                    label: "Background"
-                    widget: select
-                    required: false
-                    default: "standard"
-                    hint: "The surface behind the section — for rhythm between blocks."
-                    options:
-                      - { label: "Standard (white)", value: "standard" }
-                      - { label: "Tinted", value: "tint" }
-                      - { label: "Accent band", value: "band" }
-                      - { label: "Dark", value: "dark" }
-                      - { label: "Gradient", value: "gradient" }
+                  - name: style
+                    label: "Appearance"
+                    widget: object
+                    collapsed: true
+                    hint: "Background and accent colour — set once when the page is designed."
+                    fields:
+                      - name: surface
+                        label: "Background"
+                        widget: select
+                        required: false
+                        default: "standard"
+                        hint: "The surface behind the section — for rhythm between blocks."
+                        options:
+                          - { label: "Standard (white)", value: "standard" }
+                          - { label: "Tinted", value: "tint" }
+                          - { label: "Accent band", value: "band" }
+                          - { label: "Dark", value: "dark" }
+                          - { label: "Gradient", value: "gradient" }
               - name: steps
                 label: "Process / steps"
                 widget: object
@@ -667,27 +805,39 @@ collections:
                       - { name: kicker, label: "Tag after the number", widget: string, required: false, hint: "Short word shown with the number, e.g. \"talk\"." }
                       - { name: body, label: "Text", widget: text }
                   - { name: anchor, label: "Anchor id", widget: string, required: false, hint: "Lets links jump here — anchor \"process\" makes \"#process\" scroll to this section." }
-                  - name: width
-                    label: "Width"
-                    widget: select
-                    required: false
-                    default: "narrow"
-                    hint: "Narrow keeps text legible; full uses the whole section width."
-                    options:
-                      - { label: "Narrow (reading column)", value: "narrow" }
-                      - { label: "Full width", value: "full" }
-                  - name: surface
-                    label: "Background"
-                    widget: select
-                    required: false
-                    default: "standard"
-                    hint: "The surface behind the section — for rhythm between blocks."
-                    options:
-                      - { label: "Standard (white)", value: "standard" }
-                      - { label: "Tinted", value: "tint" }
-                      - { label: "Accent band", value: "band" }
-                      - { label: "Dark", value: "dark" }
-                      - { label: "Gradient", value: "gradient" }
+                  - name: layout
+                    label: "Layout"
+                    widget: object
+                    collapsed: true
+                    hint: "Size and placement — rarely needs changing."
+                    fields:
+                      - name: width
+                        label: "Width"
+                        widget: select
+                        required: false
+                        default: "narrow"
+                        hint: "Narrow keeps text legible; full uses the whole section width."
+                        options:
+                          - { label: "Narrow (reading column)", value: "narrow" }
+                          - { label: "Full width", value: "full" }
+                  - name: style
+                    label: "Appearance"
+                    widget: object
+                    collapsed: true
+                    hint: "Background and accent colour — set once when the page is designed."
+                    fields:
+                      - name: surface
+                        label: "Background"
+                        widget: select
+                        required: false
+                        default: "standard"
+                        hint: "The surface behind the section — for rhythm between blocks."
+                        options:
+                          - { label: "Standard (white)", value: "standard" }
+                          - { label: "Tinted", value: "tint" }
+                          - { label: "Accent band", value: "band" }
+                          - { label: "Dark", value: "dark" }
+                          - { label: "Gradient", value: "gradient" }
               - name: checklist
                 label: "Checklist"
                 widget: object
@@ -706,19 +856,31 @@ collections:
                     fields:
                       - { name: text, label: "Text", widget: string }
                       - { name: note, label: "Sub-line (optional)", widget: text, required: false }
-                  - { name: columns, label: "Columns", widget: number, required: false, default: 2, hint: "1 or 2." }
-                  - name: surface
-                    label: "Background"
-                    widget: select
-                    required: false
-                    default: "standard"
-                    hint: "The surface behind the section — for rhythm between blocks."
-                    options:
-                      - { label: "Standard (white)", value: "standard" }
-                      - { label: "Tinted", value: "tint" }
-                      - { label: "Accent band", value: "band" }
-                      - { label: "Dark", value: "dark" }
-                      - { label: "Gradient", value: "gradient" }
+                  - name: layout
+                    label: "Layout"
+                    widget: object
+                    collapsed: true
+                    hint: "Size and placement — rarely needs changing."
+                    fields:
+                      - { name: columns, label: "Columns", widget: number, required: false, default: 2, hint: "1 or 2." }
+                  - name: style
+                    label: "Appearance"
+                    widget: object
+                    collapsed: true
+                    hint: "Background and accent colour — set once when the page is designed."
+                    fields:
+                      - name: surface
+                        label: "Background"
+                        widget: select
+                        required: false
+                        default: "standard"
+                        hint: "The surface behind the section — for rhythm between blocks."
+                        options:
+                          - { label: "Standard (white)", value: "standard" }
+                          - { label: "Tinted", value: "tint" }
+                          - { label: "Accent band", value: "band" }
+                          - { label: "Dark", value: "dark" }
+                          - { label: "Gradient", value: "gradient" }
               - name: gallery
                 label: "Gallery"
                 widget: object
@@ -738,19 +900,31 @@ collections:
                       - { name: image, label: "Image", widget: image, required: false }
                       - { name: alt, label: "Alt text", widget: string, required: false }
                       - { name: caption, label: "Caption", widget: string, required: false }
-                  - { name: columns, label: "Columns", widget: number, required: false, default: 3, hint: "2 or 3." }
-                  - name: surface
-                    label: "Background"
-                    widget: select
-                    required: false
-                    default: "standard"
-                    hint: "The surface behind the section — for rhythm between blocks."
-                    options:
-                      - { label: "Standard (white)", value: "standard" }
-                      - { label: "Tinted", value: "tint" }
-                      - { label: "Accent band", value: "band" }
-                      - { label: "Dark", value: "dark" }
-                      - { label: "Gradient", value: "gradient" }
+                  - name: layout
+                    label: "Layout"
+                    widget: object
+                    collapsed: true
+                    hint: "Size and placement — rarely needs changing."
+                    fields:
+                      - { name: columns, label: "Columns", widget: number, required: false, default: 3, hint: "2 or 3." }
+                  - name: style
+                    label: "Appearance"
+                    widget: object
+                    collapsed: true
+                    hint: "Background and accent colour — set once when the page is designed."
+                    fields:
+                      - name: surface
+                        label: "Background"
+                        widget: select
+                        required: false
+                        default: "standard"
+                        hint: "The surface behind the section — for rhythm between blocks."
+                        options:
+                          - { label: "Standard (white)", value: "standard" }
+                          - { label: "Tinted", value: "tint" }
+                          - { label: "Accent band", value: "band" }
+                          - { label: "Dark", value: "dark" }
+                          - { label: "Gradient", value: "gradient" }
               - name: beforeAfter
                 label: "Before / after"
                 widget: object
@@ -758,20 +932,32 @@ collections:
                   - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
                   - { name: heading, label: "Heading", widget: string, required: false }
                   - { name: intro, label: "Intro", widget: text, required: false }
-                  - { name: before, label: "Before image", widget: image, required: false }
-                  - { name: after, label: "After image", widget: image, required: false }
-                  - name: surface
-                    label: "Background"
-                    widget: select
-                    required: false
-                    default: "standard"
-                    hint: "The surface behind the section — for rhythm between blocks."
-                    options:
-                      - { label: "Standard (white)", value: "standard" }
-                      - { label: "Tinted", value: "tint" }
-                      - { label: "Accent band", value: "band" }
-                      - { label: "Dark", value: "dark" }
-                      - { label: "Gradient", value: "gradient" }
+                  - name: media
+                    label: "Media"
+                    widget: object
+                    collapsed: true
+                    hint: "The two photos being compared."
+                    fields:
+                      - { name: before, label: "Before image", widget: image, required: false }
+                      - { name: after, label: "After image", widget: image, required: false }
+                  - name: style
+                    label: "Appearance"
+                    widget: object
+                    collapsed: true
+                    hint: "Background and accent colour — set once when the page is designed."
+                    fields:
+                      - name: surface
+                        label: "Background"
+                        widget: select
+                        required: false
+                        default: "standard"
+                        hint: "The surface behind the section — for rhythm between blocks."
+                        options:
+                          - { label: "Standard (white)", value: "standard" }
+                          - { label: "Tinted", value: "tint" }
+                          - { label: "Accent band", value: "band" }
+                          - { label: "Dark", value: "dark" }
+                          - { label: "Gradient", value: "gradient" }
               - name: definition
                 label: "Dictionary entry"
                 widget: object
@@ -790,86 +976,110 @@ collections:
                     fields:
                       - { name: text, label: "Sense", widget: string, hint: "Wrap words in *asterisks* to underline them." }
                       - { name: note, label: "Note (muted)", widget: string, required: false, hint: "A quiet addendum after the sense, e.g. an example or year." }
-                  - name: width
-                    label: "Width"
-                    widget: select
-                    required: false
-                    default: "xnarrow"
-                    hint: "How wide the entry column is."
-                    options:
-                      - { label: "Extra narrow", value: "xnarrow" }
-                      - { label: "Narrow (reading column)", value: "narrow" }
-                      - { label: "Full width", value: "full" }
-                  - name: align
-                    label: "Alignment"
-                    widget: select
-                    required: false
-                    default: "left"
-                    hint: "Where the entry sits in the section."
-                    options:
-                      - { label: "Left", value: "left" }
-                      - { label: "Centered", value: "center" }
-                      - { label: "Right", value: "right" }
-                  - name: surface
-                    label: "Background"
-                    widget: select
-                    required: false
-                    default: "standard"
-                    hint: "The surface behind the section — for rhythm between blocks."
-                    options:
-                      - { label: "Standard (white)", value: "standard" }
-                      - { label: "Tinted", value: "tint" }
-                      - { label: "Accent band", value: "band" }
-                      - { label: "Dark", value: "dark" }
-                      - { label: "Gradient", value: "gradient" }
+                  - name: layout
+                    label: "Layout"
+                    widget: object
+                    collapsed: true
+                    hint: "Size and placement — rarely needs changing."
+                    fields:
+                      - name: width
+                        label: "Width"
+                        widget: select
+                        required: false
+                        default: "xnarrow"
+                        hint: "How wide the entry column is."
+                        options:
+                          - { label: "Extra narrow", value: "xnarrow" }
+                          - { label: "Narrow (reading column)", value: "narrow" }
+                          - { label: "Full width", value: "full" }
+                      - name: align
+                        label: "Alignment"
+                        widget: select
+                        required: false
+                        default: "left"
+                        hint: "Where the entry sits in the section."
+                        options:
+                          - { label: "Left", value: "left" }
+                          - { label: "Centered", value: "center" }
+                          - { label: "Right", value: "right" }
+                  - name: style
+                    label: "Appearance"
+                    widget: object
+                    collapsed: true
+                    hint: "Background and accent colour — set once when the page is designed."
+                    fields:
+                      - name: surface
+                        label: "Background"
+                        widget: select
+                        required: false
+                        default: "standard"
+                        hint: "The surface behind the section — for rhythm between blocks."
+                        options:
+                          - { label: "Standard (white)", value: "standard" }
+                          - { label: "Tinted", value: "tint" }
+                          - { label: "Accent band", value: "band" }
+                          - { label: "Dark", value: "dark" }
+                          - { label: "Gradient", value: "gradient" }
               - name: callout
                 label: "Highlighted quote"
                 widget: object
                 fields:
                   - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
                   - { name: quote, label: "Quote / statement", widget: text, hint: "Wrap words in *asterisks* to underline them." }
-                  - name: width
-                    label: "Width"
-                    widget: select
-                    required: false
-                    default: "narrow"
-                    hint: "How wide the quote column is. Narrow reads best."
-                    options:
-                      - { label: "Narrow (reading column)", value: "narrow" }
-                      - { label: "Extra narrow", value: "xnarrow" }
-                      - { label: "Full width", value: "full" }
-                  - name: align
-                    label: "Alignment"
-                    widget: select
-                    required: false
-                    default: "left"
-                    hint: "Where the quote column sits in the section (the text stays left-aligned)."
-                    options:
-                      - { label: "Left", value: "left" }
-                      - { label: "Centered", value: "center" }
-                      - { label: "Right", value: "right" }
-                  - name: accent
-                    label: "Accent"
-                    widget: select
-                    required: false
-                    default: "brand"
-                    hint: "This block's accent colour (rule, icon or number) — not the eyebrow."
-                    options:
-                      - { label: "Brand", value: "brand" }
-                      - { label: "Secondary", value: "secondary" }
-                      - { label: "Highlight", value: "highlight" }
-                  - name: surface
-                    label: "Background"
-                    widget: select
-                    required: false
-                    default: "standard"
-                    hint: "The surface behind the section — for rhythm between blocks."
-                    options:
-                      - { label: "Standard (white)", value: "standard" }
-                      - { label: "Tinted", value: "tint" }
-                      - { label: "Accent band", value: "band" }
-                      - { label: "Dark", value: "dark" }
-                      - { label: "Gradient", value: "gradient" }
+                  - name: layout
+                    label: "Layout"
+                    widget: object
+                    collapsed: true
+                    hint: "Size and placement — rarely needs changing."
+                    fields:
+                      - name: width
+                        label: "Width"
+                        widget: select
+                        required: false
+                        default: "narrow"
+                        hint: "How wide the quote column is. Narrow reads best."
+                        options:
+                          - { label: "Narrow (reading column)", value: "narrow" }
+                          - { label: "Extra narrow", value: "xnarrow" }
+                          - { label: "Full width", value: "full" }
+                      - name: align
+                        label: "Alignment"
+                        widget: select
+                        required: false
+                        default: "left"
+                        hint: "Where the quote column sits in the section (the text stays left-aligned)."
+                        options:
+                          - { label: "Left", value: "left" }
+                          - { label: "Centered", value: "center" }
+                          - { label: "Right", value: "right" }
+                  - name: style
+                    label: "Appearance"
+                    widget: object
+                    collapsed: true
+                    hint: "Background and accent colour — set once when the page is designed."
+                    fields:
+                      - name: surface
+                        label: "Background"
+                        widget: select
+                        required: false
+                        default: "standard"
+                        hint: "The surface behind the section — for rhythm between blocks."
+                        options:
+                          - { label: "Standard (white)", value: "standard" }
+                          - { label: "Tinted", value: "tint" }
+                          - { label: "Accent band", value: "band" }
+                          - { label: "Dark", value: "dark" }
+                          - { label: "Gradient", value: "gradient" }
+                      - name: accent
+                        label: "Accent"
+                        widget: select
+                        required: false
+                        default: "brand"
+                        hint: "This block's accent colour (rule, icon or number) — not the eyebrow."
+                        options:
+                          - { label: "Brand", value: "brand" }
+                          - { label: "Secondary", value: "secondary" }
+                          - { label: "Highlight", value: "highlight" }
               - name: statPanel
                 label: "Statement panel"
                 widget: object
@@ -900,16 +1110,22 @@ collections:
                       - { name: label, label: "Label", widget: string, required: false }
                       - { name: value, label: "Value", widget: string }
                       - { name: note, label: "Note", widget: text, required: false }
-                  - name: accent
-                    label: "Accent"
-                    widget: select
-                    required: false
-                    default: "brand"
-                    hint: "This block's accent colour (rule, icon or number) — not the eyebrow."
-                    options:
-                      - { label: "Brand", value: "brand" }
-                      - { label: "Secondary", value: "secondary" }
-                      - { label: "Highlight", value: "highlight" }
+                  - name: style
+                    label: "Appearance"
+                    widget: object
+                    collapsed: true
+                    hint: "Background and accent colour — set once when the page is designed."
+                    fields:
+                      - name: accent
+                        label: "Accent"
+                        widget: select
+                        required: false
+                        default: "brand"
+                        hint: "This block's accent colour (rule, icon or number) — not the eyebrow."
+                        options:
+                          - { label: "Brand", value: "brand" }
+                          - { label: "Secondary", value: "secondary" }
+                          - { label: "Highlight", value: "highlight" }
               - name: statsBar
                 label: "Stats / facts"
                 widget: object
@@ -942,17 +1158,6 @@ collections:
                 label: "FAQ"
                 widget: object
                 fields:
-                  - name: variant
-                    label: "Layout"
-                    widget: select
-                    required: false
-                    default: "list"
-                    hint: "How the questions are presented."
-                    options:
-                      - { label: "List", value: "list" }
-                      - { label: "Accordion", value: "accordion" }
-                      - { label: "Cards", value: "cards" }
-                      - { label: "Split (index + reader)", value: "split" }
                   - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
                   - { name: heading, label: "Heading", widget: string, required: false }
                   - { name: intro, label: "Intro", widget: text, required: false }
@@ -992,18 +1197,41 @@ collections:
                           - { label: "About (/about)", value: "/about" }
                           - { label: "Contact (/contact)", value: "/contact" }
                       - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
-                  - name: surface
-                    label: "Background"
-                    widget: select
-                    required: false
-                    default: "standard"
-                    hint: "The surface behind the section — for rhythm between blocks."
-                    options:
-                      - { label: "Standard (white)", value: "standard" }
-                      - { label: "Tinted", value: "tint" }
-                      - { label: "Accent band", value: "band" }
-                      - { label: "Dark", value: "dark" }
-                      - { label: "Gradient", value: "gradient" }
+                  - name: layout
+                    label: "Layout"
+                    widget: object
+                    collapsed: true
+                    hint: "Size and placement — rarely needs changing."
+                    fields:
+                      - name: variant
+                        label: "Layout"
+                        widget: select
+                        required: false
+                        default: "list"
+                        hint: "How the questions are presented."
+                        options:
+                          - { label: "List", value: "list" }
+                          - { label: "Accordion", value: "accordion" }
+                          - { label: "Cards", value: "cards" }
+                          - { label: "Split (index + reader)", value: "split" }
+                  - name: style
+                    label: "Appearance"
+                    widget: object
+                    collapsed: true
+                    hint: "Background and accent colour — set once when the page is designed."
+                    fields:
+                      - name: surface
+                        label: "Background"
+                        widget: select
+                        required: false
+                        default: "standard"
+                        hint: "The surface behind the section — for rhythm between blocks."
+                        options:
+                          - { label: "Standard (white)", value: "standard" }
+                          - { label: "Tinted", value: "tint" }
+                          - { label: "Accent band", value: "band" }
+                          - { label: "Dark", value: "dark" }
+                          - { label: "Gradient", value: "gradient" }
               - name: ctaPanel
                 label: "Call to action (band)"
                 widget: object
@@ -1034,15 +1262,6 @@ collections:
                 label: "Call to action (box)"
                 widget: object
                 fields:
-                  - name: variant
-                    label: "Layout"
-                    widget: select
-                    required: false
-                    default: "classic"
-                    options:
-                      - { label: "Classic (centered panel)", value: "classic" }
-                      - { label: "Split (copy + facts card)", value: "split" }
-                      - { label: "Panel (dark, with readout)", value: "panel" }
                   - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
                   - { name: heading, label: "Heading", widget: string }
                   - { name: intro, label: "Intro", widget: text, required: false, hint: "A short line under the heading." }
@@ -1096,18 +1315,39 @@ collections:
                     fields:
                       - { name: label, label: "Label", widget: string }
                       - { name: value, label: "Value", widget: string }
-                  - name: surface
-                    label: "Background"
-                    widget: select
-                    required: false
-                    default: "standard"
-                    hint: "The surface behind the section — for rhythm between blocks."
-                    options:
-                      - { label: "Standard (white)", value: "standard" }
-                      - { label: "Tinted", value: "tint" }
-                      - { label: "Accent band", value: "band" }
-                      - { label: "Dark", value: "dark" }
-                      - { label: "Gradient", value: "gradient" }
+                  - name: layout
+                    label: "Layout"
+                    widget: object
+                    collapsed: true
+                    hint: "Size and placement — rarely needs changing."
+                    fields:
+                      - name: variant
+                        label: "Layout"
+                        widget: select
+                        required: false
+                        default: "classic"
+                        options:
+                          - { label: "Classic (centered panel)", value: "classic" }
+                          - { label: "Split (copy + facts card)", value: "split" }
+                          - { label: "Panel (dark, with readout)", value: "panel" }
+                  - name: style
+                    label: "Appearance"
+                    widget: object
+                    collapsed: true
+                    hint: "Background and accent colour — set once when the page is designed."
+                    fields:
+                      - name: surface
+                        label: "Background"
+                        widget: select
+                        required: false
+                        default: "standard"
+                        hint: "The surface behind the section — for rhythm between blocks."
+                        options:
+                          - { label: "Standard (white)", value: "standard" }
+                          - { label: "Tinted", value: "tint" }
+                          - { label: "Accent band", value: "band" }
+                          - { label: "Dark", value: "dark" }
+                          - { label: "Gradient", value: "gradient" }
               - name: contactForm
                 label: "Contact form"
                 widget: object
@@ -1181,6 +1421,15 @@ collections:
               - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
               - { name: heading, label: "Heading (H1)", widget: string }
               - { name: intro, label: "Intro", widget: text, required: false }
+              - name: ticks
+                label: "Ticks (checkmark lines)"
+                widget: list
+                required: false
+                label_singular: "Line"
+                collapsed: true
+                minimize_collapsed: true
+                hint: "Short ✓ lines under the intro — key reassurances."
+                field: { name: text, label: "Line", widget: string }
               - { name: ctaLabel, label: "Button label", widget: string, required: false }
               - name: ctaHref
                 label: "Button link"
@@ -1200,7 +1449,7 @@ collections:
                       - { label: "About (/about)", value: "/about" }
                       - { label: "Contact (/contact)", value: "/contact" }
                   - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
-              - { name: cta2Label, label: "Second button label", widget: string, required: false, hint: "Shown as a quiet text link beside the button." }
+              - { name: cta2Label, label: "Second button label", widget: string, required: false, hint: "A quiet text link beside the button. Leave empty to hide." }
               - name: cta2Href
                 label: "Second button link"
                 widget: object
@@ -1220,98 +1469,118 @@ collections:
                       - { label: "Contact (/contact)", value: "/contact" }
                   - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
               - name: media
-                label: "Right-side media"
-                widget: select
-                required: false
-                default: "none"
-                hint: "What shows beside the heading. Default: none."
-                options:
-                  - { label: "None (text only)", value: "none" }
-                  - { label: "Image", value: "image" }
-                  - { label: "Highlights (icon + title + line)", value: "highlights" }
-                  - { label: "Motif (animated, no image)", value: "motif" }
-              - { name: image, label: "Image", widget: image, required: false, hint: "Used when Right-side media = Image." }
-              - { name: imageAlt, label: "Image alt text", widget: string, required: false }
-              - name: highlights
-                label: "Highlights"
-                widget: list
-                required: false
-                label_singular: "Key point"
+                label: "Media"
+                widget: object
                 collapsed: true
-                minimize_collapsed: true
-                hint: "A few key points beside the heading. Used when Right-side media = Highlights."
-                summary: "{{fields.title}}"
+                summary: "{{fields.kind}}"
+                hint: "What shows beside the text. Default: none."
                 fields:
-                  - name: icon
-                    label: "Icon"
+                  - name: kind
+                    label: "Show"
                     widget: select
                     required: false
-                    hint: "Optional icon."
+                    default: "none"
+                    hint: "What shows beside the heading: none, image, highlights or motif."
                     options:
-                      - { label: "sun", value: "sun" }
-                      - { label: "panel", value: "panel" }
-                      - { label: "battery", value: "battery" }
-                      - { label: "home", value: "home" }
-                      - { label: "roof", value: "roof" }
-                      - { label: "leaf", value: "leaf" }
-                      - { label: "bolt", value: "bolt" }
-                      - { label: "shield", value: "shield" }
-                      - { label: "wrench", value: "wrench" }
-                      - { label: "headset", value: "headset" }
-                      - { label: "link", value: "link" }
-                      - { label: "phone", value: "phone" }
-                      - { label: "mail", value: "mail" }
-                  - { name: title, label: "Title", widget: string }
-                  - { name: body, label: "Text", widget: string, required: false }
-              - name: ticks
-                label: "Ticks (checkmark lines)"
-                widget: list
-                required: false
-                label_singular: "Line"
+                      - { label: "None (text only)", value: "none" }
+                      - { label: "Image", value: "image" }
+                      - { label: "Highlights (icon + title + line)", value: "highlights" }
+                      - { label: "Motif (animated, no image)", value: "motif" }
+                  - { name: image, label: "Image", widget: image, required: false, hint: "Used when Show = Image." }
+                  - { name: imageAlt, label: "Image alt text", widget: string, required: false, hint: "Describe the image for screen readers and search engines." }
+                  - name: highlights
+                    label: "Highlights"
+                    widget: list
+                    required: false
+                    label_singular: "Key point"
+                    collapsed: true
+                    minimize_collapsed: true
+                    hint: "Panel with icon + title + line. Used when Show = Highlights."
+                    summary: "{{fields.title}}"
+                    fields:
+                      - name: icon
+                        label: "Icon"
+                        widget: select
+                        required: false
+                        hint: "Optional icon."
+                        options:
+                          - { label: "sun", value: "sun" }
+                          - { label: "panel", value: "panel" }
+                          - { label: "battery", value: "battery" }
+                          - { label: "home", value: "home" }
+                          - { label: "roof", value: "roof" }
+                          - { label: "leaf", value: "leaf" }
+                          - { label: "bolt", value: "bolt" }
+                          - { label: "shield", value: "shield" }
+                          - { label: "wrench", value: "wrench" }
+                          - { label: "headset", value: "headset" }
+                          - { label: "link", value: "link" }
+                          - { label: "phone", value: "phone" }
+                          - { label: "mail", value: "mail" }
+                      - { name: title, label: "Title", widget: string }
+                      - { name: body, label: "Text", widget: string, required: false }
+              - name: layout
+                label: "Layout"
+                widget: object
                 collapsed: true
-                minimize_collapsed: true
-                hint: "Short ✓ lines under the intro — key reassurances."
-                field: { name: text, label: "Line", widget: string }
-              - name: height
-                label: "Height"
-                widget: select
-                required: false
-                default: "normal"
-                hint: "Tall fills the viewport (good with a Gradient or Dark background)."
-                options:
-                  - { label: "Normal", value: "normal" }
-                  - { label: "Tall", value: "tall" }
-              - name: align
-                label: "Text position"
-                widget: select
-                required: false
-                default: "center"
-                hint: "Where the text sits in a Tall hero."
-                options:
-                  - { label: "Top", value: "top" }
-                  - { label: "Center", value: "center" }
-                  - { label: "Bottom", value: "bottom" }
-              - name: width
-                label: "Width"
-                widget: select
-                required: false
-                default: "full"
-                hint: "Narrow centers the hero in a reading column (best without side media)."
-                options:
-                  - { label: "Full width", value: "full" }
-                  - { label: "Narrow (reading column)", value: "narrow" }
-              - name: surface
-                label: "Background"
-                widget: select
-                required: false
-                default: "standard"
-                hint: "The surface behind the section — for rhythm between blocks."
-                options:
-                  - { label: "Standard (white)", value: "standard" }
-                  - { label: "Tinted", value: "tint" }
-                  - { label: "Accent band", value: "band" }
-                  - { label: "Dark", value: "dark" }
-                  - { label: "Gradient", value: "gradient" }
+                hint: "Size and placement — rarely needs changing."
+                fields:
+                  - name: height
+                    label: "Height"
+                    widget: select
+                    required: false
+                    default: "normal"
+                    hint: "Tall fills the screen — best with a Gradient or Dark background."
+                    options:
+                      - { label: "Normal", value: "normal" }
+                      - { label: "Tall", value: "tall" }
+                  - name: align
+                    label: "Text position"
+                    widget: select
+                    required: false
+                    default: "center"
+                    hint: "Where the text sits when the hero is tall."
+                    options:
+                      - { label: "Top", value: "top" }
+                      - { label: "Center", value: "center" }
+                      - { label: "Bottom", value: "bottom" }
+                  - name: width
+                    label: "Width"
+                    widget: select
+                    required: false
+                    default: "full"
+                    hint: "Narrow centers the hero in a reading column — best without side media."
+                    options:
+                      - { label: "Full width", value: "full" }
+                      - { label: "Narrow (reading column)", value: "narrow" }
+              - name: style
+                label: "Appearance"
+                widget: object
+                collapsed: true
+                hint: "Background and accent colour — set once when the page is designed."
+                fields:
+                  - name: surface
+                    label: "Background"
+                    widget: select
+                    required: false
+                    default: "standard"
+                    hint: "The surface behind the section — for rhythm between blocks."
+                    options:
+                      - { label: "Standard (white)", value: "standard" }
+                      - { label: "Tinted", value: "tint" }
+                      - { label: "Accent band", value: "band" }
+                      - { label: "Dark", value: "dark" }
+                      - { label: "Gradient", value: "gradient" }
+                  - name: accent
+                    label: "Accent"
+                    widget: select
+                    required: false
+                    default: "brand"
+                    hint: "This block's accent colour (rule, icon or number) — not the eyebrow."
+                    options:
+                      - { label: "Brand", value: "brand" }
+                      - { label: "Secondary", value: "secondary" }
+                      - { label: "Highlight", value: "highlight" }
           - name: cover
             label: "Cover (full-bleed)"
             widget: object
@@ -1358,70 +1627,65 @@ collections:
                       - { label: "Contact (/contact)", value: "/contact" }
                   - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
               - name: media
-                label: "Background"
-                widget: select
-                required: false
-                default: "image"
-                hint: "A photo, a looping video, a generated gradient, or an animated block pattern — both gradient and animated follow your brand colour, no asset needed."
-                options:
-                  - { label: "Image", value: "image" }
-                  - { label: "Video (looping)", value: "video" }
-                  - { label: "Gradient (no image)", value: "gradient" }
-                  - { label: "Animated (no image)", value: "animated" }
-              - { name: image, label: "Background image / video poster", widget: image, required: false }
-              - { name: imageAlt, label: "Image alt text", widget: string, required: false }
-              - { name: video, label: "Video file", widget: file, required: false, hint: "Used when Background = Video. Muted, looping MP4/WebM; the image shows until it plays." }
-              - { name: videoUrl, label: "…or video URL", widget: string, required: false, hint: "External MP4/WebM URL. Used instead of an uploaded file if filled." }
-              - name: overlay
-                label: "Darken (overlay)"
-                widget: select
-                required: false
-                default: "medium"
-                hint: "How much to darken the media so the text stays readable."
-                options:
-                  - { label: "Light", value: "light" }
-                  - { label: "Medium", value: "medium" }
-                  - { label: "Strong", value: "strong" }
-              - name: align
-                label: "Text position"
-                widget: select
-                required: false
-                default: "start"
-                hint: "Where the text sits on the cover."
-                options:
-                  - { label: "Bottom left", value: "start" }
-                  - { label: "Centered", value: "center" }
-              - name: height
-                label: "Height"
-                widget: select
-                required: false
-                default: "tall"
-                hint: "Tall fills most of the screen; Medium is a shorter band."
-                options:
-                  - { label: "Tall", value: "tall" }
-                  - { label: "Medium", value: "medium" }
+                label: "Media"
+                widget: object
+                collapsed: true
+                summary: "{{fields.kind}}"
+                hint: "The full-bleed background — photo, looping video, gradient or animated pattern."
+                fields:
+                  - name: kind
+                    label: "Background"
+                    widget: select
+                    required: false
+                    default: "image"
+                    hint: "A photo, a looping video, a generated gradient, or an animated block pattern — both gradient and animated follow your brand colour, no asset needed."
+                    options:
+                      - { label: "Image", value: "image" }
+                      - { label: "Video (looping)", value: "video" }
+                      - { label: "Gradient (no image)", value: "gradient" }
+                      - { label: "Animated (no image)", value: "animated" }
+                  - { name: image, label: "Background image / video poster", widget: image, required: false }
+                  - { name: imageAlt, label: "Image alt text", widget: string, required: false }
+                  - { name: video, label: "Video file", widget: file, required: false, hint: "Used when Background = Video. Muted, looping MP4/WebM; the image shows until it plays." }
+                  - { name: videoUrl, label: "…or video URL", widget: string, required: false, hint: "External MP4/WebM URL. Used instead of an uploaded file if filled." }
+                  - name: overlay
+                    label: "Darken (overlay)"
+                    widget: select
+                    required: false
+                    default: "medium"
+                    hint: "How much to darken the media so the text stays readable."
+                    options:
+                      - { label: "Light", value: "light" }
+                      - { label: "Medium", value: "medium" }
+                      - { label: "Strong", value: "strong" }
+              - name: layout
+                label: "Layout"
+                widget: object
+                collapsed: true
+                hint: "Size and placement — rarely needs changing."
+                fields:
+                  - name: align
+                    label: "Text position"
+                    widget: select
+                    required: false
+                    default: "start"
+                    hint: "Where the text sits on the cover."
+                    options:
+                      - { label: "Bottom left", value: "start" }
+                      - { label: "Centered", value: "center" }
+                  - name: height
+                    label: "Height"
+                    widget: select
+                    required: false
+                    default: "tall"
+                    hint: "Tall fills most of the screen; Medium is a shorter band."
+                    options:
+                      - { label: "Tall", value: "tall" }
+                      - { label: "Medium", value: "medium" }
           - name: pageHeader
             label: "Page header"
             widget: object
             fields:
-              - name: variant
-                label: "Style"
-                widget: select
-                required: false
-                default: "light"
-                hint: "Band puts the title on a dark full-width band."
-                options:
-                  - { label: "Light", value: "light" }
-                  - { label: "Band", value: "dark" }
-              - name: width
-                label: "Width"
-                widget: select
-                required: false
-                default: "narrow"
-                hint: "Narrow keeps text legible; full uses the whole section width."
-                options:
-                  - { label: "Narrow (reading column)", value: "narrow" }
-                  - { label: "Full width", value: "full" }
               - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
               - { name: heading, label: "Heading (H1)", widget: string }
               - { name: intro, label: "Intro", widget: text, required: false }
@@ -1444,18 +1708,48 @@ collections:
                       - { label: "About (/about)", value: "/about" }
                       - { label: "Contact (/contact)", value: "/contact" }
                   - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
-              - name: surface
-                label: "Background"
-                widget: select
-                required: false
-                default: "standard"
-                hint: "The surface behind the section — for rhythm between blocks."
-                options:
-                  - { label: "Standard (white)", value: "standard" }
-                  - { label: "Tinted", value: "tint" }
-                  - { label: "Accent band", value: "band" }
-                  - { label: "Dark", value: "dark" }
-                  - { label: "Gradient", value: "gradient" }
+              - name: layout
+                label: "Layout"
+                widget: object
+                collapsed: true
+                hint: "Size and placement — rarely needs changing."
+                fields:
+                  - name: variant
+                    label: "Style"
+                    widget: select
+                    required: false
+                    default: "light"
+                    hint: "Band puts the title on a dark full-width band."
+                    options:
+                      - { label: "Light", value: "light" }
+                      - { label: "Band", value: "dark" }
+                  - name: width
+                    label: "Width"
+                    widget: select
+                    required: false
+                    default: "narrow"
+                    hint: "Narrow keeps text legible; full uses the whole section width."
+                    options:
+                      - { label: "Narrow (reading column)", value: "narrow" }
+                      - { label: "Full width", value: "full" }
+              - name: style
+                label: "Appearance"
+                widget: object
+                collapsed: true
+                hint: "Background and accent colour — set once when the page is designed."
+                fields:
+                  - name: surface
+                    label: "Background"
+                    widget: select
+                    required: false
+                    default: "standard"
+                    hint: "The surface behind the section — for rhythm between blocks."
+                    options:
+                      - { label: "Standard (white)", value: "standard" }
+                      - { label: "Tinted", value: "tint" }
+                      - { label: "Accent band", value: "band" }
+                      - { label: "Dark", value: "dark" }
+                      - { label: "Gradient", value: "gradient" }
           - name: prose
             label: "Rich text"
             widget: object
@@ -1465,48 +1759,78 @@ collections:
               - { name: body, label: "Body", widget: markdown, required: false }
               - { name: statValue, label: "Pull-stat number", widget: string, required: false, hint: "One headline figure shown big under the text (e.g. +50 %). Use a Stats block for a row of many." }
               - { name: statLabel, label: "Pull-stat label", widget: string, required: false, hint: "The short line beside the number." }
-              - name: width
-                label: "Width"
-                widget: select
-                required: false
-                default: "narrow"
-                hint: "Narrow keeps text legible; full uses the whole section width."
-                options:
-                  - { label: "Narrow (reading column)", value: "narrow" }
-                  - { label: "Full width", value: "full" }
-              - name: surface
-                label: "Background"
-                widget: select
-                required: false
-                default: "standard"
-                hint: "The surface behind the section — for rhythm between blocks."
-                options:
-                  - { label: "Standard (white)", value: "standard" }
-                  - { label: "Tinted", value: "tint" }
-                  - { label: "Accent band", value: "band" }
-                  - { label: "Dark", value: "dark" }
-                  - { label: "Gradient", value: "gradient" }
+              - name: layout
+                label: "Layout"
+                widget: object
+                collapsed: true
+                hint: "Size and placement — rarely needs changing."
+                fields:
+                  - name: width
+                    label: "Width"
+                    widget: select
+                    required: false
+                    default: "narrow"
+                    hint: "Narrow keeps text legible; full uses the whole section width."
+                    options:
+                      - { label: "Narrow (reading column)", value: "narrow" }
+                      - { label: "Full width", value: "full" }
+              - name: style
+                label: "Appearance"
+                widget: object
+                collapsed: true
+                hint: "Background and accent colour — set once when the page is designed."
+                fields:
+                  - name: surface
+                    label: "Background"
+                    widget: select
+                    required: false
+                    default: "standard"
+                    hint: "The surface behind the section — for rhythm between blocks."
+                    options:
+                      - { label: "Standard (white)", value: "standard" }
+                      - { label: "Tinted", value: "tint" }
+                      - { label: "Accent band", value: "band" }
+                      - { label: "Dark", value: "dark" }
+                      - { label: "Gradient", value: "gradient" }
           - name: textImage
             label: "Text + image"
             widget: object
             fields:
               - { name: heading, label: "Heading", widget: string, required: false }
               - { name: body, label: "Text", widget: markdown }
-              - { name: image, label: "Image", widget: image, required: false }
-              - { name: imageAlt, label: "Alt text", widget: string, required: false }
-              - { name: flip, label: "Image on left", widget: boolean, required: false, default: false }
-              - name: surface
-                label: "Background"
-                widget: select
-                required: false
-                default: "standard"
-                hint: "The surface behind the section — for rhythm between blocks."
-                options:
-                  - { label: "Standard (white)", value: "standard" }
-                  - { label: "Tinted", value: "tint" }
-                  - { label: "Accent band", value: "band" }
-                  - { label: "Dark", value: "dark" }
-                  - { label: "Gradient", value: "gradient" }
+              - name: media
+                label: "Media"
+                widget: object
+                collapsed: true
+                hint: "The picture beside the text."
+                fields:
+                  - { name: image, label: "Image", widget: image, required: false }
+                  - { name: imageAlt, label: "Alt text", widget: string, required: false }
+              - name: layout
+                label: "Layout"
+                widget: object
+                collapsed: true
+                hint: "Size and placement — rarely needs changing."
+                fields:
+                  - { name: flip, label: "Image on left", widget: boolean, required: false, default: false }
+              - name: style
+                label: "Appearance"
+                widget: object
+                collapsed: true
+                hint: "Background and accent colour — set once when the page is designed."
+                fields:
+                  - name: surface
+                    label: "Background"
+                    widget: select
+                    required: false
+                    default: "standard"
+                    hint: "The surface behind the section — for rhythm between blocks."
+                    options:
+                      - { label: "Standard (white)", value: "standard" }
+                      - { label: "Tinted", value: "tint" }
+                      - { label: "Accent band", value: "band" }
+                      - { label: "Dark", value: "dark" }
+                      - { label: "Gradient", value: "gradient" }
           - name: textQuote
             label: "Text + quote"
             widget: object
@@ -1514,29 +1838,41 @@ collections:
               - { name: body, label: "Body text", widget: markdown }
               - { name: quote, label: "Quote", widget: text }
               - { name: attribution, label: "Source / name", widget: string, required: false }
-              - name: accent
-                label: "Accent"
-                widget: select
-                required: false
-                default: "brand"
-                hint: "This block's accent colour (rule, icon or number) — not the eyebrow."
-                options:
-                  - { label: "Brand", value: "brand" }
-                  - { label: "Secondary", value: "secondary" }
-                  - { label: "Highlight", value: "highlight" }
-              - { name: flip, label: "Quote on left", widget: boolean, required: false, default: false }
-              - name: surface
-                label: "Background"
-                widget: select
-                required: false
-                default: "standard"
-                hint: "The surface behind the section — for rhythm between blocks."
-                options:
-                  - { label: "Standard (white)", value: "standard" }
-                  - { label: "Tinted", value: "tint" }
-                  - { label: "Accent band", value: "band" }
-                  - { label: "Dark", value: "dark" }
-                  - { label: "Gradient", value: "gradient" }
+              - name: layout
+                label: "Layout"
+                widget: object
+                collapsed: true
+                hint: "Size and placement — rarely needs changing."
+                fields:
+                  - { name: flip, label: "Quote on left", widget: boolean, required: false, default: false }
+              - name: style
+                label: "Appearance"
+                widget: object
+                collapsed: true
+                hint: "Background and accent colour — set once when the page is designed."
+                fields:
+                  - name: surface
+                    label: "Background"
+                    widget: select
+                    required: false
+                    default: "standard"
+                    hint: "The surface behind the section — for rhythm between blocks."
+                    options:
+                      - { label: "Standard (white)", value: "standard" }
+                      - { label: "Tinted", value: "tint" }
+                      - { label: "Accent band", value: "band" }
+                      - { label: "Dark", value: "dark" }
+                      - { label: "Gradient", value: "gradient" }
+                  - name: accent
+                    label: "Accent"
+                    widget: select
+                    required: false
+                    default: "brand"
+                    hint: "This block's accent colour (rule, icon or number) — not the eyebrow."
+                    options:
+                      - { label: "Brand", value: "brand" }
+                      - { label: "Secondary", value: "secondary" }
+                      - { label: "Highlight", value: "highlight" }
           - name: fragment
             label: "Story fragment"
             widget: object
@@ -1563,28 +1899,40 @@ collections:
                       - { label: "About (/about)", value: "/about" }
                       - { label: "Contact (/contact)", value: "/contact" }
                   - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
-              - name: placement
-                label: "Placement"
-                widget: select
-                required: false
-                default: "left"
-                hint: "Where the fragment sits — alternate placements to break the grid."
-                options:
-                  - { label: "Left", value: "left" }
-                  - { label: "Right", value: "right" }
-                  - { label: "Indented", value: "indent" }
-              - name: surface
-                label: "Background"
-                widget: select
-                required: false
-                default: "standard"
-                hint: "The surface behind the section — for rhythm between blocks."
-                options:
-                  - { label: "Standard (white)", value: "standard" }
-                  - { label: "Tinted", value: "tint" }
-                  - { label: "Accent band", value: "band" }
-                  - { label: "Dark", value: "dark" }
-                  - { label: "Gradient", value: "gradient" }
+              - name: layout
+                label: "Layout"
+                widget: object
+                collapsed: true
+                hint: "Size and placement — rarely needs changing."
+                fields:
+                  - name: placement
+                    label: "Placement"
+                    widget: select
+                    required: false
+                    default: "left"
+                    hint: "Where the fragment sits — alternate placements to break the grid."
+                    options:
+                      - { label: "Left", value: "left" }
+                      - { label: "Right", value: "right" }
+                      - { label: "Indented", value: "indent" }
+              - name: style
+                label: "Appearance"
+                widget: object
+                collapsed: true
+                hint: "Background and accent colour — set once when the page is designed."
+                fields:
+                  - name: surface
+                    label: "Background"
+                    widget: select
+                    required: false
+                    default: "standard"
+                    hint: "The surface behind the section — for rhythm between blocks."
+                    options:
+                      - { label: "Standard (white)", value: "standard" }
+                      - { label: "Tinted", value: "tint" }
+                      - { label: "Accent band", value: "band" }
+                      - { label: "Dark", value: "dark" }
+                      - { label: "Gradient", value: "gradient" }
           - name: featureGrid
             label: "Feature cards"
             widget: object
@@ -1642,29 +1990,41 @@ collections:
                           - { label: "Contact (/contact)", value: "/contact" }
                       - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
                   - { name: linkLabel, label: "Link label", widget: string, required: false, hint: "E.g. \"Read more\". Shown only if the card has a link." }
-              - { name: numbered, label: "Numbered (01/02/03 instead of icons)", widget: boolean, required: false, default: false }
-              - name: accent
-                label: "Accent"
-                widget: select
-                required: false
-                default: "brand"
-                hint: "This block's accent colour (rule, icon or number) — not the eyebrow."
-                options:
-                  - { label: "Brand", value: "brand" }
-                  - { label: "Secondary", value: "secondary" }
-                  - { label: "Highlight", value: "highlight" }
-              - name: surface
-                label: "Background"
-                widget: select
-                required: false
-                default: "standard"
-                hint: "The surface behind the section — for rhythm between blocks."
-                options:
-                  - { label: "Standard (white)", value: "standard" }
-                  - { label: "Tinted", value: "tint" }
-                  - { label: "Accent band", value: "band" }
-                  - { label: "Dark", value: "dark" }
-                  - { label: "Gradient", value: "gradient" }
+              - name: layout
+                label: "Layout"
+                widget: object
+                collapsed: true
+                hint: "Size and placement — rarely needs changing."
+                fields:
+                  - { name: numbered, label: "Numbered (01/02/03 instead of icons)", widget: boolean, required: false, default: false }
+              - name: style
+                label: "Appearance"
+                widget: object
+                collapsed: true
+                hint: "Background and accent colour — set once when the page is designed."
+                fields:
+                  - name: surface
+                    label: "Background"
+                    widget: select
+                    required: false
+                    default: "standard"
+                    hint: "The surface behind the section — for rhythm between blocks."
+                    options:
+                      - { label: "Standard (white)", value: "standard" }
+                      - { label: "Tinted", value: "tint" }
+                      - { label: "Accent band", value: "band" }
+                      - { label: "Dark", value: "dark" }
+                      - { label: "Gradient", value: "gradient" }
+                  - name: accent
+                    label: "Accent"
+                    widget: select
+                    required: false
+                    default: "brand"
+                    hint: "This block's accent colour (rule, icon or number) — not the eyebrow."
+                    options:
+                      - { label: "Brand", value: "brand" }
+                      - { label: "Secondary", value: "secondary" }
+                      - { label: "Highlight", value: "highlight" }
           - name: pillars
             label: "Principles / values"
             widget: object
@@ -1683,18 +2043,24 @@ collections:
                 fields:
                   - { name: title, label: "Title", widget: string }
                   - { name: body, label: "Text", widget: text }
-              - name: surface
-                label: "Background"
-                widget: select
-                required: false
-                default: "standard"
-                hint: "The surface behind the section — for rhythm between blocks."
-                options:
-                  - { label: "Standard (white)", value: "standard" }
-                  - { label: "Tinted", value: "tint" }
-                  - { label: "Accent band", value: "band" }
-                  - { label: "Dark", value: "dark" }
-                  - { label: "Gradient", value: "gradient" }
+              - name: style
+                label: "Appearance"
+                widget: object
+                collapsed: true
+                hint: "Background and accent colour — set once when the page is designed."
+                fields:
+                  - name: surface
+                    label: "Background"
+                    widget: select
+                    required: false
+                    default: "standard"
+                    hint: "The surface behind the section — for rhythm between blocks."
+                    options:
+                      - { label: "Standard (white)", value: "standard" }
+                      - { label: "Tinted", value: "tint" }
+                      - { label: "Accent band", value: "band" }
+                      - { label: "Dark", value: "dark" }
+                      - { label: "Gradient", value: "gradient" }
           - name: plans
             label: "Pricing / plans"
             widget: object
@@ -1748,18 +2114,24 @@ collections:
                           - { label: "Contact (/contact)", value: "/contact" }
                       - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
               - { name: footnote, label: "Footnote", widget: text, required: false, hint: "Small note under the cards — e.g. what every plan includes." }
-              - name: surface
-                label: "Background"
-                widget: select
-                required: false
-                default: "standard"
-                hint: "The surface behind the section — for rhythm between blocks."
-                options:
-                  - { label: "Standard (white)", value: "standard" }
-                  - { label: "Tinted", value: "tint" }
-                  - { label: "Accent band", value: "band" }
-                  - { label: "Dark", value: "dark" }
-                  - { label: "Gradient", value: "gradient" }
+              - name: style
+                label: "Appearance"
+                widget: object
+                collapsed: true
+                hint: "Background and accent colour — set once when the page is designed."
+                fields:
+                  - name: surface
+                    label: "Background"
+                    widget: select
+                    required: false
+                    default: "standard"
+                    hint: "The surface behind the section — for rhythm between blocks."
+                    options:
+                      - { label: "Standard (white)", value: "standard" }
+                      - { label: "Tinted", value: "tint" }
+                      - { label: "Accent band", value: "band" }
+                      - { label: "Dark", value: "dark" }
+                      - { label: "Gradient", value: "gradient" }
           - name: specialistGrid
             label: "Specialist grid"
             widget: object
@@ -1778,18 +2150,24 @@ collections:
                 fields:
                   - { name: title, label: "Title", widget: string }
                   - { name: body, label: "Text", widget: text }
-              - name: surface
-                label: "Background"
-                widget: select
-                required: false
-                default: "standard"
-                hint: "The surface behind the section — for rhythm between blocks."
-                options:
-                  - { label: "Standard (white)", value: "standard" }
-                  - { label: "Tinted", value: "tint" }
-                  - { label: "Accent band", value: "band" }
-                  - { label: "Dark", value: "dark" }
-                  - { label: "Gradient", value: "gradient" }
+              - name: style
+                label: "Appearance"
+                widget: object
+                collapsed: true
+                hint: "Background and accent colour — set once when the page is designed."
+                fields:
+                  - name: surface
+                    label: "Background"
+                    widget: select
+                    required: false
+                    default: "standard"
+                    hint: "The surface behind the section — for rhythm between blocks."
+                    options:
+                      - { label: "Standard (white)", value: "standard" }
+                      - { label: "Tinted", value: "tint" }
+                      - { label: "Accent band", value: "band" }
+                      - { label: "Dark", value: "dark" }
+                      - { label: "Gradient", value: "gradient" }
           - name: steps
             label: "Process / steps"
             widget: object
@@ -1810,27 +2188,39 @@ collections:
                   - { name: kicker, label: "Tag after the number", widget: string, required: false, hint: "Short word shown with the number, e.g. \"talk\"." }
                   - { name: body, label: "Text", widget: text }
               - { name: anchor, label: "Anchor id", widget: string, required: false, hint: "Lets links jump here — anchor \"process\" makes \"#process\" scroll to this section." }
-              - name: width
-                label: "Width"
-                widget: select
-                required: false
-                default: "narrow"
-                hint: "Narrow keeps text legible; full uses the whole section width."
-                options:
-                  - { label: "Narrow (reading column)", value: "narrow" }
-                  - { label: "Full width", value: "full" }
-              - name: surface
-                label: "Background"
-                widget: select
-                required: false
-                default: "standard"
-                hint: "The surface behind the section — for rhythm between blocks."
-                options:
-                  - { label: "Standard (white)", value: "standard" }
-                  - { label: "Tinted", value: "tint" }
-                  - { label: "Accent band", value: "band" }
-                  - { label: "Dark", value: "dark" }
-                  - { label: "Gradient", value: "gradient" }
+              - name: layout
+                label: "Layout"
+                widget: object
+                collapsed: true
+                hint: "Size and placement — rarely needs changing."
+                fields:
+                  - name: width
+                    label: "Width"
+                    widget: select
+                    required: false
+                    default: "narrow"
+                    hint: "Narrow keeps text legible; full uses the whole section width."
+                    options:
+                      - { label: "Narrow (reading column)", value: "narrow" }
+                      - { label: "Full width", value: "full" }
+              - name: style
+                label: "Appearance"
+                widget: object
+                collapsed: true
+                hint: "Background and accent colour — set once when the page is designed."
+                fields:
+                  - name: surface
+                    label: "Background"
+                    widget: select
+                    required: false
+                    default: "standard"
+                    hint: "The surface behind the section — for rhythm between blocks."
+                    options:
+                      - { label: "Standard (white)", value: "standard" }
+                      - { label: "Tinted", value: "tint" }
+                      - { label: "Accent band", value: "band" }
+                      - { label: "Dark", value: "dark" }
+                      - { label: "Gradient", value: "gradient" }
           - name: checklist
             label: "Checklist"
             widget: object
@@ -1849,19 +2239,31 @@ collections:
                 fields:
                   - { name: text, label: "Text", widget: string }
                   - { name: note, label: "Sub-line (optional)", widget: text, required: false }
-              - { name: columns, label: "Columns", widget: number, required: false, default: 2, hint: "1 or 2." }
-              - name: surface
-                label: "Background"
-                widget: select
-                required: false
-                default: "standard"
-                hint: "The surface behind the section — for rhythm between blocks."
-                options:
-                  - { label: "Standard (white)", value: "standard" }
-                  - { label: "Tinted", value: "tint" }
-                  - { label: "Accent band", value: "band" }
-                  - { label: "Dark", value: "dark" }
-                  - { label: "Gradient", value: "gradient" }
+              - name: layout
+                label: "Layout"
+                widget: object
+                collapsed: true
+                hint: "Size and placement — rarely needs changing."
+                fields:
+                  - { name: columns, label: "Columns", widget: number, required: false, default: 2, hint: "1 or 2." }
+              - name: style
+                label: "Appearance"
+                widget: object
+                collapsed: true
+                hint: "Background and accent colour — set once when the page is designed."
+                fields:
+                  - name: surface
+                    label: "Background"
+                    widget: select
+                    required: false
+                    default: "standard"
+                    hint: "The surface behind the section — for rhythm between blocks."
+                    options:
+                      - { label: "Standard (white)", value: "standard" }
+                      - { label: "Tinted", value: "tint" }
+                      - { label: "Accent band", value: "band" }
+                      - { label: "Dark", value: "dark" }
+                      - { label: "Gradient", value: "gradient" }
           - name: gallery
             label: "Gallery"
             widget: object
@@ -1881,19 +2283,31 @@ collections:
                   - { name: image, label: "Image", widget: image, required: false }
                   - { name: alt, label: "Alt text", widget: string, required: false }
                   - { name: caption, label: "Caption", widget: string, required: false }
-              - { name: columns, label: "Columns", widget: number, required: false, default: 3, hint: "2 or 3." }
-              - name: surface
-                label: "Background"
-                widget: select
-                required: false
-                default: "standard"
-                hint: "The surface behind the section — for rhythm between blocks."
-                options:
-                  - { label: "Standard (white)", value: "standard" }
-                  - { label: "Tinted", value: "tint" }
-                  - { label: "Accent band", value: "band" }
-                  - { label: "Dark", value: "dark" }
-                  - { label: "Gradient", value: "gradient" }
+              - name: layout
+                label: "Layout"
+                widget: object
+                collapsed: true
+                hint: "Size and placement — rarely needs changing."
+                fields:
+                  - { name: columns, label: "Columns", widget: number, required: false, default: 3, hint: "2 or 3." }
+              - name: style
+                label: "Appearance"
+                widget: object
+                collapsed: true
+                hint: "Background and accent colour — set once when the page is designed."
+                fields:
+                  - name: surface
+                    label: "Background"
+                    widget: select
+                    required: false
+                    default: "standard"
+                    hint: "The surface behind the section — for rhythm between blocks."
+                    options:
+                      - { label: "Standard (white)", value: "standard" }
+                      - { label: "Tinted", value: "tint" }
+                      - { label: "Accent band", value: "band" }
+                      - { label: "Dark", value: "dark" }
+                      - { label: "Gradient", value: "gradient" }
           - name: beforeAfter
             label: "Before / after"
             widget: object
@@ -1901,20 +2315,32 @@ collections:
               - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
               - { name: heading, label: "Heading", widget: string, required: false }
               - { name: intro, label: "Intro", widget: text, required: false }
-              - { name: before, label: "Before image", widget: image, required: false }
-              - { name: after, label: "After image", widget: image, required: false }
-              - name: surface
-                label: "Background"
-                widget: select
-                required: false
-                default: "standard"
-                hint: "The surface behind the section — for rhythm between blocks."
-                options:
-                  - { label: "Standard (white)", value: "standard" }
-                  - { label: "Tinted", value: "tint" }
-                  - { label: "Accent band", value: "band" }
-                  - { label: "Dark", value: "dark" }
-                  - { label: "Gradient", value: "gradient" }
+              - name: media
+                label: "Media"
+                widget: object
+                collapsed: true
+                hint: "The two photos being compared."
+                fields:
+                  - { name: before, label: "Before image", widget: image, required: false }
+                  - { name: after, label: "After image", widget: image, required: false }
+              - name: style
+                label: "Appearance"
+                widget: object
+                collapsed: true
+                hint: "Background and accent colour — set once when the page is designed."
+                fields:
+                  - name: surface
+                    label: "Background"
+                    widget: select
+                    required: false
+                    default: "standard"
+                    hint: "The surface behind the section — for rhythm between blocks."
+                    options:
+                      - { label: "Standard (white)", value: "standard" }
+                      - { label: "Tinted", value: "tint" }
+                      - { label: "Accent band", value: "band" }
+                      - { label: "Dark", value: "dark" }
+                      - { label: "Gradient", value: "gradient" }
           - name: definition
             label: "Dictionary entry"
             widget: object
@@ -1933,86 +2359,110 @@ collections:
                 fields:
                   - { name: text, label: "Sense", widget: string, hint: "Wrap words in *asterisks* to underline them." }
                   - { name: note, label: "Note (muted)", widget: string, required: false, hint: "A quiet addendum after the sense, e.g. an example or year." }
-              - name: width
-                label: "Width"
-                widget: select
-                required: false
-                default: "xnarrow"
-                hint: "How wide the entry column is."
-                options:
-                  - { label: "Extra narrow", value: "xnarrow" }
-                  - { label: "Narrow (reading column)", value: "narrow" }
-                  - { label: "Full width", value: "full" }
-              - name: align
-                label: "Alignment"
-                widget: select
-                required: false
-                default: "left"
-                hint: "Where the entry sits in the section."
-                options:
-                  - { label: "Left", value: "left" }
-                  - { label: "Centered", value: "center" }
-                  - { label: "Right", value: "right" }
-              - name: surface
-                label: "Background"
-                widget: select
-                required: false
-                default: "standard"
-                hint: "The surface behind the section — for rhythm between blocks."
-                options:
-                  - { label: "Standard (white)", value: "standard" }
-                  - { label: "Tinted", value: "tint" }
-                  - { label: "Accent band", value: "band" }
-                  - { label: "Dark", value: "dark" }
-                  - { label: "Gradient", value: "gradient" }
+              - name: layout
+                label: "Layout"
+                widget: object
+                collapsed: true
+                hint: "Size and placement — rarely needs changing."
+                fields:
+                  - name: width
+                    label: "Width"
+                    widget: select
+                    required: false
+                    default: "xnarrow"
+                    hint: "How wide the entry column is."
+                    options:
+                      - { label: "Extra narrow", value: "xnarrow" }
+                      - { label: "Narrow (reading column)", value: "narrow" }
+                      - { label: "Full width", value: "full" }
+                  - name: align
+                    label: "Alignment"
+                    widget: select
+                    required: false
+                    default: "left"
+                    hint: "Where the entry sits in the section."
+                    options:
+                      - { label: "Left", value: "left" }
+                      - { label: "Centered", value: "center" }
+                      - { label: "Right", value: "right" }
+              - name: style
+                label: "Appearance"
+                widget: object
+                collapsed: true
+                hint: "Background and accent colour — set once when the page is designed."
+                fields:
+                  - name: surface
+                    label: "Background"
+                    widget: select
+                    required: false
+                    default: "standard"
+                    hint: "The surface behind the section — for rhythm between blocks."
+                    options:
+                      - { label: "Standard (white)", value: "standard" }
+                      - { label: "Tinted", value: "tint" }
+                      - { label: "Accent band", value: "band" }
+                      - { label: "Dark", value: "dark" }
+                      - { label: "Gradient", value: "gradient" }
           - name: callout
             label: "Highlighted quote"
             widget: object
             fields:
               - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
               - { name: quote, label: "Quote / statement", widget: text, hint: "Wrap words in *asterisks* to underline them." }
-              - name: width
-                label: "Width"
-                widget: select
-                required: false
-                default: "narrow"
-                hint: "How wide the quote column is. Narrow reads best."
-                options:
-                  - { label: "Narrow (reading column)", value: "narrow" }
-                  - { label: "Extra narrow", value: "xnarrow" }
-                  - { label: "Full width", value: "full" }
-              - name: align
-                label: "Alignment"
-                widget: select
-                required: false
-                default: "left"
-                hint: "Where the quote column sits in the section (the text stays left-aligned)."
-                options:
-                  - { label: "Left", value: "left" }
-                  - { label: "Centered", value: "center" }
-                  - { label: "Right", value: "right" }
-              - name: accent
-                label: "Accent"
-                widget: select
-                required: false
-                default: "brand"
-                hint: "This block's accent colour (rule, icon or number) — not the eyebrow."
-                options:
-                  - { label: "Brand", value: "brand" }
-                  - { label: "Secondary", value: "secondary" }
-                  - { label: "Highlight", value: "highlight" }
-              - name: surface
-                label: "Background"
-                widget: select
-                required: false
-                default: "standard"
-                hint: "The surface behind the section — for rhythm between blocks."
-                options:
-                  - { label: "Standard (white)", value: "standard" }
-                  - { label: "Tinted", value: "tint" }
-                  - { label: "Accent band", value: "band" }
-                  - { label: "Dark", value: "dark" }
-                  - { label: "Gradient", value: "gradient" }
+              - name: layout
+                label: "Layout"
+                widget: object
+                collapsed: true
+                hint: "Size and placement — rarely needs changing."
+                fields:
+                  - name: width
+                    label: "Width"
+                    widget: select
+                    required: false
+                    default: "narrow"
+                    hint: "How wide the quote column is. Narrow reads best."
+                    options:
+                      - { label: "Narrow (reading column)", value: "narrow" }
+                      - { label: "Extra narrow", value: "xnarrow" }
+                      - { label: "Full width", value: "full" }
+                  - name: align
+                    label: "Alignment"
+                    widget: select
+                    required: false
+                    default: "left"
+                    hint: "Where the quote column sits in the section (the text stays left-aligned)."
+                    options:
+                      - { label: "Left", value: "left" }
+                      - { label: "Centered", value: "center" }
+                      - { label: "Right", value: "right" }
+              - name: style
+                label: "Appearance"
+                widget: object
+                collapsed: true
+                hint: "Background and accent colour — set once when the page is designed."
+                fields:
+                  - name: surface
+                    label: "Background"
+                    widget: select
+                    required: false
+                    default: "standard"
+                    hint: "The surface behind the section — for rhythm between blocks."
+                    options:
+                      - { label: "Standard (white)", value: "standard" }
+                      - { label: "Tinted", value: "tint" }
+                      - { label: "Accent band", value: "band" }
+                      - { label: "Dark", value: "dark" }
+                      - { label: "Gradient", value: "gradient" }
+                  - name: accent
+                    label: "Accent"
+                    widget: select
+                    required: false
+                    default: "brand"
+                    hint: "This block's accent colour (rule, icon or number) — not the eyebrow."
+                    options:
+                      - { label: "Brand", value: "brand" }
+                      - { label: "Secondary", value: "secondary" }
+                      - { label: "Highlight", value: "highlight" }
           - name: statPanel
             label: "Statement panel"
             widget: object
@@ -2043,16 +2493,22 @@ collections:
                   - { name: label, label: "Label", widget: string, required: false }
                   - { name: value, label: "Value", widget: string }
                   - { name: note, label: "Note", widget: text, required: false }
-              - name: accent
-                label: "Accent"
-                widget: select
-                required: false
-                default: "brand"
-                hint: "This block's accent colour (rule, icon or number) — not the eyebrow."
-                options:
-                  - { label: "Brand", value: "brand" }
-                  - { label: "Secondary", value: "secondary" }
-                  - { label: "Highlight", value: "highlight" }
+              - name: style
+                label: "Appearance"
+                widget: object
+                collapsed: true
+                hint: "Background and accent colour — set once when the page is designed."
+                fields:
+                  - name: accent
+                    label: "Accent"
+                    widget: select
+                    required: false
+                    default: "brand"
+                    hint: "This block's accent colour (rule, icon or number) — not the eyebrow."
+                    options:
+                      - { label: "Brand", value: "brand" }
+                      - { label: "Secondary", value: "secondary" }
+                      - { label: "Highlight", value: "highlight" }
           - name: statsBar
             label: "Stats / facts"
             widget: object
@@ -2085,17 +2541,6 @@ collections:
             label: "FAQ"
             widget: object
             fields:
-              - name: variant
-                label: "Layout"
-                widget: select
-                required: false
-                default: "list"
-                hint: "How the questions are presented."
-                options:
-                  - { label: "List", value: "list" }
-                  - { label: "Accordion", value: "accordion" }
-                  - { label: "Cards", value: "cards" }
-                  - { label: "Split (index + reader)", value: "split" }
               - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
               - { name: heading, label: "Heading", widget: string, required: false }
               - { name: intro, label: "Intro", widget: text, required: false }
@@ -2135,18 +2580,41 @@ collections:
                       - { label: "About (/about)", value: "/about" }
                       - { label: "Contact (/contact)", value: "/contact" }
                   - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
-              - name: surface
-                label: "Background"
-                widget: select
-                required: false
-                default: "standard"
-                hint: "The surface behind the section — for rhythm between blocks."
-                options:
-                  - { label: "Standard (white)", value: "standard" }
-                  - { label: "Tinted", value: "tint" }
-                  - { label: "Accent band", value: "band" }
-                  - { label: "Dark", value: "dark" }
-                  - { label: "Gradient", value: "gradient" }
+              - name: layout
+                label: "Layout"
+                widget: object
+                collapsed: true
+                hint: "Size and placement — rarely needs changing."
+                fields:
+                  - name: variant
+                    label: "Layout"
+                    widget: select
+                    required: false
+                    default: "list"
+                    hint: "How the questions are presented."
+                    options:
+                      - { label: "List", value: "list" }
+                      - { label: "Accordion", value: "accordion" }
+                      - { label: "Cards", value: "cards" }
+                      - { label: "Split (index + reader)", value: "split" }
+              - name: style
+                label: "Appearance"
+                widget: object
+                collapsed: true
+                hint: "Background and accent colour — set once when the page is designed."
+                fields:
+                  - name: surface
+                    label: "Background"
+                    widget: select
+                    required: false
+                    default: "standard"
+                    hint: "The surface behind the section — for rhythm between blocks."
+                    options:
+                      - { label: "Standard (white)", value: "standard" }
+                      - { label: "Tinted", value: "tint" }
+                      - { label: "Accent band", value: "band" }
+                      - { label: "Dark", value: "dark" }
+                      - { label: "Gradient", value: "gradient" }
           - name: ctaPanel
             label: "Call to action (band)"
             widget: object
@@ -2177,15 +2645,6 @@ collections:
             label: "Call to action (box)"
             widget: object
             fields:
-              - name: variant
-                label: "Layout"
-                widget: select
-                required: false
-                default: "classic"
-                options:
-                  - { label: "Classic (centered panel)", value: "classic" }
-                  - { label: "Split (copy + facts card)", value: "split" }
-                  - { label: "Panel (dark, with readout)", value: "panel" }
               - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
               - { name: heading, label: "Heading", widget: string }
               - { name: intro, label: "Intro", widget: text, required: false, hint: "A short line under the heading." }
@@ -2239,18 +2698,39 @@ collections:
                 fields:
                   - { name: label, label: "Label", widget: string }
                   - { name: value, label: "Value", widget: string }
-              - name: surface
-                label: "Background"
-                widget: select
-                required: false
-                default: "standard"
-                hint: "The surface behind the section — for rhythm between blocks."
-                options:
-                  - { label: "Standard (white)", value: "standard" }
-                  - { label: "Tinted", value: "tint" }
-                  - { label: "Accent band", value: "band" }
-                  - { label: "Dark", value: "dark" }
-                  - { label: "Gradient", value: "gradient" }
+              - name: layout
+                label: "Layout"
+                widget: object
+                collapsed: true
+                hint: "Size and placement — rarely needs changing."
+                fields:
+                  - name: variant
+                    label: "Layout"
+                    widget: select
+                    required: false
+                    default: "classic"
+                    options:
+                      - { label: "Classic (centered panel)", value: "classic" }
+                      - { label: "Split (copy + facts card)", value: "split" }
+                      - { label: "Panel (dark, with readout)", value: "panel" }
+              - name: style
+                label: "Appearance"
+                widget: object
+                collapsed: true
+                hint: "Background and accent colour — set once when the page is designed."
+                fields:
+                  - name: surface
+                    label: "Background"
+                    widget: select
+                    required: false
+                    default: "standard"
+                    hint: "The surface behind the section — for rhythm between blocks."
+                    options:
+                      - { label: "Standard (white)", value: "standard" }
+                      - { label: "Tinted", value: "tint" }
+                      - { label: "Accent band", value: "band" }
+                      - { label: "Dark", value: "dark" }
+                      - { label: "Gradient", value: "gradient" }
           - name: contactForm
             label: "Contact form"
             widget: object

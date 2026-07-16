@@ -13,8 +13,8 @@ import { resolveSite, type SiteConfig } from './src/config';
 // getStaticPaths there, then
 //   <Base title=... description=...><ServicePage service={entry} config={site} /></Base>
 // Chrome strings come from site.strings.service; CTA links to site.routes.contact.
-// Expects a `services` schema with: title, navLabel, summary?, bullets?, image?,
-// imageAlt?, seo? + a markdown body + optional `blocks` (composed sections, same
+// Expects a `services` schema with: title, navLabel, summary?, bullets?, media { image?, imageAlt? },
+// seo? + a markdown body + optional `blocks` (composed sections, same
 // picker as pages — rendered between the intro and the quote CTA).
 //
 // A block-composed entry may additionally carry a `hero` frontmatter group. That
@@ -46,7 +46,7 @@ const hero = hasBlocks && data.hero && typeof data.hero === 'object' ? data.hero
 const hdTicks: string[] = hero
   ? (Array.isArray(hero.ticks) && hero.ticks.length > 0 ? hero.ticks : (data.bullets ?? []))
   : [];
-const hdImage = hero ? (hero.image ?? data.image) : undefined;
+const hdImage = hero ? (hero.image ?? data.media?.image) : undefined;
 const hdCta = hero ? resolveLink(hero.ctaHref, contact) : contact;
 const hdCta2 = hero?.cta2Label ? resolveLink(hero.cta2Href, '/') : null;
 ---
@@ -72,7 +72,7 @@ const hdCta2 = hero?.cta2Label ? resolveLink(hero.cta2Href, '/') : null;
       </div>
     </div>
     {hdImage && (
-      <Cover src={hdImage} alt={hero.imageAlt ?? data.imageAlt ?? ''} placeholder="/images/placeholders/service.svg" width={800} height={600} loading="eager" class="service-hd__img" />
+      <Cover src={hdImage} alt={hero.imageAlt ?? data.media?.imageAlt ?? ''} placeholder="/images/placeholders/service.svg" width={800} height={600} loading="eager" class="service-hd__img" />
     )}
   </div>
 </section>
@@ -82,8 +82,8 @@ const hdCta2 = hero?.cta2Label ? resolveLink(hero.cta2Href, '/') : null;
   <span class="mono eyebrow">{t.eyebrow}</span>
   <h1 class="display display--hero service-h1">{data.title}</h1>
   {data.summary && <p class="intro service-lede">{data.summary}</p>}
-  {!hasBlocks && data.image && (
-    <Cover src={data.image} alt={data.imageAlt ?? data.title} placeholder="/images/placeholders/service.svg" width={1200} height={675} loading="eager" class="service-img" />
+  {!hasBlocks && data.media?.image && (
+    <Cover src={data.media?.image} alt={data.media?.imageAlt ?? data.title} placeholder="/images/placeholders/service.svg" width={1200} height={675} loading="eager" class="service-img" />
   )}
   {!hasBlocks && (
     <div class="service-prose">

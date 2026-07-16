@@ -15,7 +15,7 @@ import ContactLink from '../ContactLink.astro';
 //   split      — numbered index + a single reader panel with an embedded CTA
 //                (JS-enhanced; without JS all answers show, degrading to a list)
 interface Props {
-  variant?: 'list' | 'accordion' | 'cards' | 'split';
+  layout?: { variant?: 'list' | 'accordion' | 'cards' | 'split' };
   eyebrow?: string;
   heading?: string;
   intro?: string;
@@ -30,7 +30,8 @@ interface Props {
   // is never queried; live pages always take the collection path.
   items?: { id: string; data: { question: string; answer: string } }[];
 }
-const { variant = 'list', eyebrow, heading, intro, entries, tag, asideHeading, asideBody, asideCtaLabel, asideHref, asideCtaHref } = Astro.props;
+const { eyebrow, heading, intro, entries, tag, asideHeading, asideBody, asideCtaLabel, asideHref, asideCtaHref } = Astro.props;
+const variant = Astro.props.layout?.variant ?? 'list';
 const fixture = Astro.props.items;
 const all = fixture ?? (await getCollection('faq'));
 // Page-scoped FAQs, two ways (picked entries win over the tag filter):

@@ -8,10 +8,12 @@ interface Props {
   body?: string;
   quote?: string;
   attribution?: string;
-  flip?: boolean;
-  accent?: 'brand' | 'secondary' | 'highlight';
+  layout?: { flip?: boolean };
+  style?: { surface?: string; accent?: 'brand' | 'secondary' | 'highlight' };
 }
-const { body = '', quote, attribution, flip = false, accent = 'brand' } = Astro.props;
+const { body = '', quote, attribution } = Astro.props;
+const flip = Astro.props.layout?.flip ?? false;
+const accent = Astro.props.style?.accent ?? 'brand';
 const accentVar = accent === 'secondary' ? 'var(--color-secondary)' : accent === 'highlight' ? 'var(--color-highlight)' : 'var(--color-brand)';
 const html = await renderMarkdown(body);
 ---

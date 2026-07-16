@@ -10,10 +10,11 @@ interface Props {
   term?: string;
   wordClass?: string;
   senses?: Sense[];
-  width?: 'xnarrow' | 'narrow' | 'full';
-  align?: 'left' | 'center' | 'right';
+  layout?: { width?: 'xnarrow' | 'narrow' | 'full'; align?: 'left' | 'center' | 'right' };
 }
-const { eyebrow, term, wordClass, senses = [], width = 'xnarrow', align = 'left' } = Astro.props;
+const { eyebrow, term, wordClass, senses = [] } = Astro.props;
+const width = Astro.props.layout?.width ?? 'xnarrow';
+const align = Astro.props.layout?.align ?? 'left';
 ---
 
 {term && (
