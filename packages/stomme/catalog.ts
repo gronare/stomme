@@ -10,7 +10,7 @@ const RAW_BLOCKS: BlockDef[] = [
     summary: 'Full-width intro — eyebrow, H1, text and a button, with an optional image, highlights list or animated motif beside it.',
     shape: 'hero',
     fields: [
-      { name: 'eyebrow', label: 'Eyebrow', widget: 'string', required: false },
+      { name: 'eyebrow', label: 'Eyebrow', widget: 'string', required: false, hint: 'Small uppercase label above the heading.' },
       { name: 'heading', label: 'Heading (H1)', widget: 'string' },
       { name: 'intro', label: 'Intro', widget: 'text', required: false },
       { name: 'ctaLabel', label: 'Button label', widget: 'string', required: false },
@@ -31,14 +31,18 @@ const RAW_BLOCKS: BlockDef[] = [
         ],
         hint: 'What shows beside the heading. Default: none.',
       },
-      imageField('image', 'Image (if “Image” chosen)'),
+      imageField('image', 'Image', 'Used when Right-side media = Image.'),
       { name: 'imageAlt', label: 'Image alt text', widget: 'string', required: false },
       {
         name: 'highlights',
-        label: 'Highlights (if “Highlights” chosen)',
+        label: 'Highlights',
         widget: 'list',
         required: false,
-        hint: 'A few key points shown as a stacked panel beside the heading.',
+        collapsed: true,
+        minimize_collapsed: true,
+        label_singular: 'Key point',
+        summary: '{{fields.title}}',
+        hint: 'A few key points beside the heading. Used when Right-side media = Highlights.',
         fields: [iconField(), { name: 'title', label: 'Title', widget: 'string' }, { name: 'body', label: 'Text', widget: 'string', required: false }],
       },
       {
@@ -46,6 +50,9 @@ const RAW_BLOCKS: BlockDef[] = [
         label: 'Ticks (checkmark lines)',
         widget: 'list',
         required: false,
+        collapsed: true,
+        minimize_collapsed: true,
+        label_singular: 'Line',
         hint: 'Short ✓ lines under the intro — key reassurances.',
         field: { name: 'text', label: 'Line', widget: 'string' },
       },
@@ -74,7 +81,7 @@ const RAW_BLOCKS: BlockDef[] = [
     summary: 'Full-bleed banner — a background photo or muted looping video, with overlaid heading, text and buttons.',
     shape: 'hero',
     fields: [
-      { name: 'eyebrow', label: 'Eyebrow', widget: 'string', required: false },
+      { name: 'eyebrow', label: 'Eyebrow', widget: 'string', required: false, hint: 'Small uppercase label above the heading.' },
       { name: 'heading', label: 'Heading (H1)', widget: 'text', hint: 'Press Enter for a line break.' },
       { name: 'intro', label: 'Intro', widget: 'text', required: false },
       { name: 'ctaLabel', label: 'Button label', widget: 'string', required: false },
@@ -97,7 +104,7 @@ const RAW_BLOCKS: BlockDef[] = [
       },
       imageField('image', 'Background image / video poster'),
       { name: 'imageAlt', label: 'Image alt text', widget: 'string', required: false },
-      { name: 'video', label: 'Video file (if “Video”)', widget: 'file', required: false, hint: 'Uploaded MP4/WebM — muted + looping. The image shows until it plays, and on reduced-motion.' },
+      { name: 'video', label: 'Video file', widget: 'file', required: false, hint: 'Used when Background = Video. Muted, looping MP4/WebM; the image shows until it plays.' },
       { name: 'videoUrl', label: '…or video URL', widget: 'string', required: false, hint: 'External MP4/WebM URL. Used instead of an uploaded file if filled.' },
       {
         name: 'overlay',
@@ -118,6 +125,7 @@ const RAW_BLOCKS: BlockDef[] = [
         widget: 'select',
         required: false,
         default: 'start',
+        hint: 'Where the text sits on the cover.',
         options: [
           { label: 'Bottom left', value: 'start' },
           { label: 'Centered', value: 'center' },
@@ -129,6 +137,7 @@ const RAW_BLOCKS: BlockDef[] = [
         widget: 'select',
         required: false,
         default: 'tall',
+        hint: 'Tall fills most of the screen; Medium is a shorter band.',
         options: [
           { label: 'Tall', value: 'tall' },
           { label: 'Medium', value: 'medium' },
@@ -143,9 +152,9 @@ const RAW_BLOCKS: BlockDef[] = [
     summary: 'Page title band (light or dark): eyebrow, H1, intro and an optional button.',
     shape: 'band',
     fields: [
-      { name: 'variant', label: 'Style', widget: 'select', required: false, default: 'light', options: [{ label: 'Light', value: 'light' }, { label: 'Band', value: 'dark' }] },
+      { name: 'variant', label: 'Style', widget: 'select', required: false, default: 'light', hint: 'Band puts the title on a dark full-width band.', options: [{ label: 'Light', value: 'light' }, { label: 'Band', value: 'dark' }] },
       widthField,
-      { name: 'eyebrow', label: 'Eyebrow', widget: 'string', required: false },
+      { name: 'eyebrow', label: 'Eyebrow', widget: 'string', required: false, hint: 'Small uppercase label above the heading.' },
       { name: 'heading', label: 'Heading (H1)', widget: 'string' },
       { name: 'intro', label: 'Intro', widget: 'text', required: false },
       { name: 'ctaLabel', label: 'Button label (optional)', widget: 'string', required: false },
@@ -202,13 +211,17 @@ const RAW_BLOCKS: BlockDef[] = [
         label: 'Plans',
         widget: 'list',
         required: false,
+        collapsed: true,
+        minimize_collapsed: true,
+        label_singular: 'Plan',
+        summary: '{{fields.name}}',
         fields: [
           { name: 'name', label: 'Plan name', widget: 'string' },
           { name: 'pricePrefix', label: 'Price prefix', widget: 'string', required: false, hint: 'Small word above the price, e.g. "från".' },
           { name: 'price', label: 'Price', widget: 'string', hint: 'e.g. "595 kr", "19 900 kr", "0 kr".' },
           { name: 'period', label: 'Period', widget: 'string', required: false, hint: 'e.g. "/mån" or "engångspris". Blank for none.' },
           { name: 'description', label: 'Description', widget: 'text', required: false },
-          { name: 'features', label: 'Features', widget: 'list', required: false, fields: [{ name: 'text', label: 'Feature', widget: 'string' }] },
+          { name: 'features', label: 'Features', widget: 'list', required: false, collapsed: true, minimize_collapsed: true, label_singular: 'Feature', summary: '{{fields.text}}', fields: [{ name: 'text', label: 'Feature', widget: 'string' }] },
           { name: 'badge', label: 'Badge', widget: 'string', required: false, hint: 'Small label, e.g. "populär".' },
           { name: 'highlight', label: 'Highlight this plan', widget: 'boolean', required: false, default: false },
           { name: 'ctaLabel', label: 'Button label', widget: 'string', required: false },
@@ -226,6 +239,7 @@ const RAW_BLOCKS: BlockDef[] = [
       ...headingFields,
       {
         name: 'items', label: 'Steps', widget: 'list', required: false,
+        collapsed: true, minimize_collapsed: true, label_singular: 'Step', summary: '{{fields.title}}',
         fields: [
           { name: 'title', label: 'Title', widget: 'string' },
           { name: 'kicker', label: 'Tag after the number', widget: 'string', required: false, hint: 'Short word shown with the number, e.g. "talk".' },
@@ -245,7 +259,7 @@ const RAW_BLOCKS: BlockDef[] = [
     shape: 'checklist',
     fields: [
       ...headingFields,
-      { name: 'items', label: 'Items', widget: 'list', required: false, fields: [{ name: 'text', label: 'Text', widget: 'string' }, { name: 'note', label: 'Sub-line (optional)', widget: 'text', required: false }] },
+      { name: 'items', label: 'Items', widget: 'list', required: false, collapsed: true, minimize_collapsed: true, label_singular: 'Item', summary: '{{fields.text}}', fields: [{ name: 'text', label: 'Text', widget: 'string' }, { name: 'note', label: 'Sub-line (optional)', widget: 'text', required: false }] },
       { name: 'columns', label: 'Columns', widget: 'number', required: false, default: 2, hint: '1 or 2.' },
       surfaceField,
     ],
@@ -258,7 +272,7 @@ const RAW_BLOCKS: BlockDef[] = [
     shape: 'gallery',
     fields: [
       ...headingFields,
-      { name: 'images', label: 'Images', widget: 'list', required: false, fields: [imageField('image', 'Image'), { name: 'alt', label: 'Alt text', widget: 'string', required: false }, { name: 'caption', label: 'Caption', widget: 'string', required: false }] },
+      { name: 'images', label: 'Images', widget: 'list', required: false, collapsed: true, minimize_collapsed: true, label_singular: 'Image', fields: [imageField('image', 'Image'), { name: 'alt', label: 'Alt text', widget: 'string', required: false }, { name: 'caption', label: 'Caption', widget: 'string', required: false }] },
       { name: 'columns', label: 'Columns', widget: 'number', required: false, default: 3, hint: '2 or 3.' },
       surfaceField,
     ],
@@ -308,11 +322,12 @@ const RAW_BLOCKS: BlockDef[] = [
     summary: 'A dictionary-style word entry — term, word class and numbered senses.',
     shape: 'prose',
     fields: [
-      { name: 'eyebrow', label: 'Eyebrow', widget: 'string', required: false },
+      { name: 'eyebrow', label: 'Eyebrow', widget: 'string', required: false, hint: 'Small uppercase label above the heading.' },
       { name: 'term', label: 'Term', widget: 'string', hint: 'The word being defined, e.g. "grö·na·re" (use · for syllables).' },
       { name: 'wordClass', label: 'Word class / etymology line', widget: 'string', required: false, hint: 'The italic line under the term, e.g. "komparativ av grön".' },
       {
         name: 'senses', label: 'Senses', widget: 'list', required: false,
+        collapsed: true, minimize_collapsed: true, label_singular: 'Sense', summary: '{{fields.text}}',
         fields: [
           { name: 'text', label: 'Sense', widget: 'string', hint: 'Wrap words in *asterisks* to underline them.' },
           { name: 'note', label: 'Note (muted)', widget: 'string', required: false, hint: 'A quiet addendum after the sense, e.g. an example or year.' },
@@ -320,10 +335,12 @@ const RAW_BLOCKS: BlockDef[] = [
       },
       {
         name: 'width', label: 'Width', widget: 'select', required: false, default: 'xnarrow',
+        hint: 'How wide the entry column is.',
         options: [{ label: 'Extra narrow', value: 'xnarrow' }, { label: 'Narrow (reading column)', value: 'narrow' }, { label: 'Full width', value: 'full' }],
       },
       {
         name: 'align', label: 'Alignment', widget: 'select', required: false, default: 'left',
+        hint: 'Where the entry sits in the section.',
         options: [{ label: 'Left', value: 'left' }, { label: 'Centered', value: 'center' }, { label: 'Right', value: 'right' }],
       },
       surfaceField,
@@ -356,7 +373,7 @@ const RAW_BLOCKS: BlockDef[] = [
     summary: 'A single highlighted quote or statement.',
     shape: 'quote',
     fields: [
-      { name: 'eyebrow', label: 'Eyebrow', widget: 'string', required: false },
+      { name: 'eyebrow', label: 'Eyebrow', widget: 'string', required: false, hint: 'Small uppercase label above the heading.' },
       { name: 'quote', label: 'Quote / statement', widget: 'text', hint: 'Wrap words in *asterisks* to underline them.' },
       {
         name: 'width', label: 'Width', widget: 'select', required: false, default: 'narrow',
@@ -387,10 +404,10 @@ const RAW_BLOCKS: BlockDef[] = [
     summary: 'Dark panel with a big number, statement and badges.',
     shape: 'panel',
     fields: [
-      { name: 'eyebrow', label: 'Eyebrow', widget: 'string', required: false },
+      { name: 'eyebrow', label: 'Eyebrow', widget: 'string', required: false, hint: 'Small uppercase label above the heading.' },
       { name: 'heading', label: 'Heading', widget: 'string', required: false, hint: 'Wrap words in *asterisks* to underline them.' },
       { name: 'body', label: 'Body', widget: 'text', required: false },
-      { name: 'badges', label: 'Badges', widget: 'list', required: false, field: { name: 'badge', label: 'Badge', widget: 'string' } },
+      { name: 'badges', label: 'Badges', widget: 'list', required: false, collapsed: true, minimize_collapsed: true, label_singular: 'Badge', field: { name: 'badge', label: 'Badge', widget: 'string' } },
       { name: 'statValue', label: 'Big number', widget: 'string', required: false },
       { name: 'statLabel', label: 'Number label', widget: 'string', required: false },
       {
@@ -398,6 +415,10 @@ const RAW_BLOCKS: BlockDef[] = [
         label: 'Stat columns',
         widget: 'list',
         required: false,
+        collapsed: true,
+        minimize_collapsed: true,
+        label_singular: 'Column',
+        summary: '{{fields.label}} {{fields.value}}',
         hint: 'Two or three side-by-side figures (e.g. a comparison). Replaces the single big number when filled.',
         fields: [
           { name: 'label', label: 'Label', widget: 'string', required: false },
@@ -437,7 +458,7 @@ const RAW_BLOCKS: BlockDef[] = [
       { name: 'source', label: 'source', widget: 'hidden' },
       { name: 'base', label: 'base', widget: 'hidden' },
       { name: 'featured', label: 'Featured first post', widget: 'boolean', required: false, default: true, hint: 'Show the newest post as a large lead card.' },
-      { name: 'showImages', label: 'Image previews', widget: 'boolean', required: false, default: true },
+      { name: 'showImages', label: 'Image previews', widget: 'boolean', required: false, default: true, hint: 'Show cover images on the cards.' },
       { name: 'columns', label: 'Columns', widget: 'number', required: false, default: 3, hint: '2 or 3.' },
       surfaceField,
     ],
@@ -452,8 +473,8 @@ const RAW_BLOCKS: BlockDef[] = [
       ...headingFields,
       { name: 'source', label: 'source', widget: 'hidden' },
       { name: 'base', label: 'base', widget: 'hidden' },
-      { name: 'filters', label: 'Category filters', widget: 'boolean', required: false, default: true },
-      { name: 'showImages', label: 'Image previews', widget: 'boolean', required: false, default: true },
+      { name: 'filters', label: 'Category filters', widget: 'boolean', required: false, default: true, hint: 'Show category filter chips above the grid.' },
+      { name: 'showImages', label: 'Image previews', widget: 'boolean', required: false, default: true, hint: 'Show cover images on the cards.' },
       { name: 'columns', label: 'Columns', widget: 'number', required: false, default: 3, hint: '2 or 3.' },
       surfaceField,
     ],
@@ -474,14 +495,14 @@ const RAW_BLOCKS: BlockDef[] = [
     shape: 'box',
     fields: [
       { name: 'variant', label: 'Layout', widget: 'select', required: false, default: 'classic', options: [{ label: 'Classic (centered panel)', value: 'classic' }, { label: 'Split (copy + facts card)', value: 'split' }, { label: 'Panel (dark, with readout)', value: 'panel' }] },
-      { name: 'eyebrow', label: 'Eyebrow', widget: 'string', required: false },
+      { name: 'eyebrow', label: 'Eyebrow', widget: 'string', required: false, hint: 'Small uppercase label above the heading.' },
       { name: 'heading', label: 'Heading', widget: 'string' },
       { name: 'intro', label: 'Intro', widget: 'text', required: false, hint: 'A short line under the heading.' },
       { name: 'label', label: 'Button label', widget: 'string' },
       linkField('href', 'Button link'),
       { name: 'label2', label: 'Second button label', widget: 'string', required: false, hint: 'Shown as a quiet text link beside the button.' },
       linkField('href2', 'Second button link'),
-      { name: 'facts', label: 'Facts (label + value)', widget: 'list', required: false, hint: 'Shown as chips (Split) or a mono readout (Panel). Ignored in Classic.', fields: [{ name: 'label', label: 'Label', widget: 'string' }, { name: 'value', label: 'Value', widget: 'string' }] },
+      { name: 'facts', label: 'Facts (label + value)', widget: 'list', required: false, collapsed: true, minimize_collapsed: true, label_singular: 'Fact', summary: '{{fields.label}} {{fields.value}}', hint: 'Shown as chips (Split) or a mono readout (Panel). Ignored in Classic.', fields: [{ name: 'label', label: 'Label', widget: 'string' }, { name: 'value', label: 'Value', widget: 'string' }] },
       surfaceField,
     ],
   },
@@ -493,7 +514,7 @@ const RAW_BLOCKS: BlockDef[] = [
     shape: 'list',
     collection: 'faq',
     fields: [
-      { name: 'variant', label: 'Layout', widget: 'select', required: false, default: 'list', options: [{ label: 'List', value: 'list' }, { label: 'Accordion', value: 'accordion' }, { label: 'Cards', value: 'cards' }, { label: 'Split (index + reader)', value: 'split' }] },
+      { name: 'variant', label: 'Layout', widget: 'select', required: false, default: 'list', hint: 'How the questions are presented.', options: [{ label: 'List', value: 'list' }, { label: 'Accordion', value: 'accordion' }, { label: 'Cards', value: 'cards' }, { label: 'Split (index + reader)', value: 'split' }] },
       ...headingFields,
       { name: 'entries', label: 'Questions shown', widget: 'select', options: '$faq', multiple: true, required: false, hint: 'Pick specific questions (in order). Leave empty to use the tag filter or show all.' },
       { name: 'tag', label: 'Tag filter', widget: 'select', options: '$faqTags', required: false, hint: 'Show every question carrying this tag (tags are set on the questions). Ignored when questions are picked above.' },
@@ -511,7 +532,7 @@ const RAW_BLOCKS: BlockDef[] = [
     summary: 'A row of stats / facts (label + value).',
     shape: 'stats',
     fields: [
-      { name: 'items', label: 'Facts (label + value)', widget: 'list', required: false, fields: [{ name: 'label', label: 'Label', widget: 'string' }, { name: 'value', label: 'Value', widget: 'string' }] },
+      { name: 'items', label: 'Facts (label + value)', widget: 'list', required: false, collapsed: true, minimize_collapsed: true, label_singular: 'Fact', summary: '{{fields.label}} {{fields.value}}', fields: [{ name: 'label', label: 'Label', widget: 'string' }, { name: 'value', label: 'Value', widget: 'string' }] },
     ],
   },
   {
@@ -519,7 +540,7 @@ const RAW_BLOCKS: BlockDef[] = [
     summary: 'A centered row of partner / client names with an optional lead-in.',
     fields: [
       { name: 'lead', label: 'Lead-in', widget: 'string', required: false, hint: 'e.g. “Trusted by” or “Built on”.' },
-      { name: 'logos', label: 'Names', widget: 'list', required: false, field: { name: 'name', label: 'Name', widget: 'string' } },
+      { name: 'logos', label: 'Names', widget: 'list', required: false, collapsed: true, minimize_collapsed: true, label_singular: 'Name', field: { name: 'name', label: 'Name', widget: 'string' } },
     ],
   },
   {

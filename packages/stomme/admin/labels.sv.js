@@ -214,6 +214,7 @@ export default {
   'A still photo, or a muted looping video.': 'Ett stillbildsfoto, eller en tyst loopad video.',
   'Background image / video poster': 'Bakgrundsbild / videoposter',
   'Video file (if “Video”)': 'Videofil (om ”Video”)',
+  'Video file': 'Videofil',
   'Uploaded MP4/WebM — muted + looping. The image shows until it plays, and on reduced-motion.': 'Uppladdad MP4/WebM — tyst + loopad. Bilden visas tills den spelas, och vid reducerad rörelse.',
   '…or video URL': '…eller video-URL',
   'External MP4/WebM URL. Used instead of an uploaded file if filled.': 'Extern MP4/WebM-URL. Används istället för uppladdad fil om ifylld.',
@@ -247,7 +248,12 @@ export default {
   'Highlights (icon + title + line)': 'Höjdpunkter (ikon + titel + rad)',
   'Motif (animated, no image)': 'Mönster (animerat, ingen bild)',
   'Highlights (if “Highlights” chosen)': 'Höjdpunkter (om ”Höjdpunkter” valts)',
+  'Highlights': 'Höjdpunkter',
   'A few key points shown as a stacked panel beside the heading.': 'Några nyckelpunkter som visas som en panel bredvid rubriken.',
+  // conditional-field triggers (hint standard: plain label + "used when" hint)
+  'Used when Right-side media = Image.': 'Används när Media till höger = Bild.',
+  'A few key points beside the heading. Used when Right-side media = Highlights.': 'Några nyckelpunkter bredvid rubriken. Används när Media till höger = Höjdpunkter.',
+  'Used when Background = Video. Muted, looping MP4/WebM; the image shows until it plays.': 'Används när Bakgrund = Video. Tyst, loopad MP4/WebM; bilden visas tills den spelas.',
   // ── textImage aside ──
   'Aside · heading': 'Sidoruta · rubrik',
   'Aside · text': 'Sidoruta · text',
@@ -381,6 +387,14 @@ export default {
 
   // ── label_singular ──
   'Section': 'Sektion',
+  'Card': 'Kort',
+  'Key point': 'Nyckelpunkt',
+  'Line': 'Rad',
+  'Plan': 'Paket',
+  'Step': 'Steg',
+  'Item': 'Punkt',
+  'Column': 'Kolumn',
+  'Fact': 'Fakta',
 
   // ── block gallery: group names + page chrome ──
   'Hero & headers': 'Hero & sidhuvuden',
@@ -520,4 +534,13 @@ export default {
   'Small uppercase label above the heading.': 'Liten versal etikett ovanför rubriken.',
   'The surface behind the section — for rhythm between blocks.': 'Ytan bakom sektionen — för rytm mellan block.',
   'What shows beside the heading. Default: none.': 'Vad som visas bredvid rubriken. Standard: ingen.',
+  // short hints for selects/booleans (hint standard pass)
+  'Band puts the title on a dark full-width band.': 'Band lägger titeln på ett mörkt band i full bredd.',
+  'Where the text sits on the cover.': 'Var texten sitter på helbilden.',
+  'Tall fills most of the screen; Medium is a shorter band.': 'Hög fyller det mesta av skärmen; Mellan är ett kortare band.',
+  'How wide the entry column is.': 'Hur bred uppslagskolumnen är.',
+  'Where the entry sits in the section.': 'Var uppslaget sitter i sektionen.',
+  'How the questions are presented.': 'Hur frågorna presenteras.',
+  'Show cover images on the cards.': 'Visa omslagsbilder på korten.',
+  'Show category filter chips above the grid.': 'Visa kategorifilter ovanför rutnätet.',
 };

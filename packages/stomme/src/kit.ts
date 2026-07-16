@@ -27,6 +27,9 @@ export type Field = {
   fields?: Field[]; // for object / typed list
   field?: Field; // for a simple (single-field) list
   summary?: string; // list widgets: collapsed-row label template (default: derived — eyebrow, then title/name/label/…)
+  label_singular?: string; // list widgets: singular noun for the "Add …" button
+  collapsed?: boolean; // object/list widgets: render collapsed (grouping convention)
+  minimize_collapsed?: boolean; // list widgets: collapsing hides all entries behind the header
   multiple?: boolean; // select: allow choosing several values
   // For select widgets: a literal option list, or a sentinel the generator
   // expands — '$pages' (all internal page routes), '$services' (service slugs),
@@ -70,6 +73,8 @@ export const linkField = (name = 'href', label = 'Link', required = false): Fiel
   label,
   widget: 'object',
   required,
+  collapsed: true,
+  summary: '{{fields.page}}{{fields.url}}',
   fields: [
     { name: 'page', label: 'Page', widget: 'select', options: '$pages', required: false, hint: 'Pick a page on the site.' },
     { name: 'url', label: '…or a custom URL', widget: 'string', required: false, hint: 'External link, tel: or mailto:. Used if filled.' },
@@ -176,6 +181,10 @@ export const cardListField: Field = {
   label: 'Cards',
   widget: 'list',
   required: false,
+  collapsed: true,
+  minimize_collapsed: true,
+  label_singular: 'Card',
+  summary: '{{fields.title}}',
   fields: [
     { name: 'title', label: 'Title', widget: 'string' },
     { name: 'body', label: 'Text', widget: 'text' },
@@ -190,6 +199,10 @@ export const linkedCardListField: Field = {
   label: 'Cards',
   widget: 'list',
   required: false,
+  collapsed: true,
+  minimize_collapsed: true,
+  label_singular: 'Card',
+  summary: '{{fields.title}}',
   fields: [
     iconField(),
     { name: 'title', label: 'Title', widget: 'string' },

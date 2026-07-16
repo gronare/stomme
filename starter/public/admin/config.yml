@@ -35,7 +35,7 @@ collections:
                 label: "Hero"
                 widget: object
                 fields:
-                  - { name: eyebrow, label: "Eyebrow", widget: string, required: false }
+                  - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
                   - { name: heading, label: "Heading (H1)", widget: string }
                   - { name: intro, label: "Intro", widget: text, required: false }
                   - { name: ctaLabel, label: "Button label", widget: string, required: false }
@@ -43,6 +43,8 @@ collections:
                     label: "Button link"
                     widget: object
                     required: false
+                    collapsed: true
+                    summary: "{{fields.page}}{{fields.url}}"
                     fields:
                       - name: page
                         label: "Page"
@@ -60,6 +62,8 @@ collections:
                     label: "Second button link"
                     widget: object
                     required: false
+                    collapsed: true
+                    summary: "{{fields.page}}{{fields.url}}"
                     fields:
                       - name: page
                         label: "Page"
@@ -83,12 +87,16 @@ collections:
                       - { label: "Image", value: "image" }
                       - { label: "Highlights (icon + title + line)", value: "highlights" }
                       - { label: "Motif (animated, no image)", value: "motif" }
-                  - { name: image, label: "Image (if “Image” chosen)", widget: image, required: false }
+                  - { name: image, label: "Image", widget: image, required: false, hint: "Used when Right-side media = Image." }
                   - { name: imageAlt, label: "Image alt text", widget: string, required: false }
                   - name: highlights
-                    label: "Highlights (if “Highlights” chosen)"
+                    label: "Highlights"
                     widget: list
                     required: false
+                    label_singular: "Key point"
+                    collapsed: true
+                    minimize_collapsed: true
+                    hint: "A few key points beside the heading. Used when Right-side media = Highlights."
                     summary: "{{fields.title}}"
                     fields:
                       - name: icon
@@ -116,6 +124,10 @@ collections:
                     label: "Ticks (checkmark lines)"
                     widget: list
                     required: false
+                    label_singular: "Line"
+                    collapsed: true
+                    minimize_collapsed: true
+                    hint: "Short ✓ lines under the intro — key reassurances."
                     field: { name: text, label: "Line", widget: string }
                   - name: height
                     label: "Height"
@@ -161,7 +173,7 @@ collections:
                 label: "Cover (full-bleed)"
                 widget: object
                 fields:
-                  - { name: eyebrow, label: "Eyebrow", widget: string, required: false }
+                  - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
                   - { name: heading, label: "Heading (H1)", widget: text, hint: "Press Enter for a line break." }
                   - { name: intro, label: "Intro", widget: text, required: false }
                   - { name: ctaLabel, label: "Button label", widget: string, required: false }
@@ -169,6 +181,8 @@ collections:
                     label: "Button link"
                     widget: object
                     required: false
+                    collapsed: true
+                    summary: "{{fields.page}}{{fields.url}}"
                     fields:
                       - name: page
                         label: "Page"
@@ -186,6 +200,8 @@ collections:
                     label: "Second button link"
                     widget: object
                     required: false
+                    collapsed: true
+                    summary: "{{fields.page}}{{fields.url}}"
                     fields:
                       - name: page
                         label: "Page"
@@ -211,7 +227,7 @@ collections:
                       - { label: "Animated (no image)", value: "animated" }
                   - { name: image, label: "Background image / video poster", widget: image, required: false }
                   - { name: imageAlt, label: "Image alt text", widget: string, required: false }
-                  - { name: video, label: "Video file (if “Video”)", widget: file, required: false, hint: "Uploaded MP4/WebM — muted + looping. The image shows until it plays, and on reduced-motion." }
+                  - { name: video, label: "Video file", widget: file, required: false, hint: "Used when Background = Video. Muted, looping MP4/WebM; the image shows until it plays." }
                   - { name: videoUrl, label: "…or video URL", widget: string, required: false, hint: "External MP4/WebM URL. Used instead of an uploaded file if filled." }
                   - name: overlay
                     label: "Darken (overlay)"
@@ -228,6 +244,7 @@ collections:
                     widget: select
                     required: false
                     default: "start"
+                    hint: "Where the text sits on the cover."
                     options:
                       - { label: "Bottom left", value: "start" }
                       - { label: "Centered", value: "center" }
@@ -236,6 +253,7 @@ collections:
                     widget: select
                     required: false
                     default: "tall"
+                    hint: "Tall fills most of the screen; Medium is a shorter band."
                     options:
                       - { label: "Tall", value: "tall" }
                       - { label: "Medium", value: "medium" }
@@ -248,6 +266,7 @@ collections:
                     widget: select
                     required: false
                     default: "light"
+                    hint: "Band puts the title on a dark full-width band."
                     options:
                       - { label: "Light", value: "light" }
                       - { label: "Band", value: "dark" }
@@ -260,7 +279,7 @@ collections:
                     options:
                       - { label: "Narrow (reading column)", value: "narrow" }
                       - { label: "Full width", value: "full" }
-                  - { name: eyebrow, label: "Eyebrow", widget: string, required: false }
+                  - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
                   - { name: heading, label: "Heading (H1)", widget: string }
                   - { name: intro, label: "Intro", widget: text, required: false }
                   - { name: ctaLabel, label: "Button label (optional)", widget: string, required: false }
@@ -268,6 +287,8 @@ collections:
                     label: "Button link"
                     widget: object
                     required: false
+                    collapsed: true
+                    summary: "{{fields.page}}{{fields.url}}"
                     fields:
                       - name: page
                         label: "Page"
@@ -385,6 +406,8 @@ collections:
                     label: "Link"
                     widget: object
                     required: false
+                    collapsed: true
+                    summary: "{{fields.page}}{{fields.url}}"
                     fields:
                       - name: page
                         label: "Page"
@@ -430,6 +453,9 @@ collections:
                     label: "Cards"
                     widget: list
                     required: false
+                    label_singular: "Card"
+                    collapsed: true
+                    minimize_collapsed: true
                     summary: "{{fields.title}}"
                     fields:
                       - name: icon
@@ -458,6 +484,8 @@ collections:
                         label: "Link (optional)"
                         widget: object
                         required: false
+                        collapsed: true
+                        summary: "{{fields.page}}{{fields.url}}"
                         fields:
                           - name: page
                             label: "Page"
@@ -505,6 +533,9 @@ collections:
                     label: "Cards"
                     widget: list
                     required: false
+                    label_singular: "Card"
+                    collapsed: true
+                    minimize_collapsed: true
                     summary: "{{fields.title}}"
                     fields:
                       - { name: title, label: "Title", widget: string }
@@ -532,6 +563,9 @@ collections:
                     label: "Plans"
                     widget: list
                     required: false
+                    label_singular: "Plan"
+                    collapsed: true
+                    minimize_collapsed: true
                     summary: "{{fields.name}}"
                     fields:
                       - { name: name, label: "Plan name", widget: string }
@@ -543,6 +577,9 @@ collections:
                         label: "Features"
                         widget: list
                         required: false
+                        label_singular: "Feature"
+                        collapsed: true
+                        minimize_collapsed: true
                         summary: "{{fields.text}}"
                         fields:
                           - { name: text, label: "Feature", widget: string }
@@ -553,6 +590,8 @@ collections:
                         label: "Button link"
                         widget: object
                         required: false
+                        collapsed: true
+                        summary: "{{fields.page}}{{fields.url}}"
                         fields:
                           - name: page
                             label: "Page"
@@ -589,6 +628,9 @@ collections:
                     label: "Cards"
                     widget: list
                     required: false
+                    label_singular: "Card"
+                    collapsed: true
+                    minimize_collapsed: true
                     summary: "{{fields.title}}"
                     fields:
                       - { name: title, label: "Title", widget: string }
@@ -616,6 +658,9 @@ collections:
                     label: "Steps"
                     widget: list
                     required: false
+                    label_singular: "Step"
+                    collapsed: true
+                    minimize_collapsed: true
                     summary: "{{fields.title}}"
                     fields:
                       - { name: title, label: "Title", widget: string }
@@ -654,6 +699,9 @@ collections:
                     label: "Items"
                     widget: list
                     required: false
+                    label_singular: "Item"
+                    collapsed: true
+                    minimize_collapsed: true
                     summary: "{{fields.text}}"
                     fields:
                       - { name: text, label: "Text", widget: string }
@@ -682,6 +730,9 @@ collections:
                     label: "Images"
                     widget: list
                     required: false
+                    label_singular: "Image"
+                    collapsed: true
+                    minimize_collapsed: true
                     summary: "{{fields.caption}}"
                     fields:
                       - { name: image, label: "Image", widget: image, required: false }
@@ -725,13 +776,16 @@ collections:
                 label: "Dictionary entry"
                 widget: object
                 fields:
-                  - { name: eyebrow, label: "Eyebrow", widget: string, required: false }
+                  - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
                   - { name: term, label: "Term", widget: string, hint: "The word being defined, e.g. \"grö·na·re\" (use · for syllables)." }
                   - { name: wordClass, label: "Word class / etymology line", widget: string, required: false, hint: "The italic line under the term, e.g. \"komparativ av grön\"." }
                   - name: senses
                     label: "Senses"
                     widget: list
                     required: false
+                    label_singular: "Sense"
+                    collapsed: true
+                    minimize_collapsed: true
                     summary: "{{fields.text}}"
                     fields:
                       - { name: text, label: "Sense", widget: string, hint: "Wrap words in *asterisks* to underline them." }
@@ -741,6 +795,7 @@ collections:
                     widget: select
                     required: false
                     default: "xnarrow"
+                    hint: "How wide the entry column is."
                     options:
                       - { label: "Extra narrow", value: "xnarrow" }
                       - { label: "Narrow (reading column)", value: "narrow" }
@@ -750,6 +805,7 @@ collections:
                     widget: select
                     required: false
                     default: "left"
+                    hint: "Where the entry sits in the section."
                     options:
                       - { label: "Left", value: "left" }
                       - { label: "Centered", value: "center" }
@@ -770,7 +826,7 @@ collections:
                 label: "Highlighted quote"
                 widget: object
                 fields:
-                  - { name: eyebrow, label: "Eyebrow", widget: string, required: false }
+                  - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
                   - { name: quote, label: "Quote / statement", widget: text, hint: "Wrap words in *asterisks* to underline them." }
                   - name: width
                     label: "Width"
@@ -818,13 +874,16 @@ collections:
                 label: "Statement panel"
                 widget: object
                 fields:
-                  - { name: eyebrow, label: "Eyebrow", widget: string, required: false }
+                  - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
                   - { name: heading, label: "Heading", widget: string, required: false, hint: "Wrap words in *asterisks* to underline them." }
                   - { name: body, label: "Body", widget: text, required: false }
                   - name: badges
                     label: "Badges"
                     widget: list
                     required: false
+                    label_singular: "Badge"
+                    collapsed: true
+                    minimize_collapsed: true
                     field: { name: badge, label: "Badge", widget: string }
                   - { name: statValue, label: "Big number", widget: string, required: false }
                   - { name: statLabel, label: "Number label", widget: string, required: false }
@@ -832,7 +891,11 @@ collections:
                     label: "Stat columns"
                     widget: list
                     required: false
-                    summary: "{{fields.label}}"
+                    label_singular: "Column"
+                    collapsed: true
+                    minimize_collapsed: true
+                    hint: "Two or three side-by-side figures (e.g. a comparison). Replaces the single big number when filled."
+                    summary: "{{fields.label}} {{fields.value}}"
                     fields:
                       - { name: label, label: "Label", widget: string, required: false }
                       - { name: value, label: "Value", widget: string }
@@ -855,7 +918,10 @@ collections:
                     label: "Facts (label + value)"
                     widget: list
                     required: false
-                    summary: "{{fields.label}}"
+                    label_singular: "Fact"
+                    collapsed: true
+                    minimize_collapsed: true
+                    summary: "{{fields.label}} {{fields.value}}"
                     fields:
                       - { name: label, label: "Label", widget: string }
                       - { name: value, label: "Value", widget: string }
@@ -868,6 +934,9 @@ collections:
                     label: "Names"
                     widget: list
                     required: false
+                    label_singular: "Name"
+                    collapsed: true
+                    minimize_collapsed: true
                     field: { name: name, label: "Name", widget: string }
               - name: faq
                 label: "FAQ"
@@ -878,6 +947,7 @@ collections:
                     widget: select
                     required: false
                     default: "list"
+                    hint: "How the questions are presented."
                     options:
                       - { label: "List", value: "list" }
                       - { label: "Accordion", value: "accordion" }
@@ -908,6 +978,8 @@ collections:
                     label: "Aside · button link"
                     widget: object
                     required: false
+                    collapsed: true
+                    summary: "{{fields.page}}{{fields.url}}"
                     fields:
                       - name: page
                         label: "Page"
@@ -944,6 +1016,8 @@ collections:
                     label: "Button link"
                     widget: object
                     required: false
+                    collapsed: true
+                    summary: "{{fields.page}}{{fields.url}}"
                     fields:
                       - name: page
                         label: "Page"
@@ -969,7 +1043,7 @@ collections:
                       - { label: "Classic (centered panel)", value: "classic" }
                       - { label: "Split (copy + facts card)", value: "split" }
                       - { label: "Panel (dark, with readout)", value: "panel" }
-                  - { name: eyebrow, label: "Eyebrow", widget: string, required: false }
+                  - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
                   - { name: heading, label: "Heading", widget: string }
                   - { name: intro, label: "Intro", widget: text, required: false, hint: "A short line under the heading." }
                   - { name: label, label: "Button label", widget: string }
@@ -977,6 +1051,8 @@ collections:
                     label: "Button link"
                     widget: object
                     required: false
+                    collapsed: true
+                    summary: "{{fields.page}}{{fields.url}}"
                     fields:
                       - name: page
                         label: "Page"
@@ -994,6 +1070,8 @@ collections:
                     label: "Second button link"
                     widget: object
                     required: false
+                    collapsed: true
+                    summary: "{{fields.page}}{{fields.url}}"
                     fields:
                       - name: page
                         label: "Page"
@@ -1010,7 +1088,11 @@ collections:
                     label: "Facts (label + value)"
                     widget: list
                     required: false
-                    summary: "{{fields.label}}"
+                    label_singular: "Fact"
+                    collapsed: true
+                    minimize_collapsed: true
+                    hint: "Shown as chips (Split) or a mono readout (Panel). Ignored in Classic."
+                    summary: "{{fields.label}} {{fields.value}}"
                     fields:
                       - { name: label, label: "Label", widget: string }
                       - { name: value, label: "Value", widget: string }
@@ -1096,7 +1178,7 @@ collections:
             label: "Hero"
             widget: object
             fields:
-              - { name: eyebrow, label: "Eyebrow", widget: string, required: false }
+              - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
               - { name: heading, label: "Heading (H1)", widget: string }
               - { name: intro, label: "Intro", widget: text, required: false }
               - { name: ctaLabel, label: "Button label", widget: string, required: false }
@@ -1104,6 +1186,8 @@ collections:
                 label: "Button link"
                 widget: object
                 required: false
+                collapsed: true
+                summary: "{{fields.page}}{{fields.url}}"
                 fields:
                   - name: page
                     label: "Page"
@@ -1121,6 +1205,8 @@ collections:
                 label: "Second button link"
                 widget: object
                 required: false
+                collapsed: true
+                summary: "{{fields.page}}{{fields.url}}"
                 fields:
                   - name: page
                     label: "Page"
@@ -1144,12 +1230,16 @@ collections:
                   - { label: "Image", value: "image" }
                   - { label: "Highlights (icon + title + line)", value: "highlights" }
                   - { label: "Motif (animated, no image)", value: "motif" }
-              - { name: image, label: "Image (if “Image” chosen)", widget: image, required: false }
+              - { name: image, label: "Image", widget: image, required: false, hint: "Used when Right-side media = Image." }
               - { name: imageAlt, label: "Image alt text", widget: string, required: false }
               - name: highlights
-                label: "Highlights (if “Highlights” chosen)"
+                label: "Highlights"
                 widget: list
                 required: false
+                label_singular: "Key point"
+                collapsed: true
+                minimize_collapsed: true
+                hint: "A few key points beside the heading. Used when Right-side media = Highlights."
                 summary: "{{fields.title}}"
                 fields:
                   - name: icon
@@ -1177,6 +1267,10 @@ collections:
                 label: "Ticks (checkmark lines)"
                 widget: list
                 required: false
+                label_singular: "Line"
+                collapsed: true
+                minimize_collapsed: true
+                hint: "Short ✓ lines under the intro — key reassurances."
                 field: { name: text, label: "Line", widget: string }
               - name: height
                 label: "Height"
@@ -1222,7 +1316,7 @@ collections:
             label: "Cover (full-bleed)"
             widget: object
             fields:
-              - { name: eyebrow, label: "Eyebrow", widget: string, required: false }
+              - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
               - { name: heading, label: "Heading (H1)", widget: text, hint: "Press Enter for a line break." }
               - { name: intro, label: "Intro", widget: text, required: false }
               - { name: ctaLabel, label: "Button label", widget: string, required: false }
@@ -1230,6 +1324,8 @@ collections:
                 label: "Button link"
                 widget: object
                 required: false
+                collapsed: true
+                summary: "{{fields.page}}{{fields.url}}"
                 fields:
                   - name: page
                     label: "Page"
@@ -1247,6 +1343,8 @@ collections:
                 label: "Second button link"
                 widget: object
                 required: false
+                collapsed: true
+                summary: "{{fields.page}}{{fields.url}}"
                 fields:
                   - name: page
                     label: "Page"
@@ -1272,7 +1370,7 @@ collections:
                   - { label: "Animated (no image)", value: "animated" }
               - { name: image, label: "Background image / video poster", widget: image, required: false }
               - { name: imageAlt, label: "Image alt text", widget: string, required: false }
-              - { name: video, label: "Video file (if “Video”)", widget: file, required: false, hint: "Uploaded MP4/WebM — muted + looping. The image shows until it plays, and on reduced-motion." }
+              - { name: video, label: "Video file", widget: file, required: false, hint: "Used when Background = Video. Muted, looping MP4/WebM; the image shows until it plays." }
               - { name: videoUrl, label: "…or video URL", widget: string, required: false, hint: "External MP4/WebM URL. Used instead of an uploaded file if filled." }
               - name: overlay
                 label: "Darken (overlay)"
@@ -1289,6 +1387,7 @@ collections:
                 widget: select
                 required: false
                 default: "start"
+                hint: "Where the text sits on the cover."
                 options:
                   - { label: "Bottom left", value: "start" }
                   - { label: "Centered", value: "center" }
@@ -1297,6 +1396,7 @@ collections:
                 widget: select
                 required: false
                 default: "tall"
+                hint: "Tall fills most of the screen; Medium is a shorter band."
                 options:
                   - { label: "Tall", value: "tall" }
                   - { label: "Medium", value: "medium" }
@@ -1309,6 +1409,7 @@ collections:
                 widget: select
                 required: false
                 default: "light"
+                hint: "Band puts the title on a dark full-width band."
                 options:
                   - { label: "Light", value: "light" }
                   - { label: "Band", value: "dark" }
@@ -1321,7 +1422,7 @@ collections:
                 options:
                   - { label: "Narrow (reading column)", value: "narrow" }
                   - { label: "Full width", value: "full" }
-              - { name: eyebrow, label: "Eyebrow", widget: string, required: false }
+              - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
               - { name: heading, label: "Heading (H1)", widget: string }
               - { name: intro, label: "Intro", widget: text, required: false }
               - { name: ctaLabel, label: "Button label (optional)", widget: string, required: false }
@@ -1329,6 +1430,8 @@ collections:
                 label: "Button link"
                 widget: object
                 required: false
+                collapsed: true
+                summary: "{{fields.page}}{{fields.url}}"
                 fields:
                   - name: page
                     label: "Page"
@@ -1446,6 +1549,8 @@ collections:
                 label: "Link"
                 widget: object
                 required: false
+                collapsed: true
+                summary: "{{fields.page}}{{fields.url}}"
                 fields:
                   - name: page
                     label: "Page"
@@ -1491,6 +1596,9 @@ collections:
                 label: "Cards"
                 widget: list
                 required: false
+                label_singular: "Card"
+                collapsed: true
+                minimize_collapsed: true
                 summary: "{{fields.title}}"
                 fields:
                   - name: icon
@@ -1519,6 +1627,8 @@ collections:
                     label: "Link (optional)"
                     widget: object
                     required: false
+                    collapsed: true
+                    summary: "{{fields.page}}{{fields.url}}"
                     fields:
                       - name: page
                         label: "Page"
@@ -1566,6 +1676,9 @@ collections:
                 label: "Cards"
                 widget: list
                 required: false
+                label_singular: "Card"
+                collapsed: true
+                minimize_collapsed: true
                 summary: "{{fields.title}}"
                 fields:
                   - { name: title, label: "Title", widget: string }
@@ -1593,6 +1706,9 @@ collections:
                 label: "Plans"
                 widget: list
                 required: false
+                label_singular: "Plan"
+                collapsed: true
+                minimize_collapsed: true
                 summary: "{{fields.name}}"
                 fields:
                   - { name: name, label: "Plan name", widget: string }
@@ -1604,6 +1720,9 @@ collections:
                     label: "Features"
                     widget: list
                     required: false
+                    label_singular: "Feature"
+                    collapsed: true
+                    minimize_collapsed: true
                     summary: "{{fields.text}}"
                     fields:
                       - { name: text, label: "Feature", widget: string }
@@ -1614,6 +1733,8 @@ collections:
                     label: "Button link"
                     widget: object
                     required: false
+                    collapsed: true
+                    summary: "{{fields.page}}{{fields.url}}"
                     fields:
                       - name: page
                         label: "Page"
@@ -1650,6 +1771,9 @@ collections:
                 label: "Cards"
                 widget: list
                 required: false
+                label_singular: "Card"
+                collapsed: true
+                minimize_collapsed: true
                 summary: "{{fields.title}}"
                 fields:
                   - { name: title, label: "Title", widget: string }
@@ -1677,6 +1801,9 @@ collections:
                 label: "Steps"
                 widget: list
                 required: false
+                label_singular: "Step"
+                collapsed: true
+                minimize_collapsed: true
                 summary: "{{fields.title}}"
                 fields:
                   - { name: title, label: "Title", widget: string }
@@ -1715,6 +1842,9 @@ collections:
                 label: "Items"
                 widget: list
                 required: false
+                label_singular: "Item"
+                collapsed: true
+                minimize_collapsed: true
                 summary: "{{fields.text}}"
                 fields:
                   - { name: text, label: "Text", widget: string }
@@ -1743,6 +1873,9 @@ collections:
                 label: "Images"
                 widget: list
                 required: false
+                label_singular: "Image"
+                collapsed: true
+                minimize_collapsed: true
                 summary: "{{fields.caption}}"
                 fields:
                   - { name: image, label: "Image", widget: image, required: false }
@@ -1786,13 +1919,16 @@ collections:
             label: "Dictionary entry"
             widget: object
             fields:
-              - { name: eyebrow, label: "Eyebrow", widget: string, required: false }
+              - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
               - { name: term, label: "Term", widget: string, hint: "The word being defined, e.g. \"grö·na·re\" (use · for syllables)." }
               - { name: wordClass, label: "Word class / etymology line", widget: string, required: false, hint: "The italic line under the term, e.g. \"komparativ av grön\"." }
               - name: senses
                 label: "Senses"
                 widget: list
                 required: false
+                label_singular: "Sense"
+                collapsed: true
+                minimize_collapsed: true
                 summary: "{{fields.text}}"
                 fields:
                   - { name: text, label: "Sense", widget: string, hint: "Wrap words in *asterisks* to underline them." }
@@ -1802,6 +1938,7 @@ collections:
                 widget: select
                 required: false
                 default: "xnarrow"
+                hint: "How wide the entry column is."
                 options:
                   - { label: "Extra narrow", value: "xnarrow" }
                   - { label: "Narrow (reading column)", value: "narrow" }
@@ -1811,6 +1948,7 @@ collections:
                 widget: select
                 required: false
                 default: "left"
+                hint: "Where the entry sits in the section."
                 options:
                   - { label: "Left", value: "left" }
                   - { label: "Centered", value: "center" }
@@ -1831,7 +1969,7 @@ collections:
             label: "Highlighted quote"
             widget: object
             fields:
-              - { name: eyebrow, label: "Eyebrow", widget: string, required: false }
+              - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
               - { name: quote, label: "Quote / statement", widget: text, hint: "Wrap words in *asterisks* to underline them." }
               - name: width
                 label: "Width"
@@ -1879,13 +2017,16 @@ collections:
             label: "Statement panel"
             widget: object
             fields:
-              - { name: eyebrow, label: "Eyebrow", widget: string, required: false }
+              - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
               - { name: heading, label: "Heading", widget: string, required: false, hint: "Wrap words in *asterisks* to underline them." }
               - { name: body, label: "Body", widget: text, required: false }
               - name: badges
                 label: "Badges"
                 widget: list
                 required: false
+                label_singular: "Badge"
+                collapsed: true
+                minimize_collapsed: true
                 field: { name: badge, label: "Badge", widget: string }
               - { name: statValue, label: "Big number", widget: string, required: false }
               - { name: statLabel, label: "Number label", widget: string, required: false }
@@ -1893,7 +2034,11 @@ collections:
                 label: "Stat columns"
                 widget: list
                 required: false
-                summary: "{{fields.label}}"
+                label_singular: "Column"
+                collapsed: true
+                minimize_collapsed: true
+                hint: "Two or three side-by-side figures (e.g. a comparison). Replaces the single big number when filled."
+                summary: "{{fields.label}} {{fields.value}}"
                 fields:
                   - { name: label, label: "Label", widget: string, required: false }
                   - { name: value, label: "Value", widget: string }
@@ -1916,7 +2061,10 @@ collections:
                 label: "Facts (label + value)"
                 widget: list
                 required: false
-                summary: "{{fields.label}}"
+                label_singular: "Fact"
+                collapsed: true
+                minimize_collapsed: true
+                summary: "{{fields.label}} {{fields.value}}"
                 fields:
                   - { name: label, label: "Label", widget: string }
                   - { name: value, label: "Value", widget: string }
@@ -1929,6 +2077,9 @@ collections:
                 label: "Names"
                 widget: list
                 required: false
+                label_singular: "Name"
+                collapsed: true
+                minimize_collapsed: true
                 field: { name: name, label: "Name", widget: string }
           - name: faq
             label: "FAQ"
@@ -1939,6 +2090,7 @@ collections:
                 widget: select
                 required: false
                 default: "list"
+                hint: "How the questions are presented."
                 options:
                   - { label: "List", value: "list" }
                   - { label: "Accordion", value: "accordion" }
@@ -1969,6 +2121,8 @@ collections:
                 label: "Aside · button link"
                 widget: object
                 required: false
+                collapsed: true
+                summary: "{{fields.page}}{{fields.url}}"
                 fields:
                   - name: page
                     label: "Page"
@@ -2005,6 +2159,8 @@ collections:
                 label: "Button link"
                 widget: object
                 required: false
+                collapsed: true
+                summary: "{{fields.page}}{{fields.url}}"
                 fields:
                   - name: page
                     label: "Page"
@@ -2030,7 +2186,7 @@ collections:
                   - { label: "Classic (centered panel)", value: "classic" }
                   - { label: "Split (copy + facts card)", value: "split" }
                   - { label: "Panel (dark, with readout)", value: "panel" }
-              - { name: eyebrow, label: "Eyebrow", widget: string, required: false }
+              - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
               - { name: heading, label: "Heading", widget: string }
               - { name: intro, label: "Intro", widget: text, required: false, hint: "A short line under the heading." }
               - { name: label, label: "Button label", widget: string }
@@ -2038,6 +2194,8 @@ collections:
                 label: "Button link"
                 widget: object
                 required: false
+                collapsed: true
+                summary: "{{fields.page}}{{fields.url}}"
                 fields:
                   - name: page
                     label: "Page"
@@ -2055,6 +2213,8 @@ collections:
                 label: "Second button link"
                 widget: object
                 required: false
+                collapsed: true
+                summary: "{{fields.page}}{{fields.url}}"
                 fields:
                   - name: page
                     label: "Page"
@@ -2071,7 +2231,11 @@ collections:
                 label: "Facts (label + value)"
                 widget: list
                 required: false
-                summary: "{{fields.label}}"
+                label_singular: "Fact"
+                collapsed: true
+                minimize_collapsed: true
+                hint: "Shown as chips (Split) or a mono readout (Panel). Ignored in Classic."
+                summary: "{{fields.label}} {{fields.value}}"
                 fields:
                   - { name: label, label: "Label", widget: string }
                   - { name: value, label: "Value", widget: string }
@@ -2176,8 +2340,8 @@ collections:
               - { name: alt, label: "Logo alt text", widget: string, required: false }
               - { name: textPre, label: "Wordmark text", widget: string, required: false }
               - { name: textAccent, label: "Wordmark accent (in brand colour)", widget: string, required: false }
-          - { name: favicon, label: "Favicon", widget: image, required: false, media_folder: "/public", public_folder: "/", hint: "Browser-tab icon — SVG recommended (scales to any size). Defaults to the shipped mark when empty." }
-          - { name: appleIcon, label: "Home-screen icon", widget: image, required: false, media_folder: "/public", public_folder: "/", hint: "iOS home-screen icon — a 180×180 PNG. Optional." }
+          - { name: favicon, label: "Favicon", widget: image, required: false, media_folder: "/public/media/icons", public_folder: "/", hint: "Browser-tab icon — SVG recommended (scales to any size). Defaults to the shipped mark when empty." }
+          - { name: appleIcon, label: "Home-screen icon", widget: image, required: false, media_folder: "/public/media/icons", public_folder: "/", hint: "iOS home-screen icon — a 180×180 PNG. Optional." }
       - name: sharecards
         label: "Share cards"
         file: "src/content/settings/site.md"
@@ -2322,8 +2486,8 @@ collections:
               - { label: "Script (handwritten)", value: "script" }
               - { label: "Monospace", value: "mono" }
               - { label: "Custom (uploaded below)", value: "custom" }
-          - { name: fontCustomFile, label: "Custom heading font file", widget: file, required: false, hint: "Used when Heading font = Custom. A .woff2 / .woff / .ttf / .otf file (a font file, not an SVG)." }
-          - { name: fontCustomBodyFile, label: "Custom body font file", widget: file, required: false, hint: "Used when Body font = Custom. Leave empty to reuse the heading font for body." }
+          - { name: fontCustomFile, label: "Custom heading font file", widget: file, required: false, media_folder: "/public/media/fonts", public_folder: "/media/fonts", hint: "Used when Heading font = Custom. A .woff2 / .woff / .ttf / .otf file (a font file, not an SVG)." }
+          - { name: fontCustomBodyFile, label: "Custom body font file", widget: file, required: false, media_folder: "/public/media/fonts", public_folder: "/media/fonts", hint: "Used when Body font = Custom. Leave empty to reuse the heading font for body." }
       - name: nav
         label: "Header"
         file: "src/content/navigation/nav.md"
