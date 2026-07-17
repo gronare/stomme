@@ -229,16 +229,30 @@ jobs:
           # as DIFFERENT (byte-strict behavior, as before).
           same_png() {  # $1 = A png, $2 = B png; exit 0 = visually same
             cmp -s "$1" "$2" && return 0
-            command -v compare > /dev/null && command -v identify > /dev/null || return 1
-            local wh w h px ae
+            command -v compare > /dev/null && command -v identify > /dev/null && command -v convert > /dev/null || return 1
+            local wh w h px ae ba bb budget
             wh=$(identify -format '%wx%h' "$1" 2> /dev/null) || return 1
             w=${wh%%x*}; h=${wh##*x}
             case "$w$h" in (''|*[!0-9]*) return 1 ;; esac
             px=$(( w * h ))
-            ae=$(compare -metric AE -fuzz 2% "$1" "$2" null: 2>&1) || true
+            # Antialiasing / sub-pixel tolerance. -fuzz 2% forgives per-pixel COLOUR
+            # deltas but nothing spatial: a 1px layout jitter re-rasterises soft edges
+            # (radial gradients, 48px shadows, dashed dividers, glyphs) and flips
+            # thousands of hard-edge pixels — a false diff, seen repeatedly on the
+            # facts card. Blur BOTH by ~1px first so a sub-pixel edge shift falls under
+            # the fuzz, while a real change (new text, a moved element, a colour swap)
+            # still moves whole regions and trips the px/2000 budget. Blur failure ⇒
+            # treat as DIFFERENT (conservative), like any other compare error.
+            ba=$(mktemp --suffix=.png) && bb=$(mktemp --suffix=.png) || return 1
+            convert "$1" -blur 0x0.8 "$ba" 2> /dev/null && convert "$2" -blur 0x0.8 "$bb" 2> /dev/null || { rm -f "$ba" "$bb"; return 1; }
+            ae=$(compare -metric AE -fuzz 2% "$ba" "$bb" null: 2>&1) || true
+            rm -f "$ba" "$bb"
             case "$ae" in (''|*[!0-9.eE+-]*) return 1 ;; esac
             ae=$(awk -v v="$ae" 'BEGIN { printf "%d", v + 0 }')  # 1.2e+03 -> 1200
-            [ "$ae" -le $(( px / 2000 )) ]
+            budget=$(( px / 2000 ))
+            [ "$ae" -le "$budget" ] && return 0
+            echo "  diff $(basename "$1"): AE=$ae > budget=$budget (post-blur)" >&2  # why a page flagged
+            return 1
           }
           diffpages=""
           for a in /tmp/a/$PAT; do
