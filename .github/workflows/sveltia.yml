@@ -51,12 +51,18 @@ jobs:
 
       - name: Resolve mode + versions
         id: v
+        env: # read inputs via env, never interpolated raw into shell/sed below
+          IN_MODE: ${{ inputs.mode }}
+          IN_VERSION: ${{ inputs.version }}
         run: |
           GEN=packages/stomme/bin/gen-admin-blocks.mjs
-          MODE="${{ inputs.mode || 'check' }}" # empty on schedule → check
+          MODE="${IN_MODE:-check}" # empty on schedule → check
           CURRENT=$(grep -oE '@sveltia/cms@[0-9]+\.[0-9]+\.[0-9]+' "$GEN" | head -1 | sed 's/.*@//')
-          TARGET="${{ inputs.version }}"
-          if [ -z "$TARGET" ] || [ "$TARGET" = latest ]; then TARGET=$(npm view @sveltia/cms version); fi
+          TARGET="${IN_VERSION:-latest}"
+          if [ "$TARGET" = latest ]; then TARGET=$(npm view @sveltia/cms version); fi
+          # TARGET flows into sed + a URL below → hard-gate the shape before anything uses it.
+          if ! [[ "$TARGET" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then echo "invalid target version: $TARGET" >&2; exit 1; fi
+          if [ "$MODE" != check ] && [ "$MODE" != apply ]; then echo "invalid mode: $MODE" >&2; exit 1; fi
           echo "mode=$MODE"       >> "$GITHUB_OUTPUT"
           echo "current=$CURRENT" >> "$GITHUB_OUTPUT"
           echo "target=$TARGET"   >> "$GITHUB_OUTPUT"
@@ -88,7 +94,10 @@ jobs:
       # pin, then commit both to main. Consuming sites pick up the new engine on
       # their next publish; the operator promotes main→release from the control plane.
       - name: Commit bump (apply, green)
-        if: steps.v.outputs.mode == 'apply'
+        id: commit
+        # Explicit if:s drop the implicit success() gate — require a green verify so a
+        # red-contract (or failed build) apply can never commit a broken bump to main.
+        if: steps.v.outputs.mode == 'apply' && steps.verify.outcome == 'success'
         run: |
           (cd starter && pnpm run cms:gen)
           git config user.name "github-actions[bot]"
@@ -105,7 +114,9 @@ jobs:
         run: |
           [ -z "$SECRET" ] || [ -z "$REPORT_URL" ] && { echo "no report url/secret - skipping"; exit 0; }
           CONTRACT=$([ "${{ steps.verify.outcome }}" = success ] && echo pass || echo fail)
-          APPLIED=$([ "${{ steps.v.outputs.mode }}" = apply ] && [ "$CONTRACT" = pass ] && echo true || echo false)
+          # applied reflects the COMMIT outcome, not just a green verify — a failed push
+          # (non-fast-forward, etc.) must never report as "committad till main".
+          APPLIED=$([ "${{ steps.commit.outcome }}" = success ] && echo true || echo false)
           BODY=$(jq -nc --arg repo "$GITHUB_REPOSITORY" --arg mode "${{ steps.v.outputs.mode }}" \
             --arg current "${{ steps.v.outputs.current }}" --arg target "${{ steps.v.outputs.target }}" \
             --arg contract "$CONTRACT" --arg applied "$APPLIED" \
