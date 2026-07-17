@@ -284,7 +284,7 @@
   // (settings.ogImage → home hero → brand card) and the example generated card resolve on
   // the site origin, so a public-root path like '/og-image.png' shows instead of getAsset
   // 404ing to a broken "?". The /preview page reflects the pane's master toggle + the first
-  // enabled type's overlayText/style/scrim/showLogo/tagline/accent.
+  // enabled type's headlineField/sublineField/style/scrim/showLogo/accent.
   var ShareCardsPreview = function (props) {
     var data = props.entry.get('data');
     data = data && data.toJS ? data.toJS() : (data || {});

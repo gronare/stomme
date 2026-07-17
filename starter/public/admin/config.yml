@@ -29,6 +29,7 @@ collections:
             label_singular: "Section"
             widget: list
             required: false
+            collapsed: true
             summary: "{{fields.eyebrow}} {{fields.heading}}{{fields.quote}}"
             types:
               - name: hero
@@ -44,47 +45,57 @@ collections:
                     required: false
                     label_singular: "Line"
                     collapsed: true
-                    minimize_collapsed: true
                     hint: "Short ✓ lines under the intro — key reassurances."
                     field: { name: text, label: "Line", widget: string }
-                  - { name: ctaLabel, label: "Button label", widget: string, required: false }
-                  - name: ctaHref
-                    label: "Button link"
+                  - name: cta
+                    label: "Button"
                     widget: object
                     required: false
                     collapsed: true
-                    summary: "{{fields.page}}{{fields.url}}"
+                    summary: "{{fields.label}}"
                     fields:
-                      - name: page
-                        label: "Page"
-                        widget: select
-                        required: false
-                        hint: "Pick a page on the site."
-                        options:
-                          - { label: "— No page —", value: "" }
-                          - { label: "Home (/)", value: "/" }
-                          - { label: "About (/about)", value: "/about" }
-                          - { label: "Contact (/contact)", value: "/contact" }
-                      - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
-                  - { name: cta2Label, label: "Second button label", widget: string, required: false, hint: "A quiet text link beside the button. Leave empty to hide." }
-                  - name: cta2Href
-                    label: "Second button link"
+                      - { name: label, label: "Label", widget: string }
+                      - name: link
+                        label: "Link"
+                        widget: object
+                        collapsed: false
+                        fields:
+                          - name: page
+                            label: "Page"
+                            widget: select
+                            required: false
+                            hint: "Pick a page on the site."
+                            options:
+                              - { label: "— No page —", value: "" }
+                              - { label: "Home (/)", value: "/" }
+                              - { label: "About (/about)", value: "/about" }
+                              - { label: "Contact (/contact)", value: "/contact" }
+                          - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
+                  - name: cta2
+                    label: "Second button"
                     widget: object
                     required: false
                     collapsed: true
-                    summary: "{{fields.page}}{{fields.url}}"
+                    summary: "{{fields.label}}"
+                    hint: "Shown as a quiet text link beside the button."
                     fields:
-                      - name: page
-                        label: "Page"
-                        widget: select
-                        required: false
-                        hint: "Pick a page on the site."
-                        options:
-                          - { label: "— No page —", value: "" }
-                          - { label: "Home (/)", value: "/" }
-                          - { label: "About (/about)", value: "/about" }
-                          - { label: "Contact (/contact)", value: "/contact" }
-                      - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
+                      - { name: label, label: "Label", widget: string }
+                      - name: link
+                        label: "Link"
+                        widget: object
+                        collapsed: false
+                        fields:
+                          - name: page
+                            label: "Page"
+                            widget: select
+                            required: false
+                            hint: "Pick a page on the site."
+                            options:
+                              - { label: "— No page —", value: "" }
+                              - { label: "Home (/)", value: "/" }
+                              - { label: "About (/about)", value: "/about" }
+                              - { label: "Contact (/contact)", value: "/contact" }
+                          - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
                   - name: media
                     label: "Media"
                     widget: object
@@ -111,7 +122,6 @@ collections:
                         required: false
                         label_singular: "Key point"
                         collapsed: true
-                        minimize_collapsed: true
                         hint: "Panel with icon + title + line. Used when Show = Highlights."
                         summary: "{{fields.title}}"
                         fields:
@@ -205,44 +215,55 @@ collections:
                   - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
                   - { name: heading, label: "Heading (H1)", widget: text, hint: "Press Enter for a line break." }
                   - { name: intro, label: "Intro", widget: text, required: false }
-                  - { name: ctaLabel, label: "Button label", widget: string, required: false }
-                  - name: ctaHref
-                    label: "Button link"
+                  - name: cta
+                    label: "Button"
                     widget: object
                     required: false
                     collapsed: true
-                    summary: "{{fields.page}}{{fields.url}}"
+                    summary: "{{fields.label}}"
                     fields:
-                      - name: page
-                        label: "Page"
-                        widget: select
-                        required: false
-                        hint: "Pick a page on the site."
-                        options:
-                          - { label: "— No page —", value: "" }
-                          - { label: "Home (/)", value: "/" }
-                          - { label: "About (/about)", value: "/about" }
-                          - { label: "Contact (/contact)", value: "/contact" }
-                      - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
-                  - { name: cta2Label, label: "Second button label", widget: string, required: false }
-                  - name: cta2Href
-                    label: "Second button link"
+                      - { name: label, label: "Label", widget: string }
+                      - name: link
+                        label: "Link"
+                        widget: object
+                        collapsed: false
+                        fields:
+                          - name: page
+                            label: "Page"
+                            widget: select
+                            required: false
+                            hint: "Pick a page on the site."
+                            options:
+                              - { label: "— No page —", value: "" }
+                              - { label: "Home (/)", value: "/" }
+                              - { label: "About (/about)", value: "/about" }
+                              - { label: "Contact (/contact)", value: "/contact" }
+                          - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
+                  - name: cta2
+                    label: "Second button"
                     widget: object
                     required: false
                     collapsed: true
-                    summary: "{{fields.page}}{{fields.url}}"
+                    summary: "{{fields.label}}"
+                    hint: "A second, quieter button beside the first."
                     fields:
-                      - name: page
-                        label: "Page"
-                        widget: select
-                        required: false
-                        hint: "Pick a page on the site."
-                        options:
-                          - { label: "— No page —", value: "" }
-                          - { label: "Home (/)", value: "/" }
-                          - { label: "About (/about)", value: "/about" }
-                          - { label: "Contact (/contact)", value: "/contact" }
-                      - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
+                      - { name: label, label: "Label", widget: string }
+                      - name: link
+                        label: "Link"
+                        widget: object
+                        collapsed: false
+                        fields:
+                          - name: page
+                            label: "Page"
+                            widget: select
+                            required: false
+                            hint: "Pick a page on the site."
+                            options:
+                              - { label: "— No page —", value: "" }
+                              - { label: "Home (/)", value: "/" }
+                              - { label: "About (/about)", value: "/about" }
+                              - { label: "Contact (/contact)", value: "/contact" }
+                          - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
                   - name: media
                     label: "Media"
                     widget: object
@@ -306,25 +327,30 @@ collections:
                   - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
                   - { name: heading, label: "Heading (H1)", widget: string }
                   - { name: intro, label: "Intro", widget: text, required: false }
-                  - { name: ctaLabel, label: "Button label (optional)", widget: string, required: false }
-                  - name: ctaHref
-                    label: "Button link"
+                  - name: cta
+                    label: "Button"
                     widget: object
                     required: false
                     collapsed: true
-                    summary: "{{fields.page}}{{fields.url}}"
+                    summary: "{{fields.label}}"
                     fields:
-                      - name: page
-                        label: "Page"
-                        widget: select
-                        required: false
-                        hint: "Pick a page on the site."
-                        options:
-                          - { label: "— No page —", value: "" }
-                          - { label: "Home (/)", value: "/" }
-                          - { label: "About (/about)", value: "/about" }
-                          - { label: "Contact (/contact)", value: "/contact" }
-                      - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
+                      - { name: label, label: "Label", widget: string }
+                      - name: link
+                        label: "Link"
+                        widget: object
+                        collapsed: false
+                        fields:
+                          - name: page
+                            label: "Page"
+                            widget: select
+                            required: false
+                            hint: "Pick a page on the site."
+                            options:
+                              - { label: "— No page —", value: "" }
+                              - { label: "Home (/)", value: "/" }
+                              - { label: "About (/about)", value: "/about" }
+                              - { label: "Contact (/contact)", value: "/contact" }
+                          - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
                   - name: layout
                     label: "Layout"
                     widget: object
@@ -497,25 +523,30 @@ collections:
                   - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Usually only on the first fragment of a story." }
                   - { name: statement, label: "Statement (big line)", widget: string, hint: "Wrap words in *asterisks* to underline them." }
                   - { name: body, label: "Text", widget: text, required: false }
-                  - { name: linkLabel, label: "Link label", widget: string, required: false }
-                  - name: link
+                  - name: cta
                     label: "Link"
                     widget: object
                     required: false
                     collapsed: true
-                    summary: "{{fields.page}}{{fields.url}}"
+                    summary: "{{fields.label}}"
                     fields:
-                      - name: page
-                        label: "Page"
-                        widget: select
-                        required: false
-                        hint: "Pick a page on the site."
-                        options:
-                          - { label: "— No page —", value: "" }
-                          - { label: "Home (/)", value: "/" }
-                          - { label: "About (/about)", value: "/about" }
-                          - { label: "Contact (/contact)", value: "/contact" }
-                      - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
+                      - { name: label, label: "Label", widget: string, hint: "The link text, e.g. \"Read on\"." }
+                      - name: link
+                        label: "Link"
+                        widget: object
+                        collapsed: false
+                        fields:
+                          - name: page
+                            label: "Page"
+                            widget: select
+                            required: false
+                            hint: "Pick a page on the site."
+                            options:
+                              - { label: "— No page —", value: "" }
+                              - { label: "Home (/)", value: "/" }
+                              - { label: "About (/about)", value: "/about" }
+                              - { label: "Contact (/contact)", value: "/contact" }
+                          - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
                   - name: layout
                     label: "Layout"
                     widget: object
@@ -563,7 +594,6 @@ collections:
                     required: false
                     label_singular: "Card"
                     collapsed: true
-                    minimize_collapsed: true
                     summary: "{{fields.title}}"
                     fields:
                       - name: icon
@@ -588,25 +618,31 @@ collections:
                       - { name: title, label: "Title", widget: string }
                       - { name: body, label: "Text", widget: text }
                       - { name: tag, label: "Tag (footer label)", widget: string, required: false, hint: "Small uppercase label at the card foot, e.g. a method term." }
-                      - name: link
-                        label: "Link (optional)"
+                      - name: cta
+                        label: "Link"
                         widget: object
                         required: false
                         collapsed: true
-                        summary: "{{fields.page}}{{fields.url}}"
+                        summary: "{{fields.label}}"
+                        hint: "Make the card clickable."
                         fields:
-                          - name: page
-                            label: "Page"
-                            widget: select
-                            required: false
-                            hint: "Pick a page on the site."
-                            options:
-                              - { label: "— No page —", value: "" }
-                              - { label: "Home (/)", value: "/" }
-                              - { label: "About (/about)", value: "/about" }
-                              - { label: "Contact (/contact)", value: "/contact" }
-                          - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
-                      - { name: linkLabel, label: "Link label", widget: string, required: false, hint: "E.g. \"Read more\". Shown only if the card has a link." }
+                          - { name: label, label: "Label", widget: string, required: false, hint: "Blank shows \"Read more\"." }
+                          - name: link
+                            label: "Link"
+                            widget: object
+                            collapsed: false
+                            fields:
+                              - name: page
+                                label: "Page"
+                                widget: select
+                                required: false
+                                hint: "Pick a page on the site."
+                                options:
+                                  - { label: "— No page —", value: "" }
+                                  - { label: "Home (/)", value: "/" }
+                                  - { label: "About (/about)", value: "/about" }
+                                  - { label: "Contact (/contact)", value: "/contact" }
+                              - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
                   - name: layout
                     label: "Layout"
                     widget: object
@@ -655,7 +691,6 @@ collections:
                     required: false
                     label_singular: "Card"
                     collapsed: true
-                    minimize_collapsed: true
                     summary: "{{fields.title}}"
                     fields:
                       - { name: title, label: "Title", widget: string }
@@ -691,7 +726,6 @@ collections:
                     required: false
                     label_singular: "Plan"
                     collapsed: true
-                    minimize_collapsed: true
                     summary: "{{fields.name}}"
                     fields:
                       - { name: name, label: "Plan name", widget: string }
@@ -705,31 +739,35 @@ collections:
                         required: false
                         label_singular: "Feature"
                         collapsed: true
-                        minimize_collapsed: true
                         summary: "{{fields.text}}"
                         fields:
                           - { name: text, label: "Feature", widget: string }
                       - { name: badge, label: "Badge", widget: string, required: false, hint: "Small label, e.g. \"populär\"." }
                       - { name: highlight, label: "Highlight this plan", widget: boolean, required: false, default: false }
-                      - { name: ctaLabel, label: "Button label", widget: string, required: false }
-                      - name: ctaHref
-                        label: "Button link"
+                      - name: cta
+                        label: "Button"
                         widget: object
                         required: false
                         collapsed: true
-                        summary: "{{fields.page}}{{fields.url}}"
+                        summary: "{{fields.label}}"
                         fields:
-                          - name: page
-                            label: "Page"
-                            widget: select
-                            required: false
-                            hint: "Pick a page on the site."
-                            options:
-                              - { label: "— No page —", value: "" }
-                              - { label: "Home (/)", value: "/" }
-                              - { label: "About (/about)", value: "/about" }
-                              - { label: "Contact (/contact)", value: "/contact" }
-                          - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
+                          - { name: label, label: "Label", widget: string }
+                          - name: link
+                            label: "Link"
+                            widget: object
+                            collapsed: false
+                            fields:
+                              - name: page
+                                label: "Page"
+                                widget: select
+                                required: false
+                                hint: "Pick a page on the site."
+                                options:
+                                  - { label: "— No page —", value: "" }
+                                  - { label: "Home (/)", value: "/" }
+                                  - { label: "About (/about)", value: "/about" }
+                                  - { label: "Contact (/contact)", value: "/contact" }
+                              - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
                   - { name: footnote, label: "Footnote", widget: text, required: false, hint: "Small note under the cards — e.g. what every plan includes." }
                   - name: style
                     label: "Appearance"
@@ -762,7 +800,6 @@ collections:
                     required: false
                     label_singular: "Card"
                     collapsed: true
-                    minimize_collapsed: true
                     summary: "{{fields.title}}"
                     fields:
                       - { name: title, label: "Title", widget: string }
@@ -798,7 +835,6 @@ collections:
                     required: false
                     label_singular: "Step"
                     collapsed: true
-                    minimize_collapsed: true
                     summary: "{{fields.title}}"
                     fields:
                       - { name: title, label: "Title", widget: string }
@@ -851,7 +887,6 @@ collections:
                     required: false
                     label_singular: "Item"
                     collapsed: true
-                    minimize_collapsed: true
                     summary: "{{fields.text}}"
                     fields:
                       - { name: text, label: "Text", widget: string }
@@ -894,7 +929,6 @@ collections:
                     required: false
                     label_singular: "Image"
                     collapsed: true
-                    minimize_collapsed: true
                     summary: "{{fields.caption}}"
                     fields:
                       - { name: image, label: "Image", widget: image, required: false }
@@ -971,7 +1005,6 @@ collections:
                     required: false
                     label_singular: "Sense"
                     collapsed: true
-                    minimize_collapsed: true
                     summary: "{{fields.text}}"
                     fields:
                       - { name: text, label: "Sense", widget: string, hint: "Wrap words in *asterisks* to underline them." }
@@ -1093,7 +1126,6 @@ collections:
                     required: false
                     label_singular: "Badge"
                     collapsed: true
-                    minimize_collapsed: true
                     field: { name: badge, label: "Badge", widget: string }
                   - { name: statValue, label: "Big number", widget: string, required: false }
                   - { name: statLabel, label: "Number label", widget: string, required: false }
@@ -1103,7 +1135,6 @@ collections:
                     required: false
                     label_singular: "Column"
                     collapsed: true
-                    minimize_collapsed: true
                     hint: "Two or three side-by-side figures (e.g. a comparison). Replaces the single big number when filled."
                     summary: "{{fields.label}} {{fields.value}}"
                     fields:
@@ -1136,7 +1167,6 @@ collections:
                     required: false
                     label_singular: "Fact"
                     collapsed: true
-                    minimize_collapsed: true
                     summary: "{{fields.label}} {{fields.value}}"
                     fields:
                       - { name: label, label: "Label", widget: string }
@@ -1152,7 +1182,6 @@ collections:
                     required: false
                     label_singular: "Name"
                     collapsed: true
-                    minimize_collapsed: true
                     field: { name: name, label: "Name", widget: string }
               - name: faq
                 label: "FAQ"
@@ -1178,25 +1207,30 @@ collections:
                     options: []
                   - { name: asideHeading, label: "Aside · heading", widget: string, required: false, default: "Still have questions?" }
                   - { name: asideBody, label: "Aside · text", widget: text, required: false, default: "Get in touch and we'll help you out." }
-                  - { name: asideCtaLabel, label: "Aside · button label", widget: string, required: false, default: "Contact" }
-                  - name: asideHref
-                    label: "Aside · button link"
+                  - name: asideCta
+                    label: "Aside · button"
                     widget: object
                     required: false
                     collapsed: true
-                    summary: "{{fields.page}}{{fields.url}}"
+                    summary: "{{fields.label}}"
                     fields:
-                      - name: page
-                        label: "Page"
-                        widget: select
-                        required: false
-                        hint: "Pick a page on the site."
-                        options:
-                          - { label: "— No page —", value: "" }
-                          - { label: "Home (/)", value: "/" }
-                          - { label: "About (/about)", value: "/about" }
-                          - { label: "Contact (/contact)", value: "/contact" }
-                      - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
+                      - { name: label, label: "Label", widget: string, hint: "E.g. \"Contact\"." }
+                      - name: link
+                        label: "Link"
+                        widget: object
+                        collapsed: false
+                        fields:
+                          - name: page
+                            label: "Page"
+                            widget: select
+                            required: false
+                            hint: "Pick a page on the site."
+                            options:
+                              - { label: "— No page —", value: "" }
+                              - { label: "Home (/)", value: "/" }
+                              - { label: "About (/about)", value: "/about" }
+                              - { label: "Contact (/contact)", value: "/contact" }
+                          - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
                   - name: layout
                     label: "Layout"
                     widget: object
@@ -1239,25 +1273,30 @@ collections:
                   - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
                   - { name: heading, label: "Heading", widget: string, required: false }
                   - { name: intro, label: "Intro", widget: text, required: false }
-                  - { name: label, label: "Button label", widget: string, required: false }
-                  - name: href
-                    label: "Button link"
+                  - name: cta
+                    label: "Button"
                     widget: object
                     required: false
                     collapsed: true
-                    summary: "{{fields.page}}{{fields.url}}"
+                    summary: "{{fields.label}}"
                     fields:
-                      - name: page
-                        label: "Page"
-                        widget: select
-                        required: false
-                        hint: "Pick a page on the site."
-                        options:
-                          - { label: "— No page —", value: "" }
-                          - { label: "Home (/)", value: "/" }
-                          - { label: "About (/about)", value: "/about" }
-                          - { label: "Contact (/contact)", value: "/contact" }
-                      - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
+                      - { name: label, label: "Label", widget: string }
+                      - name: link
+                        label: "Link"
+                        widget: object
+                        collapsed: false
+                        fields:
+                          - name: page
+                            label: "Page"
+                            widget: select
+                            required: false
+                            hint: "Pick a page on the site."
+                            options:
+                              - { label: "— No page —", value: "" }
+                              - { label: "Home (/)", value: "/" }
+                              - { label: "About (/about)", value: "/about" }
+                              - { label: "Contact (/contact)", value: "/contact" }
+                          - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
               - name: ctaBox
                 label: "Call to action (box)"
                 widget: object
@@ -1265,51 +1304,61 @@ collections:
                   - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
                   - { name: heading, label: "Heading", widget: string }
                   - { name: intro, label: "Intro", widget: text, required: false, hint: "A short line under the heading." }
-                  - { name: label, label: "Button label", widget: string }
-                  - name: href
-                    label: "Button link"
+                  - name: cta
+                    label: "Button"
                     widget: object
                     required: false
                     collapsed: true
-                    summary: "{{fields.page}}{{fields.url}}"
+                    summary: "{{fields.label}}"
                     fields:
-                      - name: page
-                        label: "Page"
-                        widget: select
-                        required: false
-                        hint: "Pick a page on the site."
-                        options:
-                          - { label: "— No page —", value: "" }
-                          - { label: "Home (/)", value: "/" }
-                          - { label: "About (/about)", value: "/about" }
-                          - { label: "Contact (/contact)", value: "/contact" }
-                      - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
-                  - { name: label2, label: "Second button label", widget: string, required: false, hint: "Shown as a quiet text link beside the button." }
-                  - name: href2
-                    label: "Second button link"
+                      - { name: label, label: "Label", widget: string }
+                      - name: link
+                        label: "Link"
+                        widget: object
+                        collapsed: false
+                        fields:
+                          - name: page
+                            label: "Page"
+                            widget: select
+                            required: false
+                            hint: "Pick a page on the site."
+                            options:
+                              - { label: "— No page —", value: "" }
+                              - { label: "Home (/)", value: "/" }
+                              - { label: "About (/about)", value: "/about" }
+                              - { label: "Contact (/contact)", value: "/contact" }
+                          - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
+                  - name: cta2
+                    label: "Second button"
                     widget: object
                     required: false
                     collapsed: true
-                    summary: "{{fields.page}}{{fields.url}}"
+                    summary: "{{fields.label}}"
+                    hint: "Shown as a quiet text link beside the button."
                     fields:
-                      - name: page
-                        label: "Page"
-                        widget: select
-                        required: false
-                        hint: "Pick a page on the site."
-                        options:
-                          - { label: "— No page —", value: "" }
-                          - { label: "Home (/)", value: "/" }
-                          - { label: "About (/about)", value: "/about" }
-                          - { label: "Contact (/contact)", value: "/contact" }
-                      - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
+                      - { name: label, label: "Label", widget: string }
+                      - name: link
+                        label: "Link"
+                        widget: object
+                        collapsed: false
+                        fields:
+                          - name: page
+                            label: "Page"
+                            widget: select
+                            required: false
+                            hint: "Pick a page on the site."
+                            options:
+                              - { label: "— No page —", value: "" }
+                              - { label: "Home (/)", value: "/" }
+                              - { label: "About (/about)", value: "/about" }
+                              - { label: "Contact (/contact)", value: "/contact" }
+                          - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
                   - name: facts
                     label: "Facts (label + value)"
                     widget: list
                     required: false
                     label_singular: "Fact"
                     collapsed: true
-                    minimize_collapsed: true
                     hint: "Shown as chips (Split) or a mono readout (Panel). Ignored in Classic."
                     summary: "{{fields.label}} {{fields.value}}"
                     fields:
@@ -1412,6 +1461,7 @@ collections:
         label_singular: "Section"
         widget: list
         required: false
+        collapsed: true
         summary: "{{fields.eyebrow}} {{fields.heading}}{{fields.quote}}"
         types:
           - name: hero
@@ -1427,47 +1477,57 @@ collections:
                 required: false
                 label_singular: "Line"
                 collapsed: true
-                minimize_collapsed: true
                 hint: "Short ✓ lines under the intro — key reassurances."
                 field: { name: text, label: "Line", widget: string }
-              - { name: ctaLabel, label: "Button label", widget: string, required: false }
-              - name: ctaHref
-                label: "Button link"
+              - name: cta
+                label: "Button"
                 widget: object
                 required: false
                 collapsed: true
-                summary: "{{fields.page}}{{fields.url}}"
+                summary: "{{fields.label}}"
                 fields:
-                  - name: page
-                    label: "Page"
-                    widget: select
-                    required: false
-                    hint: "Pick a page on the site."
-                    options:
-                      - { label: "— No page —", value: "" }
-                      - { label: "Home (/)", value: "/" }
-                      - { label: "About (/about)", value: "/about" }
-                      - { label: "Contact (/contact)", value: "/contact" }
-                  - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
-              - { name: cta2Label, label: "Second button label", widget: string, required: false, hint: "A quiet text link beside the button. Leave empty to hide." }
-              - name: cta2Href
-                label: "Second button link"
+                  - { name: label, label: "Label", widget: string }
+                  - name: link
+                    label: "Link"
+                    widget: object
+                    collapsed: false
+                    fields:
+                      - name: page
+                        label: "Page"
+                        widget: select
+                        required: false
+                        hint: "Pick a page on the site."
+                        options:
+                          - { label: "— No page —", value: "" }
+                          - { label: "Home (/)", value: "/" }
+                          - { label: "About (/about)", value: "/about" }
+                          - { label: "Contact (/contact)", value: "/contact" }
+                      - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
+              - name: cta2
+                label: "Second button"
                 widget: object
                 required: false
                 collapsed: true
-                summary: "{{fields.page}}{{fields.url}}"
+                summary: "{{fields.label}}"
+                hint: "Shown as a quiet text link beside the button."
                 fields:
-                  - name: page
-                    label: "Page"
-                    widget: select
-                    required: false
-                    hint: "Pick a page on the site."
-                    options:
-                      - { label: "— No page —", value: "" }
-                      - { label: "Home (/)", value: "/" }
-                      - { label: "About (/about)", value: "/about" }
-                      - { label: "Contact (/contact)", value: "/contact" }
-                  - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
+                  - { name: label, label: "Label", widget: string }
+                  - name: link
+                    label: "Link"
+                    widget: object
+                    collapsed: false
+                    fields:
+                      - name: page
+                        label: "Page"
+                        widget: select
+                        required: false
+                        hint: "Pick a page on the site."
+                        options:
+                          - { label: "— No page —", value: "" }
+                          - { label: "Home (/)", value: "/" }
+                          - { label: "About (/about)", value: "/about" }
+                          - { label: "Contact (/contact)", value: "/contact" }
+                      - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
               - name: media
                 label: "Media"
                 widget: object
@@ -1494,7 +1554,6 @@ collections:
                     required: false
                     label_singular: "Key point"
                     collapsed: true
-                    minimize_collapsed: true
                     hint: "Panel with icon + title + line. Used when Show = Highlights."
                     summary: "{{fields.title}}"
                     fields:
@@ -1588,44 +1647,55 @@ collections:
               - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
               - { name: heading, label: "Heading (H1)", widget: text, hint: "Press Enter for a line break." }
               - { name: intro, label: "Intro", widget: text, required: false }
-              - { name: ctaLabel, label: "Button label", widget: string, required: false }
-              - name: ctaHref
-                label: "Button link"
+              - name: cta
+                label: "Button"
                 widget: object
                 required: false
                 collapsed: true
-                summary: "{{fields.page}}{{fields.url}}"
+                summary: "{{fields.label}}"
                 fields:
-                  - name: page
-                    label: "Page"
-                    widget: select
-                    required: false
-                    hint: "Pick a page on the site."
-                    options:
-                      - { label: "— No page —", value: "" }
-                      - { label: "Home (/)", value: "/" }
-                      - { label: "About (/about)", value: "/about" }
-                      - { label: "Contact (/contact)", value: "/contact" }
-                  - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
-              - { name: cta2Label, label: "Second button label", widget: string, required: false }
-              - name: cta2Href
-                label: "Second button link"
+                  - { name: label, label: "Label", widget: string }
+                  - name: link
+                    label: "Link"
+                    widget: object
+                    collapsed: false
+                    fields:
+                      - name: page
+                        label: "Page"
+                        widget: select
+                        required: false
+                        hint: "Pick a page on the site."
+                        options:
+                          - { label: "— No page —", value: "" }
+                          - { label: "Home (/)", value: "/" }
+                          - { label: "About (/about)", value: "/about" }
+                          - { label: "Contact (/contact)", value: "/contact" }
+                      - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
+              - name: cta2
+                label: "Second button"
                 widget: object
                 required: false
                 collapsed: true
-                summary: "{{fields.page}}{{fields.url}}"
+                summary: "{{fields.label}}"
+                hint: "A second, quieter button beside the first."
                 fields:
-                  - name: page
-                    label: "Page"
-                    widget: select
-                    required: false
-                    hint: "Pick a page on the site."
-                    options:
-                      - { label: "— No page —", value: "" }
-                      - { label: "Home (/)", value: "/" }
-                      - { label: "About (/about)", value: "/about" }
-                      - { label: "Contact (/contact)", value: "/contact" }
-                  - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
+                  - { name: label, label: "Label", widget: string }
+                  - name: link
+                    label: "Link"
+                    widget: object
+                    collapsed: false
+                    fields:
+                      - name: page
+                        label: "Page"
+                        widget: select
+                        required: false
+                        hint: "Pick a page on the site."
+                        options:
+                          - { label: "— No page —", value: "" }
+                          - { label: "Home (/)", value: "/" }
+                          - { label: "About (/about)", value: "/about" }
+                          - { label: "Contact (/contact)", value: "/contact" }
+                      - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
               - name: media
                 label: "Media"
                 widget: object
@@ -1689,25 +1759,30 @@ collections:
               - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
               - { name: heading, label: "Heading (H1)", widget: string }
               - { name: intro, label: "Intro", widget: text, required: false }
-              - { name: ctaLabel, label: "Button label (optional)", widget: string, required: false }
-              - name: ctaHref
-                label: "Button link"
+              - name: cta
+                label: "Button"
                 widget: object
                 required: false
                 collapsed: true
-                summary: "{{fields.page}}{{fields.url}}"
+                summary: "{{fields.label}}"
                 fields:
-                  - name: page
-                    label: "Page"
-                    widget: select
-                    required: false
-                    hint: "Pick a page on the site."
-                    options:
-                      - { label: "— No page —", value: "" }
-                      - { label: "Home (/)", value: "/" }
-                      - { label: "About (/about)", value: "/about" }
-                      - { label: "Contact (/contact)", value: "/contact" }
-                  - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
+                  - { name: label, label: "Label", widget: string }
+                  - name: link
+                    label: "Link"
+                    widget: object
+                    collapsed: false
+                    fields:
+                      - name: page
+                        label: "Page"
+                        widget: select
+                        required: false
+                        hint: "Pick a page on the site."
+                        options:
+                          - { label: "— No page —", value: "" }
+                          - { label: "Home (/)", value: "/" }
+                          - { label: "About (/about)", value: "/about" }
+                          - { label: "Contact (/contact)", value: "/contact" }
+                      - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
               - name: layout
                 label: "Layout"
                 widget: object
@@ -1880,25 +1955,30 @@ collections:
               - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Usually only on the first fragment of a story." }
               - { name: statement, label: "Statement (big line)", widget: string, hint: "Wrap words in *asterisks* to underline them." }
               - { name: body, label: "Text", widget: text, required: false }
-              - { name: linkLabel, label: "Link label", widget: string, required: false }
-              - name: link
+              - name: cta
                 label: "Link"
                 widget: object
                 required: false
                 collapsed: true
-                summary: "{{fields.page}}{{fields.url}}"
+                summary: "{{fields.label}}"
                 fields:
-                  - name: page
-                    label: "Page"
-                    widget: select
-                    required: false
-                    hint: "Pick a page on the site."
-                    options:
-                      - { label: "— No page —", value: "" }
-                      - { label: "Home (/)", value: "/" }
-                      - { label: "About (/about)", value: "/about" }
-                      - { label: "Contact (/contact)", value: "/contact" }
-                  - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
+                  - { name: label, label: "Label", widget: string, hint: "The link text, e.g. \"Read on\"." }
+                  - name: link
+                    label: "Link"
+                    widget: object
+                    collapsed: false
+                    fields:
+                      - name: page
+                        label: "Page"
+                        widget: select
+                        required: false
+                        hint: "Pick a page on the site."
+                        options:
+                          - { label: "— No page —", value: "" }
+                          - { label: "Home (/)", value: "/" }
+                          - { label: "About (/about)", value: "/about" }
+                          - { label: "Contact (/contact)", value: "/contact" }
+                      - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
               - name: layout
                 label: "Layout"
                 widget: object
@@ -1946,7 +2026,6 @@ collections:
                 required: false
                 label_singular: "Card"
                 collapsed: true
-                minimize_collapsed: true
                 summary: "{{fields.title}}"
                 fields:
                   - name: icon
@@ -1971,25 +2050,31 @@ collections:
                   - { name: title, label: "Title", widget: string }
                   - { name: body, label: "Text", widget: text }
                   - { name: tag, label: "Tag (footer label)", widget: string, required: false, hint: "Small uppercase label at the card foot, e.g. a method term." }
-                  - name: link
-                    label: "Link (optional)"
+                  - name: cta
+                    label: "Link"
                     widget: object
                     required: false
                     collapsed: true
-                    summary: "{{fields.page}}{{fields.url}}"
+                    summary: "{{fields.label}}"
+                    hint: "Make the card clickable."
                     fields:
-                      - name: page
-                        label: "Page"
-                        widget: select
-                        required: false
-                        hint: "Pick a page on the site."
-                        options:
-                          - { label: "— No page —", value: "" }
-                          - { label: "Home (/)", value: "/" }
-                          - { label: "About (/about)", value: "/about" }
-                          - { label: "Contact (/contact)", value: "/contact" }
-                      - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
-                  - { name: linkLabel, label: "Link label", widget: string, required: false, hint: "E.g. \"Read more\". Shown only if the card has a link." }
+                      - { name: label, label: "Label", widget: string, required: false, hint: "Blank shows \"Read more\"." }
+                      - name: link
+                        label: "Link"
+                        widget: object
+                        collapsed: false
+                        fields:
+                          - name: page
+                            label: "Page"
+                            widget: select
+                            required: false
+                            hint: "Pick a page on the site."
+                            options:
+                              - { label: "— No page —", value: "" }
+                              - { label: "Home (/)", value: "/" }
+                              - { label: "About (/about)", value: "/about" }
+                              - { label: "Contact (/contact)", value: "/contact" }
+                          - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
               - name: layout
                 label: "Layout"
                 widget: object
@@ -2038,7 +2123,6 @@ collections:
                 required: false
                 label_singular: "Card"
                 collapsed: true
-                minimize_collapsed: true
                 summary: "{{fields.title}}"
                 fields:
                   - { name: title, label: "Title", widget: string }
@@ -2074,7 +2158,6 @@ collections:
                 required: false
                 label_singular: "Plan"
                 collapsed: true
-                minimize_collapsed: true
                 summary: "{{fields.name}}"
                 fields:
                   - { name: name, label: "Plan name", widget: string }
@@ -2088,31 +2171,35 @@ collections:
                     required: false
                     label_singular: "Feature"
                     collapsed: true
-                    minimize_collapsed: true
                     summary: "{{fields.text}}"
                     fields:
                       - { name: text, label: "Feature", widget: string }
                   - { name: badge, label: "Badge", widget: string, required: false, hint: "Small label, e.g. \"populär\"." }
                   - { name: highlight, label: "Highlight this plan", widget: boolean, required: false, default: false }
-                  - { name: ctaLabel, label: "Button label", widget: string, required: false }
-                  - name: ctaHref
-                    label: "Button link"
+                  - name: cta
+                    label: "Button"
                     widget: object
                     required: false
                     collapsed: true
-                    summary: "{{fields.page}}{{fields.url}}"
+                    summary: "{{fields.label}}"
                     fields:
-                      - name: page
-                        label: "Page"
-                        widget: select
-                        required: false
-                        hint: "Pick a page on the site."
-                        options:
-                          - { label: "— No page —", value: "" }
-                          - { label: "Home (/)", value: "/" }
-                          - { label: "About (/about)", value: "/about" }
-                          - { label: "Contact (/contact)", value: "/contact" }
-                      - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
+                      - { name: label, label: "Label", widget: string }
+                      - name: link
+                        label: "Link"
+                        widget: object
+                        collapsed: false
+                        fields:
+                          - name: page
+                            label: "Page"
+                            widget: select
+                            required: false
+                            hint: "Pick a page on the site."
+                            options:
+                              - { label: "— No page —", value: "" }
+                              - { label: "Home (/)", value: "/" }
+                              - { label: "About (/about)", value: "/about" }
+                              - { label: "Contact (/contact)", value: "/contact" }
+                          - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
               - { name: footnote, label: "Footnote", widget: text, required: false, hint: "Small note under the cards — e.g. what every plan includes." }
               - name: style
                 label: "Appearance"
@@ -2145,7 +2232,6 @@ collections:
                 required: false
                 label_singular: "Card"
                 collapsed: true
-                minimize_collapsed: true
                 summary: "{{fields.title}}"
                 fields:
                   - { name: title, label: "Title", widget: string }
@@ -2181,7 +2267,6 @@ collections:
                 required: false
                 label_singular: "Step"
                 collapsed: true
-                minimize_collapsed: true
                 summary: "{{fields.title}}"
                 fields:
                   - { name: title, label: "Title", widget: string }
@@ -2234,7 +2319,6 @@ collections:
                 required: false
                 label_singular: "Item"
                 collapsed: true
-                minimize_collapsed: true
                 summary: "{{fields.text}}"
                 fields:
                   - { name: text, label: "Text", widget: string }
@@ -2277,7 +2361,6 @@ collections:
                 required: false
                 label_singular: "Image"
                 collapsed: true
-                minimize_collapsed: true
                 summary: "{{fields.caption}}"
                 fields:
                   - { name: image, label: "Image", widget: image, required: false }
@@ -2354,7 +2437,6 @@ collections:
                 required: false
                 label_singular: "Sense"
                 collapsed: true
-                minimize_collapsed: true
                 summary: "{{fields.text}}"
                 fields:
                   - { name: text, label: "Sense", widget: string, hint: "Wrap words in *asterisks* to underline them." }
@@ -2476,7 +2558,6 @@ collections:
                 required: false
                 label_singular: "Badge"
                 collapsed: true
-                minimize_collapsed: true
                 field: { name: badge, label: "Badge", widget: string }
               - { name: statValue, label: "Big number", widget: string, required: false }
               - { name: statLabel, label: "Number label", widget: string, required: false }
@@ -2486,7 +2567,6 @@ collections:
                 required: false
                 label_singular: "Column"
                 collapsed: true
-                minimize_collapsed: true
                 hint: "Two or three side-by-side figures (e.g. a comparison). Replaces the single big number when filled."
                 summary: "{{fields.label}} {{fields.value}}"
                 fields:
@@ -2519,7 +2599,6 @@ collections:
                 required: false
                 label_singular: "Fact"
                 collapsed: true
-                minimize_collapsed: true
                 summary: "{{fields.label}} {{fields.value}}"
                 fields:
                   - { name: label, label: "Label", widget: string }
@@ -2535,7 +2614,6 @@ collections:
                 required: false
                 label_singular: "Name"
                 collapsed: true
-                minimize_collapsed: true
                 field: { name: name, label: "Name", widget: string }
           - name: faq
             label: "FAQ"
@@ -2561,25 +2639,30 @@ collections:
                 options: []
               - { name: asideHeading, label: "Aside · heading", widget: string, required: false, default: "Still have questions?" }
               - { name: asideBody, label: "Aside · text", widget: text, required: false, default: "Get in touch and we'll help you out." }
-              - { name: asideCtaLabel, label: "Aside · button label", widget: string, required: false, default: "Contact" }
-              - name: asideHref
-                label: "Aside · button link"
+              - name: asideCta
+                label: "Aside · button"
                 widget: object
                 required: false
                 collapsed: true
-                summary: "{{fields.page}}{{fields.url}}"
+                summary: "{{fields.label}}"
                 fields:
-                  - name: page
-                    label: "Page"
-                    widget: select
-                    required: false
-                    hint: "Pick a page on the site."
-                    options:
-                      - { label: "— No page —", value: "" }
-                      - { label: "Home (/)", value: "/" }
-                      - { label: "About (/about)", value: "/about" }
-                      - { label: "Contact (/contact)", value: "/contact" }
-                  - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
+                  - { name: label, label: "Label", widget: string, hint: "E.g. \"Contact\"." }
+                  - name: link
+                    label: "Link"
+                    widget: object
+                    collapsed: false
+                    fields:
+                      - name: page
+                        label: "Page"
+                        widget: select
+                        required: false
+                        hint: "Pick a page on the site."
+                        options:
+                          - { label: "— No page —", value: "" }
+                          - { label: "Home (/)", value: "/" }
+                          - { label: "About (/about)", value: "/about" }
+                          - { label: "Contact (/contact)", value: "/contact" }
+                      - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
               - name: layout
                 label: "Layout"
                 widget: object
@@ -2622,25 +2705,30 @@ collections:
               - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
               - { name: heading, label: "Heading", widget: string, required: false }
               - { name: intro, label: "Intro", widget: text, required: false }
-              - { name: label, label: "Button label", widget: string, required: false }
-              - name: href
-                label: "Button link"
+              - name: cta
+                label: "Button"
                 widget: object
                 required: false
                 collapsed: true
-                summary: "{{fields.page}}{{fields.url}}"
+                summary: "{{fields.label}}"
                 fields:
-                  - name: page
-                    label: "Page"
-                    widget: select
-                    required: false
-                    hint: "Pick a page on the site."
-                    options:
-                      - { label: "— No page —", value: "" }
-                      - { label: "Home (/)", value: "/" }
-                      - { label: "About (/about)", value: "/about" }
-                      - { label: "Contact (/contact)", value: "/contact" }
-                  - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
+                  - { name: label, label: "Label", widget: string }
+                  - name: link
+                    label: "Link"
+                    widget: object
+                    collapsed: false
+                    fields:
+                      - name: page
+                        label: "Page"
+                        widget: select
+                        required: false
+                        hint: "Pick a page on the site."
+                        options:
+                          - { label: "— No page —", value: "" }
+                          - { label: "Home (/)", value: "/" }
+                          - { label: "About (/about)", value: "/about" }
+                          - { label: "Contact (/contact)", value: "/contact" }
+                      - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
           - name: ctaBox
             label: "Call to action (box)"
             widget: object
@@ -2648,51 +2736,61 @@ collections:
               - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
               - { name: heading, label: "Heading", widget: string }
               - { name: intro, label: "Intro", widget: text, required: false, hint: "A short line under the heading." }
-              - { name: label, label: "Button label", widget: string }
-              - name: href
-                label: "Button link"
+              - name: cta
+                label: "Button"
                 widget: object
                 required: false
                 collapsed: true
-                summary: "{{fields.page}}{{fields.url}}"
+                summary: "{{fields.label}}"
                 fields:
-                  - name: page
-                    label: "Page"
-                    widget: select
-                    required: false
-                    hint: "Pick a page on the site."
-                    options:
-                      - { label: "— No page —", value: "" }
-                      - { label: "Home (/)", value: "/" }
-                      - { label: "About (/about)", value: "/about" }
-                      - { label: "Contact (/contact)", value: "/contact" }
-                  - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
-              - { name: label2, label: "Second button label", widget: string, required: false, hint: "Shown as a quiet text link beside the button." }
-              - name: href2
-                label: "Second button link"
+                  - { name: label, label: "Label", widget: string }
+                  - name: link
+                    label: "Link"
+                    widget: object
+                    collapsed: false
+                    fields:
+                      - name: page
+                        label: "Page"
+                        widget: select
+                        required: false
+                        hint: "Pick a page on the site."
+                        options:
+                          - { label: "— No page —", value: "" }
+                          - { label: "Home (/)", value: "/" }
+                          - { label: "About (/about)", value: "/about" }
+                          - { label: "Contact (/contact)", value: "/contact" }
+                      - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
+              - name: cta2
+                label: "Second button"
                 widget: object
                 required: false
                 collapsed: true
-                summary: "{{fields.page}}{{fields.url}}"
+                summary: "{{fields.label}}"
+                hint: "Shown as a quiet text link beside the button."
                 fields:
-                  - name: page
-                    label: "Page"
-                    widget: select
-                    required: false
-                    hint: "Pick a page on the site."
-                    options:
-                      - { label: "— No page —", value: "" }
-                      - { label: "Home (/)", value: "/" }
-                      - { label: "About (/about)", value: "/about" }
-                      - { label: "Contact (/contact)", value: "/contact" }
-                  - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
+                  - { name: label, label: "Label", widget: string }
+                  - name: link
+                    label: "Link"
+                    widget: object
+                    collapsed: false
+                    fields:
+                      - name: page
+                        label: "Page"
+                        widget: select
+                        required: false
+                        hint: "Pick a page on the site."
+                        options:
+                          - { label: "— No page —", value: "" }
+                          - { label: "Home (/)", value: "/" }
+                          - { label: "About (/about)", value: "/about" }
+                          - { label: "Contact (/contact)", value: "/contact" }
+                      - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
               - name: facts
                 label: "Facts (label + value)"
                 widget: list
                 required: false
                 label_singular: "Fact"
                 collapsed: true
-                minimize_collapsed: true
                 hint: "Shown as chips (Split) or a mono readout (Panel). Ignored in Classic."
                 summary: "{{fields.label}} {{fields.value}}"
                 fields:
@@ -2786,18 +2884,20 @@ collections:
     label_singular: "Question"
     folder: "src/content/faq"
     create: true
+    reorder: true
+    summary: "{{fields.question}}"
     slug: "{{slug}}"
     fields:
       - { name: question, label: "Question", widget: string }
       - { name: answer, label: "Answer", widget: text }
-      - { name: order, label: "Order", widget: number, required: false, default: 0 }
+      - { name: order, widget: hidden, required: false, default: 0 }
       - name: tags
         label: "Tags"
         widget: list
         required: false
-        collapsed: false
+        collapsed: true
         summary: "{{fields.tag}}"
-        hint: "Scope the question to pages: an FAQ block filtered on a tag (e.g. a service or town) shows every question carrying it."
+        hint: "Scope the question to pages: an FAQ block filtered on a tag (e.g. a service or town) shows every question carrying it. Click a suggested tag to add it, or type a new one."
         field: { name: tag, label: "Tag", widget: string }
   # <<< collections:generated
   # >>> settings:generated (run: pnpm cms:gen — do not edit between markers)
@@ -2814,6 +2914,7 @@ collections:
           - name: logo
             label: "Logo"
             widget: object
+            collapsed: true
             hint: "Shown in the header and footer (each chooses what to display)."
             fields:
               - { name: image, label: "Logo mark (shown beside the text)", widget: image, required: false, media_folder: "/public/media/identity", public_folder: "/media/identity", hint: "An icon/mark. The wordmark is the text below, set in your display font." }
@@ -2830,10 +2931,10 @@ collections:
           - name: og
             label: "Generated share cards"
             widget: object
-            hint: "Build a branded card per item — its photo with overlay text, wordmark and tagline. Off = share the site default image above."
+            collapsed: false
             fields:
-              - { name: enabled, label: "Generate share cards", widget: boolean, required: false, default: false, hint: "Master switch. Turn on, then enable the content types you want cards for below." }
-              - { name: _notypes, label: "By content type", widget: hidden, required: false }
+              - { name: enabled, label: "Generate a card per item", widget: boolean, required: false, default: false, hint: "Each item's photo becomes a 1200×630 card with your wordmark and a headline. Off = everything shares the site default image above." }
+              - { name: _notypes, label: "Per content type", widget: hidden, required: false }
       - name: contact
         label: "Contact"
         file: "src/content/contact/contact.md"
@@ -2858,6 +2959,7 @@ collections:
             label: "Opening hours"
             widget: list
             required: false
+            collapsed: true
             label_singular: "hours line"
             summary: "{{fields.days}} · {{fields.hours}}"
             fields:
@@ -2868,6 +2970,7 @@ collections:
             label: "Holiday / special hours"
             widget: list
             required: false
+            collapsed: true
             label_singular: "holiday line"
             summary: "{{fields.when}} · {{fields.note}}"
             fields:
@@ -2886,6 +2989,7 @@ collections:
             label: "Social profiles"
             widget: list
             required: false
+            collapsed: true
             label_singular: "profile"
             summary: "{{fields.platform}}"
             fields:
@@ -2979,13 +3083,15 @@ collections:
             label: "Menu links"
             widget: list
             required: false
+            label_singular: "Menu link"
+            collapsed: true
             summary: "{{fields.label}}"
             fields:
               - { name: label, label: "Label", widget: string }
               - name: link
                 label: "Link"
                 widget: object
-                required: false
+                collapsed: false
                 fields:
                   - name: page
                     label: "Page"
@@ -3008,13 +3114,15 @@ collections:
                 label: "…or manual sub-links"
                 widget: list
                 required: false
+                label_singular: "Sub-link"
+                collapsed: true
                 summary: "{{fields.label}}"
                 fields:
                   - { name: label, label: "Label", widget: string }
                   - name: link
                     label: "Link"
                     widget: object
-                    required: false
+                    collapsed: false
                     fields:
                       - name: page
                         label: "Page"
@@ -3031,12 +3139,14 @@ collections:
             label: "Button"
             widget: object
             required: false
+            collapsed: true
+            summary: "{{fields.label}}"
             fields:
               - { name: label, label: "Label", widget: string }
               - name: link
                 label: "Link"
                 widget: object
-                required: false
+                collapsed: false
                 fields:
                   - name: page
                     label: "Page"
@@ -3063,13 +3173,15 @@ collections:
             label: "Quick links"
             widget: list
             required: false
+            label_singular: "Link"
+            collapsed: true
             summary: "{{fields.label}}"
             fields:
               - { name: label, label: "Label", widget: string }
               - name: link
                 label: "Link"
                 widget: object
-                required: false
+                collapsed: false
                 fields:
                   - name: page
                     label: "Page"
@@ -3087,13 +3199,15 @@ collections:
             label: "Second link group"
             widget: list
             required: false
+            label_singular: "Link"
+            collapsed: true
             summary: "{{fields.label}}"
             fields:
               - { name: label, label: "Label", widget: string }
               - name: link
                 label: "Link"
                 widget: object
-                required: false
+                collapsed: false
                 fields:
                   - name: page
                     label: "Page"
@@ -3110,13 +3224,15 @@ collections:
             label: "Legal links (bottom bar)"
             widget: list
             required: false
+            label_singular: "Link"
+            collapsed: true
             summary: "{{fields.label}}"
             fields:
               - { name: label, label: "Label", widget: string }
               - name: link
                 label: "Link"
                 widget: object
-                required: false
+                collapsed: false
                 fields:
                   - name: page
                     label: "Page"
@@ -3151,18 +3267,20 @@ collections:
             label: "Primary button"
             widget: object
             required: false
+            collapsed: true
+            summary: "{{fields.label}}"
             fields:
               - { name: label, label: "Label", widget: string, required: false, hint: "Blank = localized default (\"Back to home\")." }
               - name: link
                 label: "Link"
                 widget: object
-                required: false
+                collapsed: false
                 fields:
                   - name: page
                     label: "Page"
                     widget: select
                     required: false
-                    hint: "Pick a page on the site. Leave blank for a dropdown-only header (the label just opens its menu)."
+                    hint: "Pick a page on the site."
                     options:
                       - { label: "— No page —", value: "" }
                       - { label: "Home (/)", value: "/" }
@@ -3170,21 +3288,23 @@ collections:
                       - { label: "Contact (/contact)", value: "/contact" }
                   - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto: — overrides the page above." }
           - name: button2
-            label: "Second button (optional)"
+            label: "Second button"
             widget: object
             required: false
+            collapsed: true
+            summary: "{{fields.label}}"
             fields:
-              - { name: label, label: "Label", widget: string, required: false, hint: "Leave blank for a single button." }
+              - { name: label, label: "Label", widget: string, required: false }
               - name: link
                 label: "Link"
                 widget: object
-                required: false
+                collapsed: false
                 fields:
                   - name: page
                     label: "Page"
                     widget: select
                     required: false
-                    hint: "Pick a page on the site. Leave blank for a dropdown-only header (the label just opens its menu)."
+                    hint: "Pick a page on the site."
                     options:
                       - { label: "— No page —", value: "" }
                       - { label: "Home (/)", value: "/" }

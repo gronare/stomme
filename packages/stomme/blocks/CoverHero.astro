@@ -1,6 +1,6 @@
 ---
 import { getEntry } from 'astro:content';
-import { resolveLink } from '../src/href';
+import { resolveButton } from '../src/href';
 import Cover from '../src/Cover.astro';
 // The animated background is inlined (not <img>) so its currentColor tints to the brand.
 import motionSvg from '../assets/images/placeholders/motion.svg?raw';
@@ -16,6 +16,9 @@ interface Props {
   eyebrow?: string;
   heading: string;
   intro?: string;
+  cta?: { label?: string; link?: unknown };
+  cta2?: { label?: string; link?: unknown };
+  // Legacy flat pair (pre-group content) — still rendered via resolveButton fallback.
   ctaLabel?: string;
   ctaHref?: unknown;
   cta2Label?: string;
@@ -30,7 +33,7 @@ interface Props {
   };
   layout?: { align?: 'start' | 'center'; height?: 'tall' | 'medium' };
 }
-const { eyebrow, heading, intro, ctaLabel, ctaHref, cta2Label, cta2Href } = Astro.props;
+const { eyebrow, heading, intro, cta, cta2, ctaLabel, ctaHref, cta2Label, cta2Href } = Astro.props;
 const media = Astro.props.media?.kind ?? 'image';
 const image = Astro.props.media?.image;
 const imageAlt = Astro.props.media?.imageAlt;
@@ -40,8 +43,8 @@ const overlay = Astro.props.media?.overlay ?? 'medium';
 const align = Astro.props.layout?.align ?? 'start';
 const height = Astro.props.layout?.height ?? 'tall';
 
-const href = resolveLink(ctaHref, '/');
-const href2 = resolveLink(cta2Href, '/');
+const btn = resolveButton(cta, ctaLabel, ctaHref);
+const btn2 = resolveButton(cta2, cta2Label, cta2Href);
 
 // Resolve an uploaded video to a hashed served URL; external URLs win.
 const videoFiles = import.meta.glob('/src/assets/media/**/*.{mp4,webm,mov}', {
@@ -78,10 +81,10 @@ const videoSrc =
     {eyebrow && <span class="cover__eyebrow">{eyebrow}</span>}
     <h1 class="cover__h1">{String(heading).split('\n').map((line, i) => i === 0 ? line : <Fragment><br />{line}</Fragment>)}</h1>
     {intro && <p class="cover__intro">{intro}</p>}
-    {(ctaLabel || cta2Label) && (
+    {(btn || btn2) && (
       <div class="cover__cta">
-        {ctaLabel && <a href={href} class="btn">{ctaLabel}</a>}
-        {cta2Label && <a href={href2} class="btn cover__btn-ghost">{cta2Label}</a>}
+        {btn && <a href={btn.href} class="btn">{btn.label}</a>}
+        {btn2 && <a href={btn2.href} class="btn cover__btn-ghost">{btn2.label}</a>}
       </div>
     )}
   </div>

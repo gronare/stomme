@@ -6,7 +6,7 @@
 // nested `object` groups (same names in every block); `style` is always last.
 // The stored frontmatter is NESTED for grouped fields (hero.media.image) — content
 // written before Phase 2 is migrated by the per-site codemod.
-import { headingFields, headingFieldsWith, linkField, imageField, iconField, surfaceField, accentField, widthField, cardListField, linkedCardListField, mediaGroup, layoutGroup, styleGroup, type BlockDef } from './src/kit.ts';
+import { headingFields, headingFieldsWith, buttonField, imageField, iconField, surfaceField, accentField, widthField, cardListField, linkedCardListField, mediaGroup, layoutGroup, styleGroup, type BlockDef } from './src/kit.ts';
 
 const RAW_BLOCKS: BlockDef[] = [
   {
@@ -25,15 +25,12 @@ const RAW_BLOCKS: BlockDef[] = [
         widget: 'list',
         required: false,
         collapsed: true,
-        minimize_collapsed: true,
         label_singular: 'Line',
         hint: 'Short ✓ lines under the intro — key reassurances.',
         field: { name: 'text', label: 'Line', widget: 'string' },
       },
-      { name: 'ctaLabel', label: 'Button label', widget: 'string', required: false },
-      linkField('ctaHref', 'Button link'),
-      { name: 'cta2Label', label: 'Second button label', widget: 'string', required: false, hint: 'A quiet text link beside the button. Leave empty to hide.' },
-      linkField('cta2Href', 'Second button link'),
+      buttonField('cta', 'Button'),
+      buttonField('cta2', 'Second button', { hint: 'Shown as a quiet text link beside the button.' }),
       mediaGroup('What shows beside the text. Default: none.', [
         {
           name: 'kind',
@@ -57,7 +54,6 @@ const RAW_BLOCKS: BlockDef[] = [
           widget: 'list',
           required: false,
           collapsed: true,
-          minimize_collapsed: true,
           label_singular: 'Key point',
           summary: '{{fields.title}}',
           hint: 'Panel with icon + title + line. Used when Show = Highlights.',
@@ -94,10 +90,8 @@ const RAW_BLOCKS: BlockDef[] = [
       { name: 'eyebrow', label: 'Eyebrow', widget: 'string', required: false, hint: 'Small uppercase label above the heading.' },
       { name: 'heading', label: 'Heading (H1)', widget: 'text', hint: 'Press Enter for a line break.' },
       { name: 'intro', label: 'Intro', widget: 'text', required: false },
-      { name: 'ctaLabel', label: 'Button label', widget: 'string', required: false },
-      linkField('ctaHref', 'Button link'),
-      { name: 'cta2Label', label: 'Second button label', widget: 'string', required: false },
-      linkField('cta2Href', 'Second button link'),
+      buttonField('cta', 'Button'),
+      buttonField('cta2', 'Second button', { hint: 'A second, quieter button beside the first.' }),
       mediaGroup('The full-bleed background — photo, looping video, gradient or animated pattern.', [
         {
           name: 'kind',
@@ -169,8 +163,7 @@ const RAW_BLOCKS: BlockDef[] = [
       { name: 'eyebrow', label: 'Eyebrow', widget: 'string', required: false, hint: 'Small uppercase label above the heading.' },
       { name: 'heading', label: 'Heading (H1)', widget: 'string' },
       { name: 'intro', label: 'Intro', widget: 'text', required: false },
-      { name: 'ctaLabel', label: 'Button label (optional)', widget: 'string', required: false },
-      linkField('ctaHref', 'Button link'),
+      buttonField('cta', 'Button'),
       layoutGroup([
         { name: 'variant', label: 'Style', widget: 'select', required: false, default: 'light', hint: 'Band puts the title on a dark full-width band.', options: [{ label: 'Light', value: 'light' }, { label: 'Band', value: 'dark' }] },
         widthField,
@@ -237,7 +230,6 @@ const RAW_BLOCKS: BlockDef[] = [
         widget: 'list',
         required: false,
         collapsed: true,
-        minimize_collapsed: true,
         label_singular: 'Plan',
         summary: '{{fields.name}}',
         fields: [
@@ -246,11 +238,10 @@ const RAW_BLOCKS: BlockDef[] = [
           { name: 'price', label: 'Price', widget: 'string', hint: 'e.g. "595 kr", "19 900 kr", "0 kr".' },
           { name: 'period', label: 'Period', widget: 'string', required: false, hint: 'e.g. "/mån" or "engångspris". Blank for none.' },
           { name: 'description', label: 'Description', widget: 'text', required: false },
-          { name: 'features', label: 'Features', widget: 'list', required: false, collapsed: true, minimize_collapsed: true, label_singular: 'Feature', summary: '{{fields.text}}', fields: [{ name: 'text', label: 'Feature', widget: 'string' }] },
+          { name: 'features', label: 'Features', widget: 'list', required: false, collapsed: true, label_singular: 'Feature', summary: '{{fields.text}}', fields: [{ name: 'text', label: 'Feature', widget: 'string' }] },
           { name: 'badge', label: 'Badge', widget: 'string', required: false, hint: 'Small label, e.g. "populär".' },
           { name: 'highlight', label: 'Highlight this plan', widget: 'boolean', required: false, default: false },
-          { name: 'ctaLabel', label: 'Button label', widget: 'string', required: false },
-          linkField('ctaHref', 'Button link'),
+          buttonField('cta', 'Button'),
         ],
       },
       { name: 'footnote', label: 'Footnote', widget: 'text', required: false, hint: 'Small note under the cards — e.g. what every plan includes.' },
@@ -264,7 +255,7 @@ const RAW_BLOCKS: BlockDef[] = [
       ...headingFields,
       {
         name: 'items', label: 'Steps', widget: 'list', required: false,
-        collapsed: true, minimize_collapsed: true, label_singular: 'Step', summary: '{{fields.title}}',
+        collapsed: true, label_singular: 'Step', summary: '{{fields.title}}',
         fields: [
           { name: 'title', label: 'Title', widget: 'string' },
           { name: 'kicker', label: 'Tag after the number', widget: 'string', required: false, hint: 'Short word shown with the number, e.g. "talk".' },
@@ -284,7 +275,7 @@ const RAW_BLOCKS: BlockDef[] = [
     shape: 'checklist',
     fields: [
       ...headingFields,
-      { name: 'items', label: 'Items', widget: 'list', required: false, collapsed: true, minimize_collapsed: true, label_singular: 'Item', summary: '{{fields.text}}', fields: [{ name: 'text', label: 'Text', widget: 'string' }, { name: 'note', label: 'Sub-line (optional)', widget: 'text', required: false }] },
+      { name: 'items', label: 'Items', widget: 'list', required: false, collapsed: true, label_singular: 'Item', summary: '{{fields.text}}', fields: [{ name: 'text', label: 'Text', widget: 'string' }, { name: 'note', label: 'Sub-line (optional)', widget: 'text', required: false }] },
       layoutGroup([
         { name: 'columns', label: 'Columns', widget: 'number', required: false, default: 2, hint: '1 or 2.' },
       ]),
@@ -299,7 +290,7 @@ const RAW_BLOCKS: BlockDef[] = [
     shape: 'gallery',
     fields: [
       ...headingFields,
-      { name: 'images', label: 'Images', widget: 'list', required: false, collapsed: true, minimize_collapsed: true, label_singular: 'Image', fields: [imageField('image', 'Image'), { name: 'alt', label: 'Alt text', widget: 'string', required: false }, { name: 'caption', label: 'Caption', widget: 'string', required: false }] },
+      { name: 'images', label: 'Images', widget: 'list', required: false, collapsed: true, label_singular: 'Image', fields: [imageField('image', 'Image'), { name: 'alt', label: 'Alt text', widget: 'string', required: false }, { name: 'caption', label: 'Caption', widget: 'string', required: false }] },
       layoutGroup([
         { name: 'columns', label: 'Columns', widget: 'number', required: false, default: 3, hint: '2 or 3.' },
       ]),
@@ -365,7 +356,7 @@ const RAW_BLOCKS: BlockDef[] = [
       { name: 'wordClass', label: 'Word class / etymology line', widget: 'string', required: false, hint: 'The italic line under the term, e.g. "komparativ av grön".' },
       {
         name: 'senses', label: 'Senses', widget: 'list', required: false,
-        collapsed: true, minimize_collapsed: true, label_singular: 'Sense', summary: '{{fields.text}}',
+        collapsed: true, label_singular: 'Sense', summary: '{{fields.text}}',
         fields: [
           { name: 'text', label: 'Sense', widget: 'string', hint: 'Wrap words in *asterisks* to underline them.' },
           { name: 'note', label: 'Note (muted)', widget: 'string', required: false, hint: 'A quiet addendum after the sense, e.g. an example or year.' },
@@ -396,8 +387,7 @@ const RAW_BLOCKS: BlockDef[] = [
       { name: 'eyebrow', label: 'Eyebrow', widget: 'string', required: false, hint: 'Usually only on the first fragment of a story.' },
       { name: 'statement', label: 'Statement (big line)', widget: 'string', hint: 'Wrap words in *asterisks* to underline them.' },
       { name: 'body', label: 'Text', widget: 'text', required: false },
-      { name: 'linkLabel', label: 'Link label', widget: 'string', required: false },
-      linkField('link', 'Link'),
+      buttonField('cta', 'Link', { labelHint: 'The link text, e.g. "Read on".' }),
       layoutGroup([
         {
           name: 'placement', label: 'Placement', widget: 'select', required: false, default: 'left',
@@ -450,7 +440,7 @@ const RAW_BLOCKS: BlockDef[] = [
       { name: 'eyebrow', label: 'Eyebrow', widget: 'string', required: false, hint: 'Small uppercase label above the heading.' },
       { name: 'heading', label: 'Heading', widget: 'string', required: false, hint: 'Wrap words in *asterisks* to underline them.' },
       { name: 'body', label: 'Body', widget: 'text', required: false },
-      { name: 'badges', label: 'Badges', widget: 'list', required: false, collapsed: true, minimize_collapsed: true, label_singular: 'Badge', field: { name: 'badge', label: 'Badge', widget: 'string' } },
+      { name: 'badges', label: 'Badges', widget: 'list', required: false, collapsed: true, label_singular: 'Badge', field: { name: 'badge', label: 'Badge', widget: 'string' } },
       { name: 'statValue', label: 'Big number', widget: 'string', required: false },
       { name: 'statLabel', label: 'Number label', widget: 'string', required: false },
       {
@@ -459,7 +449,6 @@ const RAW_BLOCKS: BlockDef[] = [
         widget: 'list',
         required: false,
         collapsed: true,
-        minimize_collapsed: true,
         label_singular: 'Column',
         summary: '{{fields.label}} {{fields.value}}',
         hint: 'Two or three side-by-side figures (e.g. a comparison). Replaces the single big number when filled.',
@@ -536,7 +525,7 @@ const RAW_BLOCKS: BlockDef[] = [
     group: 'Calls to action',
     summary: 'Full-width call-to-action band with a button.',
     shape: 'band',
-    fields: [...headingFields, { name: 'label', label: 'Button label', widget: 'string', required: false }, linkField('href', 'Button link')],
+    fields: [...headingFields, buttonField('cta', 'Button')],
   },
   {
     type: 'ctaBox',
@@ -548,11 +537,9 @@ const RAW_BLOCKS: BlockDef[] = [
       { name: 'eyebrow', label: 'Eyebrow', widget: 'string', required: false, hint: 'Small uppercase label above the heading.' },
       { name: 'heading', label: 'Heading', widget: 'string' },
       { name: 'intro', label: 'Intro', widget: 'text', required: false, hint: 'A short line under the heading.' },
-      { name: 'label', label: 'Button label', widget: 'string' },
-      linkField('href', 'Button link'),
-      { name: 'label2', label: 'Second button label', widget: 'string', required: false, hint: 'Shown as a quiet text link beside the button.' },
-      linkField('href2', 'Second button link'),
-      { name: 'facts', label: 'Facts (label + value)', widget: 'list', required: false, collapsed: true, minimize_collapsed: true, label_singular: 'Fact', summary: '{{fields.label}} {{fields.value}}', hint: 'Shown as chips (Split) or a mono readout (Panel). Ignored in Classic.', fields: [{ name: 'label', label: 'Label', widget: 'string' }, { name: 'value', label: 'Value', widget: 'string' }] },
+      buttonField('cta', 'Button'),
+      buttonField('cta2', 'Second button', { hint: 'Shown as a quiet text link beside the button.' }),
+      { name: 'facts', label: 'Facts (label + value)', widget: 'list', required: false, collapsed: true, label_singular: 'Fact', summary: '{{fields.label}} {{fields.value}}', hint: 'Shown as chips (Split) or a mono readout (Panel). Ignored in Classic.', fields: [{ name: 'label', label: 'Label', widget: 'string' }, { name: 'value', label: 'Value', widget: 'string' }] },
       layoutGroup([
         { name: 'variant', label: 'Layout', widget: 'select', required: false, default: 'classic', options: [{ label: 'Classic (centered panel)', value: 'classic' }, { label: 'Split (copy + facts card)', value: 'split' }, { label: 'Panel (dark, with readout)', value: 'panel' }] },
       ]),
@@ -572,8 +559,7 @@ const RAW_BLOCKS: BlockDef[] = [
       { name: 'tag', label: 'Tag filter', widget: 'select', options: '$faqTags', required: false, hint: 'Show every question carrying this tag (tags are set on the questions). Ignored when questions are picked above.' },
       { name: 'asideHeading', label: 'Aside · heading', widget: 'string', required: false, default: 'Still have questions?' },
       { name: 'asideBody', label: 'Aside · text', widget: 'text', required: false, default: "Get in touch and we'll help you out." },
-      { name: 'asideCtaLabel', label: 'Aside · button label', widget: 'string', required: false, default: 'Contact' },
-      linkField('asideHref', 'Aside · button link'),
+      buttonField('asideCta', 'Aside · button', { labelHint: 'E.g. "Contact".' }),
       layoutGroup([
         { name: 'variant', label: 'Layout', widget: 'select', required: false, default: 'list', hint: 'How the questions are presented.', options: [{ label: 'List', value: 'list' }, { label: 'Accordion', value: 'accordion' }, { label: 'Cards', value: 'cards' }, { label: 'Split (index + reader)', value: 'split' }] },
       ]),
@@ -587,7 +573,7 @@ const RAW_BLOCKS: BlockDef[] = [
     summary: 'A row of stats / facts (label + value).',
     shape: 'stats',
     fields: [
-      { name: 'items', label: 'Facts (label + value)', widget: 'list', required: false, collapsed: true, minimize_collapsed: true, label_singular: 'Fact', summary: '{{fields.label}} {{fields.value}}', fields: [{ name: 'label', label: 'Label', widget: 'string' }, { name: 'value', label: 'Value', widget: 'string' }] },
+      { name: 'items', label: 'Facts (label + value)', widget: 'list', required: false, collapsed: true, label_singular: 'Fact', summary: '{{fields.label}} {{fields.value}}', fields: [{ name: 'label', label: 'Label', widget: 'string' }, { name: 'value', label: 'Value', widget: 'string' }] },
     ],
   },
   {
@@ -595,7 +581,7 @@ const RAW_BLOCKS: BlockDef[] = [
     summary: 'A centered row of partner / client names with an optional lead-in.',
     fields: [
       { name: 'lead', label: 'Lead-in', widget: 'string', required: false, hint: 'e.g. “Trusted by” or “Built on”.' },
-      { name: 'logos', label: 'Names', widget: 'list', required: false, collapsed: true, minimize_collapsed: true, label_singular: 'Name', field: { name: 'name', label: 'Name', widget: 'string' } },
+      { name: 'logos', label: 'Names', widget: 'list', required: false, collapsed: true, label_singular: 'Name', field: { name: 'name', label: 'Name', widget: 'string' } },
     ],
   },
   {
@@ -660,16 +646,16 @@ const FAQ_FIX = [
 ];
 const SAMPLES: Record<string, ({ _label?: string } & Record<string, unknown>)[]> = {
   hero: [
-    { _label: 'narrow · two buttons · ticks', eyebrow: 'Eyebrow label', heading: 'A heading that states the offer.', intro: 'One supporting sentence that earns the click below.', ticks: ['A first checkmark reassurance.', 'A second, slightly longer one to wrap.'], ctaLabel: 'Primary action', ctaHref: { url: '#' }, cta2Label: 'Quiet link', cta2Href: { url: '#' }, media: { kind: 'none' }, layout: { width: 'narrow' } },
-    { _label: 'highlights media', eyebrow: 'Eyebrow', heading: 'Hero beside highlights.', intro: LOREM, ctaLabel: 'Action', ctaHref: { url: '#' }, media: { kind: 'highlights', highlights: [{ icon: 'bolt', title: 'Fast', body: 'Loads instantly.' }, { icon: 'shield', title: 'Safe', body: 'Nothing to hack.' }] } },
-    { _label: 'motif · tall dark', heading: 'Tall hero on the dark surface.', intro: LOREM, ctaLabel: 'Action', ctaHref: { url: '#' }, media: { kind: 'motif' }, layout: { height: 'tall' }, style: { surface: 'dark' } },
+    { _label: 'narrow · two buttons · ticks', eyebrow: 'Eyebrow label', heading: 'A heading that states the offer.', intro: 'One supporting sentence that earns the click below.', ticks: ['A first checkmark reassurance.', 'A second, slightly longer one to wrap.'], cta: { label: 'Primary action', link: { url: '#' } }, cta2: { label: 'Quiet link', link: { url: '#' } }, media: { kind: 'none' }, layout: { width: 'narrow' } },
+    { _label: 'highlights media', eyebrow: 'Eyebrow', heading: 'Hero beside highlights.', intro: LOREM, cta: { label: 'Action', link: { url: '#' } }, media: { kind: 'highlights', highlights: [{ icon: 'bolt', title: 'Fast', body: 'Loads instantly.' }, { icon: 'shield', title: 'Safe', body: 'Nothing to hack.' }] } },
+    { _label: 'motif · tall dark', heading: 'Tall hero on the dark surface.', intro: LOREM, cta: { label: 'Action', link: { url: '#' } }, media: { kind: 'motif' }, layout: { height: 'tall' }, style: { surface: 'dark' } },
   ],
   cover: [
-    { _label: 'gradient', eyebrow: 'Eyebrow', heading: 'Full-bleed cover heading', intro: LOREM, ctaLabel: 'Primary', ctaHref: { url: '#' }, cta2Label: 'Secondary', cta2Href: { url: '#' }, media: { kind: 'gradient' } },
+    { _label: 'gradient', eyebrow: 'Eyebrow', heading: 'Full-bleed cover heading', intro: LOREM, cta: { label: 'Primary', link: { url: '#' } }, cta2: { label: 'Secondary', link: { url: '#' } }, media: { kind: 'gradient' } },
     { _label: 'animated', heading: 'Animated cover', media: { kind: 'animated' }, layout: { height: 'medium' } },
   ],
   pageHeader: [
-    { _label: 'light', eyebrow: 'Eyebrow', heading: 'Page heading', intro: 'The intro line under a page title.', ctaLabel: 'Optional button', ctaHref: { url: '#' } },
+    { _label: 'light', eyebrow: 'Eyebrow', heading: 'Page heading', intro: 'The intro line under a page title.', cta: { label: 'Optional button', link: { url: '#' } } },
     { _label: 'band (dark)', layout: { variant: 'dark' }, eyebrow: 'Eyebrow', heading: 'Dark page band', intro: LOREM },
   ],
   prose: [
@@ -693,7 +679,7 @@ const SAMPLES: Record<string, ({ _label?: string } & Record<string, unknown>)[]>
   plans: [{ eyebrow: 'Pricing — one-off', plans: [
     { name: 'Basic', price: '6 900 kr', period: 'one-off', description: LOREM },
     { name: 'Standard', price: '12 900 kr', period: 'one-off', badge: 'Popular', highlight: true, description: 'The default pick.', features: [{ text: 'Everything in Basic' }, { text: 'One more thing' }] },
-    { name: 'Plus', pricePrefix: 'from', price: '19 900 kr', period: 'one-off', description: 'For the works.', ctaLabel: 'Choose', ctaHref: { url: '#' } },
+    { name: 'Plus', pricePrefix: 'from', price: '19 900 kr', period: 'one-off', description: 'For the works.', cta: { label: 'Choose', link: { url: '#' } } },
   ], footnote: 'Every plan includes a shared line like this one — the footnote field.' }],
   specialistGrid: [{ eyebrow: 'Team', heading: 'Specialists', items: [
     { title: 'Role one', body: LOREM }, { title: 'Role two', body: 'Short line.' },
@@ -721,7 +707,7 @@ const SAMPLES: Record<string, ({ _label?: string } & Record<string, unknown>)[]>
   fragment: [
     { _label: 'left', eyebrow: 'A story', statement: 'It starts on the left.', body: LOREM, layout: { placement: 'left' } },
     { _label: 'right', statement: 'Drifts to the right.', body: LOREM, layout: { placement: 'right' } },
-    { _label: 'indent + link', statement: 'And lands *indented*.', body: LOREM, linkLabel: 'Read on', link: { url: '#' }, layout: { placement: 'indent' } },
+    { _label: 'indent + link', statement: 'And lands *indented*.', body: LOREM, cta: { label: 'Read on', link: { url: '#' } }, layout: { placement: 'indent' } },
   ],
   statPanel: [
     { _label: 'single big number', eyebrow: 'Eyebrow', heading: 'A statement with a *underlined* clause.', body: LOREM, badges: ['Badge one', 'Badge two'], statValue: '98%', statLabel: 'of something measured' },
@@ -748,12 +734,12 @@ const SAMPLES: Record<string, ({ _label?: string } & Record<string, unknown>)[]>
   ] }],
   ctaPanel: [{ eyebrow: 'Eyebrow', heading: 'A call-to-action band', intro: LOREM, label: 'Do the thing', href: { url: '#' } }],
   ctaBox: [
-    { _label: 'classic', style: { surface: 'dark' }, eyebrow: 'Next step', heading: 'A boxed call to action.', intro: 'A short supporting line under the heading.', label: 'Primary', href: { url: '#' }, label2: 'quiet second link', href2: { url: '#' } },
+    { _label: 'classic', style: { surface: 'dark' }, eyebrow: 'Next step', heading: 'A boxed call to action.', intro: 'A short supporting line under the heading.', cta: { label: 'Primary', link: { url: '#' } }, cta2: { label: 'quiet second link', link: { url: '#' } } },
     { _label: 'split · facts card', layout: { variant: 'split' }, eyebrow: 'Next step', heading: 'Split call to action.', intro: 'Copy on the left, a dark facts card on the right.', label: 'Primary', href: { url: '#' }, facts: [{ label: 'Analysis', value: 'Free' }, { label: 'Reply', value: '< 24 h' }] },
     { _label: 'panel · readout', layout: { variant: 'panel' }, eyebrow: 'Next step', heading: 'Panel call to *action*.', intro: 'Dark panel with a mono key/value readout.', label: 'Primary', href: { url: '#' }, facts: [{ label: 'Reply', value: '< 24 h' }, { label: 'Analysis', value: 'Free' }, { label: 'Method', value: 'Softwash' }] },
   ],
   faq: [
-    { _label: 'list', eyebrow: 'FAQ', heading: 'Questions (list)', asideHeading: 'More questions?', asideBody: 'Get in touch.', asideCtaLabel: 'Contact', items: FAQ_FIX },
+    { _label: 'list', eyebrow: 'FAQ', heading: 'Questions (list)', asideHeading: 'More questions?', asideBody: 'Get in touch.', asideCta: { label: 'Contact' }, items: FAQ_FIX },
     { _label: 'accordion', layout: { variant: 'accordion' }, heading: 'Questions (accordion)', items: FAQ_FIX },
     { _label: 'cards', layout: { variant: 'cards' }, heading: 'Questions (cards)', items: FAQ_FIX },
     { _label: 'split', layout: { variant: 'split' }, heading: 'Questions (split)', items: FAQ_FIX },

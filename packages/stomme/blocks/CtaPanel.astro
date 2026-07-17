@@ -1,21 +1,23 @@
 ---
-import { resolveLink } from '../src/href';
+import { resolveButton } from '../src/href';
 
 interface Props {
   eyebrow?: string;
   heading?: string;
   intro?: string;
+  cta?: { label?: string; link?: unknown };
+  // Legacy flat pair (pre-group content) — still rendered via resolveButton fallback.
   label?: string;
   href?: unknown;
 }
-const { eyebrow, heading, intro, label, href } = Astro.props;
-const link = resolveLink(href, '/');
+const { eyebrow, heading, intro, cta, label, href } = Astro.props;
+const btn = resolveButton(cta, label, href);
 ---
 <section class="section">
   <div class="band cta-panel">
     {eyebrow && <span class="mono">{eyebrow}</span>}
     {heading && <h2 class="display" style="margin-top:0.5rem">{heading}</h2>}
     {intro && <p class="lead">{intro}</p>}
-    {label && <p style="margin-top:1.75rem;margin-bottom:0"><a href={link} class="btn">{label}</a></p>}
+    {btn && <p style="margin-top:1.75rem;margin-bottom:0"><a href={btn.href} class="btn">{btn.label}</a></p>}
   </div>
 </section>

@@ -2,7 +2,7 @@
 // Pricing / plans block — a row of plan cards (name, price, period, description,
 // features, optional badge + CTA). One card can be highlighted as the default choice.
 // Styling reads theme tokens, so it follows the site's palette (monochrome on a B&W theme).
-import { resolveLink } from '../src/href';
+import { resolveButton } from '../src/href';
 
 interface Plan {
   name?: string;
@@ -13,6 +13,8 @@ interface Plan {
   features?: { text?: string }[];
   badge?: string;
   highlight?: boolean;
+  cta?: { label?: string; link?: unknown };
+  // Legacy flat pair (pre-group content) — still rendered via resolveButton fallback.
   ctaLabel?: string;
   ctaHref?: unknown;
 }
@@ -58,9 +60,9 @@ const anyPrefix = plans.some((p) => p.pricePrefix);
               {p.features.filter((f) => f && f.text).map((f) => <li>{f.text}</li>)}
             </ul>
           )}
-          {p.ctaLabel && (
-            <a href={resolveLink(p.ctaHref, '/')} class="btn plan__cta">{p.ctaLabel}</a>
-          )}
+          {(() => { const btn = resolveButton(p.cta, p.ctaLabel, p.ctaHref); return btn && (
+            <a href={btn.href} class="btn plan__cta">{btn.label}</a>
+          ); })()}
         </div>
       ))}
     </div>

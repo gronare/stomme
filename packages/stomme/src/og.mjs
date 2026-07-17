@@ -27,13 +27,13 @@ export const OG_WIDTH = 1200;
 export const OG_HEIGHT = 630;
 
 // renderOgCard input:
-//   title           string (required) — the resolved OVERLAY TEXT (template already
-//                   substituted by routes/og.ts), used as the card headline
-//   tagline         string
+//   title           string (required) — the resolved headline (routes/og.ts picks it
+//                   from the item field the type's headlineField selects)
+//   tagline         string — the resolved second line ('' = none)
 //   wordmark        string | { pre, accent } — settings.logo.textPre/textAccent
 //   bgImageBuffer   Buffer | null — item photo; null → solid brand background
 //   og              { style: 'editorial'|'bold'|'ops', scrim: 0–100, showLogo,
-//                     showTagline, accent } (a settings.og.types[<key>] config)
+//                     accent } (a settings.og.types[<key>] config)
 //   theme           { brand, ink, onDark, dark } (theme collection)
 
 // ── fonts ────────────────────────────────────────────────────────────────────
@@ -87,7 +87,7 @@ function buildTree(input, bgDataUri) {
 
   const wm = typeof input.wordmark === 'string' ? { pre: input.wordmark, accent: '' } : (input.wordmark || {});
   const hasWordmark = og.showLogo !== false && !!(wm.pre || wm.accent);
-  const tagline = og.showTagline !== false ? (input.tagline || '').trim() : '';
+  const tagline = (input.tagline || '').trim();
 
   const layers = [];
   if (bgDataUri) {

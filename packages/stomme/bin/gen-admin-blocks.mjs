@@ -308,7 +308,9 @@ function emitField(f, indent) {
   const collapseProps = () => [
     ...(f.label_singular ? [`${p}  label_singular: ${q(f.label_singular)}`] : []),
     ...(f.collapsed !== undefined ? [`${p}  collapsed: ${f.collapsed}`] : []),
-    ...(f.minimize_collapsed ? [`${p}  minimize_collapsed: true`] : []),
+    // minimize_collapsed intentionally NOT emitted: with per-item cards, collapsing the
+    // whole list behind a single "N items" row is a redundant extra click. Items stay
+    // visible as collapsed cards (collapsed:true) instead.
   ];
   if (f.widget === 'list' && f.fields) {
     const sum = f.summary || listSummary(f.fields);
@@ -368,6 +370,7 @@ function emitWidget(indent) {
     `${p}  label_singular: "Section"`,
     `${p}  widget: list`,
     `${p}  required: false`,
+    `${p}  collapsed: true`,
     // Collapsed-item label: show the block's heading (or quote) so several of the same
     // type are distinguishable at a glance; falls back to the type name when both empty.
     `${p}  summary: "{{fields.eyebrow}} {{fields.heading}}{{fields.quote}}"`,
@@ -389,10 +392,13 @@ function emitWidget(indent) {
 // and the page is required (a custom URL overrides it) so a link always resolves.
 // Each menu item can also become a dropdown — auto-filled from a collection ($menus)
 // or with manual sub-links.
-function navLinkField() {
+// REQUIRED object rendered chrome-less inline (no "Add Link" step — a nav label's
+// link is inherent; leave both fields blank for a dropdown-only header). collapsed:false
+// is load-bearing for the flat rendering (children must stay mounted).
+function navLinkField(pageHint = 'Pick a page on the site. Leave blank for a dropdown-only header (the label just opens its menu).') {
   return {
-    name: 'link', label: 'Link', widget: 'object', required: false, fields: [
-      { name: 'page', label: 'Page', widget: 'select', options: '$pages', required: false, hint: 'Pick a page on the site. Leave blank for a dropdown-only header (the label just opens its menu).' },
+    name: 'link', label: 'Link', widget: 'object', collapsed: false, fields: [
+      { name: 'page', label: 'Page', widget: 'select', options: '$pages', required: false, hint: pageHint },
       { name: 'url', label: '…or a custom URL', widget: 'string', required: false, hint: 'External link, tel: or mailto: — overrides the page above.' },
     ],
   };
@@ -402,13 +408,13 @@ function navLinkField() {
 // standard page-dropdown + custom-URL pair, so they're generated (the page options are).
 function emitFooterLinks(indent) {
   const footerLink = () => ({
-    name: 'link', label: 'Link', widget: 'object', required: false, fields: [
+    name: 'link', label: 'Link', widget: 'object', collapsed: false, fields: [
       { name: 'page', label: 'Page', widget: 'select', options: '$pages', required: false, hint: 'Pick a page on the site.' },
       { name: 'url', label: '…or a custom URL', widget: 'string', required: false, hint: 'External link, tel: or mailto: — overrides the page above.' },
     ],
   });
   const linkList = (name, label) => ({
-    name, label, widget: 'list', required: false, fields: [
+    name, label, widget: 'list', required: false, collapsed: true, label_singular: 'Link', summary: '{{fields.label}}', fields: [
       { name: 'label', label: 'Label', widget: 'string' },
       footerLink(),
     ],
@@ -424,15 +430,17 @@ function emitFooterLinks(indent) {
 }
 function emitNavLinks(indent) {
   const items = {
-    name: 'items', label: 'Menu links', widget: 'list', required: false, fields: [
+    name: 'items', label: 'Menu links', widget: 'list', required: false, collapsed: true, label_singular: 'Menu link', summary: '{{fields.label}}', fields: [
       { name: 'label', label: 'Label', widget: 'string' },
       navLinkField(),
       { name: 'menu', label: 'Dropdown from collection', widget: 'select', options: '$menus', required: false, hint: 'Optional. Fill a dropdown with every entry of a collection (e.g. all services). Overrides manual sub-links below.' },
-      { name: 'children', label: '…or manual sub-links', widget: 'list', required: false, fields: [{ name: 'label', label: 'Label', widget: 'string' }, navLinkField()] },
+      { name: 'children', label: '…or manual sub-links', widget: 'list', required: false, collapsed: true, label_singular: 'Sub-link', summary: '{{fields.label}}', fields: [{ name: 'label', label: 'Label', widget: 'string' }, navLinkField()] },
     ],
   };
+  // Genuinely optional (a header button exists or not) → keeps the on/off toggle,
+  // shown in the group's header row by the editor theme. collapsed:true = closed on load.
   const cta = {
-    name: 'cta', label: 'Button', widget: 'object', required: false, fields: [
+    name: 'cta', label: 'Button', widget: 'object', required: false, collapsed: true, summary: '{{fields.label}}', fields: [
       { name: 'label', label: 'Label', widget: 'string' },
       navLinkField(),
     ],
@@ -445,18 +453,20 @@ function emitNavLinks(indent) {
 // { label, link } — the SAME shape as the header CTA (reuses navLinkField), so the editor
 // is consistent: a Label + a Link with a page-dropdown ($pages) + custom-URL override.
 // Resolve at render via resolveLink (stomme/href).
+// Genuinely optional buttons keep the on/off toggle (in the group header, via the
+// editor theme); the link fields render inline — a button's link is inherent.
 function buttonField(name, label, labelHint) {
   return {
-    name, label, widget: 'object', required: false, fields: [
+    name, label, widget: 'object', required: false, collapsed: true, summary: '{{fields.label}}', fields: [
       { name: 'label', label: 'Label', widget: 'string', required: false, hint: labelHint },
-      navLinkField(),
+      navLinkField('Pick a page on the site.'),
     ],
   };
 }
 function emitThanksButtons(indent) {
   return [
     emitField(buttonField('button', 'Primary button', 'Blank = localized default ("Back to home").'), indent),
-    emitField(buttonField('button2', 'Second button (optional)', 'Leave blank for a single button.'), indent),
+    emitField(buttonField('button2', 'Second button'), indent),
   ].join('\n');
 }
 
@@ -469,41 +479,50 @@ function emitThanksButtons(indent) {
 // schemas (towns/services match the TownPage/ServicePage templates).
 // No field-level media_folder — Decap resolves it relative to the entry (breaks
 // uploads from subfolder entries); the global media_folder in config.yml is used.
+// Collections whose components sort by \`order\` declare \`reorder: true\`: Sveltia's entry
+// list gains a Reorder mode (drag rows, Done writes index+1 into \`order\` and commits).
+// The \`order\` field itself is \`widget: hidden\` — still serialized, never hand-edited.
 const COLLECTION_EDITORS = {
   faq: `- name: faq
   label: "FAQ"
   label_singular: "Question"
   folder: "src/content/faq"
   create: true
+  reorder: true
+  summary: "{{fields.question}}"
   slug: "{{slug}}"
   fields:
     - { name: question, label: "Question", widget: string }
     - { name: answer, label: "Answer", widget: text }
-    - { name: order, label: "Order", widget: number, required: false, default: 0 }
+    - { name: order, widget: hidden, required: false, default: 0 }
     - name: tags
       label: "Tags"
       widget: list
       required: false
-      collapsed: false
+      collapsed: true
       summary: "{{fields.tag}}"
-      hint: "Scope the question to pages: an FAQ block filtered on a tag (e.g. a service or town) shows every question carrying it."
+      hint: "Scope the question to pages: an FAQ block filtered on a tag (e.g. a service or town) shows every question carrying it. Click a suggested tag to add it, or type a new one."
       field: { name: tag, label: "Tag", widget: string }`,
   testimonials: `- name: testimonials
   label: "Testimonials"
   label_singular: "Testimonial"
   folder: "src/content/testimonials"
   create: true
+  reorder: true
+  summary: "{{fields.name}}"
   slug: "{{slug}}"
   fields:
     - { name: name, label: "Name", widget: string }
     - { name: role, label: "Role / company", widget: string, required: false }
     - { name: quote, label: "Quote", widget: text }
-    - { name: order, label: "Order", widget: number, required: false, default: 0 }`,
+    - { name: order, widget: hidden, required: false, default: 0 }`,
   towns: `- name: towns
   label: "Service areas"
   label_singular: "Area"
   folder: "src/content/towns"
   create: true
+  reorder: true
+  summary: "{{fields.name}}"
   slug: "{{slug}}"
   fields:
     - { name: name, label: "Town name", widget: string }
@@ -519,7 +538,7 @@ const COLLECTION_EDITORS = {
         - { name: description, label: "Description", widget: text }
         - { name: image, label: "Share image", widget: image, required: false, hint: "Social-share card (og:image), 1200×630. Site default used when empty." }
         - { name: ogRaw, label: "Share the image as-is", widget: boolean, required: false, default: false, hint: "Only matters when generated share cards are on (Identity settings): skip the card for this page and share the plain image instead." }
-    - { name: order, label: "Order", widget: number, required: false, default: 0 }
+    - { name: order, widget: hidden, required: false, default: 0 }
     - { name: heroSubtitle, label: "Hero subtitle", widget: text, required: false }
     - { name: heroNote, label: "Hero note", widget: string, required: false }
     - { name: why, label: "Why us here (paragraphs)", widget: text, required: false }
@@ -529,7 +548,6 @@ const COLLECTION_EDITORS = {
       required: false
       label_singular: "Problem"
       collapsed: true
-      minimize_collapsed: true
       field: { name: item, label: "Problem", widget: string }
     - name: districts
       label: "Districts / areas"
@@ -537,7 +555,6 @@ const COLLECTION_EDITORS = {
       required: false
       label_singular: "District"
       collapsed: true
-      minimize_collapsed: true
       field: { name: item, label: "District", widget: string }
     - { name: localCase, label: "Local case", widget: text, required: false }
     - name: services
@@ -546,7 +563,6 @@ const COLLECTION_EDITORS = {
       required: false
       label_singular: "Service"
       collapsed: true
-      minimize_collapsed: true
       field: { name: item, label: "Service", widget: string }
     - name: media
       label: "Media"
@@ -561,6 +577,8 @@ const COLLECTION_EDITORS = {
   label_singular: "Service"
   folder: "src/content/services"
   create: true
+  reorder: true
+  summary: "{{fields.navLabel}}"
   slug: "{{slug}}"
   fields:
     - { name: title, label: "Title (H1)", widget: string }
@@ -577,7 +595,7 @@ const COLLECTION_EDITORS = {
         - { name: ogRaw, label: "Share the image as-is", widget: boolean, required: false, default: false, hint: "Only matters when generated share cards are on (Identity settings): skip the card for this page and share the plain image instead." }
     - { name: navLabel, label: "Short label (menus/cards)", widget: string }
     - { name: summary, label: "Summary", widget: text, required: false, hint: "The lede under the title — also the card text in service lists." }
-    - { name: order, label: "Order", widget: number, required: false, default: 0 }
+    - { name: order, widget: hidden, required: false, default: 0 }
     - name: media
       label: "Media"
       widget: object
@@ -590,7 +608,6 @@ const COLLECTION_EDITORS = {
       label: "Page header (composed pages)"
       widget: object
       collapsed: true
-      required: false
       hint: "Only used when the page is built from sections below: renders a compact page header (title + summary + these extras, image beside the text) instead of the plain one."
       fields:
         - name: ticks
@@ -599,13 +616,10 @@ const COLLECTION_EDITORS = {
           required: false
           label_singular: "Line"
           collapsed: true
-          minimize_collapsed: true
           hint: "Short ✓ lines under the summary — key reassurances."
           field: { name: text, label: "Line", widget: string }
-        - { name: ctaLabel, label: "Button label", widget: string, required: false, hint: "Blank uses the site's quote-button text." }
-        - { name: ctaHref, label: "Button link", widget: string, required: false, hint: "Blank links to the contact page." }
-        - { name: cta2Label, label: "Second link label", widget: string, required: false, hint: "A quiet text link beside the button." }
-        - { name: cta2Href, label: "Second link target", widget: string, required: false, hint: "E.g. #process to jump to a section with that anchor." }
+${emitField({ ...buttonField('cta', 'Button'), hint: "The header always shows a button — blank label and link fall back to the site's quote button and the contact page." }, 8)}
+${emitField({ ...buttonField('cta2', 'Second button'), hint: 'A quiet text link beside the button — e.g. link to #process to jump to a section with that anchor.' }, 8)}
 ${emitWidget(4)}
     - { name: body, label: "Long-form text (fallback)", widget: markdown, required: false, hint: "Only shown when no sections are built above. Prefer sections; this is the simple prose fallback." }`,
 };
@@ -626,7 +640,7 @@ function listingEditor(l) {
     ? `\n    - name: specs
       label: "Specs"
       widget: object
-      collapsed: false
+      collapsed: true
       fields:
 ${specs.map((s) => `        - { name: ${s.key}, label: ${q(s.label)}, widget: string, required: false }`).join('\n')}`
     : '';
@@ -646,6 +660,8 @@ ${specs.map((s) => `        - { name: ${s.key}, label: ${q(s.label)}, widget: st
       label: "Gallery"
       widget: list
       required: false
+      collapsed: true
+      label_singular: "Image"
       fields:
         - { name: image, label: "Image", widget: image }
         - { name: alt, label: "Alt text", widget: string, required: false }${specsField}
@@ -713,21 +729,29 @@ function shareTypeList() {
   for (const l of LISTINGS) out.push({ key: l.id, label: l.label || l.id, kind: l.preset });
   return out;
 }
-// Default overlay template + the variable hint, by type kind.
-const SHARE_META = {
-  towns: { overlay: '{title}', vars: '{title} {name}' },
-  services: { overlay: '{title}', vars: '{title} {name}' },
-  article: { overlay: '{title}', vars: '{title} {date} {excerpt} {name}' },
-  catalog: { overlay: '{title} · {price}', vars: '{title} {price} {category} {status} {name}' },
+// The headline/second-line field pickers, by type kind: each type's KNOWN text fields
+// (keys must exist in src/og-pages.ts TYPE_FIELDS) + "Business name" (the site name).
+const SHARE_FIELDS = {
+  towns: [['name', 'Town name'], ['title', 'Title'], ['heroSubtitle', 'Hero subtitle']],
+  services: [['title', 'Title'], ['navLabel', 'Nav label'], ['summary', 'Summary']],
+  article: [['title', 'Title'], ['date', 'Date'], ['excerpt', 'Excerpt']],
+  catalog: [['title', 'Title'], ['price', 'Price'], ['status', 'Status'], ['category', 'Category'], ['date', 'Date added']],
 };
+// Select defaults (mirrored by the renderer fallbacks in src/og-pages.ts).
+const SHARE_DEFAULTS = { towns: { headline: 'name', subline: 'none' }, catalog: { headline: 'title', subline: 'price' } };
 function emitShareType(t, indent) {
   const p = pad(indent);
-  const meta = SHARE_META[t.kind] || SHARE_META.article;
+  const fields = SHARE_FIELDS[t.kind] || SHARE_FIELDS.article;
+  const dflt = SHARE_DEFAULTS[t.kind] || { headline: 'title', subline: 'none' };
+  const labelOf = (v) => (v === 'none' ? 'None' : (fields.find(([k]) => k === v) || [])[1] || v);
+  const opts = fields.map(([v, l]) => `${p}        - { label: ${q(l)}, value: ${v} }`);
+  const business = `${p}        - { label: "Business name", value: business }`;
   return [
     `${p}- name: ${t.key}`,
     `${p}  label: ${q(t.label)}`,
     `${p}  widget: object`,
     `${p}  collapsed: true`,
+    `${p}  summary: "{{fields.style}}"`,
     `${p}  fields:`,
     `${p}    - { name: enabled, label: "Generate cards for these", widget: boolean, required: false, default: false }`,
     `${p}    - name: style`,
@@ -739,22 +763,44 @@ function emitShareType(t, indent) {
     `${p}        - { label: "Editorial — text over a gradient at the bottom", value: editorial }`,
     `${p}        - { label: "Bold — big centred statement", value: bold }`,
     `${p}        - { label: "Ops — text panel on the left", value: ops }`,
-    `${p}    - { name: overlayText, label: "Overlay text", widget: string, required: false, default: ${q(meta.overlay)}, hint: ${q('Text drawn on each card. Variables (filled per item): ' + meta.vars + '.')} }`,
+    `${p}    - name: headlineField`,
+    `${p}      label: "Headline"`,
+    `${p}      widget: select`,
+    `${p}      required: false`,
+    `${p}      default: ${dflt.headline}`,
+    `${p}      hint: ${q("The card's big line — filled from each item. Empty = " + labelOf(dflt.headline) + '.')}`,
+    `${p}      options:`,
+    ...opts,
+    business,
+    `${p}    - name: sublineField`,
+    `${p}      label: "Second line"`,
+    `${p}      widget: select`,
+    `${p}      required: false`,
+    `${p}      default: ${dflt.subline}`,
+    `${p}      hint: ${q('A smaller line under the headline. Empty = ' + labelOf(dflt.subline) + '.')}`,
+    `${p}      options:`,
+    `${p}        - { label: "None", value: none }`,
+    ...opts,
+    business,
     `${p}    - { name: scrim, label: "Scrim strength", widget: number, value_type: int, min: 0, max: 100, default: 55, required: false, hint: "How dark the gradient over the photo is (0–100). More = better text contrast, less photo." }`,
     `${p}    - { name: showLogo, label: "Show the wordmark", widget: boolean, required: false, default: true }`,
-    `${p}    - { name: showTagline, label: "Show the tagline", widget: boolean, required: false, default: true }`,
-    `${p}    - { name: tagline, label: "Tagline", widget: string, required: false, hint: "One line under the headline. Empty falls back to the footer tagline." }`,
     `${p}    - { name: accent, label: "Accent colour", widget: color, required: false, hint: "The accent rule and wordmark accent. Empty uses your brand colour." }`,
   ].join('\n');
 }
 function emitShareCards(indent) {
   const p = pad(indent);
   const types = shareTypeList();
+  // The og + og.types wrappers exist only because of the data path (og.enabled,
+  // og.types.<key>) — the editor renders them CHROME-LESS (no card/header/collapse; see
+  // the data-key-path rules in THEME_CSS) so the pane reads flat: master toggle → type
+  // cards. `collapsed: false` is load-bearing: their content must always be visible.
   const typeFields = types.length
-    ? [`${p}        - name: types`, `${p}          label: "By content type"`, `${p}          widget: object`,
-       `${p}          collapsed: true`, `${p}          fields:`,
+    ? [`${p}        - name: types`, `${p}          label: "Per content type"`, `${p}          widget: object`,
+       `${p}          collapsed: false`,
+       `${p}          hint: "Turn a type on and open it to pick its card style and text lines."`,
+       `${p}          fields:`,
        ...types.map((t) => emitShareType(t, indent + 12))].join('\n')
-    : `${p}        - { name: _notypes, label: "By content type", widget: hidden, required: false }`;
+    : `${p}        - { name: _notypes, label: "Per content type", widget: hidden, required: false }`;
   return [
     `${p}- name: sharecards`,
     `${p}  label: "Share cards"`,
@@ -766,9 +812,9 @@ function emitShareCards(indent) {
     `${p}    - name: og`,
     `${p}      label: "Generated share cards"`,
     `${p}      widget: object`,
-    `${p}      hint: "Build a branded card per item — its photo with overlay text, wordmark and tagline. Off = share the site default image above."`,
+    `${p}      collapsed: false`,
     `${p}      fields:`,
-    `${p}        - { name: enabled, label: "Generate share cards", widget: boolean, required: false, default: false, hint: "Master switch. Turn on, then enable the content types you want cards for below." }`,
+    `${p}        - { name: enabled, label: "Generate a card per item", widget: boolean, required: false, default: false, hint: "Each item's photo becomes a 1200×630 card with your wordmark and a headline. Off = everything shares the site default image above." }`,
     typeFields,
   ].join('\n');
 }
@@ -786,6 +832,7 @@ function emitSettings() {
           - name: logo
             label: "Logo"
             widget: object
+            collapsed: true
             hint: "Shown in the header and footer (each chooses what to display)."
             fields:
               - { name: image, label: "Logo mark (shown beside the text)", widget: image, required: false, media_folder: "/public/media/identity", public_folder: "/media/identity", hint: "An icon/mark. The wordmark is the text below, set in your display font." }
@@ -819,6 +866,7 @@ ${emitShareCards(6)}
             label: "Opening hours"
             widget: list
             required: false
+            collapsed: true
             label_singular: "hours line"
             summary: "{{fields.days}} · {{fields.hours}}"
             fields:
@@ -829,6 +877,7 @@ ${emitShareCards(6)}
             label: "Holiday / special hours"
             widget: list
             required: false
+            collapsed: true
             label_singular: "holiday line"
             summary: "{{fields.when}} · {{fields.note}}"
             fields:
@@ -847,6 +896,7 @@ ${emitShareCards(6)}
             label: "Social profiles"
             widget: list
             required: false
+            collapsed: true
             label_singular: "profile"
             summary: "{{fields.platform}}"
             fields:
@@ -1129,6 +1179,19 @@ try {
   console.warn('  (stomme-previews.js copy skipped:', e.message + ')');
 }
 
+// Ship the editor enhancement (drag-and-drop section reordering). Regenerated each run.
+// The distinct FAQ tags are templated in so the tags editor can offer them as chips.
+try {
+  const editorDest = resolve(root, 'public/admin/stomme-editor.js');
+  mkdirSync(dirname(editorDest), { recursive: true });
+  let editorSrc = readFileSync(resolve(here, '../admin/editor.js'), 'utf8');
+  editorSrc = editorSrc.replace(/var FAQ_TAGS = \[[^\]]*\]; \/\/ stomme:faq-tags/,
+    `var FAQ_TAGS = ${JSON.stringify(FAQ_TAG_OPTIONS.map((o) => o.value))}; // stomme:faq-tags`);
+  writeFileSync(editorDest, editorSrc);
+} catch (e) {
+  console.warn('  (stomme-editor.js copy skipped:', e.message + ')');
+}
+
 // Same-window auth handoff for /admin. Browsers that open the login in the current tab
 // instead of a popup (Arc, some mobile) have no live window.opener to receive the token,
 // so the gateway redirects back to /admin with the token in the URL fragment. This shim
@@ -1172,15 +1235,55 @@ try {
     /<script\s+src="https:\/\/unpkg\.com\/(?:decap-cms|@sveltia\/cms)@[^"]*"><\/script>/,
     `<script src="${SVELTIA_CMS_SRC}"></script>`,
   );
+  // Load the editor enhancement (drag-and-drop) after the CMS bundle, cache-busted by a
+  // content hash so a plain reload always gets the current version.
+  {
+    let src = ''; try { src = readFileSync(resolve(here, '../admin/editor.js'), 'utf8'); } catch (e) {}
+    let h = 0; for (let i = 0; i < src.length; i++) h = (h * 31 + src.charCodeAt(i)) | 0;
+    const tag = `<script src="/admin/stomme-editor.js?v=${(h >>> 0).toString(36)}"></script>`;
+    if (/<script src="\/admin\/stomme-editor\.js[^"]*"><\/script>/.test(html)) {
+      html = html.replace(/<script src="\/admin\/stomme-editor\.js[^"]*"><\/script>/, tag);
+    } else {
+      html = html.replace(`<script src="${SVELTIA_CMS_SRC}"></script>`, `<script src="${SVELTIA_CMS_SRC}"></script>\n    ${tag}`);
+    }
+  }
   // Editor theme (conservative): one hue drives Sveltia's light+dark schemes; system font;
   // softer radii. CSS custom properties only — they inherit through the shadow DOM, and
   // explicit colours would break the in-app light/dark toggle. Managed region, like the shim.
   // `!important` is load-bearing: Sveltia injects its own `:root,:host{--sui-…}` at runtime after this style, so equal-specificity later rules would otherwise win.
-  // Surfaces derive from a background/border ramp (per light/dark via [data-theme]); tinting it toward the brand hue and steepening the border contrast is what makes the editor legible rather than flat grey. Overridden per mode so the light/dark toggle still works.
-  const RAMP_LIGHT = `--sui-background-color-1-hsl: var(--sui-base-hue) 30% 99% !important; --sui-background-color-2-hsl: var(--sui-base-hue) 22% 97% !important; --sui-background-color-3-hsl: var(--sui-base-hue) 20% 94% !important; --sui-background-color-4-hsl: var(--sui-base-hue) 18% 91% !important; --sui-background-color-5-hsl: var(--sui-base-hue) 26% 81% !important; --sui-border-color-1-hsl: var(--sui-base-hue) 18% 55% !important; --sui-border-color-2-hsl: var(--sui-base-hue) 20% 80% !important; --sui-border-color-3-hsl: var(--sui-base-hue) 18% 84% !important;`;
-  const RAMP_DARK = `--sui-background-color-1-hsl: var(--sui-base-hue) 18% 9% !important; --sui-background-color-2-hsl: var(--sui-base-hue) 18% 11% !important; --sui-background-color-3-hsl: var(--sui-base-hue) 18% 14% !important; --sui-background-color-4-hsl: var(--sui-base-hue) 18% 17% !important; --sui-background-color-5-hsl: var(--sui-base-hue) 20% 27% !important; --sui-border-color-1-hsl: var(--sui-base-hue) 16% 42% !important; --sui-border-color-2-hsl: var(--sui-base-hue) 18% 30% !important; --sui-border-color-3-hsl: var(--sui-base-hue) 18% 26% !important;`;
-  const THEME_STYLE = `<style>:root{
-      --sui-base-hue: 152 !important; /* per site: brand hue */
+  // Surfaces + accent derive from a per-mode ramp; kept NEUTRAL (near-zero saturation) so the editor reads as clean grey, with steeper lightness steps + darker borders for box definition. Accent is a desaturated slate — Sveltia bakes 80-100% saturation into --sui-primary-accent-color*, so each is overridden. Per site: set --sui-base-hue + raise accent saturation for a brand accent.
+  const RAMP_LIGHT = `--sui-background-color-1-hsl: var(--sui-base-hue) 6% 100% !important; --sui-background-color-2-hsl: var(--sui-base-hue) 7% 96.5% !important; --sui-background-color-3-hsl: var(--sui-base-hue) 8% 93.5% !important; --sui-background-color-4-hsl: var(--sui-base-hue) 8% 89.5% !important; --sui-background-color-5-hsl: var(--sui-base-hue) 10% 81% !important; --sui-border-color-1-hsl: var(--sui-base-hue) 9% 56% !important; --sui-border-color-2-hsl: var(--sui-base-hue) 10% 77% !important; --sui-border-color-3-hsl: var(--sui-base-hue) 10% 83% !important;`;
+  const RAMP_DARK = `--sui-background-color-1-hsl: var(--sui-base-hue) 8% 10% !important; --sui-background-color-2-hsl: var(--sui-base-hue) 8% 12.5% !important; --sui-background-color-3-hsl: var(--sui-base-hue) 8% 15.5% !important; --sui-background-color-4-hsl: var(--sui-base-hue) 9% 19% !important; --sui-background-color-5-hsl: var(--sui-base-hue) 10% 29% !important; --sui-border-color-1-hsl: var(--sui-base-hue) 9% 44% !important; --sui-border-color-2-hsl: var(--sui-base-hue) 10% 31% !important; --sui-border-color-3-hsl: var(--sui-base-hue) 10% 26% !important;`;
+  const ACCENT_LIGHT = `--sui-primary-accent-color: hsl(var(--sui-base-hue) 14% 40%) !important; --sui-primary-accent-color-light: hsl(var(--sui-base-hue) 14% 46%) !important; --sui-primary-accent-color-dark: hsl(var(--sui-base-hue) 16% 33%) !important; --sui-primary-accent-color-text: hsl(var(--sui-base-hue) 20% 38%) !important; --sui-primary-accent-color-translucent: hsl(var(--sui-base-hue) 14% 44% / 26%) !important; --sui-primary-accent-color-inverted: hsl(var(--sui-base-hue) 8% 100%) !important;`;
+  const ACCENT_DARK = `--sui-primary-accent-color: hsl(var(--sui-base-hue) 13% 66%) !important; --sui-primary-accent-color-light: hsl(var(--sui-base-hue) 13% 73%) !important; --sui-primary-accent-color-dark: hsl(var(--sui-base-hue) 14% 57%) !important; --sui-primary-accent-color-text: hsl(var(--sui-base-hue) 18% 70%) !important; --sui-primary-accent-color-translucent: hsl(var(--sui-base-hue) 13% 64% / 30%) !important; --sui-primary-accent-color-inverted: hsl(var(--sui-base-hue) 12% 12%) !important;`;
+  // Collapsible object-widget gates: OBJ_ANY = has a disclosure at all, OBJ_C = collapsed, OBJ_E = expanded. Gate on the widget's own disclosure (a summary node only exists when it computes non-empty); direct-child paths keep nested objects from matching their ancestors.
+  const OBJ = 'section.field[data-field-type=object]';
+  const OBJ_DISC = '> .field-wrapper > .wrapper > .header > div:first-child > button';
+  const OBJ_ANY = `${OBJ}:has(${OBJ_DISC}[aria-expanded])`;
+  const OBJ_C = `${OBJ}:has(${OBJ_DISC}[aria-expanded="false"])`;
+  const OBJ_E = `${OBJ}:has(${OBJ_DISC}[aria-expanded="true"])`;
+  // OPT = an optional object (required:false → Sveltia renders an "Add …" checkbox at
+  // > .field-wrapper > .sui.checkbox, ALWAYS mounted). The deliberately class-heavy
+  // :has() argument out-specifies OBJ_C/OBJ_E (whose args carry :first-child + 2 attrs)
+  // so OPT rules win in the added states.
+  const OPT = `${OBJ}:has(> .field-wrapper > .sui.checkbox .inner > button.sui.button[role=checkbox])`;
+  const OPT_E = `${OPT}:has(${OBJ_DISC}[aria-expanded="true"])`;
+  // GATED = an object whose first child field is the boolean `enabled` (the gate
+  // convention, mirrored in editor.js). The og wrapper is chrome-less — excluded.
+  // Expanded state self-detects via the mounted gate field; the COLLAPSED state can't
+  // (Sveltia unmounts collapsed children), so it keys on the known gate paths.
+  const KIDS = '> .field-wrapper > .wrapper > .item-list';
+  const GATE_BOOL = `${KIDS} > section.field[data-field-type=boolean][data-key-path$=".enabled"]:first-child`;
+  const GATED = `${OBJ}:not([data-key-path="og"]):has(${GATE_BOOL})`;
+  const GATED_E = `${GATED}:has(${OBJ_DISC}[aria-expanded="true"])`;
+  const GATED_C = `${OBJ}:is([data-key-path="away"],[data-key-path^="og.types."]):has(${OBJ_DISC}[aria-expanded="false"])`;
+  // LINK = a link-shaped object (page select + url string children) — self-detecting,
+  // rendered chrome-less inline. Children must be mounted (collapsed:false emitted).
+  const LINK = `${OBJ}:has(${KIDS} > section.field[data-field-type=select][data-key-path$=".page"]):has(${KIDS} > section.field[data-key-path$=".url"])`;
+  // The centred 768px field column Sveltia uses — mirrored where we re-lay-out fields.
+  const COL_PAD = 'max(16px, calc((100% - 768px) / 2))';
+  const THEME_CSS = `:root{
+      --sui-base-hue: 220 !important; /* neutral default; per site: brand hue (raise accent saturation too) */
       --sui-font-family-default: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif !important;
       --sui-font-weight-normal: 400 !important;
       --sui-font-weight-bold: 650 !important;
@@ -1190,12 +1293,145 @@ try {
       --sui-checkbox-border-radius: 4px !important;
       --sui-textbox-font-size: 15px !important;
     }
-    :root, :host, :root[data-theme=light], :host[data-theme=light] { ${RAMP_LIGHT} }
-    :root[data-theme=dark], :host[data-theme=dark] { ${RAMP_DARK} }
-    @media (prefers-color-scheme: dark) { :root:not([data-theme=light]), :host:not([data-theme=light]) { ${RAMP_DARK} } }</style>`;
+    :root, :host, :root[data-theme=light], :host[data-theme=light] { ${RAMP_LIGHT} ${ACCENT_LIGHT} }
+    :root[data-theme=dark], :host[data-theme=dark] { ${RAMP_DARK} ${ACCENT_DARK} }
+    @media (prefers-color-scheme: dark) { :root:not([data-theme=light]), :host:not([data-theme=light]) { ${RAMP_DARK} ${ACCENT_DARK} } }
+    /* List-item polish. Sveltia is light-DOM, so plain CSS reaches its internals; these target internal class names (not a public API — re-tune on a Sveltia upgrade). Section row = .item whose OWN header carries a .type pill (variable-type lists); the pill/card chrome stays scoped to those, the one-row + drag treatment applies to EVERY list item. */
+    .type{background:hsl(150 44% 86%)!important;color:hsl(150 55% 24%)!important;border-radius:999px!important;padding:5px 13px!important;margin:0 4px!important;font-size:12px!important;font-weight:700!important;letter-spacing:.06em!important;text-transform:uppercase!important;line-height:1.5!important;white-space:nowrap!important;flex:0 0 auto!important;}
+    .item:has(> .header .type){border:1px solid hsl(var(--sui-border-color-2-hsl))!important;border-radius:10px!important;margin-bottom:20px!important;overflow:hidden!important;background:hsl(var(--sui-background-color-1-hsl))!important;box-shadow:0 1px 3px hsl(var(--sui-base-hue) 8% 50% / 8%)!important;}
+    .item:has(> .header .type):hover{border-color:hsl(var(--sui-border-color-1-hsl))!important;}
+    .item:has(> .header .type) > .header{padding:14px 16px!important;background:hsl(var(--sui-background-color-2-hsl))!important;}
+    /* Expanded section: a border separates the header bar from the fields below. Sveltia hard-sets height:29px on .header (box-sizing:border-box), which swallows the padding and squeezes the pill — force height:auto so the padding gives the pill real breathing room. */
+    .item:has(> .header .type):has(> .header > div:first-child > button[aria-expanded="true"]) > .header{border-bottom:1px solid hsl(var(--sui-border-color-3-hsl))!important;height:auto!important;min-height:0!important;padding:16px!important;}
+    /* Move Up/Down arrows are replaced by whole-item drag (stomme-editor.js) on EVERY list item: hide the header's middle control group and dock the ⋮/✕ group right (Sveltia gives each header group a fixed ~205px width). NB: the disclosure is \`> .header > div:first-child > button[aria-expanded]\` — the ⋮ menu button ALSO has aria-expanded (always false while closed), so any collapsed-state selector must use the first-group path, never a bare \`button[aria-expanded="false"]\`. */
+    section[data-field-type=list] .item > .header > div:first-child{width:auto!important;flex:0 0 auto!important;}
+    section[data-field-type=list] .item > .header > div:nth-child(2){display:none!important;}
+    section[data-field-type=list] .item > .header > div:nth-child(3){width:auto!important;flex:0 0 auto!important;margin-left:auto!important;}
+    /* COLLAPSED list item = one row (mockup): the item becomes a flex row, the header joins it via display:contents, and the summary — rendered by Sveltia inside .item-body ONLY while collapsed — is ordered between the disclosure and the ⋮/✕ controls. Styled in place, never moved, so Sveltia re-renders can't desync it. Gated on the disclosure state so EXPANDED items keep a normal header row (bug: this trick used to apply always). */
+    section[data-field-type=list] .item:has(> .header > div:first-child > button[aria-expanded="false"]){display:flex!important;align-items:center!important;gap:10px!important;padding:9px 14px!important;cursor:pointer!important;user-select:none!important;}
+    section[data-field-type=list] .item:has(> .header > div:first-child > button[aria-expanded="false"]) > .header{display:contents!important;}
+    section[data-field-type=list] .item:has(> .header > div:first-child > button[aria-expanded="false"]) > .header > div:first-child{order:1!important;}
+    section[data-field-type=list] .item:has(> .header > div:first-child > button[aria-expanded="false"]) > .item-body{order:2!important;flex:1 1 auto!important;min-width:0!important;overflow:hidden!important;}
+    section[data-field-type=list] .item:has(> .header > div:first-child > button[aria-expanded="false"]) > .header > div:nth-child(3){order:3!important;}
+    section[data-field-type=list] .item > .item-body > .summary{font-weight:600!important;padding:0!important;margin:0!important;overflow:hidden!important;white-space:nowrap!important;text-overflow:ellipsis!important;}
+    section[data-field-type=list] .item > .item-body > .summary *{display:inline!important;white-space:nowrap!important;}
+    /* The whole-list collapse chevron on a list's toolbar is redundant chrome: every item below collapses individually and Expand/Collapse All does bulk. Hide it (the count + the bulk buttons stay). */
+    section[data-field-type=list] > .field-wrapper > .sui.group > .inner > .toolbar.top > button[aria-expanded]{display:none!important;}
+    /* Expanded list items WITHOUT a .type pill (fixed-type lists, e.g. cards) show Sveltia's default grey header bar with no label — a stray-looking strip. Blend it into the card (card bg, slim, just a divider) instead of leaving the raw grey default. */
+    section[data-field-type=list] .item:not(:has(> .header .type)):has(> .header > div:first-child > button[aria-expanded="true"]) > .header{background:hsl(var(--sui-background-color-1-hsl))!important;height:auto!important;min-height:0!important;padding:10px 14px!important;border-bottom:1px solid hsl(var(--sui-border-color-3-hsl))!important;}
+    /* Collapsible OBJECT groups (SEO + Media/Layout/Appearance) share the card language. Collapsed = one row [chevron][label][summary…][⋮] with the hint wrapping to a second line; expanded = label bar (chevron docked beside ⋮) with the fields below. Gated on the widget's own disclosure so plain inline objects are untouched. */
+    /* Align the object card with the section cards below it: Sveltia centres field content in a max-width:768px .field-wrapper column, but our card chrome sits on the full-width section — so a top-level SEO card stretched way past the section cards. Match that column (768px, centred) so they line up; nested objects sit in narrower parents where max-width is a no-op. Mirrors Sveltia's field-wrapper max-width — re-tune on a Sveltia upgrade. */
+    ${OBJ_ANY}{border:1px solid hsl(var(--sui-border-color-2-hsl))!important;border-radius:10px!important;max-width:768px!important;margin:14px auto!important;background:hsl(var(--sui-background-color-1-hsl))!important;overflow:hidden!important;}
+    ${OBJ_ANY}:hover{border-color:hsl(var(--sui-border-color-1-hsl))!important;}
+    /* Nested object cards (inside a list item OR inside another object — e.g. the share-cards per-type cards) keep a horizontal inset for breathing room; only top-level cards use the 768px centred column (max-width:auto centres to 0 inset in a narrow parent). */
+    section[data-field-type=list] .item ${OBJ}:has(${OBJ_DISC}[aria-expanded]), ${OBJ} ${OBJ}:has(${OBJ_DISC}[aria-expanded]){max-width:none!important;margin:14px 16px!important;}
+    ${OBJ_ANY} > header .required{display:none!important;}
+    ${OBJ_C}{display:flex!important;flex-wrap:wrap!important;align-items:center!important;gap:10px!important;padding:9px 14px!important;cursor:pointer!important;user-select:none!important;}
+    ${OBJ_C} > header{display:contents!important;}
+    ${OBJ_C} > header h4{order:2!important;flex:0 0 auto!important;}
+    ${OBJ_C} > header .sui.spacer{display:none!important;}
+    ${OBJ_C} > header > button{order:4!important;}
+    ${OBJ_C} > .field-wrapper{display:contents!important;}
+    ${OBJ_C} > .field-wrapper > .wrapper{display:contents!important;}
+    ${OBJ_C} > .field-wrapper > .wrapper > .header{display:contents!important;}
+    ${OBJ_C} > .field-wrapper > .wrapper > .header > div:first-child{order:1!important;width:auto!important;flex:0 0 auto!important;}
+    ${OBJ_C} > .field-wrapper > .wrapper > .header > div:nth-child(n+2){display:none!important;}
+    ${OBJ_C} > .field-wrapper > .wrapper > .item-list{order:3!important;flex:1 1 auto!important;min-width:0!important;}
+    ${OBJ_C} > .field-wrapper > .wrapper > .item-list > .summary{padding:0!important;overflow:hidden!important;white-space:nowrap!important;text-overflow:ellipsis!important;opacity:.75!important;}
+    ${OBJ_C} > .footer{order:5!important;flex:0 0 100%!important;margin:0!important;padding:0!important;}
+    ${OBJ_E}{position:relative!important;padding:0!important;}
+    ${OBJ_E} > header{margin:0!important;height:auto!important;min-height:0!important;padding:16px 16px 16px 48px!important;background:hsl(var(--sui-background-color-2-hsl))!important;border-bottom:1px solid hsl(var(--sui-border-color-3-hsl))!important;}
+    ${OBJ_E} > .field-wrapper > .wrapper{border:none!important;background:transparent!important;}
+    ${OBJ_E} > .field-wrapper > .wrapper > .header{position:absolute!important;top:14px!important;left:12px!important;background:transparent!important;}
+    ${OBJ_E} > .field-wrapper > .wrapper > .header > div{width:auto!important;flex:0 0 auto!important;}
+    ${OBJ_E} > .footer{margin:0!important;padding:8px 14px 10px!important;}
+    /* BOOLEAN fields read as one row — [switch] label, hint under the label — instead of Sveltia's stacked label/switch/hint. The padding mirrors the centred 768px field column. */
+    section.field[data-field-type=boolean]{display:grid!important;grid-template-columns:auto minmax(0,1fr)!important;column-gap:14px!important;align-items:center!important;padding:16px ${COL_PAD}!important;}
+    section.field[data-field-type=boolean] > header{grid-column:2!important;grid-row:1!important;margin:0!important;padding:0!important;height:auto!important;min-height:0!important;max-width:none!important;}
+    section.field[data-field-type=boolean] > .field-wrapper{grid-column:1!important;grid-row:1 / span 2!important;margin:0!important;width:auto!important;max-width:none!important;}
+    section.field[data-field-type=boolean] > .footer{grid-column:2!important;grid-row:2!important;margin:2px 0 0!important;padding:0!important;max-width:none!important;}
+    /* LINK-shaped objects (page + url) render chrome-less INLINE — a link belongs to its label; it is never an "Add …" step or a nested drawer. The two fields sit side by side where there is room. An object literally named "link" drops its redundant label; named ones ("Button link") keep it as a plain field label. */
+    ${LINK}{display:block!important;position:static!important;border:none!important;background:transparent!important;box-shadow:none!important;border-radius:0!important;max-width:none!important;margin:0!important;padding:0!important;overflow:visible!important;}
+    section[data-field-type=list] .item ${LINK}, ${OBJ} ${LINK}{max-width:none!important;margin:0!important;}
+    ${LINK} > header{display:flex!important;position:static!important;margin:0!important;height:auto!important;min-height:0!important;padding:16px ${COL_PAD} 0!important;background:transparent!important;border:none!important;}
+    ${LINK}[data-key-path$=".link"] > header{display:none!important;}
+    ${LINK} > .field-wrapper{display:block!important;margin:0!important;max-width:none!important;width:auto!important;}
+    ${LINK} > .field-wrapper > .wrapper{display:block!important;border:none!important;background:transparent!important;}
+    ${LINK} > .field-wrapper > .wrapper > .header{display:none!important;}
+    ${LINK} > .field-wrapper > .wrapper > .item-list{display:grid!important;grid-template-columns:repeat(auto-fit, minmax(260px, 1fr))!important;align-items:start!important;}
+    ${LINK} > .field-wrapper > .wrapper > .item-list > section.field{border:none!important;}
+    /* The Add-checkbox of optional objects renders as a SWITCH matching real boolean toggles. */
+    ${OBJ} > .field-wrapper > .sui.checkbox .inner > button[role=checkbox]{width:42px!important;height:24px!important;min-width:42px!important;flex:0 0 auto!important;border-radius:999px!important;border:none!important;background:hsl(var(--sui-background-color-5-hsl))!important;position:relative!important;padding:0!important;transition:background 160ms!important;}
+    ${OBJ} > .field-wrapper > .sui.checkbox .inner > button[role=checkbox] .icon{display:none!important;}
+    ${OBJ} > .field-wrapper > .sui.checkbox .inner > button[role=checkbox]::after{content:""!important;position:absolute!important;top:3px!important;left:3px!important;width:18px!important;height:18px!important;border-radius:50%!important;background:#fff!important;box-shadow:0 1px 2px rgb(0 0 0 / 0.25)!important;transition:transform 160ms!important;}
+    ${OBJ} > .field-wrapper > .sui.checkbox .inner > button[role=checkbox][aria-checked=true]{background:var(--sui-primary-accent-color)!important;}
+    ${OBJ} > .field-wrapper > .sui.checkbox .inner > button[role=checkbox][aria-checked=true]::after{transform:translateX(18px)!important;}
+    /* OPTIONAL groups (required:false objects — thanks buttons, header CTA, per-entry SEO): ONE header row [switch] label — the on/off switch IS the header, no separate "Add X" text row. The switch is pinned (absolute, same spot in unadded / on-collapsed / on-expanded states) so it NEVER moves when clicked; fields appear below the row. */
+    ${OPT}{display:flex!important;flex-wrap:wrap!important;align-items:center!important;gap:10px!important;position:relative!important;border:1px solid hsl(var(--sui-border-color-2-hsl))!important;border-radius:10px!important;max-width:768px!important;margin:14px auto!important;background:hsl(var(--sui-background-color-1-hsl))!important;overflow:hidden!important;padding:12px 14px 12px 72px!important;min-height:48px!important;cursor:pointer!important;user-select:none!important;}
+    ${OPT}:hover{border-color:hsl(var(--sui-border-color-1-hsl))!important;}
+    section[data-field-type=list] .item ${OPT}, ${OBJ} ${OPT}{max-width:none!important;margin:14px 16px!important;}
+    ${OPT} > header{display:contents!important;}
+    ${OPT} > header h4{order:1!important;flex:0 0 auto!important;}
+    ${OPT} > header .sui.spacer{display:none!important;}
+    ${OPT} > header .required{display:none!important;}
+    ${OPT} > header > button{order:4!important;margin-left:auto!important;}
+    ${OPT} > .field-wrapper{display:contents!important;}
+    ${OPT} > .field-wrapper > .sui.checkbox{position:absolute!important;top:24px!important;left:16px!important;transform:translateY(-50%)!important;padding:0!important;margin:0!important;z-index:1!important;}
+    ${OPT} > .field-wrapper > .sui.checkbox label{display:none!important;}
+    ${OPT} > .field-wrapper > .wrapper{display:contents!important;}
+    ${OPT} > .field-wrapper > .wrapper > .header{display:none!important;}
+    ${OPT} > .field-wrapper > .wrapper > .item-list{order:2!important;flex:1 1 auto!important;min-width:0!important;}
+    ${OPT} > .field-wrapper > .wrapper > .item-list > .summary{padding:0!important;overflow:hidden!important;white-space:nowrap!important;text-overflow:ellipsis!important;opacity:.75!important;}
+    ${OPT} > .footer{order:8!important;flex:0 0 100%!important;margin:0!important;padding:0!important;}
+    ${OPT_E}{cursor:default!important;}
+    ${OPT_E} > .field-wrapper > .wrapper > .item-list{order:9!important;flex:1 1 100%!important;min-width:0!important;margin:12px -14px -12px -72px!important;border-top:1px solid hsl(var(--sui-border-color-3-hsl))!important;}
+    /* GATED groups (first child = the boolean \`enabled\`; e.g. share-card types, away mode): expanded, the gate switch is pinned into the header row and its own field row disappears; collapsed, a switch-width chevron slot keeps the label from shifting between states. */
+    ${GATED_C}{padding:12px 14px 12px 16px!important;gap:14px!important;min-height:48px!important;}
+    ${GATED_C} > .field-wrapper > .wrapper > .header > div:first-child{width:42px!important;flex:0 0 42px!important;justify-content:flex-start!important;}
+    ${GATED_E} > header{display:flex!important;align-items:center!important;margin:0!important;height:auto!important;min-height:48px!important;padding:12px 16px 12px 72px!important;background:hsl(var(--sui-background-color-2-hsl))!important;border-bottom:1px solid hsl(var(--sui-border-color-3-hsl))!important;}
+    ${GATED_E} > .field-wrapper > .wrapper > .header{display:none!important;}
+    ${GATED_E} ${GATE_BOOL}{display:block!important;position:absolute!important;top:24px!important;left:16px!important;transform:translateY(-50%)!important;width:42px!important;padding:0!important;margin:0!important;z-index:1!important;border:none!important;background:transparent!important;}
+    ${GATED_E} ${GATE_BOOL} > header, ${GATED_E} ${GATE_BOOL} > .footer{display:none!important;}
+    ${GATED_E} ${GATE_BOOL} > .field-wrapper{margin:0!important;width:auto!important;grid-column:auto!important;}
+    /* gate OFF: the header row is the whole card — no stray divider under it */
+    ${GATED_E}:has(${GATE_BOOL} [role=switch][aria-checked=false]) > header{border-bottom:none!important;}
+    /* Share-cards flat wrappers: the og + og.types objects exist only for the data path (og.enabled, og.types.<key>) — render them CHROME-LESS (no card border/header/collapse) so the pane reads: master toggle → type cards (the approved mockup). Selectors reuse OBJ_ANY so they outrank the generic object-card rules above; both wrappers are emitted collapsed:false and stay expanded (no disclosure left to collapse them). */
+    ${OBJ_ANY}:is([data-key-path="og"],[data-key-path="og.types"]){border:none!important;background:transparent!important;box-shadow:none!important;border-radius:0!important;overflow:visible!important;padding:0!important;}
+    ${OBJ_ANY}:is([data-key-path="og"],[data-key-path="og.types"]) > header{display:none!important;}
+    ${OBJ_ANY}:is([data-key-path="og"],[data-key-path="og.types"]) > .field-wrapper > .wrapper > .header{display:none!important;}
+    /* og.types keeps a quiet section label + hint (mockup "Per content type"): its header returns as a plain heading and the hint moves above the cards via flex order. */
+    ${OBJ_ANY}[data-key-path="og.types"]{display:flex!important;flex-direction:column!important;margin:14px 0!important;}
+    /* Under flex, the field-wrapper's own margin-inline:auto would shrink it to fit-content — pin it full width. */
+    ${OBJ_ANY}[data-key-path="og.types"] > .field-wrapper{width:100%!important;margin:0!important;max-width:none!important;}
+    ${OBJ_ANY}[data-key-path="og.types"] > header{display:flex!important;order:-2!important;position:static!important;background:transparent!important;border:none!important;height:auto!important;min-height:0!important;padding:18px 2px 0!important;}
+    ${OBJ_ANY}[data-key-path="og.types"] > header > button,${OBJ_ANY}[data-key-path="og.types"] > header .required{display:none!important;}
+    ${OBJ_ANY}[data-key-path="og.types"] > .footer{order:-1!important;margin:0!important;padding:2px 2px 0!important;}
+    /* Type cards fill the settings column (they'd otherwise take the nested 16px inset). */
+    ${OBJ_ANY}[data-key-path="og.types"] > .field-wrapper > .wrapper > .item-list > ${OBJ_ANY}{max-width:none!important;margin:14px 0!important;}
+    /* Type-card labels read as the editor's green type pills (mockup language). */
+    ${OBJ}[data-key-path^="og.types."][data-field-type=object] > header h4{background:hsl(150 44% 86%)!important;color:hsl(150 55% 24%)!important;border-radius:999px!important;padding:4px 12px!important;font-size:12px!important;font-weight:700!important;letter-spacing:.06em!important;text-transform:uppercase!important;line-height:1.5!important;flex:0 0 auto!important;}
+    /* The master toggle as a prominent card: [switch] [label + hint] on one row. */
+    section.field[data-key-path="og.enabled"]{display:grid!important;grid-template-columns:auto minmax(0,1fr)!important;column-gap:14px!important;align-items:center!important;border:1px solid hsl(var(--sui-border-color-2-hsl))!important;border-radius:10px!important;background:hsl(var(--sui-background-color-1-hsl))!important;box-shadow:0 1px 3px hsl(var(--sui-base-hue) 8% 50% / 8%)!important;padding:14px 16px!important;margin:14px 0!important;}
+    section.field[data-key-path="og.enabled"] > header{grid-column:2!important;grid-row:1!important;margin:0!important;padding:0!important;height:auto!important;min-height:0!important;}
+    section.field[data-key-path="og.enabled"] > .field-wrapper{grid-column:1!important;grid-row:1 / span 2!important;}
+    section.field[data-key-path="og.enabled"] > .footer{grid-column:2!important;grid-row:2!important;margin:0!important;padding:0!important;}
+    /* Drag feedback (stomme-editor.js drives Sveltia's own move-up/down on drop). */
+    .item.stomme-dragging{opacity:.4!important;}
+    .item.stomme-drop-before{box-shadow:0 -3px 0 -1px var(--sui-primary-accent-color)!important;}
+    .item.stomme-drop-after{box-shadow:0 3px 0 -1px var(--sui-primary-accent-color)!important;}
+    /* FAQ tag suggestions (stomme-editor.js): existing tags as click-to-add chips. */
+    .stomme-tag-chips{display:flex;flex-wrap:wrap;gap:8px;width:100%;justify-content:flex-start;padding:10px 0 4px;}
+    .stomme-tag-chip{appearance:none;border:1px dashed hsl(var(--sui-border-color-1-hsl));border-radius:999px;background:hsl(var(--sui-background-color-2-hsl));color:var(--sui-secondary-foreground-color);font:inherit;font-size:12px;line-height:1;padding:7px 12px;cursor:pointer;transition:background 120ms,color 120ms,border-color 120ms;}
+    .stomme-tag-chip:hover{background:var(--sui-primary-accent-color-translucent);border-color:var(--sui-primary-accent-color);color:var(--sui-primary-accent-color-text);border-style:solid;}`;
   const T_START = '<!-- >>> stomme-theme:generated (managed by stomme-gen — do not edit) -->';
   const T_END = '<!-- <<< stomme-theme:generated -->';
-  const themeRegion = `${T_START}\n    ${THEME_STYLE}\n    ${T_END}`;
+  // External, content-hashed stylesheet: an inline <style> in index.html isn't cache-busted,
+  // so a plain reload keeps serving stale theme CSS (the recurring "nothing changed" trap).
+  // Versioned like stomme-editor.js so every reload gets the current styling.
+  let th = 0; for (let i = 0; i < THEME_CSS.length; i++) th = (th * 31 + THEME_CSS.charCodeAt(i)) | 0;
+  try { writeFileSync(resolve(root, 'public/admin/stomme-theme.css'), THEME_CSS); }
+  catch (e) { console.warn('  (stomme-theme.css skipped:', e.message + ')'); }
+  const themeRegion = `${T_START}\n    <link rel="stylesheet" href="/admin/stomme-theme.css?v=${(th >>> 0).toString(36)}">\n    ${T_END}`;
   const ts = html.indexOf(T_START), te = html.indexOf(T_END);
   if (ts !== -1 && te !== -1) {
     html = html.slice(0, ts) + themeRegion + html.slice(te + T_END.length); // refresh in place

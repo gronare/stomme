@@ -5,7 +5,7 @@ import Cover from './src/Cover.astro';
 // blocks get the site's custom blocks. Same resolution the lookbook route uses.
 import BlockRenderer from '@stomme/renderer';
 import { render } from 'astro:content';
-import { resolveLink } from './src/href';
+import { resolveLink, resolveButton } from './src/href';
 import { resolveSite, type SiteConfig } from './src/config';
 
 // Service detail page rendered from a `services` collection entry (its markdown
@@ -47,8 +47,11 @@ const hdTicks: string[] = hero
   ? (Array.isArray(hero.ticks) && hero.ticks.length > 0 ? hero.ticks : (data.bullets ?? []))
   : [];
 const hdImage = hero ? (hero.image ?? data.media?.image) : undefined;
-const hdCta = hero ? resolveLink(hero.ctaHref, contact) : contact;
-const hdCta2 = hero?.cta2Label ? resolveLink(hero.cta2Href, '/') : null;
+// Primary CTA always renders (label/link default to the service strings + contact route);
+// `cta`/`cta2` are the grouped shape, the flat pairs are legacy content.
+const hdCta = hero ? resolveLink(hero.cta?.link ?? hero.ctaHref, contact) : contact;
+const hdCtaLabel = hero ? (hero.cta?.label || hero.ctaLabel || t.cta) : t.cta;
+const hdBtn2 = hero ? resolveButton(hero.cta2, hero.cta2Label, hero.cta2Href) : null;
 ---
 {hero && (
 <section class="section service-hd">
@@ -65,9 +68,9 @@ const hdCta2 = hero?.cta2Label ? resolveLink(hero.cta2Href, '/') : null;
         </ul>
       )}
       <div class="service-hd__cta">
-        <a href={hdCta} class="btn">{hero.ctaLabel ?? t.cta}</a>
-        {hero.cta2Label && hdCta2 && (
-          <a href={hdCta2} class="btn-ghost">{`${hero.cta2Label} ${hdCta2.startsWith('#') ? '↓' : '→'}`}</a>
+        <a href={hdCta} class="btn">{hdCtaLabel}</a>
+        {hdBtn2 && (
+          <a href={hdBtn2.href} class="btn-ghost">{`${hdBtn2.label} ${hdBtn2.href.startsWith('#') ? '↓' : '→'}`}</a>
         )}
       </div>
     </div>

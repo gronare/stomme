@@ -1,6 +1,6 @@
 ---
 import { getEntry } from 'astro:content';
-import { resolveLink } from '../src/href';
+import { resolveButton } from '../src/href';
 import ContactLink from '../ContactLink.astro';
 import Emph from '../src/Emph.astro';
 
@@ -11,15 +11,17 @@ interface Props {
   eyebrow?: string;
   heading?: string;
   intro?: string;
+  cta?: { label?: string; link?: unknown };
+  // Legacy flat pair (pre-group content) — still rendered via resolveButton fallback.
   ctaLabel?: string;
   ctaHref?: unknown;
   layout?: { variant?: 'light' | 'dark'; width?: 'narrow' | 'full' };
 }
-const { eyebrow, heading, intro, ctaLabel, ctaHref } = Astro.props;
+const { eyebrow, heading, intro, cta, ctaLabel, ctaHref } = Astro.props;
 const variant = Astro.props.layout?.variant ?? 'light';
 const width = Astro.props.layout?.width ?? 'narrow';
 const read = width !== 'full';
-const href = resolveLink(ctaHref, '/');
+const btn = resolveButton(cta, ctaLabel, ctaHref);
 const contact = ((await getEntry('contact', 'contact').catch(() => null))?.data ?? {}) as any;
 ---
 
@@ -30,9 +32,9 @@ const contact = ((await getEntry('contact', 'contact').catch(() => null))?.data 
       {eyebrow && <span class="mono eyebrow">{eyebrow}</span>}
       <h1 class="display display--hero page-header__heading"><Emph text={heading} /></h1>
       {intro && <p class="intro page-header__intro">{intro}</p>}
-      {ctaLabel && (
+      {btn && (
         <div class="btn-row">
-          <a href={href} class="btn btn-on-dark">{ctaLabel}</a>
+          <a href={btn.href} class="btn btn-on-dark">{btn.label}</a>
           {contact.phone && <ContactLink kind="tel" class="btn-ghost" target={contact.phoneE164 || contact.phone} display={contact.phone} prefix="Call " suffix=" →" protect={!!contact.protectContact} />}
         </div>
       )}
@@ -43,6 +45,6 @@ const contact = ((await getEntry('contact', 'contact').catch(() => null))?.data 
     {eyebrow && <span class="mono eyebrow">{eyebrow}</span>}
     <h1 class="display display--hero page-header__heading"><Emph text={heading} /></h1>
     {intro && <p class="intro page-header__intro">{intro}</p>}
-    {ctaLabel && <div class="btn-row"><a href={href} class="btn">{ctaLabel}</a></div>}
+    {btn && <div class="btn-row"><a href={btn.href} class="btn">{btn.label}</a></div>}
   </section>
 )}
