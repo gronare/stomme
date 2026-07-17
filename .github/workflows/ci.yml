@@ -74,3 +74,26 @@ jobs:
           node --check packages/stomme/integration.mjs
           node --check packages/stomme/admin/previews.js
           node --check packages/stomme/test/smoke-preview-workerd.mjs
+
+  # The control plane fetches schema-manifest.json + blocks-manifest.json raw at
+  # release refs and diffs site content against them — a committed manifest that
+  # lags its generator source (collections.ts / catalog.ts) reports wrong drift.
+  # Regenerate both and fail on any diff, so every ref the fleet can pin to
+  # carries manifests that match the code at that ref.
+  manifests-fresh:
+    name: manifests fresh (schema + blocks)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: regenerate manifests
+        run: |
+          pnpm --filter @gronare/stomme gen:schema-manifest
+          pnpm --filter @gronare/stomme gen:blocks-manifest
+      - name: committed manifests match their generators
+        run: git diff --exit-code -- packages/stomme/schema-manifest.json packages/stomme/blocks-manifest.json
