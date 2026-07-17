@@ -173,10 +173,17 @@ jobs:
           # both A and B render with the site's real theme in place.
           if [ -d stomme-themes/themes ]; then export STOMME_THEMES_DIR="$PWD/stomme-themes/themes"; fi
           render() {  # $1 = engine sha, $2 = output dir
-            # -f + clean: a build can dirty the engine checkout (older engines
-            # regenerate manifest files in-tree), and a dirty tree makes the
-            # SECOND checkout fail with "local changes would be overwritten".
-            git -C stomme checkout -qf "$1"
+            # A missing/orphaned engine SHA (removed from history by a rewrite) fails
+            # checkout in this refs-only clone. Record it as a STRUCTURED reason so the
+            # control plane self-heals deterministically instead of guessing reachability
+            # (the commits API returns 200 for dangling commits and gets it wrong).
+            # -f + clean: a build can dirty the engine checkout (older engines regenerate
+            # manifest files in-tree), and a dirty tree fails the SECOND checkout.
+            if ! git -C stomme checkout -qf "$1" 2> /dev/null; then
+              echo "engine_checkout_failed=$1" >> "$GITHUB_OUTPUT"
+              echo "::error::engine checkout failed: $1 not in history (orphaned/rewritten)"
+              exit 1
+            fi
             git -C stomme clean -fdq -- packages/stomme
             (cd stomme && pnpm install --frozen-lockfile --silent)
             rm -rf site/dist
@@ -312,16 +319,20 @@ jobs:
         run: |
           [ -z "$SECRET" ] || [ -z "$REPORT_URL" ] && { echo "no report url/secret - skipping report"; exit 0; }
           STATUS="${{ steps.pin.outputs.status }}"
+          MISSING="${{ steps.render.outputs.engine_checkout_failed }}"
+          REASON=""
           if [ "$STATUS" = "check" ]; then
-            if [ "${{ job.status }}" != "success" ] && [ -z "${{ steps.render.outputs.diffpages }}" ]; then STATUS="error"
+            if [ -n "$MISSING" ]; then STATUS="error"; REASON="engine_checkout_failed"  # orphaned SHA → deterministic self-heal
+            elif [ "${{ job.status }}" != "success" ] && [ -z "${{ steps.render.outputs.diffpages }}" ]; then STATUS="error"
             elif [ -n "${{ steps.render.outputs.diffpages }}" ]; then STATUS="diff"
             elif [ "${{ steps.pin.outputs.ab_mode }}" = "1" ]; then STATUS="up_to_date"  # follows-release, identical release SHAs ⇒ keep following
             else STATUS="follows_release"; fi  # pinned site, green A/B ⇒ unfreeze, follow release again
           fi
           BODY=$(jq -nc --arg repo "$GITHUB_REPOSITORY" --arg status "$STATUS" \
             --arg from "${{ steps.pin.outputs.pin }}" --arg to "${{ steps.pin.outputs.release }}" \
+            --arg reason "$REASON" --arg missing "$MISSING" \
             --arg run_url "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" \
-            '{repo:$repo,status:$status,from:$from,to:$to,run_url:$run_url}')
+            '{repo:$repo,status:$status,from:$from,to:$to,run_url:$run_url} + (if $reason != "" then {reason:$reason,missing:$missing} else {} end)')
           SIG=$(printf '%s' "$BODY" | openssl dgst -sha256 -hmac "$SECRET" | awk '{print $NF}')
           curl -sf -X POST -H "Content-Type: application/json" \
             -H "X-Stomme-Signature: $SIG" -d "$BODY" \
