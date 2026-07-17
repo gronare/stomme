@@ -17,7 +17,7 @@
 // `passthrough: true` means the collection's schema carries a passthrough `blocks`
 // array (home/pages/services) — unknown BLOCK-level fields are retained, so the control plane
 // validates only unexpected TOP-LEVEL collection keys, never block-level keys.
-import { writeFileSync } from 'node:fs';
+import { writeFileSync, realpathSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createJiti } from 'jiti';
@@ -107,7 +107,10 @@ export async function generate({ write = true } = {}) {
 }
 
 // Run when invoked directly (bin / script). Importers (stomme-gen) call generate().
-const invokedDirectly = process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url);
+// realpathSync so an npm `.bin/*` symlink (npx stomme-gen-schema) still matches the
+// module realpath in import.meta.url — a plain resolve() leaves the symlink unresolved
+// and the guard silently no-ops.
+const invokedDirectly = process.argv[1] && realpathSync(process.argv[1]) === fileURLToPath(import.meta.url);
 if (invokedDirectly) {
   const manifest = await generate();
   const names = Object.keys(manifest.collections);

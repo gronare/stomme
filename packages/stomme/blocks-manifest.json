@@ -1,0 +1,2299 @@
+{
+  "blocks": {
+    "beforeAfter": {
+      "label": "Before / after",
+      "group": "Media",
+      "shape": "split",
+      "fields": [
+        {
+          "name": "eyebrow",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "heading",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "intro",
+          "widget": "text",
+          "required": false
+        },
+        {
+          "name": "media",
+          "widget": "object",
+          "fields": [
+            {
+              "name": "before",
+              "widget": "image",
+              "required": false
+            },
+            {
+              "name": "after",
+              "widget": "image",
+              "required": false
+            }
+          ]
+        },
+        {
+          "name": "style",
+          "widget": "object",
+          "fields": [
+            {
+              "name": "surface",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "standard",
+                "tint",
+                "band",
+                "dark",
+                "gradient"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "callout": {
+      "label": "Highlighted quote",
+      "group": "Quote & highlight",
+      "shape": "quote",
+      "fields": [
+        {
+          "name": "eyebrow",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "quote",
+          "widget": "text"
+        },
+        {
+          "name": "layout",
+          "widget": "object",
+          "fields": [
+            {
+              "name": "width",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "narrow",
+                "xnarrow",
+                "full"
+              ]
+            },
+            {
+              "name": "align",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "left",
+                "center",
+                "right"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "style",
+          "widget": "object",
+          "fields": [
+            {
+              "name": "surface",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "standard",
+                "tint",
+                "band",
+                "dark",
+                "gradient"
+              ]
+            },
+            {
+              "name": "accent",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "brand",
+                "secondary",
+                "highlight"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "catalogList": {
+      "label": "Catalog (for sale)",
+      "group": "From collections",
+      "shape": "grid",
+      "fields": [
+        {
+          "name": "eyebrow",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "heading",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "intro",
+          "widget": "text",
+          "required": false
+        },
+        {
+          "name": "source",
+          "widget": "hidden"
+        },
+        {
+          "name": "base",
+          "widget": "hidden"
+        },
+        {
+          "name": "media",
+          "widget": "object",
+          "fields": [
+            {
+              "name": "showImages",
+              "widget": "boolean",
+              "required": false
+            }
+          ]
+        },
+        {
+          "name": "layout",
+          "widget": "object",
+          "fields": [
+            {
+              "name": "filters",
+              "widget": "boolean",
+              "required": false
+            },
+            {
+              "name": "columns",
+              "widget": "number",
+              "required": false
+            }
+          ]
+        },
+        {
+          "name": "style",
+          "widget": "object",
+          "fields": [
+            {
+              "name": "surface",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "standard",
+                "tint",
+                "band",
+                "dark",
+                "gradient"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "checklist": {
+      "label": "Checklist",
+      "group": "Cards & lists",
+      "shape": "checklist",
+      "fields": [
+        {
+          "name": "eyebrow",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "heading",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "intro",
+          "widget": "text",
+          "required": false
+        },
+        {
+          "name": "items",
+          "widget": "list",
+          "required": false,
+          "fields": [
+            {
+              "name": "text",
+              "widget": "string"
+            },
+            {
+              "name": "note",
+              "widget": "text",
+              "required": false
+            }
+          ]
+        },
+        {
+          "name": "layout",
+          "widget": "object",
+          "fields": [
+            {
+              "name": "columns",
+              "widget": "number",
+              "required": false
+            }
+          ]
+        },
+        {
+          "name": "style",
+          "widget": "object",
+          "fields": [
+            {
+              "name": "surface",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "standard",
+                "tint",
+                "band",
+                "dark",
+                "gradient"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "contactCard": {
+      "label": "Contact card",
+      "group": "Calls to action",
+      "shape": "box",
+      "fields": [
+        {
+          "name": "show",
+          "widget": "select",
+          "required": false,
+          "multiple": true,
+          "options": [
+            "phone",
+            "email",
+            "hours",
+            "address",
+            "map",
+            "socials"
+          ]
+        },
+        {
+          "name": "label",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "tint",
+          "widget": "boolean",
+          "required": false
+        }
+      ]
+    },
+    "contactForm": {
+      "label": "Contact form",
+      "group": "Calls to action",
+      "shape": "band",
+      "fields": [
+        {
+          "name": "eyebrow",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "heading",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "intro",
+          "widget": "text",
+          "required": false
+        },
+        {
+          "name": "labelName",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "labelEmail",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "showPhone",
+          "widget": "boolean",
+          "required": false
+        },
+        {
+          "name": "labelMessage",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "submitLabel",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "showDirectContact",
+          "widget": "boolean",
+          "required": false
+        }
+      ]
+    },
+    "cover": {
+      "label": "Cover (full-bleed)",
+      "group": "Hero & headers",
+      "shape": "hero",
+      "fields": [
+        {
+          "name": "eyebrow",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "heading",
+          "widget": "text"
+        },
+        {
+          "name": "intro",
+          "widget": "text",
+          "required": false
+        },
+        {
+          "name": "cta",
+          "widget": "object",
+          "required": false,
+          "fields": [
+            {
+              "name": "label",
+              "widget": "string"
+            },
+            {
+              "name": "link",
+              "widget": "object",
+              "fields": [
+                {
+                  "name": "page",
+                  "widget": "select",
+                  "required": false,
+                  "options": "$pages"
+                },
+                {
+                  "name": "url",
+                  "widget": "string",
+                  "required": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "cta2",
+          "widget": "object",
+          "required": false,
+          "fields": [
+            {
+              "name": "label",
+              "widget": "string"
+            },
+            {
+              "name": "link",
+              "widget": "object",
+              "fields": [
+                {
+                  "name": "page",
+                  "widget": "select",
+                  "required": false,
+                  "options": "$pages"
+                },
+                {
+                  "name": "url",
+                  "widget": "string",
+                  "required": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "media",
+          "widget": "object",
+          "fields": [
+            {
+              "name": "kind",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "image",
+                "video",
+                "gradient",
+                "animated"
+              ]
+            },
+            {
+              "name": "image",
+              "widget": "image",
+              "required": false
+            },
+            {
+              "name": "imageAlt",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "video",
+              "widget": "file",
+              "required": false
+            },
+            {
+              "name": "videoUrl",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "overlay",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "light",
+                "medium",
+                "strong"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "layout",
+          "widget": "object",
+          "fields": [
+            {
+              "name": "align",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "start",
+                "center"
+              ]
+            },
+            {
+              "name": "height",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "tall",
+                "medium"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "ctaBox": {
+      "label": "Call to action (box)",
+      "group": "Calls to action",
+      "shape": "box",
+      "fields": [
+        {
+          "name": "eyebrow",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "heading",
+          "widget": "string"
+        },
+        {
+          "name": "intro",
+          "widget": "text",
+          "required": false
+        },
+        {
+          "name": "cta",
+          "widget": "object",
+          "required": false,
+          "fields": [
+            {
+              "name": "label",
+              "widget": "string"
+            },
+            {
+              "name": "link",
+              "widget": "object",
+              "fields": [
+                {
+                  "name": "page",
+                  "widget": "select",
+                  "required": false,
+                  "options": "$pages"
+                },
+                {
+                  "name": "url",
+                  "widget": "string",
+                  "required": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "cta2",
+          "widget": "object",
+          "required": false,
+          "fields": [
+            {
+              "name": "label",
+              "widget": "string"
+            },
+            {
+              "name": "link",
+              "widget": "object",
+              "fields": [
+                {
+                  "name": "page",
+                  "widget": "select",
+                  "required": false,
+                  "options": "$pages"
+                },
+                {
+                  "name": "url",
+                  "widget": "string",
+                  "required": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "facts",
+          "widget": "list",
+          "required": false,
+          "fields": [
+            {
+              "name": "label",
+              "widget": "string"
+            },
+            {
+              "name": "value",
+              "widget": "string"
+            }
+          ]
+        },
+        {
+          "name": "layout",
+          "widget": "object",
+          "fields": [
+            {
+              "name": "variant",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "classic",
+                "split",
+                "panel"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "style",
+          "widget": "object",
+          "fields": [
+            {
+              "name": "surface",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "standard",
+                "tint",
+                "band",
+                "dark",
+                "gradient"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "ctaPanel": {
+      "label": "Call to action (band)",
+      "group": "Calls to action",
+      "shape": "band",
+      "fields": [
+        {
+          "name": "eyebrow",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "heading",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "intro",
+          "widget": "text",
+          "required": false
+        },
+        {
+          "name": "cta",
+          "widget": "object",
+          "required": false,
+          "fields": [
+            {
+              "name": "label",
+              "widget": "string"
+            },
+            {
+              "name": "link",
+              "widget": "object",
+              "fields": [
+                {
+                  "name": "page",
+                  "widget": "select",
+                  "required": false,
+                  "options": "$pages"
+                },
+                {
+                  "name": "url",
+                  "widget": "string",
+                  "required": false
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "definition": {
+      "label": "Dictionary entry",
+      "group": "Quote & highlight",
+      "shape": "prose",
+      "fields": [
+        {
+          "name": "eyebrow",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "term",
+          "widget": "string"
+        },
+        {
+          "name": "wordClass",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "senses",
+          "widget": "list",
+          "required": false,
+          "fields": [
+            {
+              "name": "text",
+              "widget": "string"
+            },
+            {
+              "name": "note",
+              "widget": "string",
+              "required": false
+            }
+          ]
+        },
+        {
+          "name": "layout",
+          "widget": "object",
+          "fields": [
+            {
+              "name": "width",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "xnarrow",
+                "narrow",
+                "full"
+              ]
+            },
+            {
+              "name": "align",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "left",
+                "center",
+                "right"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "style",
+          "widget": "object",
+          "fields": [
+            {
+              "name": "surface",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "standard",
+                "tint",
+                "band",
+                "dark",
+                "gradient"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "faq": {
+      "label": "FAQ",
+      "group": "From collections",
+      "shape": "list",
+      "collection": "faq",
+      "fields": [
+        {
+          "name": "eyebrow",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "heading",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "intro",
+          "widget": "text",
+          "required": false
+        },
+        {
+          "name": "entries",
+          "widget": "select",
+          "required": false,
+          "multiple": true,
+          "options": "$faq"
+        },
+        {
+          "name": "tag",
+          "widget": "select",
+          "required": false,
+          "options": "$faqTags"
+        },
+        {
+          "name": "asideHeading",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "asideBody",
+          "widget": "text",
+          "required": false
+        },
+        {
+          "name": "asideCta",
+          "widget": "object",
+          "required": false,
+          "fields": [
+            {
+              "name": "label",
+              "widget": "string"
+            },
+            {
+              "name": "link",
+              "widget": "object",
+              "fields": [
+                {
+                  "name": "page",
+                  "widget": "select",
+                  "required": false,
+                  "options": "$pages"
+                },
+                {
+                  "name": "url",
+                  "widget": "string",
+                  "required": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "layout",
+          "widget": "object",
+          "fields": [
+            {
+              "name": "variant",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "list",
+                "accordion",
+                "cards",
+                "split"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "style",
+          "widget": "object",
+          "fields": [
+            {
+              "name": "surface",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "standard",
+                "tint",
+                "band",
+                "dark",
+                "gradient"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "featureGrid": {
+      "label": "Feature cards",
+      "group": "Cards & lists",
+      "shape": "grid",
+      "fields": [
+        {
+          "name": "eyebrow",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "heading",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "intro",
+          "widget": "text",
+          "required": false
+        },
+        {
+          "name": "items",
+          "widget": "list",
+          "required": false,
+          "fields": [
+            {
+              "name": "icon",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "sun",
+                "panel",
+                "battery",
+                "home",
+                "roof",
+                "leaf",
+                "bolt",
+                "shield",
+                "wrench",
+                "headset",
+                "link",
+                "phone",
+                "mail"
+              ]
+            },
+            {
+              "name": "title",
+              "widget": "string"
+            },
+            {
+              "name": "body",
+              "widget": "text"
+            },
+            {
+              "name": "tag",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "cta",
+              "widget": "object",
+              "required": false,
+              "fields": [
+                {
+                  "name": "label",
+                  "widget": "string",
+                  "required": false
+                },
+                {
+                  "name": "link",
+                  "widget": "object",
+                  "fields": [
+                    {
+                      "name": "page",
+                      "widget": "select",
+                      "required": false,
+                      "options": "$pages"
+                    },
+                    {
+                      "name": "url",
+                      "widget": "string",
+                      "required": false
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "layout",
+          "widget": "object",
+          "fields": [
+            {
+              "name": "numbered",
+              "widget": "boolean",
+              "required": false
+            }
+          ]
+        },
+        {
+          "name": "style",
+          "widget": "object",
+          "fields": [
+            {
+              "name": "surface",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "standard",
+                "tint",
+                "band",
+                "dark",
+                "gradient"
+              ]
+            },
+            {
+              "name": "accent",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "brand",
+                "secondary",
+                "highlight"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "findUs": {
+      "label": "Find us (map)",
+      "group": "Calls to action",
+      "shape": "split",
+      "fields": [
+        {
+          "name": "heading",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "showHours",
+          "widget": "boolean",
+          "required": false
+        }
+      ]
+    },
+    "fragment": {
+      "label": "Story fragment",
+      "group": "Text",
+      "shape": "prose",
+      "fields": [
+        {
+          "name": "eyebrow",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "statement",
+          "widget": "string"
+        },
+        {
+          "name": "body",
+          "widget": "text",
+          "required": false
+        },
+        {
+          "name": "cta",
+          "widget": "object",
+          "required": false,
+          "fields": [
+            {
+              "name": "label",
+              "widget": "string"
+            },
+            {
+              "name": "link",
+              "widget": "object",
+              "fields": [
+                {
+                  "name": "page",
+                  "widget": "select",
+                  "required": false,
+                  "options": "$pages"
+                },
+                {
+                  "name": "url",
+                  "widget": "string",
+                  "required": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "layout",
+          "widget": "object",
+          "fields": [
+            {
+              "name": "placement",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "left",
+                "right",
+                "indent"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "style",
+          "widget": "object",
+          "fields": [
+            {
+              "name": "surface",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "standard",
+                "tint",
+                "band",
+                "dark",
+                "gradient"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "gallery": {
+      "label": "Gallery",
+      "group": "Media",
+      "shape": "gallery",
+      "fields": [
+        {
+          "name": "eyebrow",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "heading",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "intro",
+          "widget": "text",
+          "required": false
+        },
+        {
+          "name": "images",
+          "widget": "list",
+          "required": false,
+          "fields": [
+            {
+              "name": "image",
+              "widget": "image",
+              "required": false
+            },
+            {
+              "name": "alt",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "caption",
+              "widget": "string",
+              "required": false
+            }
+          ]
+        },
+        {
+          "name": "layout",
+          "widget": "object",
+          "fields": [
+            {
+              "name": "columns",
+              "widget": "number",
+              "required": false
+            }
+          ]
+        },
+        {
+          "name": "style",
+          "widget": "object",
+          "fields": [
+            {
+              "name": "surface",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "standard",
+                "tint",
+                "band",
+                "dark",
+                "gradient"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "hero": {
+      "label": "Hero",
+      "group": "Hero & headers",
+      "shape": "hero",
+      "fields": [
+        {
+          "name": "eyebrow",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "heading",
+          "widget": "string"
+        },
+        {
+          "name": "intro",
+          "widget": "text",
+          "required": false
+        },
+        {
+          "name": "ticks",
+          "widget": "list",
+          "required": false,
+          "field": {
+            "name": "text",
+            "widget": "string"
+          }
+        },
+        {
+          "name": "cta",
+          "widget": "object",
+          "required": false,
+          "fields": [
+            {
+              "name": "label",
+              "widget": "string"
+            },
+            {
+              "name": "link",
+              "widget": "object",
+              "fields": [
+                {
+                  "name": "page",
+                  "widget": "select",
+                  "required": false,
+                  "options": "$pages"
+                },
+                {
+                  "name": "url",
+                  "widget": "string",
+                  "required": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "cta2",
+          "widget": "object",
+          "required": false,
+          "fields": [
+            {
+              "name": "label",
+              "widget": "string"
+            },
+            {
+              "name": "link",
+              "widget": "object",
+              "fields": [
+                {
+                  "name": "page",
+                  "widget": "select",
+                  "required": false,
+                  "options": "$pages"
+                },
+                {
+                  "name": "url",
+                  "widget": "string",
+                  "required": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "media",
+          "widget": "object",
+          "fields": [
+            {
+              "name": "kind",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "none",
+                "image",
+                "highlights",
+                "motif"
+              ]
+            },
+            {
+              "name": "image",
+              "widget": "image",
+              "required": false
+            },
+            {
+              "name": "imageAlt",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "highlights",
+              "widget": "list",
+              "required": false,
+              "fields": [
+                {
+                  "name": "icon",
+                  "widget": "select",
+                  "required": false,
+                  "options": [
+                    "sun",
+                    "panel",
+                    "battery",
+                    "home",
+                    "roof",
+                    "leaf",
+                    "bolt",
+                    "shield",
+                    "wrench",
+                    "headset",
+                    "link",
+                    "phone",
+                    "mail"
+                  ]
+                },
+                {
+                  "name": "title",
+                  "widget": "string"
+                },
+                {
+                  "name": "body",
+                  "widget": "string",
+                  "required": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "layout",
+          "widget": "object",
+          "fields": [
+            {
+              "name": "height",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "normal",
+                "tall"
+              ]
+            },
+            {
+              "name": "align",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "top",
+                "center",
+                "bottom"
+              ]
+            },
+            {
+              "name": "width",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "full",
+                "narrow"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "style",
+          "widget": "object",
+          "fields": [
+            {
+              "name": "surface",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "standard",
+                "tint",
+                "band",
+                "dark",
+                "gradient"
+              ]
+            },
+            {
+              "name": "accent",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "brand",
+                "secondary",
+                "highlight"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "linkChips": {
+      "label": "Link chips",
+      "group": "From collections",
+      "shape": "chips",
+      "collection": "towns",
+      "fields": [
+        {
+          "name": "eyebrow",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "heading",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "intro",
+          "widget": "text",
+          "required": false
+        },
+        {
+          "name": "style",
+          "widget": "object",
+          "fields": [
+            {
+              "name": "surface",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "standard",
+                "tint",
+                "band",
+                "dark",
+                "gradient"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "logoStrip": {
+      "label": "Logo strip",
+      "group": "Numbers",
+      "shape": "chips",
+      "fields": [
+        {
+          "name": "lead",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "logos",
+          "widget": "list",
+          "required": false,
+          "field": {
+            "name": "name",
+            "widget": "string"
+          }
+        }
+      ]
+    },
+    "pageHeader": {
+      "label": "Page header",
+      "group": "Hero & headers",
+      "shape": "band",
+      "fields": [
+        {
+          "name": "eyebrow",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "heading",
+          "widget": "string"
+        },
+        {
+          "name": "intro",
+          "widget": "text",
+          "required": false
+        },
+        {
+          "name": "cta",
+          "widget": "object",
+          "required": false,
+          "fields": [
+            {
+              "name": "label",
+              "widget": "string"
+            },
+            {
+              "name": "link",
+              "widget": "object",
+              "fields": [
+                {
+                  "name": "page",
+                  "widget": "select",
+                  "required": false,
+                  "options": "$pages"
+                },
+                {
+                  "name": "url",
+                  "widget": "string",
+                  "required": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "layout",
+          "widget": "object",
+          "fields": [
+            {
+              "name": "variant",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "light",
+                "dark"
+              ]
+            },
+            {
+              "name": "width",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "narrow",
+                "full"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "style",
+          "widget": "object",
+          "fields": [
+            {
+              "name": "surface",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "standard",
+                "tint",
+                "band",
+                "dark",
+                "gradient"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "pillars": {
+      "label": "Principles / values",
+      "group": "Cards & lists",
+      "shape": "grid",
+      "fields": [
+        {
+          "name": "eyebrow",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "heading",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "intro",
+          "widget": "text",
+          "required": false
+        },
+        {
+          "name": "items",
+          "widget": "list",
+          "required": false,
+          "fields": [
+            {
+              "name": "title",
+              "widget": "string"
+            },
+            {
+              "name": "body",
+              "widget": "text"
+            }
+          ]
+        },
+        {
+          "name": "style",
+          "widget": "object",
+          "fields": [
+            {
+              "name": "surface",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "standard",
+                "tint",
+                "band",
+                "dark",
+                "gradient"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "plans": {
+      "label": "Pricing / plans",
+      "group": "Cards & lists",
+      "shape": "grid",
+      "fields": [
+        {
+          "name": "eyebrow",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "heading",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "intro",
+          "widget": "text",
+          "required": false
+        },
+        {
+          "name": "plans",
+          "widget": "list",
+          "required": false,
+          "fields": [
+            {
+              "name": "name",
+              "widget": "string"
+            },
+            {
+              "name": "pricePrefix",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "price",
+              "widget": "string"
+            },
+            {
+              "name": "period",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "description",
+              "widget": "text",
+              "required": false
+            },
+            {
+              "name": "features",
+              "widget": "list",
+              "required": false,
+              "fields": [
+                {
+                  "name": "text",
+                  "widget": "string"
+                }
+              ]
+            },
+            {
+              "name": "badge",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "highlight",
+              "widget": "boolean",
+              "required": false
+            },
+            {
+              "name": "cta",
+              "widget": "object",
+              "required": false,
+              "fields": [
+                {
+                  "name": "label",
+                  "widget": "string"
+                },
+                {
+                  "name": "link",
+                  "widget": "object",
+                  "fields": [
+                    {
+                      "name": "page",
+                      "widget": "select",
+                      "required": false,
+                      "options": "$pages"
+                    },
+                    {
+                      "name": "url",
+                      "widget": "string",
+                      "required": false
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "footnote",
+          "widget": "text",
+          "required": false
+        },
+        {
+          "name": "style",
+          "widget": "object",
+          "fields": [
+            {
+              "name": "surface",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "standard",
+                "tint",
+                "band",
+                "dark",
+                "gradient"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "postList": {
+      "label": "Posts (blog / news)",
+      "group": "From collections",
+      "shape": "list",
+      "fields": [
+        {
+          "name": "eyebrow",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "heading",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "intro",
+          "widget": "text",
+          "required": false
+        },
+        {
+          "name": "source",
+          "widget": "hidden"
+        },
+        {
+          "name": "base",
+          "widget": "hidden"
+        },
+        {
+          "name": "media",
+          "widget": "object",
+          "fields": [
+            {
+              "name": "showImages",
+              "widget": "boolean",
+              "required": false
+            }
+          ]
+        },
+        {
+          "name": "layout",
+          "widget": "object",
+          "fields": [
+            {
+              "name": "featured",
+              "widget": "boolean",
+              "required": false
+            },
+            {
+              "name": "columns",
+              "widget": "number",
+              "required": false
+            }
+          ]
+        },
+        {
+          "name": "style",
+          "widget": "object",
+          "fields": [
+            {
+              "name": "surface",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "standard",
+                "tint",
+                "band",
+                "dark",
+                "gradient"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "prose": {
+      "label": "Rich text",
+      "group": "Text",
+      "shape": "prose",
+      "fields": [
+        {
+          "name": "eyebrow",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "heading",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "body",
+          "widget": "markdown",
+          "required": false
+        },
+        {
+          "name": "statValue",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "statLabel",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "layout",
+          "widget": "object",
+          "fields": [
+            {
+              "name": "width",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "narrow",
+                "full"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "style",
+          "widget": "object",
+          "fields": [
+            {
+              "name": "surface",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "standard",
+                "tint",
+                "band",
+                "dark",
+                "gradient"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "serviceGrid": {
+      "label": "Service cards",
+      "group": "From collections",
+      "shape": "grid",
+      "collection": "services",
+      "fields": [
+        {
+          "name": "eyebrow",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "heading",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "intro",
+          "widget": "text",
+          "required": false
+        },
+        {
+          "name": "services",
+          "widget": "select",
+          "required": false,
+          "multiple": true,
+          "options": "$services"
+        },
+        {
+          "name": "style",
+          "widget": "object",
+          "fields": [
+            {
+              "name": "surface",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "standard",
+                "tint",
+                "band",
+                "dark",
+                "gradient"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "specialistGrid": {
+      "label": "Specialist grid",
+      "group": "Cards & lists",
+      "shape": "grid",
+      "fields": [
+        {
+          "name": "eyebrow",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "heading",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "intro",
+          "widget": "text",
+          "required": false
+        },
+        {
+          "name": "items",
+          "widget": "list",
+          "required": false,
+          "fields": [
+            {
+              "name": "title",
+              "widget": "string"
+            },
+            {
+              "name": "body",
+              "widget": "text"
+            }
+          ]
+        },
+        {
+          "name": "style",
+          "widget": "object",
+          "fields": [
+            {
+              "name": "surface",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "standard",
+                "tint",
+                "band",
+                "dark",
+                "gradient"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "statPanel": {
+      "label": "Statement panel",
+      "group": "Quote & highlight",
+      "shape": "panel",
+      "fields": [
+        {
+          "name": "eyebrow",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "heading",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "body",
+          "widget": "text",
+          "required": false
+        },
+        {
+          "name": "badges",
+          "widget": "list",
+          "required": false,
+          "field": {
+            "name": "badge",
+            "widget": "string"
+          }
+        },
+        {
+          "name": "statValue",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "statLabel",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "stats",
+          "widget": "list",
+          "required": false,
+          "fields": [
+            {
+              "name": "label",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "value",
+              "widget": "string"
+            },
+            {
+              "name": "note",
+              "widget": "text",
+              "required": false
+            }
+          ]
+        },
+        {
+          "name": "style",
+          "widget": "object",
+          "fields": [
+            {
+              "name": "accent",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "brand",
+                "secondary",
+                "highlight"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "statsBar": {
+      "label": "Stats / facts",
+      "group": "Numbers",
+      "shape": "stats",
+      "fields": [
+        {
+          "name": "items",
+          "widget": "list",
+          "required": false,
+          "fields": [
+            {
+              "name": "label",
+              "widget": "string"
+            },
+            {
+              "name": "value",
+              "widget": "string"
+            }
+          ]
+        }
+      ]
+    },
+    "steps": {
+      "label": "Process / steps",
+      "group": "Cards & lists",
+      "shape": "steps",
+      "fields": [
+        {
+          "name": "eyebrow",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "heading",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "intro",
+          "widget": "text",
+          "required": false
+        },
+        {
+          "name": "items",
+          "widget": "list",
+          "required": false,
+          "fields": [
+            {
+              "name": "title",
+              "widget": "string"
+            },
+            {
+              "name": "kicker",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "body",
+              "widget": "text"
+            }
+          ]
+        },
+        {
+          "name": "anchor",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "layout",
+          "widget": "object",
+          "fields": [
+            {
+              "name": "width",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "narrow",
+                "full"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "style",
+          "widget": "object",
+          "fields": [
+            {
+              "name": "surface",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "standard",
+                "tint",
+                "band",
+                "dark",
+                "gradient"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "testimonials": {
+      "label": "Testimonials",
+      "group": "From collections",
+      "shape": "quote",
+      "collection": "testimonials",
+      "fields": [
+        {
+          "name": "eyebrow",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "heading",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "intro",
+          "widget": "text",
+          "required": false
+        },
+        {
+          "name": "style",
+          "widget": "object",
+          "fields": [
+            {
+              "name": "surface",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "standard",
+                "tint",
+                "band",
+                "dark",
+                "gradient"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "textImage": {
+      "label": "Text + image",
+      "group": "Text",
+      "shape": "split",
+      "fields": [
+        {
+          "name": "heading",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "body",
+          "widget": "markdown"
+        },
+        {
+          "name": "media",
+          "widget": "object",
+          "fields": [
+            {
+              "name": "image",
+              "widget": "image",
+              "required": false
+            },
+            {
+              "name": "imageAlt",
+              "widget": "string",
+              "required": false
+            }
+          ]
+        },
+        {
+          "name": "layout",
+          "widget": "object",
+          "fields": [
+            {
+              "name": "flip",
+              "widget": "boolean",
+              "required": false
+            }
+          ]
+        },
+        {
+          "name": "style",
+          "widget": "object",
+          "fields": [
+            {
+              "name": "surface",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "standard",
+                "tint",
+                "band",
+                "dark",
+                "gradient"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "textQuote": {
+      "label": "Text + quote",
+      "group": "Text",
+      "shape": "split",
+      "fields": [
+        {
+          "name": "body",
+          "widget": "markdown"
+        },
+        {
+          "name": "quote",
+          "widget": "text"
+        },
+        {
+          "name": "attribution",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "layout",
+          "widget": "object",
+          "fields": [
+            {
+              "name": "flip",
+              "widget": "boolean",
+              "required": false
+            }
+          ]
+        },
+        {
+          "name": "style",
+          "widget": "object",
+          "fields": [
+            {
+              "name": "surface",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "standard",
+                "tint",
+                "band",
+                "dark",
+                "gradient"
+              ]
+            },
+            {
+              "name": "accent",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "brand",
+                "secondary",
+                "highlight"
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

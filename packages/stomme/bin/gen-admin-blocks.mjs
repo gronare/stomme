@@ -1543,6 +1543,13 @@ if (!here.includes('node_modules')) {
   } catch (e) {
     console.warn('  (schema-manifest refresh skipped:', e.message + ')');
   }
+  try {
+    const { generate } = await import('./gen-blocks-manifest.mjs');
+    const m = await generate();
+    console.log(`  ↳ blocks-manifest.json refreshed (${Object.keys(m.blocks).length} block types)`);
+  } catch (e) {
+    console.warn('  (blocks-manifest refresh skipped:', e.message + ')');
+  }
 }
 
 console.log(`✓ stomme-gen: ${Object.entries(counts).map(([k, v]) => `${k}×${v}`).join(', ')} · ${AVAILABLE_BLOCKS.length} block types · ${PAGE_OPTIONS.length} link options`);
