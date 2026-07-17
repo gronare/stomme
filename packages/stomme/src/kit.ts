@@ -29,7 +29,6 @@ export type Field = {
   summary?: string; // list widgets: collapsed-row label template (default: derived — eyebrow, then title/name/label/…)
   label_singular?: string; // list widgets: singular noun for the "Add …" button
   collapsed?: boolean; // object/list widgets: render collapsed (grouping convention)
-  minimize_collapsed?: boolean; // list widgets: collapsing hides all entries behind the header
   multiple?: boolean; // select: allow choosing several values
   // For select widgets: a literal option list, or a sentinel the generator
   // expands — '$pages' (all internal page routes), '$services' (service slugs),
@@ -68,16 +67,37 @@ export type BlockDef = {
 // mailto: / anchor). The custom URL wins if both are set. Resolve the stored
 // value with resolveLink() (stomme/href). The page dropdown options are filled
 // from real routes by stomme-gen. Backward-compatible with a plain string href.
-export const linkField = (name = 'href', label = 'Link', required = false): Field => ({
+// REQUIRED object, rendered chrome-less inline (page + url side by side) by the
+// editor theme — a link is its label's companion, never behind an "Add …" step.
+// Both children optional + omit_empty_optional_fields: nothing filled = key absent.
+// collapsed:false is load-bearing: the flat rendering needs the children mounted.
+export const linkField = (name = 'href', label = 'Link'): Field => ({
   name,
   label,
   widget: 'object',
-  required,
-  collapsed: true,
-  summary: '{{fields.page}}{{fields.url}}',
+  collapsed: false,
   fields: [
     { name: 'page', label: 'Page', widget: 'select', options: '$pages', required: false, hint: 'Pick a page on the site.' },
     { name: 'url', label: '…or a custom URL', widget: 'string', required: false, hint: 'External link, tel: or mailto:. Used if filled.' },
+  ],
+});
+
+// A button/CTA: ONE optional group `{ label, link: {page,url} }` — the same shape the
+// header CTA and thanks buttons already use, so every button in the editor reads the
+// same: an on/off toggle in the group header (off = no button), then Label + the inline
+// link (page dropdown + custom URL). The inner object is literally named `link` so the
+// editor theme renders it chrome-less without a heading. Resolve with resolveButton().
+export const buttonField = (name: string, label = 'Button', opts: { hint?: string; labelHint?: string; optionalLabel?: boolean } = {}): Field => ({
+  name,
+  label,
+  widget: 'object',
+  required: false,
+  collapsed: true,
+  summary: '{{fields.label}}',
+  ...(opts.hint ? { hint: opts.hint } : {}),
+  fields: [
+    { name: 'label', label: 'Label', widget: 'string', ...(opts.optionalLabel ? { required: false } : {}), ...(opts.labelHint ? { hint: opts.labelHint } : {}) },
+    linkField('link', 'Link'),
   ],
 });
 
@@ -211,7 +231,6 @@ export const cardListField: Field = {
   widget: 'list',
   required: false,
   collapsed: true,
-  minimize_collapsed: true,
   label_singular: 'Card',
   summary: '{{fields.title}}',
   fields: [
@@ -222,14 +241,14 @@ export const cardListField: Field = {
 
 // Like cardListField, but each card may optionally link somewhere — rendered as a
 // clickable card with a "read more" affordance by blocks that support it (e.g.
-// featureGrid). The link uses the standard linkField shape; resolve via resolveLink.
+// featureGrid). The link is a toggled group `{ label, link }` (buttonField shape, read
+// with resolveButton): off = plain card; label blank = the localized "Read more".
 export const linkedCardListField: Field = {
   name: 'items',
   label: 'Cards',
   widget: 'list',
   required: false,
   collapsed: true,
-  minimize_collapsed: true,
   label_singular: 'Card',
   summary: '{{fields.title}}',
   fields: [
@@ -237,7 +256,6 @@ export const linkedCardListField: Field = {
     { name: 'title', label: 'Title', widget: 'string' },
     { name: 'body', label: 'Text', widget: 'text' },
     { name: 'tag', label: 'Tag (footer label)', widget: 'string', required: false, hint: 'Small uppercase label at the card foot, e.g. a method term.' },
-    linkField('link', 'Link (optional)'),
-    { name: 'linkLabel', label: 'Link label', widget: 'string', required: false, hint: 'E.g. "Read more". Shown only if the card has a link.' },
+    buttonField('cta', 'Link', { optionalLabel: true, labelHint: 'Blank shows "Read more".', hint: 'Make the card clickable.' }),
   ],
 };

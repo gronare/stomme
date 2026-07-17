@@ -145,6 +145,8 @@
           "image",
           "imageAlt",
           "ticks",
+          "cta",
+          "cta2",
           "ctaLabel",
           "ctaHref",
           "cta2Label",

@@ -7,7 +7,7 @@ interface Props {
   eyebrow?: string;
   heading?: string;
   intro?: string;
-  items?: { icon?: string; title: string; body?: string; tag?: string; link?: unknown; linkLabel?: string }[];
+  items?: { icon?: string; title: string; body?: string; tag?: string; cta?: { label?: string; link?: unknown }; link?: unknown; linkLabel?: string }[];
   layout?: { numbered?: boolean };
   style?: { surface?: string; accent?: 'brand' | 'secondary' | 'highlight' };
   site?: any;
@@ -28,7 +28,10 @@ const accentVar = accent === 'secondary' ? 'var(--color-secondary)' : accent ===
   )}
   <div class="feature-grid">
     {items.map((it, i) => {
-      const href = it.link ? resolveLink(it.link, '') : '';
+      // The card link: the `cta` group, or the legacy link + linkLabel pair.
+      const target = it.cta?.link ?? it.link;
+      const href = target ? resolveLink(target, '') : '';
+      const label = it.cta?.label || it.linkLabel || readMore;
       const Tag = href ? 'a' : 'div';
       return (
         <Tag href={href || undefined} class="card feature-card">
@@ -39,7 +42,7 @@ const accentVar = accent === 'secondary' ? 'var(--color-secondary)' : accent ===
           )}
           <h3>{it.title}</h3>
           {it.body && <p>{it.body}</p>}
-          {href && <span class="mono" style="display:inline-block;margin-top:1rem;color:var(--color-brand)">{it.linkLabel ?? readMore} →</span>}
+          {href && <span class="mono" style="display:inline-block;margin-top:1rem;color:var(--color-brand)">{label} →</span>}
           {it.tag && <span class="mono card-tag">{it.tag}</span>}
         </Tag>
       );

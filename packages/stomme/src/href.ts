@@ -11,3 +11,13 @@ export function resolveLink(value: unknown, fallback = '/'): string {
   }
   return fallback;
 }
+
+// Resolve a buttonField() group `{ label, link }` to { label, href } — null = no button.
+// Legacy args accept the pre-group pair (ctaLabel + ctaHref etc.) so an engine update
+// keeps rendering existing sites' content unchanged (kit FIELD POLICY).
+export function resolveButton(button: unknown, legacyLabel?: unknown, legacyHref?: unknown, fallback = '/'): { label: string; href: string } | null {
+  const b = (button && typeof button === 'object' ? button : {}) as { label?: unknown; link?: unknown };
+  const label = typeof b.label === 'string' && b.label ? b.label : typeof legacyLabel === 'string' && legacyLabel ? legacyLabel : '';
+  if (!label) return null;
+  return { label, href: resolveLink(b.link ?? legacyHref, fallback) };
+}

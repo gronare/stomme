@@ -36,16 +36,6 @@ export async function getStaticPaths() {
   return pages.filter((p) => p.card).map((p) => ({ params: { slug: p.slug }, props: { page: p } }));
 }
 
-// Fill {var} placeholders from the item's data; unknown/empty → '' and any dangling
-// separators an empty value leaves behind (e.g. "Title · " → "Title") are trimmed off.
-function fillTemplate(tpl: string, vars: Record<string, string>): string {
-  return tpl
-    .replace(/\{(\w+)\}/g, (_m, k: string) => (vars[k] != null ? vars[k] : ''))
-    .replace(/\s+/g, ' ')
-    .replace(/^[\s·•|,:–—-]+|[\s·•|,:–—-]+$/g, '')
-    .trim();
-}
-
 // Local last resort: og.ts exports EMPTY_PNG, but if that module itself fails to load
 // (native-dep trouble), nothing from it is reachable — keep an independent copy.
 const EMPTY_PNG = Buffer.from(
@@ -70,7 +60,6 @@ async function buildPng(page: OgPage): Promise<Buffer> {
 
   const settings = (await getEntry('settings', 'site'))?.data ?? ({} as Record<string, never>);
   const theme = (await getEntry('theme', 'theme'))?.data ?? {};
-  const footer = (await getEntry('footer', 'footer'))?.data;
   const logo = settings.logo ?? {};
   const name = settings.name || '';
   const vars: Record<string, string> = page.vars ?? {};
@@ -79,16 +68,18 @@ async function buildPng(page: OgPage): Promise<Buffer> {
   // no wordmark/tagline (the name is already the headline). Otherwise the per-type config.
   const isDefault = !page.typeKey;
   const t = (page.typeKey && settings.og?.types?.[page.typeKey]) || {};
-  const template = (t.overlayText && t.overlayText.trim()) || page.overlayDefault || '{title}';
-  const overlay = fillTemplate(template, vars) || vars.title || name;
+  // Headline + second line are picked FIELDS ('business' = the site name, 'none' = off);
+  // unset falls to the per-type default the field picker shows.
+  const pick = (key?: string) => (!key || key === 'none' ? '' : key === 'business' ? name : vars[key] ?? '');
+  const headline = pick(t.headlineField || page.headlineDefault || 'title') || vars.title || name;
+  const subline = isDefault ? '' : pick(t.sublineField || page.sublineDefault || 'none');
   const showLogo = !isDefault && t.showLogo !== false;
-  const showTagline = !isDefault && t.showTagline !== false;
 
   const input = {
-    title: overlay || name,
-    tagline: showTagline ? (t.tagline || footer?.tagline || '') : '',
+    title: headline,
+    tagline: subline,
     wordmark: showLogo ? (logo.textPre || logo.textAccent ? { pre: logo.textPre, accent: logo.textAccent } : name) : null,
-    og: { style: t.style, scrim: t.scrim, showLogo, showTagline, accent: t.accent },
+    og: { style: t.style, scrim: t.scrim, showLogo, accent: t.accent },
     theme,
   };
 

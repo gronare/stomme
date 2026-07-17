@@ -82,8 +82,8 @@ export function stommeCollections(listings?: Listing[]) {
         //   `types` holds ONE config per generatable type (key = a listing id, or
         //   "towns"/"services"). When a type's `enabled` is true (and the master is on)
         //   each of its items gets a build-time card: the item photo cropped to 1200×630
-        //   with a scrim + overlay text (a template with {var} substitution) + optional
-        //   wordmark/tagline. All optional with defaults so existing content validates.
+        //   with a scrim + a headline/second line picked from the item's own fields +
+        //   an optional wordmark. All optional with defaults so existing content validates.
         og: z.object({
           enabled: z.boolean().default(false),
           types: z
@@ -93,15 +93,15 @@ export function stommeCollections(listings?: Listing[]) {
                 // Card layout preset: editorial (bottom gradient — default),
                 // bold (centred statement), ops (left panel).
                 style: z.enum(['editorial', 'bold', 'ops']).default('editorial'),
-                // Overlay text template — {var} substituted per item at build. Blank ⇒
-                // the sensible per-type default (catalog "{title} · {price}", else "{title}").
-                overlayText: z.string().default(''),
+                // Which item field the headline (big line) is filled from; 'business' =
+                // the business name. Blank ⇒ the per-type default (towns: name, else title).
+                headlineField: z.string().default(''),
+                // The smaller second line: an item field, 'business', or 'none'. Blank ⇒
+                // the per-type default (catalog: price, else none).
+                sublineField: z.string().default(''),
                 // Gradient opacity over the photo, 0–100.
                 scrim: z.number().min(0).max(100).default(55),
                 showLogo: z.boolean().default(true),
-                showTagline: z.boolean().default(true),
-                // Falls back to the footer tagline, then the business name.
-                tagline: z.string().default(''),
                 // Accent colour (rule/bar + wordmark accent). Defaults to theme.brand.
                 accent: z.string().optional(),
               }).default({}),
@@ -269,6 +269,9 @@ export function stommeCollections(listings?: Listing[]) {
             image: z.string().optional(),
             imageAlt: z.string().optional(),
             ticks: z.array(z.string()).default([]),
+            // Grouped buttons (buttonField shape); the flat pairs are legacy content.
+            cta: z.object({ label: z.string().optional(), link }).optional(),
+            cta2: z.object({ label: z.string().optional(), link }).optional(),
             ctaLabel: z.string().optional(),
             ctaHref: link,
             cta2Label: z.string().optional(),

@@ -33,8 +33,9 @@ export interface OgPage {
   raw?: string; // when !card: the raw URL this page's og:image should point at
   typeKey?: string; // 'towns' | 'services' | <listing id> — which settings.og.types config
   image?: string; // card background source; unset → brand background
-  overlayDefault?: string; // fallback overlay template when the type sets none
-  vars?: Record<string, string>; // {title,price,…} substituted into the overlay template
+  headlineDefault?: string; // field key the headline falls back to when the type sets none
+  sublineDefault?: string; // field key ('none' allowed) the second line falls back to
+  vars?: Record<string, string>; // the item's known field values (+ business) by field key
 }
 
 export interface OgConfig {
@@ -93,16 +94,28 @@ async function siteDefault(settings: { ogImage?: string }): Promise<string> {
   return '/og/default.png';
 }
 
-// Substitution vars for an item, by preset. Empty/unknown values resolve to '' at render.
-function itemVars(preset: 'article' | 'catalog', d: Record<string, unknown>, name: string): Record<string, string> {
+// The headline/second-line field pickers offer each type's KNOWN text fields (must match
+// the selects gen-admin-blocks.mjs emits); 'business' (the site name) is added at resolve.
+export type OgTypeKind = 'article' | 'catalog' | 'towns' | 'services';
+export const TYPE_FIELDS: Record<OgTypeKind, string[]> = {
+  article: ['title', 'date', 'excerpt'],
+  catalog: ['title', 'price', 'status', 'category', 'date'],
+  towns: ['name', 'title', 'heroSubtitle'],
+  services: ['title', 'navLabel', 'summary'],
+};
+// Per-type fallbacks when the CMS never saved a pick (mirror the selects' defaults).
+export const HEADLINE_DEFAULT: Record<OgTypeKind, string> = { article: 'title', catalog: 'title', towns: 'name', services: 'title' };
+export const SUBLINE_DEFAULT: Record<OgTypeKind, string> = { article: 'none', catalog: 'price', towns: 'none', services: 'none' };
+
+// The item's known field values by field key. `title` always resolves (towns fall back to
+// `name`) so the headline fallback chain never dead-ends on an entry without a title.
+function itemVars(kind: OgTypeKind, d: Record<string, unknown>, name: string): Record<string, string> {
   const s = (v: unknown) => (v == null ? '' : String(v));
-  const common = { name, title: s((d as { title?: string; name?: string }).title ?? (d as { name?: string }).name) };
-  if (preset === 'catalog') {
-    return { ...common, price: s(d.price), category: s(d.category), status: s(d.status) };
-  }
-  return { ...common, date: s(d.date), excerpt: s(d.excerpt) };
+  const vars: Record<string, string> = { business: name };
+  for (const f of TYPE_FIELDS[kind]) vars[f] = s(d[f]);
+  if (!vars.title) vars.title = s((d as { name?: string }).name);
+  return vars;
 }
-const overlayDefaultFor = (preset: 'article' | 'catalog') => (preset === 'catalog' ? '{title} · {price}' : '{title}');
 
 // One generatable collection: for every entry decide card vs raw-override vs site-default.
 async function addCollection(
@@ -111,13 +124,13 @@ async function addCollection(
     collection: string;
     routeBase: string;
     typeKey: string;
-    preset: 'article' | 'catalog';
+    kind: OgTypeKind;
     typeEnabled: boolean;
     fallback: string; // the site-default URL (used when the type is off, no override)
-    name: string; // business name → {name}
+    name: string; // business name → the 'business' field
   },
 ) {
-  const { collection, routeBase, typeKey, preset, typeEnabled, fallback, name } = opts;
+  const { collection, routeBase, typeKey, kind, typeEnabled, fallback, name } = opts;
   for (const e of await getCollection(collection as 'posts')) {
     const d = e.data as Record<string, unknown> & { seo?: { image?: string; ogRaw?: boolean } };
     const path = normalizePath(`${routeBase}/${e.id}`);
@@ -129,7 +142,8 @@ async function addCollection(
     if (typeEnabled) {
       out.push({
         slug: slugFor(path), path, card: true, typeKey,
-        image: mainImage(d), overlayDefault: overlayDefaultFor(preset), vars: itemVars(preset, d, name),
+        image: mainImage(d), headlineDefault: HEADLINE_DEFAULT[kind], sublineDefault: SUBLINE_DEFAULT[kind],
+        vars: itemVars(kind, d, name),
       });
     } else {
       // Type off, no override → the site default (resolved concretely so Head needn't guess).
@@ -154,17 +168,17 @@ async function enumerate(cfg: OgConfig): Promise<OgPage[]> {
   // hero photo (siteDefault then resolves to /og/default.png). Emitted once, site-wide.
   const fallback = await siteDefault(settings);
   if (fallback === '/og/default.png') {
-    out.push({ slug: 'default.png', path: null, card: true, typeKey: '', vars: { name, title: name } });
+    out.push({ slug: 'default.png', path: null, card: true, typeKey: '', vars: { business: name, title: name } });
   }
 
   if (features.areas) {
-    await addCollection(out, { collection: 'towns', routeBase: routes.towns || '/areas', typeKey: 'towns', preset: 'article', typeEnabled: !!types.towns?.enabled, fallback, name });
+    await addCollection(out, { collection: 'towns', routeBase: routes.towns || '/areas', typeKey: 'towns', kind: 'towns', typeEnabled: !!types.towns?.enabled, fallback, name });
   }
   if (features.services) {
-    await addCollection(out, { collection: 'services', routeBase: routes.services || '/services', typeKey: 'services', preset: 'article', typeEnabled: !!types.services?.enabled, fallback, name });
+    await addCollection(out, { collection: 'services', routeBase: routes.services || '/services', typeKey: 'services', kind: 'services', typeEnabled: !!types.services?.enabled, fallback, name });
   }
   for (const l of effectiveListings(cfg)) {
-    await addCollection(out, { collection: l.id, routeBase: l.route, typeKey: l.id, preset: l.preset, typeEnabled: !!types[l.id]?.enabled, fallback, name });
+    await addCollection(out, { collection: l.id, routeBase: l.route, typeKey: l.id, kind: l.preset, typeEnabled: !!types[l.id]?.enabled, fallback, name });
   }
   return out;
 }

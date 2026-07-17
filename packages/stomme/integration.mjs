@@ -65,7 +65,7 @@ function previewEntrypoint(isStatic, scriptHashes = []) {
 export const prerender = ${isStatic ? 'true' : 'false'};
 import Base from '@stomme/base';
 import { Image } from 'astro:assets';
-import { site, features } from '@stomme/config';
+import { site, features, listings } from '@stomme/config';
 import { getCollection, getEntry } from 'astro:content';
 import { resolveSite } from '@gronare/stomme/config';
 import { resolveLink } from '@gronare/stomme/href';
@@ -187,7 +187,7 @@ const idLabel = 'font-family:ui-monospace,Menlo,monospace;font-size:.62rem;lette
 // draft settings, so every image resolves on-site (no getAsset / broken img in the iframe).
 // Site default = ogImage → home-hero image → a brand-colour card with the business name.
 // When the master is on and a type is enabled, also show an example generated card built
-// from that type's overlayText/style/scrim/showLogo/tagline/accent + a sample title.
+// from that type's headlineField/sublineField/style/scrim/showLogo/accent + a sample item.
 const shareDraft = kind === 'sharecards' && draft && typeof draft === 'object' ? draft : null;
 const scName = (shareDraft && shareDraft.name) || 'Your business';
 const scOgImage = idAsset(shareDraft && shareDraft.ogImage);
@@ -208,19 +208,20 @@ if (shareDraft && scOg.enabled) {
   const key = Object.keys(scTypes).find((k) => scTypes[k] && scTypes[k].enabled);
   if (key) {
     const t = scTypes[key] || {};
-    const tpl = (t.overlayText && String(t.overlayText).trim()) || '{title}';
-    const overlay = tpl
-      .split('{title}').join('Example item')
-      .split('{price}').join('12 000 kr')
-      .split('{category}').join('Kategori')
-      .split('{status}').join('Tillgänglig')
-      .split('{date}').join('2026-07-15')
-      .split('{excerpt}').join('En kort beskrivning.')
-      .split('{name}').join(scName)
-      .replace(/\\{[^}]+\\}/g, '')
-      .replace(/\\s+/g, ' ')
-      .replace(/^[\\s·•|,:.-]+|[\\s·•|,:.-]+$/g, '')
-      .trim() || scName;
+    // Resolve the type's headline/second-line FIELD picks against a sample item of the
+    // matching kind (mirrors routes/og.ts: 'business' = site name, 'none' = off).
+    const scKind = key === 'towns' ? 'towns' : key === 'services' ? 'services'
+      : (((listings || []).find((l) => l.id === key) || {}).preset === 'catalog' ? 'catalog' : 'article');
+    const scSamples = {
+      article: { title: 'A headline from the item', date: '2026-07-15', excerpt: 'A short excerpt from the item.' },
+      catalog: { title: 'Example item', price: '12 000 kr', status: 'Available', category: 'Category', date: '2026-07-15' },
+      towns: { name: 'Sampletown', title: 'Sampletown', heroSubtitle: 'A local line from the item' },
+      services: { title: 'A service title', navLabel: 'Service', summary: 'A short summary from the item.' },
+    };
+    const scSample = scSamples[scKind];
+    const scPick = (k) => (!k || k === 'none' ? '' : k === 'business' ? scName : (scSample[k] || ''));
+    const overlay = scPick(t.headlineField || (scKind === 'towns' ? 'name' : 'title')) || scSample.title || scName;
+    const subline = scPick(t.sublineField || (scKind === 'catalog' ? 'price' : 'none'));
     const alpha = Math.min(100, Math.max(0, typeof t.scrim === 'number' ? t.scrim : 55)) / 100;
     const style = t.style || 'editorial';
     const scrim = style === 'bold'
@@ -230,7 +231,7 @@ if (shareDraft && scOg.enabled) {
       : 'linear-gradient(to top, rgba(12,14,19,' + alpha.toFixed(3) + ') 0%, rgba(12,14,19,' + (alpha * 0.85).toFixed(3) + ') 30%, rgba(12,14,19,0) 66%)';
     scExample = {
       overlay,
-      tagline: t.tagline || '',
+      tagline: subline,
       showLogo: t.showLogo !== false,
       accent: t.accent || scBrand,
       scrim,
@@ -334,10 +335,10 @@ if (shareDraft && scOg.enabled) {
             {scExample.tagline && <div style={'margin-top:12px;font-size:.95rem;color:rgba(255,255,255,.85);text-align:' + scExample.textAlign}>{scExample.tagline}</div>}
           </div>
         </div>
-        <p style="margin-top:8px;color:#6b7280;font-size:.8rem">Exempel — det riktiga kortet byggs av objektets egen bild.</p>
+        <p style="margin-top:8px;color:#6b7280;font-size:.8rem">Example — the real card is built from each item's own photo.</p>
         </>
       ) : (
-        <p style="color:#6b7280;font-size:.9rem;margin:0">Delningskort av — sidor delar standardbilden ovan.</p>
+        <p style="color:#6b7280;font-size:.9rem;margin:0">Cards are off — pages share the site default image above.</p>
       )}
     </div>
   </div></Base>

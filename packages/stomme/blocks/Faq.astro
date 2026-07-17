@@ -1,7 +1,7 @@
 ---
 import { getCollection, getEntry } from 'astro:content';
 import Icon from '../src/Icon.astro';
-import { resolveLink } from '../src/href';
+import { resolveButton } from '../src/href';
 import ContactLink from '../ContactLink.astro';
 
 // Collection-backed: Q&A from the `faq` collection; chrome + the contact aside
@@ -23,6 +23,8 @@ interface Props {
   tag?: string; // …or filter by an entry tag (a service slug, a town, any label)
   asideHeading?: string;
   asideBody?: string;
+  asideCta?: { label?: string; link?: unknown };
+  // Legacy flat pair (pre-group content) — still rendered via resolveButton fallback.
   asideCtaLabel?: string;
   asideHref?: unknown;
   asideCtaHref?: unknown; // plain-string alias accepted from content
@@ -30,7 +32,7 @@ interface Props {
   // is never queried; live pages always take the collection path.
   items?: { id: string; data: { question: string; answer: string } }[];
 }
-const { eyebrow, heading, intro, entries, tag, asideHeading, asideBody, asideCtaLabel, asideHref, asideCtaHref } = Astro.props;
+const { eyebrow, heading, intro, entries, tag, asideHeading, asideBody, asideCta, asideCtaLabel, asideHref, asideCtaHref } = Astro.props;
 const variant = Astro.props.layout?.variant ?? 'list';
 const fixture = Astro.props.items;
 const all = fixture ?? (await getCollection('faq'));
@@ -46,10 +48,12 @@ const items = Array.isArray(entries) && entries.length
       .sort((a, b) => a.data.order - b.data.order);
 const contact = ((await getEntry('contact', 'contact').catch(() => null))?.data ?? {}) as any;
 const emailFallback = contact.email ? `mailto:${contact.email}` : '/';
-const aHref = resolveLink(asideHref ?? asideCtaHref, emailFallback);
+const asideBtn = resolveButton(asideCta, asideCtaLabel, asideHref ?? asideCtaHref, emailFallback);
+const aLabel = asideBtn?.label;
+const aHref = asideBtn?.href ?? emailFallback;
 // Only the email fallback leaks an address; a custom CTA href is left as-is.
 const protectAside = !!contact.protectContact && !!contact.email && aHref === emailFallback;
-const hasAside = !!(asideHeading || asideBody || asideCtaLabel);
+const hasAside = !!(asideHeading || asideBody || aLabel);
 const n = (i: number) => String(i + 1).padStart(2, '0');
 ---
 <section class="section">
@@ -71,9 +75,9 @@ const n = (i: number) => String(i + 1).padStart(2, '0');
           <span class="ico-badge"><Icon name="headset" /></span>
           {asideHeading && <h3 class="faq-aside__h">{asideHeading}</h3>}
           {asideBody && <p class="faq-aside__body">{asideBody}</p>}
-          {asideCtaLabel && <p style="margin-top:1.25rem;margin-bottom:0">{protectAside
-            ? <ContactLink kind="mailto" class="btn" target={contact.email} label={asideCtaLabel} protect={true} />
-            : <a href={aHref} class="btn">{asideCtaLabel}</a>}</p>}
+          {aLabel && <p style="margin-top:1.25rem;margin-bottom:0">{protectAside
+            ? <ContactLink kind="mailto" class="btn" target={contact.email} label={aLabel} protect={true} />
+            : <a href={aHref} class="btn">{aLabel}</a>}</p>}
         </aside>
       )}
     </div>
@@ -98,9 +102,9 @@ const n = (i: number) => String(i + 1).padStart(2, '0');
           <span class="ico-badge"><Icon name="headset" /></span>
           {asideHeading && <h3 class="faq-aside__h">{asideHeading}</h3>}
           {asideBody && <p class="faq-aside__body">{asideBody}</p>}
-          {asideCtaLabel && <p style="margin-top:1.25rem;margin-bottom:0">{protectAside
-            ? <ContactLink kind="mailto" class="btn" target={contact.email} label={asideCtaLabel} protect={true} />
-            : <a href={aHref} class="btn">{asideCtaLabel}</a>}</p>}
+          {aLabel && <p style="margin-top:1.25rem;margin-bottom:0">{protectAside
+            ? <ContactLink kind="mailto" class="btn" target={contact.email} label={aLabel} protect={true} />
+            : <a href={aHref} class="btn">{aLabel}</a>}</p>}
         </aside>
       )}
     </div>
@@ -119,7 +123,7 @@ const n = (i: number) => String(i + 1).padStart(2, '0');
         <div class="faq-qcard faq-qcard--cta">
           {asideHeading && <h3 class="faq-qcard__q">{asideHeading}</h3>}
           {asideBody && <p class="faq-qcard__a">{asideBody}</p>}
-          {asideCtaLabel && <a href={aHref} class="btn faq-qcard__btn">{asideCtaLabel}</a>}
+          {aLabel && <a href={aHref} class="btn faq-qcard__btn">{aLabel}</a>}
         </div>
       )}
     </div>
@@ -146,7 +150,7 @@ const n = (i: number) => String(i + 1).padStart(2, '0');
         {hasAside && (
           <div class="faq-reader__cta">
             {asideBody && <span>{asideBody}</span>}
-            {asideCtaLabel && <a href={aHref} class="btn">{asideCtaLabel}</a>}
+            {aLabel && <a href={aHref} class="btn">{aLabel}</a>}
           </div>
         )}
       </div>

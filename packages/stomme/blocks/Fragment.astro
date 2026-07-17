@@ -1,6 +1,6 @@
 ---
 import Emph from '../src/Emph.astro';
-import { resolveLink } from '../src/href';
+import { resolveButton } from '../src/href';
 
 // Editorial story fragment — a big lead line, a short body and an optional quiet link,
 // placed left / right / indented so consecutive fragments drift across the page
@@ -9,13 +9,15 @@ interface Props {
   eyebrow?: string;
   statement?: string;
   body?: string;
+  cta?: { label?: string; link?: unknown };
+  // Legacy flat pair (pre-group content) — still rendered via resolveButton fallback.
   linkLabel?: string;
   link?: unknown;
   layout?: { placement?: 'left' | 'right' | 'indent' };
 }
-const { eyebrow, statement, body, linkLabel, link } = Astro.props;
+const { eyebrow, statement, body, cta, linkLabel, link } = Astro.props;
 const placement = Astro.props.layout?.placement ?? 'left';
-const href = resolveLink(link, '/');
+const btn = resolveButton(cta, linkLabel, link);
 ---
 
 {(statement || body) && (
@@ -24,7 +26,7 @@ const href = resolveLink(link, '/');
       {eyebrow && <span class="mono eyebrow fragment__eyebrow">{eyebrow}</span>}
       {statement && <p class="display fragment__statement"><Emph text={statement} /></p>}
       {body && <p class="fragment__body">{body}</p>}
-      {linkLabel && <p class="fragment__link"><a href={href} class="btn-ghost">{linkLabel} →</a></p>}
+      {btn && <p class="fragment__link"><a href={btn.href} class="btn-ghost">{btn.label} →</a></p>}
     </div>
   </section>
 )}
