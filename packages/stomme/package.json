@@ -42,7 +42,8 @@
   "scripts": {
     "gen:schema-manifest": "node bin/gen-schema-manifest.mjs",
     "test:preview-workerd": "node test/smoke-preview-workerd.mjs",
-    "test:og": "node test/smoke-og.mjs"
+    "test:og": "node test/smoke-og.mjs",
+    "test:admin-contract": "node test/admin-contract.mjs"
   },
   "bin": {
     "stomme-gen": "bin/gen-admin-blocks.mjs",
@@ -83,6 +84,9 @@
   },
   "peerDependencies": {
     "astro": ">=5"
+  },
+  "devDependencies": {
+    "playwright-core": "^1.61.1"
   },
   "license": "AGPL-3.0-only"
 }
