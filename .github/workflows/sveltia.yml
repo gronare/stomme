@@ -1,0 +1,117 @@
+# Sveltia version check / bump — nightly + on-demand from the control plane (no PRs).
+#
+#   nightly (schedule) → mode=check against the latest npm release.
+#   mode=check  → run the admin DOM contract test against a target Sveltia version
+#                 (STOMME_SVELTIA_SRC dry-run) WITHOUT changing anything. Green =
+#                 that version is safe to adopt.
+#   mode=apply  → bump the pin (SVELTIA_CMS_SRC in gen-admin-blocks.mjs) to the
+#                 target, regenerate + build + contract, and COMMIT to main only if
+#                 everything is green (never a broken main; operator then promotes
+#                 main→release). No PR.
+#
+# This is the ONLY place the contract runs — it is not part of per-PR CI, because
+# between bumps the pinned Sveltia (and thus the DOM) does not change. Both modes
+# report the outcome to the control plane over the same HMAC webhook as
+# upgrade-check.yml (report_url/report_secret secrets; skips if unset), so its
+# page can show status + notify without anyone touching GitHub.
+name: Sveltia
+
+on:
+  schedule:
+    - cron: "17 3 * * *" # nightly — check the latest release against the contract
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: check (dry-run contract) or apply (bump + commit to main)
+        type: choice
+        options: [check, apply]
+        default: check
+      version:
+        description: target version, or "latest"
+        type: string
+        default: latest
+
+concurrency: sveltia-${{ github.ref }}
+
+jobs:
+  sveltia:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # apply commits the bump to main
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+
+      - name: Resolve mode + versions
+        id: v
+        run: |
+          GEN=packages/stomme/bin/gen-admin-blocks.mjs
+          MODE="${{ inputs.mode || 'check' }}" # empty on schedule → check
+          CURRENT=$(grep -oE '@sveltia/cms@[0-9]+\.[0-9]+\.[0-9]+' "$GEN" | head -1 | sed 's/.*@//')
+          TARGET="${{ inputs.version }}"
+          if [ -z "$TARGET" ] || [ "$TARGET" = latest ]; then TARGET=$(npm view @sveltia/cms version); fi
+          echo "mode=$MODE"       >> "$GITHUB_OUTPUT"
+          echo "current=$CURRENT" >> "$GITHUB_OUTPUT"
+          echo "target=$TARGET"   >> "$GITHUB_OUTPUT"
+          echo "src=https://unpkg.com/@sveltia/cms@$TARGET/dist/sveltia-cms.js" >> "$GITHUB_OUTPUT"
+          echo "Sveltia: mode=$MODE current=$CURRENT target=$TARGET"
+
+      # apply: bump the pin FIRST so the build/contract exercise the new version.
+      - name: Bump pin (apply)
+        if: steps.v.outputs.mode == 'apply'
+        run: |
+          GEN=packages/stomme/bin/gen-admin-blocks.mjs
+          sed -i -E "s#@sveltia/cms@[0-9]+\.[0-9]+\.[0-9]+#@sveltia/cms@${{ steps.v.outputs.target }}#g" "$GEN"
+
+      # Guard the target the way a deploy would: types + build + the DOM contract.
+      # apply reads the (now-bumped) pin; check overrides via STOMME_SVELTIA_SRC.
+      - name: Verify (build + contract)
+        id: verify
+        env:
+          STOMME_SVELTIA_SRC: ${{ steps.v.outputs.mode == 'check' && steps.v.outputs.src || '' }}
+        run: |
+          set -e
+          if [ "${{ steps.v.outputs.mode }}" = apply ]; then
+            (cd starter && pnpm exec astro check)
+            (cd starter && pnpm run build) > /dev/null
+          fi
+          pnpm --filter @gronare/stomme test:admin-contract
+
+      # apply + green: regenerate the tracked starter admin so it matches the new
+      # pin, then commit both to main. Consuming sites pick up the new engine on
+      # their next publish; the operator promotes main→release from the control plane.
+      - name: Commit bump (apply, green)
+        if: steps.v.outputs.mode == 'apply'
+        run: |
+          (cd starter && pnpm run cms:gen)
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add packages/stomme/bin/gen-admin-blocks.mjs starter/public/admin
+          git commit -m "cms: bump Sveltia ${{ steps.v.outputs.current }} → ${{ steps.v.outputs.target }} (contract green)"
+          git push
+
+      - name: Report to control plane
+        if: always()
+        env:
+          REPORT_URL: ${{ secrets.report_url }}
+          SECRET: ${{ secrets.report_secret }}
+        run: |
+          [ -z "$SECRET" ] || [ -z "$REPORT_URL" ] && { echo "no report url/secret - skipping"; exit 0; }
+          CONTRACT=$([ "${{ steps.verify.outcome }}" = success ] && echo pass || echo fail)
+          APPLIED=$([ "${{ steps.v.outputs.mode }}" = apply ] && [ "$CONTRACT" = pass ] && echo true || echo false)
+          BODY=$(jq -nc --arg repo "$GITHUB_REPOSITORY" --arg mode "${{ steps.v.outputs.mode }}" \
+            --arg current "${{ steps.v.outputs.current }}" --arg target "${{ steps.v.outputs.target }}" \
+            --arg contract "$CONTRACT" --arg applied "$APPLIED" \
+            --arg run_url "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" \
+            '{repo:$repo,kind:"sveltia",mode:$mode,current:$current,target:$target,contract:$contract,applied:($applied=="true"),run_url:$run_url}')
+          SIG=$(printf '%s' "$BODY" | openssl dgst -sha256 -hmac "$SECRET" | awk '{print $NF}')
+          curl -sf -X POST -H "Content-Type: application/json" \
+            -H "X-Stomme-Signature: $SIG" -d "$BODY" \
+            "$REPORT_URL" || echo "report failed (non-blocking)"

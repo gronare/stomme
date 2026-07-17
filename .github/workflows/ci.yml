@@ -52,24 +52,10 @@ jobs:
       - name: smoke /preview on workerd
         run: pnpm --filter @gronare/stomme test:preview-workerd -- --no-csp
 
-  # Sveltia DOM contract: the editor theme (THEME_CSS) + admin/editor.js target
-  # undocumented Sveltia internals, so a pin bump can break the editor with no
-  # build error. Render the generated admin headlessly (test-repo backend, the
-  # runner's Chrome) and assert every selector/ARIA contract the CSS/JS rely on
-  # — this is the gate on a Sveltia-version-bump PR.
-  admin-contract:
-    name: admin DOM contract (Sveltia)
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7
-      - uses: pnpm/action-setup@v6
-      - uses: actions/setup-node@v6
-        with:
-          node-version: 24
-          cache: pnpm
-      - run: pnpm install --frozen-lockfile
-      - name: admin contract (headless Chrome)
-        run: pnpm --filter @gronare/stomme test:admin-contract
+  # NB: the Sveltia DOM contract test (test:admin-contract) is deliberately NOT a
+  # per-PR job — between version bumps the pinned Sveltia (and its DOM) doesn't
+  # change, so it would be redundant every run. It runs in sveltia.yml instead:
+  # nightly against the latest release, and on every apply (bump) before commit.
 
   # Catch syntax errors in the engine's plain-JS scripts (bins, integration,
   # the Decap previews module) — none of these go through astro check.
