@@ -1,9 +1,10 @@
 # Fleet upgrade check — reusable workflow called from site repos (weekly cron +
 # manual dispatch). Baseline-less A/B in the SAME runner: build the site's
 # lookbook with the pinned engine SHA and with the latest release, render both
-# to page images and hash-compare. Identical ⇒ the pin is bumped automatically
-# (editor builds pick up the new engine on their next publish). Different ⇒
-# side-by-side artifacts + a red run awaiting operator approval.
+# to page images and hash-compare. This workflow only REPORTS the outcome to the
+# control plane (which owns the pin under the "abolish followers" model and adopts
+# the release SHA on a green report). Different ⇒ side-by-side artifacts +
+# a red run awaiting operator approval.
 #
 # Freeze-on-diff: a site that follows `release` (no SHA pin) is normally a no-op
 # here, but if the caller passes an explicit A/B range (ab_from/ab_to) the two
@@ -273,27 +274,12 @@ jobs:
           done
           echo "diffpages=${diffpages# }" >> "$GITHUB_OUTPUT"
 
-      # Only a SHA-pinned site has a local pin to bump. In freeze-on-diff ab_mode
-      # (a follows-release site A/B'ing a release transition) there is no pin here
-      # — the control plane pins the site itself — so this step is skipped.
-      # Green A/B ⇒ no unresolved diff, so a pinned site RETURNS TO FOLLOWING
-      # release — pins exist only for an open diff or handover ("born-following,
-      # pin on diff"). Writing `release` (not a SHA) unfreezes it; the control
-      # plane is told follows_release. Skipped in ab_mode (a follows-release site
-      # has no local pin here) and for handover (its status is follows_release,
-      # never 'check', so this never runs).
-      - name: Follow release again (identical render)
-        if: steps.pin.outputs.status == 'check' && steps.render.outputs.diffpages == '' && steps.pin.outputs.ab_mode != '1'
-        id: bump
-        working-directory: site
-        run: |
-          PIN="${{ steps.pin.outputs.pin }}"
-          echo "release" > .stomme-engine
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add .stomme-engine
-          git commit -m "upgrade-check: follow release again (green A/B, was $PIN)"
-          git push
+      # NB: the workflow no longer writes .stomme-engine on a green A/B. Under the
+      # control plane's "abolish followers" model the pin is owned SOLELY by the control
+      # plane (it pins the exact release SHA + deploys on the follows_release/up_to_date
+      # report). A workflow-side `echo release > .stomme-engine` would reintroduce an
+      # ungated follower and race the control plane's Contents-API write — so green just
+      # REPORTS (the report step below sets status=follows_release for an identical render).
 
       - name: Collect diff artifacts
         if: steps.pin.outputs.status == 'check' && steps.render.outputs.diffpages != ''
