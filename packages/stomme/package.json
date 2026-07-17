@@ -41,6 +41,7 @@
   },
   "scripts": {
     "gen:schema-manifest": "node bin/gen-schema-manifest.mjs",
+    "gen:blocks-manifest": "node bin/gen-blocks-manifest.mjs",
     "test:preview-workerd": "node test/smoke-preview-workerd.mjs",
     "test:og": "node test/smoke-og.mjs",
     "test:admin-contract": "node test/admin-contract.mjs"
@@ -48,6 +49,7 @@
   "bin": {
     "stomme-gen": "bin/gen-admin-blocks.mjs",
     "stomme-gen-schema": "bin/gen-schema-manifest.mjs",
+    "stomme-gen-blocks": "bin/gen-blocks-manifest.mjs",
     "stomme-new-block": "bin/new-block.mjs",
     "stomme-lint-styles": "bin/lint-styles.mjs"
   },
@@ -61,6 +63,7 @@
     "catalog.ts",
     "collections.ts",
     "schema-manifest.json",
+    "blocks-manifest.json",
     "integration.mjs",
     "integration.d.ts",
     "DirectContact.astro",
