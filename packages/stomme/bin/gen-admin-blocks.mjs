@@ -511,7 +511,7 @@ ${emitWidget(8)}`,
   slug: "{{slug}}"
   fields:
     - { name: title, label: "Title", widget: string }
-    - { name: published, label: "Published (uncheck to hide this page from the site)", widget: boolean, default: true, required: false }
+    - { name: published, label: "Published", widget: boolean, default: true, required: false, hint: "Uncheck to hide the page — unpublished pages aren't built." }
     - name: seo
       label: "SEO"
       widget: object
