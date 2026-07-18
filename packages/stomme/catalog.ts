@@ -574,6 +574,7 @@ const RAW_BLOCKS: BlockDef[] = [
     shape: 'stats',
     fields: [
       { name: 'items', label: 'Facts (label + value)', widget: 'list', required: false, collapsed: true, label_singular: 'Fact', summary: '{{fields.label}} {{fields.value}}', fields: [{ name: 'label', label: 'Label', widget: 'string' }, { name: 'value', label: 'Value', widget: 'string' }] },
+      styleGroup([surfaceField]),
     ],
   },
   {
