@@ -40,7 +40,7 @@ const outPath = resolve(pkgRoot, 'blocks-manifest.json');
 // a single-field list (list-with-field) descends into `field`. Everything else is a leaf.
 // Keeps only what the control plane needs to diff frontmatter; UI-only keys (label, hint,
 // summary, collapsed, label_singular, default) are dropped.
-function walk(f) {
+export function walk(f) {
   const node = { name: f.name, widget: f.widget };
   // Drift-required = required AND no default. A field with a `default` can never be
   // "missing" at render (the default fills it), so it must not warn when absent — even
@@ -60,6 +60,23 @@ function walk(f) {
   return node;
 }
 
+// Project a list of BlockDefs into the manifest's `{ blocks: { <type>: entry } }` shape.
+// The single source of the field-node contract — reused by the per-site custom-delta
+// emitter in gen-admin-blocks.mjs so a site manifest and the engine manifest project a
+// block identically (identical projection == not a custom override).
+export function blocksToManifest(blockDefs) {
+  const blocks = {};
+  for (const b of [...blockDefs].sort((a, z) => a.type.localeCompare(z.type))) {
+    const entry = { label: b.label };
+    if (b.group) entry.group = b.group;
+    if (b.shape) entry.shape = b.shape;
+    if (b.collection) entry.collection = b.collection;
+    entry.fields = Array.isArray(b.fields) ? b.fields.map(walk) : [];
+    blocks[b.type] = entry;
+  }
+  return { blocks };
+}
+
 export async function generate({ write = true } = {}) {
   // catalog.ts → ./src/kit.ts import nothing virtual (unlike collections.ts, which imports
   // astro:content), so a plain jiti import works — no astro:content stub needed.
@@ -72,17 +89,7 @@ export async function generate({ write = true } = {}) {
 
   // The WHOLE engine catalog, every block type — a manifest describes what the engine
   // offers, not what any one site enables (contrast AVAILABLE_BLOCKS in gen-admin-blocks).
-  const blocks = {};
-  for (const b of [...catalog].sort((a, z) => a.type.localeCompare(z.type))) {
-    const entry = { label: b.label };
-    if (b.group) entry.group = b.group;
-    if (b.shape) entry.shape = b.shape;
-    if (b.collection) entry.collection = b.collection;
-    entry.fields = Array.isArray(b.fields) ? b.fields.map(walk) : [];
-    blocks[b.type] = entry;
-  }
-
-  const manifest = { blocks };
+  const manifest = blocksToManifest(catalog);
   if (write) writeFileSync(outPath, JSON.stringify(manifest, null, 2) + '\n');
   return manifest;
 }

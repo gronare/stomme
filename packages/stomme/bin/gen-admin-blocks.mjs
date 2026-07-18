@@ -1552,6 +1552,36 @@ if (!here.includes('node_modules')) {
   }
 }
 
+// Per-site CUSTOM-DELTA manifest → public/admin/blocks-manifest.json. NOTE: same filename
+// as the engine's own blocks-manifest.json, but this one holds only the SITE's custom
+// subset — block types this site adds or SHADOWS over the engine defaults, projected
+// through the SAME contract (blocksToManifest) the engine manifest uses. The control plane
+// merges this over the engine manifest so custom blocks get real field-level validation
+// instead of drift noise; an empty delta emits { "blocks": {} } (degrades to engine-only).
+// Unguarded on purpose: unlike the engine-manifest refresh above (which skips outside the
+// engine source), this must run wherever stomme is INSTALLED IN A SITE (node_modules or a
+// workspace link — cwd = site root, BLOCKS = the site's catalog).
+try {
+  const { blocksToManifest } = await import('./gen-blocks-manifest.mjs');
+  const { defaultBlocks } = await jiti.import('@gronare/stomme/catalog');
+  const engineManifest = blocksToManifest(defaultBlocks).blocks;
+  const engineTypes = new Set(defaultBlocks.map((d) => d.type));
+  // Custom = a new block type (absent from engine) OR a same-type SHADOW whose field
+  // projection differs from the engine entry (e.g. an extra field or a widened option set).
+  const delta = BLOCKS.filter((b) => {
+    if (!engineTypes.has(b.type)) return true;
+    return JSON.stringify(blocksToManifest([b]).blocks[b.type]) !== JSON.stringify(engineManifest[b.type]);
+  });
+  const manifest = blocksToManifest(delta);
+  const outPath = resolve(root, 'public/admin/blocks-manifest.json');
+  mkdirSync(dirname(outPath), { recursive: true });
+  writeFileSync(outPath, JSON.stringify(manifest, null, 2) + '\n');
+  const names = Object.keys(manifest.blocks);
+  console.log(`  ↳ custom blocks-manifest.json: ${names.length ? names.join(', ') : '(none — engine defaults only)'}`);
+} catch (e) {
+  console.warn('  (custom blocks-manifest skipped:', e.message + ')');
+}
+
 console.log(`✓ stomme-gen: ${Object.entries(counts).map(([k, v]) => `${k}×${v}`).join(', ')} · ${AVAILABLE_BLOCKS.length} block types · ${PAGE_OPTIONS.length} link options`);
 if (counts.collections) {
   const editors = Object.keys(COLLECTION_EDITORS).filter(collectionEnabled);
