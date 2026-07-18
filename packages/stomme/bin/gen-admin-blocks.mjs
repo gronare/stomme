@@ -1580,6 +1580,15 @@ try {
   console.log(`  ↳ custom blocks-manifest.json: ${names.length ? names.join(', ') : '(none — engine defaults only)'}`);
 } catch (e) {
   console.warn('  (custom blocks-manifest skipped:', e.message + ')');
+  // Fail safe: never leave a STALE delta from a previous build. The control plane merges
+  // this file site-wins over the engine manifest, so a stale entry could MASK real drift on
+  // a block this site no longer shadows. Degrade to engine-only ({ "blocks": {} }) — the
+  // worst case is a custom block showing as drift noise again, never a silently masked one.
+  try {
+    const outPath = resolve(root, 'public/admin/blocks-manifest.json');
+    mkdirSync(dirname(outPath), { recursive: true });
+    writeFileSync(outPath, JSON.stringify({ blocks: {} }, null, 2) + '\n');
+  } catch {}
 }
 
 console.log(`✓ stomme-gen: ${Object.entries(counts).map(([k, v]) => `${k}×${v}`).join(', ')} · ${AVAILABLE_BLOCKS.length} block types · ${PAGE_OPTIONS.length} link options`);
