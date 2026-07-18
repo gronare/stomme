@@ -47,6 +47,15 @@
       "blocks": ["statsBar"],
       "field": "surface",
       "to": "style.surface"
+    },
+    {
+      "kind": "button-group",
+      "note": "featureGrid card link: the legacy linkLabel/link pair on each item folds into the item's cta group (component reads it.cta ?? the legacy pair). `in` = the list field whose items carry the pair.",
+      "blocks": ["featureGrid"],
+      "in": "items",
+      "label": "linkLabel",
+      "href": "link",
+      "to": "cta"
     }
   ]
 }
