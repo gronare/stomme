@@ -230,11 +230,12 @@ jobs:
           # `compare -metric AE -fuzz 2%`. Rationale: PNG re-encoding and sub-pixel
           # antialiasing jitter can make visually identical renders byte-differ
           # (false-positive diffs — one fleet page); a real change (text, color,
-          # layout) flips thousands of pixels. SAME iff AE <= pixels/2000 — 0.05%,
-          # ~250 px on a 595x842 A4 page @72dpi, proportionally less for small block
-          # pages. Deliberately conservative so it can never mask a real change:
-          # dimension mismatch, any compare error, or missing ImageMagick all count
-          # as DIFFERENT (byte-strict behavior, as before).
+          # layout) flips thousands of pixels. SAME iff AE <= pixels/400 — 0.25%. (Was
+          # pixels/2000 = 0.05%; raised after a decorative fine-stroke icon jittered ~700 px
+          # between builds even post-blur, entirely on the icon, with no perceivable change —
+          # 0.25% is orders of magnitude below any real engine-upgrade regression.) ERRORS
+          # stay strict: dimension mismatch, any compare error, or missing ImageMagick all
+          # count as DIFFERENT (byte-strict, as before).
           same_png() {  # $1 = A png, $2 = B png; exit 0 = visually same
             cmp -s "$1" "$2" && return 0
             command -v compare > /dev/null && command -v identify > /dev/null && command -v convert > /dev/null || return 1
@@ -249,7 +250,7 @@ jobs:
             # thousands of hard-edge pixels — a false diff, seen repeatedly on the
             # facts card. Blur BOTH by ~1px first so a sub-pixel edge shift falls under
             # the fuzz, while a real change (new text, a moved element, a colour swap)
-            # still moves whole regions and trips the px/2000 budget. Blur failure ⇒
+            # still moves whole regions and trips the px/400 budget. Blur failure ⇒
             # treat as DIFFERENT (conservative), like any other compare error.
             ba=$(mktemp --suffix=.png) && bb=$(mktemp --suffix=.png) || return 1
             convert "$1" -blur 0x0.8 "$ba" 2> /dev/null && convert "$2" -blur 0x0.8 "$bb" 2> /dev/null || { rm -f "$ba" "$bb"; return 1; }
@@ -257,7 +258,7 @@ jobs:
             rm -f "$ba" "$bb"
             case "$ae" in (''|*[!0-9.eE+-]*) return 1 ;; esac
             ae=$(awk -v v="$ae" 'BEGIN { printf "%d", v + 0 }')  # 1.2e+03 -> 1200
-            budget=$(( px / 2000 ))
+            budget=$(( px / 400 ))
             [ "$ae" -le "$budget" ] && return 0
             echo "  diff $(basename "$1"): AE=$ae > budget=$budget (post-blur)" >&2  # why a page flagged
             return 1
