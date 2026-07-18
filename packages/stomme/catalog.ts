@@ -306,6 +306,10 @@ const RAW_BLOCKS: BlockDef[] = [
     fields: [
       ...headingFields,
       mediaGroup('The two photos being compared.', [imageField('before', 'Before image'), imageField('after', 'After image')]),
+      // Alt text for the two images (the component reads these, falling back to a tag) —
+      // declared so they are editable and don't read as unknown-field drift.
+      { name: 'beforeAlt', label: 'Before · alt text', widget: 'string', required: false, hint: 'Describe the before image (accessibility). Falls back to a label.' },
+      { name: 'afterAlt', label: 'After · alt text', widget: 'string', required: false, hint: 'Describe the after image.' },
       styleGroup([surfaceField]),
     ],
   },
@@ -487,8 +491,11 @@ const RAW_BLOCKS: BlockDef[] = [
     shape: 'list',
     fields: [
       ...headingFields,
-      { name: 'source', label: 'source', widget: 'hidden' },
-      { name: 'base', label: 'base', widget: 'hidden' },
+      // Hidden, auto-set from the listing config; the component defaults them when absent, so
+      // they are optional — required:false keeps a manually-added block (no listing) from
+      // reading as missing-required drift.
+      { name: 'source', label: 'source', widget: 'hidden', required: false },
+      { name: 'base', label: 'base', widget: 'hidden', required: false },
       mediaGroup('Cover images on the cards.', [
         { name: 'showImages', label: 'Image previews', widget: 'boolean', required: false, default: true, hint: 'Show cover images on the cards.' },
       ]),
@@ -507,8 +514,11 @@ const RAW_BLOCKS: BlockDef[] = [
     shape: 'grid',
     fields: [
       ...headingFields,
-      { name: 'source', label: 'source', widget: 'hidden' },
-      { name: 'base', label: 'base', widget: 'hidden' },
+      // Hidden, auto-set from the listing config; the component defaults them when absent, so
+      // they are optional — required:false keeps a manually-added block (no listing) from
+      // reading as missing-required drift.
+      { name: 'source', label: 'source', widget: 'hidden', required: false },
+      { name: 'base', label: 'base', widget: 'hidden', required: false },
       mediaGroup('Cover images on the cards.', [
         { name: 'showImages', label: 'Image previews', widget: 'boolean', required: false, default: true, hint: 'Show cover images on the cards.' },
       ]),
