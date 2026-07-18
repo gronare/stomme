@@ -1,0 +1,45 @@
+{
+  "description": "Field migrations that bring site content up to the current engine spec. Each entry describes a field whose canonical shape changed but which the engine still renders via a back-compat shim (so existing sites never break) — a site can be migrated forward when convenient. Consumed by the control plane (labels block-drift as a recognised 'migrate to X' instead of unknown-field noise) and by the bring-up-to-spec tooling (auto-applies the transform, verified pixel-identical by the A/B lookbook). Add an entry whenever a field's canonical shape changes and a shim keeps the old one rendering.",
+  "migrations": [
+    {
+      "kind": "button-group",
+      "note": "Flat label/href pair folded into the cta { label, link:{url} } group (resolveButton back-compat).",
+      "blocks": ["ctaBox", "ctaPanel"],
+      "label": "label",
+      "href": "href",
+      "to": "cta"
+    },
+    {
+      "kind": "button-group",
+      "note": "Second flat button on ctaBox → the cta2 group.",
+      "blocks": ["ctaBox"],
+      "label": "label2",
+      "href": "href2",
+      "to": "cta2"
+    },
+    {
+      "kind": "button-group",
+      "note": "Header-style blocks used ctaLabel/ctaHref before the cta group.",
+      "blocks": ["cover", "hero", "pageHeader"],
+      "label": "ctaLabel",
+      "href": "ctaHref",
+      "to": "cta"
+    },
+    {
+      "kind": "button-group",
+      "note": "Second header button.",
+      "blocks": ["cover", "hero"],
+      "label": "cta2Label",
+      "href": "cta2Href",
+      "to": "cta2"
+    },
+    {
+      "kind": "button-group",
+      "note": "FAQ aside button; the href arrived as either asideHref or asideCtaHref.",
+      "blocks": ["faq"],
+      "label": "asideCtaLabel",
+      "href": ["asideHref", "asideCtaHref"],
+      "to": "asideCta"
+    }
+  ]
+}
