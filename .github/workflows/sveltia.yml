@@ -103,8 +103,20 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add packages/stomme/bin/gen-admin-blocks.mjs starter/public/admin
+          # Nothing staged ⇒ the pin was already at target. Report that distinctly
+          # (already=true) so the control plane doesn't confuse it with a real commit/push
+          # failure (a rejected push must NOT read as "already at target"). applied stays
+          # false; only a real commit+push sets applied=true (a push failure exits non-zero
+          # before that line, leaving applied unset → false).
+          if git diff --cached --quiet; then
+            echo "already=true"  >> "$GITHUB_OUTPUT"
+            echo "applied=false" >> "$GITHUB_OUTPUT"
+            echo "nothing to commit — pin already at target"
+            exit 0
+          fi
           git commit -m "cms: bump Sveltia ${{ steps.v.outputs.current }} → ${{ steps.v.outputs.target }} (contract green)"
           git push
+          echo "applied=true" >> "$GITHUB_OUTPUT"
 
       - name: Report to control plane
         if: always()
@@ -114,14 +126,17 @@ jobs:
         run: |
           [ -z "$SECRET" ] || [ -z "$REPORT_URL" ] && { echo "no report url/secret - skipping"; exit 0; }
           CONTRACT=$([ "${{ steps.verify.outcome }}" = success ] && echo pass || echo fail)
-          # applied reflects the COMMIT outcome, not just a green verify — a failed push
-          # (non-fast-forward, etc.) must never report as "committad till main".
-          APPLIED=$([ "${{ steps.commit.outcome }}" = success ] && echo true || echo false)
+          # applied/already come from the commit step's EXPLICIT outputs, not its outcome:
+          # a "nothing to commit" exits 0 (already=true, applied=false) and a rejected push
+          # exits non-zero (both unset → false) — so a failed push reports applied=false,
+          # already=false and the control plane can tell it apart from "already at target".
+          APPLIED="${{ steps.commit.outputs.applied }}"; APPLIED="${APPLIED:-false}"
+          ALREADY="${{ steps.commit.outputs.already }}"; ALREADY="${ALREADY:-false}"
           BODY=$(jq -nc --arg repo "$GITHUB_REPOSITORY" --arg mode "${{ steps.v.outputs.mode }}" \
             --arg current "${{ steps.v.outputs.current }}" --arg target "${{ steps.v.outputs.target }}" \
-            --arg contract "$CONTRACT" --arg applied "$APPLIED" \
+            --arg contract "$CONTRACT" --arg applied "$APPLIED" --arg already "$ALREADY" \
             --arg run_url "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" \
-            '{repo:$repo,kind:"sveltia",mode:$mode,current:$current,target:$target,contract:$contract,applied:($applied=="true"),run_url:$run_url}')
+            '{repo:$repo,kind:"sveltia",mode:$mode,current:$current,target:$target,contract:$contract,applied:($applied=="true"),already:($already=="true"),run_url:$run_url}')
           SIG=$(printf '%s' "$BODY" | openssl dgst -sha256 -hmac "$SECRET" | awk '{print $NF}')
           curl -sf -X POST -H "Content-Type: application/json" \
             -H "X-Stomme-Signature: $SIG" -d "$BODY" \
