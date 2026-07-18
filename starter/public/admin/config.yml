@@ -14,6 +14,7 @@ media_libraries:
       raster_image: { format: webp, quality: 82, width: 2048, height: 2048 }
       svg: { optimize: true }
 collections:
+  # >>> collections:generated (run: pnpm cms:gen — do not edit between markers)
   - name: home
     media_folder: "/public/media/home"
     public_folder: "/media/home"
@@ -23,7 +24,13 @@ collections:
         label: "Home"
         file: "src/content/home/home.md"
         fields:
-          # >>> blocks:generated (run: pnpm cms:gen — do not edit between markers)
+          - name: seo
+            label: "SEO"
+            widget: object
+            collapsed: true
+            fields:
+              - { name: title, label: "SEO title", widget: string }
+              - { name: description, label: "SEO description", widget: text }
           - name: blocks
             label: "Sections · build the page (drag to reorder)"
             label_singular: "Section"
@@ -131,19 +138,60 @@ collections:
                             required: false
                             hint: "Optional icon."
                             options:
+                              - { label: "check", value: "check" }
+                              - { label: "star", value: "star" }
+                              - { label: "heart", value: "heart" }
+                              - { label: "spark", value: "spark" }
+                              - { label: "sparkles", value: "sparkles" }
+                              - { label: "arrow", value: "arrow" }
+                              - { label: "search", value: "search" }
+                              - { label: "clock", value: "clock" }
+                              - { label: "calendar", value: "calendar" }
+                              - { label: "pin", value: "pin" }
+                              - { label: "map", value: "map" }
+                              - { label: "users", value: "users" }
+                              - { label: "chat", value: "chat" }
+                              - { label: "bulb", value: "bulb" }
+                              - { label: "chart", value: "chart" }
+                              - { label: "gauge", value: "gauge" }
+                              - { label: "award", value: "award" }
+                              - { label: "shield", value: "shield" }
+                              - { label: "tag", value: "tag" }
+                              - { label: "percent", value: "percent" }
+                              - { label: "coins", value: "coins" }
+                              - { label: "document", value: "document" }
+                              - { label: "gear", value: "gear" }
+                              - { label: "refresh", value: "refresh" }
+                              - { label: "link", value: "link" }
+                              - { label: "globe", value: "globe" }
+                              - { label: "wifi", value: "wifi" }
+                              - { label: "phone", value: "phone" }
+                              - { label: "mail", value: "mail" }
+                              - { label: "headset", value: "headset" }
+                              - { label: "home", value: "home" }
+                              - { label: "roof", value: "roof" }
+                              - { label: "key", value: "key" }
+                              - { label: "truck", value: "truck" }
+                              - { label: "tree", value: "tree" }
+                              - { label: "wrench", value: "wrench" }
+                              - { label: "hammer", value: "hammer" }
+                              - { label: "ruler", value: "ruler" }
+                              - { label: "paint", value: "paint" }
+                              - { label: "plug", value: "plug" }
+                              - { label: "bolt", value: "bolt" }
                               - { label: "sun", value: "sun" }
                               - { label: "panel", value: "panel" }
                               - { label: "battery", value: "battery" }
-                              - { label: "home", value: "home" }
-                              - { label: "roof", value: "roof" }
                               - { label: "leaf", value: "leaf" }
-                              - { label: "bolt", value: "bolt" }
-                              - { label: "shield", value: "shield" }
-                              - { label: "wrench", value: "wrench" }
-                              - { label: "headset", value: "headset" }
-                              - { label: "link", value: "link" }
-                              - { label: "phone", value: "phone" }
-                              - { label: "mail", value: "mail" }
+                              - { label: "flame", value: "flame" }
+                              - { label: "snowflake", value: "snowflake" }
+                              - { label: "thermometer", value: "thermometer" }
+                              - { label: "droplet", value: "droplet" }
+                              - { label: "wind", value: "wind" }
+                              - { label: "spray", value: "spray" }
+                              - { label: "drone", value: "drone" }
+                              - { label: "camera", value: "camera" }
+                              - { label: "compass", value: "compass" }
                           - { name: title, label: "Title", widget: string }
                           - { name: body, label: "Text", widget: string, required: false }
                   - name: layout
@@ -602,19 +650,60 @@ collections:
                         required: false
                         hint: "Optional icon."
                         options:
+                          - { label: "check", value: "check" }
+                          - { label: "star", value: "star" }
+                          - { label: "heart", value: "heart" }
+                          - { label: "spark", value: "spark" }
+                          - { label: "sparkles", value: "sparkles" }
+                          - { label: "arrow", value: "arrow" }
+                          - { label: "search", value: "search" }
+                          - { label: "clock", value: "clock" }
+                          - { label: "calendar", value: "calendar" }
+                          - { label: "pin", value: "pin" }
+                          - { label: "map", value: "map" }
+                          - { label: "users", value: "users" }
+                          - { label: "chat", value: "chat" }
+                          - { label: "bulb", value: "bulb" }
+                          - { label: "chart", value: "chart" }
+                          - { label: "gauge", value: "gauge" }
+                          - { label: "award", value: "award" }
+                          - { label: "shield", value: "shield" }
+                          - { label: "tag", value: "tag" }
+                          - { label: "percent", value: "percent" }
+                          - { label: "coins", value: "coins" }
+                          - { label: "document", value: "document" }
+                          - { label: "gear", value: "gear" }
+                          - { label: "refresh", value: "refresh" }
+                          - { label: "link", value: "link" }
+                          - { label: "globe", value: "globe" }
+                          - { label: "wifi", value: "wifi" }
+                          - { label: "phone", value: "phone" }
+                          - { label: "mail", value: "mail" }
+                          - { label: "headset", value: "headset" }
+                          - { label: "home", value: "home" }
+                          - { label: "roof", value: "roof" }
+                          - { label: "key", value: "key" }
+                          - { label: "truck", value: "truck" }
+                          - { label: "tree", value: "tree" }
+                          - { label: "wrench", value: "wrench" }
+                          - { label: "hammer", value: "hammer" }
+                          - { label: "ruler", value: "ruler" }
+                          - { label: "paint", value: "paint" }
+                          - { label: "plug", value: "plug" }
+                          - { label: "bolt", value: "bolt" }
                           - { label: "sun", value: "sun" }
                           - { label: "panel", value: "panel" }
                           - { label: "battery", value: "battery" }
-                          - { label: "home", value: "home" }
-                          - { label: "roof", value: "roof" }
                           - { label: "leaf", value: "leaf" }
-                          - { label: "bolt", value: "bolt" }
-                          - { label: "shield", value: "shield" }
-                          - { label: "wrench", value: "wrench" }
-                          - { label: "headset", value: "headset" }
-                          - { label: "link", value: "link" }
-                          - { label: "phone", value: "phone" }
-                          - { label: "mail", value: "mail" }
+                          - { label: "flame", value: "flame" }
+                          - { label: "snowflake", value: "snowflake" }
+                          - { label: "thermometer", value: "thermometer" }
+                          - { label: "droplet", value: "droplet" }
+                          - { label: "wind", value: "wind" }
+                          - { label: "spray", value: "spray" }
+                          - { label: "drone", value: "drone" }
+                          - { label: "camera", value: "camera" }
+                          - { label: "compass", value: "compass" }
                       - { name: title, label: "Title", widget: string }
                       - { name: body, label: "Text", widget: text }
                       - { name: tag, label: "Tag (footer label)", widget: string, required: false, hint: "Small uppercase label at the card foot, e.g. a method term." }
@@ -974,6 +1063,8 @@ collections:
                     fields:
                       - { name: before, label: "Before image", widget: image, required: false }
                       - { name: after, label: "After image", widget: image, required: false }
+                  - { name: beforeAlt, label: "Before · alt text", widget: string, required: false, hint: "Describe the before image (accessibility). Falls back to a label." }
+                  - { name: afterAlt, label: "After · alt text", widget: string, required: false, hint: "Describe the after image." }
                   - name: style
                     label: "Appearance"
                     widget: object
@@ -1171,6 +1262,24 @@ collections:
                     fields:
                       - { name: label, label: "Label", widget: string }
                       - { name: value, label: "Value", widget: string }
+                  - name: style
+                    label: "Appearance"
+                    widget: object
+                    collapsed: true
+                    hint: "Background and accent colour — set once when the page is designed."
+                    fields:
+                      - name: surface
+                        label: "Background"
+                        widget: select
+                        required: false
+                        default: "standard"
+                        hint: "The surface behind the section — for rhythm between blocks."
+                        options:
+                          - { label: "Standard (white)", value: "standard" }
+                          - { label: "Tinted", value: "tint" }
+                          - { label: "Accent band", value: "band" }
+                          - { label: "Dark", value: "dark" }
+                          - { label: "Gradient", value: "gradient" }
               - name: logoStrip
                 label: "Logo strip"
                 widget: object
@@ -1436,14 +1545,6 @@ collections:
                 fields:
                   - { name: heading, label: "Heading", widget: string, required: false, default: "Find us" }
                   - { name: showHours, label: "Show opening hours", widget: boolean, required: false, default: true }
-          # <<< blocks:generated
-          - label: "SEO"
-            name: seo
-            widget: object
-            collapsed: true
-            fields:
-              - { name: title, label: "SEO title", widget: string }
-              - { name: description, label: "SEO description", widget: text }
   - name: pages
     media_folder: "/public/media/pages/{{slug}}"
     public_folder: "/media/pages/{{slug}}"
@@ -1455,7 +1556,13 @@ collections:
     fields:
       - { name: title, label: "Title", widget: string }
       - { name: published, label: "Published (uncheck to hide this page from the site)", widget: boolean, default: true, required: false }
-      # >>> blocks:generated (run: pnpm cms:gen — do not edit between markers)
+      - name: seo
+        label: "SEO"
+        widget: object
+        collapsed: true
+        fields:
+          - { name: title, label: "SEO title", widget: string }
+          - { name: description, label: "SEO description", widget: text }
       - name: blocks
         label: "Sections · build the page (drag to reorder)"
         label_singular: "Section"
@@ -1563,19 +1670,60 @@ collections:
                         required: false
                         hint: "Optional icon."
                         options:
+                          - { label: "check", value: "check" }
+                          - { label: "star", value: "star" }
+                          - { label: "heart", value: "heart" }
+                          - { label: "spark", value: "spark" }
+                          - { label: "sparkles", value: "sparkles" }
+                          - { label: "arrow", value: "arrow" }
+                          - { label: "search", value: "search" }
+                          - { label: "clock", value: "clock" }
+                          - { label: "calendar", value: "calendar" }
+                          - { label: "pin", value: "pin" }
+                          - { label: "map", value: "map" }
+                          - { label: "users", value: "users" }
+                          - { label: "chat", value: "chat" }
+                          - { label: "bulb", value: "bulb" }
+                          - { label: "chart", value: "chart" }
+                          - { label: "gauge", value: "gauge" }
+                          - { label: "award", value: "award" }
+                          - { label: "shield", value: "shield" }
+                          - { label: "tag", value: "tag" }
+                          - { label: "percent", value: "percent" }
+                          - { label: "coins", value: "coins" }
+                          - { label: "document", value: "document" }
+                          - { label: "gear", value: "gear" }
+                          - { label: "refresh", value: "refresh" }
+                          - { label: "link", value: "link" }
+                          - { label: "globe", value: "globe" }
+                          - { label: "wifi", value: "wifi" }
+                          - { label: "phone", value: "phone" }
+                          - { label: "mail", value: "mail" }
+                          - { label: "headset", value: "headset" }
+                          - { label: "home", value: "home" }
+                          - { label: "roof", value: "roof" }
+                          - { label: "key", value: "key" }
+                          - { label: "truck", value: "truck" }
+                          - { label: "tree", value: "tree" }
+                          - { label: "wrench", value: "wrench" }
+                          - { label: "hammer", value: "hammer" }
+                          - { label: "ruler", value: "ruler" }
+                          - { label: "paint", value: "paint" }
+                          - { label: "plug", value: "plug" }
+                          - { label: "bolt", value: "bolt" }
                           - { label: "sun", value: "sun" }
                           - { label: "panel", value: "panel" }
                           - { label: "battery", value: "battery" }
-                          - { label: "home", value: "home" }
-                          - { label: "roof", value: "roof" }
                           - { label: "leaf", value: "leaf" }
-                          - { label: "bolt", value: "bolt" }
-                          - { label: "shield", value: "shield" }
-                          - { label: "wrench", value: "wrench" }
-                          - { label: "headset", value: "headset" }
-                          - { label: "link", value: "link" }
-                          - { label: "phone", value: "phone" }
-                          - { label: "mail", value: "mail" }
+                          - { label: "flame", value: "flame" }
+                          - { label: "snowflake", value: "snowflake" }
+                          - { label: "thermometer", value: "thermometer" }
+                          - { label: "droplet", value: "droplet" }
+                          - { label: "wind", value: "wind" }
+                          - { label: "spray", value: "spray" }
+                          - { label: "drone", value: "drone" }
+                          - { label: "camera", value: "camera" }
+                          - { label: "compass", value: "compass" }
                       - { name: title, label: "Title", widget: string }
                       - { name: body, label: "Text", widget: string, required: false }
               - name: layout
@@ -2034,19 +2182,60 @@ collections:
                     required: false
                     hint: "Optional icon."
                     options:
+                      - { label: "check", value: "check" }
+                      - { label: "star", value: "star" }
+                      - { label: "heart", value: "heart" }
+                      - { label: "spark", value: "spark" }
+                      - { label: "sparkles", value: "sparkles" }
+                      - { label: "arrow", value: "arrow" }
+                      - { label: "search", value: "search" }
+                      - { label: "clock", value: "clock" }
+                      - { label: "calendar", value: "calendar" }
+                      - { label: "pin", value: "pin" }
+                      - { label: "map", value: "map" }
+                      - { label: "users", value: "users" }
+                      - { label: "chat", value: "chat" }
+                      - { label: "bulb", value: "bulb" }
+                      - { label: "chart", value: "chart" }
+                      - { label: "gauge", value: "gauge" }
+                      - { label: "award", value: "award" }
+                      - { label: "shield", value: "shield" }
+                      - { label: "tag", value: "tag" }
+                      - { label: "percent", value: "percent" }
+                      - { label: "coins", value: "coins" }
+                      - { label: "document", value: "document" }
+                      - { label: "gear", value: "gear" }
+                      - { label: "refresh", value: "refresh" }
+                      - { label: "link", value: "link" }
+                      - { label: "globe", value: "globe" }
+                      - { label: "wifi", value: "wifi" }
+                      - { label: "phone", value: "phone" }
+                      - { label: "mail", value: "mail" }
+                      - { label: "headset", value: "headset" }
+                      - { label: "home", value: "home" }
+                      - { label: "roof", value: "roof" }
+                      - { label: "key", value: "key" }
+                      - { label: "truck", value: "truck" }
+                      - { label: "tree", value: "tree" }
+                      - { label: "wrench", value: "wrench" }
+                      - { label: "hammer", value: "hammer" }
+                      - { label: "ruler", value: "ruler" }
+                      - { label: "paint", value: "paint" }
+                      - { label: "plug", value: "plug" }
+                      - { label: "bolt", value: "bolt" }
                       - { label: "sun", value: "sun" }
                       - { label: "panel", value: "panel" }
                       - { label: "battery", value: "battery" }
-                      - { label: "home", value: "home" }
-                      - { label: "roof", value: "roof" }
                       - { label: "leaf", value: "leaf" }
-                      - { label: "bolt", value: "bolt" }
-                      - { label: "shield", value: "shield" }
-                      - { label: "wrench", value: "wrench" }
-                      - { label: "headset", value: "headset" }
-                      - { label: "link", value: "link" }
-                      - { label: "phone", value: "phone" }
-                      - { label: "mail", value: "mail" }
+                      - { label: "flame", value: "flame" }
+                      - { label: "snowflake", value: "snowflake" }
+                      - { label: "thermometer", value: "thermometer" }
+                      - { label: "droplet", value: "droplet" }
+                      - { label: "wind", value: "wind" }
+                      - { label: "spray", value: "spray" }
+                      - { label: "drone", value: "drone" }
+                      - { label: "camera", value: "camera" }
+                      - { label: "compass", value: "compass" }
                   - { name: title, label: "Title", widget: string }
                   - { name: body, label: "Text", widget: text }
                   - { name: tag, label: "Tag (footer label)", widget: string, required: false, hint: "Small uppercase label at the card foot, e.g. a method term." }
@@ -2406,6 +2595,8 @@ collections:
                 fields:
                   - { name: before, label: "Before image", widget: image, required: false }
                   - { name: after, label: "After image", widget: image, required: false }
+              - { name: beforeAlt, label: "Before · alt text", widget: string, required: false, hint: "Describe the before image (accessibility). Falls back to a label." }
+              - { name: afterAlt, label: "After · alt text", widget: string, required: false, hint: "Describe the after image." }
               - name: style
                 label: "Appearance"
                 widget: object
@@ -2603,6 +2794,24 @@ collections:
                 fields:
                   - { name: label, label: "Label", widget: string }
                   - { name: value, label: "Value", widget: string }
+              - name: style
+                label: "Appearance"
+                widget: object
+                collapsed: true
+                hint: "Background and accent colour — set once when the page is designed."
+                fields:
+                  - name: surface
+                    label: "Background"
+                    widget: select
+                    required: false
+                    default: "standard"
+                    hint: "The surface behind the section — for rhythm between blocks."
+                    options:
+                      - { label: "Standard (white)", value: "standard" }
+                      - { label: "Tinted", value: "tint" }
+                      - { label: "Accent band", value: "band" }
+                      - { label: "Dark", value: "dark" }
+                      - { label: "Gradient", value: "gradient" }
           - name: logoStrip
             label: "Logo strip"
             widget: object
@@ -2868,15 +3077,6 @@ collections:
             fields:
               - { name: heading, label: "Heading", widget: string, required: false, default: "Find us" }
               - { name: showHours, label: "Show opening hours", widget: boolean, required: false, default: true }
-      # <<< blocks:generated
-      - label: "SEO"
-        name: seo
-        widget: object
-        collapsed: true
-        fields:
-          - { name: title, label: "SEO title", widget: string }
-          - { name: description, label: "SEO description", widget: text }
-  # >>> collections:generated (run: pnpm cms:gen — do not edit between markers)
   - name: faq
     media_folder: "/public/media/faq"
     public_folder: "/media/faq"

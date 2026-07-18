@@ -156,6 +156,7 @@ export default {
   '…or a custom URL': '…eller en egen URL',
   'Page': 'Sida',
   'Pages': 'Sidor',
+  'Published (uncheck to hide this page from the site)': 'Publicerad (avmarkera för att dölja sidan)',
 
   // ── images / media ──
   'Image': 'Bild',

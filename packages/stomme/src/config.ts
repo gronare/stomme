@@ -99,6 +99,10 @@ export interface StommeFeatures {
   // Existing sites that never set this keep their form (rule zero). Set it to `false`
   // to remove the contactForm block from the site. Gated in BlockRenderer.
   contactForm?: boolean;
+  // DELIBERATE exception too: pages are on by DEFAULT (the collection predates feature
+  // flags; absent-means-off would orphan existing page content). `false` hides the Pages
+  // collection from the CMS (single-page site). Gated in the config generator.
+  pages?: boolean;
 }
 export const FEATURE_DEFAULTS: Required<StommeFeatures> = {
   blog: false,
@@ -109,6 +113,8 @@ export const FEATURE_DEFAULTS: Required<StommeFeatures> = {
   tracking: false,
   // ON by default — a site without the flag keeps its contact form; false removes it.
   contactForm: true,
+  // ON by default — a site without the flag keeps its Pages collection; false hides it.
+  pages: true,
 };
 // Resolve a site's flags over the defaults (all false except contactForm, which is on).
 // Unknown keys are ignored; known-but-omitted keys fall back to their default.
