@@ -249,6 +249,11 @@ function collectionExists(name) {
 // without a `features` config keep their old behaviour.
 const FEATURE_OF = { faq: 'faq', testimonials: 'testimonials', towns: 'areas', posts: 'blog', services: 'services' };
 function collectionEnabled(name) {
+  if (name === 'home') return true; // every site has a home page
+  // Pages are enabled unless EXPLICITLY disabled (single-page tier). Deliberate legacy
+  // exception to "absent = off": the collection predates feature flags, and absent-means-off
+  // would orphan every existing site's page content.
+  if (name === 'pages') return !(FEATURES && FEATURES.pages === false);
   if (FEATURES && FEATURE_OF[name]) return !!FEATURES[FEATURE_OF[name]];
   return collectionExists(name);
 }
@@ -483,6 +488,38 @@ function emitThanksButtons(indent) {
 // list gains a Reorder mode (drag rows, Done writes index+1 into \`order\` and commits).
 // The \`order\` field itself is \`widget: hidden\` — still serialized, never hand-edited.
 const COLLECTION_EDITORS = {
+  home: `- name: home
+  label: "Home page"
+  files:
+    - name: home
+      label: "Home"
+      file: "src/content/home/home.md"
+      fields:
+        - name: seo
+          label: "SEO"
+          widget: object
+          collapsed: true
+          fields:
+            - { name: title, label: "SEO title", widget: string }
+            - { name: description, label: "SEO description", widget: text }
+${emitWidget(8)}`,
+  pages: `- name: pages
+  label: "Pages"
+  label_singular: "Page"
+  folder: "src/content/pages"
+  create: true
+  slug: "{{slug}}"
+  fields:
+    - { name: title, label: "Title", widget: string }
+    - { name: published, label: "Published (uncheck to hide this page from the site)", widget: boolean, default: true, required: false }
+    - name: seo
+      label: "SEO"
+      widget: object
+      collapsed: true
+      fields:
+        - { name: title, label: "SEO title", widget: string }
+        - { name: description, label: "SEO description", widget: text }
+${emitWidget(4)}`,
   faq: `- name: faq
   label: "FAQ"
   label_singular: "Question"
@@ -677,10 +714,14 @@ ${l.preset === 'catalog' ? catalogFields : articleFields}`;
 }
 
 // Emit editor sections: the conventional collections the site has, then one per listing.
+// A hand-authored collection of the same name OUTSIDE the generated regions wins — its
+// generated counterpart is skipped, so a site keeping (or customizing) a static pane
+// never gets a duplicate collection (back-compatible, like the cms:generated markers).
+const generatedEditors = () => Object.keys(COLLECTION_EDITORS).filter(collectionEnabled).filter((n) => !STATIC_COLLECTIONS.has(n));
 function emitCollections(indent) {
   const p = pad(indent);
   const ind = (s) => s.split('\n').map((l) => (l ? p + l : l)).join('\n');
-  const fixed = Object.keys(COLLECTION_EDITORS).filter(collectionEnabled).map((name) => ind(COLLECTION_EDITORS[name]));
+  const fixed = generatedEditors().map((name) => ind(COLLECTION_EDITORS[name]));
   const listing = LISTINGS.map((l) => ind(listingEditor(l)));
   return [...fixed, ...listing].join('\n');
 }
@@ -1044,6 +1085,18 @@ const EMITTERS = { blocks: emitWidget, collections: emitCollections, navlinks: e
 
 // Fill every `# >>> NAME:generated … # <<< NAME:generated` region (idempotent).
 const lines = readFileSync(configPath, 'utf8').split('\n');
+// Top-level collections hand-authored OUTSIDE any generated region (indent-2 entries of
+// the `collections:` list) — these suppress their generated counterpart in emitCollections.
+const STATIC_COLLECTIONS = new Set();
+{
+  let inRegion = false;
+  for (const l of lines) {
+    if (MARKER_START.test(l)) { inRegion = true; continue; }
+    if (/# <<< \w+:generated/.test(l)) { inRegion = false; continue; }
+    const m = inRegion ? null : l.match(/^ {2}- name: (\S+)\s*$/);
+    if (m) STATIC_COLLECTIONS.add(m[1]);
+  }
+}
 const cache = {};
 const out = [];
 const counts = {};
@@ -1593,8 +1646,10 @@ try {
 
 console.log(`✓ stomme-gen: ${Object.entries(counts).map(([k, v]) => `${k}×${v}`).join(', ')} · ${AVAILABLE_BLOCKS.length} block types · ${PAGE_OPTIONS.length} link options`);
 if (counts.collections) {
-  const editors = Object.keys(COLLECTION_EDITORS).filter(collectionEnabled);
+  const editors = generatedEditors();
   console.log(`  ↳ collection editors: ${editors.length ? editors.join(', ') : '(none present)'}`);
+  const kept = [...STATIC_COLLECTIONS].filter((n) => COLLECTION_EDITORS[n] && collectionEnabled(n));
+  if (kept.length) console.log(`  ↳ hand-authored panes kept (outside markers): ${kept.join(', ')}`);
 }
 if (SKIPPED_BLOCKS.length) {
   console.log(`  ↳ ${SKIPPED_BLOCKS.length} block(s) skipped — collection absent: ${SKIPPED_BLOCKS.map((b) => `${b.type}→${b.collection}`).join(', ')}`);
