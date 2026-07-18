@@ -40,6 +40,13 @@
       "label": "asideCtaLabel",
       "href": ["asideHref", "asideCtaHref"],
       "to": "asideCta"
+    },
+    {
+      "kind": "field-move",
+      "note": "A top-level surface (pre-style-group era) moved into the style group; the renderer reads style.surface. statsBar regained a proper style group, so a hand-authored top-level surface folds in.",
+      "blocks": ["statsBar"],
+      "field": "surface",
+      "to": "style.surface"
     }
   ]
 }
