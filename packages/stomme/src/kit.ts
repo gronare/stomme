@@ -9,6 +9,7 @@
 //   • the site's schema.ts          — to declare its BLOCKS
 //   • stomme-gen (bin)            — to emit the Decap CMS config
 // ─────────────────────────────────────────────────────────────────────────
+import { ICON_NAMES } from './icons.ts';
 
 // ── FIELD POLICY (engine invariant) ─────────────────────────────────────────
 // A new field must be OPT-IN: absent from the frontmatter = disabled / not shown.
@@ -119,8 +120,9 @@ export const headingFieldsWith = (eyebrow?: string, heading?: string): Field[] =
   { name: 'intro', label: 'Intro', widget: 'text', required: false },
 ];
 
-// Curated icon set — must match the names in the site's Icon component.
-export const ICON_NAMES = ['sun', 'panel', 'battery', 'home', 'roof', 'leaf', 'bolt', 'shield', 'wrench', 'headset', 'link', 'phone', 'mail'];
+// Curated icon set — derived from the glyph library (src/icons.ts), the same
+// record Icon.astro renders from, so the picker and the glyphs can't drift.
+export { ICON_NAMES };
 
 // An optional icon picker (used by cards).
 export const iconField = (name = 'icon', label = 'Icon'): Field => ({
