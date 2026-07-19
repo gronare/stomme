@@ -137,7 +137,8 @@ jobs:
             --arg contract "$CONTRACT" --arg applied "$APPLIED" --arg already "$ALREADY" \
             --arg run_url "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" \
             '{repo:$repo,kind:"sveltia",mode:$mode,current:$current,target:$target,contract:$contract,applied:($applied=="true"),already:($already=="true"),run_url:$run_url}')
-          SIG=$(printf '%s' "$BODY" | openssl dgst -sha256 -hmac "$SECRET" | awk '{print $NF}')
+          TS=$(date +%s)
+          SIG=$(printf '%s' "$TS.$BODY" | openssl dgst -sha256 -hmac "$SECRET" | awk '{print $NF}')
           curl -sf -X POST -H "Content-Type: application/json" \
-            -H "X-Stomme-Signature: $SIG" -d "$BODY" \
+            -H "X-Stomme-Signature: t=$TS,v1=$SIG" -d "$BODY" \
             "$REPORT_URL" || echo "report failed (non-blocking)"

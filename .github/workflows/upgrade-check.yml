@@ -131,9 +131,10 @@ jobs:
             --arg from "${{ steps.pin.outputs.pin }}" --arg to "${{ steps.pin.outputs.release }}" \
             --arg run_url "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" \
             '{repo:$repo,status:$status,from:$from,to:$to,run_url:$run_url}')
-          SIG=$(printf '%s' "$BODY" | openssl dgst -sha256 -hmac "$SECRET" | awk '{print $NF}')
+          TS=$(date +%s)
+          SIG=$(printf '%s' "$TS.$BODY" | openssl dgst -sha256 -hmac "$SECRET" | awk '{print $NF}')
           curl -sf -X POST -H "Content-Type: application/json" \
-            -H "X-Stomme-Signature: $SIG" -d "$BODY" \
+            -H "X-Stomme-Signature: t=$TS,v1=$SIG" -d "$BODY" \
             "$REPORT_URL" || echo "report failed (non-blocking)"
 
       - name: Setup pnpm
@@ -320,9 +321,10 @@ jobs:
             --arg reason "$REASON" --arg missing "$MISSING" \
             --arg run_url "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" \
             '{repo:$repo,status:$status,from:$from,to:$to,run_url:$run_url} + (if $reason != "" then {reason:$reason,missing:$missing} else {} end)')
-          SIG=$(printf '%s' "$BODY" | openssl dgst -sha256 -hmac "$SECRET" | awk '{print $NF}')
+          TS=$(date +%s)
+          SIG=$(printf '%s' "$TS.$BODY" | openssl dgst -sha256 -hmac "$SECRET" | awk '{print $NF}')
           curl -sf -X POST -H "Content-Type: application/json" \
-            -H "X-Stomme-Signature: $SIG" -d "$BODY" \
+            -H "X-Stomme-Signature: t=$TS,v1=$SIG" -d "$BODY" \
             "$REPORT_URL" || echo "report failed (non-blocking)"
 
       - name: Fail on diff (awaiting approval)
