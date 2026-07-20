@@ -21,7 +21,7 @@ const here = dirname(fileURLToPath(import.meta.url));
 // CMS bundle: Sveltia CMS, pinned. Swapped into each site's public/admin/index.html on
 // build (replacing the legacy Decap CDN tag). Bump deliberately — Sveltia is pre-1.0.
 // Override for a local/vendored copy with STOMME_SVELTIA_SRC (e.g. /admin/sveltia-cms.js).
-const SVELTIA_CMS_SRC = process.env.STOMME_SVELTIA_SRC || 'https://unpkg.com/@sveltia/cms@0.172.0/dist/sveltia-cms.js';
+const SVELTIA_CMS_SRC = process.env.STOMME_SVELTIA_SRC || 'https://unpkg.com/@sveltia/cms@0.172.1/dist/sveltia-cms.js';
 
 // Load the site's TS config/catalog through jiti rather than a bare dynamic import.
 // Node's built-in type-stripping refuses any .ts file under node_modules, so a plain
