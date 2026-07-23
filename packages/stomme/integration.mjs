@@ -876,10 +876,36 @@ const { thanksProps, serviceFixture, townFixture } = templateFixtures(rs);
         if (slotsDir) {
           const routesManifest = resolve(slotsDir, 'routes.mjs');
           if (existsSync(routesManifest)) {
-            const mod = await import(pathToFileURL(routesManifest).href);
+            let mod;
+            try {
+              mod = await import(pathToFileURL(routesManifest).href);
+            } catch (e) {
+              // A broken manifest otherwise throws a raw import stack out of
+              // astro:config:setup — surface a clear, generic cause instead.
+              throw new Error(
+                `stomme: failed to load routes manifest from STOMME_SLOTS_DIR (${routesManifest}): ${e?.message || e}`,
+              );
+            }
             const addonRoutes = Array.isArray(mod.routes) ? mod.routes : Array.isArray(mod.default) ? mod.default : [];
             for (const r of addonRoutes) {
-              if (!r || !r.pattern || !r.entrypoint || !features[r.feature]) continue;
+              // Validate each entry before injecting — a malformed/incomplete entry is
+              // skipped with a warning, never injected (an invalid pattern or a missing
+              // entrypoint file would otherwise fail the whole build deep in Astro's route
+              // scan). Mirrors how the slot / addon-collections aliases guard with existsSync.
+              if (!r || typeof r.feature !== 'string' || !r.feature) {
+                logger.warn('addon routes: skipped an entry with a missing/invalid "feature" (expected a non-empty string)');
+                continue;
+              }
+              if (typeof r.pattern !== 'string' || !r.pattern.startsWith('/')) {
+                logger.warn(`addon routes: skipped "${r.feature}" — "pattern" must be a non-empty string starting with "/"`);
+                continue;
+              }
+              if (typeof r.entrypoint !== 'string' || !r.entrypoint || !existsSync(r.entrypoint)) {
+                logger.warn(`addon routes: skipped "${r.pattern}" — entrypoint not found (${r.entrypoint || 'missing'})`);
+                continue;
+              }
+              // Feature-gated: only inject when the site has this flag on (unchanged).
+              if (!features[r.feature]) continue;
               injectRoute({ pattern: r.pattern, entrypoint: r.entrypoint });
               enabled.push(r.pattern);
             }
