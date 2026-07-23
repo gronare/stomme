@@ -61,7 +61,9 @@ const has = (page, sel) => page.evaluate((s) => !!document.querySelector(s), sel
 
 try {
   browser = await chromium.launch({ channel: 'chrome', headless: true });
-  const page = await browser.newPage({ viewport: { width: 1280, height: 1000 } });
+  // Tall viewport: Sveltia lazy-mounts offscreen fields as placeholders — below-the-fold
+  // widgets (share-card type cards, optional groups) must be mounted for the checks.
+  const page = await browser.newPage({ viewport: { width: 1280, height: 2600 } });
 
   // Enter the test repo (Sveltia's no-auth login button).
   await page.goto(`http://localhost:${PORT}/admin/index.html`, { waitUntil: 'domcontentloaded' });
@@ -81,6 +83,68 @@ try {
   await page.waitForSelector('section.field[data-key-path="og"]', { timeout: 30000 });
   await check('share-cards wrapper ([data-key-path="og"])', () => has(page, 'section.field[data-field-type=object][data-key-path="og"]'));
   await check('master toggle ([data-key-path="og.enabled"] boolean)', () => has(page, 'section.field[data-field-type=boolean][data-key-path="og.enabled"]'));
+
+  // Gated switch-cards (editor.js .stomme-open): the enable switch and the open/closed
+  // UI state are INDEPENDENT gestures — closed by default, a card click toggles open,
+  // the switch only flips `enabled`. The starter's gated object is the contact `away`
+  // banner (og.types.* only exists on sites with item collections).
+  // Bounce via the collection list: a settings→settings hash hop (sharecards→contact)
+  // does not re-render the editor pane (SPA router quirk) and leaves it blank.
+  await page.evaluate(() => { location.hash = '#/collections/settings'; });
+  await page.waitForTimeout(800);
+  await page.evaluate(() => { location.hash = '#/collections/settings/entries/contact'; });
+  await page.waitForSelector('section.field[data-key-path="phone"]', { timeout: 30000 });
+  await check('gated card: closed by default, card click opens/closes (.stomme-open)', async () => {
+    // Sveltia lazy-mounts offscreen fields as placeholders — scroll the pane down until
+    // the away card and its gate switch are mounted.
+    for (let i = 0; i < 20; i++) {
+      const ok = await page.evaluate(() => {
+        if (document.querySelector('section.field[data-key-path="away.enabled"] [role=switch]')) return true;
+        let n = document.querySelector('section.field[data-key-path="phone"]');
+        while (n && n.scrollHeight <= n.clientHeight + 1) n = n.parentElement;
+        if (n) n.scrollTop = n.scrollHeight;
+        const away = document.querySelector('section.field[data-key-path="away"]');
+        if (away) away.scrollIntoView({ block: 'center' });
+        return false;
+      });
+      if (ok) break;
+      await page.waitForTimeout(500);
+    }
+    await page.waitForFunction(() => document.querySelector('section.field[data-key-path="away.enabled"] [role=switch]'), null, { timeout: 10000 });
+    await page.waitForTimeout(400);
+    const startOpen = await page.evaluate(() => document.querySelector('section.field[data-key-path="away"]').classList.contains('stomme-open'));
+    if (startOpen) return false; // must start closed
+    const clickHeader = () => page.evaluate(() => {
+      const f = document.querySelector('section.field[data-key-path="away"]');
+      f.querySelector(':scope > header').dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    });
+    await clickHeader();
+    await page.waitForTimeout(300);
+    const opened = await page.evaluate(() => document.querySelector('section.field[data-key-path="away"]').classList.contains('stomme-open'));
+    await clickHeader();
+    await page.waitForTimeout(300);
+    const closed = await page.evaluate(() => !document.querySelector('section.field[data-key-path="away"]').classList.contains('stomme-open'));
+    return opened && closed;
+  });
+  await check('gated card: the switch flips enabled without touching .stomme-open', async () => {
+    const res = await page.evaluate(() => {
+      const f = document.querySelector('section.field[data-key-path="away"]');
+      const sw = f.querySelector('section.field[data-key-path="away.enabled"] [role=switch]');
+      const openBefore = f.classList.contains('stomme-open');
+      const was = sw.getAttribute('aria-checked') === 'true';
+      sw.click();
+      return { openBefore, was };
+    });
+    await page.waitForTimeout(300);
+    return page.evaluate(({ openBefore, was }) => {
+      const f = document.querySelector('section.field[data-key-path="away"]');
+      const sw = f.querySelector('section.field[data-key-path="away.enabled"] [role=switch]');
+      const flipped = (sw.getAttribute('aria-checked') === 'true') !== was;
+      const openSame = f.classList.contains('stomme-open') === openBefore;
+      sw.click(); // restore
+      return flipped && openSame;
+    }, res);
+  });
 
   // ---- A new page entry: object widget + the variable-type sections list ----
   await page.evaluate(() => { location.hash = '#/collections/pages/new'; });
@@ -183,6 +247,26 @@ try {
     if (!hit) return false;
     await page.waitForFunction(() => document.querySelector('[data-stomme-probe] > .field-wrapper > .wrapper'), null, { timeout: 5000 });
     return true;
+  });
+  await check('optional-object: added state starts COLLAPSED, card click toggles both ways', async () => {
+    // The switch only adds/removes; no auto-expand (editor.js) + collapsed:true emitted.
+    const disc = () => page.evaluate(() => {
+      const b = document.querySelector('[data-stomme-probe] > .field-wrapper > .wrapper > .header > div:first-child > button[aria-expanded]');
+      return b && b.getAttribute('aria-expanded');
+    });
+    await page.waitForFunction(() => document.querySelector('[data-stomme-probe] > .field-wrapper > .wrapper > .header > div:first-child > button[aria-expanded]'), null, { timeout: 5000 });
+    if (await disc() !== 'false') return false;
+    const clickRow = () => page.evaluate(() => {
+      const f = document.querySelector('[data-stomme-probe]');
+      f.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    });
+    await clickRow();
+    await page.waitForTimeout(300);
+    const opened = await disc() === 'true';
+    await clickRow();
+    await page.waitForTimeout(300);
+    const closed = await disc() === 'false';
+    return opened && closed;
   });
 } finally {
   if (browser) await browser.close();

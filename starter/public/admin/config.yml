@@ -3179,7 +3179,7 @@ collections:
           - name: away
             label: "Away banner"
             widget: object
-            collapsed: true
+            collapsed: false
             hint: "Shows a notice on every contact card. Auto-hides after the date."
             fields:
               - { name: enabled, label: "Show the away banner", widget: boolean, required: false, default: false }

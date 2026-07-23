@@ -336,7 +336,13 @@ function emitField(f, indent) {
   if (f.widget === 'object' && f.fields) {
     const head = [`${p}- name: ${f.name}`, `${p}  label: ${q(f.label)}`, `${p}  widget: object`];
     if (f.required === false) head.push(`${p}  required: false`);
-    if (f.collapsed !== undefined) head.push(`${p}  collapsed: ${f.collapsed}`);
+    // Gate convention: an object whose first field is the boolean `enabled` renders as a
+    // switch-card (THEME_CSS GATED + editor.js). collapsed:false is load-bearing there —
+    // the switch must stay mounted in BOTH UI states (open/closed is the custom
+    // .stomme-open class, never Sveltia's disclosure) — so it is enforced.
+    const gated = f.fields[0]?.widget === 'boolean' && f.fields[0]?.name === 'enabled';
+    if (gated) head.push(`${p}  collapsed: false`);
+    else if (f.collapsed !== undefined) head.push(`${p}  collapsed: ${f.collapsed}`);
     if (f.summary) head.push(`${p}  summary: ${q(f.summary)}`);
     if (f.hint) head.push(`${p}  hint: ${q(f.hint)}`);
     head.push(`${p}  fields:`);
@@ -791,8 +797,10 @@ function emitShareType(t, indent) {
     `${p}- name: ${t.key}`,
     `${p}  label: ${q(t.label)}`,
     `${p}  widget: object`,
-    `${p}  collapsed: true`,
-    `${p}  summary: "{{fields.style}}"`,
+    // Gate convention: collapsed:false is load-bearing — the enabled switch must stay
+    // mounted in both UI states; open/closed is the custom .stomme-open class, never
+    // Sveltia's disclosure (THEME_CSS GATED + editor.js).
+    `${p}  collapsed: false`,
     `${p}  fields:`,
     `${p}    - { name: enabled, label: "Generate cards for these", widget: boolean, required: false, default: false }`,
     `${p}    - name: style`,
@@ -927,7 +935,7 @@ ${emitShareCards(6)}
           - name: away
             label: "Away banner"
             widget: object
-            collapsed: true
+            collapsed: false
             hint: "Shows a notice on every contact card. Auto-hides after the date."
             fields:
               - { name: enabled, label: "Show the away banner", widget: boolean, required: false, default: false }
@@ -1320,21 +1328,41 @@ try {
   // :has() argument out-specifies OBJ_C/OBJ_E (whose args carry :first-child + 2 attrs)
   // so OPT rules win in the added states.
   const OPT = `${OBJ}:has(> .field-wrapper > .sui.checkbox .inner > button.sui.button[role=checkbox])`;
+  const OPT_ON = `${OPT}:has(> .field-wrapper > .sui.checkbox .inner > button[role=checkbox][aria-checked="true"])`;
   const OPT_E = `${OPT}:has(${OBJ_DISC}[aria-expanded="true"])`;
   // GATED = an object whose first child field is the boolean `enabled` (the gate
   // convention, mirrored in editor.js). The og wrapper is chrome-less — excluded.
-  // Expanded state self-detects via the mounted gate field; the COLLAPSED state can't
-  // (Sveltia unmounts collapsed children), so it keys on the known gate paths.
+  // Gated objects are emitted collapsed:false (load-bearing: children stay mounted, so
+  // the gate switch exists in every state and the selector self-detects — no path list).
+  // TWO independent gestures: the switch toggles `enabled` (data); a card click toggles
+  // the .stomme-open class (editor.js), a pure UI open/closed state — Sveltia's own
+  // disclosure stays hidden (collapsing it would unmount the switch).
   const KIDS = '> .field-wrapper > .wrapper > .item-list';
   const GATE_BOOL = `${KIDS} > section.field[data-field-type=boolean][data-key-path$=".enabled"]:first-child`;
   const GATED = `${OBJ}:not([data-key-path="og"]):has(${GATE_BOOL})`;
-  const GATED_E = `${GATED}:has(${OBJ_DISC}[aria-expanded="true"])`;
-  const GATED_C = `${OBJ}:is([data-key-path="away"],[data-key-path^="og.types."]):has(${OBJ_DISC}[aria-expanded="false"])`;
+  // Chevron affordance shared by GATED + added-OPT cards (Material Symbols ships with Sveltia).
+  const CHEVRON = `content:"expand_more"!important;font-family:"Material Symbols Outlined"!important;font-size:20px!important;line-height:1!important;flex:0 0 auto!important;opacity:.5!important;transform:rotate(-90deg)!important;transition:transform 160ms!important;`;
   // LINK = a link-shaped object (page select + url string children) — self-detecting,
   // rendered chrome-less inline. Children must be mounted (collapsed:false emitted).
   const LINK = `${OBJ}:has(${KIDS} > section.field[data-field-type=select][data-key-path$=".page"]):has(${KIDS} > section.field[data-key-path$=".url"])`;
   // The centred 768px field column Sveltia uses — mirrored where we re-lay-out fields.
   const COL_PAD = 'max(16px, calc((100% - 768px) / 2))';
+  // Card outer width (border-box): the 768px column + 16px interior padding + 1px border
+  // per side, so a card's CHILD fields (16px field padding, own 768px .field-wrapper cap)
+  // land exactly on the same column as top-level fields. One width for every card kind.
+  // Cards cap at CARD_W only when the pane has room — narrow panes (preview open) get
+  // min(CARD_W, 100% - 32px): the card fills the pane minus the 16px field padding, same
+  // as section-list cards. Top-level PLAIN fields then need the inverse treatment (TOP_*
+  // below): their 768px column must shrink by the 34px card frame so inputs and labels
+  // keep landing on the card-child column at every pane width, not just wide ones.
+  const CARD_W = '802px';
+  const CARD_MAX = `min(${CARD_W}, 100% - 32px)`;
+  // Top-level fields (not nested in a card/item). Booleans align via padding (their own
+  // grid ignores the field-wrapper); lists keep the CARD_W wrapper; object cards release
+  // header/wrapper to the card width with stronger rules of their own.
+  const TOP = 'section.field:not(section.field section.field)';
+  const TOP_PLAIN = `${TOP}:not([data-field-type=list]):not([data-field-type=boolean]):not([data-field-type=object])`;
+  const TOP_LABELED = `${TOP}:not([data-field-type=boolean]):not([data-field-type=object])`;
   const THEME_CSS = `:root{
       --sui-base-hue: 220 !important; /* neutral default; per site: brand hue (raise accent saturation too) */
       --sui-font-family-default: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif !important;
@@ -1373,11 +1401,21 @@ try {
     /* Expanded list items WITHOUT a .type pill (fixed-type lists, e.g. cards) show Sveltia's default grey header bar with no label — a stray-looking strip. Blend it into the card (card bg, slim, just a divider) instead of leaving the raw grey default. */
     section[data-field-type=list] .item:not(:has(> .header .type)):has(> .header > div:first-child > button[aria-expanded="true"]) > .header{background:hsl(var(--sui-background-color-1-hsl))!important;height:auto!important;min-height:0!important;padding:10px 14px!important;border-bottom:1px solid hsl(var(--sui-border-color-3-hsl))!important;}
     /* Collapsible OBJECT groups (SEO + Media/Layout/Appearance) share the card language. Collapsed = one row [chevron][label][summary…][⋮] with the hint wrapping to a second line; expanded = label bar (chevron docked beside ⋮) with the fields below. Gated on the widget's own disclosure so plain inline objects are untouched. */
-    /* Align the object card with the section cards below it: Sveltia centres field content in a max-width:768px .field-wrapper column, but our card chrome sits on the full-width section — so a top-level SEO card stretched way past the section cards. Match that column (768px, centred) so they line up; nested objects sit in narrower parents where max-width is a no-op. Mirrors Sveltia's field-wrapper max-width — re-tune on a Sveltia upgrade. */
-    ${OBJ_ANY}{border:1px solid hsl(var(--sui-border-color-2-hsl))!important;border-radius:10px!important;max-width:768px!important;margin:14px auto!important;background:hsl(var(--sui-background-color-1-hsl))!important;overflow:hidden!important;}
+    /* Card geometry: every top-level card is CARD_W wide so its CHILD fields — 16px field padding, then each child's own 768px .field-wrapper cap — land exactly on the SAME centred 768px column as top-level fields (SEO title aligns with Title). The card's own inner .field-wrapper cap is released so children flow to the card width; nested cards sit in narrower parents where the cap is a no-op. Mirrors Sveltia's field-wrapper max-width — re-tune on a Sveltia upgrade. */
+    ${OBJ_ANY}{border:1px solid hsl(var(--sui-border-color-2-hsl))!important;border-radius:10px!important;max-width:${CARD_MAX}!important;margin:14px auto!important;background:hsl(var(--sui-background-color-1-hsl))!important;overflow:hidden!important;}
     ${OBJ_ANY}:hover{border-color:hsl(var(--sui-border-color-1-hsl))!important;}
-    /* Nested object cards (inside a list item OR inside another object — e.g. the share-cards per-type cards) keep a horizontal inset for breathing room; only top-level cards use the 768px centred column (max-width:auto centres to 0 inset in a narrow parent). */
-    section[data-field-type=list] .item ${OBJ}:has(${OBJ_DISC}[aria-expanded]), ${OBJ} ${OBJ}:has(${OBJ_DISC}[aria-expanded]){max-width:none!important;margin:14px 16px!important;}
+    ${OBJ_ANY} > .field-wrapper{max-width:none!important;}
+    /* Sveltia caps a field's > header and > .footer at the same 768px column — inside an 802px card the header bar would stop 34px short of the right edge (a notch in the top-right corner). Release them to the card width. */
+    ${OBJ_ANY} > header, ${OBJ_ANY} > .footer, ${OPT} > header, ${OPT} > .footer{max-width:none!important;}
+    /* Section cards share the same geometry: the list's field column widens to CARD_W so each item card = CARD_W and the fields INSIDE items land on the 768px column too — one card width, one field column, everywhere. */
+    section[data-field-type=list] > .field-wrapper{max-width:${CARD_W}!important;}
+    /* Top-level plain fields join the card-child column at EVERY pane width: Sveltia's 768px caps (header/wrapper/footer, margin-inline auto) only line up with card children while the pane is wide enough to centre them — in a narrow pane (preview open) they fill and sit 17px outside the column. Shrinking the caps by the 34px card frame keeps inputs AND labels on the same edges as fields inside section/object cards; at wide widths min() returns 768px and nothing changes. */
+    ${TOP_PLAIN} > .field-wrapper{max-width:min(768px, 100% - 34px)!important;}
+    ${TOP_LABELED} > header, ${TOP_LABELED} > .footer{max-width:min(768px, 100% - 34px)!important;}
+    /* Top-level booleans (e.g. Published) align via their padding instead — 33px floor = 16px pane inset + 17px card frame; the centred term takes over exactly when the plain-field min() does. */
+    ${TOP}[data-field-type=boolean]{padding:16px max(33px, calc((100% - 768px) / 2))!important;}
+    /* Nested object cards (inside a list item OR inside another object) keep a horizontal inset for breathing room; only top-level cards use the centred column. og.types is excluded: it is a chrome-less wrapper that must span its parent so the type cards inside align with the master-toggle card (its own margin rule below would otherwise lose this specificity fight). */
+    section[data-field-type=list] .item ${OBJ}:has(${OBJ_DISC}[aria-expanded]), ${OBJ} ${OBJ}:not([data-key-path="og.types"]):has(${OBJ_DISC}[aria-expanded]){max-width:none!important;margin:14px 16px!important;}
     ${OBJ_ANY} > header .required{display:none!important;}
     ${OBJ_C}{display:flex!important;flex-wrap:wrap!important;align-items:center!important;gap:10px!important;padding:9px 14px!important;cursor:pointer!important;user-select:none!important;}
     ${OBJ_C} > header{display:contents!important;}
@@ -1419,8 +1457,12 @@ try {
     ${OBJ} > .field-wrapper > .sui.checkbox .inner > button[role=checkbox]::after{content:""!important;position:absolute!important;top:3px!important;left:3px!important;width:18px!important;height:18px!important;border-radius:50%!important;background:#fff!important;box-shadow:0 1px 2px rgb(0 0 0 / 0.25)!important;transition:transform 160ms!important;}
     ${OBJ} > .field-wrapper > .sui.checkbox .inner > button[role=checkbox][aria-checked=true]{background:var(--sui-primary-accent-color)!important;}
     ${OBJ} > .field-wrapper > .sui.checkbox .inner > button[role=checkbox][aria-checked=true]::after{transform:translateX(18px)!important;}
-    /* OPTIONAL groups (required:false objects — thanks buttons, header CTA, per-entry SEO): ONE header row [switch] label — the on/off switch IS the header, no separate "Add X" text row. The switch is pinned (absolute, same spot in unadded / on-collapsed / on-expanded states) so it NEVER moves when clicked; fields appear below the row. */
-    ${OPT}{display:flex!important;flex-wrap:wrap!important;align-items:center!important;gap:10px!important;position:relative!important;border:1px solid hsl(var(--sui-border-color-2-hsl))!important;border-radius:10px!important;max-width:768px!important;margin:14px auto!important;background:hsl(var(--sui-background-color-1-hsl))!important;overflow:hidden!important;padding:12px 14px 12px 72px!important;min-height:48px!important;cursor:pointer!important;user-select:none!important;}
+    /* OPTIONAL groups (required:false objects — thanks buttons, header CTA, per-entry SEO): ONE header row [switch] label — the on/off switch IS the header, no separate "Add X" text row. The switch is pinned (absolute, same spot in unadded / on-collapsed / on-expanded states) so it NEVER moves when clicked. TWO independent gestures, same as GATED: the switch adds/removes the group (data); once ON, a card click drives Sveltia's own disclosure (editor.js) — collapsed by default (collapsed:true emitted), a chevron appears, fields below when open. Unadded, the row is inert apart from the switch. */
+    ${OPT}{display:flex!important;flex-wrap:wrap!important;align-items:center!important;gap:10px!important;position:relative!important;border:1px solid hsl(var(--sui-border-color-2-hsl))!important;border-radius:10px!important;max-width:${CARD_MAX}!important;margin:14px auto!important;background:hsl(var(--sui-background-color-1-hsl))!important;overflow:hidden!important;padding:12px 14px 12px 72px!important;min-height:48px!important;cursor:default!important;user-select:none!important;}
+    ${OPT_ON}{cursor:pointer!important;}
+    ${OPT_ON} > header::before{${CHEVRON}order:0!important;}
+    /* rotation keyed on OPT_ON + the disclosure — a bare OPT_E loses the specificity fight against OPT_ON's checkbox :has() */
+    ${OPT_ON}:has(${OBJ_DISC}[aria-expanded="true"]) > header::before{transform:none!important;}
     ${OPT}:hover{border-color:hsl(var(--sui-border-color-1-hsl))!important;}
     section[data-field-type=list] .item ${OPT}, ${OBJ} ${OPT}{max-width:none!important;margin:14px 16px!important;}
     ${OPT} > header{display:contents!important;}
@@ -1437,28 +1479,35 @@ try {
     ${OPT} > .field-wrapper > .wrapper > .item-list > .summary{padding:0!important;overflow:hidden!important;white-space:nowrap!important;text-overflow:ellipsis!important;opacity:.75!important;}
     ${OPT} > .footer{order:8!important;flex:0 0 100%!important;margin:0!important;padding:0!important;}
     ${OPT_E}{cursor:default!important;}
+    ${OPT_E} > header{cursor:pointer!important;}
     ${OPT_E} > .field-wrapper > .wrapper > .item-list{order:9!important;flex:1 1 100%!important;min-width:0!important;margin:12px -14px -12px -72px!important;border-top:1px solid hsl(var(--sui-border-color-3-hsl))!important;}
-    /* GATED groups (first child = the boolean \`enabled\`; e.g. share-card types, away mode): expanded, the gate switch is pinned into the header row and its own field row disappears; collapsed, a switch-width chevron slot keeps the label from shifting between states. */
-    ${GATED_C}{padding:12px 14px 12px 16px!important;gap:14px!important;min-height:48px!important;}
-    ${GATED_C} > .field-wrapper > .wrapper > .header > div:first-child{width:42px!important;flex:0 0 42px!important;justify-content:flex-start!important;}
-    ${GATED_E} > header{display:flex!important;align-items:center!important;margin:0!important;height:auto!important;min-height:48px!important;padding:12px 16px 12px 72px!important;background:hsl(var(--sui-background-color-2-hsl))!important;border-bottom:1px solid hsl(var(--sui-border-color-3-hsl))!important;}
-    ${GATED_E} > .field-wrapper > .wrapper > .header{display:none!important;}
-    ${GATED_E} ${GATE_BOOL}{display:block!important;position:absolute!important;top:24px!important;left:16px!important;transform:translateY(-50%)!important;width:42px!important;padding:0!important;margin:0!important;z-index:1!important;border:none!important;background:transparent!important;}
-    ${GATED_E} ${GATE_BOOL} > header, ${GATED_E} ${GATE_BOOL} > .footer{display:none!important;}
-    ${GATED_E} ${GATE_BOOL} > .field-wrapper{margin:0!important;width:auto!important;grid-column:auto!important;}
-    /* gate OFF: the header row is the whole card — no stray divider under it */
-    ${GATED_E}:has(${GATE_BOOL} [role=switch][aria-checked=false]) > header{border-bottom:none!important;}
+    /* GATED groups (first child = the boolean \`enabled\`; e.g. share-card types, away mode): a switch-card with TWO independent gestures — the pinned switch toggles \`enabled\` (data, Sveltia's own click), a card click toggles .stomme-open (editor.js), a pure UI state that defaults to CLOSED. Closed = one row [switch] chevron label + hint; open = the row becomes a header bar with ALL config fields below. Open/closed is independent of enabled, so a disabled card can still be inspected. */
+    ${GATED}{position:relative!important;user-select:none!important;}
+    ${GATED} > header{display:flex!important;align-items:center!important;margin:0!important;height:auto!important;min-height:48px!important;padding:12px 16px 12px 72px!important;background:hsl(var(--sui-background-color-2-hsl))!important;border-bottom:1px solid hsl(var(--sui-border-color-3-hsl))!important;cursor:pointer!important;}
+    ${GATED} > header::before{${CHEVRON}margin-right:10px!important;}
+    ${GATED}.stomme-open > header::before{transform:none!important;}
+    ${GATED} > .field-wrapper > .wrapper > .header{display:none!important;}
+    ${GATED} ${GATE_BOOL}{display:block!important;position:absolute!important;top:24px!important;left:16px!important;transform:translateY(-50%)!important;width:42px!important;padding:0!important;margin:0!important;z-index:1!important;border:none!important;background:transparent!important;}
+    ${GATED} ${GATE_BOOL} > header, ${GATED} ${GATE_BOOL} > .footer{display:none!important;}
+    ${GATED} ${GATE_BOOL} > .field-wrapper{margin:0!important;width:auto!important;grid-column:auto!important;}
+    /* closed (default): the row IS the card — plain background, no divider; the config fields are hidden (the pinned \`enabled\` switch stays); the group hint reads as the row's second line, aligned under the label. */
+    ${GATED}:not(.stomme-open){cursor:pointer!important;}
+    ${GATED}:not(.stomme-open) > header{background:hsl(var(--sui-background-color-1-hsl))!important;border-bottom:none!important;}
+    ${GATED}:not(.stomme-open) ${KIDS} > section.field:not(:first-child){display:none!important;}
+    ${GATED}:not(.stomme-open) > .footer{margin:0!important;padding:0 16px 12px 72px!important;}
     /* Share-cards flat wrappers: the og + og.types objects exist only for the data path (og.enabled, og.types.<key>) — render them CHROME-LESS (no card border/header/collapse) so the pane reads: master toggle → type cards (the approved mockup). Selectors reuse OBJ_ANY so they outrank the generic object-card rules above; both wrappers are emitted collapsed:false and stay expanded (no disclosure left to collapse them). */
     ${OBJ_ANY}:is([data-key-path="og"],[data-key-path="og.types"]){border:none!important;background:transparent!important;box-shadow:none!important;border-radius:0!important;overflow:visible!important;padding:0!important;}
     ${OBJ_ANY}:is([data-key-path="og"],[data-key-path="og.types"]) > header{display:none!important;}
     ${OBJ_ANY}:is([data-key-path="og"],[data-key-path="og.types"]) > .field-wrapper > .wrapper > .header{display:none!important;}
     /* og.types keeps a quiet section label + hint (mockup "Per content type"): its header returns as a plain heading and the hint moves above the cards via flex order. */
-    ${OBJ_ANY}[data-key-path="og.types"]{display:flex!important;flex-direction:column!important;margin:14px 0!important;}
+    /* max-width:none is load-bearing: og.types must span its parent (og already carries the CARD_MAX cap) or the type cards fall 16px inside the master-toggle card. */
+    ${OBJ_ANY}[data-key-path="og.types"]{display:flex!important;flex-direction:column!important;margin:14px 0!important;max-width:none!important;}
     /* Under flex, the field-wrapper's own margin-inline:auto would shrink it to fit-content — pin it full width. */
     ${OBJ_ANY}[data-key-path="og.types"] > .field-wrapper{width:100%!important;margin:0!important;max-width:none!important;}
-    ${OBJ_ANY}[data-key-path="og.types"] > header{display:flex!important;order:-2!important;position:static!important;background:transparent!important;border:none!important;height:auto!important;min-height:0!important;padding:18px 2px 0!important;}
+    /* The wrapper spans CARD_W (cards overhang the 768px column by 17px each side), so a 17px inset lands the section label + hint on the same x as the field labels around it (labels sit at the column edge). */
+    ${OBJ_ANY}[data-key-path="og.types"] > header{display:flex!important;order:-2!important;position:static!important;background:transparent!important;border:none!important;height:auto!important;min-height:0!important;padding:18px 17px 0!important;}
     ${OBJ_ANY}[data-key-path="og.types"] > header > button,${OBJ_ANY}[data-key-path="og.types"] > header .required{display:none!important;}
-    ${OBJ_ANY}[data-key-path="og.types"] > .footer{order:-1!important;margin:0!important;padding:2px 2px 0!important;}
+    ${OBJ_ANY}[data-key-path="og.types"] > .footer{order:-1!important;margin:0!important;padding:2px 17px 0!important;}
     /* Type cards fill the settings column (they'd otherwise take the nested 16px inset). */
     ${OBJ_ANY}[data-key-path="og.types"] > .field-wrapper > .wrapper > .item-list > ${OBJ_ANY}{max-width:none!important;margin:14px 0!important;}
     /* Type-card labels read as the editor's green type pills (mockup language). */

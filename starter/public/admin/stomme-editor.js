@@ -150,47 +150,28 @@
     if (field.__stommeObj || !objectToggle(field)) return;
     field.__stommeObj = true;
     field.addEventListener('click', function (e) {
+      // Checked at CLICK time, not bind time: Sveltia lazy-mounts offscreen children as
+      // placeholders, so a gated card is indistinguishable from a plain group until it
+      // scrolls into view — a stale bind-time check would let this handler collapse the
+      // Sveltia object and unmount the gate switch. enhanceGated owns these cards.
+      if (isGatedCard(field)) return;
       if (inControl(e.target)) return;
       if (e.target.closest('section.field') !== field) return; // clicks inside nested fields
       var b = objectToggle(field);
       if (!b) return;
       if (b.getAttribute('aria-expanded') === 'true') {
         if (isFlatLink(field)) return; // inline links stay open
+        // Children still lazy-mounting (Sveltia placeholders): the group's kind is
+        // unknowable — a gated card mid-mount must not get its switch collapsed away.
+        if (field.querySelector(':scope > .field-wrapper > .wrapper > .item-list > .placeholder')) return;
+        // Collapse from the card's own header row. Optional groups render their header
+        // display:contents (only the h4 has a box), so a hit on the field's bare row
+        // counts as the header too — without it the card is near-impossible to close.
         var h = e.target.closest('header');
-        if (!h || h.parentElement !== field) return;
+        if (!(h && h.parentElement === field) && e.target !== field) return;
       }
       b.click();
     });
-  }
-
-  // OPTIONAL groups (required:false objects — Sveltia's "Add …" checkbox, restyled as the
-  // switch in the group header): the row is one affordance. Clicking an OFF row switches
-  // the group on, and switching on auto-expands so the fields are ready to fill.
-  function addCheckbox(field) { return field.querySelector(':scope > .field-wrapper > .sui.checkbox .inner > button[role=checkbox]'); }
-  function enhanceOptional(field) {
-    if (field.__stommeOpt || !addCheckbox(field)) return;
-    field.__stommeOpt = true;
-    field.addEventListener('click', function (e) {
-      var cb = addCheckbox(field);
-      if (!cb) return;
-      if (cb.contains(e.target)) { // the switch itself: mark intent, let Sveltia toggle
-        if (cb.getAttribute('aria-checked') === 'false') field.__stommeOpenOnAdd = true;
-        return;
-      }
-      if (inControl(e.target)) return;
-      if (e.target.closest('section.field') !== field) return;
-      if (!objectToggle(field) && cb.getAttribute('aria-checked') === 'false') {
-        field.__stommeOpenOnAdd = true;
-        cb.click();
-      }
-    });
-  }
-  function openPending(field) {
-    if (!field.__stommeOpenOnAdd) return;
-    var b = objectToggle(field);
-    if (!b) return; // fields not mounted yet — retried on the next scan
-    field.__stommeOpenOnAdd = false;
-    if (b.getAttribute('aria-expanded') === 'false') b.click();
   }
 
   // Conditional visibility (Sveltia has no native dependent fields): an object whose FIRST
@@ -207,7 +188,13 @@
     if (!/\.enabled$/.test(fields[0].getAttribute('data-key-path') || '')) return null;
     return fields;
   }
+  // Gated switch-cards render as THEME_CSS ${GATED} everywhere EXCEPT the chrome-less og
+  // wrapper (whose master switch still gates its siblings via gateObject).
+  function isGatedCard(field) {
+    return !!gatedFields(field) && (field.getAttribute('data-key-path') || '') !== 'og';
+  }
   function gateObject(obj) {
+    if (isGatedCard(obj)) return; // switch-cards: field visibility = .stomme-open (UI state), never `enabled`
     var fields = gatedFields(obj);
     if (!fields) return;
     var sw = fields[0].querySelector('[role=switch]');
@@ -218,6 +205,24 @@
       if (on) fields[i].style.removeProperty('display');
       else fields[i].style.setProperty('display', 'none', 'important');
     }
+  }
+  // Gated switch-cards (styled by THEME_CSS ${GATED}): two INDEPENDENT gestures. The
+  // pinned switch toggles `enabled` (its own click, handled by Sveltia — it sits in the
+  // first child field, so the closest-section check below excludes it). A card click
+  // toggles the .stomme-open UI state: closed (default) = anywhere on the row opens;
+  // open = the header row closes. Open/closed never touches the data.
+  function enhanceGated(field) {
+    if (field.__stommeGated || !isGatedCard(field)) return;
+    field.__stommeGated = true;
+    field.addEventListener('click', function (e) {
+      if (inControl(e.target)) return;
+      if (e.target.closest('section.field') !== field) return; // the switch + config fields keep their own clicks
+      if (field.classList.contains('stomme-open')) {
+        var h = e.target.closest('header');
+        if (!h || h.parentElement !== field) return; // open: only the header row collapses
+      }
+      field.classList.toggle('stomme-open');
+    });
   }
 
   // FAQ tag suggestions — Sveltia's select can't create new options, so `tags` stays a
@@ -293,7 +298,7 @@
   function scan() {
     document.querySelectorAll('.item').forEach(enhance);
     document.querySelectorAll('section.field[data-field-type="object"]').forEach(function (o) {
-      enhanceObject(o); enhanceOptional(o); openPending(o); gateObject(o);
+      enhanceObject(o); gateObject(o); enhanceGated(o);
     });
     enhanceFaqTags();
   }
