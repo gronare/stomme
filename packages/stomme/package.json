@@ -45,6 +45,7 @@
     "gen:blocks-manifest": "node bin/gen-blocks-manifest.mjs",
     "test:preview-workerd": "node test/smoke-preview-workerd.mjs",
     "test:og": "node test/smoke-og.mjs",
+    "test:addon-routes": "node test/smoke-addon-routes.mjs",
     "test:admin-contract": "node test/admin-contract.mjs"
   },
   "bin": {
