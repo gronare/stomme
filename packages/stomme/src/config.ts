@@ -103,6 +103,12 @@ export interface StommeFeatures {
   // flags; absent-means-off would orphan existing page content). `false` hides the Pages
   // collection from the CMS (single-page site). Gated in the config generator.
   pages?: boolean;
+  // Forward-compatible: a site may carry extra flags the engine doesn't (yet) name — e.g.
+  // one an out-of-tree extension gates its own collection/route on. Those type-check here
+  // and pass through resolveFeatures untouched ("Unknown keys are ignored" — they neither
+  // override a default nor turn a known feature on). Keeps the documented keys above as the
+  // contract while letting a site opt a flag on without the engine having to know it.
+  [flag: string]: boolean | undefined;
 }
 export const FEATURE_DEFAULTS: Required<StommeFeatures> = {
   blog: false,

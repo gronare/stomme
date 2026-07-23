@@ -16,6 +16,7 @@
     "./contact": "./src/contact.ts",
     "./catalog": "./catalog.ts",
     "./collections": "./collections.ts",
+    "./addon-collections": "./addon-collections.ts",
     "./integration": {
       "types": "./integration.d.ts",
       "default": "./integration.mjs"
@@ -62,6 +63,7 @@
     "routes",
     "catalog.ts",
     "collections.ts",
+    "addon-collections.ts",
     "schema-manifest.json",
     "blocks-manifest.json",
     "integration.mjs",
