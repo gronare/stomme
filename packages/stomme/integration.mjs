@@ -683,7 +683,7 @@ const { thanksProps, serviceFixture, townFixture } = templateFixtures(rs);
   return {
     name: 'stomme',
     hooks: {
-      'astro:config:setup': ({ command, config, injectRoute, injectScript, updateConfig, logger }) => {
+      'astro:config:setup': async ({ command, config, injectRoute, injectScript, updateConfig, logger }) => {
         const root = fileURLToPath(config.root);
         const pkgDir = dirname(fileURLToPath(import.meta.url));
 
@@ -722,6 +722,18 @@ const { thanksProps, serviceFixture, townFixture } = templateFixtures(rs);
           slotAlias[`@stomme/slot-${name}`] = on ? file : slotNoop;
           if (on) slotsOn.push(name);
         }
+
+        // Addon collections — the slots dir may ship a `collections.mjs` at its root that
+        // adds content collections. Mirrors the slot alias exactly: '@stomme/addon-collections'
+        // resolves to that file when present, else to a noop that exports {}. A site's
+        // content.config spreads stommeAddonCollections() (which imports this alias) beside
+        // stommeCollections(), so the dir can add collections without the engine naming any.
+        // No dir / no file ⇒ {} ⇒ the site's collections are unchanged.
+        const addonCollectionsFile = slotsDir ? resolve(slotsDir, 'collections.mjs') : null;
+        const addonCollectionsOn = !!(addonCollectionsFile && existsSync(addonCollectionsFile));
+        slotAlias['@stomme/addon-collections'] = addonCollectionsOn
+          ? addonCollectionsFile
+          : resolve(pkgDir, 'src/AddonCollectionsNoop.mjs');
 
         updateConfig({
           vite: {
@@ -854,6 +866,24 @@ const { thanksProps, serviceFixture, townFixture } = templateFixtures(rs);
           if (!r.on) continue;
           injectRoute({ pattern: `${r.prefix}/[slug]`, entrypoint: r.entrypoint });
           enabled.push(`${r.prefix}/[slug]`);
+        }
+
+        // 1b. Addon routes — the slots dir may ship a `routes.mjs` at its root exporting an
+        // array of { feature, pattern, entrypoint }. Each is injected only when the site has
+        // that flag on (features[feature] truthy); `entrypoint` is an absolute path into the
+        // dir (already in server.fs.allow above). Data-driven: the engine names no feature and
+        // hardcodes no pattern. No dir / no manifest ⇒ nothing injected.
+        if (slotsDir) {
+          const routesManifest = resolve(slotsDir, 'routes.mjs');
+          if (existsSync(routesManifest)) {
+            const mod = await import(pathToFileURL(routesManifest).href);
+            const addonRoutes = Array.isArray(mod.routes) ? mod.routes : Array.isArray(mod.default) ? mod.default : [];
+            for (const r of addonRoutes) {
+              if (!r || !r.pattern || !r.entrypoint || !features[r.feature]) continue;
+              injectRoute({ pattern: r.pattern, entrypoint: r.entrypoint });
+              enabled.push(r.pattern);
+            }
+          }
         }
 
         // 2. Listing detail routes — one generated, prerendered entrypoint each.
