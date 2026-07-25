@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// stomme-gen — generate the Decap "blocks" builder widget from the site's block
+// stomme-gen — generate the Sveltia CMS "blocks" builder widget from the site's block
 // catalog and splice it into the site's admin config between the generated-block
 // markers. Runs in the CONSUMER's project (process.cwd()).
 //
@@ -54,7 +54,10 @@ if (!Array.isArray(BLOCKS)) {
 // Falls back to the package defaults when absent.
 let ROUTES = { services: '/services', towns: '/areas', blog: '/blog' };
 let FEATURES = null; // null = no `features` declared → fall back to folder-existence
-let CMS_LOCALE = 'en'; // Decap admin UI language (config.yml `locale:`); 'en' is Decap's default
+// Language of the generated /admin FIELD LABELS. Applied at generation time via
+// translateLabels() + admin/labels.<locale>.js — NOT a config.yml `locale:` line (Sveltia
+// ignores that; it is stripped below). 'en' = the untranslated English source.
+let CMS_LOCALE = 'en';
 let CMS = null; // site.cms → generated `backend:` block (between # >>> cms:generated markers)
 let LISTINGS = []; // config-defined collections (news/for-sale/…) → editors + seeded index
 let STYLE = process.env.STOMME_STYLE || null; // optional look & feel (theme directory name)
@@ -285,7 +288,7 @@ const GROUP_ORDER = ['Hero & headers', 'Text', 'Cards & lists', 'Media', 'Quote 
 const groupRank = (b) => { const i = GROUP_ORDER.indexOf(b.group); return i === -1 ? GROUP_ORDER.length : i; };
 AVAILABLE_BLOCKS.sort((a, b) => groupRank(a) - groupRank(b));
 
-// Collapsed-row label for list items: Decap defaults to the FIRST field's value (an
+// Collapsed-row label for list items: the CMS defaults to the FIRST field's value (an
 // empty icon picker reads "No icon"). Derive a summary — eyebrow first when present,
 // then the item's identifying field. Empty placeholders render as nothing, so whichever
 // fields are filled show. An explicit `summary` on the Field def wins.
@@ -482,13 +485,13 @@ function emitThanksButtons(indent) {
 }
 
 // ── Collection editors ──────────────────────────────────────────────────────
-// Decap editor sections for the conventional content collections. Emitted (gated
+// CMS editor sections for the conventional content collections. Emitted (gated
 // by collectionExists) into the `# >>> collections:generated` region so the CMS
 // sidebar gains an editor for whatever collections a site actually has — no more
 // hand-authoring them per site. A site with bespoke collections adds its own
 // editors outside the markers. Field shapes mirror the recommended content.config
 // schemas (towns/services match the TownPage/ServicePage templates).
-// No field-level media_folder — Decap resolves it relative to the entry (breaks
+// No field-level media_folder — the CMS resolves it relative to the entry (breaks
 // uploads from subfolder entries); the global media_folder in config.yml is used.
 // Collections whose components sort by \`order\` declare \`reorder: true\`: Sveltia's entry
 // list gains a Reorder mode (drag rows, Done writes index+1 into \`order\` and commits).
@@ -733,7 +736,7 @@ function emitCollections(indent) {
 }
 
 // ── CMS backend (generated) ──────────────────────────────────────────────────
-// Emit the Decap `backend:` block from the site's `cms` config so config.yml auth
+// Emit the `backend:` block from the site's `cms` config so config.yml auth
 // isn't hand-edited. Generic: only the fields the site sets are written. Defaults:
 // backend git-gateway, branch main. (No `cms:generated` markers in a site's
 // config.yml → nothing emitted, hand-authored backend preserved — back-compatible.)
@@ -1256,7 +1259,7 @@ try {
 // Same-window auth handoff for /admin. Browsers that open the login in the current tab
 // instead of a popup (Arc, some mobile) have no live window.opener to receive the token,
 // so the gateway redirects back to /admin with the token in the URL fragment. This shim
-// persists it the way Decap does and reloads. It MUST run before the Decap bundle (whose
+// persists it the way Sveltia does and reloads. It MUST run before the CMS bundle (whose
 // hash router would otherwise consume the fragment), so it's injected into <head>.
 // Managed here (idempotent via the markers) so every site gets it — and stays current —
 // on build, rather than living as a hand-edited per-site file.

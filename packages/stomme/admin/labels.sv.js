@@ -99,7 +99,7 @@ export default {
   'Logo / partner strip (auto)': 'Logotyp / partnerrad (auto)',
   'Checklist (ticked items)': 'Checklista (bockade punkter)',
   'Testimonials': 'Omdömen',
-  // shortened block-type labels (kept concise so the Decap add-menu doesn't truncate)
+  // shortened block-type labels (kept concise so the CMS add-menu doesn't truncate)
   'Service cards': 'Tjänstekort',
   'Link chips': 'Länkchips',
   'Blog posts': 'Blogginlägg',

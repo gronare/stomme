@@ -1,6 +1,6 @@
 # stomme
 
-A block-based CMS engine for **Astro + Decap**. Compose pages from a styled,
+A block-based CMS engine for **Astro + Sveltia CMS**. Compose pages from a styled,
 themeable **component library**, edit them in a Git-backed CMS with a **live
 preview of the real components**, and ship a fully static site.
 
@@ -23,7 +23,7 @@ blocks:
 - **A component library** — ~20 ready-made, styled blocks (hero, featureGrid,
   testimonials, faq, gallery, before/after, steps, CTA, …). Recolor with CSS
   variables; no Tailwind required.
-- **A CMS page builder** — Decap, generated from your block catalog, with a live
+- **A CMS page builder** — Sveltia CMS, generated from your block catalog, with a live
   preview that renders the *real* components (no parallel preview code).
 - **Static output** — every page prerenders; only `/preview` is on-demand.
 - **Extensible** — add your own blocks alongside the library ones.
@@ -75,7 +75,7 @@ serverless function automatically. Set `RESEND_API_KEY`, `CONTACT_FROM` and
 ## Commands (in a site)
 
 ```
-pnpm dev          # Astro + Decap local proxy (+ /admin, /preview)
+pnpm dev          # Astro dev server (+ /admin, /preview)
 pnpm build        # cms:gen + astro build
 pnpm cms:gen      # regenerate the CMS builder UI from your catalog
 pnpm block:new -- MyBlock   # scaffold a custom block component
@@ -107,5 +107,5 @@ a network service, the same freedoms must be passed on.
 
 ## Stack
 
-Astro 5 (content collections, `astro:assets`), Decap CMS, marked. pnpm workspace,
+Astro 5 (content collections, `astro:assets`), Sveltia CMS, marked. pnpm workspace,
 Node ≥ 20.

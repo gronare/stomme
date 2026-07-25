@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Content Manager</title>
-    <!-- stomme-gen injects the same-window auth handoff shim here (before the Decap bundle). -->
+    <!-- stomme-gen injects the same-window auth handoff shim here (before the CMS bundle). -->
       <!-- >>> stomme-auth:generated (managed by stomme-gen — do not edit) -->
     <script>
       (function () {
@@ -19,7 +19,7 @@
             b += '==='.slice((b.length + 3) % 4);
             email = (JSON.parse(atob(b)) || {}).email || '';
           } catch (e) {}
-          localStorage.setItem('decap-cms-user', JSON.stringify({ name: email, login: email, email: email, token: token, backendName: 'github' }));
+          localStorage.setItem('sveltia-cms.user', JSON.stringify({ name: email, login: email, email: email, token: token, backendName: 'github' }));
           history.replaceState(null, '', location.pathname + location.search);
           location.reload();
         } catch (e) {}
@@ -28,7 +28,7 @@
     <!-- <<< stomme-auth:generated -->
   </head>
   <body>
-    <script src="https://unpkg.com/decap-cms@^3.8.4/dist/decap-cms.js"></script>
+    <script src="https://unpkg.com/@sveltia/cms@0.172.3/dist/sveltia-cms.js"></script>
     <!-- engine previews (copied by stomme-gen), then optional site-specific ones -->
     <script src="/admin/stomme-previews.js"></script>
     <script src="/admin/previews.js"></script>

@@ -18,7 +18,10 @@ export interface SiteConfig {
     contact?: string; // contact page (town/service CTAs link here)
     formSuccess?: string; // contactForm success page
   };
-  locale?: string; // date/number formatting (BCP47, e.g. 'sv-SE')
+  // The site's language + region (BCP47, e.g. 'sv-SE'). Drives date/number formatting and the
+  // language of the engine's built-in wording ('sv' and 'en' shipped, else English); `strings`
+  // overrides individual phrases.
+  locale?: string;
   // Optional look & feel: the name of a theme directory supplied at build time. When set,
   // the engine splices that theme's tokens.css + theme.css into the site's global.css
   // (after the engine stylesheet import, before the site's own rules) and — via stomme-gen —
@@ -27,10 +30,12 @@ export interface SiteConfig {
   // layer is added and the build is unchanged.
   style?: string;
   // Operator-owned analytics — lives in code (site.config.ts), NOT in CMS content, so an
-  // editor can't disable it (Decap rewrites managed files on save and would drop it).
+  // editor can't disable it (the CMS rewrites managed files on save and would drop it).
   // cfToken = Cloudflare Web Analytics beacon token: cookieless, no consent banner needed.
   analytics?: { cfToken?: string };
-  cmsLocale?: string; // Decap admin UI language (e.g. 'en', 'sv'); written to config.yml by stomme-gen
+  // Language of the /admin field labels ('sv' | 'en'). Baked into config.yml by stomme-gen,
+  // so re-run it after changing. Does not affect the public site — that's `locale`.
+  cmsLocale?: string;
   strings?: {
     readMore?: string;
     latest?: string; // "Latest" tag on the featured post
@@ -61,7 +66,7 @@ export interface SiteConfig {
   // can resolve their specs without importing the integration's config alias. A site
   // that uses listings passes them in (e.g. `config={{ ...site, listings }}`).
   listings?: Listing[];
-  // CMS auth/backend for the generated Decap config.yml. stomme-gen emits the
+  // CMS auth/backend for the generated Sveltia config.yml. stomme-gen emits the
   // `backend:` block from this (between the `# >>> cms:generated` markers) so a
   // site picks its backend without hand-editing config.yml. Generic across
   // github / git-gateway (Netlify Identity, DecapBridge, a custom OAuth proxy).
@@ -271,7 +276,7 @@ const STRINGS_SV: typeof STRINGS_EN = {
 const STRINGS_BY_LANG: Record<string, typeof STRINGS_EN> = { en: STRINGS_EN, sv: STRINGS_SV };
 
 // Pick the base string set for the SITE language. Driven by `locale` (the site's BCP47
-// language/region, e.g. sv-SE) — NOT cmsLocale, which is only the Decap admin UI language.
+// language/region, e.g. sv-SE) — NOT cmsLocale, which only picks the /admin label language.
 // cmsLocale is just a fallback for older configs that set it but no locale.
 function baseStrings(locale?: string, cmsLocale?: string) {
   const lang = String(locale || cmsLocale || 'en').split(/[-_]/)[0].toLowerCase();

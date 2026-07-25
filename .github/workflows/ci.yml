@@ -58,7 +58,7 @@ jobs:
   # nightly against the latest release, and on every apply (bump) before commit.
 
   # Catch syntax errors in the engine's plain-JS scripts (bins, integration,
-  # the Decap previews module) — none of these go through astro check.
+  # the CMS previews module) — none of these go through astro check.
   engine-scripts:
     name: engine scripts syntax
     runs-on: ubuntu-latest

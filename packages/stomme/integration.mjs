@@ -164,7 +164,7 @@ const townDraft = kind === 'town' && draft && typeof draft === 'object' ? draft 
 // Identity: render the composed logo (mark + wordmark) with the SAME uploaded-vs-public
 // resolution as Header — an uploaded logo (/media/… → /src/assets/media via the build-bridge)
 // goes through Astro's image optimizer, so the CMS Identity pane shows the real optimized
-// image. A hand-built mockup using Decap's getAsset only had a raw path, which isn't served.
+// image. A hand-built mockup using the CMS's getAsset only had a raw path, which isn't served.
 const identityDraft = kind === 'identity' && draft && typeof draft === 'object' ? draft : null;
 const idLogo = (identityDraft && identityDraft.logo) || {};
 const idUploads = import.meta.glob('/src/assets/media/**/*.{jpg,jpeg,png,webp,avif}');

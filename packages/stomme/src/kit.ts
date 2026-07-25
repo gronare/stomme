@@ -7,14 +7,14 @@
 //
 // Consumed by:
 //   • the site's schema.ts          — to declare its BLOCKS
-//   • stomme-gen (bin)            — to emit the Decap CMS config
+//   • stomme-gen (bin)            — to emit the Sveltia CMS config
 // ─────────────────────────────────────────────────────────────────────────
 import { ICON_NAMES } from './icons.ts';
 
 // ── FIELD POLICY (engine invariant) ─────────────────────────────────────────
 // A new field must be OPT-IN: absent from the frontmatter = disabled / not shown.
 // Never write an `x !== false` (absent = on) fallback for a NEW field — an engine
-// update must not change what an existing site renders, and Decap displays an
+// update must not change what an existing site renders, and the CMS displays an
 // absent boolean as OFF regardless of `default:`, so absent-means-on makes the
 // CMS lie. (A dozen legacy `!== false` fields predate this rule; flipping them
 // requires seeding explicit values into every site's content first.)

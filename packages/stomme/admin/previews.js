@@ -1,7 +1,7 @@
 /*
- * stomme — Decap CMS preview templates (engine-provided). Copied into
+ * stomme — CMS preview templates (engine-provided), for Sveltia CMS. Copied into
  * <site>/public/admin/stomme-previews.js by `stomme-gen`, loaded before the
- * site's own previews.js. `CMS`, `h` are globals from the Decap bundle.
+ * site's own previews.js. `CMS`, `h` are globals from the Sveltia bundle.
  *
  * Pages get a LIVE preview (the real components via the /preview route). The
  * collections/settings/chrome get rich, styled mockups (the preview iframe has no
@@ -9,7 +9,7 @@
  * A site adds bespoke previews for its own collections in public/admin/previews.js
  * (loaded after this) — re-registering a name overrides the generic one.
  */
-// Editors log in via email (Cloudflare Access), not GitHub — relabel Decap's login
+// Editors log in via email (Cloudflare Access), not GitHub — relabel the CMS's login
 // button. Its text contains "GitHub" in every UI language ("Login with GitHub",
 // "Logga in med GitHub", …), so match that; LOGIN_LABEL is localized by stomme-gen
 // from the site's cmsLocale. Standalone (no CMS globals); copied into every /admin.
@@ -26,12 +26,12 @@
 })();
 
 // NOTE: the same-window auth handoff (Arc etc.) lives in /admin/index.html <head>, NOT
-// here — it must run BEFORE the Decap bundle, whose hash router would otherwise consume
-// the token in the URL fragment before this (post-Decap) script could read it.
+// here — it must run BEFORE the CMS bundle, whose hash router would otherwise consume
+// the token in the URL fragment before this (post-bundle) script could read it.
 
 (function () {
   if (typeof window.CMS === 'undefined' || typeof window.h === 'undefined') {
-    console.warn('[stomme] Decap globals unavailable; skipping previews.');
+    console.warn('[stomme] CMS globals unavailable; skipping previews.');
     return;
   }
   var h = window.h;
@@ -122,7 +122,7 @@
   var FRAME_STYLE = { width: '100%', height: '100vh', border: '0', display: 'block', background: '#fff' };
   // A short frame for an inline snippet (the Identity logo row) rather than a full page.
   var LOGO_FRAME_STYLE = { width: '100%', height: '88px', border: '0', display: 'block', background: 'transparent' };
-  // Per-id frame state. A React ref captures the real <iframe> node (Decap renders the
+  // Per-id frame state. A React ref captures the real <iframe> node (the CMS renders the
   // preview inside its own frame, so document.getElementById from here wouldn't find it).
   var FRAMES = {};
   function liveFrame(id, baseSrc, data, style) {
@@ -194,7 +194,7 @@
     var dkCard = 'color-mix(in srgb, ' + dkInk + ' 7%, ' + dk + ')';
     var dkMuted = 'color-mix(in srgb, ' + dkInk + ' 56%, ' + dk + ')';
     // Apply the chosen fonts so the preview reflects the pickers — including custom
-    // uploads, loaded via Decap's getAsset (resolves the upload to a usable URL).
+    // uploads, loaded via the CMS's getAsset (resolves the upload to a usable URL).
     var assetUrl = function (p) { try { return p && props.getAsset ? String(props.getAsset(p)) : null; } catch (_e) { return null; } };
     var dispCustom = assetUrl(g('fontCustomFile', ''));
     var bodyCustom = assetUrl(g('fontCustomBodyFile', '')) || dispCustom;
@@ -270,7 +270,7 @@
   // Identity — the logo, browser-tab favicon, home-screen icon, social-share image and
   // business name. Rendered ENTIRELY via /preview?kind=identity (a full-height iframe),
   // so every asset is the SERVED file: an uploaded favicon/og image (/src/assets/uploads/…)
-  // and public-root defaults ('/favicon.svg') both resolve on the site origin. Decap's
+  // and public-root defaults ('/favicon.svg') both resolve on the site origin. The CMS's
   // getAsset only yields the raw /src path (unserved → 404), which is why the logo already
   // rendered via /preview; the favicon + social share now do the same instead of getAsset.
   var IdentityPreview = function (props) {
@@ -378,7 +378,7 @@
     id: 'image',
     label: 'Image',
     fields: [
-      // No field-level media_folder: Decap resolves that relative to the entry, so a
+      // No field-level media_folder: the CMS resolves that relative to the entry, so a
       // post in src/content/posts/ would upload to .../posts/src/assets/uploads and show
       // an empty picker. The global media_folder (config.yml) is root-relative + works.
       { name: 'image', label: 'Image', widget: 'image' },
@@ -411,7 +411,7 @@
   // Sveltia's rich-text image button resolves the component named `linked-image` when
   // `linked_images` is on (its default). Register the same definition under that id too so
   // OUR caption/placement/size dialog is used instead of the built-in src/alt/title one.
-  // (Decap ignores the extra registration — it has no `linked-image` built-in.) The stored
+  // (The CMS ignores the extra registration — it has no `linked-image` built-in.) The stored
   // markdown is unchanged: `![alt](src "align size")`.
   try { window.CMS.registerEditorComponent(Object.assign({}, IMAGE_COMPONENT, { id: 'linked-image' })); } catch (e) {}
 })();

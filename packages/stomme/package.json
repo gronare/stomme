@@ -1,7 +1,7 @@
 {
   "name": "@gronare/stomme",
   "version": "0.1.79",
-  "description": "Block-CMS engine for Astro + Decap — types, helpers, runtime components, tooling.",
+  "description": "Block-CMS engine for Astro + Sveltia CMS — types, helpers, runtime components, tooling.",
   "type": "module",
   "repository": {
     "type": "git",

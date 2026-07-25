@@ -31,14 +31,15 @@ export const site: SiteConfig = {
     formSuccess: '/thanks', // the contact-form success page
   },
 
-  // ⚠️ TWO DIFFERENT locales — don't mix them up:
-  locale: 'en-US', //   (1) date & number FORMATTING (BCP47 tag). e.g. 'sv-SE', 'nb-NO', 'de-DE'.
-  cmsLocale: 'en', //   (2) the Decap ADMIN UI language: 'en' | 'sv' | 'da' | 'nb_no' | …
-  //        ↑ This is the one that makes /admin Swedish. Re-run `pnpm cms:gen` after changing it
-  //          (it's written into public/admin/config.yml), then hard-reload /admin.
+  // locale    — the site's language + region (BCP47). Drives date/number formatting and the
+  //             language of the engine's built-in wording ('sv' and 'en' shipped, else English).
+  // cmsLocale — language of the /admin field labels only. Re-run `pnpm cms:gen` after changing.
+  locale: 'en-US',
+  cmsLocale: 'en',
 
   // Fixed wording used by blocks/templates. Override only what you want changed; anything
-  // omitted falls back to the engine's English defaults. All groups below are optional.
+  // omitted falls back to the engine's built-in wording for `locale`'s language
+  // (English here, via `locale: 'en-US'`). All groups below are optional.
   strings: {
     readMore: 'Read more',
     // Contact form field labels:

@@ -30,15 +30,16 @@ classes are plain and overridable (no `!important`, no scoped-style fights).
 
 ## Per-site config (routes / locale / strings)
 
-Collection-backed blocks build links and format dates from a config object you pass
-to the renderer. Define it once:
+Collection-backed blocks build links, format dates and take their fixed wording from
+a config object you pass to the renderer. Define it once:
 
 ```ts
 // src/site.config.ts
-import type { KitConfig } from '@gronare/stomme/config';
-export const kit: KitConfig = {
+import type { SiteConfig } from '@gronare/stomme/config';
+export const site: SiteConfig = {
   routes: { towns: '/orter', blog: '/blogg', formSuccess: '/tack' },
   locale: 'sv-SE',
+  cmsLocale: 'sv',
   strings: { readMore: 'Läs mer' },
 };
 ```
@@ -47,6 +48,16 @@ Pass it through your `BlockRenderer` wrapper (see below). Defaults are neutral
 English, so a site only sets what differs. **A route prefix must match the actual
 route folder** under `src/pages/` (e.g. `routes.blog: '/blogg'` ⇒
 `src/pages/blogg/[slug].astro`).
+
+### The two locale fields
+
+- **`locale`** — the site's language + region (BCP47). Drives date and number formatting
+  *and* the language of the engine's built-in public strings (`sv` and `en` shipped, any
+  other language falls back to English). Your own `strings` override individual phrases.
+  It is the site-language switch, not formatting-only.
+- **`cmsLocale`** — the language of the `/admin` **field labels**, and nothing on the public
+  site. Baked into `public/admin/config.yml` by `stomme-gen`, so re-run `pnpm cms:gen` after
+  changing it. Sveltia's own chrome follows the browser.
 
 ## Adding a custom block
 

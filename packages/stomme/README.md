@@ -1,6 +1,6 @@
 # stomme
 
-A block-based CMS engine + component library for **Astro + Decap**. Compose pages
+A block-based CMS engine + component library for **Astro + Sveltia CMS**. Compose pages
 from ~20 styled, themeable blocks; edit in a Git-backed CMS with a live preview of
 the real components; ship static. Extend with your own blocks.
 
@@ -22,7 +22,7 @@ Quickstart: `pnpm dlx create-stomme my-site`. Full docs in the
 
 ## Bin scripts
 
-- `stomme-gen` — generate the Decap admin from your catalog (+ copy the previews).
+- `stomme-gen` — generate the Sveltia admin from your catalog (+ copy the previews).
 - `stomme-new-block` — scaffold a custom block component.
 
 Peer dependency: `astro >= 5`.
