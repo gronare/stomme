@@ -51,7 +51,7 @@ try {
   stub = mkdtempSync(join(tmpdir(), 'stomme-addon-cms-'));
   // A file collection is the shape a single editable page uses (the engine's own
   // "Form confirmation" pane is one), so the stub mirrors a real addon page.
-  writeFileSync(join(stub, 'cms.mjs'), `export const collections = ({ routes }) => [
+  writeFileSync(join(stub, 'cms.mjs'), `export const collections = ({ routes, blocks }) => [
   {
     feature: 'faq',
     yaml: \`- name: addon_on
@@ -61,7 +61,8 @@ try {
       label: "Addon page"
       file: "src/content/addon/addon.md"
       fields:
-        - { name: heading, label: "Heading", widget: string, required: false, hint: "success route is \${routes.formSuccess}" }\`,
+        - { name: heading, label: "Heading", widget: string, required: false, hint: "success route is \${routes.formSuccess}" }
+\${blocks(8)}\`,
   },
   { feature: 'blog', yaml: '- name: addon_off\\n  label: "Addon pane (off)"\\n  files: []' },
   { feature: '', yaml: '- name: broken' },
@@ -74,6 +75,9 @@ try {
   if (!withStub.ok) console.error(withStub.out);
   check(/^ {2}- name: addon_on$/m.test(withStub.yml), "the ON pane is emitted at the collections indent");
   check(withStub.yml.includes('success route is /thanks'), "the manifest function receives the site's own routes");
+  // The pane composes out of the SITE's blocks, so an addon page is stylable like any other.
+  // Authored at 8 in the pane, +2 for the region indent, exactly like the engine's own editors.
+  check(/^ {10}- name: blocks$/m.test(withStub.yml), "the manifest function receives the site's own block picker");
   check(!withStub.yml.includes('addon_off'), 'a pane whose feature is OFF is not emitted');
   check(!withStub.yml.includes('- name: broken'), 'a malformed entry is not emitted');
   check(/addon cms: skipped a malformed entry/.test(withStub.out), 'the malformed entry is reported');

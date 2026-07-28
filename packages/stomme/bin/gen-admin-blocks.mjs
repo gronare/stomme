@@ -129,41 +129,6 @@ try {
   /* no dictionaries — labels stay English */
 }
 
-// ── Addon CMS panes (generic seam) ───────────────────────────────────────────
-// The slots dir (STOMME_SLOTS_DIR — the same one that supplies slot components, addon
-// collections and addon routes) may ship a `cms.mjs` at its root exporting
-// `collections`: an array of { feature, yaml }, or a FUNCTION returning one, called with
-// the site's own { routes, features }. Each entry's `yaml` is one Sveltia collection
-// block authored at indent 0; it is emitted into the collections:generated region only
-// when features[feature] is truthy.
-//
-// This is what lets an out-of-tree extension's pages be EDITED like every other page
-// instead of being invisible to the CMS. The engine names no feature and authors no
-// pane: it hands over the config and splices back whatever comes out. No dir / no file
-// ⇒ nothing emitted, config.yml unchanged.
-let ADDON_PANES = [];
-{
-  const slotsDir = process.env.STOMME_SLOTS_DIR;
-  const manifest = slotsDir ? resolve(slotsDir, 'cms.mjs') : null;
-  if (manifest && existsSync(manifest)) {
-    try {
-      const mod = await import(pathToFileURL(manifest).href);
-      const declared = mod.collections ?? mod.default;
-      const entries = typeof declared === 'function' ? declared({ routes: ROUTES, features: FEATURES }) : declared;
-      ADDON_PANES = (Array.isArray(entries) ? entries : []).filter((e) => {
-        if (!e || typeof e.feature !== 'string' || !e.feature || typeof e.yaml !== 'string' || !e.yaml.trim()) {
-          console.warn('  ⚠ addon cms: skipped a malformed entry (needs a non-empty `feature` and `yaml`)');
-          return false;
-        }
-        return !FEATURES || !!FEATURES[e.feature];
-      });
-    } catch (e) {
-      // A broken manifest must not silently cost the site every generated pane.
-      throw new Error(`stomme-gen: failed to load the CMS manifest from STOMME_SLOTS_DIR (${manifest}): ${e?.message || e}`);
-    }
-  }
-}
-
 const MARKER_START = /# >>> (\w+):generated/;
 const q = (s) => `"${String(s).replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`;
 const pad = (n) => ' '.repeat(n);
@@ -761,6 +726,44 @@ ${l.preset === 'catalog' ? catalogFields : articleFields}`;
 // A hand-authored collection of the same name OUTSIDE the generated regions wins — its
 // generated counterpart is skipped, so a site keeping (or customizing) a static pane
 // never gets a duplicate collection (back-compatible, like the cms:generated markers).
+// ── Addon CMS panes (generic seam) ───────────────────────────────────────────
+// The slots dir (STOMME_SLOTS_DIR — the same one that supplies slot components, addon
+// collections and addon routes) may ship a `cms.mjs` at its root exporting `collections`:
+// an array of { feature, yaml }, or a FUNCTION returning one. The function is called with
+// the site's own { routes, features } and `blocks(indent)` — the very block picker the
+// engine's own page editors embed. Each entry's `yaml` is one Sveltia collection block
+// authored at indent 0, emitted into the collections:generated region only when
+// features[feature] is truthy.
+//
+// This is what lets an out-of-tree extension's pages be EDITED — and composed out of the
+// site's own blocks — like every other page, instead of being invisible to the CMS. The
+// engine names no feature and authors no pane: it hands over the config and splices back
+// whatever comes out. No dir / no file ⇒ nothing emitted, config.yml unchanged.
+let ADDON_PANES = [];
+{
+  const slotsDir = process.env.STOMME_SLOTS_DIR;
+  const manifest = slotsDir ? resolve(slotsDir, 'cms.mjs') : null;
+  if (manifest && existsSync(manifest)) {
+    try {
+      const mod = await import(pathToFileURL(manifest).href);
+      const declared = mod.collections ?? mod.default;
+      const entries = typeof declared === 'function'
+        ? declared({ routes: ROUTES, features: FEATURES, blocks: emitWidget })
+        : declared;
+      ADDON_PANES = (Array.isArray(entries) ? entries : []).filter((e) => {
+        if (!e || typeof e.feature !== 'string' || !e.feature || typeof e.yaml !== 'string' || !e.yaml.trim()) {
+          console.warn('  ⚠ addon cms: skipped a malformed entry (needs a non-empty `feature` and `yaml`)');
+          return false;
+        }
+        return !FEATURES || !!FEATURES[e.feature];
+      });
+    } catch (e) {
+      // A broken manifest must not silently cost the site every generated pane.
+      throw new Error(`stomme-gen: failed to load the CMS manifest from STOMME_SLOTS_DIR (${manifest}): ${e?.message || e}`);
+    }
+  }
+}
+
 const generatedEditors = () => Object.keys(COLLECTION_EDITORS).filter(collectionEnabled).filter((n) => !STATIC_COLLECTIONS.has(n));
 function emitCollections(indent) {
   const p = pad(indent);
