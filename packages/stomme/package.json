@@ -46,6 +46,7 @@
     "test:preview-workerd": "node test/smoke-preview-workerd.mjs",
     "test:og": "node test/smoke-og.mjs",
     "test:addon-routes": "node test/smoke-addon-routes.mjs",
+    "test:addon-cms": "node test/smoke-addon-cms.mjs",
     "test:admin-contract": "node test/admin-contract.mjs"
   },
   "bin": {

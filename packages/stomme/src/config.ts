@@ -11,12 +11,21 @@ export interface SiteConfig {
   // astro.config reads it directly (`site: site.url || process.env.SITE_URL || '<own host>'`),
   // so it falls back to the SITE_URL env var, then the site's own hardcoded host.
   url?: string;
+  // Where this site's pages live. A site's public URLs are its OWN content, so every one of
+  // them is configurable per site and localizable ('/services' or '/tjanster'); the defaults
+  // below are neutral English. Consumed by the blocks, by the detail-route injection in the
+  // integration, and by the CMS generator.
   routes?: {
     services?: string; // serviceGrid + ServicePage detail-page prefix
     towns?: string; // linkChips + TownPage detail-page prefix
     blog?: string; // postList detail-page prefix
     contact?: string; // contact page (town/service CTAs link here)
     formSuccess?: string; // contactForm success page
+    // Forward-compatible, exactly like StommeFeatures' index signature: a site may configure
+    // a path the engine doesn't name — e.g. one an out-of-tree extension routes its own pages
+    // on. The whole map is handed to the addon route/CMS manifests, so an extension reads its
+    // own keys here instead of hardcoding a pattern.
+    [key: string]: string | undefined;
   };
   // The site's language + region (BCP47, e.g. 'sv-SE'). Drives date/number formatting and the
   // language of the engine's built-in wording ('sv' and 'en' shipped, else English); `strings`

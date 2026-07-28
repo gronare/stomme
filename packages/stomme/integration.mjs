@@ -869,10 +869,16 @@ const { thanksProps, serviceFixture, townFixture } = templateFixtures(rs);
         }
 
         // 1b. Addon routes — the slots dir may ship a `routes.mjs` at its root exporting an
-        // array of { feature, pattern, entrypoint }. Each is injected only when the site has
-        // that flag on (features[feature] truthy); `entrypoint` is an absolute path into the
-        // dir (already in server.fs.allow above). Data-driven: the engine names no feature and
-        // hardcodes no pattern. No dir / no manifest ⇒ nothing injected.
+        // array of { feature, pattern, entrypoint }, or a FUNCTION returning one. Each is
+        // injected only when the site has that flag on (features[feature] truthy);
+        // `entrypoint` is an absolute path into the dir (already in server.fs.allow above).
+        // Data-driven: the engine names no feature and hardcodes no pattern. No dir / no
+        // manifest ⇒ nothing injected.
+        //
+        // The function form receives the site's own config — `routes` above all — so an addon
+        // derives its patterns from the site's configured, localizable paths (the same map
+        // /services and /thanks come from) instead of shipping a fixed URL. The engine still
+        // names nothing: it hands over the map and injects whatever comes back.
         if (slotsDir) {
           const routesManifest = resolve(slotsDir, 'routes.mjs');
           if (existsSync(routesManifest)) {
@@ -886,7 +892,21 @@ const { thanksProps, serviceFixture, townFixture } = templateFixtures(rs);
                 `stomme: failed to load routes manifest from STOMME_SLOTS_DIR (${routesManifest}): ${e?.message || e}`,
               );
             }
-            const addonRoutes = Array.isArray(mod.routes) ? mod.routes : Array.isArray(mod.default) ? mod.default : [];
+            const declared = mod.routes ?? mod.default;
+            let addonRoutes;
+            try {
+              addonRoutes = typeof declared === 'function'
+                ? declared({ routes, features })
+                : declared;
+            } catch (e) {
+              // The manifest refused the site's config (e.g. two of its pages configured onto
+              // colliding paths). That is a real misconfiguration — fail the build rather than
+              // ship a site whose pages shadow each other.
+              throw new Error(
+                `stomme: the routes manifest in STOMME_SLOTS_DIR (${routesManifest}) rejected this site's config: ${e?.message || e}`,
+              );
+            }
+            if (!Array.isArray(addonRoutes)) addonRoutes = [];
             for (const r of addonRoutes) {
               // Validate each entry before injecting — a malformed/incomplete entry is
               // skipped with a warning, never injected (an invalid pattern or a missing

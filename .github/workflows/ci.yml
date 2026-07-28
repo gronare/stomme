@@ -52,6 +52,25 @@ jobs:
       - name: smoke /preview on workerd
         run: pnpm --filter @gronare/stomme test:preview-workerd -- --no-csp
 
+  # The three seams an out-of-tree extension mounts on (collections, routes, CMS panes).
+  # Nothing in this repo exercises them — a site with no slots dir builds identically with
+  # or without them — so a regression here is invisible until a downstream site breaks.
+  addon-seams:
+    name: addon seams (routes + CMS panes)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: route-manifest injection
+        run: pnpm --filter @gronare/stomme test:addon-routes
+      - name: CMS-pane manifest
+        run: pnpm --filter @gronare/stomme test:addon-cms
+
   # NB: the Sveltia DOM contract test (test:admin-contract) is deliberately NOT a
   # per-PR job — between version bumps the pinned Sveltia (and its DOM) doesn't
   # change, so it would be redundant every run. It runs in sveltia.yml instead:

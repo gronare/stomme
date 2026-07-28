@@ -14,7 +14,13 @@
  *        · '/addon-off'     (feature 'blog', OFF in the starter) → NOT emitted (feature-gated).
  *        · '/addon-missing' (feature ON but a non-existent entrypoint) → NOT emitted, and the
  *          build still SUCCEEDS (the invalid entry is skipped with a warning, not fatal).
+ *        · the manifest may be a FUNCTION: it is called with the site's own { routes, features },
+ *          so an addon derives its patterns from the site's CONFIGURED, localizable paths. The
+ *          stub returns `${routes.formSuccess}-addon`, so '/thanks-addon' proves the starter's
+ *          real route map reached it.
  *   2. WITHOUT STOMME_SLOTS_DIR, the same build emits none of the addon routes (no injection).
+ *   3. A manifest FUNCTION THAT THROWS (an addon refusing a colliding config) fails the build
+ *      loudly instead of shipping a site whose pages shadow each other.
  *
  * The stub reuses the starter's REAL feature flags (faq:true, blog:false in
  * src/site.config.ts) so no tracked file is touched. Injection is asserted by dist output
@@ -61,11 +67,14 @@ try {
   stub = mkdtempSync(join(tmpdir(), 'stomme-addon-routes-'));
   writeFileSync(join(stub, 'on.astro'), page('addon-on'));
   writeFileSync(join(stub, 'off.astro'), page('addon-off'));
+  writeFileSync(join(stub, 'configured.astro'), page('addon-configured'));
   writeFileSync(join(stub, 'collections.mjs'), 'export const collections = {};\n');
-  writeFileSync(join(stub, 'routes.mjs'), `export const routes = [
+  // Function form: the engine calls it with the site's own config.
+  writeFileSync(join(stub, 'routes.mjs'), `export const routes = ({ routes }) => [
   { feature: 'faq', pattern: '/addon-on', entrypoint: ${JSON.stringify(join(stub, 'on.astro'))} },
   { feature: 'blog', pattern: '/addon-off', entrypoint: ${JSON.stringify(join(stub, 'off.astro'))} },
   { feature: 'faq', pattern: '/addon-missing', entrypoint: ${JSON.stringify(join(stub, 'does-not-exist.astro'))} },
+  { feature: 'faq', pattern: \`\${routes.formSuccess}-addon\`, entrypoint: ${JSON.stringify(join(stub, 'configured.astro'))} },
 ];
 `);
 
@@ -79,6 +88,7 @@ try {
   check(!emitted('addon-off'), "'/addon-off' NOT injected (feature 'blog' is OFF)");
   check(!emitted('addon-missing'), "'/addon-missing' NOT injected (entrypoint file does not exist)");
   check(/addon routes: skipped .*addon-missing/.test(withStub.out), 'build warns that the missing-entrypoint entry was skipped');
+  check(emitted('thanks-addon'), "the manifest function is called with the site's own routes — '/thanks-addon' (routes.formSuccess) emitted");
 
   // ── 2. build WITHOUT the stub ───────────────────────────────────────────────────────
   console.log('· static build WITHOUT STOMME_SLOTS_DIR…');
@@ -87,6 +97,16 @@ try {
   check(noStub.ok, 'build succeeds without STOMME_SLOTS_DIR');
   if (!noStub.ok) console.error(noStub.out);
   check(!emitted('addon-on') && !emitted('addon-off') && !emitted('addon-missing'), 'no addon routes injected without a slots dir');
+
+  // ── 3. a manifest that REFUSES the site's config must fail the build ───────────────
+  // An addon whose pages would collide has no safe output; a warning would ship a site
+  // where one page silently shadows another.
+  console.log('· static build with a manifest that throws…');
+  rmSync(DIST, { recursive: true, force: true });
+  writeFileSync(join(stub, 'routes.mjs'), "export const routes = () => { throw new Error('colliding paths'); };\n");
+  const refused = buildStatic({ STOMME_SLOTS_DIR: stub });
+  check(!refused.ok, 'build FAILS when the routes manifest rejects the config');
+  check(/rejected this site's config: colliding paths/.test(refused.out), "the failure names the manifest's own reason");
 } finally {
   if (stub) { try { rmSync(stub, { recursive: true, force: true }); } catch {} }
   try { rmSync(DIST, { recursive: true, force: true }); } catch {}
