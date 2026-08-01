@@ -167,8 +167,23 @@ try {
   });
   await check('object label bar (> header h4)', () => has(page, 'section.field[data-field-type=object] > header h4'));
   await check('list widget renders', () => has(page, 'section.field[data-field-type=list]'));
-  await check('list toolbar chevron (.sui.group > .inner > .toolbar.top > button[aria-expanded])', () =>
-    has(page, 'section.field[data-field-type=list] > .field-wrapper > .sui.group > .inner > .toolbar.top > button[aria-expanded]'));
+  // The exact selector THEME_CSS hides. Its depth inside .toolbar.top varies by Sveltia
+  // version (a direct child beside .summary, or nested in a .label group), hence the
+  // descendant match. The toolbar's Add button ALSO carries aria-expanded, so the rule
+  // excludes menu buttons — the second half asserts that exclusion still separates the two
+  // (exactly one chevron matched, the Add button not), or the CSS silently hides "Add" and
+  // the list can no longer be filled.
+  await check('list toolbar chevron (.toolbar.top disclosure, not the Add menu button)', async () =>
+    (await has(page, 'section.field[data-field-type=list] > .field-wrapper > .sui.group > .inner > .toolbar.top button[aria-expanded]:not([aria-haspopup])'))
+    && (await page.evaluate(() => {
+      // Across the list's own toolbars: Add sits either in a sibling .toolbar.top.add or in
+      // an .actions group inside the one toolbar — both are in the CSS rule's scope.
+      const inner = document.querySelector('section.field[data-field-type=list] > .field-wrapper > .sui.group > .inner');
+      const bars = [...inner.querySelectorAll(':scope > .toolbar')];
+      const chevrons = bars.flatMap((b) => [...b.querySelectorAll('button[aria-expanded]:not([aria-haspopup])')]);
+      const menus = bars.flatMap((b) => [...b.querySelectorAll('button[aria-haspopup=menu]')]);
+      return chevrons.length === 1 && menus.length === 1;
+    })));
 
   // Add a block: the Add button opens ITS popup (aria-controls) with one
   // role=menuitem per block type — never match popups globally (the command
