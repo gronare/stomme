@@ -3,6 +3,7 @@
 // features, optional badge + CTA). One card can be highlighted as the default choice.
 // Styling reads theme tokens, so it follows the site's palette (monochrome on a B&W theme).
 import { resolveButton } from '../src/href';
+import Emph from '../src/Emph.astro';
 
 interface Plan {
   name?: string;
@@ -36,7 +37,7 @@ const anyPrefix = plans.some((p) => p.pricePrefix);
     {(eyebrow || heading || intro) && (
       <div class="section-head">
         {eyebrow && <span class="mono eyebrow">{eyebrow}</span>}
-        {heading && <h2 class="display plans__heading">{heading}</h2>}
+        {heading && <h2 class="display plans__heading"><Emph text={heading} /></h2>}
         {intro && <p class="intro">{intro}</p>}
       </div>
     )}
@@ -54,10 +55,10 @@ const anyPrefix = plans.some((p) => p.pricePrefix);
               <span class="plan__amount">{p.price}</span>{p.period && '\u200b'}{p.period && <span class="plan__period">{p.period}</span>}
             </div>
           )}
-          {p.description && <p class="plan__desc">{p.description}</p>}
+          {p.description && <p class="plan__desc"><Emph text={p.description} /></p>}
           {p.features && p.features.length > 0 && (
             <ul class="plan__features">
-              {p.features.filter((f) => f && f.text).map((f) => <li>{f.text}</li>)}
+              {p.features.filter((f) => f && f.text).map((f) => <li><Emph text={f.text} /></li>)}
             </ul>
           )}
           {(() => { const btn = resolveButton(p.cta, p.ctaLabel, p.ctaHref); return btn && (
@@ -66,6 +67,6 @@ const anyPrefix = plans.some((p) => p.pricePrefix);
         </div>
       ))}
     </div>
-    {footnote && <p class="plans__footnote">{footnote}</p>}
+    {footnote && <p class="plans__footnote"><Emph text={footnote} /></p>}
   </section>
 )}
