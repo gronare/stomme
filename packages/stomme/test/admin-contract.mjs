@@ -302,6 +302,12 @@ try {
 
 const failed = results.filter(([ok]) => !ok);
 console.log(`\n${results.length - failed.length}/${results.length} contract checks passed`);
+// Names stay in RUN ORDER: one broken step cascades (no list row ⇒ every row check after it fails), and only the order separates a root cause from its fallout. Opt-in — no env, no file.
+if (process.env.STOMME_CONTRACT_REPORT) {
+  writeFileSync(process.env.STOMME_CONTRACT_REPORT, JSON.stringify({
+    passed: results.length - failed.length, total: results.length, failed: failed.map(([, name]) => name),
+  }));
+}
 if (failed.length) {
   console.error(`\n✗ Sveltia DOM contract BROKEN — ${failed.length} check(s) our editor CSS/JS rely on no longer hold:`);
   for (const [, name] of failed) console.error(`   · ${name}`);
