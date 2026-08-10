@@ -185,21 +185,32 @@ try {
       return chevrons.length === 1 && menus.length === 1;
     })));
 
-  // Add a block: the Add button opens ITS popup (aria-controls) with one
-  // role=menuitem per block type — never match popups globally (the command
-  // palette / collection nav are role=option listboxes and shadow it).
-  await check('add-item picker opens (aria-controls popup, role=menuitem types)', async () => {
+  // Add a block: the list's own Add button (aria-haspopup=menu, never a row button) opens a
+  // menu with one role=menuitem per block type. 0.176 named that popup via aria-controls;
+  // 0.184 dropped the attribute and renders a plain [role=menu] — so resolve the popup by
+  // aria-controls when it is there and fall back to the open menu that holds the items.
+  // Still never a global [role=option] match: the command palette and collection nav are
+  // listboxes and would shadow it.
+  await check('add-item picker opens (menu button → role=menuitem types)', async () => {
     const id = await page.evaluate(() => {
       const list = document.querySelector('section.field[data-field-type=list]');
-      const add = [...(list?.querySelectorAll(':scope > .field-wrapper button') || [])]
-        .find((b) => /\badd\b/i.test(b.textContent || '') && b.getAttribute('aria-controls') && !b.closest('.item'));
+      const add = [...(list?.querySelectorAll(':scope > .field-wrapper button[aria-haspopup=menu]') || [])]
+        .find((b) => !b.closest('.item'));
       if (!add) return null;
       add.click();
-      return add.getAttribute('aria-controls');
+      return add.getAttribute('aria-controls') || '';
     });
-    if (!id) return false;
-    await page.waitForFunction((pid) => document.getElementById(pid)?.querySelector('button[role=menuitem]'), id, { timeout: 10000 });
-    await page.evaluate((pid) => { document.getElementById(pid).querySelector('button[role=menuitem]').click(); }, id);
+    if (id === null) return false;
+    await page.waitForFunction((pid) => {
+      const host = pid ? document.getElementById(pid) : null;
+      const scope = host || [...document.querySelectorAll('[role=menu]')].find((m) => m.querySelector('button[role=menuitem]'));
+      return !!scope?.querySelector('button[role=menuitem]');
+    }, id, { timeout: 10000 });
+    await page.evaluate((pid) => {
+      const host = pid ? document.getElementById(pid) : null;
+      const scope = host || [...document.querySelectorAll('[role=menu]')].find((m) => m.querySelector('button[role=menuitem]'));
+      scope.querySelector('button[role=menuitem]').click();
+    }, id);
     await page.waitForSelector('section.field[data-field-type=list] .item', { timeout: 10000 });
     return true;
   });
