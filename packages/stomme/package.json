@@ -47,7 +47,8 @@
     "test:og": "node test/smoke-og.mjs",
     "test:addon-routes": "node test/smoke-addon-routes.mjs",
     "test:addon-cms": "node test/smoke-addon-cms.mjs",
-    "test:admin-contract": "node test/admin-contract.mjs"
+    "test:admin-contract": "node test/admin-contract.mjs",
+    "test:noindex": "node test/smoke-noindex.mjs"
   },
   "bin": {
     "stomme-gen": "bin/gen-admin-blocks.mjs",

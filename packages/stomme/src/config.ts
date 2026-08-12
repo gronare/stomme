@@ -27,6 +27,10 @@ export interface SiteConfig {
     // own keys here instead of hardcoding a pattern.
     [key: string]: string | undefined;
   };
+  // Paths that exist but are not to be found. Each entry is a path prefix; a page whose URL sits
+  // under one is served normally and marked noindex, so a link somebody already holds keeps working
+  // while search engines are told to leave it alone. External-managed, like `url`.
+  noindex?: string[];
   // The site's language + region (BCP47, e.g. 'sv-SE'). Drives date/number formatting and the
   // language of the engine's built-in wording ('sv' and 'en' shipped, else English); `strings`
   // overrides individual phrases.
@@ -308,6 +312,16 @@ export const SITE_DEFAULTS = {
   cmsLocale: 'en',
   strings: STRINGS_EN,
 };
+
+// Whether a page is one the site keeps unlisted. Prefix match on whole segments, so '/book' covers
+// '/book/anything' but never '/booking'.
+export function isUnlisted(pathname: string, noindex?: string[]): boolean {
+  const path = String(pathname || '');
+  return (noindex ?? []).some((raw) => {
+    const prefix = String(raw || '').trim().replace(/\/+$/, '');
+    return prefix !== '' && (path === prefix || path.startsWith(`${prefix}/`));
+  });
+}
 
 export function resolveSite(c?: SiteConfig) {
   const s = c && c.strings;

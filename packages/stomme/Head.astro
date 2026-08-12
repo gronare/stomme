@@ -18,6 +18,7 @@ import { getEntry } from 'astro:content';
 // @ts-expect-error — virtual alias, no static types.
 import { site, features, listings } from '@stomme/config';
 import { resolveShareImage } from './src/og-pages.ts';
+import { isUnlisted } from './src/config.ts';
 
 interface Props {
   title?: string;
@@ -60,7 +61,7 @@ const ogUrl = Astro.site ? new URL(Astro.url.pathname, Astro.site).href : undefi
 // noindex so search engines never index it. Once live (Astro.site = the real domain)
 // it's indexable, and the canonical points at the real domain even when the same build
 // is served via the *.pages.dev shadow — so the pages.dev copy defers, not competes.
-const noindex = Astro.site ? new URL(Astro.site).hostname.endsWith('.pages.dev') : false;
+const noindex = isUnlisted(Astro.url.pathname, site?.noindex) || (Astro.site ? new URL(Astro.site).hostname.endsWith('.pages.dev') : false);
 ---
 <title>{title ?? settings.name}</title>
 {description && <meta name="description" content={description} />}
