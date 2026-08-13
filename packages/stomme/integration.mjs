@@ -746,8 +746,10 @@ const { thanksProps, serviceFixture, townFixture } = templateFixtures(rs);
                 ...slotAlias,
               },
             },
-            // Dev server must be allowed to read slot files outside the project root.
-            ...(slotsDir ? { server: { fs: { allow: [slotsDir] } } } : {}),
+            // Dev server must be allowed to read slot files outside the project root — and the
+            // project root itself, which the list replaces rather than extends (a site's own
+            // src/styles/global.css 403s otherwise, with slots wired).
+            ...(slotsDir ? { server: { fs: { allow: [slotsDir, root] } } } : {}),
             // Never inline hoisted component <script> chunks into the HTML (Astro inlines
             // chunks under 4 KB by default). As external /_astro/*.js files they are
             // covered by the /preview CSP's script-src 'self'; inlined they'd need
