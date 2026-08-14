@@ -53,11 +53,19 @@ await new Promise((r) => srv.listen(PORT, r));
 
 let browser;
 const results = [];
+// A check returns true to pass; a STRING is a failure whose text names the DOM property that
+// moved — "fail" alone sends the next reader back to a browser to find out which half broke.
 const check = async (name, fn) => {
-  try { const ok = await fn(); results.push([!!ok, name]); console.log(`${ok ? '✓' : '✗'} ${name}`); }
-  catch (e) { results.push([false, name]); console.log(`✗ ${name} — ${String(e.message).split('\n')[0]}`); }
+  try {
+    const r = await fn();
+    const why = typeof r === 'string' ? r : '';
+    const ok = !why && !!r;
+    results.push([ok, name, why]);
+    console.log(`${ok ? '✓' : '✗'} ${name}${why ? ` — ${why}` : ''}`);
+  } catch (e) { const why = String(e.message).split('\n')[0]; results.push([false, name, why]); console.log(`✗ ${name} — ${why}`); }
 };
 const has = (page, sel) => page.evaluate((s) => !!document.querySelector(s), sel);
+let optKeys = [];
 
 try {
   browser = await chromium.launch({ channel: 'chrome', headless: true });
@@ -259,41 +267,126 @@ try {
   });
   await check('optional-object "Add" checkbox (> .field-wrapper > .sui.checkbox)', () => has(page, 'section.field[data-field-type=object] > .field-wrapper > .sui.checkbox'));
   await check('optional-object toggle is button[role=checkbox][aria-checked]', () => has(page, '.sui.checkbox .inner > button[role=checkbox][aria-checked]'));
-  await check('optional-object ADDED state gains > .field-wrapper > .wrapper', async () => {
-    // OPT_OFF detection in the CSS/JS: unadded has no .wrapper; checking adds it.
-    const hit = await page.evaluate(() => {
-      const f = [...document.querySelectorAll('section.field[data-field-type=object]')]
-        .find((o) => o.querySelector(':scope > .field-wrapper > .sui.checkbox .inner > button[role=checkbox][aria-checked="false"]')
-          && !o.querySelector(':scope > .field-wrapper > .wrapper'));
-      if (!f) return null;
-      f.setAttribute('data-stomme-probe', '1');
-      f.querySelector(':scope > .field-wrapper > .sui.checkbox .inner > button[role=checkbox]').click();
-      return true;
-    });
-    if (!hit) return false;
-    await page.waitForFunction(() => document.querySelector('[data-stomme-probe] > .field-wrapper > .wrapper'), null, { timeout: 5000 });
+  // ---- Optional-object cards, whole lifecycle, EVERY card in the pane ----
+  // These carry the thanks buttons, the header CTA and per-entry SEO on every site.
+  // One aspect per check so a red names the DOM property that moved, and every card is driven
+  // (not just the first match) — a regression that only reaches the second card is the same bug.
+  await check('optional-object: the pane has optional-object cards to drive', async () => {
+    const keys = await page.evaluate(() => [...document.querySelectorAll('section.field[data-field-type=object]')]
+      .filter((o) => o.querySelector(':scope > .field-wrapper > .sui.checkbox .inner > button[role=checkbox][aria-checked="false"]'))
+      .map((o, i) => { o.setAttribute('data-stomme-opt', String(i)); return o.getAttribute('data-key-path') || `#${i}`; }));
+    optKeys = keys;
+    return keys.length ? true : 'no unadded section.field[data-field-type=object] carries > .field-wrapper > .sui.checkbox .inner > button[role=checkbox] — optional objects no longer render an Add switch';
+  });
+  const eachCard = (fn) => async () => {
+    for (let i = 0; i < optKeys.length; i++) {
+      const why = await page.evaluate(([idx, key]) => {
+        const f = document.querySelector(`[data-stomme-opt="${idx}"]`);
+        if (!f) return `${key}: the card vanished from the DOM`;
+        return null;
+      }, [i, optKeys[i]]);
+      if (why) return why;
+      const r = await fn(i, optKeys[i]);
+      if (r !== true) return `${optKeys[i]}: ${r}`;
+    }
     return true;
-  });
-  await check('optional-object: added state starts COLLAPSED, card click toggles both ways', async () => {
-    // The switch only adds/removes; no auto-expand (editor.js) + collapsed:true emitted.
-    const disc = () => page.evaluate(() => {
-      const b = document.querySelector('[data-stomme-probe] > .field-wrapper > .wrapper > .header > div:first-child > button[aria-expanded]');
-      return b && b.getAttribute('aria-expanded');
-    });
-    await page.waitForFunction(() => document.querySelector('[data-stomme-probe] > .field-wrapper > .wrapper > .header > div:first-child > button[aria-expanded]'), null, { timeout: 5000 });
-    if (await disc() !== 'false') return false;
-    const clickRow = () => page.evaluate(() => {
-      const f = document.querySelector('[data-stomme-probe]');
-      f.dispatchEvent(new MouseEvent('click', { bubbles: true }));
-    });
-    await clickRow();
-    await page.waitForTimeout(300);
-    const opened = await disc() === 'true';
-    await clickRow();
-    await page.waitForTimeout(300);
-    const closed = await disc() === 'false';
-    return opened && closed;
-  });
+  };
+  const card = (i) => `[data-stomme-opt="${i}"]`;
+  const discState = (i) => page.evaluate((s) => {
+    const b = document.querySelector(`${s} > .field-wrapper > .wrapper > .header > div:first-child > button[aria-expanded]`);
+    return b ? b.getAttribute('aria-expanded') : null;
+  }, card(i));
+  const cardHeight = (i) => page.evaluate((s) => Math.round(document.querySelector(s).getBoundingClientRect().height), card(i));
+  const childCount = (i) => page.evaluate((s) => {
+    const l = document.querySelector(`${s} > .field-wrapper > .wrapper > .item-list`);
+    return l ? l.querySelectorAll(':scope > section.field').length : -1;
+  }, card(i));
+  const clickCard = (i) => page.evaluate((s) => { document.querySelector(s).dispatchEvent(new MouseEvent('click', { bubbles: true })); }, card(i));
+  // The chevron rotates through a 160ms transition, so it is read by polling to settle — an
+  // instant read lands on the pre-transition value and would fail on every green run.
+  const chevron = (i) => page.evaluate((s) => {
+    const h = document.querySelector(`${s} > header`);
+    if (!h) return null;
+    const b = getComputedStyle(h, '::before');
+    return { content: b.content, transform: b.transform, font: b.fontFamily };
+  }, card(i));
+  const chevronSettles = async (i, rotated) => {
+    for (let t = 0; t < 20; t++) {
+      const c = await chevron(i);
+      if (c && (rotated ? c.transform !== 'none' : c.transform === 'none')) return true;
+      await page.waitForTimeout(50);
+    }
+    return false;
+  };
+  const collapsedH = [];
+
+  await check('optional-object: UNADDED card has no > .field-wrapper > .wrapper (the OPT_OFF signal)', eachCard(async (i) => {
+    const st = await page.evaluate((s) => {
+      const f = document.querySelector(s);
+      return { checked: f.querySelector(':scope > .field-wrapper > .sui.checkbox .inner > button[role=checkbox]').getAttribute('aria-checked'), wrapper: !!f.querySelector(':scope > .field-wrapper > .wrapper') };
+    }, card(i));
+    if (st.checked !== 'false') return `starts aria-checked="${st.checked}" — expected an unadded card`;
+    return st.wrapper ? 'unadded but already has > .field-wrapper > .wrapper — OPT_OFF can no longer be detected' : true;
+  }));
+
+  await check('optional-object ADDED state gains > .field-wrapper > .wrapper', eachCard(async (i) => {
+    await page.evaluate((s) => { document.querySelector(`${s} > .field-wrapper > .sui.checkbox .inner > button[role=checkbox]`).click(); }, card(i));
+    try { await page.waitForFunction((s) => document.querySelector(`${s} > .field-wrapper > .wrapper`), card(i), { timeout: 5000 }); }
+    catch { return 'the Add switch did not mount > .field-wrapper > .wrapper'; }
+    return true;
+  }));
+
+  // Arming is its own contract: editor.js owns click-to-expand on these cards, so a card that
+  // mounts without being armed is inert no matter how intact the rest of the DOM looks. Waiting
+  // on it also takes the observer's scheduling out of the gesture checks below — those must fail
+  // on a DOM change, never on which frame the scan happened to land in.
+  await check('optional-object: editor.js ARMS the freshly mounted card (click-to-expand bound)', eachCard(async (i) => {
+    try { await page.waitForFunction((s) => !!document.querySelector(s).__stommeObj, card(i), { timeout: 5000 }); }
+    catch { return 'editor.js never bound enhanceObject — objectToggle() finds no > .field-wrapper > .wrapper > .header button[aria-expanded]'; }
+    return true;
+  }));
+
+  await check('optional-object: added card starts COLLAPSED (disclosure aria-expanded="false")', eachCard(async (i) => {
+    const s = await discState(i);
+    if (s === null) return 'no disclosure at > .field-wrapper > .wrapper > .header > div:first-child > button[aria-expanded]';
+    collapsedH[i] = await cardHeight(i);
+    return s === 'false' ? true : `disclosure is aria-expanded="${s}" right after Add — the card auto-expands (collapsed:true no longer honoured, or editor.js expands it)`;
+  }));
+
+  await check('optional-object: collapsed card mounts no child fields (.wrapper > .item-list empty)', eachCard(async (i) => {
+    const n = await childCount(i);
+    if (n < 0) return 'no > .field-wrapper > .wrapper > .item-list';
+    return n === 0 ? true : `${n} child section.field(s) rendered while collapsed — the one-row card is not collapsed`;
+  }));
+
+  // The only affordance that says a card can be opened: THEME_CSS ${CHEVRON} on the card's own
+  // header. Lose it and the card still works but reads as dead — no other check would notice.
+  await check('optional-object: collapsed card shows the rotated chevron (> header ::before)', eachCard(async (i) => {
+    const c = await chevron(i);
+    if (!c) return 'the card has no own > header to hang the chevron on';
+    if (!/expand_more/.test(c.content)) return `> header ::before content is ${c.content} — the chevron affordance is gone`;
+    if (!/Material Symbols/.test(c.font)) return `> header ::before font-family is ${c.font} — the icon font no longer resolves`;
+    return (await chevronSettles(i, true)) ? true : '> header ::before never rotates while collapsed — open and closed look identical';
+  }));
+
+  await check('optional-object: a card click EXPANDS it (aria-expanded, child fields, height)', eachCard(async (i) => {
+    await clickCard(i);
+    try { await page.waitForFunction((s) => document.querySelector(`${s} > .field-wrapper > .wrapper > .header > div:first-child > button[aria-expanded="true"]`), card(i), { timeout: 5000 }); }
+    catch { return `a click on the card did not flip the disclosure to aria-expanded="true" (still ${await discState(i)})`; }
+    const n = await childCount(i);
+    if (n < 1) return 'expanded but > .wrapper > .item-list mounted no child section.field';
+    const h = await cardHeight(i);
+    if (!(h > collapsedH[i])) return `expanded but the card is still ${h}px (collapsed was ${collapsedH[i]}px) — the fields are not visible`;
+    return (await chevronSettles(i, false)) ? true : `expanded but > header ::before stays rotated (${(await chevron(i)).transform}) — the chevron lies about the state`;
+  }));
+
+  await check('optional-object: a second card click COLLAPSES it again (both ways, not one-shot)', eachCard(async (i) => {
+    await clickCard(i);
+    try { await page.waitForFunction((s) => document.querySelector(`${s} > .field-wrapper > .wrapper > .header > div:first-child > button[aria-expanded="false"]`), card(i), { timeout: 5000 }); }
+    catch { return `a second click did not flip the disclosure back to aria-expanded="false" (still ${await discState(i)}) — the card opens but cannot be closed`; }
+    const h = await cardHeight(i);
+    return h === collapsedH[i] ? true : `collapsed again but the card is ${h}px, not the ${collapsedH[i]}px it started at`;
+  }));
 } finally {
   if (browser) await browser.close();
   srv.close();
@@ -305,12 +398,12 @@ console.log(`\n${results.length - failed.length}/${results.length} contract chec
 // Names stay in RUN ORDER: one broken step cascades (no list row ⇒ every row check after it fails), and only the order separates a root cause from its fallout. Opt-in — no env, no file.
 if (process.env.STOMME_CONTRACT_REPORT) {
   writeFileSync(process.env.STOMME_CONTRACT_REPORT, JSON.stringify({
-    passed: results.length - failed.length, total: results.length, failed: failed.map(([, name]) => name),
+    passed: results.length - failed.length, total: results.length, failed: failed.map(([, name, why]) => (why ? `${name} — ${why}` : name)),
   }));
 }
 if (failed.length) {
   console.error(`\n✗ Sveltia DOM contract BROKEN — ${failed.length} check(s) our editor CSS/JS rely on no longer hold:`);
-  for (const [, name] of failed) console.error(`   · ${name}`);
+  for (const [, name, why] of failed) console.error(`   · ${name}${why ? `\n     ↳ ${why}` : ''}`);
   console.error('\nA Sveltia upgrade likely changed the editor DOM. Re-check THEME_CSS + admin/editor.js against the new structure (see Resources/stomme-sveltia-upgrade-risks.md).');
   process.exit(1);
 }

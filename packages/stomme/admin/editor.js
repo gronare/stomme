@@ -302,10 +302,13 @@
     });
     enhanceFaqTags();
   }
-  var scheduled = 0;
+  var raf = 0, timer = 0;
+  function run() { cancelAnimationFrame(raf); clearTimeout(timer); raf = timer = 0; scan(); }
+  // Never rAF alone: the browser suspends it while the document is hidden, so a card mounted in that window would stay unarmed (no click-to-expand, no drag) until the tab is looked at again — the timeout is the ceiling, and whichever fires first cancels the other.
   var obs = new MutationObserver(function () {
-    if (scheduled) return;
-    scheduled = requestAnimationFrame(function () { scheduled = 0; scan(); });
+    if (raf || timer) return;
+    raf = requestAnimationFrame(run);
+    timer = setTimeout(run, 16);
   });
   function start() {
     obs.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['aria-expanded', 'aria-checked'] });
