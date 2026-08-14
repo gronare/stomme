@@ -1,0 +1,7 @@
+---
+// Fallback target for the @stomme/addon-preview alias when the slots dir ships no preview.astro
+// (or STOMME_SLOTS_DIR is unset): an unknown /preview?kind= then renders nothing rather than
+// failing the build. See the addon preview alias in integration.mjs.
+const { kind } = Astro.props;
+---
+<p style="color:#6b7280;font-size:.9rem;margin:1.5rem">Ingen förhandsvisning för "{kind}".</p>

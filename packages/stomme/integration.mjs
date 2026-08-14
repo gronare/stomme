@@ -78,6 +78,7 @@ import FindUs from '@gronare/stomme/blocks/FindUs.astro';
 import ServicePage from '@gronare/stomme/ServicePage.astro';
 import TownPage from '@gronare/stomme/TownPage.astro';
 import { renderMarkdown } from '@gronare/stomme/markdown';
+import AddonPreview from '@stomme/addon-preview';
 
 // Reflected-XSS hardening. /preview renders attacker-controlled ?data= (markdown body,
 // block content) through set:html; on SSR it is an unauthenticated public GET. A strict
@@ -341,6 +342,10 @@ if (shareDraft && scOg.enabled) {
         <p style="color:#6b7280;font-size:.9rem;margin:0">Cards are off — pages share the site default image above.</p>
       )}
     </div>
+  </div></Base>
+) : kind ? (
+  <Base title="Preview"><div id="preview-root">
+    <AddonPreview kind={kind} draft={draft} config={site} />
   </div></Base>
 ) : (
   <Base title="Preview"><div id="preview-root"><BlockRenderer blocks={blocks} config={site} features={features} /></div></Base>
@@ -744,6 +749,15 @@ const { thanksProps, serviceFixture, townFixture } = templateFixtures(rs);
         slotAlias['@stomme/addon-blocks'] = addonBlocksOn
           ? addonBlocksFile
           : resolve(pkgDir, 'src/AddonBlocksNoop.mjs');
+
+        // Addon preview — the /preview route renders this component for any `kind` it does not
+        // know itself, so an addon's own page can be previewed BY ITS OWN COMPONENTS rather than
+        // by a hand-built mockup. `preview.astro` at the slots dir root; noop renders nothing.
+        const addonPreviewFile = slotsDir ? resolve(slotsDir, 'preview.astro') : null;
+        const addonPreviewOn = !!(addonPreviewFile && existsSync(addonPreviewFile));
+        slotAlias['@stomme/addon-preview'] = addonPreviewOn
+          ? addonPreviewFile
+          : resolve(pkgDir, 'src/AddonPreviewNoop.astro');
 
         updateConfig({
           vite: {

@@ -361,6 +361,17 @@
   // Config-defined listing collections (news / for-sale / …) get the matching preset
   // preview. stomme-gen appends stommeRegisterListing(id, preset, specs) calls for this
   // site; `specs` is the catalog listing's [{key,label}] so the preview can label them.
+  // A collection whose entry is rendered by a page of its own: previewed through /preview?kind=,
+  // the same live frame the chrome panes use, with the draft passed along so the page shows what
+  // is being typed. Exposed for an addon's previews.js — the engine never names the kinds.
+  window.stommeRegisterFramePage = function (name, kind) {
+    window.CMS.registerPreviewTemplate(name, function (props) {
+      var data = props.entry.get('data');
+      data = data && data.toJS ? data.toJS() : (data || {});
+      return liveFrame('stomme-preview-' + kind, '/preview?kind=' + kind, b64(data));
+    });
+  };
+
   // Any collection whose entry IS a composed page (title/heading/intro + blocks) can reuse the
   // live page preview. Exposed so an addon's own previews.js registers its pages without the
   // engine naming them: stommeRegisterPage('confirmation').
