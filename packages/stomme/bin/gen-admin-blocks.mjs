@@ -804,7 +804,16 @@ let ADDON_PANES = [];
       const mod = await import(pathToFileURL(manifest).href);
       const declared = mod.collections ?? mod.default;
       const entries = typeof declared === 'function'
-        ? declared({ routes: ROUTES, features: FEATURES, blocks: emitWidget })
+        ? declared({
+            routes: ROUTES, features: FEATURES, blocks: emitWidget,
+            // The house field shapes, so an addon's own pages ask for a button or a link the same
+            // way every other page does instead of hand-copying the YAML.
+            fields: {
+              button: (name, label, indent = 8, hint) => emitField(buttonField(name, label, hint), indent),
+              link: (name, label, indent = 8, hint) =>
+                emitField({ ...navLinkField(hint), name, label }, indent),
+            },
+          })
         : declared;
       ADDON_PANES = (Array.isArray(entries) ? entries : []).filter((e) => {
         if (!e || typeof e.feature !== 'string' || !e.feature || typeof e.yaml !== 'string' || !e.yaml.trim()) {
