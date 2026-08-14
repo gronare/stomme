@@ -631,7 +631,9 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
     outline: none;
     border-color: var(--color-brand);
   }
-  .contact-form .btn { align-self: flex-start; border: none; cursor: pointer; }
+  /* Ingen border-nollställning: på ett tema där .btn ÄR en konturknapp blir skickaknappen bar
+     text utan ram. Formulärets knapp ska se ut som sajtens andra knappar. */
+  .contact-form .btn { align-self: flex-start; cursor: pointer; }
 
   /* Direct-contact card — shared by the contact-form aside, /thanks, and the inline
      confirmation (DirectContact.astro). `--tint` is the soft brand-tinted variant. */

@@ -821,9 +821,17 @@ const ADDON_PANEL_FILES = {};
       // header and the identity — instead of as a lone collection at the bottom of the sidebar. The
       // engine names no collection and no feature: it takes { <collection>: [ { feature, yaml } ] }
       // and splices each entry into that collection's own `files:` list when the feature is on.
-      const panels = typeof mod.panelFiles === 'function'
-        ? mod.panelFiles({ routes: ROUTES, features: FEATURES })
-        : mod.panelFiles;
+      // Samma kontext som collections får: en panelfil är en sida som helst, och blockväljaren är
+      // sajtens egen — den går inte att återskapa i tillägget.
+      const addonCtx = {
+        routes: ROUTES, features: FEATURES, blocks: emitWidget,
+        fields: {
+          button: (name, label, indent = 8, hint) => emitField(buttonField(name, label, hint), indent),
+          link: (name, label, indent = 8, hint) =>
+            emitField({ ...navLinkField(hint), name, label }, indent),
+        },
+      };
+      const panels = typeof mod.panelFiles === 'function' ? mod.panelFiles(addonCtx) : mod.panelFiles;
       for (const [collection, list] of Object.entries(panels || {})) {
         ADDON_PANEL_FILES[collection] = (Array.isArray(list) ? list : []).filter((e) => {
           if (!e || typeof e.feature !== 'string' || !e.feature || typeof e.yaml !== 'string' || !e.yaml.trim()) {

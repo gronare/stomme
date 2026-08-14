@@ -1,6 +1,9 @@
 ---
 import { getEntry } from 'astro:content';
 import ContactLink from './ContactLink.astro';
+import { site } from '@stomme/config';
+// Rubrikerna följer sajtens språk som resten av motorns egen copy; hårdkodade stod de på engelska på varje svensk sajt.
+const copy: Record<string, string> = (site as any)?.strings?.contact ?? {};
 // Direct-contact card — ONE component, fed by the Contact settings, with per-placement
 // display toggles (show). Used by the contact-form aside, /thanks, the contactCard block,
 // and the findUs block. Phone in the brand colour; an optional away banner (global, from
@@ -72,7 +75,7 @@ const slug = (p: string) => p.toLowerCase().replace(/[^a-z]/g, '');
 
   {s.hours && (hours.length > 0 || holiday.length > 0) && (
     <div class="direct-card__sec">
-      <h2 class="mono direct-card__h">Opening hours</h2>
+      <h2 class="mono direct-card__h">{copy.hours ?? "Opening hours"}</h2>
       {holiday.map((hl) => (
         <p class="direct-card__holiday"><span class="direct-card__away-dot" aria-hidden="true"></span><span><b>{hl.when}</b>{hl.note ? ` — ${hl.note}` : ''}</span></p>
       ))}
@@ -90,7 +93,7 @@ const slug = (p: string) => p.toLowerCase().replace(/[^a-z]/g, '');
 
   {s.address && hasAddr && (
     <div class="direct-card__sec">
-      <h2 class="mono direct-card__h">Visit</h2>
+      <h2 class="mono direct-card__h">{copy.visit ?? "Visit"}</h2>
       <p class="direct-card__addr">
         {address.street}{address.street && <br />}
         {addrLine2}{addrLine2 && <br />}

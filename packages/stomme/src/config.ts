@@ -192,7 +192,7 @@ export function resolveListings(l?: Listing[]): (Omit<Listing, 'specs'> & { spec
 const STRINGS_EN = {
   readMore: 'Read more',
   latest: 'Latest',
-  contact: { name: 'Name', email: 'Email', phone: 'Phone', message: 'Describe your project', submit: 'Send request', direct: 'Direct contact', honeypot: 'Leave this field empty' },
+  contact: { name: 'Name', email: 'Email', phone: 'Phone', message: 'Describe your project', submit: 'Send request', direct: 'Direct contact', honeypot: 'Leave this field empty', hours: 'Opening hours', visit: 'Visit' },
   beforeAfter: { before: 'Before', after: 'After' },
   town: {
     eyebrow: 'Local service: {name}',
@@ -242,7 +242,7 @@ const STRINGS_EN = {
 const STRINGS_SV: typeof STRINGS_EN = {
   readMore: 'Läs mer',
   latest: 'Senaste',
-  contact: { name: 'Namn', email: 'E-post', phone: 'Telefon', message: 'Beskriv ditt projekt', submit: 'Skicka förfrågan', direct: 'Direktkontakt', honeypot: 'Lämna fältet tomt' },
+  contact: { name: 'Namn', email: 'E-post', phone: 'Telefon', message: 'Beskriv ditt projekt', submit: 'Skicka förfrågan', direct: 'Direktkontakt', honeypot: 'Lämna fältet tomt', hours: 'Öppettider', visit: 'Hitta hit' },
   beforeAfter: { before: 'Före', after: 'Efter' },
   town: {
     eyebrow: 'Lokal tjänst: {name}',
