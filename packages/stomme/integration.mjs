@@ -691,6 +691,25 @@ const { thanksProps, serviceFixture, townFixture } = templateFixtures(rs);
 `;
 }
 
+// Vites publicmiddleware matchar bara exakta filnamn, så en katalogadress ur public/ når aldrig sirv och Astros router har ingen rutt för den: `/admin` ger 404 i dev medan samma adress fungerar i drift, och både README och create-stomme lovar att CMS:et ligger där.
+function publicIndexPlugin(publicDir) {
+  return {
+    name: 'stomme:public-index',
+    enforce: 'pre',
+    configureServer(server) {
+      server.middlewares.use((req, _res, next) => {
+        const [path, query] = (req.url || '').split('?');
+        let rel = '';
+        try { rel = decodeURIComponent(path || '').replace(/^\/+|\/+$/g, ''); } catch { return next(); }
+        if (rel && !rel.split('/').includes('..') && existsSync(resolve(publicDir, rel, 'index.html'))) {
+          req.url = `/${rel}/index.html${query ? `?${query}` : ''}`;
+        }
+        next();
+      });
+    },
+  };
+}
+
   return {
     name: 'stomme',
     hooks: {
@@ -767,6 +786,7 @@ const { thanksProps, serviceFixture, townFixture } = templateFixtures(rs);
 
         updateConfig({
           vite: {
+            plugins: [ publicIndexPlugin(fileURLToPath(config.publicDir)) ],
             resolve: {
               alias: {
                 '@stomme/base': resolve(root, layout),
