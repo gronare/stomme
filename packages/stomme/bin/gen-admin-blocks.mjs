@@ -1311,6 +1311,21 @@ if (!/^output:/m.test(yaml)) {
   yaml = `output:\n  omit_empty_optional_fields: true\n${yaml}`;
 }
 yaml = translateLabels(yaml);
+
+// MONOREPO: Sveltia's local mode requires the picked directory to BE the repository root (it
+// checks for `.git`), and every path in this file is resolved from there. A site that lives in a
+// subdirectory therefore needs its paths written from the repo root, which is what `cms.repoPath`
+// says ('sites/publik'). Only filesystem paths move: `public_folder` is a URL on the built site
+// and must not gain the prefix, or every image 404s.
+const REPO_PATH = String((CMS && CMS.repoPath) || '').trim().replace(/^\/+|\/+$/g, '');
+if (REPO_PATH) {
+  yaml = yaml
+    .replace(/^(\s*)(folder|file): "(?!\/)/gm, `$1$2: "${REPO_PATH}/`)
+    .replace(/^(\s*)media_folder: "\//gm, `$1media_folder: "/${REPO_PATH}/`)
+    .replace(/(\{[^}\n]*?)media_folder: "\//g, `$1media_folder: "/${REPO_PATH}/`);
+  console.log(`  · monorepo: paths written from the repo root (${REPO_PATH}/…)`);
+}
+
 writeFileSync(configPath, yaml);
 
 // Ship the engine's generic preview templates into the site's admin so live page
