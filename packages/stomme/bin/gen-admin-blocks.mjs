@@ -394,6 +394,19 @@ function emitField(f, indent) {
     head.push(`${p}  fields:`);
     return [...head, ...f.fields.map((sf) => emitField(sf, indent + 4))].join('\n');
   }
+  // A RELATION points at another collection, and its target is the whole field: without
+  // `collection` + `value_field` the CMS shows a picker that resolves nothing.
+  if (f.widget === 'relation') {
+    const list = (v) => `[${(Array.isArray(v) ? v : [v]).map(q).join(', ')}]`;
+    return [`${p}- name: ${f.name}`, `${p}  label: ${q(f.label)}`, `${p}  widget: relation`,
+      ...(f.required === false ? [`${p}  required: false`] : []),
+      `${p}  collection: ${q(f.collection)}`,
+      `${p}  value_field: ${q(f.value_field || '{{slug}}')}`,
+      ...(f.search_fields ? [`${p}  search_fields: ${list(f.search_fields)}`] : []),
+      ...(f.display_fields ? [`${p}  display_fields: ${list(f.display_fields)}`] : []),
+      ...(f.multiple ? [`${p}  multiple: true`] : []),
+      ...(f.hint ? [`${p}  hint: ${q(f.hint)}`] : [])].join('\n');
+  }
   if (f.widget === 'select') {
     const opts = typeof f.options === 'string' ? OPTION_SOURCES[f.options] ?? [] : Array.isArray(f.options) ? f.options : [];
     const out = [`${p}- name: ${f.name}`, `${p}  label: ${q(f.label)}`, `${p}  widget: select`];
