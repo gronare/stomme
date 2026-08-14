@@ -402,7 +402,13 @@ if (shareDraft && scOg.enabled) {
         .then(function (html) {
           var cur = document.getElementById('preview-root');
           var fresh = new DOMParser().parseFromString(html, 'text/html').getElementById('preview-root');
-          if (cur && fresh) morphChildren(cur, fresh);
+          if (cur && fresh) {
+            morphChildren(cur, fresh);
+            // A morph patches the DOM but never re-runs a page's island: anything that painted
+            // itself on load (a card built from data attributes) would sit at its empty first
+            // state for every edit after the first. The page listens and paints again.
+            cur.dispatchEvent(new CustomEvent('stomme:preview-morph', { bubbles: true }));
+          }
         })
         .catch(function () {})
         .then(function () {
