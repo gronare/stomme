@@ -735,6 +735,16 @@ const { thanksProps, serviceFixture, townFixture } = templateFixtures(rs);
           ? addonCollectionsFile
           : resolve(pkgDir, 'src/AddonCollectionsNoop.mjs');
 
+        // Addon blocks — the same seam for BLOCK TYPES. A `blocks.mjs` at the slots dir root
+        // exports `{ type: Component }`, which BlockRenderer merges into its own registry (a
+        // site's own registry still wins on a key clash). No dir / no file ⇒ {} ⇒ the library
+        // blocks and nothing else. The engine never names an addon's block types.
+        const addonBlocksFile = slotsDir ? resolve(slotsDir, 'blocks.mjs') : null;
+        const addonBlocksOn = !!(addonBlocksFile && existsSync(addonBlocksFile));
+        slotAlias['@stomme/addon-blocks'] = addonBlocksOn
+          ? addonBlocksFile
+          : resolve(pkgDir, 'src/AddonBlocksNoop.mjs');
+
         updateConfig({
           vite: {
             resolve: {

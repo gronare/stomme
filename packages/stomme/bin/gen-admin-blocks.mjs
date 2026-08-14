@@ -43,11 +43,33 @@ if (!existsSync(configPath)) {
 
 // The site's catalog. Loaded via jiti so its bare '@gronare/stomme/kit' import resolves
 // against the consumer's node_modules and transpiles cleanly even when installed there.
-const { BLOCKS } = await jiti.import(schemaPath);
-if (!Array.isArray(BLOCKS)) {
+const { BLOCKS: SITE_BLOCKS } = await jiti.import(schemaPath);
+if (!Array.isArray(SITE_BLOCKS)) {
   console.error(`No BLOCKS export found in ${schemaPath}`);
   process.exit(1);
 }
+
+// Addon block catalog — the slots dir (STOMME_SLOTS_DIR, the same one supplying slot components,
+// addon collections, addon routes and addon CMS panes) may ship a `block-catalog.mjs` exporting
+// `BLOCKS`: the picker entries for the block types its `blocks.mjs` registers. Without this the
+// component would render but no editor could ever choose it. A site's own catalog wins on a type
+// clash, since its schema.ts is the file its owner edits.
+const BLOCKS = await (async () => {
+  const slotsDir = process.env.STOMME_SLOTS_DIR;
+  const file = slotsDir ? resolve(slotsDir, 'block-catalog.mjs') : null;
+  if (!file || !existsSync(file)) return SITE_BLOCKS;
+  try {
+    const mod = await jiti.import(pathToFileURL(file).href);
+    const added = (Array.isArray(mod.BLOCKS) ? mod.BLOCKS : []).filter((b) => b && b.type);
+    const own = new Set(SITE_BLOCKS.map((b) => b.type));
+    const fresh = added.filter((b) => !own.has(b.type));
+    if (fresh.length) console.log(`  · addon blocks: ${fresh.map((b) => b.type).join(', ')}`);
+    return [ ...SITE_BLOCKS, ...fresh ];
+  } catch (e) {
+    console.warn(`  ⚠ addon blocks: ${resolve(file)} could not be read (${e.message}) — skipped`);
+    return SITE_BLOCKS;
+  }
+})();
 
 // Collection→route map from the site's own config (no longer hardcoded). The site
 // exports `site` (a SiteConfig) from src/site.config.ts; Node strips its TS types.
@@ -320,6 +342,27 @@ function emitField(f, indent) {
     // whole list behind a single "N items" row is a redundant extra click. Items stay
     // visible as collapsed cards (collapsed:true) instead.
   ];
+  // A BLOCK LIST inside a block: the same picker, one level down. `widget: 'blocks'` in a
+  // catalog field means "sections here too" — a container block needs the real type list, not a
+  // hand-copied subset. The nested list never offers container types again, so the CMS cannot
+  // build a doll's house.
+  if (f.widget === 'blocks') {
+    const types = AVAILABLE_BLOCKS.filter((b) => !b.fields.some((x) => x.widget === 'blocks'));
+    const lines = [`${p}- name: ${f.name}`, `${p}  label: ${q(f.label)}`, `${p}  widget: list`,
+      ...(f.required === false ? [`${p}  required: false`] : []),
+      ...collapseProps(),
+      ...(f.hint ? [`${p}  hint: ${q(f.hint)}`] : []),
+      `${p}  summary: "{{fields.eyebrow}} {{fields.heading}}{{fields.quote}}"`,
+      `${p}  types:`];
+    for (const b of types) {
+      lines.push(`${p}    - name: ${b.type}`, `${p}      label: ${q(b.label)}`, `${p}      widget: object`);
+      lines.push(`${p}      fields:`);
+      lines.push(...(b.fields.length
+        ? b.fields.map((sf) => emitField(sf, indent + 8))
+        : [`${p}        - { name: _auto, label: "Auto", widget: hidden }`]));
+    }
+    return lines.join('\n');
+  }
   if (f.widget === 'list' && f.fields) {
     const sum = f.summary || listSummary(f.fields);
     return [`${p}- name: ${f.name}`, `${p}  label: ${q(f.label)}`, `${p}  widget: list`,
