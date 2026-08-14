@@ -9,7 +9,7 @@
 // Writes: <cwd>/public/admin/config.yml (override: BLOCKKIT_CONFIG)
 // The consumer's schema.ts imports field helpers from '@gronare/stomme/kit'; Node strips
 // the TS types on import (Node 22.6+).
-import { readFileSync, writeFileSync, readdirSync, copyFileSync, cpSync, mkdirSync, existsSync } from 'node:fs';
+import { readFileSync, writeFileSync, readdirSync, copyFileSync, cpSync, mkdirSync, existsSync, rmSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { createJiti } from 'jiti';
@@ -1328,6 +1328,25 @@ if (REPO_PATH) {
 
 writeFileSync(configPath, yaml);
 
+// The slots dir may ship a `previews.js` registering preview templates for the collections it
+// contributes — the same seam shape as its collections, routes, CMS panes and blocks. Copied
+// beside the engine's own and loaded between it and the site's, so the engine's generic
+// templates are available to it and the site still has the last word.
+try {
+  const slotsDir = process.env.STOMME_SLOTS_DIR;
+  const src = slotsDir ? resolve(slotsDir, 'previews.js') : null;
+  const dest = resolve(root, 'public/admin/stomme-addon-previews.js');
+  if (src && existsSync(src)) {
+    mkdirSync(dirname(dest), { recursive: true });
+    copyFileSync(src, dest);
+    console.log('  ↳ addon previews: stomme-addon-previews.js');
+  } else if (existsSync(dest)) {
+    rmSync(dest);
+  }
+} catch (e) {
+  console.warn('  (addon previews copy skipped:', e.message + ')');
+}
+
 // Ship the engine's generic preview templates into the site's admin so live page
 // previews + readable settings previews work out of the box (loaded before the
 // site's own previews.js). Regenerated each run, so engine updates flow through.
@@ -1415,6 +1434,14 @@ try {
   {
     let src = ''; try { src = readFileSync(resolve(here, '../admin/editor.js'), 'utf8'); } catch (e) {}
     let h = 0; for (let i = 0; i < src.length; i++) h = (h * 31 + src.charCodeAt(i)) | 0;
+    const addonTag = '<script src="/admin/stomme-addon-previews.js"></script>';
+    const hasAddonPreviews = existsSync(resolve(root, 'public/admin/stomme-addon-previews.js'));
+    if (hasAddonPreviews && !html.includes(addonTag)) {
+      html = html.replace('<script src="/admin/previews.js"></script>',
+        `${addonTag}\n    <script src="/admin/previews.js"></script>`);
+    } else if (!hasAddonPreviews && html.includes(addonTag)) {
+      html = html.replace(new RegExp(`\\s*${addonTag.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`), '');
+    }
     const tag = `<script src="/admin/stomme-editor.js?v=${(h >>> 0).toString(36)}"></script>`;
     if (/<script src="\/admin\/stomme-editor\.js[^"]*"><\/script>/.test(html)) {
       html = html.replace(/<script src="\/admin\/stomme-editor\.js[^"]*"><\/script>/, tag);

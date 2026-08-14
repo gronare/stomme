@@ -361,6 +361,24 @@
   // Config-defined listing collections (news / for-sale / …) get the matching preset
   // preview. stomme-gen appends stommeRegisterListing(id, preset, specs) calls for this
   // site; `specs` is the catalog listing's [{key,label}] so the preview can label them.
+  // Any collection whose entry IS a composed page (title/heading/intro + blocks) can reuse the
+  // live page preview. Exposed so an addon's own previews.js registers its pages without the
+  // engine naming them: stommeRegisterPage('confirmation').
+  window.stommeRegisterPage = function (name) {
+    window.CMS.registerPreviewTemplate(name, PagePreview);
+  };
+
+  // Same, for a page whose heading and intro are FIELDS rather than a block: they are shown as
+  // the page header the real page renders them as, above the entry's own blocks.
+  window.stommeRegisterHeadedPage = function (name, headingField, introField) {
+    window.CMS.registerPreviewTemplate(name, function (props) {
+      var e = props.entry;
+      var head = { type: 'pageHeader', heading: v(e, headingField || 'heading'), intro: v(e, introField || 'message') };
+      var blocks = jsBlocks(e);
+      return liveFrame('stomme-preview', '/preview', b64(head.heading || head.intro ? [head].concat(blocks) : blocks));
+    });
+  };
+
   window.stommeRegisterListing = function (id, preset, specs) {
     var tmpl = preset === 'catalog'
       ? function (props) { return CatalogPreview(props, specs); }
