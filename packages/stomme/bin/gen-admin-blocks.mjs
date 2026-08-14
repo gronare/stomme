@@ -796,6 +796,7 @@ ${l.preset === 'catalog' ? catalogFields : articleFields}`;
 // engine names no feature and authors no pane: it hands over the config and splices back
 // whatever comes out. No dir / no file ⇒ nothing emitted, config.yml unchanged.
 let ADDON_PANES = [];
+const ADDON_PANEL_FILES = {};
 {
   const slotsDir = process.env.STOMME_SLOTS_DIR;
   const manifest = slotsDir ? resolve(slotsDir, 'cms.mjs') : null;
@@ -815,6 +816,24 @@ let ADDON_PANES = [];
             },
           })
         : declared;
+      // The same manifest may also contribute FILES to a collection the engine already emits, so an
+      // extension's own setting lands where the owner looks for it — under Settings, beside the
+      // header and the identity — instead of as a lone collection at the bottom of the sidebar. The
+      // engine names no collection and no feature: it takes { <collection>: [ { feature, yaml } ] }
+      // and splices each entry into that collection's own `files:` list when the feature is on.
+      const panels = typeof mod.panelFiles === 'function'
+        ? mod.panelFiles({ routes: ROUTES, features: FEATURES })
+        : mod.panelFiles;
+      for (const [collection, list] of Object.entries(panels || {})) {
+        ADDON_PANEL_FILES[collection] = (Array.isArray(list) ? list : []).filter((e) => {
+          if (!e || typeof e.feature !== 'string' || !e.feature || typeof e.yaml !== 'string' || !e.yaml.trim()) {
+            console.warn('  ⚠ addon cms: skipped a malformed panel file (needs a non-empty `feature` and `yaml`)');
+            return false;
+          }
+          return !FEATURES || !!FEATURES[e.feature];
+        });
+      }
+
       ADDON_PANES = (Array.isArray(entries) ? entries : []).filter((e) => {
         if (!e || typeof e.feature !== 'string' || !e.feature || typeof e.yaml !== 'string' || !e.yaml.trim()) {
           console.warn('  ⚠ addon cms: skipped a malformed entry (needs a non-empty `feature` and `yaml`)');
@@ -1173,7 +1192,19 @@ ${emitFooterLinks(10)}
           - { name: heading, label: "Heading", widget: string, required: false, hint: "Big confirmation headline. Blank = localized default." }
           - { name: message, label: "Message", widget: text, required: false, hint: "Reassurance line under the heading. Blank = default." }
 ${emitThanksButtons(10)}
-          - { name: showContact, label: "Show the direct-contact card", widget: boolean, required: false, default: true, hint: "Phone / email / hours from Site & contact." }${tp ? '\n' + tp : ''}`;
+          - { name: showContact, label: "Show the direct-contact card", widget: boolean, required: false, default: true, hint: "Phone / email / hours from Site & contact." }${tp ? '\n' + tp : ''}${addonPanelFiles('settings', 6)}`;
+}
+
+// Files an out-of-tree extension contributes to a collection the engine emits. Appended last, so a
+// site's own settings can never be displaced by one.
+function addonPanelFiles(collection, indent) {
+  const entries = ADDON_PANEL_FILES[collection] || [];
+  if (!entries.length) return '';
+
+  const p = pad(indent);
+  return '\n' + entries
+    .map((e) => e.yaml.replace(/\n+$/, '').split('\n').map((l) => (l ? p + l : l)).join('\n'))
+    .join('\n');
 }
 
 // Tracking & cookies settings pane — only when the `tracking` feature is on (toggle with
