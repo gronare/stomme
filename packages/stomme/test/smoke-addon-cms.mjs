@@ -18,6 +18,11 @@
  *   3. A malformed entry is skipped with a warning, and the generator still succeeds.
  *   4. WITHOUT the slots dir, the generated config.yml is byte-identical to the tracked one —
  *      the seam costs a site with no addons nothing.
+ *   5. `panelFiles` — the same manifest may contribute FILES to a collection the engine already
+ *      emits. An ON entry lands in THAT collection's own `files:` (Settings, after the engine's
+ *      own panes) with the site's routes and block picker in hand; an OFF one is not emitted; a
+ *      malformed one warns without costing the rest; and an entry naming a collection the engine
+ *      does not emit lands nowhere at all.
  *
  * starter/public/admin/config.yml is regenerated in place (as admin-contract.mjs already
  * does) and restored from its pre-run bytes in `finally`.
@@ -67,6 +72,24 @@ try {
   { feature: 'blog', yaml: '- name: addon_off\\n  label: "Addon pane (off)"\\n  files: []' },
   { feature: '', yaml: '- name: broken' },
 ];
+
+// Files contributed to a collection the ENGINE emits — the addon's own setting under Settings.
+export const panelFiles = ({ routes, blocks }) => ({
+  settings: [
+    {
+      feature: 'faq',
+      yaml: \`- name: addon_panel
+  label: "Addon settings page"
+  file: "src/content/addon/panel.md"
+  fields:
+    - { name: heading, label: "Heading", widget: string, required: false, hint: "panel route is \${routes.formSuccess}" }
+\${blocks(6)}\`,
+    },
+    { feature: 'blog', yaml: '- name: addon_panel_off\\n  label: "Off"\\n  file: "src/content/addon/off.md"\\n  fields: []' },
+    { feature: '', yaml: '- name: broken_panel' },
+  ],
+  nowhere: [{ feature: 'faq', yaml: '- name: addon_panel_stray\\n  label: "Stray"\\n  file: "src/content/addon/stray.md"\\n  fields: []' }],
+});
 `);
 
   console.log('· cms:gen WITH STOMME_SLOTS_DIR (stub)…');
@@ -87,6 +110,22 @@ try {
     withStub.yml.indexOf('# <<< collections:generated'),
   );
   check(region.includes('- name: addon_on'), 'the pane lands inside the collections:generated region');
+
+  // ── panelFiles: files spliced into a collection the engine already emits ──────────
+  const settings = withStub.yml.slice(
+    withStub.yml.indexOf('# >>> settings:generated'),
+    withStub.yml.indexOf('# <<< settings:generated'),
+  );
+  check(/^ {6}- name: addon_panel$/m.test(settings), "the ON panel file lands in the settings collection's own files:");
+  check(settings.includes('panel route is /thanks'), "the panelFiles function receives the site's own routes");
+  // Authored at 6 in the panel file, +6 for the settings files indent.
+  check(/^ {12}- name: blocks$/m.test(settings), "the panelFiles function receives the site's own block picker");
+  // Appended last, so an addon can never displace the settings the site's owner came for.
+  check(settings.indexOf('- name: addon_panel') > settings.indexOf('- name: showContact'), "the panel file follows the engine's own settings panes");
+  check(!withStub.yml.includes('addon_panel_off'), 'a panel file whose feature is OFF is not emitted');
+  check(!withStub.yml.includes('broken_panel'), 'a malformed panel file is not emitted');
+  check(/addon cms: skipped a malformed panel file/.test(withStub.out), 'the malformed panel file is reported');
+  check(!withStub.yml.includes('addon_panel_stray'), 'a panel file for a collection the engine does not emit lands nowhere');
 
   console.log('· cms:gen WITHOUT STOMME_SLOTS_DIR…');
   const noStub = generate({ STOMME_SLOTS_DIR: '' });
