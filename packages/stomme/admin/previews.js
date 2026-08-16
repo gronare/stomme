@@ -66,7 +66,7 @@
   var cBrand = 'var(--color-brand,' + BRAND + ')', cInk = 'var(--color-ink,' + INK + ')',
       cSurface = 'var(--color-surface,' + SURFACE + ')', cPaper = 'var(--color-paper,' + PAPER + ')',
       cLine = 'var(--color-line,' + LINE + ')', cMuted = 'var(--color-muted,' + MUTED + ')';
-  var fSans = 'var(--bk-font-sans,' + SANS + ')', fMono = 'var(--bk-font-mono,' + MONO + ')';
+  var fSans = 'var(--font-sans,' + SANS + ')', fMono = 'var(--font-mono,' + MONO + ')';
 
   // Load the site's actual stylesheet first so the mockups match the live site
   // (tokens + any class overrides). The raw rules below layer the preview-only

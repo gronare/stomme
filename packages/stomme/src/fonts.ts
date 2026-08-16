@@ -1,7 +1,7 @@
 // Font picker for the theme. Curated, ready-to-use stacks (system / web-safe — no
 // external requests, no GDPR concern) plus an optional custom uploaded font. The
 // theme's `fontDisplay` / `fontBody` choose a key here (or 'custom'); Base injects the
-// resolved stacks as --bk-font-display / --bk-font-sans, and an @font-face for a
+// resolved stacks as --font-display / --font-sans, and an @font-face for a
 // custom upload. Option VALUES must match the keys below (hand-authored in config.yml).
 export const FONT_STACKS: Record<string, string> = {
   system: 'ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
@@ -75,9 +75,9 @@ export function resolveFonts(
   const bodyFamily = customBodyUrl ? '"StommeFontBody"' : dispFamily;
   const vars: string[] = [];
   const d = stack(theme.fontDisplay, dispFamily);
-  if (d) vars.push(`--bk-font-display:${d}`);
+  if (d) vars.push(`--font-display:${d}`);
   const b = stack(theme.fontBody, bodyFamily);
-  if (b) vars.push(`--bk-font-sans:${b}`);
+  if (b) vars.push(`--font-sans:${b}`);
   const faces: string[] = [];
   const preloads: { href: string; type: string }[] = [];
   if (customDisplayUrl) { faces.push(fontFace('StommeFontDisplay', customDisplayUrl)); preloads.push({ href: customDisplayUrl, type: mimeOf(customDisplayUrl) }); }
