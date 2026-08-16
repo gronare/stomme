@@ -3,9 +3,9 @@
 // translated into Sveltia's own move-up/down clicks, so the SAVED order changes) and
 // click-anywhere expand/collapse, plus click-to-toggle on collapsible object groups
 // (SEO / Media / Layout / Appearance). All layout (pill + one-row collapsed items,
-// group cards) is pure CSS in gen-admin-blocks.mjs THEME_STYLE — the summary is styled
+// group cards) is pure CSS in gen-admin-blocks.mjs THEME_CSS — the summary is styled
 // where Sveltia renders it, never moved, so re-renders can't desync it. Light-DOM;
-// targets Sveltia internals (0.170.x) — re-check on a Sveltia upgrade.
+// targets Sveltia internals — re-check on a Sveltia upgrade.
 (function () {
   'use strict';
   var UP = 'arrow_upward', DOWN = 'arrow_downward';
@@ -199,7 +199,7 @@
     if (!fields) return;
     var sw = fields[0].querySelector('[role=switch]');
     var on = !!sw && sw.getAttribute('aria-checked') === 'true';
-    // 'important' so the hide also beats THEME_STYLE display rules (e.g. the flattened
+    // 'important' so the hide also beats THEME_CSS display rules (e.g. the flattened
     // share-cards og.types wrapper is display:flex!important).
     for (var i = 1; i < fields.length; i++) {
       if (on) fields[i].style.removeProperty('display');
