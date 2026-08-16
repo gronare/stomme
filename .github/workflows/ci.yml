@@ -98,8 +98,7 @@ jobs:
 
   # NB: the Sveltia DOM contract test (test:admin-contract) is deliberately NOT a
   # per-PR job — between version bumps the pinned Sveltia (and its DOM) doesn't
-  # change, so it would be redundant every run. It runs in sveltia.yml instead:
-  # nightly against the latest release, and on every apply (bump) before commit.
+  # change, so it would be redundant every run. It runs whenever the pin is bumped.
 
   # Catch syntax errors in the engine's plain-JS scripts (bins, integration,
   # the CMS previews module) — none of these go through astro check.
