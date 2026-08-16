@@ -32,10 +32,6 @@
   --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   --font-display: var(--font-sans);
   --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
-  /* Deprecated --bk-* aliases (the old project name). Themes, addons and site CSS still read them; remove once every consumer is on --font-*. */
-  --bk-font-sans: var(--font-sans);
-  --bk-font-display: var(--font-display);
-  --bk-font-mono: var(--font-mono);
 }
 
 *, *::before, *::after { box-sizing: border-box; }
