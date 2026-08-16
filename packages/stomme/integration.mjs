@@ -691,7 +691,7 @@ const { thanksProps, serviceFixture, townFixture } = templateFixtures(rs);
 `;
 }
 
-// Vites publicmiddleware matchar bara exakta filnamn, så en katalogadress ur public/ når aldrig sirv och Astros router har ingen rutt för den: `/admin` ger 404 i dev medan samma adress fungerar i drift, och både README och create-stomme lovar att CMS:et ligger där.
+// Vite's public middleware matches exact filenames only, so a directory address under public/ never reaches sirv and Astro's router has no route for it: `/admin` 404s in dev while the same address works in production, and both the README and create-stomme promise the CMS lives there.
 function publicIndexPlugin(publicDir) {
   return {
     name: 'stomme:public-index',

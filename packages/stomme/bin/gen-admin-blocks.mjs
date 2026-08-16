@@ -821,8 +821,7 @@ const ADDON_PANEL_FILES = {};
       // header and the identity — instead of as a lone collection at the bottom of the sidebar. The
       // engine names no collection and no feature: it takes { <collection>: [ { feature, yaml } ] }
       // and splices each entry into that collection's own `files:` list when the feature is on.
-      // Samma kontext som collections får: en panelfil är en sida som helst, och blockväljaren är
-      // sajtens egen — den går inte att återskapa i tillägget.
+      // Panel files get the same context collections get: a panel file is a page like any other, and the block picker is the site's own — an addon cannot reconstruct it.
       const addonCtx = {
         routes: ROUTES, features: FEATURES, blocks: emitWidget,
         fields: {

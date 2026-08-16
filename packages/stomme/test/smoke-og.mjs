@@ -33,8 +33,8 @@ const photo = await sharp({
   .toBuffer();
 
 const base = {
-  title: 'Professionell drönartvätt av fasader och tak i hela Västsverige',
-  tagline: 'Snabbt, skonsamt och utan ställningar',
+  title: 'Professional facade and roof cleaning across the western seaboard',
+  tagline: 'Fast, gentle, and without scaffolding',
   wordmark: { pre: 'Starter', accent: 'Co' },
   theme: { brand: '#4338ca', ink: '#1f2937', onDark: '#ffffff' },
 };

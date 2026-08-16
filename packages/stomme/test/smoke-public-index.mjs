@@ -33,7 +33,7 @@ import { fileURLToPath } from 'node:url';
 const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = resolve(HERE, '../../..');
 const STARTER = resolve(REPO_ROOT, 'starter');
-// Astro direkt, inte via `pnpm run`: pakethanteraren äter flaggorna och servern hade startat på sin egen port.
+// Astro directly, not via `pnpm run`: the package manager eats the flags and the server would start on its own port.
 const ASTRO = resolve(STARTER, 'node_modules/.bin/astro');
 const PORT = Number(process.env.PORT || 4399);
 const BASE = `http://127.0.0.1:${PORT}`;
@@ -52,7 +52,7 @@ async function waitUp(timeoutMs = 120000) {
   return false;
 }
 
-// Följer omdirigeringen: dev-servern skickar '/admin' vidare till '/admin/', och det är den adressen mellanvaran svarar på.
+// Follow the redirect: the dev server sends '/admin' on to '/admin/', and that is the address the middleware answers.
 async function get(path) {
   const res = await fetch(`${BASE}${path}`);
   return { status: res.status, body: await res.text() };
@@ -68,7 +68,7 @@ try {
     console.error(`✗ something is already listening on ${BASE} — refusing to test against a server this run did not start.`);
     process.exit(1);
   }
-  // Egen processgrupp: `pnpm run` är bara ett skal runt astro, och en TERM till skalet lämnar servern kvar och lyssnande.
+  // Own process group: `pnpm run` is just a shell around astro, and a TERM to the shell leaves the server alive and listening.
   child = spawn(ASTRO, ['dev', '--port', String(PORT), '--host', '127.0.0.1'], {
     cwd: STARTER,
     env: { ...process.env, STOMME_SLOTS_DIR: '' },

@@ -46,7 +46,7 @@ const hasDirect = showContact === true; // opt-in (rule zero); the route gates t
 const twoCol = hasRecap && hasDirect;
 
 // Letter chrome: the postmark ring reads "<site> · <town>", its centre is the eyebrow word
-// ("Skickat"), the frimärke carries the site's initial. Year is stamped at build time.
+// ("Message sent"), the stamp carries the site's initial. Year is stamped at build time.
 const ring = [who, town].filter(Boolean).join(' · ').toUpperCase();
 const stampInitial = (who || 'g').trim().charAt(0).toLowerCase();
 const toLine = [who, town].filter(Boolean).join(', ').toLowerCase();

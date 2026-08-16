@@ -2,7 +2,6 @@
 import { getEntry } from 'astro:content';
 import ContactLink from './ContactLink.astro';
 import { site } from '@stomme/config';
-// Rubrikerna följer sajtens språk som resten av motorns egen copy; hårdkodade stod de på engelska på varje svensk sajt.
 const copy: Record<string, string> = (site as any)?.strings?.contact ?? {};
 // Direct-contact card — ONE component, fed by the Contact settings, with per-placement
 // display toggles (show). Used by the contact-form aside, /thanks, the contactCard block,
