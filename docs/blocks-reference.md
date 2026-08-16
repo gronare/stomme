@@ -22,6 +22,9 @@ follows `theme.eyebrowColor`). Add your own blocks alongside these (see
 | `checklist` | Ticked list, 1–2 columns | `eyebrow`/`heading`/`intro`, `items[]` (`text`, `note`), `columns` |
 | `gallery` | Responsive image grid with captions | `eyebrow`/`heading`/`intro`, `images[]` (`image`, `alt`, `caption`), `columns` |
 | `beforeAfter` | Draggable before/after image slider | `eyebrow`/`heading`/`intro`, `before`, `after` |
+| `definition` | A dictionary-style entry (term, word class, senses) | `eyebrow`, `term`, `wordClass`, `senses[]` (`text`, `note`), `width` |
+| `fragment` | A placed editorial fragment — big lead line, short body, optional link; consecutive fragments drift across the page | `eyebrow`, `statement`, `body`, `cta` |
+| `plans` | A row of pricing plan cards | `eyebrow`/`heading`/`intro`, `plans[]` (`name`, `pricePrefix`, `price`, `period`, `description`, `features[]`, `badge`, `highlight`), `footnote` |
 | `textImage` | Text column beside an image (flippable) | `heading`, `body` (markdown), `image`, `imageAlt`, `flip` |
 | `textQuote` | Body text beside a pull quote (flippable) | `body` (markdown), `quote`, `attribution`, `flip`, `accent` |
 | `callout` | Single highlighted statement / quote | `eyebrow`, `quote`, `accent` |
@@ -48,15 +51,26 @@ when it's absent). Chrome fields (`eyebrow`/`heading`/`intro`) are optional.
 | `postList` | `posts` / any `article` listing (`title`, `date`, `excerpt`, `cover`, `showCover`) | listing `route` | Featured lead (a "Latest" tag, `strings.latest`) + card grid; per-post `showCover` shows the image or a brand-tinted default; `featured`/`showImages`/`columns` |
 | `catalogList` | any `catalog` listing (`title`, `price`, `status`, `category`, `cover`, `gallery[]`, keyed `specs`) | listing `route` | Filterable cards with cover, status badge (themed), price + the listing's config-defined specs; `filters`/`showImages`/`columns` |
 
-## Settings-backed (auto)
+## Numbers & proof
 
-No fields — they read the `settings` singleton.
-
-| Type | Reads | What it renders |
+| Type | What it renders | Key fields |
 |---|---|---|
-| `statsBar` | `settings.facts[]` (`label`, `value`) | A facts/stats grid |
-| `logoStrip` | `settings.partners[]` + `partnersLead` | A row of partner/brand names |
-| `contactForm` | `settings.{phone,phoneE164,email,name,hq,orgNr}` | Netlify form + direct-contact aside (success route from `routes.formSuccess`) |
+| `statsBar` | A label/value facts grid | `items[]` (`label`, `value`) |
+| `logoStrip` | A centred row of partner/client names | `lead`, `logos[]` (`name`) |
+| `statPanel` | A single figure on a dark panel | `eyebrow`/`heading`/`body`, `statValue`, `statLabel`, `badges[]` |
+
+Each carries its own data, so different pages can show different numbers.
+
+## Contact
+
+| Type | What it renders | Key fields |
+|---|---|---|
+| `contactForm` | Form + direct-contact aside; posts to the engine's contact route and redirects to `routes.formSuccess` | `eyebrow`/`heading`/`intro`, `labelName`, `labelEmail`, `labelMessage`, `submitLabel`, `showPhone`, `showDirectContact` |
+| `contactCard` | The direct-contact card on its own | `show` (which parts), `tint` |
+| `findUs` | Map + address block | reads the `contact` settings |
+
+The contact blocks read the `contact` settings for the actual phone/email/address; their
+fields control wording and which parts appear.
 
 ## Chrome (not blocks)
 

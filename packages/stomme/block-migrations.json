@@ -42,13 +42,6 @@
       "to": "asideCta"
     },
     {
-      "kind": "field-move",
-      "note": "A top-level surface (pre-style-group era) moved into the style group; the renderer reads style.surface. statsBar regained a proper style group, so a hand-authored top-level surface folds in.",
-      "blocks": ["statsBar"],
-      "field": "surface",
-      "to": "style.surface"
-    },
-    {
       "kind": "button-group",
       "note": "Fragment's quiet link: the legacy linkLabel/link pair on the block folds into the cta group (resolveButton back-compat). Same pair as featureGrid's, but on the block itself rather than on list items.",
       "blocks": ["fragment"],
