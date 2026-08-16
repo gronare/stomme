@@ -234,12 +234,12 @@ const RAW_BLOCKS: BlockDef[] = [
         summary: '{{fields.name}}',
         fields: [
           { name: 'name', label: 'Plan name', widget: 'string' },
-          { name: 'pricePrefix', label: 'Price prefix', widget: 'string', required: false, hint: 'Small word above the price, e.g. "från".' },
-          { name: 'price', label: 'Price', widget: 'string', hint: 'e.g. "595 kr", "19 900 kr", "0 kr".' },
-          { name: 'period', label: 'Period', widget: 'string', required: false, hint: 'e.g. "/mån" or "engångspris". Blank for none.' },
+          { name: 'pricePrefix', label: 'Price prefix', widget: 'string', required: false, hint: 'Small word above the price, e.g. "from".' },
+          { name: 'price', label: 'Price', widget: 'string', hint: 'The price as you want it shown, e.g. "595 kr" or "$1,200".' },
+          { name: 'period', label: 'Period', widget: 'string', required: false, hint: 'e.g. "/mo" or "one-time". Blank for none.' },
           { name: 'description', label: 'Description', widget: 'text', required: false },
           { name: 'features', label: 'Features', widget: 'list', required: false, collapsed: true, label_singular: 'Feature', summary: '{{fields.text}}', fields: [{ name: 'text', label: 'Feature', widget: 'string' }] },
-          { name: 'badge', label: 'Badge', widget: 'string', required: false, hint: 'Small label, e.g. "populär".' },
+          { name: 'badge', label: 'Badge', widget: 'string', required: false, hint: 'Small label, e.g. "popular".' },
           { name: 'highlight', label: 'Highlight this plan', widget: 'boolean', required: false, default: false },
           buttonField('cta', 'Button'),
         ],
@@ -356,8 +356,8 @@ const RAW_BLOCKS: BlockDef[] = [
     shape: 'prose',
     fields: [
       { name: 'eyebrow', label: 'Eyebrow', widget: 'string', required: false, hint: 'Small uppercase label above the heading.' },
-      { name: 'term', label: 'Term', widget: 'string', hint: 'The word being defined, e.g. "grö·na·re" (use · for syllables).' },
-      { name: 'wordClass', label: 'Word class / etymology line', widget: 'string', required: false, hint: 'The italic line under the term, e.g. "komparativ av grön".' },
+      { name: 'term', label: 'Term', widget: 'string', hint: 'The word being defined, e.g. "ex·am·ple" (use · for syllables).' },
+      { name: 'wordClass', label: 'Word class / etymology line', widget: 'string', required: false, hint: 'The italic line under the term, e.g. "noun, from Latin".' },
       {
         name: 'senses', label: 'Senses', widget: 'list', required: false,
         collapsed: true, label_singular: 'Sense', summary: '{{fields.text}}',

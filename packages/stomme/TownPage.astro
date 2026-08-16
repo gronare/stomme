@@ -47,11 +47,11 @@ const jsonLd = {
       <h1 class="display display--hero town-h1">{data.title ?? fill(t.heading)}</h1>
       {data.heroSubtitle && <p class="intro town-sub">{data.heroSubtitle}</p>}
       {data.heroNote && (
-        <p class="town-fieldnote"><span class="town-fieldnote__k mono">Fältnotis</span><span>{data.heroNote}</span></p>
+        <p class="town-fieldnote"><span class="town-fieldnote__k mono">{fill(t.fieldNote)}</span><span>{data.heroNote}</span></p>
       )}
       <div class="town-hero__cta">
         <a href={contact} class="btn">{fill(t.cta)}</a>
-        {data.services?.length > 0 && <a href="#tjanster" class="town-jump">{fill(t.servicesHeading)} ↓</a>}
+        {data.services?.length > 0 && <a href="#services" class="town-jump">{fill(t.servicesHeading)} ↓</a>}
       </div>
     </div>
     {data.media?.image && (
@@ -107,7 +107,7 @@ const jsonLd = {
 )}
 
 {data.services?.length > 0 && (
-  <section class="section town-services-sec" id="tjanster">
+  <section class="section town-services-sec" id="services">
     <h2 class="display town-h2">{fill(t.servicesHeading)}</h2>
     <ul class="town-svc">{data.services.map((s: string) => <li><span class="town-svc__tick" aria-hidden="true">✓</span><span>{s}</span></li>)}</ul>
   </section>
