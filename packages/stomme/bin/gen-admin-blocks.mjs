@@ -5,8 +5,8 @@
 //
 //   npx stomme-gen                 (or wire to "cms:gen" in package.json)
 //
-// Reads:  <cwd>/src/blocks/schema.ts   (override: BLOCKKIT_SCHEMA)
-// Writes: <cwd>/public/admin/config.yml (override: BLOCKKIT_CONFIG)
+// Reads:  <cwd>/src/blocks/schema.ts   (override: STOMME_SCHEMA)
+// Writes: <cwd>/public/admin/config.yml (override: STOMME_CONFIG)
 // The consumer's schema.ts imports field helpers from '@gronare/stomme/kit'; Node strips
 // the TS types on import (Node 22.6+).
 import { readFileSync, writeFileSync, readdirSync, copyFileSync, cpSync, mkdirSync, existsSync, rmSync } from 'node:fs';
@@ -30,14 +30,14 @@ const SVELTIA_CMS_SRC = process.env.STOMME_SVELTIA_SRC || 'https://unpkg.com/@sv
 // where a real registry install lives. jiti transpiles .ts everywhere, including
 // node_modules, and resolves each module's bare specifiers from its own location.
 const jiti = createJiti(import.meta.url);
-const schemaPath = resolve(root, process.env.BLOCKKIT_SCHEMA || 'src/blocks/schema.ts');
-const configPath = resolve(root, process.env.BLOCKKIT_CONFIG || 'public/admin/config.yml');
+const schemaPath = resolve(root, process.env.STOMME_SCHEMA || 'src/blocks/schema.ts');
+const configPath = resolve(root, process.env.STOMME_CONFIG || 'public/admin/config.yml');
 
 // CMS-less site (public/admin removed — e.g. handed over to a customer who edits the
 // markdown directly): everything this generator produces lives under public/admin, so
 // there is nothing to do. Graceful no-op keeps `pnpm build` (which runs stomme-gen) working.
 if (!existsSync(configPath)) {
-  console.log(`stomme-gen: no ${process.env.BLOCKKIT_CONFIG || 'public/admin/config.yml'} — CMS-less site, nothing to generate`);
+  console.log(`stomme-gen: no ${process.env.STOMME_CONFIG || 'public/admin/config.yml'} — CMS-less site, nothing to generate`);
   process.exit(0);
 }
 
