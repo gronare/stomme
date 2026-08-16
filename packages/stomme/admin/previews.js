@@ -279,7 +279,7 @@
     return liveFrame('stomme-preview-identity', '/preview?kind=identity', b64(data));
   };
 
-  // Delningskort (share cards) — rendered via /preview?kind=sharecards (a full-height
+  // Share cards — rendered via /preview?kind=sharecards (a full-height
   // iframe), the SAME served-asset fix as IdentityPreview: the site-default image
   // (settings.ogImage → home hero → brand card) and the example generated card resolve on
   // the site origin, so a public-root path like '/og-image.png' shows instead of getAsset

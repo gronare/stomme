@@ -184,7 +184,7 @@ const idApple = idAsset(identityDraft && identityDraft.appleIcon);
 const idOg = idAsset(identityDraft && identityDraft.ogImage);
 const idLabel = 'font-family:ui-monospace,Menlo,monospace;font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;color:#6b7280;margin:0 0 10px';
 
-// Delningskort (share cards): render the SAME layered model the real system uses, from the
+// Share cards: render the SAME layered model the real system uses, from the
 // draft settings, so every image resolves on-site (no getAsset / broken img in the iframe).
 // Site default = ogImage → home-hero image → a brand-colour card with the business name.
 // When the master is on and a type is enabled, also show an example generated card built

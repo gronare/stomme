@@ -172,7 +172,7 @@ export function listingSpecRows(entryData: any, listing?: { specs?: SpecDef[] })
 
 export interface Listing {
   id: string; // collection name + content folder (src/content/<id>)
-  route: string; // index + detail route base, e.g. '/till-salu'
+  route: string; // index + detail route base, e.g. '/for-sale'
   label: string; // CMS collection + nav label
   preset: 'article' | 'catalog';
   specs?: SpecInput[]; // catalog: the spec fields every item shares (config-defined, consistent)

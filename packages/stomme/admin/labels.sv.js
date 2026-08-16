@@ -297,7 +297,7 @@ export default {
   'An icon/mark. The wordmark is the text below, set in your display font.': 'En ikon/ett märke. Ordmärket är texten nedan, satt i ditt rubriktypsnitt.',
   'Browser-tab icon — SVG recommended (scales to any size). Defaults to the shipped mark when empty.': 'Ikon i webbläsarfliken — SVG rekommenderas (skalar till alla storlekar). Tomt = det medföljande märket.',
   'iOS home-screen icon — a 180×180 PNG. Optional.': 'Hemskärmsikon för iOS — en PNG på 180×180. Valfritt.',
-  // ── Delningskort (share-cards) settings pane ──
+  // ── Share-cards settings pane ──
   'Share cards': 'Delningskort',
   'Site default share image': 'Standardbild för delning',
   'Shown when a page is shared (iMessage, Slack, social) and it has no card of its own. Use ~1200×630px.': 'Visas när en sida delas (iMessage, Slack, sociala medier) och saknar eget kort. Använd ca 1200×630 px.',

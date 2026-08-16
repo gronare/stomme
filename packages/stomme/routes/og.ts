@@ -2,7 +2,7 @@
 // endpoint (settings.og). Prerendered: each item of a TYPE-ENABLED collection (and the
 // site-default brand card when needed) emits one static 1200×630 PNG — see src/og-pages.ts,
 // the same enumeration Head.astro resolves og:image with. Slug carries the page path
-// (e.g. /og/nyheter/x.png); the site-default card is /og/default.png.
+// (e.g. /og/news/x.png); the site-default card is /og/default.png.
 //
 // The master switch is CONTENT (settings.og.enabled), which doesn't exist yet at
 // astro:config:setup — so the route is always injected and gates itself here:

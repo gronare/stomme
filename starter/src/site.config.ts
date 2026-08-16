@@ -65,23 +65,23 @@ export const site: SiteConfig = {
 //
 // Each listing: { id, route, label, preset, options? }
 //   id      — collection name + content folder (src/content/<id>)
-//   route   — index + detail URL base, e.g. '/till-salu'
+//   route   — index + detail URL base, e.g. '/for-sale'
 //   label   — admin collection + nav label
 //   preset  — 'article' (title, date, excerpt, cover, body  → blog/news)
 //          — 'catalog' (title, price, status, category, gallery, specs, body → for-sale of anything)
 //   options — optional presentation: { columns?: number; showImages?: boolean; featured?: boolean; filters?: boolean }
 // Uncomment an example to enable it, then run `pnpm cms:gen`. You then get, per entry:
-//   • an admin collection "Nyheter" / "Till salu" to add entries in
+//   • an admin collection ("News" / "For sale") to add entries in
 //   • an editable index page at the route (pageHeader + the list block), seeded once
 //   • detail pages at <route>/<slug>
-//   • content under src/content/<id>/ (e.g. src/content/nyheter/my-post.md)
+//   • content under src/content/<id>/ (e.g. src/content/news/my-post.md)
 export const listings: Listing[] = [
-  // News: /nyheter index + /nyheter/<slug> posts. Entries: title, date, excerpt, cover, body.
-  // { id: 'nyheter', route: '/nyheter', label: 'Nyheter', preset: 'article' },
+  // News: /news index + /news/<slug> posts. Entries: title, date, excerpt, cover, body.
+  // { id: 'news', route: '/news', label: 'News', preset: 'article' },
 
-  // For-sale (e.g. used cars): /till-salu index with category filters + status badges
-  // (available/reserved/sold), and /till-salu/<slug> detail with price, specs + gallery.
+  // For-sale (e.g. used cars): /for-sale index with category filters + status badges
+  // (available/reserved/sold), and /for-sale/<slug> detail with price, specs + gallery.
   // `specs` defines the spec fields every item shares (label in your language; the data is
   // stored under a stable key, so renaming a label to localize never orphans existing data).
-  // { id: 'bilar', route: '/till-salu', label: 'Till salu', preset: 'catalog', specs: ['Year', 'Mileage', 'Gearbox', 'Fuel'], options: { columns: 3, filters: true } },
+  // { id: 'cars', route: '/for-sale', label: 'For sale', preset: 'catalog', specs: ['Year', 'Mileage', 'Gearbox', 'Fuel'], options: { columns: 3, filters: true } },
 ];
