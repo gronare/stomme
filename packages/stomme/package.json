@@ -50,7 +50,8 @@
     "test:admin-contract": "node test/admin-contract.mjs",
     "test:noindex": "node test/smoke-noindex.mjs",
     "test:addon-blocks": "node test/smoke-addon-blocks.mjs",
-    "test:public-index": "node test/smoke-public-index.mjs"
+    "test:public-index": "node test/smoke-public-index.mjs",
+    "test:slots": "node test/smoke-slots.mjs"
   },
   "bin": {
     "stomme-gen": "bin/gen-admin-blocks.mjs",

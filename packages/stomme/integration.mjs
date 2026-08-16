@@ -741,7 +741,7 @@ function publicIndexPlugin(publicDir) {
         // hardcodes no slot location or repo name). Each slot aliases to the supplied file
         // when present, else to a noop that renders nothing, so a site with no slots dir
         // builds exactly as before.
-        const SLOT_NAMES = ['footer-end', 'footer-legal-end', 'header-start', 'header-nav-end', 'header-end', 'head-end', 'body-end'];
+        const SLOT_NAMES = ['footer-end', 'header-start', 'header-nav-end', 'header-end'];
         const slotsDir = process.env.STOMME_SLOTS_DIR;
         const slotNoop = resolve(pkgDir, 'src/SlotNoop.astro');
         const slotAlias = {};
