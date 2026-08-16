@@ -730,15 +730,9 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
   .confirm-eyebrow { margin: 0 0 .7rem; }
   .confirm-head { font-size: clamp(1.6rem, 3.5vw, 2.1rem); font-weight: 800; letter-spacing: -.02em; line-height: 1.1; margin: 0; max-width: 20ch; text-wrap: balance; }
   .confirm-lead { color: var(--color-muted); font-size: 1.08rem; margin: .9rem 0 0; max-width: 46ch; }
-  .confirm-recap { margin-top: 1.8rem; background: var(--color-surface); border: 1px solid var(--color-line); border-radius: 1rem; padding: 1.4rem 1.5rem; }
   /* card section label — uses the shared .mono .eyebrow eyebrow so it follows the
      site's eyebrow style + colour ([data-eyebrow] + --eyebrow-accent); this is just spacing */
   .confirm-label { margin: 0 0 1rem; }
-  .confirm-recap dl { margin: 0; display: grid; grid-template-columns: max-content 1fr; gap: .8rem 1.4rem; align-items: baseline; }
-  .confirm-recap dt { font-family: var(--bk-font-mono); font-size: .72rem; letter-spacing: .06em; text-transform: uppercase; color: var(--color-muted); }
-  .confirm-recap dd { margin: 0; overflow-wrap: anywhere; }
-  .confirm-recap .confirm-msg { grid-column: 1 / -1; border-top: 1px solid var(--color-line); padding-top: 1rem; }
-  .confirm-recap .confirm-msg dt { margin-bottom: .35rem; }
   .confirm-actions { margin-top: 1.6rem; display: flex; gap: .8rem; flex-wrap: wrap; align-items: center; }
   /* Secondary/outline button (confirmation's optional 2nd button) — distinct from .btn-ghost,
      which is the text-link phone CTA used in heroes. */
