@@ -17,7 +17,7 @@
   ],
   "scripts": {
     "prepack": "node scripts/bundle-template.mjs",
-    "clean-template": "node scripts/clean-template.mjs"
+    "postpack": "node scripts/clean-template.mjs"
   },
   "license": "AGPL-3.0-only"
 }
