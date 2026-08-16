@@ -40,7 +40,7 @@ const footer = p.footer;
 const show = p.show ?? {};
 const protect = !!c.protectContact;
 
-// Phone + email default on; the richer parts default off (a placement opts into them).
+// Every part is opt-in: a placement passes the ones it wants, absent means hidden.
 const s = {
   phone: show.phone === true, email: show.email === true,
   hours: !!show.hours, address: !!show.address, socials: !!show.socials, map: !!show.map,

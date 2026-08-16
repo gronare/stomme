@@ -897,7 +897,7 @@ function emitCms(indent) {
 // engine changes here now flow to every site on `pnpm cms:gen`. The nav menu links +
 // thanks buttons reuse the same emitters as before (per-site $pages / $menus options).
 // Written at the canonical absolute indent (the `settings` collection sits at indent 2).
-// ── "Delningskort" (share cards) settings pane (generated) ───────────────────
+// ── Share-cards settings pane (generated) ──────────────────────────────────
 // A SECOND file pane on site.md (Sveltia preserves each pane's other frontmatter on
 // save). Holds the site-default share image + the master switch + one section per
 // generatable type — a listing (article/catalog, blog folded), plus Service areas
@@ -1406,7 +1406,7 @@ try {
   const loginLabel = LOGIN_LABELS[CMS_LOCALE] || LOGIN_LABELS[String(CMS_LOCALE).split(/[-_]/)[0]] || 'Log in';
   previewsSrc = previewsSrc.replace(/var LOGIN_LABEL = '[^']*'; \/\/ stomme:login-label/, `var LOGIN_LABEL = ${JSON.stringify(loginLabel)}; // stomme:login-label`);
   // Register a styled preview for each config-defined listing collection (article →
-  // post preview, catalog → catalog preview); otherwise Decap shows a raw field dump.
+  // post preview, catalog → catalog preview); otherwise the CMS shows a raw field dump.
   if (LISTINGS.length) {
     const regs = LISTINGS.map((l) => {
       const specs = (Array.isArray(l.specs) ? l.specs : []).map((s, i) =>
