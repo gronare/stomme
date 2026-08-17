@@ -1,53 +1,25 @@
-// Per-site configuration for the library blocks: where collection pages live,
-// how dates format, and a few fixed strings. A site passes this to BlockRenderer
-// (`<BlockRenderer config={...}>`), which forwards it to every block as `site`.
-// The TownPage/ServicePage templates take the same `site`.
-// Defaults are neutral English; override only what differs.
 export interface SiteConfig {
-  // Canonical absolute site URL (e.g. 'https://example.com') — drives Astro.site,
-  // which Head.astro uses for og:image (absolute), og:url, <link canonical> and the
-  // sitemap. External-managed: set per site to the canonical host (custom domain when
-  // live, *.pages.dev while in demo/review) and updated at go-live. The site's
-  // astro.config reads it directly (`site: site.url || process.env.SITE_URL || '<own host>'`),
-  // so it falls back to the SITE_URL env var, then the site's own hardcoded host.
+  // Canonical absolute site URL — drives Astro.site, so og:image/og:url/canonical/sitemap are absolute; the site's astro.config falls back to SITE_URL then its own host.
   url?: string;
-  // Where this site's pages live. A site's public URLs are its OWN content, so every one of
-  // them is configurable per site and localizable ('/services' or '/tjanster'); the defaults
-  // below are neutral English. Consumed by the blocks, by the detail-route injection in the
-  // integration, and by the CMS generator.
+  // A site's public URLs are its own content: every route is per-site and localizable, read by the blocks, the integration's detail-route injection and the CMS generator.
   routes?: {
     services?: string; // serviceGrid + ServicePage detail-page prefix
     towns?: string; // linkChips + TownPage detail-page prefix
     blog?: string; // postList detail-page prefix
     contact?: string; // contact page (town/service CTAs link here)
     formSuccess?: string; // contactForm success page
-    // Forward-compatible, exactly like StommeFeatures' index signature: a site may configure
-    // a path the engine doesn't name — e.g. one an out-of-tree extension routes its own pages
-    // on. The whole map is handed to the addon route/CMS manifests, so an extension reads its
-    // own keys here instead of hardcoding a pattern.
+    // Unknown keys pass through so an out-of-tree extension can route its own pages on a path the engine never names; the whole map reaches the addon manifests.
     [key: string]: string | undefined;
   };
-  // Paths that exist but are not to be found. Each entry is a path prefix; a page whose URL sits
-  // under one is served normally and marked noindex, so a link somebody already holds keeps working
-  // while search engines are told to leave it alone. External-managed, like `url`.
+  // Path prefixes served normally but marked noindex — a link someone already holds keeps working while search engines are told to leave it alone.
   noindex?: string[];
-  // The site's language + region (BCP47, e.g. 'sv-SE'). Drives date/number formatting and the
-  // language of the engine's built-in wording ('sv' and 'en' shipped, else English); `strings`
-  // overrides individual phrases.
+  // BCP47 language + region. Drives date/number formatting and which built-in wording is used ('sv' and 'en' shipped, else English); `strings` overrides individual phrases.
   locale?: string;
-  // Optional look & feel: the name of a theme directory supplied at build time. When set,
-  // the engine splices that theme's tokens.css + theme.css into the site's global.css
-  // (after the engine stylesheet import, before the site's own rules) and — via stomme-gen —
-  // into the CMS preview stylesheet, and seeds the theme colours once. The theme directory is
-  // found under STOMME_THEMES_DIR or a themes checkout beside the engine. Unset ⇒ no theme
-  // layer is added and the build is unchanged.
+  // Theme directory name, resolved at build from STOMME_THEMES_DIR. Unset means no theme layer; a name whose theme.css is missing fails the build rather than shipping unstyled.
   style?: string;
-  // Operator-owned analytics — lives in code (site.config.ts), NOT in CMS content, so an
-  // editor can't disable it (the CMS rewrites managed files on save and would drop it).
-  // cfToken = Cloudflare Web Analytics beacon token: cookieless, no consent banner needed.
+  // Lives in code, not CMS content: the CMS rewrites managed files on save and would drop it. cfToken is the cookieless Cloudflare beacon, so no consent banner is needed.
   analytics?: { cfToken?: string };
-  // Language of the /admin field labels ('sv' | 'en'). Baked into config.yml by stomme-gen,
-  // so re-run it after changing. Does not affect the public site — that's `locale`.
+  // Language of the /admin field labels only — baked into config.yml by stomme-gen, so re-run it after changing. The public site follows `locale`.
   cmsLocale?: string;
   strings?: {
     readMore?: string;
@@ -69,20 +41,13 @@ export interface SiteConfig {
       ctaEyebrow?: string; // closing CTA band
       ctaHeading?: string; // closing CTA heading; `{name}` interpolated
     };
-    // ServicePage chrome.
     service?: { eyebrow?: string; quoteEyebrow?: string; quoteHeading?: string; cta?: string };
-    // Catalog listing chrome (for-sale presentation).
     listingStatus?: { available?: string; reserved?: string; sold?: string; all?: string };
     listingCta?: string;
   };
-  // Config-defined listings, forwarded to blocks via the `site` prop so catalog blocks
-  // can resolve their specs without importing the integration's config alias. A site
-  // that uses listings passes them in (e.g. `config={{ ...site, listings }}`).
+  // Forwarded to blocks via the `site` prop so a catalog block resolves its specs without reaching for the integration's config alias.
   listings?: Listing[];
-  // CMS auth/backend for the generated Sveltia config.yml. stomme-gen emits the
-  // `backend:` block from this (between the `# >>> cms:generated` markers) so a
-  // site picks its backend without hand-editing config.yml. Generic across
-  // github / git-gateway (Netlify Identity, DecapBridge, a custom OAuth proxy).
+  // stomme-gen emits the `backend:` block from this between the cms:generated markers, so a site picks its backend without hand-editing config.yml.
   cms?: {
     backend?: string; // 'github' | 'git-gateway' | 'gitlab'
     repo?: string; // 'owner/name' (github/gitlab)
@@ -93,19 +58,13 @@ export interface SiteConfig {
     gatewayUrl?: string; // git-gateway gateway URL (DecapBridge / self-hosted)
     identityUrl?: string; // git-gateway identity URL (DecapBridge / GoTrue)
   };
-  // The public contact-form gateway — a thin edge Worker (spam-gate + rate limit) that
-  // hands off to the caller (which stores + sends). Kept separate from `cms`: the CMS proxy
-  // moved to the caller, but the form endpoint stays at the edge for portability. When unset,
-  // ContactForm falls back to cms.baseUrl (legacy, pre-consolidation sites).
+  // The contact-form edge Worker. Separate from `cms` on purpose: the CMS proxy moved to the caller, the form endpoint stayed at the edge. Unset falls back to cms.baseUrl.
   contact?: {
     endpoint?: string; // form worker origin, e.g. 'https://example.com'
   };
 }
 
-// Optional capabilities a site can switch on. A flag that's missing (or the whole
-// `features` object) resolves to false — so adding new features to the engine never
-// turns anything on for existing sites; they stay hidden until a site opts in.
-// The one exception is `contactForm` (see FEATURE_DEFAULTS below).
+// A missing flag — or a missing `features` object — resolves to false, so a new engine feature never turns itself on for an existing site. contactForm and pages are the two deliberate exceptions.
 export interface StommeFeatures {
   blog?: boolean; // posts collection + /<blog> routes + postList block
   areas?: boolean; // towns collection + /<towns> routes + linkChips block
@@ -113,19 +72,11 @@ export interface StommeFeatures {
   testimonials?: boolean; // testimonials collection + testimonials block
   faq?: boolean; // faq collection + faq block
   tracking?: boolean; // analytics (GTM/GA4/Meta) + cookie-consent banner + the Tracking settings pane
-  // DELIBERATE exception to the all-false convention: a contact form is on by DEFAULT.
-  // Existing sites that never set this keep their form (rule zero). Set it to `false`
-  // to remove the contactForm block from the site. Gated in BlockRenderer.
+  // Deliberate exception: on by DEFAULT, so a site that never set it keeps its form. Gated in BlockRenderer.
   contactForm?: boolean;
-  // DELIBERATE exception too: pages are on by DEFAULT (the collection predates feature
-  // flags; absent-means-off would orphan existing page content). `false` hides the Pages
-  // collection from the CMS (single-page site). Gated in the config generator.
+  // Deliberate exception: on by DEFAULT — the collection predates feature flags, and absent-means-off would orphan existing page content. Gated in the config generator.
   pages?: boolean;
-  // Forward-compatible: a site may carry extra flags the engine doesn't (yet) name — e.g.
-  // one an out-of-tree extension gates its own collection/route on. Those type-check here
-  // and pass through resolveFeatures untouched ("Unknown keys are ignored" — they neither
-  // override a default nor turn a known feature on). Keeps the documented keys above as the
-  // contract while letting a site opt a flag on without the engine having to know it.
+  // A flag the engine does not name type-checks here and passes through resolveFeatures untouched, so a site can gate an extension's own collection without the engine knowing it.
   [flag: string]: boolean | undefined;
 }
 export const FEATURE_DEFAULTS: Required<StommeFeatures> = {
@@ -135,34 +86,20 @@ export const FEATURE_DEFAULTS: Required<StommeFeatures> = {
   testimonials: false,
   faq: false,
   tracking: false,
-  // ON by default — a site without the flag keeps its contact form; false removes it.
   contactForm: true,
-  // ON by default — a site without the flag keeps its Pages collection; false hides it.
   pages: true,
 };
-// Resolve a site's flags over the defaults (all false except contactForm, which is on).
-// Unknown keys are ignored; known-but-omitted keys fall back to their default.
 export function resolveFeatures(f?: StommeFeatures): Required<StommeFeatures> {
   return { ...FEATURE_DEFAULTS, ...(f || {}) };
 }
 
-// A content listing: a collection with an index + detail pages, instantiated from
-// config so several can coexist (news, for-sale, …) without bespoke engine features.
-// `preset` picks the schema + presentation: `article` (date/excerpt/cover — blog & news)
-// or `catalog` (price/status/specs/gallery — for-sale of anything). The engine adds a
-// collection per listing, a CMS editor, a seeded editable index page, and detail routes.
-// A catalog spec field: a label (in the site's language) + a stable key the entry data
-// is stored under. A bare string is shorthand — the key defaults to its position
-// (`spec_0`, `spec_1`, …) so renaming a label (e.g. to localize) never orphans the data;
-// only reordering would. Give an explicit `key` for a readable key in the content files.
+// A bare string spec keys off its position (spec_0, spec_1…), so renaming a label never orphans stored data — but REORDERING does. Give an explicit key to be safe.
 export type SpecInput = string | { key?: string; label: string };
 export interface SpecDef { key: string; label: string }
 export function resolveSpecs(specs?: SpecInput[]): SpecDef[] {
   return (Array.isArray(specs) ? specs : []).map((s, i) =>
     typeof s === 'string' ? { key: `spec_${i}`, label: s } : { key: s.key || `spec_${i}`, label: s.label });
 }
-// The {label, value} rows to render for a catalog entry: the listing's configured specs,
-// paired with the entry's keyed values; empty values are dropped.
 export function listingSpecRows(entryData: any, listing?: { specs?: SpecDef[] }): { label: string; value: string }[] {
   const vals = (entryData && entryData.specs) || {};
   return (listing?.specs || [])
@@ -170,6 +107,7 @@ export function listingSpecRows(entryData: any, listing?: { specs?: SpecDef[] })
     .filter((r) => r.value);
 }
 
+// A collection with an index + detail pages, instantiated from config so several can coexist without bespoke engine features. `preset` picks both schema and presentation.
 export interface Listing {
   id: string; // collection name + content folder (src/content/<id>)
   route: string; // index + detail route base, e.g. '/for-sale'
@@ -178,17 +116,13 @@ export interface Listing {
   specs?: SpecInput[]; // catalog: the spec fields every item shares (config-defined, consistent)
   options?: { columns?: number; showImages?: boolean; featured?: boolean; filters?: boolean };
 }
-// Normalize: drop entries missing an id/route/preset; default the route slash; resolve specs.
 export function resolveListings(l?: Listing[]): (Omit<Listing, 'specs'> & { specs: SpecDef[] })[] {
   return (Array.isArray(l) ? l : [])
     .filter((x) => x && x.id && x.route && (x.preset === 'article' || x.preset === 'catalog'))
     .map((x) => ({ ...x, route: x.route.startsWith('/') ? x.route : `/${x.route}`, specs: resolveSpecs(x.specs) }));
 }
 
-// Per-language site-string defaults. English is the base; other locales override only
-// the keys they translate (anything omitted falls back to English). A site's
-// `config.strings` still overrides all of this. Contact labels mirror ContactForm.astro's
-// own English fallbacks, so English sites are unaffected.
+// English is the base; another locale overrides only the keys it translates, and a site's own `config.strings` overrides all of it.
 const STRINGS_EN = {
   readMore: 'Read more',
   latest: 'Latest',
@@ -223,7 +157,6 @@ const STRINGS_EN = {
     to: 'to',
     from: 'from',
   },
-  // 404 page (engine-injected /404 route).
   notFound: {
     title: 'Page not found',
     heading: 'Page not found',
@@ -290,9 +223,7 @@ const STRINGS_SV: typeof STRINGS_EN = {
 
 const STRINGS_BY_LANG: Record<string, typeof STRINGS_EN> = { en: STRINGS_EN, sv: STRINGS_SV };
 
-// Pick the base string set for the SITE language. Driven by `locale` (the site's BCP47
-// language/region, e.g. sv-SE) — NOT cmsLocale, which only picks the /admin label language.
-// cmsLocale is just a fallback for older configs that set it but no locale.
+// Driven by `locale`, NOT cmsLocale — cmsLocale only picks the /admin label language, and is read here purely as a fallback for older configs that set it without a locale.
 function baseStrings(locale?: string, cmsLocale?: string) {
   const lang = String(locale || cmsLocale || 'en').split(/[-_]/)[0].toLowerCase();
   const b = STRINGS_BY_LANG[lang] || STRINGS_EN;
@@ -315,8 +246,7 @@ export const SITE_DEFAULTS = {
   strings: STRINGS_EN,
 };
 
-// Whether a page is one the site keeps unlisted. Prefix match on whole segments, so '/book' covers
-// '/book/anything' but never '/booking'.
+// Prefix match on WHOLE segments: '/book' covers '/book/anything' but never '/booking'.
 export function isUnlisted(pathname: string, noindex?: string[]): boolean {
   const path = String(pathname || '');
   return (noindex ?? []).some((raw) => {
