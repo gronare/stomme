@@ -1,9 +1,11 @@
 ---
-brand: "#4338ca"
-ink: "#1f2937"
+brand: "#0f5d56"
+ink: "#1f2a28"
 onDark: "#ffffff"
-surface: "#e0e7ff"
-paper: "#ffffff"
-line: "#e5e7eb"
-highlight: "#f59e0b"
+surface: "#e4ede6"
+paper: "#fafaf7"
+line: "#e3e6e0"
+secondary: "#3d6d94"
+highlight: "#e6a33c"
+eyebrowColor: "highlight"
 ---

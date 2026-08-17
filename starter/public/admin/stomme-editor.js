@@ -194,7 +194,7 @@
   }
 
   // Sveltia's select cannot create options, so `tags` stays a free list and the tags already used across FAQ entries (templated in by stomme-gen) render as chips that drive Sveltia's own Add button.
-  var FAQ_TAGS = []; // stomme:faq-tags
+  var FAQ_TAGS = ["basics","editing"]; // stomme:faq-tags
   function tagInputs(section) {
     return section.querySelectorAll(':scope input[type="text"]');
   }

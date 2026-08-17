@@ -1306,14 +1306,20 @@ collections:
                     required: false
                     hint: "Pick specific questions (in order). Leave empty to use the tag filter or show all."
                     options:
+                      - { label: "How do I add a page?", value: "add-a-page" }
+                      - { label: "Can it do a blog, services, or a for-sale catalog?", value: "blog-and-more" }
+                      - { label: "How do I change the look?", value: "change-the-look" }
                       - { label: "How do I edit content?", value: "how-to-edit" }
                       - { label: "What is this starter?", value: "what-is-this" }
+                      - { label: "Where do images go?", value: "where-images-go" }
                   - name: tag
                     label: "Tag filter"
                     widget: select
                     required: false
                     hint: "Show every question carrying this tag (tags are set on the questions). Ignored when questions are picked above."
-                    options: []
+                    options:
+                      - { label: "basics", value: "basics" }
+                      - { label: "editing", value: "editing" }
                   - { name: asideHeading, label: "Aside · heading", widget: string, required: false, default: "Still have questions?" }
                   - { name: asideBody, label: "Aside · text", widget: text, required: false, default: "Get in touch and we'll help you out." }
                   - name: asideCta
@@ -2838,14 +2844,20 @@ collections:
                 required: false
                 hint: "Pick specific questions (in order). Leave empty to use the tag filter or show all."
                 options:
+                  - { label: "How do I add a page?", value: "add-a-page" }
+                  - { label: "Can it do a blog, services, or a for-sale catalog?", value: "blog-and-more" }
+                  - { label: "How do I change the look?", value: "change-the-look" }
                   - { label: "How do I edit content?", value: "how-to-edit" }
                   - { label: "What is this starter?", value: "what-is-this" }
+                  - { label: "Where do images go?", value: "where-images-go" }
               - name: tag
                 label: "Tag filter"
                 widget: select
                 required: false
                 hint: "Show every question carrying this tag (tags are set on the questions). Ignored when questions are picked above."
-                options: []
+                options:
+                  - { label: "basics", value: "basics" }
+                  - { label: "editing", value: "editing" }
               - { name: asideHeading, label: "Aside · heading", widget: string, required: false, default: "Still have questions?" }
               - { name: asideBody, label: "Aside · text", widget: text, required: false, default: "Get in touch and we'll help you out." }
               - name: asideCta
