@@ -202,7 +202,10 @@ function faqTagOptions() {
   }
   const tags = new Set();
   for (const f of files) {
-    const src = readFileSync(resolve(root, 'src/content/faq', f), 'utf8');
+    // One unreadable entry must not take the whole admin down: this runs at module load, so a
+    // throw here means the site's config.yml is never written at all.
+    let src = '';
+    try { src = readFileSync(resolve(root, 'src/content/faq', f), 'utf8'); } catch { continue; }
     const block = src.match(/^tags:\s*\n((?:[ \t]+-[ \t]+.*\n)+)/m);
     if (block) for (const m of block[1].matchAll(/-[ \t]+["']?([^"'\n]+?)["']?\s*$/gm)) tags.add(m[1].trim());
     const inline = src.match(/^tags:\s*\[([^\]]*)\]/m);

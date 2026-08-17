@@ -25,6 +25,13 @@ export function makeEmitters({ q, pad, AVAILABLE_BLOCKS, OPTION_SOURCES }) {
       ...(f.collapsed !== undefined ? [`${p}  collapsed: ${f.collapsed}`] : []),
       // minimize_collapsed deliberately NOT emitted: with per-item cards, hiding the whole list behind a single "N items" row is a redundant extra click.
     ];
+    // media_folder/public_folder ride on `parts` for a leaf widget, but every container below
+    // builds its own lines — without splicing the pair in there too, an uploads path set on a
+    // list or an object is accepted by the catalog and silently never reaches the CMS.
+    const mediaProps = () => [
+      ...(f.media_folder ? [`${p}  media_folder: ${q(f.media_folder)}`] : []),
+      ...(f.public_folder ? [`${p}  public_folder: ${q(f.public_folder)}`] : []),
+    ];
     // `widget: 'blocks'` in a catalog field means "sections here too": the container gets the real type list minus every container type, so the CMS cannot build a doll's house.
     if (f.widget === 'blocks') {
       const types = AVAILABLE_BLOCKS.filter((b) => !b.fields.some((x) => x.widget === 'blocks'));
@@ -32,6 +39,7 @@ export function makeEmitters({ q, pad, AVAILABLE_BLOCKS, OPTION_SOURCES }) {
         ...(f.required === false ? [`${p}  required: false`] : []),
         ...collapseProps(),
         ...(f.hint ? [`${p}  hint: ${q(f.hint)}`] : []),
+        ...mediaProps(),
         `${p}  summary: "{{fields.eyebrow}} {{fields.heading}}{{fields.quote}}"`,
         `${p}  types:`];
       for (const b of types) {
@@ -49,6 +57,7 @@ export function makeEmitters({ q, pad, AVAILABLE_BLOCKS, OPTION_SOURCES }) {
         ...(f.required === false ? [`${p}  required: false`] : []),
         ...collapseProps(),
         ...(f.hint ? [`${p}  hint: ${q(f.hint)}`] : []),
+        ...mediaProps(),
         ...(sum ? [`${p}  summary: ${q(sum)}`] : []),
         `${p}  fields:`, ...f.fields.map((sf) => emitField(sf, indent + 4))].join('\n');
     }
@@ -57,6 +66,7 @@ export function makeEmitters({ q, pad, AVAILABLE_BLOCKS, OPTION_SOURCES }) {
         ...(f.required === false ? [`${p}  required: false`] : []),
         ...collapseProps(),
         ...(f.hint ? [`${p}  hint: ${q(f.hint)}`] : []),
+        ...mediaProps(),
         `${p}  field: ${emitFlow(f.field)}`].join('\n');
     }
     if (f.widget === 'object' && f.fields) {
@@ -68,6 +78,7 @@ export function makeEmitters({ q, pad, AVAILABLE_BLOCKS, OPTION_SOURCES }) {
       else if (f.collapsed !== undefined) head.push(`${p}  collapsed: ${f.collapsed}`);
       if (f.summary) head.push(`${p}  summary: ${q(f.summary)}`);
       if (f.hint) head.push(`${p}  hint: ${q(f.hint)}`);
+      head.push(...mediaProps());
       head.push(`${p}  fields:`);
       return [...head, ...f.fields.map((sf) => emitField(sf, indent + 4))].join('\n');
     }
