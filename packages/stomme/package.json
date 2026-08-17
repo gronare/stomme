@@ -54,7 +54,8 @@
     "test:addon-blocks": "node test/smoke-addon-blocks.mjs",
     "test:public-index": "node test/smoke-public-index.mjs",
     "test:slots": "node test/smoke-slots.mjs",
-    "lint:comments": "node bin/lint-comments.mjs ."
+    "lint:comments": "node bin/lint-comments.mjs .",
+    "test:contracts": "node test/cross-file-contracts.mjs"
   },
   "bin": {
     "stomme-gen": "bin/gen-admin-blocks.mjs",

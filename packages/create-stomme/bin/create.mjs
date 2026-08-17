@@ -1,11 +1,9 @@
 #!/usr/bin/env node
-// Copies the starter into <dir>, names it and prints next steps. See the README for how it is invoked.
 import { cpSync, existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { resolve, relative, dirname, basename } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const here = dirname(fileURLToPath(import.meta.url));
-// The live monorepo starter wins when it exists, so a lingering ./template can never shadow it — publishing therefore needn't race to delete the snapshot.
 const starter = resolve(here, '../../../starter');
 const template = existsSync(starter) ? starter : resolve(here, '../template');
 
@@ -19,7 +17,6 @@ if (!existsSync(template)) {
   process.exit(1);
 }
 
-// Set while rewriting package.json, read again by the .npmrc step and the closing message.
 let fromCheckout = false;
 const dest = resolve(process.cwd(), arg);
 if (existsSync(dest)) {
@@ -33,7 +30,7 @@ cpSync(template, dest, {
   filter: (src) => !SKIP.has(basename(src)),
 });
 
-// Inside the monorepo the engine dependency is a relative `link:` because it is path-based and survives the scaffold's own pnpm-workspace.yaml, which makes the site its own workspace root and would break `workspace:*`. Outside, a registry version.
+// `link:` rather than `workspace:*`: the scaffold writes its own pnpm-workspace.yaml, so the new site is its own workspace root and a `workspace:` range has nothing to resolve against.
 try {
   const pkgPath = resolve(dest, 'package.json');
   const pkg = JSON.parse(readFileSync(pkgPath, 'utf8'));
@@ -41,20 +38,16 @@ try {
   if (pkg.dependencies && '@gronare/stomme' in pkg.dependencies) {
     const repoRoot = resolve(here, '../../..');
     const enginePkg = resolve(repoRoot, 'packages/stomme');
-    // Scaffolding from a checkout links to THAT checkout's engine, wherever the new site lands: the registry copy is scoped and needs a token, so a `latest` here would hand anyone who cloned the repo a site they cannot install.
     fromCheckout = template === starter && existsSync(enginePkg);
-    // A relative link stays portable while the site lives inside the checkout; outside it the traversal buys nothing and an absolute path is the one that survives the site being moved.
     const inRepo = dest === repoRoot || dest.startsWith(repoRoot + '/');
     pkg.dependencies['@gronare/stomme'] = fromCheckout
       ? 'link:' + (inRepo ? relative(dest, enginePkg).split('\\').join('/') : enginePkg)
       : 'latest';
   }
   writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + '\n');
-} catch {
-  /* leave package.json as-is if anything is unexpected */
-}
+} catch {}
 
-// allowBuilds is required: pnpm 11 refuses to run a dependency's native build scripts (sharp/esbuild/@parcel/watcher) without an allowlist in pnpm-workspace.yaml, and `pnpm install` stops with ERR_PNPM_IGNORED_BUILDS.
+// Without this allowlist pnpm 11 refuses to run the native build scripts and `pnpm install` stops with ERR_PNPM_IGNORED_BUILDS.
 const workspaceYaml = resolve(dest, 'pnpm-workspace.yaml');
 if (!existsSync(workspaceYaml)) {
   writeFileSync(
@@ -62,7 +55,6 @@ if (!existsSync(workspaceYaml)) {
     "allowBuilds:\n  '@parcel/watcher': true\n  esbuild: true\n  sharp: true\n  workerd: true\n",
   );
 }
-//  2. The @gronare scope's registry. Auth is a secret and stays out of this committed file — a read:packages token belongs in the user's own ~/.npmrc.
 const npmrc = resolve(dest, '.npmrc');
 if (!fromCheckout && !existsSync(npmrc)) {
   writeFileSync(

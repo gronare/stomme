@@ -1,4 +1,3 @@
-// encode = base64(reverse(s)) and MUST stay in sync with its hand-mirrored decode, reverse(atob(s)), in the REVEAL page script in src/entrypoints.mjs.
 export function encodeContact(value: string): string {
   const reversed = (value || '').split('').reverse().join('');
   if (typeof btoa === 'function') return btoa(reversed);

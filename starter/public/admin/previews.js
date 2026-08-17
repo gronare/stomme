@@ -1,5 +1,1 @@
-// Site-specific CMS preview templates (optional).
-// The engine provides live page previews + readable settings previews via
-// stomme-previews.js, which loads before this file. Register bespoke templates
-// here to add or override — re-registering a name wins. Example:
-//   CMS.registerPreviewTemplate('mySection', function (props) { /* ... */ });
+// admin/index.html loads this file after stomme-previews.js, so it must exist even when empty; a template re-registered here overrides the engine's.

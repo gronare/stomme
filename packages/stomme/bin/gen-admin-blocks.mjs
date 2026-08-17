@@ -255,13 +255,19 @@ try {
   console.warn('  (addon previews copy skipped:', e.message + ')');
 }
 
+const substitute = (src, re, replacement, what) => {
+  const out = src.replace(re, replacement);
+  if (out === src) throw new Error(`stomme-gen: ${what} — the declaration this rewrites is gone or renamed (${re})`);
+  return out;
+};
+
 try {
   const previewsDest = resolve(root, 'public/admin/stomme-previews.js');
   mkdirSync(dirname(previewsDest), { recursive: true });
   let previewsSrc = readFileSync(resolve(here, '../admin/previews.js'), 'utf8');
   const LOGIN_LABELS = { en: 'Log in', sv: 'Logga in', da: 'Log ind', nb_no: 'Logg inn', nb: 'Logg inn', nn: 'Logg inn', de: 'Anmelden', fr: 'Se connecter', es: 'Iniciar sesión', it: 'Accedi', nl: 'Inloggen', pt: 'Entrar', fi: 'Kirjaudu sisään' };
   const loginLabel = LOGIN_LABELS[CMS_LOCALE] || LOGIN_LABELS[String(CMS_LOCALE).split(/[-_]/)[0]] || 'Log in';
-  previewsSrc = previewsSrc.replace(/var LOGIN_LABEL = '[^']*'; \/\/ stomme:login-label/, `var LOGIN_LABEL = ${JSON.stringify(loginLabel)}; // stomme:login-label`);
+  previewsSrc = substitute(previewsSrc, /var LOGIN_LABEL = '[^']*';/, `var LOGIN_LABEL = ${JSON.stringify(loginLabel)};`, 'the admin login label');
   if (LISTINGS.length) {
     const regs = LISTINGS.map((l) => {
       const specs = (Array.isArray(l.specs) ? l.specs : []).map((s, i) =>
@@ -279,8 +285,8 @@ try {
   const editorDest = resolve(root, 'public/admin/stomme-editor.js');
   mkdirSync(dirname(editorDest), { recursive: true });
   let editorSrc = readFileSync(resolve(here, '../admin/editor.js'), 'utf8');
-  editorSrc = editorSrc.replace(/var FAQ_TAGS = \[[^\]]*\]; \/\/ stomme:faq-tags/,
-    `var FAQ_TAGS = ${JSON.stringify(FAQ_TAG_OPTIONS.map((o) => o.value))}; // stomme:faq-tags`);
+  editorSrc = substitute(editorSrc, /var FAQ_TAGS = \[[^\]]*\];/,
+    `var FAQ_TAGS = ${JSON.stringify(FAQ_TAG_OPTIONS.map((o) => o.value))};`, 'the FAQ tag list');
   writeFileSync(editorDest, editorSrc);
 } catch (e) {
   console.warn('  (stomme-editor.js copy skipped:', e.message + ')');

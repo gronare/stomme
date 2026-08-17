@@ -183,7 +183,7 @@
     });
   }
 
-  var FAQ_TAGS = []; // stomme:faq-tags
+  var FAQ_TAGS = [];
   function tagInputs(section) {
     return section.querySelectorAll(':scope input[type="text"]');
   }

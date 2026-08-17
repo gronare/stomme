@@ -5,8 +5,6 @@ import { getCollection } from 'astro:content';
 import { site, features } from '../site.config';
 
 export async function getStaticPaths() {
-  // Unpublished pages (published: false) aren't built — the owner can hide a page (e.g.
-  // the contact form) from the CMS without deleting it. It 404s until re-published.
   const pages = (await getCollection('pages')).filter((p) => p.data.published !== false);
   return pages.map((p) => ({ params: { slug: p.id }, props: { page: p } }));
 }

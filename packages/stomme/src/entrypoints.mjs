@@ -336,7 +336,6 @@ const { entry } = Astro.props;
 `;
 }
 
-// Injected on every page (deferred module): reveals scraper-protected contact links by decoding the reversed+base64 tel:/mailto: held in data-t/data-d on a.js-contact. Mirrors encodeContact in src/protect.ts — keep the two in sync.
 export const REVEAL = `
 (function () {
   function dec(s) { return s ? atob(s).split('').reverse().join('') : ''; }

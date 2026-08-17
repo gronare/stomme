@@ -1,5 +1,5 @@
 (function () {
-  var LOGIN_LABEL = 'Log in'; // stomme:login-label (localized by stomme-gen)
+  var LOGIN_LABEL = 'Log in';
   function relabel() {
     document.querySelectorAll('button').forEach(function (b) {
       if (/github/i.test(b.textContent || '')) b.textContent = LOGIN_LABEL;
@@ -23,7 +23,6 @@
       LINE = '#e5e7eb', MUTED = '#6b7280', HIGHLIGHT = '#f59e0b';
   var SANS = 'ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif';
   var MONO = 'ui-monospace,Menlo,Consolas,monospace';
-  // Mirrors src/fonts.ts FONT_STACKS so the theme preview reflects the font pickers.
   var FONT_STACKS = {
     system: SANS,
     serif: '"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif',

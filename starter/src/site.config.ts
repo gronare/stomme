@@ -1,85 +1,26 @@
 import type { SiteConfig, StommeFeatures, Listing } from '@gronare/stomme/config';
 
-// site.config.ts — the single file that configures the engine for this site.
-// Three exports: `features` (on/off capabilities), `site` (routes, locale, wording),
-// and `listings` (config-defined collections). After changing ANYTHING here, re-run the
-// generator so /admin reflects it: `pnpm cms:gen` (or just `pnpm dev` / `pnpm build`,
-// which run it for you). Editing this file alone does not update the CMS until then.
-
-// FEATURES — optional capabilities. true → that collection's CMS editor, its blocks, and
-// its detail routes switch on (each is its own collection in the admin sidebar).
-// false/omitted → completely hidden. Turning one on later never breaks existing content.
 export const features: StommeFeatures = {
-  faq: true, // FAQ collection + the "FAQ" block
-  blog: false, // posts collection + an editable /blog index + /blog/<post> pages + "Blog posts" block
-  areas: false, // towns collection + /areas/<town> pages + "Link chips" block
-  services: false, // services collection + /services/<service> pages + "Service cards" block
-  testimonials: false, // testimonials collection + the "Testimonials" block
+  faq: true,
+  blog: false,
+  areas: false,
+  services: false,
+  testimonials: false,
 };
 
-// SITE — configuration handed to the blocks and page templates.
 export const site: SiteConfig = {
-  // Optional look & feel: a theme directory name, looked up under STOMME_THEMES_DIR at
-  // build time. Leave unset for the neutral engine default. Setting it without that env
-  // var fails the build rather than shipping unstyled. Example: style: 'bruket'
-  // style: undefined,
-
-  // Route prefixes for collection pages. For the feature-backed ones (blog/areas/services)
-  // these must match the route folders under src/pages/. Defaults shown — override as needed.
   routes: {
-    services: '/services', // "Service cards" block + service detail pages
-    towns: '/areas', // "Link chips" block + town/area detail pages
-    blog: '/blog', // "Blog posts" block + post detail pages
-    contact: '/contact', // where contact CTAs (town/service pages, catalog) link to
-    formSuccess: '/thanks', // the contact-form success page
+    services: '/services',
+    towns: '/areas',
+    blog: '/blog',
+    contact: '/contact',
+    formSuccess: '/thanks',
   },
-
-  // locale    — the site's language + region (BCP47). Drives date/number formatting and the
-  //             language of the engine's built-in wording ('sv' and 'en' shipped, else English).
-  // cmsLocale — language of the /admin field labels only. Re-run `pnpm cms:gen` after changing.
   locale: 'en-US',
   cmsLocale: 'en',
-
-  // Fixed wording used by blocks/templates. Override only what you want changed; anything
-  // omitted falls back to the engine's built-in wording for `locale`'s language
-  // (English here, via `locale: 'en-US'`). All groups below are optional.
   strings: {
     readMore: 'Read more',
-    // Contact form field labels:
-    // contact: { name: 'Name', email: 'Email', phone: 'Phone', message: 'Message', submit: 'Send', direct: 'Or reach us directly' },
-    // Catalog (for-sale) listing wording:
-    // listingStatus: { available: 'Available', reserved: 'Reserved', sold: 'Sold', all: 'All' },
-    // listingCta: 'Contact us',
-    // Town/area page chrome ({name} is replaced with the town name):
-    // town: { eyebrow: 'Local service: {name}', heading: '{name}', cta: 'Get a quote', whyHeading: 'Why choose us in {name}?', servicesHeading: 'Our services in {name}' },
-    // Service page chrome:
-    // service: { eyebrow: 'Service', quoteEyebrow: 'Free quote', quoteHeading: 'Want to know what it costs?', cta: 'Get a quote' },
   },
 };
 
-// LISTINGS — config-defined collections. Each entry becomes its own admin collection, an
-// editable index page (seeded at `route`), and detail pages at `route`/<slug>. Add as many
-// as you want — news AND for-sale AND … can coexist. Empty by default.
-//
-// Each listing: { id, route, label, preset, options? }
-//   id      — collection name + content folder (src/content/<id>)
-//   route   — index + detail URL base, e.g. '/for-sale'
-//   label   — admin collection + nav label
-//   preset  — 'article' (title, date, excerpt, cover, body  → blog/news)
-//          — 'catalog' (title, price, status, category, gallery, specs, body → for-sale of anything)
-//   options — optional presentation: { columns?: number; showImages?: boolean; featured?: boolean; filters?: boolean }
-// Uncomment an example to enable it, then run `pnpm cms:gen`. You then get, per entry:
-//   • an admin collection ("News" / "For sale") to add entries in
-//   • an editable index page at the route (pageHeader + the list block), seeded once
-//   • detail pages at <route>/<slug>
-//   • content under src/content/<id>/ (e.g. src/content/news/my-post.md)
-export const listings: Listing[] = [
-  // News: /news index + /news/<slug> posts. Entries: title, date, excerpt, cover, body.
-  // { id: 'news', route: '/news', label: 'News', preset: 'article' },
-
-  // For-sale (e.g. used cars): /for-sale index with category filters + status badges
-  // (available/reserved/sold), and /for-sale/<slug> detail with price, specs + gallery.
-  // `specs` defines the spec fields every item shares (label in your language; the data is
-  // stored under a stable key, so renaming a label to localize never orphans existing data).
-  // { id: 'cars', route: '/for-sale', label: 'For sale', preset: 'catalog', specs: ['Year', 'Mileage', 'Gearbox', 'Fuel'], options: { columns: 3, filters: true } },
-];
+export const listings: Listing[] = [];

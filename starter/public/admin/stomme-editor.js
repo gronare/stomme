@@ -183,7 +183,7 @@
     });
   }
 
-  var FAQ_TAGS = ["basics","editing"]; // stomme:faq-tags
+  var FAQ_TAGS = ["basics","editing"];
   function tagInputs(section) {
     return section.querySelectorAll(':scope input[type="text"]');
   }

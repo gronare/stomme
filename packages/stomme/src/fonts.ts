@@ -1,4 +1,3 @@
-// The theme's `fontDisplay` / `fontBody` name a key here (or 'custom'). The picker's option VALUES are hand-authored in bin/gen-admin-blocks.mjs and the CMS preview repeats these stacks in admin/previews.js — both have to match these keys.
 export const FONT_STACKS: Record<string, string> = {
   system: 'ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
   serif: '"Iowan Old Style", "Palatino Linotype", Palatino, Georgia, "Times New Roman", serif',
