@@ -13,7 +13,6 @@ export const FONT_STACKS: Record<string, string> = {
 };
 
 export interface Webfont { family: string; fallbackFamily: string; fallback: string; }
-// resolveFonts authors the real @font-face (latin-subset variable woff2); the capsize metric-matched Arial fallback is what makes the swap shift-free.
 export const WEBFONTS: Record<string, Webfont> = {
   inter: {
     family: 'Inter Variable', fallbackFamily: 'Inter Fallback',
@@ -27,13 +26,11 @@ export const WEBFONTS: Record<string, Webfont> = {
 
 const formatOf = (path: string) =>
   path.endsWith('.woff2') ? 'woff2' : path.endsWith('.woff') ? 'woff' : path.endsWith('.otf') ? 'opentype' : 'truetype';
-// MIME type for <link rel=preload as=font type=…>
 const mimeOf = (path: string) =>
   path.endsWith('.woff2') ? 'font/woff2' : path.endsWith('.woff') ? 'font/woff' : path.endsWith('.otf') ? 'font/otf' : 'font/ttf';
 const fontFace = (family: string, url: string) =>
   `@font-face{font-family:"${family}";src:url("${url}") format("${formatOf(url)}");font-display:swap;font-weight:100 900;}`;
 
-// The theme stores the served /media/fonts/… path; the build-bridge mirrors public/media → src/assets/media and Vite ?url-hashes it. Eager glob = URL strings only, so an unused upload costs deploy bytes, not a fetch.
 const uploadedFontUrls = import.meta.glob('/src/assets/media/**/*.{woff2,woff,ttf,otf}', { query: '?url', import: 'default', eager: true }) as Record<string, string>;
 const uploadFontUrl = (p?: string | null): string | null => {
   if (!p) return null;
@@ -41,7 +38,6 @@ const uploadFontUrl = (p?: string | null): string | null => {
   return key ? (uploadedFontUrls[key] ?? null) : null;
 };
 
-// A curated webfont is a real family only once its file is actually served, so this resolves each key from the conventional upload path (/media/fonts/<key>.woff2). A site that drops the file in gets the family; one that has not keeps the system stack, and the picker's choice stops being a silent no-op.
 export function curatedWebfontUrls(): Record<string, string> {
   const out: Record<string, string> = {};
   for (const key of Object.keys(WEBFONTS)) {
@@ -51,7 +47,6 @@ export function curatedWebfontUrls(): Record<string, string> {
   return out;
 }
 
-// webfontUrls (curated-webfont key → served latin woff2) stays SITE-provided; custom uploads resolve through the glob above.
 export function resolveFonts(
   theme: { fontDisplay?: string; fontBody?: string; fontCustomFile?: string; fontCustomBodyFile?: string } = {},
   webfontUrls: Record<string, string> = {},
@@ -62,13 +57,11 @@ export function resolveFonts(
     if (key === 'custom') return customFamily ? `${customFamily}, ${FONT_STACKS.system}` : null;
     if (key && WEBFONTS[key]) {
       const wf = WEBFONTS[key];
-      // Wired → the real family with its metric-matched fallback; unwired → graceful system.
       return webfontUrls[key] ? `"${wf.family}", "${wf.fallbackFamily}", ${FONT_STACKS.system}` : FONT_STACKS.system;
     }
     return key && FONT_STACKS[key] ? FONT_STACKS[key] : null;
   };
   const dispFamily = customDisplayUrl ? '"StommeFontDisplay"' : null;
-  // Body custom font falls back to the heading one when not uploaded (one-font setups).
   const bodyFamily = customBodyUrl ? '"StommeFontBody"' : dispFamily;
   const vars: string[] = [];
   const d = stack(theme.fontDisplay, dispFamily);
@@ -79,7 +72,6 @@ export function resolveFonts(
   const preloads: { href: string; type: string }[] = [];
   if (customDisplayUrl) { faces.push(fontFace('StommeFontDisplay', customDisplayUrl)); preloads.push({ href: customDisplayUrl, type: mimeOf(customDisplayUrl) }); }
   if (customBodyUrl) { faces.push(fontFace('StommeFontBody', customBodyUrl)); preloads.push({ href: customBodyUrl, type: mimeOf(customBodyUrl) }); }
-  // One @font-face + fallback + preload per distinct wired key (display == body dedupes to a single pair).
   const webfontKeys = [...new Set([theme.fontDisplay, theme.fontBody])].filter(
     (k): k is string => !!k && !!WEBFONTS[k] && !!webfontUrls[k],
   );

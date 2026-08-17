@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-// Ratchets color literals found OUTSIDE the :root token block against a committed baseline (styles-colors.baseline.json, a value→count map): plain run fails on any new literal or extra use, --update accepts the current state. A literal outside :root is invisible to theming — a themed site gets it whether it fits or not.
 
 import { readFileSync, writeFileSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
@@ -12,14 +11,12 @@ const UPDATE = process.argv.includes('--update');
 
 const src = readFileSync(CSS, 'utf8');
 
-// The :root block is blanked before matching: literals there are the theme DEFAULTS, overridden at runtime, not leaks.
 let css = src.replace(/\/\*[\s\S]*?\*\//g, (m) => m.replace(/[^\n]/g, ' '));
 css = css.replace(/:root\s*{[^}]*}/g, (m) => m.replace(/[^\n]/g, ' '));
 
-// Named colors are deliberately not matched — too many false positives (white-space) for the two or three real uses.
 const RE = /#[0-9a-fA-F]{3,8}\b|(?:rgba?|hsla?)\([^)]*\)/g;
 
-const found = new Map(); // literal -> { count, lines: [lineNo…] }
+const found = new Map();
 const lines = css.split('\n');
 lines.forEach((line, i) => {
   for (const m of line.matchAll(RE)) {
@@ -43,7 +40,7 @@ let baseline = {};
 try { baseline = JSON.parse(readFileSync(BASELINE, 'utf8')); }
 catch { console.error(`no baseline at ${BASELINE} — run with --update to create it`); process.exit(1); }
 
-const added = []; // new literal, or more uses of a known one
+const added = [];
 const removed = [];
 for (const [lit, count] of Object.entries(current)) {
   const base = baseline[lit] ?? 0;

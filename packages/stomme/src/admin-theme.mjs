@@ -1,11 +1,10 @@
 // Editor theme: CSS custom properties only — they inherit through the shadow DOM, and explicit colours would break Sveltia's in-app light/dark toggle.
 // `!important` is load-bearing: Sveltia injects its own `:root,:host{--sui-…}` at runtime after this style, so equal-specificity later rules would otherwise win.
-// Surfaces + accent derive from a per-mode ramp; kept NEUTRAL (near-zero saturation) so the editor reads as clean grey, with steeper lightness steps + darker borders for box definition. Accent is a desaturated slate — Sveltia bakes 80-100% saturation into --sui-primary-accent-color*, so each is overridden. Per site: set --sui-base-hue + raise accent saturation for a brand accent.
 const RAMP_LIGHT = `--sui-background-color-1-hsl: var(--sui-base-hue) 6% 100% !important; --sui-background-color-2-hsl: var(--sui-base-hue) 7% 96.5% !important; --sui-background-color-3-hsl: var(--sui-base-hue) 8% 93.5% !important; --sui-background-color-4-hsl: var(--sui-base-hue) 8% 89.5% !important; --sui-background-color-5-hsl: var(--sui-base-hue) 10% 81% !important; --sui-border-color-1-hsl: var(--sui-base-hue) 9% 56% !important; --sui-border-color-2-hsl: var(--sui-base-hue) 10% 77% !important; --sui-border-color-3-hsl: var(--sui-base-hue) 10% 83% !important;`;
 const RAMP_DARK = `--sui-background-color-1-hsl: var(--sui-base-hue) 8% 10% !important; --sui-background-color-2-hsl: var(--sui-base-hue) 8% 12.5% !important; --sui-background-color-3-hsl: var(--sui-base-hue) 8% 15.5% !important; --sui-background-color-4-hsl: var(--sui-base-hue) 9% 19% !important; --sui-background-color-5-hsl: var(--sui-base-hue) 10% 29% !important; --sui-border-color-1-hsl: var(--sui-base-hue) 9% 44% !important; --sui-border-color-2-hsl: var(--sui-base-hue) 10% 31% !important; --sui-border-color-3-hsl: var(--sui-base-hue) 10% 26% !important;`;
 const ACCENT_LIGHT = `--sui-primary-accent-color: hsl(var(--sui-base-hue) 14% 40%) !important; --sui-primary-accent-color-light: hsl(var(--sui-base-hue) 14% 46%) !important; --sui-primary-accent-color-dark: hsl(var(--sui-base-hue) 16% 33%) !important; --sui-primary-accent-color-text: hsl(var(--sui-base-hue) 20% 38%) !important; --sui-primary-accent-color-translucent: hsl(var(--sui-base-hue) 14% 44% / 26%) !important; --sui-primary-accent-color-inverted: hsl(var(--sui-base-hue) 8% 100%) !important;`;
 const ACCENT_DARK = `--sui-primary-accent-color: hsl(var(--sui-base-hue) 13% 66%) !important; --sui-primary-accent-color-light: hsl(var(--sui-base-hue) 13% 73%) !important; --sui-primary-accent-color-dark: hsl(var(--sui-base-hue) 14% 57%) !important; --sui-primary-accent-color-text: hsl(var(--sui-base-hue) 18% 70%) !important; --sui-primary-accent-color-translucent: hsl(var(--sui-base-hue) 13% 64% / 30%) !important; --sui-primary-accent-color-inverted: hsl(var(--sui-base-hue) 12% 12%) !important;`;
-// Collapsible object-widget gates: OBJ_ANY = has a disclosure at all, OBJ_C = collapsed, OBJ_E = expanded. Gate on the widget's own disclosure (a summary node only exists when it computes non-empty); direct-child paths keep nested objects from matching their ancestors.
+// Gate on the widget's own disclosure (a summary node only exists when it computes non-empty); direct-child paths keep nested objects from matching their ancestors.
 const OBJ = 'section.field[data-field-type=object]';
 const OBJ_DISC = '> .field-wrapper > .wrapper > .header > div:first-child > button';
 const OBJ_ANY = `${OBJ}:has(${OBJ_DISC}[aria-expanded])`;
@@ -19,16 +18,12 @@ const OPT_E = `${OPT}:has(${OBJ_DISC}[aria-expanded="true"])`;
 const KIDS = '> .field-wrapper > .wrapper > .item-list';
 const GATE_BOOL = `${KIDS} > section.field[data-field-type=boolean][data-key-path$=".enabled"]:first-child`;
 const GATED = `${OBJ}:not([data-key-path="og"]):has(${GATE_BOOL})`;
-// Chevron affordance shared by GATED + added-OPT cards (Material Symbols ships with Sveltia).
 const CHEVRON = `content:"expand_more"!important;font-family:"Material Symbols Outlined"!important;font-size:20px!important;line-height:1!important;flex:0 0 auto!important;opacity:.5!important;transform:rotate(-90deg)!important;transition:transform 160ms!important;`;
-// LINK = a link-shaped object (page select + url string children) — self-detecting, rendered chrome-less inline, children mounted via collapsed:false.
 const LINK = `${OBJ}:has(${KIDS} > section.field[data-field-type=select][data-key-path$=".page"]):has(${KIDS} > section.field[data-key-path$=".url"])`;
-// The centred 768px field column Sveltia uses — mirrored where we re-lay-out fields.
 const COL_PAD = 'max(16px, calc((100% - 768px) / 2))';
 // Card outer width (border-box) = the 768px column + 16px interior padding + 1px border per side, so a card's CHILD fields land on exactly the same column as top-level fields — one width for every card kind. It caps at min(CARD_W, 100% - 32px) so a narrow pane (preview open) fills the pane minus the 16px field padding, which is why top-level PLAIN fields need the inverse treatment (TOP_* below): their 768px column must shrink by the 34px card frame to keep landing on the card-child column at every pane width, not just wide ones.
 const CARD_W = '802px';
 const CARD_MAX = `min(${CARD_W}, 100% - 32px)`;
-// Top-level fields (not nested in a card/item): booleans align via padding because their own grid ignores the field-wrapper, lists keep the CARD_W wrapper, and object cards release header/wrapper to the card width with stronger rules of their own.
 const TOP = 'section.field:not(section.field section.field)';
 const TOP_PLAIN = `${TOP}:not([data-field-type=list]):not([data-field-type=boolean]):not([data-field-type=object])`;
 const TOP_LABELED = `${TOP}:not([data-field-type=boolean]):not([data-field-type=object])`;

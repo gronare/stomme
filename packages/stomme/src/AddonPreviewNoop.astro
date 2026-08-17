@@ -1,5 +1,4 @@
 ---
-// Fallback for the @stomme/addon-preview alias when the slots dir ships no preview.astro: an unknown /preview?kind= renders this instead of failing the build.
 const { kind } = Astro.props;
 ---
 <p style="color:#6b7280;font-size:.9rem;margin:1.5rem">No preview for "{kind}".</p>

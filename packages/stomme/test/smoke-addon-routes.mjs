@@ -13,7 +13,6 @@ const DIST = resolve(STARTER, 'dist');
 const results = [];
 const check = (ok, name) => { results.push([!!ok, name]); console.log(`${ok ? '✓' : '✗'} ${name}`); };
 
-// Self-contained (no engine aliases), so the emitted HTML alone proves the route was injected.
 const page = (label) => `---
 export const prerender = true;
 ---

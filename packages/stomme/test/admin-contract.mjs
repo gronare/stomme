@@ -11,7 +11,6 @@ const starter = resolve(here, '../../../starter');
 const PORT = process.env.PORT || 4577;
 const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/javascript', '.yml': 'text/yaml', '.css': 'text/css', '.json': 'application/json', '.svg': 'image/svg+xml', '.png': 'image/png' };
 
-// The copy swaps the backend to test-repo (in-memory, no auth) so a headless browser can open entries.
 console.log('· generating starter admin (cms:gen)…');
 execFileSync('pnpm', ['run', 'cms:gen'], { cwd: starter, stdio: 'inherit' });
 const srcAdmin = join(starter, 'public/admin');
@@ -36,7 +35,6 @@ await new Promise((r) => srv.listen(PORT, r));
 
 let browser;
 const results = [];
-// A check returns true to pass; a STRING is a failure whose text names the DOM property that moved.
 const check = async (name, fn) => {
   try {
     const r = await fn();
@@ -77,7 +75,6 @@ try {
   await page.evaluate(() => { location.hash = '#/collections/settings/entries/contact'; });
   await page.waitForSelector('section.field[data-key-path="phone"]', { timeout: 30000 });
   await check('gated card: closed by default, card click opens/closes (.stomme-open)', async () => {
-    // Scroll until the away card and its gate switch are mounted — Sveltia lazy-mounts offscreen fields as placeholders.
     for (let i = 0; i < 20; i++) {
       const ok = await page.evaluate(() => {
         if (document.querySelector('section.field[data-key-path="away.enabled"] [role=switch]')) return true;
@@ -94,7 +91,7 @@ try {
     await page.waitForFunction(() => document.querySelector('section.field[data-key-path="away.enabled"] [role=switch]'), null, { timeout: 10000 });
     await page.waitForTimeout(400);
     const startOpen = await page.evaluate(() => document.querySelector('section.field[data-key-path="away"]').classList.contains('stomme-open'));
-    if (startOpen) return false; // must start closed
+    if (startOpen) return false;
     const clickHeader = () => page.evaluate(() => {
       const f = document.querySelector('section.field[data-key-path="away"]');
       f.querySelector(':scope > header').dispatchEvent(new MouseEvent('click', { bubbles: true }));
@@ -122,7 +119,7 @@ try {
       const sw = f.querySelector('section.field[data-key-path="away.enabled"] [role=switch]');
       const flipped = (sw.getAttribute('aria-checked') === 'true') !== was;
       const openSame = f.classList.contains('stomme-open') === openBefore;
-      sw.click(); // restore
+      sw.click();
       return flipped && openSame;
     }, res);
   });
@@ -150,7 +147,6 @@ try {
   await check('list toolbar chevron (.toolbar.top disclosure, not the Add menu button)', async () =>
     (await has(page, 'section.field[data-field-type=list] > .field-wrapper > .sui.group > .inner > .toolbar.top button[aria-expanded]:not([aria-haspopup])'))
     && (await page.evaluate(() => {
-      // Add sits either in a sibling .toolbar.top.add or in an .actions group inside the one toolbar — both are in the CSS rule's scope.
       const inner = document.querySelector('section.field[data-field-type=list] > .field-wrapper > .sui.group > .inner');
       const bars = [...inner.querySelectorAll(':scope > .toolbar')];
       const chevrons = bars.flatMap((b) => [...b.querySelectorAll('button[aria-expanded]:not([aria-haspopup])')]);
@@ -200,7 +196,6 @@ try {
     return has(page, '.item > .item-body > .summary');
   });
   await check('editor.js click-to-expand (row click flips aria-expanded)', async () => {
-    // A synthetic click on the collapsed row (target = the item, not a control) — editor.js must translate it into the disclosure's own click.
     await page.evaluate(() => { document.querySelector('section.field[data-field-type=list] .item').click(); });
     await page.waitForFunction(() => document.querySelector('.item > .header > div:first-child > button[aria-expanded="true"]'), null, { timeout: 5000 });
     return true;
@@ -220,12 +215,11 @@ try {
     await sw.click();
     await page.waitForTimeout(300);
     const now = await sw.getAttribute('aria-checked');
-    await sw.click(); // restore
+    await sw.click();
     return was === 'true' ? now !== 'true' : now === 'true';
   });
   await check('optional-object "Add" checkbox (> .field-wrapper > .sui.checkbox)', () => has(page, 'section.field[data-field-type=object] > .field-wrapper > .sui.checkbox'));
   await check('optional-object toggle is button[role=checkbox][aria-checked]', () => has(page, '.sui.checkbox .inner > button[role=checkbox][aria-checked]'));
-  // Every optional-object card in the pane is driven, one aspect per check, so a red names the DOM property that moved and a regression reaching only the second card still shows.
   await check('optional-object: the pane has optional-object cards to drive', async () => {
     const keys = await page.evaluate(() => [...document.querySelectorAll('section.field[data-field-type=object]')]
       .filter((o) => o.querySelector(':scope > .field-wrapper > .sui.checkbox .inner > button[role=checkbox][aria-checked="false"]'))
@@ -345,7 +339,6 @@ try {
 
 const failed = results.filter(([ok]) => !ok);
 console.log(`\n${results.length - failed.length}/${results.length} contract checks passed`);
-// Names stay in RUN ORDER: one broken step cascades (no list row ⇒ every row check after it fails), and only the order separates a root cause from its fallout.
 if (process.env.STOMME_CONTRACT_REPORT) {
   writeFileSync(process.env.STOMME_CONTRACT_REPORT, JSON.stringify({
     passed: results.length - failed.length, total: results.length, failed: failed.map(([, name, why]) => (why ? `${name} — ${why}` : name)),

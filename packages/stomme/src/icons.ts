@@ -56,8 +56,6 @@ export const ICONS: Record<string, string> = {
   compass: '<circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/>',
 };
 
-// Selectable names, in picker order. Derived — cannot drift from the glyphs.
 export const ICON_NAMES = Object.keys(ICONS);
 
-// Unknown/legacy names degrade to this glyph (a neutral burst).
 export const FALLBACK_ICON = 'spark';

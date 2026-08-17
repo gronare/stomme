@@ -43,7 +43,6 @@ try {
   { feature: '', yaml: '- name: broken' },
 ];
 
-// Files contributed to a collection the ENGINE emits — the addon's own setting under Settings.
 export const panelFiles = ({ routes, blocks }) => ({
   settings: [
     {

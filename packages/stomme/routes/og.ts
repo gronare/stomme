@@ -1,5 +1,3 @@
-// The master switch is CONTENT (settings.og.enabled), which doesn't exist yet at astro:config:setup — so the integration always injects this route and it gates itself in getStaticPaths, leaving the renderer's native deps unloaded when disabled.
-// A card failure must NEVER fail the build: every step falls through with a warning — full card → card on the brand background → settings.ogImage as a plain PNG → solid brand colour → a 1×1 placeholder.
 export const prerender = true;
 
 // The renderer's absolute file:// URL, a Vite define from the integration: it MUST be loaded as a runtime dynamic import of that URL and never bundled — sharp/@resvg are native binaries Rollup can't ingest, and externalized bare specifiers wouldn't resolve from a consuming site's dist under pnpm isolation.
@@ -14,7 +12,6 @@ export async function getStaticPaths() {
   const settings = (await getEntry('settings', 'site'))?.data;
   if (!settings?.og?.enabled) return [];
   const pages = await ogPages({ features, routes: site.routes, listings });
-  // Raw-override and site-default entries carry a URL, not a PNG to emit.
   return pages.filter((p) => p.card).map((p) => ({ params: { slug: p.slug }, props: { page: p } }));
 }
 
@@ -28,7 +25,7 @@ async function buildPng(page: OgPage): Promise<Buffer> {
   const warn = (msg: string, e?: unknown) =>
     console.warn(`[stomme og] ${page.slug}: ${msg}${e ? ` — ${(e as Error)?.message ?? e}` : ''} (build continues)`);
 
-  let og; // the renderer module — loaded lazily so disabled sites never touch native deps
+  let og;
   try {
     // Variable indirection on purpose: a define-substituted string literal inside import() gets statically resolved and bundled by Rollup even with @vite-ignore.
     const rendererUrl: string = __STOMME_OG_RENDERER__;
@@ -44,10 +41,8 @@ async function buildPng(page: OgPage): Promise<Buffer> {
   const name = settings.name || '';
   const vars: Record<string, string> = page.vars ?? {};
 
-  // The site-default brand card (no typeKey) carries no wordmark or tagline — the business name is already the headline.
   const isDefault = !page.typeKey;
   const t = (page.typeKey && settings.og?.types?.[page.typeKey]) || {};
-  // Headline and second line are picked FIELDS: 'business' = the site name, 'none' = off, unset falls to the per-type default.
   const pick = (key?: string) => (!key || key === 'none' ? '' : key === 'business' ? name : vars[key] ?? '');
   const headline = pick(t.headlineField || page.headlineDefault || 'title') || vars.title || name;
   const subline = isDefault ? '' : pick(t.sublineField || page.sublineDefault || 'none');

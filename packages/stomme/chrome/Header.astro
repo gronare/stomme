@@ -7,7 +7,6 @@ import SlotHeaderStart from '@stomme/slot-header-start';
 import SlotHeaderNavEnd from '@stomme/slot-header-nav-end';
 import SlotHeaderEnd from '@stomme/slot-header-end';
 
-// A nav item becomes a dropdown when it has `menu` ("<collectionId>::<routeBase>" — every entry linked to its detail page) or manual `children`.
 interface NavLink { label: string; link?: unknown }
 interface NavItem extends NavLink { menu?: string; children?: NavLink[] }
 interface NavData {
@@ -24,11 +23,9 @@ let { nav, settings } = Astro.props;
 if (!nav) nav = (await getEntry('navigation', 'nav'))!.data as NavData;
 if (!settings) settings = (await getEntry('settings', 'site'))!.data as SiteData;
 
-// Blank textPre means no wordmark — deliberately no site-name fallback, so a logo with embedded text can stand alone.
 const logo = settings.logo ?? {};
 const showMark = nav.showLogo === true && !!logo.image;
 const showWord = nav.showWordmark === true && !!logo.textPre;
-// Uploaded logo is optimized; a public-root logo (e.g. /logo.svg) renders as a plain <img>.
 const logoUploads = import.meta.glob<{ default: ImageMetadata }>('/src/assets/media/**/*.{jpg,jpeg,png,webp,avif}');
 const logoKey = logo.image && logo.image.startsWith('/media/') ? `/src/assets/media/${logo.image.slice('/media/'.length)}` : null;
 const logoOptimized = logoKey && logoUploads[logoKey] ? logoUploads[logoKey] : null;
@@ -51,7 +48,6 @@ async function childrenOf(item: NavItem): Promise<{ label: string; href: string 
   if (Array.isArray(item.children)) return item.children.map((c) => ({ label: c.label, href: resolveLink(c.link, homeHref) }));
   return [];
 }
-// The empty fallback (not homeHref) marks a dropdown-only parent — it opens its menu and links nowhere.
 const resolved = await Promise.all(
   items.map(async (i) => ({ label: i.label, href: resolveLink(i.link, ''), children: await childrenOf(i) })),
 );
@@ -111,7 +107,6 @@ const resolved = await Promise.all(
       });
     });
 
-    // Tapping a real destination closes the fold-out — an accordion header (.nav-top) must not.
     if (toggle) {
       var setOpen = function (open) {
         header.classList.toggle('nav-open', open);
@@ -123,7 +118,6 @@ const resolved = await Promise.all(
       });
     }
 
-    // Only a *sticky* header needs the solid swap (a non-sticky one scrolls away with the hero), and this runs before <main> is parsed, so it defers to DOM ready.
     var initOverlay = function () {
       if (!header.classList.contains('is-sticky')) return;
       var cover = document.querySelector('main .cover:first-child');

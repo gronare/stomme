@@ -28,7 +28,6 @@ const accentVar = accent === 'secondary' ? 'var(--color-secondary)' : accent ===
   )}
   <div class="feature-grid">
     {items.map((it, i) => {
-      // The card link: the `cta` group, or the legacy link + linkLabel pair.
       const target = it.cta?.link ?? it.link;
       const href = target ? resolveLink(target, '') : '';
       const label = it.cta?.label || it.linkLabel || readMore;

@@ -24,11 +24,10 @@
 *, *::before, *::after { box-sizing: border-box; }
 html { background: var(--color-paper); color: var(--color-ink); }
 body { font-family: var(--font-sans); margin: 0; line-height: 1.6; min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; }
-body > main { flex: 1 0 auto; } /* sticky footer: main grows so the footer sits at the bottom on short pages */
+body > main { flex: 1 0 auto; }
 
 .section { max-width: 72rem; margin-inline: auto; padding: 2.75rem 1.5rem; }
 @media (min-width: 768px) { .section { padding-block: 3.75rem; } }
-/* Reading measure — a narrower column for text-led blocks so line length stays legible while grids keep the full width. */
 .section--read { max-width: 53rem; }
 .section-head { max-width: 52rem; }
 
@@ -40,7 +39,6 @@ body > main { flex: 1 0 auto; } /* sticky footer: main grows so the footer sits 
 
 .mono { font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.12em; font-size: 0.74rem; color: var(--color-muted); }
 .eyebrow { display: inline-flex; align-items: center; gap: 10px; }
-/* Eyebrow marker, site-wide via [data-eyebrow] on <html>: default is a dash, `bullet` a dot, `bold` drops the marker and puts the emphasis in weight + tracking instead. */
 .eyebrow::before { content: ""; width: 18px; height: 2px; background: var(--eyebrow-accent, var(--color-brand)); display: inline-block; }
 [data-eyebrow="bullet"] .eyebrow::before { width: 7px; height: 7px; border-radius: 50%; }
 [data-eyebrow="bold"] .eyebrow::before { display: none; }
@@ -55,7 +53,6 @@ body > main { flex: 1 0 auto; } /* sticky footer: main grows so the footer sits 
 .band { background: var(--color-surface); color: var(--color-ink); }
 .surface-tint { background: color-mix(in srgb, var(--color-surface) 30%, var(--color-paper)); }
 
-/* The dark surface does not restyle blocks — it remaps the tokens they already read (paper -> dark ground, ink -> light, surface -> raised dark, line -> faint rule), while brand, highlight and on-dark keep their values so accents stay vivid. */
 .surface-dark {
   background: var(--color-dark);
   color: var(--color-dark-ink);
@@ -65,19 +62,15 @@ body > main { flex: 1 0 auto; } /* sticky footer: main grows so the footer sits 
   --color-surface: color-mix(in srgb, var(--color-dark-ink) 12%, var(--color-dark));
   --color-line: var(--color-dark-line);
 }
-/* The brand colour can itself be dark, so headings are forced light here. */
 .surface-dark .display { color: var(--color-dark-ink); }
 .surface-dark .hl-row { background: color-mix(in srgb, var(--color-dark-ink) 6%, var(--color-dark)); border-color: var(--color-dark-line); }
 .surface-dark .hl-ic { background: color-mix(in srgb, var(--color-brand) 22%, transparent); }
 .surface-dark .ico-badge { background: color-mix(in srgb, var(--color-brand) 28%, transparent); }
-/* StatPanel is already dark by design — letting the wrapper show through beats painting its now-light --color-ink ground over it. */
 .surface-dark .stat-panel { background: transparent; }
-/* A near-black brand would vanish on these surfaces, so the eyebrow marker and the primary button switch to the light ink. */
 .surface-dark, .surface-gradient { --eyebrow-accent: var(--color-dark-ink); }
 .surface-dark .btn, .surface-gradient .btn { background: var(--color-dark-ink); color: var(--color-dark); }
 .surface-dark .btn:hover, .surface-gradient .btn:hover { background: color-mix(in srgb, var(--color-dark-ink) 82%, var(--color-dark)); color: var(--color-dark); }
 
-/* Same token remap as .surface-dark, over the cover's slate gradient. */
 .surface-gradient {
   background: linear-gradient(120deg, #12151d, #222a3a 60%, #10131a);
   color: #e9ebf1;
@@ -91,14 +84,12 @@ body > main { flex: 1 0 auto; } /* sticky footer: main grows so the footer sits 
 .surface-gradient .ico-badge { background: color-mix(in srgb, var(--color-brand) 28%, transparent); }
 .surface-gradient .stat-panel { background: transparent; }
 .section--hero-tall { display: flex; flex-direction: column; min-height: 100vh; min-height: 100dvh; }
-/* Print: viewport-height sections become pages of solid background and can kill the print job — collapse them to their content. */
 @media print {
   .section--hero-tall, .cover--h-tall, .cover--h-medium { min-height: 0; }
   body { min-height: 0; }
 /* Animations off in print: their pre-start `both` state (opacity 0 / undrawn strokes) would print blank, and !important is needed because the base rules come later in the file. */
   .thanks-confirm, .letter-sheet, .letter-ink, .letter-postmark { animation: none !important; }
   .confirm-badge circle, .confirm-badge path { animation: none !important; stroke-dashoffset: 0; }
-/* Freezing the loops makes a printed page (and a lookbook snapshot) identical every time; .cover__motion's SVG is inlined, so its internal .rise/.drift rules are reachable from here. */
   .cover__media--gradient, .hero-motif .hm-rise, .hero-motif .hm-float,
   .cover__motion .rise, .cover__motion .drift { animation: none !important; }
 }
@@ -108,7 +99,6 @@ body > main { flex: 1 0 auto; } /* sticky footer: main grows so the footer sits 
 
 .card { display: block; border: 1px solid var(--color-line); border-radius: 1rem; background: var(--color-paper); overflow: hidden; text-decoration: none; color: inherit; }
 
-/* Tinted placeholder — the fallback art is the brand colour masked by the placeholder SVG's alpha, so the mask replaces object-fit while the image class's box is kept. */
 .ph-tint { display: block; background-color: var(--color-brand);
   -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
   -webkit-mask-position: center; mask-position: center;
@@ -144,7 +134,6 @@ body > main { flex: 1 0 auto; } /* sticky footer: main grows so the footer sits 
 @keyframes hm-drift { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
 @media (prefers-reduced-motion: reduce) { .hero-motif .hm-rise, .hero-motif .hm-float { animation: none; } }
 
-/* Cover text is always #fff over a dark ground plus a scrim, so its colours are explicit rather than token-derived; the .cover background is that ground and shows through wherever the media layer is transparent or absent. */
 .cover { position: relative; display: flex; overflow: hidden; isolation: isolate; color: #fff; background: var(--color-dark); }
 .cover--h-tall { min-height: 100vh; min-height: 100dvh; }
 .cover--h-medium { min-height: 58vh; }
@@ -177,7 +166,6 @@ main .cover:first-child .cover__scrim::before {
 .cover--center .cover__inner { align-self: center; }
 .cover--center .cover__h1, .cover--center .cover__intro { margin-inline: auto; }
 .cover--center .cover__cta { justify-content: center; }
-/* The cover eyebrow deliberately overrides the site-wide eyebrow style — bold, wide and marker-less is the hero's signature. */
 .cover__eyebrow { font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.16em; font-size: 0.74rem; font-weight: 700; color: color-mix(in srgb, var(--color-brand) 45%, #fff); }
 .cover__h1 { font-family: var(--font-display); font-weight: 800; letter-spacing: -0.02em; line-height: 1.04; font-size: clamp(2.4rem, 6vw, 4.6rem); color: #fff; margin: 0.8rem 0 0; max-width: 18ch; text-shadow: 0 2px 30px rgba(0,0,0,.35); }
 .cover--center .cover__h1 { max-width: 22ch; }
@@ -259,7 +247,6 @@ main .cover:first-child .cover__scrim::before {
 .site-header { background: var(--color-paper); border-bottom: 1px solid var(--color-line); }
 .site-header .inner, .site-footer .inner { max-width: 72rem; margin-inline: auto; padding: 1rem 1.5rem; }
 .site-header .inner { display: flex; align-items: center; justify-content: flex-start; gap: 1rem; }
-/* The CTA sits in the bar rather than inside .site-nav so it stays visible next to the hamburger on mobile. */
 .site-nav { display: flex; gap: 1.25rem; align-items: center; flex-wrap: wrap; margin-left: auto; }
 .site-nav a { text-decoration: none; color: var(--color-ink); }
 .site-nav a:hover { color: var(--color-brand); }
@@ -317,16 +304,13 @@ main .cover:first-child .cover__scrim::before {
   .nav-item--menu.is-open .nav-caret { transform: rotate(-135deg) translateY(2px); }
 }
 
-/* The logo mark is its own fixed-colour file, so it has to read on both the light header and the dark footer/hero — only the wordmark's colour follows .logo. */
 .logo { display: inline-flex; align-items: center; gap: 0.5rem; font-family: var(--font-display); font-weight: 600; font-size: 1.9rem; color: var(--color-ink); text-decoration: none; line-height: 1; }
 .logo .accent { color: var(--color-brand); }
 .logo-mark { display: block; height: 1.3em; width: auto; flex: 0 0 auto; }
 .logo-word { white-space: nowrap; }
 
-/* Sticky header, opt-in via nav.sticky; without .is-sticky the header is in normal flow and scrolls away with the page. */
 .site-header.is-sticky { position: sticky; top: 0; z-index: 50; }
 
-/* Over a full-bleed cover or a dark/gradient hero the header floats with light text and no bar: absolute by default so it scrolls away with the hero and can never overlap the heading, fixed only when sticky, where .solid (added past the hero) and .nav-open restore legibility. */
 body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header {
   position: absolute; top: 0; left: 0; right: 0; z-index: 50;
   background: transparent; border-bottom-width: 0; color: #fff;
@@ -341,7 +325,6 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
 body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header.solid,
 body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header.nav-open {
   background: color-mix(in srgb, var(--color-paper) 96%, transparent);
-/* Resets the base #fff so inherited bits like the dropdown caret (currentColor) turn dark too, not just the explicitly-reset links. */
   color: var(--color-ink);
   -webkit-backdrop-filter: saturate(1.2) blur(8px); backdrop-filter: saturate(1.2) blur(8px);
   border-bottom: 1px solid var(--color-line); box-shadow: 0 12px 30px -24px rgba(0,0,0,0.5);
@@ -357,7 +340,6 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
 body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header.solid .logo .accent,
 body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header.nav-open .logo .accent { color: var(--color-brand); }
 
-/* No top margin on the footer: it showed the page background as a stray strip above a dark footer or after a coloured band, and the footer's own padding-block gives the room. */
 .site-footer { background: var(--color-surface); color: var(--color-ink); }
 .site-footer .inner { padding-block: 3rem; }
 .site-footer--dark {
@@ -368,7 +350,6 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
 }
 .footer-grid { display: flex; gap: 40px 56px; flex-wrap: wrap; align-items: flex-start; }
 .footer-grid > :first-child { flex: 1 1 300px; }
-/* The link columns wrap below the brand as one group (never one-up/one-down) and margin-left:auto keeps them right-aligned even when wrapped. */
 .footer-cols { display: flex; gap: 32px 56px; flex-wrap: wrap; margin-left: auto; }
 .footer-link { color: inherit; text-decoration: none; font-weight: 600; }
 .footer-link:hover { color: var(--color-brand); }
@@ -380,7 +361,6 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
 .footer-legal .footer-link { font-weight: 500; color: var(--color-muted); }
 .footer-legal .footer-link:hover { color: var(--color-brand); }
 
-/* markdown inline figures (emitted by stomme/markdown) */
 .prose { max-width: 72ch; }
 .prose-fig { margin: 1.5rem 0; }
 .prose-fig img { display: block; width: 100%; height: auto; border-radius: 12px; border: 1px solid var(--color-line); }
@@ -431,7 +411,6 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
     font-size: clamp(1.5rem, 3.5vw, 2.25rem);
     line-height: 1.3;
   }
-  /* These size the quote figure; `narrow` is the section's own section--read box, which is why no --narrow class exists here. */
   .callout--xnarrow { max-width: 34rem; }
   .callout--full { max-width: none; }
   .callout--center { margin-inline: auto; }
@@ -449,7 +428,6 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
   .definition__senses li { display: grid; grid-template-columns: 2rem 1fr; gap: 1rem; }
   .definition__n { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.2em; color: var(--color-muted); font-weight: 700; padding-top: 0.35rem; }
   .definition__text { font-size: 1.15rem; color: var(--color-ink); }
-  /* margin, not template whitespace, separates the note — Astro collapses the gap */
   .definition__note { color: var(--color-muted); margin-left: 0.35em; }
 
 .fragment { max-width: 28rem; }
@@ -522,7 +500,6 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
     outline: none;
     border-color: var(--color-brand);
   }
-  /* No border reset: on a theme where .btn IS an outline button, the submit button would render as bare text with no frame. */
   .contact-form .btn { align-self: flex-start; cursor: pointer; }
 
   /* Direct-contact card — shared by the contact-form aside, /thanks and the inline confirmation (DirectContact.astro), so a change here lands in all three. */
@@ -573,7 +550,6 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
   .direct-card__socials a:hover { border-color: var(--color-brand); }
   .direct-card__socials svg { width: 18px; height: 18px; }
   .direct-card__footer { margin: 1.6rem 0 0; color: var(--color-muted); }
-  /* width:100% so the card fills up to its max in a flex/centred parent (the CMS preview) instead of collapsing to its content width. */
   .contact-card-block { width: 100%; max-width: 460px; margin-inline: auto; }
   .findus-block { width: min(72rem, 100% - 3rem); margin-inline: auto; padding: clamp(2.5rem, 6vw, 4rem) 0; }
   .findus { display: grid; grid-template-columns: 1.3fr 1fr; border: 1px solid var(--color-line); border-radius: 18px; overflow: hidden; background: var(--color-paper); }
@@ -605,10 +581,8 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
   .confirm-eyebrow { margin: 0 0 .7rem; }
   .confirm-head { font-size: clamp(1.6rem, 3.5vw, 2.1rem); font-weight: 800; letter-spacing: -.02em; line-height: 1.1; margin: 0; max-width: 20ch; text-wrap: balance; }
   .confirm-lead { color: var(--color-muted); font-size: 1.08rem; margin: .9rem 0 0; max-width: 46ch; }
-  /* Spacing only — the label reuses .mono .eyebrow so it follows the site's eyebrow style and colour. */
   .confirm-label { margin: 0 0 1rem; }
   .confirm-actions { margin-top: 1.6rem; display: flex; gap: .8rem; flex-wrap: wrap; align-items: center; }
-  /* Outline button — distinct from .btn-ghost, which is the text-link phone CTA used in heroes. */
   .btn-outline { background: var(--color-paper); color: var(--color-brand); border: 1px solid var(--color-line); }
   .btn-outline:hover { border-color: color-mix(in srgb, var(--color-brand) 40%, var(--color-line)); }
   .thanks-confirm { max-width: 760px; margin-inline: auto; text-align: center; padding-bottom: clamp(2.5rem, 6vw, 4.5rem); animation: confirm-rise .55s cubic-bezier(.2,.7,.3,1) both; }
@@ -673,7 +647,6 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
   @media (min-width: 800px) {
     .ctabox--split { grid-template-columns: 1.1fr 0.9fr; gap: clamp(2rem, 4vw, 3.5rem); }
   }
-  /* The facts card is decorative (aria-hidden — the copy carries the message) and its ::before/::after are left free for a site to layer its own scene art on. */
   .ctabox-aside {
     list-style: none; margin: 0; padding: 0.85rem;
     position: relative; overflow: hidden; aspect-ratio: 16 / 9.5;
@@ -739,7 +712,6 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
     border: 1px solid var(--color-line);
     background: color-mix(in srgb, var(--color-surface) 12%, var(--color-paper));
   }
-  /* height:auto — the placeholder's height attribute must not force the box height. */
   .gallery-img { display: block; width: 100%; height: auto; aspect-ratio: 4 / 3; object-fit: cover; }
   .gallery-cap { padding: 0.75rem 1rem; font-size: 0.9rem; color: var(--color-muted); }
 
@@ -976,7 +948,6 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
   .catalog-thumbs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.6rem; margin-top: 0.6rem; }
   .catalog-thumb { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 8px; display: block; }
   .catalog-info { display: flex; flex-direction: column; align-items: flex-start; }
-  /* On the detail page the pill is in flow above the title — left absolute it would anchor to the page corner. */
   .catalog-info .listing-badge { position: static; margin-bottom: 0.75rem; }
   .catalog-h1 { margin: 0.5rem 0 0; }
   .catalog-price { font-size: 1.9rem; font-weight: 800; color: var(--color-brand); margin: 0.4rem 0 0; letter-spacing: -0.02em; }
@@ -1118,7 +1089,6 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
   .ti-grid > * { min-width: 0; }
   .ti-text .prose { max-width: none; }
   .ti-body { margin-top: 1rem; }
-  /* height:auto keeps the natural ratio instead of the placeholder's height attribute. */
   .ti-img { display: block; width: 100%; height: auto; border-radius: 1rem; border: 1px solid var(--color-line); object-fit: cover; }
 
 .tq-grid { display: grid; align-items: center; gap: 2.5rem; grid-template-columns: 1fr; }
@@ -1139,7 +1109,7 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
 @keyframes letter-stampdown { 0% { opacity: 0; transform: rotate(-11deg) scale(1.9); } 62% { opacity: 1; transform: rotate(-11deg) scale(0.94); } 80% { transform: rotate(-11deg) scale(1.04); } 100% { opacity: 1; transform: rotate(-11deg) scale(1); } }
 @keyframes letter-ink-in { from { opacity: 0; } to { opacity: 1; } }
 .thanks-letter { max-width: 44rem; margin-inline: auto; }
-  .letter-wrap { padding-top: 1.75rem; /* room for the postmark overhang */ }
+  .letter-wrap { padding-top: 1.75rem; }
   .letter-sheet { position: relative; background: var(--color-paper); border: 1px solid var(--color-ink); padding: clamp(1.5rem, 4vw, 2.75rem); transform: rotate(-1.6deg); animation: letter-settle 0.7s cubic-bezier(0.2, 0.7, 0.3, 1) both; }
   .letter-sheet::before { content: ""; position: absolute; inset: 10px -11px -11px 10px; border: 1px solid var(--color-line); z-index: -1; background: var(--color-paper); transform: rotate(1.2deg); }
   .letter-ink { animation: letter-ink-in 0.5s 0.5s both; }

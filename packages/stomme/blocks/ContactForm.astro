@@ -9,7 +9,6 @@ interface Props {
 }
 const { site, eyebrow, heading, intro, labelName, labelEmail, labelMessage, submitLabel, showPhone, showDirectContact } = Astro.props;
 const c = site?.strings?.contact ?? {};
-// Labels are editable but never empty: a blank field falls back to the localized default.
 const L = {
   name: labelName || (c.name ?? 'Name'),
   email: labelEmail || (c.email ?? 'Email'),
@@ -19,8 +18,8 @@ const L = {
   direct: c.direct ?? 'Direct contact',
   honeypot: c.honeypot ?? 'Leave this field empty',
 };
-const showPhoneField = showPhone === true; // opt-in — absent means hidden
-const showAside = showDirectContact === true; // opt-in: absent or off → full-width form
+const showPhoneField = showPhone === true;
+const showAside = showDirectContact === true;
 
 const settings = (await getEntry('settings', 'site'))!.data;
 const contact = ((await getEntry('contact', 'contact').catch(() => null))?.data ?? {}) as any;
@@ -28,14 +27,11 @@ const contactLine = [settings.name, contact.address?.city, contact.orgNr && `Org
   .filter(Boolean)
   .join(' · ');
 
-// Falls back through cms.baseUrl to the engine's own /api/contact, so a site that configures no endpoint still has a working form.
 const contactAction = site?.contact?.endpoint
   ? `${site.contact.endpoint}/contact`
   : site?.cms?.baseUrl ? `${site.cms.baseUrl}/contact` : '/api/contact';
-// No-JS fallback — the worker 303s here after a successful submit; JS submits go to /thanks themselves.
 const successPath = site?.routes?.formSuccess ?? '/thanks';
 
-// The "what you sent" recap on /thanks is labelled with this form's own field labels.
 const recapLabels = JSON.stringify({ email: L.email, phone: L.phone, message: L.message });
 ---
 <section class="section">
@@ -50,7 +46,6 @@ const recapLabels = JSON.stringify({ email: L.email, phone: L.phone, message: L.
     <form method="POST" action={contactAction} class="contact-form" data-recap-labels={recapLabels} data-success={successPath}>
       {/* Honeypot — hidden INLINE so no stylesheet-subset context (CMS preview) can show it. */}
       <p class="hp" aria-hidden="true" style="display:none"><label>{L.honeypot} <input name="bot-field" tabindex="-1" autocomplete="off" /></label></p>
-      {/* No-JS success path — the form worker 303s to this on the site's own origin. */}
       <input type="hidden" name="_success" value={successPath} />
       <div class="field">
         <label for="name" class="mono">{L.name}</label>
@@ -78,7 +73,6 @@ const recapLabels = JSON.stringify({ email: L.email, phone: L.phone, message: L.
     )}
   </div>
   <script is:inline>
-    // Progressive enhancement — stash the recap, then go to /thanks; without JS the POST goes straight to the endpoint, which 303s there.
     (function () {
       var form = document.currentScript.closest('section').querySelector('.contact-form');
       if (!form) return;

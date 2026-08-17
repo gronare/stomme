@@ -25,7 +25,6 @@ function loadFonts() {
   return fonts;
 }
 
-// Theme colours are hex from the CMS colour widget; anything unparseable falls back.
 function hexToRgb(hex, fallback) {
   const v = (hex || '').trim();
   const m = /^#?([0-9a-f]{6})$/i.exec(v);
@@ -42,7 +41,6 @@ function hexToRgb(hex, fallback) {
 }
 const rgba = ([r, g, b], a) => `rgba(${r},${g},${b},${Math.min(1, Math.max(0, a)).toFixed(3)})`;
 
-// satori element tree in object form — the package ships no JSX pipeline.
 const el = (type, style, children) =>
   ({ type, props: children == null ? { style } : { style, children } });
 
@@ -53,8 +51,8 @@ function buildTree(input, bgDataUri) {
   const style = og.style || 'editorial';
   const alpha = Math.min(100, Math.max(0, og.scrim ?? 55)) / 100;
   const theme = input.theme || {};
-  const ink = hexToRgb(theme.dark ?? theme.ink, [31, 41, 55]); // theme.ink default #1f2937
-  const brand = hexToRgb(theme.brand, [67, 56, 202]); // theme.brand default #4338ca
+  const ink = hexToRgb(theme.dark ?? theme.ink, [31, 41, 55]);
+  const brand = hexToRgb(theme.brand, [67, 56, 202]);
   const onDark = theme.onDark || '#ffffff';
   const accent = og.accent || theme.brand || '#4338ca';
 
@@ -66,7 +64,6 @@ function buildTree(input, bgDataUri) {
   if (bgDataUri) {
     layers.push({ type: 'img', props: { src: bgDataUri, width: OG_WIDTH, height: OG_HEIGHT, style: { position: 'absolute', top: 0, left: 0, width: OG_WIDTH, height: OG_HEIGHT, objectFit: 'cover' } } });
   } else {
-    // A faint dark wash keeps the overlay text legible on a light brand colour.
     layers.push(el('div', {
       position: 'absolute', top: 0, left: 0, width: OG_WIDTH, height: OG_HEIGHT,
       backgroundColor: rgba(brand, 1),
@@ -74,7 +71,6 @@ function buildTree(input, bgDataUri) {
     }));
   }
 
-  // Scrim — only over a photo (the brand background is already dark and even).
   const scrims = [];
   if (bgDataUri) {
     if (style === 'editorial') {
@@ -135,7 +131,6 @@ function buildTree(input, bgDataUri) {
   return el('div', { display: 'flex', position: 'relative', width: OG_WIDTH, height: OG_HEIGHT, fontFamily: 'Inter' }, [...layers, ...content]);
 }
 
-// Content image values are served paths resolved on disk under public/ ('src/…' from the project root instead); null means unresolvable, and the caller falls back to the brand background.
 export async function loadImageSource(src, root = process.cwd()) {
   if (!src) return null;
   try {
@@ -155,7 +150,6 @@ export async function loadImageSource(src, root = process.cwd()) {
 export async function renderOgCard(input) {
   let bgDataUri = null;
   if (input.bgImageBuffer) {
-    // Flattened + jpeg-encoded so satori embeds a small, alpha-free raster (the scrim provides all the darkening).
     const bg = await sharp(input.bgImageBuffer)
       .resize(OG_WIDTH, OG_HEIGHT, { fit: 'cover' })
       .flatten({ background: '#ffffff' })
@@ -167,16 +161,13 @@ export async function renderOgCard(input) {
   return Buffer.from(new Resvg(svg, { fitTo: { mode: 'width', value: OG_WIDTH } }).render().asPng());
 }
 
-// settings.ogImage bytes → plain 1200×630 PNG (no overlay — it's already a designed card).
 export async function rawImagePng(buf) {
   return sharp(buf).resize(OG_WIDTH, OG_HEIGHT, { fit: 'cover' }).flatten({ background: '#ffffff' }).png().toBuffer();
 }
-// Solid brand-colour PNG — the deepest sharp-only fallback (no satori/resvg involved).
 export async function solidPng(hex) {
   const [r, g, b] = hexToRgb(hex, [31, 41, 55]);
   return sharp({ create: { width: OG_WIDTH, height: OG_HEIGHT, channels: 3, background: { r, g, b } } }).png().toBuffer();
 }
-// Absolute last resort: a valid-but-empty 1×1 PNG, so the response/emit never throws.
 export const EMPTY_PNG = Buffer.from(
   'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg==',
   'base64',

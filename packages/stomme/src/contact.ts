@@ -2,8 +2,6 @@ import type { APIRoute } from 'astro';
 import { getEntry } from 'astro:content';
 import { site } from '@stomme/config';
 
-// Contact-form handler (SSR endpoint) wired at /api/contact: CONTACT_FROM must sit on a Resend-verified domain, CONTACT_TO defaults to the CMS contact email, and on Cloudflare the env arrives on locals.runtime.env rather than in import.meta.env.
-
 export const prerender = false;
 
 function env(locals: any, key: string): string | undefined {
@@ -20,7 +18,6 @@ export const POST: APIRoute = async ({ request, locals, redirect }) => {
 
   if (form.get('bot-field')) return ok({ ok: true }); // honeypot → silently "succeed"
 
-  // Per-IP rate limit (5 per 10 min) that also keeps us under Resend's per-second cap; skipped when the STOMME_RL KV binding is absent, so older sites simply don't rate-limit.
   const rlKv = (locals as any)?.runtime?.env?.STOMME_RL;
   if (rlKv) {
     const ip = request.headers.get('CF-Connecting-IP') || request.headers.get('x-forwarded-for') || 'unknown';

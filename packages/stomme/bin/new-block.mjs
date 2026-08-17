@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-// Scaffolds <cwd>/src/blocks/<Name>.astro in the consumer's project and prints the two edits needed to register it.
 import { writeFileSync, existsSync, mkdirSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 

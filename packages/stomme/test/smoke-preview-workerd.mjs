@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-// Flags: --site <dir> (default starter) · --port <n> (8799) · --no-build (reuse an existing cloudflare dist/) · --no-csp (skip the browser detector) · --strict-csp (violations exit 1) · --csp-channel <name> (use an installed browser instead of downloaded Chromium) · --keep (leave workerd up) · --ip / --compatibility-date.
 import { spawn, spawnSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
@@ -55,7 +54,6 @@ async function waitFor(url, ms) {
   return false;
 }
 
-// From the opening tag to end of doc — enough to know it's non-empty and carries the marker, no parsing needed.
 function previewRootInner(html) {
   const m = html.match(/id="preview-root"[^>]*>([\s\S]*)/);
   return m ? m[1] : null;
@@ -122,7 +120,6 @@ async function main() {
         browser = await pw.launch(CSP_CHANNEL ? { channel: CSP_CHANNEL } : {});
         const page = await (await browser.newContext()).newPage();
         const violations = [];
-        // securitypolicyviolation fires in-page for every blocked resource/script.
         await page.addInitScript(() => {
           window.__csp = [];
           document.addEventListener('securitypolicyviolation', (e) =>

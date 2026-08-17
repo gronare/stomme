@@ -1,5 +1,3 @@
-// Copied to <site>/public/admin/stomme-previews.js by stomme-gen and loaded BEFORE the site's own previews.js, so a site re-registering a name overrides the generic preview; `CMS` and `h` are Sveltia globals.
-// Editors log in by email, so the login button is relabelled by matching "GitHub" — the one substring its text carries in every UI language; this IIFE runs standalone (no CMS globals) in every /admin.
 (function () {
   var LOGIN_LABEL = 'Log in'; // stomme:login-label (localized by stomme-gen)
   function relabel() {
@@ -21,7 +19,6 @@
   }
   var h = window.h;
 
-  // These hexes are only fallbacks — the preview iframe loads /admin/stomme-site.css (stomme-gen's copy of the site's global.css), so the var() references below resolve to the SITE's tokens.
   var BRAND = '#4338ca', INK = '#1f2937', SURFACE = '#e0e7ff', PAPER = '#ffffff',
       LINE = '#e5e7eb', MUTED = '#6b7280', HIGHLIGHT = '#f59e0b';
   var SANS = 'ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif';
@@ -38,7 +35,6 @@
     humanist: 'Verdana,"Segoe UI","Lucida Grande","Lucida Sans Unicode",Geneva,Tahoma,ui-sans-serif,sans-serif',
     script: '"Snell Roundhand","Brush Script MT","Segoe Script","Bradley Hand",ui-rounded,cursive',
     mono: MONO,
-    // Curated webfonts (src/fonts.ts WEBFONTS); the woff2 is not loaded in the admin preview, so the stack falls to system here.
     inter: '"Inter Variable",' + SANS,
     'inter-tight': '"Inter Tight Variable",' + SANS,
   };
@@ -93,13 +89,11 @@
   }
   // The iframe stays MOUNTED across edits: returning its src UNCHANGED is what stops the CMS's React from reloading (and flickering) it — new drafts ride in on postMessage and /preview swaps #preview-root in place.
   var FRAME_STYLE = { width: '100%', height: '100vh', border: '0', display: 'block', background: '#fff' };
-  // Per-id frame state; a React ref captures the real <iframe> node, since the CMS renders the preview inside its own frame where getElementById from here would not find it.
   var FRAMES = {};
   function liveFrame(id, baseSrc, data, style) {
     var rec = FRAMES[id] || (FRAMES[id] = {});
     if (!rec.ref) rec.ref = function (el) { rec.el = el; if (!el) rec.src = null; };
     if (!rec.src) {
-      // First mount (or after unmount): bake the data into the src so the frame SSR-renders it immediately.
       var sep = baseSrc.indexOf('?') >= 0 ? '&' : '?';
       rec.src = baseSrc + sep + 'data=' + encodeURIComponent(data);
     } else if (rec.el && rec.el.contentWindow) {
@@ -234,7 +228,6 @@
     return liveFrame('stomme-preview-identity', '/preview?kind=identity', b64(data));
   };
 
-  // Same served-asset reason as IdentityPreview; /preview reflects the pane's master toggle plus the first enabled type's headlineField/sublineField/style/scrim/showLogo/accent.
   var ShareCardsPreview = function (props) {
     var data = props.entry.get('data');
     data = data && data.toJS ? data.toJS() : (data || {});
@@ -251,7 +244,6 @@
   var STATUS = { available: ['Available', '#d1fae5', '#047857'], reserved: ['Reserved', '#fef3c7', '#b45309'], sold: ['Sold', '#e2e8f0', '#475569'] };
   var CatalogPreview = function (props, specDefs) {
     var e = props.entry;
-    // Specs are keyed by the listing's config-defined keys and labelled from the specDefs stomme-gen passes in; entries written before that still carry their own [{label,value}].
     var specs = (specDefs && specDefs.length)
       ? specDefs.map(function (d) { var val = e.getIn(['data', 'specs', d.key]); return { label: d.label, value: val == null ? '' : val }; }).filter(function (r) { return r.value; })
       : arr(e, 'specs');
@@ -294,7 +286,6 @@
   window.CMS.registerPreviewTemplate('footer', FooterPreview);
   window.CMS.registerPreviewTemplate('thanks', ThanksPreview);
 
-  // Exposed for an addon's previews.js so the engine never names the preview kinds itself.
   window.stommeRegisterFramePage = function (name, kind) {
     window.CMS.registerPreviewTemplate(name, function (props) {
       var data = props.entry.get('data');
@@ -303,12 +294,10 @@
     });
   };
 
-  // Exposed so an addon's previews.js can reuse the live page preview for its own composed-page collections.
   window.stommeRegisterPage = function (name) {
     window.CMS.registerPreviewTemplate(name, PagePreview);
   };
 
-  // Same, for a page whose heading and intro are FIELDS rather than a block — synthesised into the pageHeader block the real page renders.
   window.stommeRegisterHeadedPage = function (name, headingField, introField) {
     window.CMS.registerPreviewTemplate(name, function (props) {
       var e = props.entry;

@@ -77,7 +77,7 @@ function emittedCssHasStyle(dir) {
       const p = resolve(cur, ent.name);
       if (ent.isDirectory()) { stack.push(p); continue; }
       if (!/\.(css|html)$/i.test(ent.name)) continue;
-      try { if (readFileSync(p, 'utf8').includes(STYLE_SENTINEL)) return true; } catch { /* skip */ }
+      try { if (readFileSync(p, 'utf8').includes(STYLE_SENTINEL)) return true; } catch { }
     }
   }
   return false;
@@ -109,7 +109,7 @@ export default function stomme(options = {}) {
           if (existsSync(mediaSrc)) {
             cpSync(mediaSrc, mediaDest, { recursive: true });
             mkdirSync(mediaDest, { recursive: true });
-            writeFileSync(resolve(mediaDest, '.gitignore'), '*\n'); // build-generated; never commit
+            writeFileSync(resolve(mediaDest, '.gitignore'), '*\n');
 
             logger?.info('media: synced public/media → src/assets/media (build-bridge)');
           }
@@ -118,7 +118,6 @@ export default function stomme(options = {}) {
         }
         const siteRenderer = resolve(root, 'src/blocks/BlockRenderer.astro');
 
-        // Component slots — optional components at named engine extension points, supplied entirely via STOMME_SLOTS_DIR; the engine hardcodes no slot location or repo name. Each name aliases to the supplied file, else to a noop that renders nothing, so a site with no slots dir builds unchanged.
         const SLOT_NAMES = ['footer-end', 'header-start', 'header-nav-end', 'header-end'];
         const slotsDir = process.env.STOMME_SLOTS_DIR;
         const slotNoop = resolve(pkgDir, 'src/SlotNoop.astro');
@@ -131,21 +130,18 @@ export default function stomme(options = {}) {
           if (on) slotsOn.push(name);
         }
 
-        // Same seam for content collections: a collections.mjs at the slots dir root, else a noop exporting {}. A site's content.config spreads stommeAddonCollections() (which imports this alias) beside stommeCollections(), so the dir can add collections without the engine naming any.
         const addonCollectionsFile = slotsDir ? resolve(slotsDir, 'collections.mjs') : null;
         const addonCollectionsOn = !!(addonCollectionsFile && existsSync(addonCollectionsFile));
         slotAlias['@stomme/addon-collections'] = addonCollectionsOn
           ? addonCollectionsFile
           : resolve(pkgDir, 'src/addon-collections-noop.mjs');
 
-        // Same seam for BLOCK TYPES: a blocks.mjs exporting { type: Component }, which BlockRenderer merges into its own registry — the site's own registry still wins a key clash. The engine never names an addon's block types.
         const addonBlocksFile = slotsDir ? resolve(slotsDir, 'blocks.mjs') : null;
         const addonBlocksOn = !!(addonBlocksFile && existsSync(addonBlocksFile));
         slotAlias['@stomme/addon-blocks'] = addonBlocksOn
           ? addonBlocksFile
           : resolve(pkgDir, 'src/addon-blocks-noop.mjs');
 
-        // Same seam for /preview: a preview.astro at the slots dir root renders any kind the engine does not know itself, so an addon's page is previewed by its own components; the noop renders nothing.
         const addonPreviewFile = slotsDir ? resolve(slotsDir, 'preview.astro') : null;
         const addonPreviewOn = !!(addonPreviewFile && existsSync(addonPreviewFile));
         slotAlias['@stomme/addon-preview'] = addonPreviewOn
@@ -201,7 +197,7 @@ export default function stomme(options = {}) {
 
         const isStatic = (process.env.STOMME_TARGET || 'netlify') === 'static';
 
-        // Contact endpoint on adapter builds only: an SSR route without an adapter fails the whole build, so a static target must stay adapterless. A site that ships its own src/pages/api/contact.ts keeps it — skip to avoid a duplicate route.
+        // Contact endpoint on adapter builds only: an SSR route without an adapter fails the whole build, so a static target must stay adapterless.
         const siteContact = resolve(root, 'src/pages/api/contact.ts');
         if (!isStatic && !existsSync(siteContact)) {
           injectRoute({ pattern: '/api/contact', entrypoint: resolve(pkgDir, 'routes/contact.ts') });
@@ -256,7 +252,6 @@ export default function stomme(options = {}) {
           enabled.push(`${r.prefix}/[slug]`);
         }
 
-        // Addon routes — a routes.mjs at the slots dir root exporting an array of { feature, pattern, entrypoint }, or a function handed { routes, features } so an addon derives its patterns from the site's own configured, localizable paths instead of a fixed URL. The engine names no feature and hardcodes no pattern; entrypoint is an absolute path into the dir, already in server.fs.allow above.
         if (slotsDir) {
           const routesManifest = resolve(slotsDir, 'routes.mjs');
           if (existsSync(routesManifest)) {
@@ -281,7 +276,6 @@ export default function stomme(options = {}) {
             }
             if (!Array.isArray(addonRoutes)) addonRoutes = [];
             for (const r of addonRoutes) {
-              // Validate before injecting: an invalid pattern or a missing entrypoint file would otherwise fail the whole build deep in Astro's route scan, so a malformed entry is skipped with a warning instead.
               if (!r || typeof r.feature !== 'string' || !r.feature) {
                 logger.warn('addon routes: skipped an entry with a missing/invalid "feature" (expected a non-empty string)');
                 continue;
@@ -315,7 +309,6 @@ export default function stomme(options = {}) {
 
       'astro:build:done': ({ dir, logger }) => {
         const outDir = fileURLToPath(dir);
-        // favicon/apple-touch-icon must serve from the ROOT (Apple/iOS) but upload into the scoped /media/icons folder, so copy them up here.
         try {
           const iconsDir = resolve(outDir, 'media/icons');
           if (existsSync(iconsDir)) {

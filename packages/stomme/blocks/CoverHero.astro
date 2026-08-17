@@ -2,17 +2,14 @@
 import { getEntry } from 'astro:content';
 import { resolveButton } from '../src/href';
 import Cover from '../src/Cover.astro';
-// The animated background is inlined (not <img>) so its currentColor tints to the brand.
 import motionSvg from '../assets/images/placeholders/motion.svg?raw';
 
-// With kind=video the image still renders behind it, doubling as the poster and the prefers-reduced-motion fallback.
 interface Props {
   eyebrow?: string;
   heading: string;
   intro?: string;
   cta?: { label?: string; link?: unknown };
   cta2?: { label?: string; link?: unknown };
-  // Legacy flat pair (pre-group content) — still rendered via resolveButton fallback.
   ctaLabel?: string;
   ctaHref?: unknown;
   cta2Label?: string;
@@ -40,7 +37,6 @@ const height = Astro.props.layout?.height ?? 'tall';
 const btn = resolveButton(cta, ctaLabel, ctaHref);
 const btn2 = resolveButton(cta2, cta2Label, cta2Href);
 
-// Resolve an uploaded video to a hashed served URL; external URLs win.
 const videoFiles = import.meta.glob('/src/assets/media/**/*.{mp4,webm,mov}', {
   query: '?url', import: 'default', eager: true,
 });

@@ -1,12 +1,11 @@
 #!/usr/bin/env node
-// blocks-manifest.json: a per-block-type field tree projected from catalog.ts, published for tooling that checks site content against the engine. A REPORTING artifact, never a build gate. Contract traps: absence of `required` means the field IS required, a field with an editor default is emitted required:false (its default fills it, so it can never be missing), and `options` is either a literal value list or a dynamic sentinel string kept verbatim ($pages/$services/…).
 import { writeFileSync, realpathSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createJiti } from 'jiti';
 
 const here = dirname(fileURLToPath(import.meta.url));
-const pkgRoot = resolve(here, '..'); // packages/stomme (the engine source, wherever this lives)
+const pkgRoot = resolve(here, '..');
 const catalogPath = resolve(pkgRoot, 'catalog.ts');
 const outPath = resolve(pkgRoot, 'blocks-manifest.json');
 
@@ -19,7 +18,7 @@ export function walk(f) {
   if (Array.isArray(f.options)) {
     node.options = f.options.map((o) => (o && typeof o === 'object' ? o.value : o));
   } else if (typeof f.options === 'string') {
-    node.options = f.options; // dynamic sentinel ($pages/$services/…) — resolved per-site, kept literal
+    node.options = f.options;
   }
   if (f.widget === 'object' && Array.isArray(f.fields)) node.fields = f.fields.map(walk);
   else if (f.widget === 'list' && Array.isArray(f.fields)) node.fields = f.fields.map(walk);
@@ -42,7 +41,6 @@ export function blocksToManifest(blockDefs) {
 }
 
 export async function generate({ write = true } = {}) {
-  // catalog.ts imports nothing virtual (unlike collections.ts, which needs astro:content), so a plain jiti import works here — no stub required.
   const jiti = createJiti(import.meta.url);
   const mod = await jiti.import(catalogPath);
   const catalog = mod.defaultBlocks;
@@ -50,7 +48,6 @@ export async function generate({ write = true } = {}) {
     throw new Error(`defaultBlocks export not found (or not an array) in ${catalogPath}`);
   }
 
-  // The WHOLE catalog: this describes what the engine offers, not what any one site enables (contrast AVAILABLE_BLOCKS in gen-admin-blocks.mjs).
   const manifest = blocksToManifest(catalog);
   if (write) writeFileSync(outPath, JSON.stringify(manifest, null, 2) + '\n');
   return manifest;

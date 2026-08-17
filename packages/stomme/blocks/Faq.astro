@@ -14,18 +14,15 @@ interface Props {
   asideHeading?: string;
   asideBody?: string;
   asideCta?: { label?: string; link?: unknown };
-  // Legacy flat pair (pre-group content) — still rendered via resolveButton fallback.
   asideCtaLabel?: string;
   asideHref?: unknown;
-  asideCtaHref?: unknown; // plain-string alias accepted from content
-  // Fixture override (lookbook samples) — never a CMS field; when given the collection is never queried.
+  asideCtaHref?: unknown;
   items?: { id: string; data: { question: string; answer: string } }[];
 }
 const { eyebrow, heading, intro, entries, tag, asideHeading, asideBody, asideCta, asideCtaLabel, asideHref, asideCtaHref } = Astro.props;
 const variant = Astro.props.layout?.variant ?? 'list';
 const fixture = Astro.props.items;
 const all = fixture ?? (await getCollection('faq'));
-// Picked entries win over the tag filter; neither set = the whole collection, by `order`.
 const items = Array.isArray(entries) && entries.length
   ? (entries.map((id) => all.find((e) => e.id === id)).filter((e) => e != null) as typeof all)
   : [...all]
@@ -36,7 +33,6 @@ const emailFallback = contact.email ? `mailto:${contact.email}` : '/';
 const asideBtn = resolveButton(asideCta, asideCtaLabel, asideHref ?? asideCtaHref, emailFallback);
 const aLabel = asideBtn?.label;
 const aHref = asideBtn?.href ?? emailFallback;
-// Only the email fallback leaks an address; a custom CTA href is left as-is.
 const protectAside = !!contact.protectContact && !!contact.email && aHref === emailFallback;
 const hasAside = !!(asideHeading || asideBody || aLabel);
 const n = (i: number) => String(i + 1).padStart(2, '0');
@@ -144,7 +140,6 @@ const n = (i: number) => String(i + 1).padStart(2, '0');
 </section>
 
 <script>
-  // Without JS the `.js` class is never added, so every .faq-panel stays visible (a readable list).
   document.querySelectorAll('.faq-split').forEach((root) => {
     root.classList.add('js');
     const panels = root.querySelectorAll('.faq-panel');

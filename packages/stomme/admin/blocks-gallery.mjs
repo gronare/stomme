@@ -1,8 +1,5 @@
-// Standalone block-gallery reference page; stomme-gen writes the result to public/admin/blocks.html. Block labels and group names go through `t`, while summaries stay in the catalog language.
-
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
-// Crude wireframe pictograms — inner markup per `shape`, drawn by the CSS below.
 const SHAPES = {
   hero: '<i class="col"><i class="ln w70"></i><i class="ln w90"></i><i class="ln w40"></i></i><i class="box"></i>',
   band: '<i class="bar"></i><i class="ln w50 ctr"></i>',

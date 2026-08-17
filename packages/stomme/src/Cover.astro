@@ -4,11 +4,11 @@ import type { ImageMetadata } from 'astro';
 
 // With no image the placeholder SVG is drawn as a CSS mask so the default art takes the brand tint — an <img> can't inherit currentColor.
 interface Props {
-  src?: string; // value stored in frontmatter (may be undefined)
+  src?: string;
   alt: string;
   width?: number;
   height?: number;
-  placeholder: string; // public path to the placeholder SVG
+  placeholder: string;
   class?: string;
   loading?: 'eager' | 'lazy';
 }

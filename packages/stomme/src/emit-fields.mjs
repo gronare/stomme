@@ -1,4 +1,3 @@
-// The field-emission DSL: every function that turns a Field definition into Sveltia widget YAML.
 export function makeEmitters({ q, pad, AVAILABLE_BLOCKS, OPTION_SOURCES }) {
   // The CMS labels a collapsed row with the FIRST field's value (an empty icon picker reads "No icon"), so derive a summary instead — eyebrow when present, then the identifying field; empty placeholders render as nothing. An explicit `summary` on the Field def wins.
   const SUMMARY_PRIORITY = ['title', 'name', 'label', 'question', 'quote', 'heading', 'statement', 'term', 'caption', 'text', 'alt', 'value'];
@@ -23,14 +22,12 @@ export function makeEmitters({ q, pad, AVAILABLE_BLOCKS, OPTION_SOURCES }) {
     const collapseProps = () => [
       ...(f.label_singular ? [`${p}  label_singular: ${q(f.label_singular)}`] : []),
       ...(f.collapsed !== undefined ? [`${p}  collapsed: ${f.collapsed}`] : []),
-      // minimize_collapsed deliberately NOT emitted: with per-item cards, hiding the whole list behind a single "N items" row is a redundant extra click.
     ];
     // media_folder/public_folder ride on `parts` for a leaf widget, but every container below builds its own lines — without splicing the pair in there too, an uploads path set on a list or an object is accepted by the catalog and silently never reaches the CMS.
     const mediaProps = () => [
       ...(f.media_folder ? [`${p}  media_folder: ${q(f.media_folder)}`] : []),
       ...(f.public_folder ? [`${p}  public_folder: ${q(f.public_folder)}`] : []),
     ];
-    // `widget: 'blocks'` in a catalog field means "sections here too": the container gets the real type list minus every container type, so the CMS cannot build a doll's house.
     if (f.widget === 'blocks') {
       const types = AVAILABLE_BLOCKS.filter((b) => !b.fields.some((x) => x.widget === 'blocks'));
       const lines = [`${p}- name: ${f.name}`, `${p}  label: ${q(f.label)}`, `${p}  widget: list`,
@@ -80,7 +77,6 @@ export function makeEmitters({ q, pad, AVAILABLE_BLOCKS, OPTION_SOURCES }) {
       head.push(`${p}  fields:`);
       return [...head, ...f.fields.map((sf) => emitField(sf, indent + 4))].join('\n');
     }
-    // A relation without `collection` + `value_field` shows a picker that resolves nothing.
     if (f.widget === 'relation') {
       const list = (v) => `[${(Array.isArray(v) ? v : [v]).map(q).join(', ')}]`;
       return [`${p}- name: ${f.name}`, `${p}  label: ${q(f.label)}`, `${p}  widget: relation`,
@@ -97,7 +93,6 @@ export function makeEmitters({ q, pad, AVAILABLE_BLOCKS, OPTION_SOURCES }) {
       const out = [`${p}- name: ${f.name}`, `${p}  label: ${q(f.label)}`, `${p}  widget: select`];
       if (f.multiple) out.push(`${p}  multiple: true`);
       if (f.required === false) out.push(`${p}  required: false`);
-      // A multi-select default is a list of values, not a comma-joined string.
       if (f.default !== undefined) out.push(`${p}  default: ${Array.isArray(f.default) ? `[${f.default.map(q).join(', ')}]` : q(f.default)}`);
       if (f.hint) out.push(`${p}  hint: ${q(f.hint)}`);
       if (opts.length === 0) {
@@ -190,7 +185,6 @@ export function makeEmitters({ q, pad, AVAILABLE_BLOCKS, OPTION_SOURCES }) {
     return [emitField(items, indent), emitField(cta, indent)].join('\n');
   }
 
-  // A thanks button is the same { label, link } shape as the header CTA (it reuses navLinkField) and is resolved at render by resolveLink (stomme/href).
   function buttonField(name, label, labelHint) {
     return {
       name, label, widget: 'object', required: false, collapsed: true, summary: '{{fields.label}}', fields: [

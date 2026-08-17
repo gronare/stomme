@@ -8,7 +8,7 @@ import { resolveSite, type SiteConfig } from './src/config';
 
 interface Props {
   service?: any;
-  data?: any; // the CMS preview passes draft frontmatter + a pre-rendered body instead of an entry
+  data?: any;
   bodyHtml?: string;
   config?: SiteConfig;
 }
@@ -18,15 +18,12 @@ const site = resolveSite(config);
 const t = site.strings.service;
 const contact = site.routes.contact ?? '/contact';
 const Content = service ? (await render(service)).Content : null;
-// The template body/bullets/image + quote-CTA band are the LEGACY layout, kept for entries without blocks.
 const hasBlocks = Array.isArray(data.blocks) && data.blocks.length > 0;
-// The hero group only upgrades block-composed entries — the legacy layout renders bullets/image itself and would double them.
 const hero = hasBlocks && data.hero && typeof data.hero === 'object' ? data.hero : null;
 const hdTicks: string[] = hero
   ? (Array.isArray(hero.ticks) && hero.ticks.length > 0 ? hero.ticks : (data.bullets ?? []))
   : [];
 const hdImage = hero ? (hero.image ?? data.media?.image) : undefined;
-// Legacy flat pairs (ctaHref/ctaLabel/cta2*) — still rendered via the resolveLink/resolveButton fallback.
 const hdCta = hero ? resolveLink(hero.cta?.link ?? hero.ctaHref, contact) : contact;
 const hdCtaLabel = hero ? (hero.cta?.label || hero.ctaLabel || t.cta) : t.cta;
 const hdBtn2 = hero ? resolveButton(hero.cta2, hero.cta2Label, hero.cta2Href) : null;
@@ -96,7 +93,6 @@ const hdBtn2 = hero ? resolveButton(hero.cta2, hero.cta2Label, hero.cta2Href) : 
   @media (min-width: 768px) { .service-hd { padding-block: 3rem 2.25rem; } }
   .service-hd__grid { display: grid; grid-template-columns: 1fr; gap: 2rem; align-items: center; }
   @media (min-width: 920px) { .service-hd__grid.has-media { grid-template-columns: 1.1fr 0.9fr; gap: clamp(2rem, 4vw, 3.5rem); } }
-  /* :global — the image comes out of the Cover child, so it carries no scope attribute of this component. */
   .service-hd__grid > :global(*) { min-width: 0; }
   .service-hd__h1 { margin-top: 1rem; }
   .service-hd__lede { max-width: 36rem; }

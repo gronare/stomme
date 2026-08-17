@@ -5,7 +5,6 @@ import { features, site } from '@stomme/config';
 
 const t: any = (await getEntry('tracking', 'tracking')?.catch(() => null))?.data ?? {};
 const on = resolveFeatures(features).tracking && !!(t.gtmId || t.ga4Id || t.metaPixelId);
-// Cloudflare Web Analytics is cookieless, so it deliberately sits outside both the consent banner and the tracking flag; its token lives in site.config.ts (operator-owned) so editors can't switch measurement off.
 const cfToken = String((site as any)?.analytics?.cfToken || '').trim();
 ---
 {cfToken && (

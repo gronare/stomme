@@ -1,7 +1,5 @@
-// The per-collection Sveltia editors, and the editor for a config-defined listing.
 export function makeCollectionEditors({ q, emitField, emitWidget, buttonField }) {
 // No field-level media_folder in any editor below: the CMS resolves it relative to the entry, which breaks uploads from subfolder entries — the global media_folder in config.yml is the one that works.
-// A collection whose component sorts by `order` declares `reorder: true`: Sveltia gains a Reorder mode that writes index+1 into the hidden `order` field on Done.
 const COLLECTION_EDITORS = {
   home: `- name: home
   label: "Home page"
@@ -183,7 +181,6 @@ function listingEditor(l) {
     - { name: cover, label: "Cover image", widget: image, required: false }
     - { name: showCover, label: "Show cover", widget: boolean, required: false, default: false, hint: "Show a cover on cards + the article — your image, or a themed default if none." }
     - { name: body, label: "Body", widget: markdown }`;
-  // A bare string spec keys off its position (spec_0, spec_1…), so renaming a label never orphans stored data — but REORDERING does. Give an explicit key to be safe.
   const specs = (Array.isArray(l.specs) ? l.specs : []).map((s, i) =>
     typeof s === 'string' ? { key: `spec_${i}`, label: s } : { key: s.key || `spec_${i}`, label: s.label });
   const specsField = specs.length

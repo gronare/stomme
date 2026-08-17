@@ -8,32 +8,26 @@ export type Field = {
   required?: boolean;
   default?: unknown;
   hint?: string;
-  fields?: Field[]; // for object / typed list
-  field?: Field; // for a simple (single-field) list
-  summary?: string; // list widgets: collapsed-row label template (default: derived — eyebrow, then title/name/label/…)
-  label_singular?: string; // list widgets: singular noun for the "Add …" button
-  collapsed?: boolean; // object/list widgets: render collapsed (grouping convention)
-  multiple?: boolean; // select: allow choosing several values
-  // select only: a literal option list, or a sentinel stomme-gen expands — '$pages' (internal page routes), '$services' (service slugs), '$faq' (question slugs), '$faqTags' (distinct tags in use).
+  fields?: Field[];
+  field?: Field;
+  summary?: string;
+  label_singular?: string;
+  collapsed?: boolean;
+  multiple?: boolean;
   options?: '$pages' | '$services' | '$faq' | '$faqTags' | { label: string; value: string }[];
-  // image only: an ABSOLUTE repo path overriding where uploads land — the generator sets these per collection, a field overrides only for special cases (favicon → the public root).
   media_folder?: string;
   public_folder?: string;
 };
 
 export type BlockDef = {
-  type: string; // discriminator stored in frontmatter + key in the renderer registry
-  label: string; // shown in the CMS "add block" picker
-  fields: Field[]; // editorial fields; [] = self-contained block (reads its own data)
-  // The collection this block reads its items from — declaring it makes stomme-gen DROP the block from the CMS picker on a site with no `src/content/<name>/`, which is why settings-backed blocks leave it unset.
+  type: string;
+  label: string;
+  fields: Field[];
   collection?: string;
-  // The site feature that owns this block — the flag is the site's, so an extension gates its own blocks and stomme-gen drops them wherever `features[<name>]` is off.
   feature?: string;
-  // Picker + gallery metadata only, nothing at render: `group` clusters the block, `summary` is a one-line "what it produces", `shape` keys a wireframe pictogram.
   group?: string;
   summary?: string;
   shape?: string;
-  // Lookbook fixtures the /lookbook route renders so a theme is validated against EVERY block; `samples` lists variants (`_label` annotates each) and stomme-gen warns when a block has neither.
   sample?: Record<string, unknown>;
   samples?: ({ _label?: string } & Record<string, unknown>)[];
 };
@@ -50,7 +44,6 @@ export const linkField = (name = 'href', label = 'Link'): Field => ({
   ],
 });
 
-// One optional group `{ label, link }` whose inner object must be named exactly `link` or the editor theme stops rendering it chrome-less; the group toggle off means no button, and resolveButton() reads it.
 export const buttonField = (name: string, label = 'Button', opts: { hint?: string; labelHint?: string; optionalLabel?: boolean } = {}): Field => ({
   name,
   label,
@@ -71,14 +64,12 @@ export const headingFields: Field[] = [
   { name: 'intro', label: 'Intro', widget: 'text', required: false },
 ];
 
-// Pre-fills eyebrow/heading via CMS `default:` so the editor sees, and can clear, the shipped chrome as real text — always prefer this to a hidden component-side fallback.
 export const headingFieldsWith = (eyebrow?: string, heading?: string): Field[] => [
   { name: 'eyebrow', label: 'Eyebrow', widget: 'string', required: false, hint: 'Small uppercase label above the heading.', ...(eyebrow ? { default: eyebrow } : {}) },
   { name: 'heading', label: 'Heading', widget: 'string', required: false, ...(heading ? { default: heading } : {}) },
   { name: 'intro', label: 'Intro', widget: 'text', required: false },
 ];
 
-// Re-exported from the one record Icon.astro renders from — a hand-listed picker here would drift from the glyphs.
 export { ICON_NAMES };
 
 export const iconField = (name = 'icon', label = 'Icon'): Field => ({
@@ -107,7 +98,6 @@ export const surfaceField: Field = {
   hint: 'The surface behind the section — for rhythm between blocks.',
 };
 
-// Sets `--block-accent` for a rule, icon or number; the eyebrow marker is unaffected — it follows theme.eyebrowColor.
 export const accentField: Field = {
   name: 'accent',
   label: 'Accent',
@@ -122,7 +112,6 @@ export const accentField: Field = {
   hint: "This block's accent colour (rule, icon or number) — not the eyebrow.",
 };
 
-// Text-led blocks only (pageHeader / prose / steps) — grids ignore it, they are always full width.
 export const widthField: Field = {
   name: 'width',
   label: 'Width',
@@ -136,7 +125,6 @@ export const widthField: Field = {
   hint: 'Narrow keeps text legible; full uses the whole section width.',
 };
 
-// A group is a REQUIRED object — add `required: false` and Sveltia hides it behind an "Add …" button instead of rendering it inline collapsed; the children are what stay optional.
 export const group = (name: string, label: string, hint: string, fields: Field[]): Field => ({
   name,
   label,
@@ -181,7 +169,6 @@ export const cardListField: Field = {
   ],
 };
 
-// cardListField plus a toggled cta group — off leaves a plain card, on makes the whole card clickable in the blocks that support it (e.g. featureGrid).
 export const linkedCardListField: Field = {
   name: 'items',
   label: 'Cards',

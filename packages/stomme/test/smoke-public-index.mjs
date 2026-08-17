@@ -25,7 +25,6 @@ async function waitUp(timeoutMs = 120000) {
   return false;
 }
 
-// Follow the redirect: the dev server sends '/admin' on to '/admin/', and that is the address the middleware answers.
 async function get(path) {
   const res = await fetch(`${BASE}${path}`);
   return { status: res.status, body: await res.text() };

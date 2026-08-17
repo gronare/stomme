@@ -1,4 +1,3 @@
-// Accepts the linkField() object { page, url } (url wins), a bare string (legacy, returned as-is), or nothing.
 export function resolveLink(value: unknown, fallback = '/'): string {
   if (!value) return fallback;
   if (typeof value === 'string') return value;

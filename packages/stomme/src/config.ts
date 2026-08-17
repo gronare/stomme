@@ -1,82 +1,67 @@
 export interface SiteConfig {
-  // Canonical absolute site URL — drives Astro.site, so og:image/og:url/canonical/sitemap are absolute; the site's astro.config falls back to SITE_URL then its own host.
   url?: string;
-  // A site's public URLs are its own content: every route is per-site and localizable, read by the blocks, the integration's detail-route injection and the CMS generator.
   routes?: {
-    services?: string; // serviceGrid + ServicePage detail-page prefix
-    towns?: string; // linkChips + TownPage detail-page prefix
-    blog?: string; // postList detail-page prefix
-    contact?: string; // contact page (town/service CTAs link here)
-    formSuccess?: string; // contactForm success page
-    // Unknown keys pass through so an out-of-tree extension can route its own pages on a path the engine never names; the whole map reaches the addon manifests.
+    services?: string;
+    towns?: string;
+    blog?: string;
+    contact?: string;
+    formSuccess?: string;
     [key: string]: string | undefined;
   };
-  // Path prefixes served normally but marked noindex — a link someone already holds keeps working while search engines are told to leave it alone.
   noindex?: string[];
-  // BCP47 language + region. Drives date/number formatting and which built-in wording is used ('sv' and 'en' shipped, else English); `strings` overrides individual phrases.
   locale?: string;
-  // Theme directory name, looked up under STOMME_THEMES_DIR. Leave it unset for no theme layer — but SETTING it without that env var, or naming a directory with no theme.css, fails the build rather than shipping unstyled.
   style?: string;
-  // Lives in code, not CMS content: the CMS rewrites managed files on save and would drop it. cfToken is the cookieless Cloudflare beacon, so no consent banner is needed.
   analytics?: { cfToken?: string };
-  // Language of the /admin field labels only — baked into config.yml by stomme-gen, so re-run it after changing. The public site follows `locale`.
   cmsLocale?: string;
   strings?: {
     readMore?: string;
-    latest?: string; // "Latest" tag on the featured post
+    latest?: string;
     contact?: { name?: string; email?: string; phone?: string; message?: string; submit?: string; direct?: string; honeypot?: string };
     beforeAfter?: { before?: string; after?: string };
-    // TownPage chrome. Strings may contain `{name}` — replaced with the town name.
     town?: {
       eyebrow?: string;
-      heading?: string; // H1 template when a town has no `title`; e.g. 'Cleaning in {name}'
+      heading?: string;
       cta?: string;
       whyHeading?: string;
       problemsHeading?: string;
       districtsHeading?: string;
       caseHeading?: string;
-      reasons?: { title: string; body: string }[]; // shown as cards on every town; `{name}` interpolated
+      reasons?: { title: string; body: string }[];
       servicesHeading?: string;
       servicesCta?: string;
-      ctaEyebrow?: string; // closing CTA band
-      ctaHeading?: string; // closing CTA heading; `{name}` interpolated
+      ctaEyebrow?: string;
+      ctaHeading?: string;
     };
     service?: { eyebrow?: string; quoteEyebrow?: string; quoteHeading?: string; cta?: string };
     listingStatus?: { available?: string; reserved?: string; sold?: string; all?: string };
     listingCta?: string;
   };
-  // Forwarded to blocks via the `site` prop so a catalog block resolves its specs without reaching for the integration's config alias.
   listings?: Listing[];
-  // stomme-gen emits the `backend:` block from this between the cms:generated markers, so a site picks its backend without hand-editing config.yml.
   cms?: {
-    backend?: string; // 'github' | 'git-gateway' | 'gitlab'
-    repo?: string; // 'owner/name' (github/gitlab)
-    branch?: string; // default 'main'
-    baseUrl?: string; // OAuth base / proxy origin (github backend, custom OAuth)
-    authEndpoint?: string; // OAuth path under baseUrl (e.g. 'auth')
-    apiRoot?: string; // git provider API root (a proxy that injects the server token)
-    gatewayUrl?: string; // git-gateway gateway URL (DecapBridge / self-hosted)
-    identityUrl?: string; // git-gateway identity URL (DecapBridge / GoTrue)
+    backend?: string;
+    repo?: string;
+    branch?: string;
+    baseUrl?: string;
+    authEndpoint?: string;
+    apiRoot?: string;
+    gatewayUrl?: string;
+    identityUrl?: string;
   };
-  // Where the contact form POSTs. Deliberately separate from `cms` so the form can live at the edge independently of wherever the CMS backend is proxied. Unset falls back to cms.baseUrl.
   contact?: {
-    endpoint?: string; // origin of the form handler, e.g. 'https://forms.example.com'
+    endpoint?: string;
   };
 }
 
 // A missing flag — or a missing `features` object — resolves to false, so a new engine feature never turns itself on for an existing site. contactForm and pages are the two deliberate exceptions.
 export interface StommeFeatures {
-  blog?: boolean; // posts collection + /<blog> routes + postList block
-  areas?: boolean; // towns collection + /<towns> routes + linkChips block
-  services?: boolean; // services collection + /<services> routes + serviceGrid block
-  testimonials?: boolean; // testimonials collection + testimonials block
-  faq?: boolean; // faq collection + faq block
-  tracking?: boolean; // analytics (GTM/GA4/Meta) + cookie-consent banner + the Tracking settings pane
-  // Deliberate exception: on by DEFAULT, so a site that never set it keeps its form. Gated in BlockRenderer.
+  blog?: boolean;
+  areas?: boolean;
+  services?: boolean;
+  testimonials?: boolean;
+  faq?: boolean;
+  tracking?: boolean;
   contactForm?: boolean;
-  // Deliberate exception: on by DEFAULT — the collection predates feature flags, and absent-means-off would orphan existing page content. Gated in the config generator.
   pages?: boolean;
-  // A flag the engine does not name type-checks here and passes through resolveFeatures untouched, so a site can gate an extension's own collection without the engine knowing it.
   [flag: string]: boolean | undefined;
 }
 export const FEATURE_DEFAULTS: Required<StommeFeatures> = {
@@ -107,13 +92,12 @@ export function listingSpecRows(entryData: any, listing?: { specs?: SpecDef[] })
     .filter((r) => r.value);
 }
 
-// A collection with an index + detail pages, instantiated from config so several can coexist without bespoke engine features. `preset` picks both schema and presentation.
 export interface Listing {
-  id: string; // collection name + content folder (src/content/<id>)
-  route: string; // index + detail route base, e.g. '/for-sale'
-  label: string; // CMS collection + nav label
+  id: string;
+  route: string;
+  label: string;
   preset: 'article' | 'catalog';
-  specs?: SpecInput[]; // catalog: the spec fields every item shares (config-defined, consistent)
+  specs?: SpecInput[];
   options?: { columns?: number; showImages?: boolean; featured?: boolean; filters?: boolean };
 }
 export function resolveListings(l?: Listing[]): (Omit<Listing, 'specs'> & { specs: SpecDef[] })[] {
@@ -122,7 +106,6 @@ export function resolveListings(l?: Listing[]): (Omit<Listing, 'specs'> & { spec
     .map((x) => ({ ...x, route: x.route.startsWith('/') ? x.route : `/${x.route}`, specs: resolveSpecs(x.specs) }));
 }
 
-// English is the base; another locale overrides only the keys it translates, and a site's own `config.strings` overrides all of it.
 const STRINGS_EN = {
   readMore: 'Read more',
   latest: 'Latest',
@@ -146,7 +129,6 @@ const STRINGS_EN = {
   service: { eyebrow: 'Service', quoteEyebrow: 'Free quote', quoteHeading: 'Want to know what it costs?', cta: 'Get a quote' },
   listingStatus: { available: 'Available', reserved: 'Reserved', sold: 'Sold', all: 'All' },
   listingCta: 'Contact us',
-  // Contact-form confirmation (inline "what you sent" + the /thanks page). {name} → ", Carl" or "".
   thanks: {
     eyebrow: 'Message sent',
     heading: "Thanks{name} — it's on its way.",
@@ -163,7 +145,6 @@ const STRINGS_EN = {
     lead: "The page you're looking for doesn't exist or may have moved.",
     home: 'Back to home',
   },
-  // Cookie-consent banner (only shown when tracking is enabled).
   consent: {
     text: 'We use cookies for statistics and to improve the site.',
     accept: 'Accept',
@@ -223,7 +204,6 @@ const STRINGS_SV: typeof STRINGS_EN = {
 
 const STRINGS_BY_LANG: Record<string, typeof STRINGS_EN> = { en: STRINGS_EN, sv: STRINGS_SV };
 
-// Driven by `locale`, NOT cmsLocale — cmsLocale only picks the /admin label language, and is read here purely as a fallback for older configs that set it without a locale.
 function baseStrings(locale?: string, cmsLocale?: string) {
   const lang = String(locale || cmsLocale || 'en').split(/[-_]/)[0].toLowerCase();
   const b = STRINGS_BY_LANG[lang] || STRINGS_EN;
@@ -246,7 +226,6 @@ export const SITE_DEFAULTS = {
   strings: STRINGS_EN,
 };
 
-// Prefix match on WHOLE segments: '/book' covers '/book/anything' but never '/booking'.
 export function isUnlisted(pathname: string, noindex?: string[]): boolean {
   const path = String(pathname || '');
   return (noindex ?? []).some((raw) => {
@@ -265,7 +244,6 @@ export function resolveSite(c?: SiteConfig) {
     strings: {
       ...base,
       ...s,
-      // Deep-merged so a site can override one key without re-supplying the whole group.
       contact: { ...base.contact, ...(s && s.contact) },
       town: { ...base.town, ...(s && s.town) },
       service: { ...base.service, ...(s && s.service) },
@@ -276,7 +254,7 @@ export function resolveSite(c?: SiteConfig) {
       consent: { ...base.consent, ...((s && (s as any).consent) || {}) },
     },
     listings: resolveListings(c && c.listings),
-    cms: c && c.cms, // forwarded so blocks (e.g. ContactForm) can reach the gateway baseUrl
-    contact: c && c.contact, // forwarded so ContactForm posts to the dedicated form worker
+    cms: c && c.cms,
+    contact: c && c.contact,
   };
 }

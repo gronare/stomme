@@ -1,6 +1,4 @@
-// The settings pane and the collections/backend regions: everything the generator splices outside the block picker.
 export function makeSettingsPane({ q, pad, emitWidget, emitNavLinks, emitFooterLinks, emitThanksButtons, COLLECTION_EDITORS, listingEditor, collectionEnabled, FEATURES, LISTINGS, CMS, ADDON_PANES, ADDON_PANEL_FILES, getStaticCollections }) {
-// A hand-authored collection of the same name OUTSIDE the generated regions wins: STATIC_COLLECTIONS suppresses its generated counterpart, so a site keeping (or customizing) a static pane never gets a duplicate.
 const generatedEditors = () => Object.keys(COLLECTION_EDITORS).filter(collectionEnabled).filter((n) => !getStaticCollections().has(n));
 function emitCollections(indent) {
   const p = pad(indent);
@@ -12,7 +10,6 @@ function emitCollections(indent) {
   return [...fixed, ...listing, ...addon].join('\n');
 }
 
-// Only the fields the site's `cms` config sets are written; the defaults are git-gateway on main. No `cms:generated` markers in a site's config.yml ⇒ nothing emitted and a hand-authored backend survives.
 function emitCms(indent) {
   const p = ' '.repeat(indent);
   const c = CMS || {};
@@ -22,16 +19,13 @@ function emitCms(indent) {
   if (c.baseUrl) L.push(`${p}  base_url: ${c.baseUrl}`);
   if (c.authEndpoint) L.push(`${p}  auth_endpoint: ${c.authEndpoint}`);
   if (c.apiRoot) L.push(`${p}  api_root: ${c.apiRoot}`);
-  // Gated on baseUrl: only a site with gateway OAuth loses Sveltia's built-in PAT sign-in — solo/local sites with no auth server keep the token fallback.
   if (c.baseUrl) L.push(`${p}  auth_methods: [oauth]`);
-  // Sveltia sends the OAuth `site_id` from `site_domain`, and the gateway's same-window (Arc/mobile) fallback keys off it to find the site in KV; it defaults to the deploy host.
   if (c.siteDomain) L.push(`${p}  site_domain: ${c.siteDomain}`);
   if (c.gatewayUrl) L.push(`${p}  gateway_url: ${c.gatewayUrl}`);
   if (c.identityUrl) L.push(`${p}  identity_url: ${c.identityUrl}`);
   return L.join('\n');
 }
 
-// A SECOND file pane on site.md — Sveltia preserves each pane's other frontmatter on save. The data lands at settings.ogImage and settings.og.{enabled,types}, read by Head.astro / routes/og.ts / src/og-pages.ts.
 function shareTypeList() {
   const out = [];
   if (collectionEnabled('towns')) out.push({ key: 'towns', label: 'Service areas', kind: 'towns' });
@@ -59,7 +53,6 @@ function emitShareType(t, indent) {
     `${p}- name: ${t.key}`,
     `${p}  label: ${q(t.label)}`,
     `${p}  widget: object`,
-    // Gate convention: collapsed:false is load-bearing — the enabled switch must stay mounted in both UI states, since open/closed is the custom .stomme-open class and never Sveltia's disclosure (THEME_CSS GATED + editor.js).
     `${p}  collapsed: false`,
     `${p}  fields:`,
     `${p}    - { name: enabled, label: "Generate cards for these", widget: boolean, required: false, default: false }`,
@@ -113,7 +106,6 @@ function emitShareCards(indent) {
     `${p}  file: "src/content/settings/site.md"`,
     `${p}  fields:`,
     `${p}    - { name: ogImage, label: "Site default share image", widget: image, required: false, media_folder: "/public/media/share", public_folder: "/media/share", hint: "Shown when a page is shared (iMessage, Slack, social) and it has no card of its own. Use ~1200×630px." }`,
-    // Always-rendered object (no `required: false`): Sveltia wraps an optional object behind an "Add …" button, which would hide the master toggle and the per-type sections.
     `${p}    - name: og`,
     `${p}      label: "Generated share cards"`,
     `${p}      widget: object`,
@@ -124,7 +116,6 @@ function emitShareCards(indent) {
   ].join('\n');
 }
 
-// emitSettings takes no indent, unlike every other emitter: its panes are written at absolute indentation, with the `settings` collection itself at indent 2.
 function emitSettings() {
   const tp = emitTrackingPane(6);
   return `  - name: settings
@@ -326,7 +317,6 @@ ${emitThanksButtons(10)}
           - { name: showContact, label: "Show the direct-contact card", widget: boolean, required: false, default: true, hint: "Phone / email / hours from Site & contact." }${tp ? '\n' + tp : ''}${addonPanelFiles('settings', 6)}`;
 }
 
-// Files an out-of-tree extension contributes to a collection the engine emits. Appended last, so a site's own settings can never be displaced by one.
 function addonPanelFiles(collection, indent) {
   const entries = ADDON_PANEL_FILES[collection] || [];
   if (!entries.length) return '';
@@ -337,7 +327,6 @@ function addonPanelFiles(collection, indent) {
     .join('\n');
 }
 
-// Only emitted when the `tracking` feature is on: into a `tracking:generated` region on static-pane sites, folded into emitSettings on generated-settings ones. The feature flag is the master switch; this pane only holds the IDs.
 function trackingPaneYaml(indent) {
   const p = ' '.repeat(indent);
   return [

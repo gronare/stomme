@@ -76,7 +76,6 @@ interface Props {
 const { blocks = [], registry = {}, config, features } = Astro.props;
 const reg = { ...defaults, ...(addonBlocks ?? {}), ...registry };
 const site = resolveSite(config);
-// Gating only ever filters blocks out, never injects one, and contactForm defaults ON — so a page that passes no `features` renders exactly as before.
 const feats = resolveFeatures(features);
 const rendered = feats.contactForm === false ? blocks.filter((b) => b.type !== 'contactForm') : blocks;
 

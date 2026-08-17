@@ -5,7 +5,6 @@ interface Props {
   eyebrow?: string;
   heading?: string;
   intro?: string;
-  // Fixture override (lookbook samples) — never a CMS field; when given the collection is never queried.
   items?: { data: { name: string; role?: string; quote: string } }[];
 }
 const { eyebrow, heading, intro } = Astro.props;

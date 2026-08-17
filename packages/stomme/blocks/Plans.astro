@@ -12,7 +12,6 @@ interface Plan {
   badge?: string;
   highlight?: boolean;
   cta?: { label?: string; link?: unknown };
-  // Legacy flat pair (pre-group content) — still rendered via resolveButton fallback.
   ctaLabel?: string;
   ctaHref?: unknown;
 }
@@ -24,7 +23,6 @@ interface Props {
   footnote?: string;
 }
 const { eyebrow, heading, intro, plans = [], footnote } = Astro.props;
-// One plan with a price prefix ("from") makes every card reserve the prefix line, so the big numbers stay aligned across the group.
 const anyPrefix = plans.some((p) => p.pricePrefix);
 ---
 

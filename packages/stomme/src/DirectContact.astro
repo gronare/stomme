@@ -18,7 +18,6 @@ interface Props {
   footer?: string;
   show?: Show;
 }
-// `data` overrides the settings lookup so the CMS preview can render a draft.
 const p = Astro.props as Props & { data?: any };
 const c = (p.data ?? (await getEntry('contact', 'contact').catch(() => null))?.data ?? {}) as any;
 const label = p.label ?? 'Direct contact';
@@ -36,7 +35,6 @@ const footer = p.footer;
 const show = p.show ?? {};
 const protect = !!c.protectContact;
 
-// Every part is opt-in: a placement passes the ones it wants, absent means hidden.
 const s = {
   phone: show.phone === true, email: show.email === true,
   hours: show.hours === true, address: show.address === true, socials: show.socials === true, map: show.map === true,
@@ -123,7 +121,6 @@ const slug = (p: string) => p.toLowerCase().replace(/[^a-z]/g, '');
 </aside>
 {showAway && (
   <script is:inline>
-    // Away banner auto-hides once its date has passed (build is static, so do it in the browser).
     (function () {
       if (window.__stommeAway) return; window.__stommeAway = 1;
       document.querySelectorAll('.direct-card__away[data-until]').forEach(function (el) {

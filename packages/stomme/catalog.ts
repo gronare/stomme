@@ -1,4 +1,3 @@
-// Fields follow the block-field convention: content flat and first in reading order, then media/layout/style as collapsed groups with those exact names, `style` always last — and the stored frontmatter nests to match (hero.media.image).
 import { headingFields, headingFieldsWith, buttonField, imageField, iconField, surfaceField, accentField, widthField, cardListField, linkedCardListField, mediaGroup, layoutGroup, styleGroup, type BlockDef } from './src/kit.ts';
 
 const RAW_BLOCKS: BlockDef[] = [
@@ -299,7 +298,6 @@ const RAW_BLOCKS: BlockDef[] = [
     fields: [
       ...headingFields,
       mediaGroup('The two photos being compared.', [imageField('before', 'Before image'), imageField('after', 'After image')]),
-      // Declared so the alt text the component already reads is editable and doesn't report as unknown-field drift.
       { name: 'beforeAlt', label: 'Before · alt text', widget: 'string', required: false, hint: 'Describe the before image (accessibility). Falls back to a label.' },
       { name: 'afterAlt', label: 'After · alt text', widget: 'string', required: false, hint: 'Describe the after image.' },
       styleGroup([surfaceField]),
@@ -483,7 +481,6 @@ const RAW_BLOCKS: BlockDef[] = [
     shape: 'list',
     fields: [
       ...headingFields,
-      // Auto-set from the listing config; required:false is what keeps a hand-added block with no listing from reporting as missing-required drift.
       { name: 'source', label: 'source', widget: 'hidden', required: false },
       { name: 'base', label: 'base', widget: 'hidden', required: false },
       mediaGroup('Cover images on the cards.', [
@@ -504,7 +501,6 @@ const RAW_BLOCKS: BlockDef[] = [
     shape: 'grid',
     fields: [
       ...headingFields,
-      // Auto-set from the listing config; required:false is what keeps a hand-added block with no listing from reporting as missing-required drift.
       { name: 'source', label: 'source', widget: 'hidden', required: false },
       { name: 'base', label: 'base', widget: 'hidden', required: false },
       mediaGroup('Cover images on the cards.', [
@@ -590,7 +586,6 @@ const RAW_BLOCKS: BlockDef[] = [
       { name: 'eyebrow', label: 'Eyebrow', widget: 'string', required: false, hint: 'Small uppercase label above the heading.' },
       { name: 'heading', label: 'Heading', widget: 'string', required: false, hint: 'Blank uses the page title.' },
       { name: 'intro', label: 'Intro / description', widget: 'text', required: false, hint: 'Optional line under the heading. Blank = hidden.' },
-      // Required only so the editor never reads them as "optional" — an empty one still falls back to the localized default at render.
       { name: 'labelName', label: 'Field label — name', widget: 'string', default: 'Name' },
       { name: 'labelEmail', label: 'Field label — email', widget: 'string', default: 'Email' },
       { name: 'showPhone', label: 'Show the phone field', widget: 'boolean', required: false, default: true },
@@ -628,9 +623,7 @@ const RAW_BLOCKS: BlockDef[] = [
   },
 ];
 
-// Keyed by block type, one /lookbook section per array entry (`_label` names the variant), grouped fields in the NESTED shape exactly like migrated content; collection-backed blocks render the SITE's real entries so their samples only set chrome, and stomme-gen warns when a block has none.
 const LOREM = 'A short supporting line of body copy, long enough to wrap on narrow columns.';
-// Shared faq fixtures — every variant sample renders the same three questions.
 const FAQ_FIX = [
   { id: 'q1', data: { question: 'A first sample question?', answer: LOREM, order: 1 } },
   { id: 'q2', data: { question: 'A second, longer sample question to wrap the row?', answer: 'A short answer.', order: 2 } },
@@ -705,7 +698,6 @@ const SAMPLES: Record<string, ({ _label?: string } & Record<string, unknown>)[]>
     { _label: 'single big number', eyebrow: 'Eyebrow', heading: 'A statement with a *underlined* clause.', body: LOREM, badges: ['Badge one', 'Badge two'], statValue: '98%', statLabel: 'of something measured' },
     { _label: 'compare columns', eyebrow: 'Compare', heading: 'Them versus us.', stats: [{ label: 'Them', value: '1 500 kr', note: 'per month, locked in.' }, { label: 'Us', value: '595 kr', note: 'per month, leave anytime.' }] },
   ],
-  // The fixture `items` below are the components' lookbook-only override, so the theme is exercised even on a site with no collection content.
   testimonials: [{ _label: 'fixture entries', eyebrow: 'Customers', heading: 'What they say', items: [
     { data: { name: 'Anna A.', role: 'Café owner', quote: 'A pulled-out customer line, long enough to wrap and show the quote type.' } },
     { data: { name: 'Bo B.', role: 'Builder', quote: 'A shorter one.' } },

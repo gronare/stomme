@@ -1,7 +1,6 @@
 import { resolve } from 'node:path';
 import { readdirSync, readFileSync } from 'node:fs';
 
-// Everything the picker is built from: the option lists a field can point at, which collections count as enabled, and the block set that survives both gates. The three mutations at the end (the $menus source, the menu list, the group sort) belong inside — a caller that saw the half-built values would emit a picker in catalog order and a menu field with no options.
 export function buildOptionSources({ root, ROUTES, FEATURES, LISTINGS, BLOCKS }) {
   function labelFromFrontmatter(file, key) {
     try {
@@ -33,7 +32,6 @@ export function buildOptionSources({ root, ROUTES, FEATURES, LISTINGS, BLOCKS })
     try {
       files = readdirSync(resolve(root, 'src/content/pages')).filter((f) => f.endsWith('.md'));
     } catch {
-      /* none yet */
     }
     for (const f of files.sort()) {
       const slug = f.replace(/\.md$/, '');
@@ -44,7 +42,7 @@ export function buildOptionSources({ root, ROUTES, FEATURES, LISTINGS, BLOCKS })
   }
 
   const PAGE_OPTIONS = [
-    { label: '— No page —', value: '' }, // lets a link be cleared / left blank (e.g. a dropdown-only nav header)
+    { label: '— No page —', value: '' },
     ...pageRouteOptions(),
     ...collectionOptions('src/content/services', ROUTES.services, 'navLabel'),
     ...collectionOptions('src/content/towns', ROUTES.towns, 'name'),
@@ -87,7 +85,6 @@ export function buildOptionSources({ root, ROUTES, FEATURES, LISTINGS, BLOCKS })
     }
     const tags = new Set();
     for (const f of files) {
-      // One unreadable entry must not take the whole admin down: this runs at module load, so a throw here means the site's config.yml is never written at all.
       let src = '';
       try { src = readFileSync(resolve(root, 'src/content/faq', f), 'utf8'); } catch { continue; }
       const block = src.match(/^tags:\s*\n((?:[ \t]+-[ \t]+.*\n)+)/m);
@@ -101,7 +98,6 @@ export function buildOptionSources({ root, ROUTES, FEATURES, LISTINGS, BLOCKS })
 
   const OPTION_SOURCES = { '$pages': PAGE_OPTIONS, '$services': SERVICE_OPTIONS, '$faq': FAQ_OPTIONS, '$faqTags': FAQ_TAG_OPTIONS };
 
-  // A block may declare a source `collection` — src/content/<name>/, its glob base. When that folder is absent the block is dropped from the picker instead of being offered with nothing to load. Settings-backed blocks declare none and always show.
   function collectionExists(name) {
     try {
       readdirSync(resolve(root, 'src/content', name));
@@ -112,7 +108,7 @@ export function buildOptionSources({ root, ROUTES, FEATURES, LISTINGS, BLOCKS })
   }
   const FEATURE_OF = { faq: 'faq', testimonials: 'testimonials', towns: 'areas', posts: 'blog', services: 'services' };
   function collectionEnabled(name) {
-    if (name === 'home') return true; // every site has a home page
+    if (name === 'home') return true;
     // Pages are enabled unless EXPLICITLY disabled — a deliberate exception to "absent = off", since the collection predates feature flags and absent-means-off would orphan every existing site's page content.
     if (name === 'pages') return !(FEATURES && FEATURES.pages === false);
     if (FEATURES && FEATURE_OF[name]) return !!FEATURES[FEATURE_OF[name]];
@@ -121,7 +117,6 @@ export function buildOptionSources({ root, ROUTES, FEATURES, LISTINGS, BLOCKS })
   const hasCatalog = LISTINGS.some((l) => l.preset === 'catalog');
   const hasArticle = !!(FEATURES && FEATURES.blog) || LISTINGS.some((l) => l.preset === 'article');
   const presetOk = (b) => (b.type !== 'catalogList' || hasCatalog) && (b.type !== 'postList' || hasArticle);
-  // A block may name the `feature` that owns it — the flag is the site's, not the engine's, so an extension gates its own blocks without the engine knowing they exist.
   const featureOn = (name) => !!(FEATURES && FEATURES[name]);
   const blockOk = (b) => (!b.collection || collectionEnabled(b.collection)) && (!b.feature || featureOn(b.feature)) && presetOk(b);
   const AVAILABLE_BLOCKS = BLOCKS.filter(blockOk);
@@ -134,10 +129,9 @@ export function buildOptionSources({ root, ROUTES, FEATURES, LISTINGS, BLOCKS })
   const MENU_OPTIONS = [];
   if (collectionEnabled('services')) MENU_OPTIONS.push({ label: 'Services', value: `services::${ROUTES.services || '/services'}` });
   if (collectionEnabled('towns')) MENU_OPTIONS.push({ label: 'Areas', value: `towns::${ROUTES.towns || '/areas'}` });
-  for (const l of LISTINGS) MENU_OPTIONS.push({ label: l.label || l.id, value: `${l.id}::${l.route}` }); // blog is in LISTINGS too
+  for (const l of LISTINGS) MENU_OPTIONS.push({ label: l.label || l.id, value: `${l.id}::${l.route}` });
   OPTION_SOURCES['$menus'] = MENU_OPTIONS;
 
-  // Cluster the "add section" picker (and the gallery) by group. The sort is STABLE, so blocks keep their catalog order within a group; an unknown or missing group ranks last.
   const GROUP_ORDER = ['Hero & headers', 'Text', 'Cards & lists', 'Media', 'Quote & highlight', 'Numbers', 'From collections', 'Calls to action', 'Automatic'];
   const groupRank = (b) => { const i = GROUP_ORDER.indexOf(b.group); return i === -1 ? GROUP_ORDER.length : i; };
   AVAILABLE_BLOCKS.sort((a, b) => groupRank(a) - groupRank(b));

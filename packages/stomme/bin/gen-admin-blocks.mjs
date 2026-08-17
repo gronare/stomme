@@ -22,7 +22,6 @@ const jiti = createJiti(import.meta.url);
 const schemaPath = resolve(root, process.env.STOMME_SCHEMA || 'src/blocks/schema.ts');
 const configPath = resolve(root, process.env.STOMME_CONFIG || 'public/admin/config.yml');
 
-// No config.yml means the site has no public/admin at all (handed to a customer who edits the markdown), and everything this generator writes lives under public/admin — so exit 0 rather than fail the `pnpm build` that runs it.
 if (!existsSync(configPath)) {
   console.log(`stomme-gen: no ${process.env.STOMME_CONFIG || 'public/admin/config.yml'} — CMS-less site, nothing to generate`);
   process.exit(0);
@@ -34,7 +33,6 @@ if (!Array.isArray(SITE_BLOCKS)) {
   process.exit(1);
 }
 
-// STOMME_SLOTS_DIR may ship a `block-catalog.mjs` exporting `BLOCKS`: the picker entries for the types its `blocks.mjs` registers, without which the component renders but no editor can ever choose it. A site's own catalog wins on a type clash, since schema.ts is the file its owner edits.
 const BLOCKS = await (async () => {
   const slotsDir = process.env.STOMME_SLOTS_DIR;
   const file = slotsDir ? resolve(slotsDir, 'block-catalog.mjs') : null;
@@ -53,12 +51,11 @@ const BLOCKS = await (async () => {
 })();
 
 let ROUTES = { services: '/services', towns: '/areas', blog: '/blog' };
-let FEATURES = null; // null = no `features` declared → fall back to folder-existence
-// Language of the generated /admin FIELD LABELS, applied at generation time via translateLabels() + admin/labels.<locale>.js — NOT a config.yml `locale:` line, which Sveltia ignores and which is stripped below. 'en' = the untranslated English source.
+let FEATURES = null;
 let CMS_LOCALE = 'en';
-let CMS = null; // site.cms → generated `backend:` block (between # >>> cms:generated markers)
-let LISTINGS = []; // config-defined collections (news/for-sale/…) → editors + seeded index
-let STYLE = process.env.STOMME_STYLE || null; // optional look & feel (theme directory name)
+let CMS = null;
+let LISTINGS = [];
+let STYLE = process.env.STOMME_STYLE || null;
 try {
   const mod = await jiti.import(resolve(root, 'src/site.config.ts'));
   if (mod.site && mod.site.routes) ROUTES = { ...ROUTES, ...mod.site.routes };
@@ -71,9 +68,7 @@ try {
       .filter((x) => x && x.id && x.route && (x.preset === 'article' || x.preset === 'catalog'))
       .map((x) => ({ ...x, route: x.route.startsWith('/') ? x.route : `/${x.route}` }));
 } catch {
-  /* no site.config — use defaults */
 }
-// The blog is an article listing in all but name, so desugar it and let one code path (editor, seeded index, dropdown source) cover both; the posts-folder fallback mirrors collectionEnabled for sites with no `features` config.
 const blogEnabled = FEATURES
   ? !!FEATURES.blog
   : (() => { try { return readdirSync(resolve(root, 'src/content/posts')).some((f) => f.endsWith('.md')); } catch { return false; } })();
@@ -113,7 +108,6 @@ try {
     if (mm[1] === CMS_LOCALE) FORWARD = dict;
   }
 } catch {
-  /* no dictionaries — labels stay English */
 }
 
 const MARKER_START = /# >>> (\w+):generated/;
@@ -133,7 +127,6 @@ const { generatedEditors, emitCollections, emitCms, emitSettings, emitTrackingPa
 const EMITTERS = { blocks: emitWidget, collections: emitCollections, navlinks: emitNavLinks, thanksbuttons: emitThanksButtons, footerlinks: emitFooterLinks, settings: emitSettings, cms: emitCms, tracking: emitTrackingPane };
 
 const lines = readFileSync(configPath, 'utf8').split('\n');
-// Top-level collections hand-authored OUTSIDE any generated region (indent-2 entries of `collections:`) — these suppress their generated counterpart in emitCollections.
 const STATIC_COLLECTIONS = new Set();
 {
   let inRegion = false;
@@ -167,7 +160,6 @@ if (total === 0) {
   console.error('No `# >>> blocks:generated` markers found in', configPath);
   process.exit(1);
 }
-// Normalize any known translation back to English, then map to the active locale; unmapped values (custom labels, icon ids, dynamic page options) pass through unchanged.
 function translateLabels(text) {
   return text.replace(/\b(label|label_singular|hint): "((?:[^"\\]|\\.)*)"/g, (m, key, val) => {
     const plain = val.replace(/\\"/g, '"').replace(/\\\\/g, '\\');
@@ -178,28 +170,24 @@ function translateLabels(text) {
   });
 }
 
-// Sveltia ignores Decap's top-level `locale:` (Decap's own UI language) and `local_backend:` (Sveltia's local edits use the File System Access API, no proxy) and warns in the console about both, so strip them — field LABELS are localized by translateLabels instead.
 let yaml = out.join('\n');
 yaml = yaml.replace(/^locale:.*$\n?/m, '');
 yaml = yaml.replace(/^local_backend:.*$\n?/m, '');
-// Uploads live in served public/media (Sveltia resolves assets via public_folder URL; src/ isn't served).
 yaml = yaml.replace(/^media_folder: .*$/m, 'media_folder: "/public/media"');
 yaml = yaml.replace(/^public_folder: .*$/m, 'public_folder: "/media"');
-// Per-collection folders (absolute): per-entry collections use {{slug}}, flat/file a static folder.
 const mSlug = (dir) => ({ m: `/public/media/${dir}/{{slug}}`, p: `/media/${dir}/{{slug}}` });
 const mFlat = (dir) => ({ m: `/public/media/${dir}`, p: `/media/${dir}` });
 const COLLECTION_MEDIA = {
   home: mFlat('home'), pages: mSlug('pages'), towns: mSlug('towns'), services: mSlug('services'),
   faq: mFlat('faq'), testimonials: mFlat('testimonials'), settings: mFlat('settings'),
 };
-// Listings: catalog (for-sale) per item; article (news/blog) flat — kept apart, never mixed.
 for (const l of LISTINGS) COLLECTION_MEDIA[l.id] = l.preset === 'catalog' ? mSlug(l.id) : mFlat(l.id);
 {
   const srcLines = yaml.split('\n');
   const injected = [];
   for (let i = 0; i < srcLines.length; i++) {
     injected.push(srcLines[i]);
-    const cm = srcLines[i].match(/^ {2}- name: (\S+)\s*$/); // top-level collection (indent 2)
+    const cm = srcLines[i].match(/^ {2}- name: (\S+)\s*$/);
     if (cm && COLLECTION_MEDIA[cm[1]] && !/^ {4}media_folder:/.test(srcLines[i + 1] || '')) {
       injected.push(`    media_folder: ${JSON.stringify(COLLECTION_MEDIA[cm[1]].m)}`);
       injected.push(`    public_folder: ${JSON.stringify(COLLECTION_MEDIA[cm[1]].p)}`);
@@ -207,7 +195,6 @@ for (const l of LISTINGS) COLLECTION_MEDIA[l.id] = l.preset === 'catalog' ? mSlu
   }
   yaml = injected.join('\n');
 }
-// Convention: collection-level `seo` groups render collapsed. Hand-authored panes predate it, so insert `collapsed: true` after `widget: object` when the seo object sets none. Idempotent.
 {
   const srcLines = yaml.split('\n');
   for (let i = 0; i < srcLines.length; i++) {
@@ -221,7 +208,7 @@ for (const l of LISTINGS) COLLECTION_MEDIA[l.id] = l.preset === 'catalog' ? mSlu
     let widgetAt = -1, hasCollapsed = false;
     for (let j = i + 1; j < srcLines.length; j++) {
       const k = prop(j);
-      if (k === null || k === 'fields') break; // left the field's own props
+      if (k === null || k === 'fields') break;
       if (k === 'widget' && /widget: object\s*$/.test(srcLines[j])) widgetAt = j;
       if (k === 'collapsed') hasCollapsed = true;
     }
@@ -229,7 +216,6 @@ for (const l of LISTINGS) COLLECTION_MEDIA[l.id] = l.preset === 'catalog' ? mSlu
   }
   yaml = srcLines.join('\n');
 }
-// Sveltia shrinks the master to webp on upload; Astro still builds the responsive variants.
 if (!/^media_libraries:/m.test(yaml)) {
   yaml = yaml.replace(/^public_folder: .*$/m, (l) =>
     `${l}\nmedia_libraries:\n  all:\n    slugify_filename: true\n    transformations:\n` +
@@ -254,7 +240,6 @@ if (REPO_PATH) {
 
 writeFileSync(configPath, yaml);
 
-// The slots dir may ship a `previews.js` registering preview templates for the collections it contributes; copied beside the engine's own and loaded between it and the site's, so it can build on the engine's generic templates and the site still has the last word.
 try {
   const slotsDir = process.env.STOMME_SLOTS_DIR;
   const src = slotsDir ? resolve(slotsDir, 'previews.js') : null;
@@ -274,11 +259,9 @@ try {
   const previewsDest = resolve(root, 'public/admin/stomme-previews.js');
   mkdirSync(dirname(previewsDest), { recursive: true });
   let previewsSrc = readFileSync(resolve(here, '../admin/previews.js'), 'utf8');
-  // Localize the login-button relabel (previews.js ships the English default label).
   const LOGIN_LABELS = { en: 'Log in', sv: 'Logga in', da: 'Log ind', nb_no: 'Logg inn', nb: 'Logg inn', nn: 'Logg inn', de: 'Anmelden', fr: 'Se connecter', es: 'Iniciar sesión', it: 'Accedi', nl: 'Inloggen', pt: 'Entrar', fi: 'Kirjaudu sisään' };
   const loginLabel = LOGIN_LABELS[CMS_LOCALE] || LOGIN_LABELS[String(CMS_LOCALE).split(/[-_]/)[0]] || 'Log in';
   previewsSrc = previewsSrc.replace(/var LOGIN_LABEL = '[^']*'; \/\/ stomme:login-label/, `var LOGIN_LABEL = ${JSON.stringify(loginLabel)}; // stomme:login-label`);
-  // A listing collection with no registered preview shows a raw field dump in the CMS.
   if (LISTINGS.length) {
     const regs = LISTINGS.map((l) => {
       const specs = (Array.isArray(l.specs) ? l.specs : []).map((s, i) =>
@@ -292,7 +275,6 @@ try {
   console.warn('  (stomme-previews.js copy skipped:', e.message + ')');
 }
 
-// The distinct FAQ tags are templated into the editor script so the tags editor can offer them as chips.
 try {
   const editorDest = resolve(root, 'public/admin/stomme-editor.js');
   mkdirSync(dirname(editorDest), { recursive: true });
@@ -306,12 +288,9 @@ try {
 
 writeAdminShell({ root, here, SVELTIA_CMS_SRC });
 
-// The site stylesheet with the library @import inlined, so the CMS preview mockups reflect the site theme — tokens and any class overrides the site adds. previews.js loads it as registerPreviewStyle('/admin/stomme-site.css'), and it only refreshes on cms:gen.
 try {
   const libCss = readFileSync(resolve(here, '../styles.css'), 'utf8');
-  // The engine stylesheet is inlined because the raw import (scoped or bare) cannot resolve in the browser and 404s under /admin/; its body layout rules (flex column + full height, for the sticky footer) would shift the inline preview panes, so they are neutralized right after the inlined block.
   const PREVIEW_BODY_RESET = '\n/* admin preview: undo the sticky-footer body layout */\nbody{display:block;min-height:auto}\n';
-  // A style's tokens.css + theme.css are inlined after the engine CSS and before the site's own rules — the same cascade position as the live build — so the preview mockups are truthful. `astro build` throws on a genuinely missing theme, so a warning is enough here.
   let styleCss = '';
   if (STYLE_DIR) {
     const tokensP = resolve(STYLE_DIR, 'tokens.css');
@@ -323,7 +302,6 @@ try {
   }
   const siteCss = readFileSync(resolve(root, 'src/styles/global.css'), 'utf8')
     .replace(/@import\s+["'](?:@[\w-]+\/)?stomme\/styles\.css["'];?/, () => libCss + PREVIEW_BODY_RESET + styleCss);
-  // theme.md tokens → :root so the INLINE preview mockups use the site's actual colours instead of the build-time defaults baked into styles.css (iframe previews already load the real themed page). Mirrors Base.astro's themeVars.
   let themeRoot = '';
   try {
     const tm = readFileSync(resolve(root, 'src/content/theme/theme.md'), 'utf8');
@@ -340,7 +318,6 @@ try {
   console.warn('  (stomme-site.css skipped:', e.message + ')');
 }
 
-// Engine-managed art, overwritten each run: a site that wants its own sets a block's image field instead of editing these files.
 try {
   const imgSrc = resolve(here, '../assets/images');
   if (existsSync(imgSrc)) cpSync(imgSrc, resolve(root, 'public/images'), { recursive: true });
@@ -393,13 +370,11 @@ if (!here.includes('node_modules')) {
   }
 }
 
-// Per-site CUSTOM-DELTA manifest: the same filename as the engine's own blocks-manifest.json, but holding only the SITE's custom subset — types it adds or SHADOWS — projected through the same blocksToManifest contract, so a reader can merge it over the engine manifest and validate custom blocks field-by-field instead of reporting them as unknown. Unguarded on purpose, unlike the engine-manifest refresh above: this must run wherever stomme is INSTALLED IN A SITE (cwd = site root, BLOCKS = the site's catalog).
 try {
   const { blocksToManifest } = await import('./gen-blocks-manifest.mjs');
   const { defaultBlocks } = await jiti.import('@gronare/stomme/catalog');
   const engineManifest = blocksToManifest(defaultBlocks).blocks;
   const engineTypes = new Set(defaultBlocks.map((d) => d.type));
-  // Custom = a type absent from the engine, OR a same-type SHADOW whose field projection differs (an extra field, a widened option set).
   const delta = BLOCKS.filter((b) => {
     if (!engineTypes.has(b.type)) return true;
     return JSON.stringify(blocksToManifest([b]).blocks[b.type]) !== JSON.stringify(engineManifest[b.type]);

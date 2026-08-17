@@ -1,17 +1,16 @@
-// One module shared by routes/og.ts (emits the cards) and Head.astro (resolves og:image) so the two can never disagree; the site's { features, routes, listings } arrive as an argument rather than through the @stomme/config alias, so this stays importable outside an integration build (tests).
 import { getCollection, getEntry } from 'astro:content';
 import { resolveFeatures, resolveListings, type StommeFeatures, type Listing, type SiteConfig } from './config.ts';
 
 export interface OgPage {
-  slug: string; // /og/<slug> — carries the .png (rest-param route, astro-og-canvas style)
-  path: string | null; // the page's pathname (normalized); null for the site-default card
-  card: boolean; // true → emit a PNG at slug (generate a card); false → use `raw`
-  raw?: string; // when !card: the raw URL this page's og:image should point at
-  typeKey?: string; // 'towns' | 'services' | <listing id> — which settings.og.types config
-  image?: string; // card background source; unset → brand background
-  headlineDefault?: string; // field key the headline falls back to when the type sets none
-  sublineDefault?: string; // field key ('none' allowed) the second line falls back to
-  vars?: Record<string, string>; // the item's known field values (+ business) by field key
+  slug: string;
+  path: string | null;
+  card: boolean;
+  raw?: string;
+  typeKey?: string;
+  image?: string;
+  headlineDefault?: string;
+  sublineDefault?: string;
+  vars?: Record<string, string>;
 }
 
 export interface OgConfig {
@@ -20,10 +19,9 @@ export interface OgConfig {
   listings?: Listing[];
 }
 
-// Decode %-escapes so non-ASCII ids match the paths built from entry ids.
 export function normalizePath(pathname: string): string {
   let p = pathname || '/';
-  try { p = decodeURIComponent(p); } catch { /* keep raw */ }
+  try { p = decodeURIComponent(p); } catch { }
   if (!p.startsWith('/')) p = `/${p}`;
   p = p.replace(/\/+$/, '');
   return p === '' ? '/' : p;
@@ -31,7 +29,6 @@ export function normalizePath(pathname: string): string {
 
 const slugFor = (path: string) => (path === '/' ? 'index' : path.replace(/^\//, '')) + '.png';
 
-// One chain across every collection shape: catalog cover/gallery, article cover, services hero, towns/services media.
 type ItemData = {
   cover?: string;
   gallery?: { image: string }[];
@@ -57,7 +54,6 @@ async function homeHeroImage(): Promise<string | undefined> {
   return hit?.media?.image || undefined;
 }
 
-// Uploaded default → home-hero photo → /og/default.png, the brand card enumerate() emits in exactly this case.
 async function siteDefault(settings: { ogImage?: string }): Promise<string> {
   if (settings.ogImage) return settings.ogImage;
   const hero = await homeHeroImage();
@@ -73,11 +69,9 @@ export const TYPE_FIELDS: Record<OgTypeKind, string[]> = {
   towns: ['name', 'title', 'heroSubtitle'],
   services: ['title', 'navLabel', 'summary'],
 };
-// Per-type fallbacks when the CMS never saved a pick (mirror the selects' defaults).
 export const HEADLINE_DEFAULT: Record<OgTypeKind, string> = { article: 'title', catalog: 'title', towns: 'name', services: 'title' };
 export const SUBLINE_DEFAULT: Record<OgTypeKind, string> = { article: 'none', catalog: 'price', towns: 'none', services: 'none' };
 
-// `title` always resolves (towns fall back to `name`) so the headline fallback chain never dead-ends.
 function itemVars(kind: OgTypeKind, d: Record<string, unknown>, name: string): Record<string, string> {
   const s = (v: unknown) => (v == null ? '' : String(v));
   const vars: Record<string, string> = { business: name };
@@ -94,8 +88,8 @@ async function addCollection(
     typeKey: string;
     kind: OgTypeKind;
     typeEnabled: boolean;
-    fallback: string; // the site-default URL (used when the type is off, no override)
-    name: string; // business name → the 'business' field
+    fallback: string;
+    name: string;
   },
 ) {
   const { collection, routeBase, typeKey, kind, typeEnabled, fallback, name } = opts;
@@ -112,7 +106,6 @@ async function addCollection(
         vars: itemVars(kind, d, name),
       });
     } else {
-      // Resolved concretely here so Head never has to re-derive the default.
       out.push({ slug: slugFor(path), path, card: false, raw: fallback });
     }
   }
@@ -130,7 +123,6 @@ async function enumerate(cfg: OgConfig): Promise<OgPage[]> {
   const name = settings.name || '';
   const out: OgPage[] = [];
 
-  // The brand card is emitted once, site-wide, and only when siteDefault resolved to it.
   const fallback = await siteDefault(settings);
   if (fallback === '/og/default.png') {
     out.push({ slug: 'default.png', path: null, card: true, typeKey: '', vars: { business: name, title: name } });
@@ -148,14 +140,12 @@ async function enumerate(cfg: OgConfig): Promise<OgPage[]> {
   return out;
 }
 
-// Memoized per build (content is frozen there); recomputed per call in dev/SSR so content edits need no restart.
 let cache: Promise<OgPage[]> | null = null;
 export function ogPages(cfg: OgConfig): Promise<OgPage[]> {
   if (import.meta.env?.PROD) return (cache ??= enumerate(cfg));
   return enumerate(cfg);
 }
 
-// Relative URL — Head makes it absolute. `override` is the page's own seo.image (the image prop routes pass for home/pages).
 export async function resolveShareImage(pathname: string, override: string | undefined, cfg: OgConfig): Promise<string | null> {
   const settings = ((await getEntry('settings', 'site'))?.data ?? {}) as { ogImage?: string; og?: { enabled?: boolean } };
   if (!settings.og?.enabled) return override ?? settings.ogImage ?? null;

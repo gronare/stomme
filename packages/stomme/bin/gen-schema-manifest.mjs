@@ -1,25 +1,23 @@
 #!/usr/bin/env node
-// schema-manifest.json: every content collection's allowed TOP-LEVEL frontmatter fields, read from the zod schemas in collections.ts and published for tooling that cannot introspect Astro/zod. `passthrough: true` marks a collection whose schema carries a passthrough `blocks` array, meaning unknown BLOCK-level keys are retained and only unexpected top-level keys are unexpected.
 import { writeFileSync, realpathSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createJiti } from 'jiti';
 
 const here = dirname(fileURLToPath(import.meta.url));
-const pkgRoot = resolve(here, '..'); // packages/stomme (the engine source, wherever this lives)
+const pkgRoot = resolve(here, '..');
 const collectionsPath = resolve(pkgRoot, 'collections.ts');
 const outPath = resolve(pkgRoot, 'schema-manifest.json');
 const stubPath = resolve(here, '_astro-content-stub.mjs');
 
-// Peels zod's default/optional/nullable/effects wrappers to reach the type underneath.
 function unwrap(type) {
   let cur = type;
   const seen = new Set();
   while (cur && cur._def && !seen.has(cur)) {
     seen.add(cur);
     const def = cur._def;
-    if (def.innerType) { cur = def.innerType; continue; } // ZodDefault / ZodOptional / ZodNullable
-    if (def.schema) { cur = def.schema; continue; } // ZodEffects (.transform)
+    if (def.innerType) { cur = def.innerType; continue; }
+    if (def.schema) { cur = def.schema; continue; }
     break;
   }
   return cur;
@@ -37,7 +35,6 @@ function fieldsOf(schema) {
   return shape ? Object.keys(shape) : [];
 }
 
-// One level only, and array/record fields are left out on purpose — their element shape is not a top-level concern.
 function nestedOf(schema) {
   const shape = objectShape(schema);
   if (!shape) return undefined;
@@ -50,14 +47,12 @@ function nestedOf(schema) {
 }
 
 export async function generate({ write = true } = {}) {
-  // collections.ts imports the virtual astro:content, which exists only inside an Astro build, so jiti gets a stub for it; astro/loaders resolves natively.
   const jiti = createJiti(import.meta.url, { alias: { 'astro:content': stubPath } });
   const mod = await jiti.import(collectionsPath);
   if (typeof mod.stommeCollections !== 'function') {
     throw new Error(`stommeCollections export not found in ${collectionsPath}`);
   }
 
-  // No listings means the fixed base collections only — listing collections are per-site, and their shape is carried by the `presets` map instead.
   const cols = mod.stommeCollections();
   const collections = {};
   for (const name of Object.keys(cols).sort()) {
@@ -69,7 +64,6 @@ export async function generate({ write = true } = {}) {
     collections[name] = entry;
   }
 
-  // Presets are exposed separately so listing content can be validated without knowing the site's collection id in advance.
   const presets = {};
   for (const [name, schema] of Object.entries(mod.PRESET_SCHEMAS ?? {})) {
     presets[name] = { fields: fieldsOf(schema) };

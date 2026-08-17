@@ -1,5 +1,4 @@
 ---
-// `*words*` becomes an <em>, which styles.css renders as an underline, not italics.
 interface Props { text?: string }
 const parts = String(Astro.props.text ?? '').split(/\*([^*]+)\*/);
 ---

@@ -2,7 +2,6 @@ import { marked } from 'marked';
 import { getImage } from 'astro:assets';
 import type { ImageMetadata } from 'astro';
 
-// Placement and size come from the image *title* keywords — `![caption](src "right small")` — and alt becomes the caption.
 const uploads = import.meta.glob<{ default: ImageMetadata }>(
   '/src/assets/media/**/*.{jpg,jpeg,png,webp,avif}',
 );
@@ -43,7 +42,6 @@ export async function renderMarkdown(md = ''): Promise<string> {
       (alt ? `<figcaption>${alt}</figcaption>` : '') +
       '</figure>';
 
-    // Replace a standalone <p><img></p> with the figure; otherwise the bare tag.
     html = html.replace(new RegExp(`<p>\\s*${esc(tag)}\\s*</p>`, 'g'), figure).split(tag).join(figure);
   }
   return html;
