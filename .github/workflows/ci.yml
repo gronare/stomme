@@ -45,6 +45,12 @@ jobs:
       - name: tsc --noEmit (packages/stomme)
         run: pnpm --filter @gronare/stomme typecheck
 
+      # The comment rule the engine is written to: one line each, English. A line that stops mid-sentence is a wrapped block; two adjacent one-liners about unrelated things stay legal. The starter is out of scope on purpose — its config carries reader-facing documentation.
+      - name: comment style (packages/stomme, packages/create-stomme)
+        run: |
+          node packages/stomme/bin/lint-comments.mjs packages/stomme
+          node packages/stomme/bin/lint-comments.mjs packages/create-stomme
+
   # Catches what the Node dev server cannot: decoding ?data= with Node's Buffer, absent on workerd, empties #preview-root on every deployed site. HTTP checks only — the CSP detector needs Playwright and runs locally.
   preview-workerd:
     name: preview smoke (workerd)

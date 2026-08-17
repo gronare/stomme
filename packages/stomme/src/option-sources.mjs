@@ -1,10 +1,7 @@
 import { resolve } from 'node:path';
 import { readdirSync, readFileSync } from 'node:fs';
 
-// Everything the picker is built from: the option lists a field can point at, which collections
-// count as enabled, and the block set that survives both gates. The three mutations at the end
-// (the $menus source, the menu list, the group sort) belong inside — a caller that saw the
-// half-built values would emit a picker in catalog order and a menu field with no options.
+// Everything the picker is built from: the option lists a field can point at, which collections count as enabled, and the block set that survives both gates. The three mutations at the end (the $menus source, the menu list, the group sort) belong inside — a caller that saw the half-built values would emit a picker in catalog order and a menu field with no options.
 export function buildOptionSources({ root, ROUTES, FEATURES, LISTINGS, BLOCKS }) {
   function labelFromFrontmatter(file, key) {
     try {
@@ -90,8 +87,7 @@ export function buildOptionSources({ root, ROUTES, FEATURES, LISTINGS, BLOCKS })
     }
     const tags = new Set();
     for (const f of files) {
-      // One unreadable entry must not take the whole admin down: this runs at module load, so a
-      // throw here means the site's config.yml is never written at all.
+      // One unreadable entry must not take the whole admin down: this runs at module load, so a throw here means the site's config.yml is never written at all.
       let src = '';
       try { src = readFileSync(resolve(root, 'src/content/faq', f), 'utf8'); } catch { continue; }
       const block = src.match(/^tags:\s*\n((?:[ \t]+-[ \t]+.*\n)+)/m);

@@ -25,9 +25,7 @@ export function makeEmitters({ q, pad, AVAILABLE_BLOCKS, OPTION_SOURCES }) {
       ...(f.collapsed !== undefined ? [`${p}  collapsed: ${f.collapsed}`] : []),
       // minimize_collapsed deliberately NOT emitted: with per-item cards, hiding the whole list behind a single "N items" row is a redundant extra click.
     ];
-    // media_folder/public_folder ride on `parts` for a leaf widget, but every container below
-    // builds its own lines — without splicing the pair in there too, an uploads path set on a
-    // list or an object is accepted by the catalog and silently never reaches the CMS.
+    // media_folder/public_folder ride on `parts` for a leaf widget, but every container below builds its own lines — without splicing the pair in there too, an uploads path set on a list or an object is accepted by the catalog and silently never reaches the CMS.
     const mediaProps = () => [
       ...(f.media_folder ? [`${p}  media_folder: ${q(f.media_folder)}`] : []),
       ...(f.public_folder ? [`${p}  public_folder: ${q(f.public_folder)}`] : []),

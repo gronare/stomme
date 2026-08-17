@@ -52,14 +52,16 @@
     "test:noindex": "node test/smoke-noindex.mjs",
     "test:addon-blocks": "node test/smoke-addon-blocks.mjs",
     "test:public-index": "node test/smoke-public-index.mjs",
-    "test:slots": "node test/smoke-slots.mjs"
+    "test:slots": "node test/smoke-slots.mjs",
+    "lint:comments": "node bin/lint-comments.mjs ."
   },
   "bin": {
     "stomme-gen": "bin/gen-admin-blocks.mjs",
     "stomme-gen-schema": "bin/gen-schema-manifest.mjs",
     "stomme-gen-blocks": "bin/gen-blocks-manifest.mjs",
     "stomme-new-block": "bin/new-block.mjs",
-    "stomme-lint-styles": "bin/lint-styles.mjs"
+    "stomme-lint-styles": "bin/lint-styles.mjs",
+    "stomme-lint-comments": "bin/lint-comments.mjs"
   },
   "files": [
     "src",
