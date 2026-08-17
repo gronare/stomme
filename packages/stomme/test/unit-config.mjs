@@ -124,10 +124,8 @@ const deepMerged = groups.filter((g) => {
   const out = resolveSite({ locale: 'sv', strings: { [g]: { [keys[0]]: 'OVERRIDDEN' } } }).strings[g];
   return out[keys[0]] === 'OVERRIDDEN' && keys.slice(1).every((k) => out[k] !== undefined);
 });
-eq(deepMerged.sort(), ['consent', 'contact', 'listingStatus', 'notFound', 'service', 'thanks', 'town'],
-  'overriding one string in a group keeps its siblings for every group resolveSite merges');
-check(resolveSite({ locale: 'sv', strings: { beforeAfter: { before: 'Förr' } } }).strings.beforeAfter.after === undefined,
-  'beforeAfter is the one group replaced wholesale — a partial override drops its sibling');
+eq(deepMerged.sort(), groups.slice().sort(),
+  'overriding one string in a group keeps its siblings — for every group, with no exception');
 
 eq(resolveSite({ strings: { readMore: 'More →' } }).strings.readMore, 'More →', 'a site string overrides the locale default');
 eq(resolveSite({ locale: 'sv', strings: { listingCta: 'Boka' } }).strings.listingCta, 'Boka', 'listingCta is overridable');

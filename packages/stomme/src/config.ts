@@ -251,6 +251,7 @@ export function resolveSite(c?: SiteConfig) {
       listingCta: (s && s.listingCta) || base.listingCta,
       thanks: { ...base.thanks, ...((s && (s as any).thanks) || {}) },
       notFound: { ...base.notFound, ...((s && (s as any).notFound) || {}) },
+      beforeAfter: { ...base.beforeAfter, ...((s && (s as any).beforeAfter) || {}) },
       consent: { ...base.consent, ...((s && (s as any).consent) || {}) },
     },
     listings: resolveListings(c && c.listings),
