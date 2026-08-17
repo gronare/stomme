@@ -180,3 +180,47 @@ a live page preview (real components via `/preview`) plus rich mockups for
 testimonials/faq/posts/theme/nav/footer/settings. Add or override per-site previews
 in `public/admin/previews.js` (loaded after the engine's): re-register a name to
 override, or add bespoke previews for your own collections (e.g. a `towns` mockup).
+
+## The contact form's handler
+
+The form is a plain `<form method="POST">` that also submits over `fetch` when JavaScript
+runs. Where it posts is a seam — you can use the built-in handler, host your own, or replace
+the engine's route entirely.
+
+**1. Use the built-in handler.** On an adapter build the engine injects `/api/contact` and
+sends mail through Resend. Set `RESEND_API_KEY`, `CONTACT_FROM` (on a Resend-verified
+domain) and `CONTACT_TO` in the site's environment. Nothing else to configure.
+
+**2. Point the form somewhere else.** Set `contact.endpoint` in `site.config.ts` and the
+form posts to `<endpoint>/contact` instead. Any host works — a Worker, a Lambda, a form
+service — as long as it satisfies the contract below.
+
+```ts
+export const site: SiteConfig = {
+  contact: { endpoint: 'https://forms.example.com' },
+};
+```
+
+**3. Ship your own route.** Create `src/pages/api/contact.ts` and the engine detects it and
+does not inject its own, so there is no duplicate route. You get the same URL with your code
+behind it.
+
+### The contract a handler must satisfy
+
+The form POSTs `multipart/form-data` with these fields:
+
+| Field | |
+|---|---|
+| `name`, `email`, `phone`, `message` | the visitor's input; `phone` only when the block enables it |
+| `bot-field` | honeypot — if it is non-empty, respond 200 and discard silently, do not tell the bot |
+| `_success` | the path to redirect a no-JavaScript submit to, taken from `routes.formSuccess` |
+
+Respond one of two ways, chosen by the request:
+
+- **JSON** when `Accept` includes `application/json` or `X-Requested-With: fetch` — the
+  JavaScript path reads `{ ok: true }` and renders the confirmation inline.
+- **303 to `_success`** otherwise — the no-JavaScript path. Honour `_success`; a hardcoded
+  `/thanks` breaks every site that renamed its success page.
+
+A static build (`build:static`) has no server, so `/api/contact` is not injected there — a
+static site needs `contact.endpoint`.

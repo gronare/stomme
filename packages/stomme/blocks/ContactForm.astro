@@ -28,7 +28,7 @@ const contactLine = [settings.name, contact.address?.city, contact.orgNr && `Org
   .filter(Boolean)
   .join(' · ');
 
-// Legacy fallback for sites not yet on the dedicated form worker: cms.baseUrl, then the per-site /api/contact when un-wired.
+// Falls back through cms.baseUrl to the engine's own /api/contact, so a site that configures no endpoint still has a working form.
 const contactAction = site?.contact?.endpoint
   ? `${site.contact.endpoint}/contact`
   : site?.cms?.baseUrl ? `${site.cms.baseUrl}/contact` : '/api/contact';

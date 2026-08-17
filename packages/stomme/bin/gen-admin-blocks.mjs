@@ -1608,7 +1608,7 @@ if (!here.includes('node_modules')) {
   }
 }
 
-// Per-site CUSTOM-DELTA manifest: the same filename as the engine's own blocks-manifest.json, but holding only the SITE's custom subset — types it adds or SHADOWS — projected through the same blocksToManifest contract, which the caller merges over the engine manifest so custom blocks get field-level validation instead of drift noise. Unguarded on purpose, unlike the engine-manifest refresh above: this must run wherever stomme is INSTALLED IN A SITE (cwd = site root, BLOCKS = the site's catalog).
+// Per-site CUSTOM-DELTA manifest: the same filename as the engine's own blocks-manifest.json, but holding only the SITE's custom subset — types it adds or SHADOWS — projected through the same blocksToManifest contract, so a reader can merge it over the engine manifest and validate custom blocks field-by-field instead of reporting them as unknown. Unguarded on purpose, unlike the engine-manifest refresh above: this must run wherever stomme is INSTALLED IN A SITE (cwd = site root, BLOCKS = the site's catalog).
 try {
   const { blocksToManifest } = await import('./gen-blocks-manifest.mjs');
   const { defaultBlocks } = await jiti.import('@gronare/stomme/catalog');
@@ -1627,7 +1627,7 @@ try {
   console.log(`  ↳ custom blocks-manifest.json: ${names.length ? names.join(', ') : '(none — engine defaults only)'}`);
 } catch (e) {
   console.warn('  (custom blocks-manifest skipped:', e.message + ')');
-  // Never leave a STALE delta from a previous build: the caller merges this file site-wins over the engine manifest, so a stale entry could MASK real drift on a block the site no longer shadows — degrading to engine-only shows drift noise again at worst.
+  // Never leave a STALE delta from a previous build: this file is merged site-wins over the engine manifest, so a leftover entry could MASK a real change on a block the site no longer shadows — writing nothing at all merely loses the site-specific detail.
   try {
     const outPath = resolve(root, 'public/admin/blocks-manifest.json');
     mkdirSync(dirname(outPath), { recursive: true });

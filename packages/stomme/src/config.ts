@@ -58,9 +58,9 @@ export interface SiteConfig {
     gatewayUrl?: string; // git-gateway gateway URL (DecapBridge / self-hosted)
     identityUrl?: string; // git-gateway identity URL (DecapBridge / GoTrue)
   };
-  // The contact-form edge Worker. Separate from `cms` on purpose: the CMS proxy moved to the caller, the form endpoint stayed at the edge. Unset falls back to cms.baseUrl.
+  // Where the contact form POSTs. Deliberately separate from `cms` so the form can live at the edge independently of wherever the CMS backend is proxied. Unset falls back to cms.baseUrl.
   contact?: {
-    endpoint?: string; // form worker origin, e.g. 'https://example.com'
+    endpoint?: string; // origin of the form handler, e.g. 'https://forms.example.com'
   };
 }
 

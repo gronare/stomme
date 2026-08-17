@@ -1,5 +1,5 @@
 {
-  "description": "Field migrations that bring site content up to the current engine spec. Each entry describes a field whose canonical shape changed but which the engine still renders via a back-compat shim (so existing sites never break) — a site can be migrated forward when convenient. Consumed by the caller (labels block-drift as a recognised 'migrate to X' instead of unknown-field noise) and by the migration tooling (auto-applies the transform, verified pixel-identical by the A/B lookbook). Add an entry whenever a field's canonical shape changes and a shim keeps the old one rendering.",
+  "description": "Field migrations that bring site content up to the current engine spec. Each entry describes a field whose canonical shape changed but which the engine still renders via a back-compat shim, so existing content never breaks and can be migrated forward when convenient. Published for tooling that checks site content against the engine: an entry lets a renamed field be reported as 'migrate to X' rather than as an unknown field. Add one whenever a field's canonical shape changes AND a shim keeps the old one rendering.",
   "migrations": [
     {
       "kind": "button-group",
