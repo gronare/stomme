@@ -27,6 +27,8 @@ export type BlockDef = {
   fields: Field[]; // editorial fields; [] = self-contained block (reads its own data)
   // The collection this block reads its items from — declaring it makes stomme-gen DROP the block from the CMS picker on a site with no `src/content/<name>/`, which is why settings-backed blocks leave it unset.
   collection?: string;
+  // The site feature that owns this block — the flag is the site's, so an extension gates its own blocks and stomme-gen drops them wherever `features[<name>]` is off.
+  feature?: string;
   // Picker + gallery metadata only, nothing at render: `group` clusters the block, `summary` is a one-line "what it produces", `shape` keys a wireframe pictogram.
   group?: string;
   summary?: string;

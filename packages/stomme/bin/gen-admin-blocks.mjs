@@ -234,11 +234,14 @@ function collectionEnabled(name) {
 const hasCatalog = LISTINGS.some((l) => l.preset === 'catalog');
 const hasArticle = !!(FEATURES && FEATURES.blog) || LISTINGS.some((l) => l.preset === 'article');
 const presetOk = (b) => (b.type !== 'catalogList' || hasCatalog) && (b.type !== 'postList' || hasArticle);
-const AVAILABLE_BLOCKS = BLOCKS.filter((b) => (!b.collection || collectionEnabled(b.collection)) && presetOk(b));
+// A block may name the `feature` that owns it — the flag is the site's, not the engine's, so an extension gates its own blocks without the engine knowing they exist.
+const featureOn = (name) => !!(FEATURES && FEATURES[name]);
+const blockOk = (b) => (!b.collection || collectionEnabled(b.collection)) && (!b.feature || featureOn(b.feature)) && presetOk(b);
+const AVAILABLE_BLOCKS = BLOCKS.filter(blockOk);
 
 const NO_SAMPLE = BLOCKS.filter((b) => !(b.sample || (Array.isArray(b.samples) && b.samples.length)));
 if (NO_SAMPLE.length) console.warn(`  ⚠ lookbook: no sample for ${NO_SAMPLE.map((b) => b.type).join(', ')} — add \`sample\`/\`samples\` in the catalog (block won't render in /lookbook)`);
-const SKIPPED_BLOCKS = BLOCKS.filter((b) => (b.collection && !collectionEnabled(b.collection)) || !presetOk(b));
+const SKIPPED_BLOCKS = BLOCKS.filter((b) => !blockOk(b));
 
 // The menu value encodes "<collectionId>::<routeBase>" — Header splits on it to query the collection AND build per-entry links, so the separator is a contract.
 const MENU_OPTIONS = [];
