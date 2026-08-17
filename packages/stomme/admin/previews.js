@@ -362,7 +362,6 @@
     },
   };
   window.CMS.registerEditorComponent(IMAGE_COMPONENT);
-  // Sveltia's rich-text image button resolves the component named `linked-image` when
   // Sveltia's rich-text image button resolves the component named `linked-image` when `linked_images` is on (its default), so the same definition is registered under that id or the built-in src/alt/title dialog wins.
   try { window.CMS.registerEditorComponent(Object.assign({}, IMAGE_COMPONENT, { id: 'linked-image' })); } catch (e) {}
 })();

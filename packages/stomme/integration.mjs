@@ -288,16 +288,9 @@ if (shareDraft && scOg.enabled) {
   <Base title="Preview"><div id="preview-root"><BlockRenderer blocks={blocks} config={site} features={features} /></div></Base>
 )}
 <script is:inline nonce={nonce}>
-  // Live updates without reloading: the CMS keeps this iframe mounted (stable src) and
-  // posts the new draft as it's typed. We re-fetch this page's HTML and MORPH it into the
-  // existing #preview-root — patching only what changed — so there's no navigation and
-  // unchanged nodes are left in place (no white flash, scroll/focus kept, and one-shot
-  // animations like the confirmation badge don't replay). Single-flight + trailing: one
-  // fetch at a time, always converging to the latest data (no fixed debounce lag).
+  // The CMS keeps this iframe mounted and posts each draft; re-fetching and MORPHING into #preview-root patches only what changed, so there is no reload, no white flash, scroll and focus survive, and one-shot animations do not replay. Single-flight with a trailing run always converges on the latest data.
   (function () {
-    // Minimal DOM morph: align children by index, patch text/attributes in place, keep
-    // matching elements. Good enough for live editing — text edits touch only text nodes;
-    // structural changes (adding/reordering blocks) patch more but still never reload.
+    // Aligns children by index and patches text/attributes in place: a text edit touches only text nodes, a structural change patches more, neither reloads.
     function morph(from, to) {
       if (from.nodeType !== to.nodeType || from.nodeName !== to.nodeName) {
         from.parentNode.replaceChild(to.cloneNode(true), from);
@@ -341,9 +334,7 @@ if (shareDraft && scOg.enabled) {
           var fresh = new DOMParser().parseFromString(html, 'text/html').getElementById('preview-root');
           if (cur && fresh) {
             morphChildren(cur, fresh);
-            // A morph patches the DOM but never re-runs a page's island: anything that painted
-            // itself on load (a card built from data attributes) would sit at its empty first
-            // state for every edit after the first. The page listens and paints again.
+            // A morph never re-runs a page's island, so anything that painted itself on load would sit at its empty first state for every edit after the first — the page listens for this and paints again.
             cur.dispatchEvent(new CustomEvent('stomme:preview-morph', { bubbles: true }));
           }
         })

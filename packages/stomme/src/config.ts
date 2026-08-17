@@ -265,8 +265,7 @@ export function resolveSite(c?: SiteConfig) {
     strings: {
       ...base,
       ...s,
-      // Deep-merge the nested string groups so a site can override one key
-      // without having to re-supply the whole group.
+      // Deep-merged so a site can override one key without re-supplying the whole group.
       contact: { ...base.contact, ...(s && s.contact) },
       town: { ...base.town, ...(s && s.town) },
       service: { ...base.service, ...(s && s.service) },
