@@ -41,13 +41,9 @@ try {
   if (pkg.dependencies && '@gronare/stomme' in pkg.dependencies) {
     const repoRoot = resolve(here, '../../..');
     const enginePkg = resolve(repoRoot, 'packages/stomme');
-    // Scaffolding from a checkout links to THAT checkout's engine, wherever the new site lands.
-    // The registry copy is scoped and needs a token, so a `latest` here would hand anyone who
-    // cloned the repo a site that cannot install — the documented quickstart is clone-and-scaffold.
+    // Scaffolding from a checkout links to THAT checkout's engine, wherever the new site lands: the registry copy is scoped and needs a token, so a `latest` here would hand anyone who cloned the repo a site they cannot install.
     fromCheckout = template === starter && existsSync(enginePkg);
-    // A relative link only holds inside the repo. Outside it the traversal is resolved against a
-    // path that may cross a symlink (macOS /tmp -> /private/tmp) and Vite then loads the engine
-    // twice under two names, so an absolute link is the one that survives.
+    // A relative link stays portable while the site lives inside the checkout; outside it the traversal buys nothing and an absolute path is the one that survives the site being moved.
     const inRepo = dest === repoRoot || dest.startsWith(repoRoot + '/');
     pkg.dependencies['@gronare/stomme'] = fromCheckout
       ? 'link:' + (inRepo ? relative(dest, enginePkg).split('\\').join('/') : enginePkg)
