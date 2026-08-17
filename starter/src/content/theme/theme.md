@@ -1,6 +1,7 @@
 ---
 brand: "#0f5d56"
 ink: "#1f2a28"
+muted: "#5a6b66"
 onDark: "#ffffff"
 surface: "#e4ede6"
 paper: "#fafaf7"

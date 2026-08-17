@@ -201,6 +201,7 @@
       "fields": [
         "brand",
         "ink",
+        "muted",
         "onDark",
         "surface",
         "paper",

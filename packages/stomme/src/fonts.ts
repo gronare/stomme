@@ -41,6 +41,16 @@ const uploadFontUrl = (p?: string | null): string | null => {
   return key ? (uploadedFontUrls[key] ?? null) : null;
 };
 
+// A curated webfont is a real family only once its file is actually served, so this resolves each key from the conventional upload path (/media/fonts/<key>.woff2). A site that drops the file in gets the family; one that has not keeps the system stack, and the picker's choice stops being a silent no-op.
+export function curatedWebfontUrls(): Record<string, string> {
+  const out: Record<string, string> = {};
+  for (const key of Object.keys(WEBFONTS)) {
+    const url = uploadFontUrl(`/media/fonts/${key}.woff2`);
+    if (url) out[key] = url;
+  }
+  return out;
+}
+
 // webfontUrls (curated-webfont key → served latin woff2) stays SITE-provided; custom uploads resolve through the glob above.
 export function resolveFonts(
   theme: { fontDisplay?: string; fontBody?: string; fontCustomFile?: string; fontCustomBodyFile?: string } = {},

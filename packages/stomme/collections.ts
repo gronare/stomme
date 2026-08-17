@@ -110,6 +110,7 @@ export function stommeCollections(listings?: Listing[]) {
       schema: z.object({
         brand: z.string().default('#4338ca'),
         ink: z.string().default('#1f2937'),
+        muted: z.string().optional(),
         onDark: z.string().default('#ffffff'),
         surface: z.string().default('#e0e7ff'),
         paper: z.string().default('#ffffff'),

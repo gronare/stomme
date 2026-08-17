@@ -1,7 +1,7 @@
 ---
 import '../styles/global.css';
 import { getEntry, getCollection } from 'astro:content';
-import { resolveFonts } from '@gronare/stomme/fonts';
+import { resolveFonts, curatedWebfontUrls } from '@gronare/stomme/fonts';
 import Header from '@gronare/stomme/Header.astro';
 import Footer from '@gronare/stomme/Footer.astro';
 import Tracking from '@gronare/stomme/Tracking.astro';
@@ -22,11 +22,12 @@ const towns = footerCfg.showTowns === true
       .sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0))
       .map((t) => ({ id: t.id, name: t.data.name }))
   : [];
-const fonts = resolveFonts(theme);
+const fonts = resolveFonts(theme, curatedWebfontUrls());
 
 const themeVars = [
   `--color-brand:${theme.brand}`,
   `--color-ink:${theme.ink}`,
+  ...(theme.muted ? [`--color-muted:${theme.muted}`] : []),
   `--color-on-dark:${theme.onDark}`,
   `--color-surface:${theme.surface}`,
   `--color-paper:${theme.paper}`,

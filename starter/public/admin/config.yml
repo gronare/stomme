@@ -3215,6 +3215,7 @@ collections:
         fields:
           - { name: brand, label: "Primary", widget: color, default: "#4338ca", hint: "Buttons, links and key accents." }
           - { name: ink, label: "Text", widget: color, default: "#1f2937", hint: "Default body-text colour." }
+          - { name: muted, label: "Secondary text", widget: color, required: false, default: "#6b7280", hint: "Captions, notes and helper text. Check it against the tinted surface, not only the page background." }
           - { name: onDark, label: "Text on primary", widget: color, default: "#ffffff", hint: "Button labels and text on dark/brand bands." }
           - { name: surface, label: "Tinted surface", widget: color, default: "#e0e7ff", hint: "Soft background for highlighted sections." }
           - { name: paper, label: "Page background", widget: color, default: "#ffffff", hint: "The main page background." }
@@ -3248,7 +3249,7 @@ collections:
             label: "Heading font"
             widget: select
             required: false
-            hint: "Font for headings. Empty = system default."
+            hint: "Font for headings. Empty = system default. Inter and Inter Tight are served from your own site: upload the file to /media/fonts/<name>.woff2 or they fall back to the system stack."
             options:
               - { label: "System (default)", value: "system" }
               - { label: "Serif (elegant headlines)", value: "serif" }
@@ -3267,7 +3268,7 @@ collections:
             label: "Body font"
             widget: select
             required: false
-            hint: "Font for body text. Empty = system default."
+            hint: "Font for body text. Empty = system default. Inter and Inter Tight are served from your own site: upload the file to /media/fonts/<name>.woff2 or they fall back to the system stack."
             options:
               - { label: "System (default)", value: "system" }
               - { label: "Serif (elegant headlines)", value: "serif" }
