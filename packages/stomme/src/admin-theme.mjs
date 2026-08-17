@@ -1,0 +1,196 @@
+// Editor theme: CSS custom properties only — they inherit through the shadow DOM, and explicit colours would break Sveltia's in-app light/dark toggle.
+// `!important` is load-bearing: Sveltia injects its own `:root,:host{--sui-…}` at runtime after this style, so equal-specificity later rules would otherwise win.
+// Surfaces + accent derive from a per-mode ramp; kept NEUTRAL (near-zero saturation) so the editor reads as clean grey, with steeper lightness steps + darker borders for box definition. Accent is a desaturated slate — Sveltia bakes 80-100% saturation into --sui-primary-accent-color*, so each is overridden. Per site: set --sui-base-hue + raise accent saturation for a brand accent.
+const RAMP_LIGHT = `--sui-background-color-1-hsl: var(--sui-base-hue) 6% 100% !important; --sui-background-color-2-hsl: var(--sui-base-hue) 7% 96.5% !important; --sui-background-color-3-hsl: var(--sui-base-hue) 8% 93.5% !important; --sui-background-color-4-hsl: var(--sui-base-hue) 8% 89.5% !important; --sui-background-color-5-hsl: var(--sui-base-hue) 10% 81% !important; --sui-border-color-1-hsl: var(--sui-base-hue) 9% 56% !important; --sui-border-color-2-hsl: var(--sui-base-hue) 10% 77% !important; --sui-border-color-3-hsl: var(--sui-base-hue) 10% 83% !important;`;
+const RAMP_DARK = `--sui-background-color-1-hsl: var(--sui-base-hue) 8% 10% !important; --sui-background-color-2-hsl: var(--sui-base-hue) 8% 12.5% !important; --sui-background-color-3-hsl: var(--sui-base-hue) 8% 15.5% !important; --sui-background-color-4-hsl: var(--sui-base-hue) 9% 19% !important; --sui-background-color-5-hsl: var(--sui-base-hue) 10% 29% !important; --sui-border-color-1-hsl: var(--sui-base-hue) 9% 44% !important; --sui-border-color-2-hsl: var(--sui-base-hue) 10% 31% !important; --sui-border-color-3-hsl: var(--sui-base-hue) 10% 26% !important;`;
+const ACCENT_LIGHT = `--sui-primary-accent-color: hsl(var(--sui-base-hue) 14% 40%) !important; --sui-primary-accent-color-light: hsl(var(--sui-base-hue) 14% 46%) !important; --sui-primary-accent-color-dark: hsl(var(--sui-base-hue) 16% 33%) !important; --sui-primary-accent-color-text: hsl(var(--sui-base-hue) 20% 38%) !important; --sui-primary-accent-color-translucent: hsl(var(--sui-base-hue) 14% 44% / 26%) !important; --sui-primary-accent-color-inverted: hsl(var(--sui-base-hue) 8% 100%) !important;`;
+const ACCENT_DARK = `--sui-primary-accent-color: hsl(var(--sui-base-hue) 13% 66%) !important; --sui-primary-accent-color-light: hsl(var(--sui-base-hue) 13% 73%) !important; --sui-primary-accent-color-dark: hsl(var(--sui-base-hue) 14% 57%) !important; --sui-primary-accent-color-text: hsl(var(--sui-base-hue) 18% 70%) !important; --sui-primary-accent-color-translucent: hsl(var(--sui-base-hue) 13% 64% / 30%) !important; --sui-primary-accent-color-inverted: hsl(var(--sui-base-hue) 12% 12%) !important;`;
+// Collapsible object-widget gates: OBJ_ANY = has a disclosure at all, OBJ_C = collapsed, OBJ_E = expanded. Gate on the widget's own disclosure (a summary node only exists when it computes non-empty); direct-child paths keep nested objects from matching their ancestors.
+const OBJ = 'section.field[data-field-type=object]';
+const OBJ_DISC = '> .field-wrapper > .wrapper > .header > div:first-child > button';
+const OBJ_ANY = `${OBJ}:has(${OBJ_DISC}[aria-expanded])`;
+const OBJ_C = `${OBJ}:has(${OBJ_DISC}[aria-expanded="false"])`;
+const OBJ_E = `${OBJ}:has(${OBJ_DISC}[aria-expanded="true"])`;
+// OPT = an optional object (required:false → Sveltia mounts an "Add …" checkbox at > .field-wrapper > .sui.checkbox, ALWAYS present): the deliberately class-heavy :has() argument out-specifies OBJ_C/OBJ_E (whose arguments carry :first-child + two attributes) so OPT rules win in the added states.
+const OPT = `${OBJ}:has(> .field-wrapper > .sui.checkbox .inner > button.sui.button[role=checkbox])`;
+const OPT_ON = `${OPT}:has(> .field-wrapper > .sui.checkbox .inner > button[role=checkbox][aria-checked="true"])`;
+const OPT_E = `${OPT}:has(${OBJ_DISC}[aria-expanded="true"])`;
+// GATED = an object whose first child field is the boolean `enabled` (the gate convention, mirrored in editor.js; the chrome-less og wrapper is excluded). Emitted collapsed:false so the children stay mounted, the switch exists in every state and the selector self-detects without a path list — and the two gestures are independent: the switch writes `enabled`, a card click toggles .stomme-open (editor.js) while Sveltia's own disclosure stays hidden, because collapsing it would unmount the switch.
+const KIDS = '> .field-wrapper > .wrapper > .item-list';
+const GATE_BOOL = `${KIDS} > section.field[data-field-type=boolean][data-key-path$=".enabled"]:first-child`;
+const GATED = `${OBJ}:not([data-key-path="og"]):has(${GATE_BOOL})`;
+// Chevron affordance shared by GATED + added-OPT cards (Material Symbols ships with Sveltia).
+const CHEVRON = `content:"expand_more"!important;font-family:"Material Symbols Outlined"!important;font-size:20px!important;line-height:1!important;flex:0 0 auto!important;opacity:.5!important;transform:rotate(-90deg)!important;transition:transform 160ms!important;`;
+// LINK = a link-shaped object (page select + url string children) — self-detecting, rendered chrome-less inline, children mounted via collapsed:false.
+const LINK = `${OBJ}:has(${KIDS} > section.field[data-field-type=select][data-key-path$=".page"]):has(${KIDS} > section.field[data-key-path$=".url"])`;
+// The centred 768px field column Sveltia uses — mirrored where we re-lay-out fields.
+const COL_PAD = 'max(16px, calc((100% - 768px) / 2))';
+// Card outer width (border-box) = the 768px column + 16px interior padding + 1px border per side, so a card's CHILD fields land on exactly the same column as top-level fields — one width for every card kind. It caps at min(CARD_W, 100% - 32px) so a narrow pane (preview open) fills the pane minus the 16px field padding, which is why top-level PLAIN fields need the inverse treatment (TOP_* below): their 768px column must shrink by the 34px card frame to keep landing on the card-child column at every pane width, not just wide ones.
+const CARD_W = '802px';
+const CARD_MAX = `min(${CARD_W}, 100% - 32px)`;
+// Top-level fields (not nested in a card/item): booleans align via padding because their own grid ignores the field-wrapper, lists keep the CARD_W wrapper, and object cards release header/wrapper to the card width with stronger rules of their own.
+const TOP = 'section.field:not(section.field section.field)';
+const TOP_PLAIN = `${TOP}:not([data-field-type=list]):not([data-field-type=boolean]):not([data-field-type=object])`;
+const TOP_LABELED = `${TOP}:not([data-field-type=boolean]):not([data-field-type=object])`;
+export const THEME_CSS = `:root{
+      --sui-base-hue: 220 !important; /* neutral default; per site: brand hue (raise accent saturation too) */
+      --sui-font-family-default: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif !important;
+      --sui-font-weight-normal: 400 !important;
+      --sui-font-weight-bold: 650 !important;
+      --sui-control-medium-border-radius: 6px !important;
+      --sui-textbox-border-radius: 6px !important;
+      --sui-button-medium-border-radius: 6px !important;
+      --sui-checkbox-border-radius: 4px !important;
+      --sui-textbox-font-size: 15px !important;
+    }
+    :root, :host, :root[data-theme=light], :host[data-theme=light] { ${RAMP_LIGHT} ${ACCENT_LIGHT} }
+    :root[data-theme=dark], :host[data-theme=dark] { ${RAMP_DARK} ${ACCENT_DARK} }
+    @media (prefers-color-scheme: dark) { :root:not([data-theme=light]), :host:not([data-theme=light]) { ${RAMP_DARK} ${ACCENT_DARK} } }
+    /* List-item polish. Sveltia is light-DOM, so plain CSS reaches its internals; these target internal class names (not a public API — re-tune on a Sveltia upgrade). Section row = .item whose OWN header carries a .type pill (variable-type lists); the pill/card chrome stays scoped to those, the one-row + drag treatment applies to EVERY list item. */
+    .type{background:hsl(150 44% 86%)!important;color:hsl(150 55% 24%)!important;border-radius:999px!important;padding:5px 13px!important;margin:0 4px!important;font-size:12px!important;font-weight:700!important;letter-spacing:.06em!important;text-transform:uppercase!important;line-height:1.5!important;white-space:nowrap!important;flex:0 0 auto!important;}
+    .item:has(> .header .type){border:1px solid hsl(var(--sui-border-color-2-hsl))!important;border-radius:10px!important;margin-bottom:20px!important;overflow:hidden!important;background:hsl(var(--sui-background-color-1-hsl))!important;box-shadow:0 1px 3px hsl(var(--sui-base-hue) 8% 50% / 8%)!important;}
+    .item:has(> .header .type):hover{border-color:hsl(var(--sui-border-color-1-hsl))!important;}
+    .item:has(> .header .type) > .header{padding:14px 16px!important;background:hsl(var(--sui-background-color-2-hsl))!important;}
+    /* Expanded section: a border separates the header bar from the fields below. Sveltia hard-sets height:29px on .header (box-sizing:border-box), which swallows the padding and squeezes the pill — force height:auto so the padding gives the pill real breathing room. */
+    .item:has(> .header .type):has(> .header > div:first-child > button[aria-expanded="true"]) > .header{border-bottom:1px solid hsl(var(--sui-border-color-3-hsl))!important;height:auto!important;min-height:0!important;padding:16px!important;}
+    /* Move Up/Down arrows are replaced by whole-item drag (stomme-editor.js) on EVERY list item: hide the header's middle control group and dock the ⋮/✕ group right (Sveltia gives each header group a fixed ~205px width). NB: the disclosure is \`> .header > div:first-child > button[aria-expanded]\` — the ⋮ menu button ALSO has aria-expanded (always false while closed), so any collapsed-state selector must use the first-group path, never a bare \`button[aria-expanded="false"]\`. */
+    section[data-field-type=list] .item > .header > div:first-child{width:auto!important;flex:0 0 auto!important;}
+    section[data-field-type=list] .item > .header > div:nth-child(2){display:none!important;}
+    section[data-field-type=list] .item > .header > div:nth-child(3){width:auto!important;flex:0 0 auto!important;margin-left:auto!important;}
+    /* COLLAPSED list item = one row (mockup): the item becomes a flex row, the header joins it via display:contents, and the summary — rendered by Sveltia inside .item-body ONLY while collapsed — is ordered between the disclosure and the ⋮/✕ controls. Styled in place, never moved, so Sveltia re-renders can't desync it. Gated on the disclosure state so EXPANDED items keep a normal header row (bug: this trick used to apply always). */
+    section[data-field-type=list] .item:has(> .header > div:first-child > button[aria-expanded="false"]){display:flex!important;align-items:center!important;gap:10px!important;padding:9px 14px!important;cursor:pointer!important;user-select:none!important;}
+    section[data-field-type=list] .item:has(> .header > div:first-child > button[aria-expanded="false"]) > .header{display:contents!important;}
+    section[data-field-type=list] .item:has(> .header > div:first-child > button[aria-expanded="false"]) > .header > div:first-child{order:1!important;}
+    section[data-field-type=list] .item:has(> .header > div:first-child > button[aria-expanded="false"]) > .item-body{order:2!important;flex:1 1 auto!important;min-width:0!important;overflow:hidden!important;}
+    section[data-field-type=list] .item:has(> .header > div:first-child > button[aria-expanded="false"]) > .header > div:nth-child(3){order:3!important;}
+    section[data-field-type=list] .item > .item-body > .summary{font-weight:600!important;padding:0!important;margin:0!important;overflow:hidden!important;white-space:nowrap!important;text-overflow:ellipsis!important;}
+    section[data-field-type=list] .item > .item-body > .summary *{display:inline!important;white-space:nowrap!important;}
+    /* The whole-list collapse chevron on a list's toolbar is redundant chrome: every item below collapses individually and Expand/Collapse All does bulk. Hide it (the count + the bulk buttons stay). Its depth inside .toolbar.top varies by Sveltia version (a direct child beside .summary, or nested in a .label group), so match it anywhere in the toolbar — but the toolbar's Add button ALSO carries aria-expanded, so menu buttons must stay excluded or "Add" disappears with it. */
+    section[data-field-type=list] > .field-wrapper > .sui.group > .inner > .toolbar.top button[aria-expanded]:not([aria-haspopup]){display:none!important;}
+    /* Expanded list items WITHOUT a .type pill (fixed-type lists, e.g. cards) show Sveltia's default grey header bar with no label — a stray-looking strip. Blend it into the card (card bg, slim, just a divider) instead of leaving the raw grey default. */
+    section[data-field-type=list] .item:not(:has(> .header .type)):has(> .header > div:first-child > button[aria-expanded="true"]) > .header{background:hsl(var(--sui-background-color-1-hsl))!important;height:auto!important;min-height:0!important;padding:10px 14px!important;border-bottom:1px solid hsl(var(--sui-border-color-3-hsl))!important;}
+    /* Collapsible OBJECT groups (SEO + Media/Layout/Appearance) share the card language. Collapsed = one row [chevron][label][summary…][⋮] with the hint wrapping to a second line; expanded = label bar (chevron docked beside ⋮) with the fields below. Gated on the widget's own disclosure so plain inline objects are untouched. */
+    /* Card geometry: every top-level card is CARD_W wide so its CHILD fields — 16px field padding, then each child's own 768px .field-wrapper cap — land exactly on the SAME centred 768px column as top-level fields (SEO title aligns with Title). The card's own inner .field-wrapper cap is released so children flow to the card width; nested cards sit in narrower parents where the cap is a no-op. Mirrors Sveltia's field-wrapper max-width — re-tune on a Sveltia upgrade. */
+    ${OBJ_ANY}{border:1px solid hsl(var(--sui-border-color-2-hsl))!important;border-radius:10px!important;max-width:${CARD_MAX}!important;margin:14px auto!important;background:hsl(var(--sui-background-color-1-hsl))!important;overflow:hidden!important;}
+    ${OBJ_ANY}:hover{border-color:hsl(var(--sui-border-color-1-hsl))!important;}
+    ${OBJ_ANY} > .field-wrapper{max-width:none!important;}
+    /* Sveltia caps a field's > header and > .footer at the same 768px column — inside an 802px card the header bar would stop 34px short of the right edge (a notch in the top-right corner). Release them to the card width. */
+    ${OBJ_ANY} > header, ${OBJ_ANY} > .footer, ${OPT} > header, ${OPT} > .footer{max-width:none!important;}
+    /* Section cards share the same geometry: the list's field column widens to CARD_W so each item card = CARD_W and the fields INSIDE items land on the 768px column too — one card width, one field column, everywhere. */
+    section[data-field-type=list] > .field-wrapper{max-width:${CARD_W}!important;}
+    /* Top-level plain fields join the card-child column at EVERY pane width: Sveltia's 768px caps (header/wrapper/footer, margin-inline auto) only line up with card children while the pane is wide enough to centre them — in a narrow pane (preview open) they fill and sit 17px outside the column. Shrinking the caps by the 34px card frame keeps inputs AND labels on the same edges as fields inside section/object cards; at wide widths min() returns 768px and nothing changes. */
+    ${TOP_PLAIN} > .field-wrapper{max-width:min(768px, 100% - 34px)!important;}
+    ${TOP_LABELED} > header, ${TOP_LABELED} > .footer{max-width:min(768px, 100% - 34px)!important;}
+    /* Top-level booleans (e.g. Published) align via their padding instead — 33px floor = 16px pane inset + 17px card frame; the centred term takes over exactly when the plain-field min() does. */
+    ${TOP}[data-field-type=boolean]{padding:16px max(33px, calc((100% - 768px) / 2))!important;}
+    /* Nested object cards (inside a list item OR inside another object) keep a horizontal inset for breathing room; only top-level cards use the centred column. og.types is excluded: it is a chrome-less wrapper that must span its parent so the type cards inside align with the master-toggle card (its own margin rule below would otherwise lose this specificity fight). */
+    section[data-field-type=list] .item ${OBJ}:has(${OBJ_DISC}[aria-expanded]), ${OBJ} ${OBJ}:not([data-key-path="og.types"]):has(${OBJ_DISC}[aria-expanded]){max-width:none!important;margin:14px 16px!important;}
+    ${OBJ_ANY} > header .required{display:none!important;}
+    ${OBJ_C}{display:flex!important;flex-wrap:wrap!important;align-items:center!important;gap:10px!important;padding:9px 14px!important;cursor:pointer!important;user-select:none!important;}
+    ${OBJ_C} > header{display:contents!important;}
+    ${OBJ_C} > header h4{order:2!important;flex:0 0 auto!important;}
+    ${OBJ_C} > header .sui.spacer{display:none!important;}
+    ${OBJ_C} > header > button{order:4!important;}
+    ${OBJ_C} > .field-wrapper{display:contents!important;}
+    ${OBJ_C} > .field-wrapper > .wrapper{display:contents!important;}
+    ${OBJ_C} > .field-wrapper > .wrapper > .header{display:contents!important;}
+    ${OBJ_C} > .field-wrapper > .wrapper > .header > div:first-child{order:1!important;width:auto!important;flex:0 0 auto!important;}
+    ${OBJ_C} > .field-wrapper > .wrapper > .header > div:nth-child(n+2){display:none!important;}
+    ${OBJ_C} > .field-wrapper > .wrapper > .item-list{order:3!important;flex:1 1 auto!important;min-width:0!important;}
+    ${OBJ_C} > .field-wrapper > .wrapper > .item-list > .summary{padding:0!important;overflow:hidden!important;white-space:nowrap!important;text-overflow:ellipsis!important;opacity:.75!important;}
+    ${OBJ_C} > .footer{order:5!important;flex:0 0 100%!important;margin:0!important;padding:0!important;}
+    ${OBJ_E}{position:relative!important;padding:0!important;}
+    ${OBJ_E} > header{margin:0!important;height:auto!important;min-height:0!important;padding:16px 16px 16px 48px!important;background:hsl(var(--sui-background-color-2-hsl))!important;border-bottom:1px solid hsl(var(--sui-border-color-3-hsl))!important;}
+    ${OBJ_E} > .field-wrapper > .wrapper{border:none!important;background:transparent!important;}
+    ${OBJ_E} > .field-wrapper > .wrapper > .header{position:absolute!important;top:14px!important;left:12px!important;background:transparent!important;}
+    ${OBJ_E} > .field-wrapper > .wrapper > .header > div{width:auto!important;flex:0 0 auto!important;}
+    ${OBJ_E} > .footer{margin:0!important;padding:8px 14px 10px!important;}
+    /* BOOLEAN fields read as one row — [switch] label, hint under the label — instead of Sveltia's stacked label/switch/hint. The padding mirrors the centred 768px field column. */
+    section.field[data-field-type=boolean]{display:grid!important;grid-template-columns:auto minmax(0,1fr)!important;column-gap:14px!important;align-items:center!important;padding:16px ${COL_PAD}!important;}
+    section.field[data-field-type=boolean] > header{grid-column:2!important;grid-row:1!important;margin:0!important;padding:0!important;height:auto!important;min-height:0!important;max-width:none!important;}
+    section.field[data-field-type=boolean] > .field-wrapper{grid-column:1!important;grid-row:1 / span 2!important;margin:0!important;width:auto!important;max-width:none!important;}
+    section.field[data-field-type=boolean] > .footer{grid-column:2!important;grid-row:2!important;margin:2px 0 0!important;padding:0!important;max-width:none!important;}
+    /* LINK-shaped objects (page + url) render chrome-less INLINE — a link belongs to its label; it is never an "Add …" step or a nested drawer. The two fields sit side by side where there is room. An object literally named "link" drops its redundant label; named ones ("Button link") keep it as a plain field label. */
+    ${LINK}{display:block!important;position:static!important;border:none!important;background:transparent!important;box-shadow:none!important;border-radius:0!important;max-width:none!important;margin:0!important;padding:0!important;overflow:visible!important;}
+    section[data-field-type=list] .item ${LINK}, ${OBJ} ${LINK}{max-width:none!important;margin:0!important;}
+    ${LINK} > header{display:flex!important;position:static!important;margin:0!important;height:auto!important;min-height:0!important;padding:16px ${COL_PAD} 0!important;background:transparent!important;border:none!important;}
+    ${LINK}[data-key-path$=".link"] > header{display:none!important;}
+    ${LINK} > .field-wrapper{display:block!important;margin:0!important;max-width:none!important;width:auto!important;}
+    ${LINK} > .field-wrapper > .wrapper{display:block!important;border:none!important;background:transparent!important;}
+    ${LINK} > .field-wrapper > .wrapper > .header{display:none!important;}
+    ${LINK} > .field-wrapper > .wrapper > .item-list{display:grid!important;grid-template-columns:repeat(auto-fit, minmax(260px, 1fr))!important;align-items:start!important;}
+    ${LINK} > .field-wrapper > .wrapper > .item-list > section.field{border:none!important;}
+    /* The Add-checkbox of optional objects renders as a SWITCH matching real boolean toggles. */
+    ${OBJ} > .field-wrapper > .sui.checkbox .inner > button[role=checkbox]{width:42px!important;height:24px!important;min-width:42px!important;flex:0 0 auto!important;border-radius:999px!important;border:none!important;background:hsl(var(--sui-background-color-5-hsl))!important;position:relative!important;padding:0!important;transition:background 160ms!important;}
+    ${OBJ} > .field-wrapper > .sui.checkbox .inner > button[role=checkbox] .icon{display:none!important;}
+    ${OBJ} > .field-wrapper > .sui.checkbox .inner > button[role=checkbox]::after{content:""!important;position:absolute!important;top:3px!important;left:3px!important;width:18px!important;height:18px!important;border-radius:50%!important;background:#fff!important;box-shadow:0 1px 2px rgb(0 0 0 / 0.25)!important;transition:transform 160ms!important;}
+    ${OBJ} > .field-wrapper > .sui.checkbox .inner > button[role=checkbox][aria-checked=true]{background:var(--sui-primary-accent-color)!important;}
+    ${OBJ} > .field-wrapper > .sui.checkbox .inner > button[role=checkbox][aria-checked=true]::after{transform:translateX(18px)!important;}
+    /* OPTIONAL groups (required:false objects — thanks buttons, header CTA, per-entry SEO): ONE header row [switch] label — the on/off switch IS the header, no separate "Add X" text row. The switch is pinned (absolute, same spot in unadded / on-collapsed / on-expanded states) so it NEVER moves when clicked. TWO independent gestures, same as GATED: the switch adds/removes the group (data); once ON, a card click drives Sveltia's own disclosure (editor.js) — collapsed by default (collapsed:true emitted), a chevron appears, fields below when open. Unadded, the row is inert apart from the switch. */
+    ${OPT}{display:flex!important;flex-wrap:wrap!important;align-items:center!important;gap:10px!important;position:relative!important;border:1px solid hsl(var(--sui-border-color-2-hsl))!important;border-radius:10px!important;max-width:${CARD_MAX}!important;margin:14px auto!important;background:hsl(var(--sui-background-color-1-hsl))!important;overflow:hidden!important;padding:12px 14px 12px 72px!important;min-height:48px!important;cursor:default!important;user-select:none!important;}
+    ${OPT_ON}{cursor:pointer!important;}
+    ${OPT_ON} > header::before{${CHEVRON}order:0!important;}
+    /* rotation keyed on OPT_ON + the disclosure — a bare OPT_E loses the specificity fight against OPT_ON's checkbox :has() */
+    ${OPT_ON}:has(${OBJ_DISC}[aria-expanded="true"]) > header::before{transform:none!important;}
+    ${OPT}:hover{border-color:hsl(var(--sui-border-color-1-hsl))!important;}
+    section[data-field-type=list] .item ${OPT}, ${OBJ} ${OPT}{max-width:none!important;margin:14px 16px!important;}
+    ${OPT} > header{display:contents!important;}
+    ${OPT} > header h4{order:1!important;flex:0 0 auto!important;}
+    ${OPT} > header .sui.spacer{display:none!important;}
+    ${OPT} > header .required{display:none!important;}
+    ${OPT} > header > button{order:4!important;margin-left:auto!important;}
+    ${OPT} > .field-wrapper{display:contents!important;}
+    ${OPT} > .field-wrapper > .sui.checkbox{position:absolute!important;top:24px!important;left:16px!important;transform:translateY(-50%)!important;padding:0!important;margin:0!important;z-index:1!important;}
+    ${OPT} > .field-wrapper > .sui.checkbox label{display:none!important;}
+    ${OPT} > .field-wrapper > .wrapper{display:contents!important;}
+    ${OPT} > .field-wrapper > .wrapper > .header{display:none!important;}
+    ${OPT} > .field-wrapper > .wrapper > .item-list{order:2!important;flex:1 1 auto!important;min-width:0!important;}
+    ${OPT} > .field-wrapper > .wrapper > .item-list > .summary{padding:0!important;overflow:hidden!important;white-space:nowrap!important;text-overflow:ellipsis!important;opacity:.75!important;}
+    ${OPT} > .footer{order:8!important;flex:0 0 100%!important;margin:0!important;padding:0!important;}
+    ${OPT_E}{cursor:default!important;}
+    ${OPT_E} > header{cursor:pointer!important;}
+    ${OPT_E} > .field-wrapper > .wrapper > .item-list{order:9!important;flex:1 1 100%!important;min-width:0!important;margin:12px -14px -12px -72px!important;border-top:1px solid hsl(var(--sui-border-color-3-hsl))!important;}
+    /* GATED groups (first child = the boolean \`enabled\`; e.g. share-card types, away mode): a switch-card with TWO independent gestures — the pinned switch toggles \`enabled\` (data, Sveltia's own click), a card click toggles .stomme-open (editor.js), a pure UI state that defaults to CLOSED. Closed = one row [switch] chevron label + hint; open = the row becomes a header bar with ALL config fields below. Open/closed is independent of enabled, so a disabled card can still be inspected. */
+    ${GATED}{position:relative!important;user-select:none!important;}
+    ${GATED} > header{display:flex!important;align-items:center!important;margin:0!important;height:auto!important;min-height:48px!important;padding:12px 16px 12px 72px!important;background:hsl(var(--sui-background-color-2-hsl))!important;border-bottom:1px solid hsl(var(--sui-border-color-3-hsl))!important;cursor:pointer!important;}
+    ${GATED} > header::before{${CHEVRON}margin-right:10px!important;}
+    ${GATED}.stomme-open > header::before{transform:none!important;}
+    ${GATED} > .field-wrapper > .wrapper > .header{display:none!important;}
+    ${GATED} ${GATE_BOOL}{display:block!important;position:absolute!important;top:24px!important;left:16px!important;transform:translateY(-50%)!important;width:42px!important;padding:0!important;margin:0!important;z-index:1!important;border:none!important;background:transparent!important;}
+    ${GATED} ${GATE_BOOL} > header, ${GATED} ${GATE_BOOL} > .footer{display:none!important;}
+    ${GATED} ${GATE_BOOL} > .field-wrapper{margin:0!important;width:auto!important;grid-column:auto!important;}
+    /* closed (default): the row IS the card — plain background, no divider; the config fields are hidden (the pinned \`enabled\` switch stays); the group hint reads as the row's second line, aligned under the label. */
+    ${GATED}:not(.stomme-open){cursor:pointer!important;}
+    ${GATED}:not(.stomme-open) > header{background:hsl(var(--sui-background-color-1-hsl))!important;border-bottom:none!important;}
+    ${GATED}:not(.stomme-open) ${KIDS} > section.field:not(:first-child){display:none!important;}
+    ${GATED}:not(.stomme-open) > .footer{margin:0!important;padding:0 16px 12px 72px!important;}
+    /* Share-cards flat wrappers: the og + og.types objects exist only for the data path (og.enabled, og.types.<key>) — render them CHROME-LESS (no card border/header/collapse) so the pane reads: master toggle → type cards (the approved mockup). Selectors reuse OBJ_ANY so they outrank the generic object-card rules above; both wrappers are emitted collapsed:false and stay expanded (no disclosure left to collapse them). */
+    ${OBJ_ANY}:is([data-key-path="og"],[data-key-path="og.types"]){border:none!important;background:transparent!important;box-shadow:none!important;border-radius:0!important;overflow:visible!important;padding:0!important;}
+    ${OBJ_ANY}:is([data-key-path="og"],[data-key-path="og.types"]) > header{display:none!important;}
+    ${OBJ_ANY}:is([data-key-path="og"],[data-key-path="og.types"]) > .field-wrapper > .wrapper > .header{display:none!important;}
+    /* og.types keeps a quiet section label + hint (mockup "Per content type"): its header returns as a plain heading and the hint moves above the cards via flex order. */
+    /* max-width:none is load-bearing: og.types must span its parent (og already carries the CARD_MAX cap) or the type cards fall 16px inside the master-toggle card. */
+    ${OBJ_ANY}[data-key-path="og.types"]{display:flex!important;flex-direction:column!important;margin:14px 0!important;max-width:none!important;}
+    /* Under flex, the field-wrapper's own margin-inline:auto would shrink it to fit-content — pin it full width. */
+    ${OBJ_ANY}[data-key-path="og.types"] > .field-wrapper{width:100%!important;margin:0!important;max-width:none!important;}
+    /* The wrapper spans CARD_W (cards overhang the 768px column by 17px each side), so a 17px inset lands the section label + hint on the same x as the field labels around it (labels sit at the column edge). */
+    ${OBJ_ANY}[data-key-path="og.types"] > header{display:flex!important;order:-2!important;position:static!important;background:transparent!important;border:none!important;height:auto!important;min-height:0!important;padding:18px 17px 0!important;}
+    ${OBJ_ANY}[data-key-path="og.types"] > header > button,${OBJ_ANY}[data-key-path="og.types"] > header .required{display:none!important;}
+    ${OBJ_ANY}[data-key-path="og.types"] > .footer{order:-1!important;margin:0!important;padding:2px 17px 0!important;}
+    /* Type cards fill the settings column (they'd otherwise take the nested 16px inset). */
+    ${OBJ_ANY}[data-key-path="og.types"] > .field-wrapper > .wrapper > .item-list > ${OBJ_ANY}{max-width:none!important;margin:14px 0!important;}
+    /* Type-card labels read as the editor's green type pills (mockup language). */
+    ${OBJ}[data-key-path^="og.types."][data-field-type=object] > header h4{background:hsl(150 44% 86%)!important;color:hsl(150 55% 24%)!important;border-radius:999px!important;padding:4px 12px!important;font-size:12px!important;font-weight:700!important;letter-spacing:.06em!important;text-transform:uppercase!important;line-height:1.5!important;flex:0 0 auto!important;}
+    /* The master toggle as a prominent card: [switch] [label + hint] on one row. */
+    section.field[data-key-path="og.enabled"]{display:grid!important;grid-template-columns:auto minmax(0,1fr)!important;column-gap:14px!important;align-items:center!important;border:1px solid hsl(var(--sui-border-color-2-hsl))!important;border-radius:10px!important;background:hsl(var(--sui-background-color-1-hsl))!important;box-shadow:0 1px 3px hsl(var(--sui-base-hue) 8% 50% / 8%)!important;padding:14px 16px!important;margin:14px 0!important;}
+    section.field[data-key-path="og.enabled"] > header{grid-column:2!important;grid-row:1!important;margin:0!important;padding:0!important;height:auto!important;min-height:0!important;}
+    section.field[data-key-path="og.enabled"] > .field-wrapper{grid-column:1!important;grid-row:1 / span 2!important;}
+    section.field[data-key-path="og.enabled"] > .footer{grid-column:2!important;grid-row:2!important;margin:0!important;padding:0!important;}
+    /* Drag feedback (stomme-editor.js drives Sveltia's own move-up/down on drop). */
+    .item.stomme-dragging{opacity:.4!important;}
+    .item.stomme-drop-before{box-shadow:0 -3px 0 -1px var(--sui-primary-accent-color)!important;}
+    .item.stomme-drop-after{box-shadow:0 3px 0 -1px var(--sui-primary-accent-color)!important;}
+    /* FAQ tag suggestions (stomme-editor.js): existing tags as click-to-add chips. */
+    .stomme-tag-chips{display:flex;flex-wrap:wrap;gap:8px;width:100%;justify-content:flex-start;padding:10px 0 4px;}
+    .stomme-tag-chip{appearance:none;border:1px dashed hsl(var(--sui-border-color-1-hsl));border-radius:999px;background:hsl(var(--sui-background-color-2-hsl));color:var(--sui-secondary-foreground-color);font:inherit;font-size:12px;line-height:1;padding:7px 12px;cursor:pointer;transition:background 120ms,color 120ms,border-color 120ms;}
+    .stomme-tag-chip:hover{background:var(--sui-primary-accent-color-translucent);border-color:var(--sui-primary-accent-color);color:var(--sui-primary-accent-color-text);border-style:solid;}`;
