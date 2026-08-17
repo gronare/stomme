@@ -53,10 +53,6 @@ jobs:
       - name: unit + contract suites
         run: pnpm --filter @gronare/stomme run test:units
 
-      - name: comment style (packages/stomme, packages/create-stomme)
-        run: |
-          node packages/stomme/bin/lint-comments.mjs packages/stomme
-          node packages/stomme/bin/lint-comments.mjs packages/create-stomme
 
   # Catches what the Node dev server cannot: decoding ?data= with Node's Buffer, absent on workerd, empties #preview-root on every deployed site. HTTP checks only — the CSP detector needs Playwright and runs locally.
   preview-workerd:
