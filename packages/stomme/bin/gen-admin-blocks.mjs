@@ -255,9 +255,10 @@ try {
   console.warn('  (addon previews copy skipped:', e.message + ')');
 }
 
+class AnchorMissing extends Error {}
 const substitute = (src, re, replacement, what) => {
   const out = src.replace(re, replacement);
-  if (out === src) throw new Error(`stomme-gen: ${what} — the declaration this rewrites is gone or renamed (${re})`);
+  if (out === src) throw new AnchorMissing(`stomme-gen: ${what} — the declaration this rewrites is gone or renamed (${re})`);
   return out;
 };
 
@@ -278,6 +279,7 @@ try {
   }
   writeFileSync(previewsDest, previewsSrc);
 } catch (e) {
+  if (e instanceof AnchorMissing) throw e;
   console.warn('  (stomme-previews.js copy skipped:', e.message + ')');
 }
 
@@ -289,6 +291,7 @@ try {
     `var FAQ_TAGS = ${JSON.stringify(FAQ_TAG_OPTIONS.map((o) => o.value))};`, 'the FAQ tag list');
   writeFileSync(editorDest, editorSrc);
 } catch (e) {
+  if (e instanceof AnchorMissing) throw e;
   console.warn('  (stomme-editor.js copy skipped:', e.message + ')');
 }
 

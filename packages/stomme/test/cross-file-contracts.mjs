@@ -45,8 +45,10 @@ check(encodesReversed && decodesReversed,
   'src/protect.ts encodes reversed+base64 and src/entrypoints.mjs decodes the same way',
   `encode=${encodesReversed} decode=${decodesReversed}`);
 
-check(/const substitute = \(src, re, replacement, what\) => \{/.test(gen) && /throw new Error\(`stomme-gen: \$\{what\}/.test(gen),
-  'a generator substitution that matches nothing throws instead of silently shipping the default');
+const throwsOnMiss = /const substitute = \(src, re, replacement, what\) => \{/.test(gen) && /throw new AnchorMissing\(`stomme-gen: \$\{what\}/.test(gen);
+const escapesCatch = (gen.match(/if \(e instanceof AnchorMissing\) throw e;/g) || []).length >= 2;
+check(throwsOnMiss, 'a generator substitution that matches nothing throws');
+check(escapesCatch, 'that throw escapes the copy try/catch instead of degrading to a warning');
 const rewrites = [...gen.matchAll(/substitute\((\w+), (\/[^,]+\/),/g)].map((m) => m[2]);
 check(rewrites.length >= 2, `${rewrites.length} generated-asset rewrites are guarded`, rewrites.join('  '));
 for (const re of rewrites) {

@@ -55,7 +55,19 @@
     "test:public-index": "node test/smoke-public-index.mjs",
     "test:slots": "node test/smoke-slots.mjs",
     "lint:comments": "node bin/lint-comments.mjs .",
-    "test:contracts": "node test/cross-file-contracts.mjs"
+    "test:contracts": "node test/cross-file-contracts.mjs",
+    "test:emit-fields": "node test/unit-emit-fields.mjs",
+    "test:collection-editors": "node test/unit-collection-editors.mjs",
+    "test:option-sources": "node test/unit-option-sources.mjs",
+    "test:admin-theme": "node test/unit-admin-theme.mjs",
+    "test:markdown": "node test/unit-markdown.mjs",
+    "test:href": "node test/unit-href.mjs",
+    "test:config": "node test/unit-config.mjs",
+    "test:kit": "node test/unit-kit.mjs",
+    "test:icons": "node test/unit-icons.mjs",
+    "test:protect": "node test/unit-protect.mjs",
+    "test:og-pages": "node test/unit-og-pages.mjs",
+    "test:units": "pnpm -s run test:contracts && pnpm -s run test:emit-fields && pnpm -s run test:collection-editors && pnpm -s run test:option-sources && pnpm -s run test:admin-theme && pnpm -s run test:markdown && pnpm -s run test:href && pnpm -s run test:config && pnpm -s run test:kit && pnpm -s run test:icons && pnpm -s run test:protect && pnpm -s run test:og-pages"
   },
   "bin": {
     "stomme-gen": "bin/gen-admin-blocks.mjs",

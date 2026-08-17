@@ -5,6 +5,10 @@ on:
     branches: [main]
   pull_request:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   # The regression net: a broken block, a type error or a failing image/Astro build shows up here.
   sites:
@@ -46,6 +50,9 @@ jobs:
         run: pnpm --filter @gronare/stomme typecheck
 
       # The comment rule the engine is written to: one line each, English. A line that stops mid-sentence is a wrapped block; two adjacent one-liners about unrelated things stay legal. The starter is out of scope on purpose — its config carries reader-facing documentation.
+      - name: unit + contract suites
+        run: pnpm --filter @gronare/stomme run test:units
+
       - name: comment style (packages/stomme, packages/create-stomme)
         run: |
           node packages/stomme/bin/lint-comments.mjs packages/stomme
