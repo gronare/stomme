@@ -93,7 +93,6 @@
   }
   // The iframe stays MOUNTED across edits: returning its src UNCHANGED is what stops the CMS's React from reloading (and flickering) it — new drafts ride in on postMessage and /preview swaps #preview-root in place.
   var FRAME_STYLE = { width: '100%', height: '100vh', border: '0', display: 'block', background: '#fff' };
-  var LOGO_FRAME_STYLE = { width: '100%', height: '88px', border: '0', display: 'block', background: 'transparent' };
   // Per-id frame state; a React ref captures the real <iframe> node, since the CMS renders the preview inside its own frame where getElementById from here would not find it.
   var FRAMES = {};
   function liveFrame(id, baseSrc, data, style) {
