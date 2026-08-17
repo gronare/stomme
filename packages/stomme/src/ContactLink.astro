@@ -1,6 +1,6 @@
 ---
 // With `protect` on the real value never reaches the HTML (encoded into data attrs, rebuilt in-browser — see src/protect.ts); `label` is rendered verbatim, so a sensitive value belongs in `display`, never `label`.
-import { encodeContact, maskContact } from './src/protect';
+import { encodeContact, maskContact } from './protect';
 interface Props {
   kind: 'tel' | 'mailto';
   target: string;

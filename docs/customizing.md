@@ -181,6 +181,19 @@ testimonials/faq/posts/theme/nav/footer/settings. Add or override per-site previ
 in `public/admin/previews.js` (loaded after the engine's): re-register a name to
 override, or add bespoke previews for your own collections (e.g. a `towns` mockup).
 
+## Where things live in the package
+
+| Directory | What goes there |
+|---|---|
+| `blocks/` | Only components the renderer dispatches by catalog `type` — one file per block, nothing else |
+| `chrome/` | Fixed-position site furniture a layout renders directly: header, footer, tracking, consent banner |
+| `src/` | Engine internals and shared primitives — config, field kit, helpers, and the small components blocks reuse (`Cover`, `Icon`, `ContactLink`, `DirectContact`) |
+| package root | Page templates a route renders: `TownPage`, `ServicePage`, `PostPage`, `CatalogPage`, `Thanks`, plus `Head` |
+
+Import by the published specifier, never by internal path: `@gronare/stomme/Header.astro`
+works wherever the file happens to sit. `@gronare/stomme/blocks/*` is published too, for
+extending a single block, but the rest of the layout is not a stable path.
+
 ## The contact form's handler
 
 The form is a plain `<form method="POST">` that also submits over `fetch` when JavaScript

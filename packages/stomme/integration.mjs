@@ -633,14 +633,14 @@ function publicIndexPlugin(publicDir) {
         const addonCollectionsOn = !!(addonCollectionsFile && existsSync(addonCollectionsFile));
         slotAlias['@stomme/addon-collections'] = addonCollectionsOn
           ? addonCollectionsFile
-          : resolve(pkgDir, 'src/AddonCollectionsNoop.mjs');
+          : resolve(pkgDir, 'src/addon-collections-noop.mjs');
 
         // Same seam for BLOCK TYPES: a blocks.mjs exporting { type: Component }, which BlockRenderer merges into its own registry — the site's own registry still wins a key clash. The engine never names an addon's block types.
         const addonBlocksFile = slotsDir ? resolve(slotsDir, 'blocks.mjs') : null;
         const addonBlocksOn = !!(addonBlocksFile && existsSync(addonBlocksFile));
         slotAlias['@stomme/addon-blocks'] = addonBlocksOn
           ? addonBlocksFile
-          : resolve(pkgDir, 'src/AddonBlocksNoop.mjs');
+          : resolve(pkgDir, 'src/addon-blocks-noop.mjs');
 
         // Same seam for /preview: a preview.astro at the slots dir root renders any kind the engine does not know itself, so an addon's page is previewed by its own components; the noop renders nothing.
         const addonPreviewFile = slotsDir ? resolve(slotsDir, 'preview.astro') : null;

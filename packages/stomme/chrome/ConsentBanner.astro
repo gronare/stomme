@@ -1,6 +1,6 @@
 ---
 import { getEntry } from 'astro:content';
-import { resolveSite, resolveFeatures } from './src/config';
+import { resolveSite, resolveFeatures } from '../src/config';
 import { site as siteConfig, features } from '@stomme/config';
 
 const t: any = (await getEntry('tracking', 'tracking')?.catch(() => null))?.data ?? {};

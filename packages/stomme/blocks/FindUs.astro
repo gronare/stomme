@@ -1,7 +1,7 @@
 ---
 // `data` overrides the settings lookup so the CMS preview can render a draft.
 import { getEntry } from 'astro:content';
-import ContactLink from '../ContactLink.astro';
+import ContactLink from '../src/ContactLink.astro';
 interface Props { heading?: string; showHours?: boolean; data?: any }
 const { heading = 'Find us', showHours, data } = Astro.props;
 const c = (data ?? (await getEntry('contact', 'contact').catch(() => null))?.data ?? {}) as any;
