@@ -1,28 +1,37 @@
-# stomme
+# @gronare/stomme
 
-A block-based CMS engine + component library for **Astro + Sveltia CMS**. Compose pages
-from ~20 styled, themeable blocks; edit in a Git-backed CMS with a live preview of
-the real components; ship static. Extend with your own blocks.
+A block-based CMS engine + component library for **Astro + Sveltia CMS**. Compose pages from
+31 styled, themeable blocks; edit them in a Git-backed CMS with a live preview of the real
+components; ship static. Extend with your own blocks, routes and collections.
 
-Quickstart: `pnpm dlx create-stomme my-site`. Full docs in the
-[repository](https://example.com) (`README.md` + `docs/`).
+Not published to a registry yet — clone the repository and scaffold from it. See the
+[repository README](https://github.com/gronare/stomme#quickstart) for the quickstart, and
+`docs/` for theming, custom blocks, collections and the contact form's handler.
 
 ## Exports
 
 | Import | What |
 |---|---|
-| `stomme/BlockRenderer.astro` | Renders a `blocks` array. Built-in registry + optional `registry` (custom blocks) and `config` (routes/locale/strings) props. |
-| `stomme/catalog` | `defaultBlocks` — the built-in block field definitions. |
-| `stomme/styles.css` | Design tokens + all component classes (override to rebrand). |
-| `stomme/config` | `KitConfig` type + defaults (routes/locale/strings). |
-| `stomme/kit` | Field/block types + field helpers for catalogs. |
-| `stomme/Header.astro`, `stomme/Footer.astro` | Themeable site chrome. |
-| `stomme/Cover.astro`, `stomme/Icon.astro` | Optimized image + icon set. |
-| `stomme/markdown`, `stomme/href` | `renderMarkdown`, `resolveLink`. |
+| `@gronare/stomme/integration` | The Astro integration. Wires the CMS generator, virtual aliases, `/preview`, `/404`, `/api/contact`, `/og`, theme splicing and the addon seams. |
+| `@gronare/stomme/BlockRenderer.astro` | Renders a `blocks` array. Built-in registry plus optional `registry` (your blocks) and `config` (routes/locale/strings) props. |
+| `@gronare/stomme/catalog` | `defaultBlocks` — the built-in block field definitions. |
+| `@gronare/stomme/collections` | `stommeCollections()` — the content-collection schemas. |
+| `@gronare/stomme/addon-collections` | `stommeAddonCollections()` — collections contributed by an out-of-tree addon dir. |
+| `@gronare/stomme/kit` | `SiteConfig`-independent field/block types and field helpers for building a catalog. |
+| `@gronare/stomme/config` | `SiteConfig` / `StommeFeatures` / `Listing` types, defaults, and the per-locale string sets. |
+| `@gronare/stomme/styles.css` | Design tokens + every component class (override the tokens to rebrand). |
+| `@gronare/stomme/Header.astro`, `Footer.astro` | Themeable site chrome. |
+| `@gronare/stomme/Head.astro` | Title, description, Open Graph, Twitter card, favicon, canonical and noindex. |
+| `@gronare/stomme/Cover.astro`, `Icon.astro` | Optimized image + the icon set. |
+| `@gronare/stomme/Thanks.astro`, `TownPage.astro`, `ServicePage.astro`, `PostPage.astro`, `CatalogPage.astro` | Page templates. |
+| `@gronare/stomme/markdown`, `href`, `fonts`, `contact` | `renderMarkdown`, `resolveLink`, `resolveFonts`, the contact-form handler. |
+| `@gronare/stomme/blocks/*`, `routes/*` | Individual block components and the injectable routes. |
 
 ## Bin scripts
 
-- `stomme-gen` — generate the Sveltia admin from your catalog (+ copy the previews).
+- `stomme-gen` — generate the Sveltia admin from your catalog, and copy the preview assets.
 - `stomme-new-block` — scaffold a custom block component.
+- `stomme-gen-schema`, `stomme-gen-blocks` — emit the schema and block manifests.
+- `stomme-lint-styles` — fail on a new hardcoded colour outside the token block.
 
-Peer dependency: `astro >= 5`.
+Peer dependency: `astro >= 5`. Node `>= 20`.

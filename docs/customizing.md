@@ -2,7 +2,7 @@
 
 ## Theming (recolor)
 
-The library ships `stomme/styles.css` — design tokens (CSS variables) plus all
+The library ships `@gronare/stomme/styles.css` — design tokens (CSS variables) plus all
 component classes. A site imports it once and overrides the variables.
 
 ```css
@@ -167,8 +167,8 @@ So to add a blog: set `blog: true`, run `pnpm dev` (or `cms:gen`), and add posts
 ## Images
 
 CMS images go through Astro's pipeline: uploads land in `src/assets/uploads` and
-render optimized. Use `stomme/Cover.astro` for structured image fields, and
-`stomme/markdown` (`renderMarkdown`) for markdown bodies — it optimizes inline
+render optimized. Use `@gronare/stomme/Cover.astro` for structured image fields, and
+`@gronare/stomme/markdown` (`renderMarkdown`) for markdown bodies — it optimizes inline
 `![]()` images and lays them out from a title keyword (`"left"`/`"right"`/`"wide"`
 + `"small"`/`"large"`). The CMS "Image" button (registered by the engine previews)
 writes that markdown for editors. Never write a raw `<img src={cmsValue}>`.

@@ -1,6 +1,6 @@
 # Blocks reference
 
-The built-in library blocks (`stomme/catalog`). Most section blocks accept
+The built-in library blocks (`@gronare/stomme/catalog`). Most section blocks accept
 `surface` (`standard` / `tint` / `band` / `dark` / `gradient`) — the renderer wraps
 them in a full-bleed band. Several also accept `accent` (`brand` / `secondary` /
 `highlight`), which colours that block's rule/icon/number (not the eyebrow — that
@@ -86,7 +86,7 @@ Five pairs are easy to mix up. Each row says what makes the block different, not
 
 ## Chrome (not blocks)
 
-`stomme/Header.astro` and `stomme/Footer.astro` render the site header/footer
+`@gronare/stomme/Header.astro` and `@gronare/stomme/Footer.astro` render the site header/footer
 from the `navigation`/`footer`/`settings` collections; use them in your `Base`
 layout. They accept optional draft props so the CMS chrome previews can render them.
 
@@ -94,11 +94,11 @@ layout. They accept optional draft props so the CMS chrome previews can render t
 
 For collection **detail** pages, the package ships two layouts you drop into a route:
 
-- `stomme/TownPage.astro` — rich service-area landing from a `towns` entry (hero /
+- `@gronare/stomme/TownPage.astro` — rich service-area landing from a `towns` entry (hero /
   why / problems / districts / reason cards / local case / services + JSON-LD). Chrome
   strings come from `strings.town` (`{name}` is interpolated; `heading` is the H1
   template when an entry has no `title`); CTAs link to `routes.contact`.
-- `stomme/ServicePage.astro` — service detail from a `services` entry (its markdown
+- `@gronare/stomme/ServicePage.astro` — service detail from a `services` entry (its markdown
   body becomes the article) + bullets + a quote CTA band. Strings from `strings.service`.
 
 Use them in `src/pages/<route>/[slug].astro`: `getStaticPaths` over the collection,

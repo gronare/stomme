@@ -55,7 +55,7 @@ Then register it (2 edits) and run \`stomme-gen\`:
          type: '${type}',
          label: '${Pascal}',
          fields: [
-           { name: 'heading', label: 'Rubrik', widget: 'string', required: false },
+           { name: 'heading', label: 'Heading', widget: 'string', required: false },
          ],
        },
 `);
