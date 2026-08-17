@@ -10,6 +10,7 @@ import { writeAdminShell } from '../src/admin-shell.mjs';
 import { makeEmitters } from '../src/emit-fields.mjs';
 import { createJiti } from 'jiti';
 import { renderGallery } from '../admin/blocks-gallery.mjs';
+import { rewriteLabels, listingAliases } from '../src/label-paths.mjs';
 
 const root = process.cwd();
 const here = dirname(fileURLToPath(import.meta.url));
@@ -95,20 +96,26 @@ if (STYLE_DIR) {
   }
 }
 
-// FORWARD is the active locale's dict (English ships none); REVERSE_ALL maps every shipped translation back to English so an already-localized config is normalized before re-localizing — that is what makes the pass idempotent and reversible across locale flips.
-let FORWARD = null;
+let LOCALIZED_BY_PATH = null;
+let LOCALIZED_BY_TEXT = null;
 const REVERSE_ALL = {};
 try {
   const adminDir = new URL('../admin/', import.meta.url);
   for (const f of readdirSync(adminDir)) {
     const mm = f.match(/^labels\.([\w-]+)\.js$/);
     if (!mm) continue;
-    const dict = (await import(new URL(f, adminDir))).default;
-    for (const [en, loc] of Object.entries(dict)) REVERSE_ALL[loc] = en;
-    if (mm[1] === CMS_LOCALE) FORWARD = dict;
+    const byPath = {};
+    const byText = {};
+    for (const [path, entry] of Object.entries((await import(new URL(f, adminDir))).default)) {
+      const [en, loc] = Array.isArray(entry) ? entry : [null, entry];
+      byPath[path] = loc;
+      if (en !== null) { byText[en] = loc; REVERSE_ALL[loc] = en; }
+    }
+    if (mm[1] === CMS_LOCALE) { LOCALIZED_BY_PATH = byPath; LOCALIZED_BY_TEXT = byText; }
   }
 } catch {
 }
+const localized = (path, en) => (LOCALIZED_BY_PATH ? LOCALIZED_BY_PATH[path] ?? LOCALIZED_BY_TEXT[en] ?? en : en);
 
 const MARKER_START = /# >>> (\w+):generated/;
 const q = (s) => `"${String(s).replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`;
@@ -160,14 +167,9 @@ if (total === 0) {
   console.error('No `# >>> blocks:generated` markers found in', configPath);
   process.exit(1);
 }
+const LABEL_ALIASES = listingAliases(LISTINGS);
 function translateLabels(text) {
-  return text.replace(/\b(label|label_singular|hint): "((?:[^"\\]|\\.)*)"/g, (m, key, val) => {
-    const plain = val.replace(/\\"/g, '"').replace(/\\\\/g, '\\');
-    const en = REVERSE_ALL[plain] ?? plain;
-    const next = FORWARD && FORWARD[en] !== undefined ? FORWARD[en] : en;
-    if (next === plain) return m;
-    return `${key}: "${next.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`;
-  });
+  return rewriteLabels(text, (path, current) => localized(path, REVERSE_ALL[current] ?? current), { aliases: LABEL_ALIASES });
 }
 
 let yaml = out.join('\n');
@@ -335,7 +337,7 @@ try {
 }
 
 try {
-  const t = (s) => (FORWARD && FORWARD[s] !== undefined ? FORWARD[s] : s);
+  const t = (key, fallback) => localized(key, fallback);
   const html = renderGallery(AVAILABLE_BLOCKS, { t, groupOrder: GROUP_ORDER, locale: CMS_LOCALE });
   writeFileSync(resolve(root, 'public/admin/blocks.html'), html);
 } catch (e) {

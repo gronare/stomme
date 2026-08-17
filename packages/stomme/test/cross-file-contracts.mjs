@@ -1,7 +1,8 @@
 #!/usr/bin/env node
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { referenceLabels } from './label-reference.mjs';
 
 const pkg = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (p) => readFileSync(resolve(pkg, p), 'utf8');
@@ -55,6 +56,38 @@ for (const re of rewrites) {
   const body = re.slice(1, -1).replace(/\\\//g, '/');
   const target = body.startsWith('var LOGIN_LABEL') ? previews : body.startsWith('var FAQ_TAGS') ? read('admin/editor.js') : null;
   if (target) check(new RegExp(body).test(target), `the declaration ${body.split(' =')[0]} still exists for the generator to rewrite`);
+}
+
+const { byPath: REFERENCE, blocks, groups } = await referenceLabels();
+const gallerySrc = read('admin/blocks-gallery.mjs');
+const galleryKeys = new Set([
+  ...[...gallerySrc.matchAll(/\bt\('([\w.]+)'/g)].map((m) => m[1]),
+  ...groups.map((g) => `gallery.group.${g}`),
+  ...blocks.map((b) => `block.${b.type}.summary`),
+]);
+check(REFERENCE.size > 500 && galleryKeys.size > 30,
+  `the engine emits ${REFERENCE.size} translatable field paths and ${galleryKeys.size} gallery strings`);
+
+const UNTRANSLATED_CEILING = { 'labels.sv.js': 229 };
+
+for (const file of readdirSync(resolve(pkg, 'admin')).filter((f) => /^labels\.[\w-]+\.js$/.test(f)).sort()) {
+  const dict = (await import(resolve(pkg, 'admin', file))).default;
+  const keys = Object.keys(dict);
+  const orphans = keys.filter((k) => !REFERENCE.has(k) && !galleryKeys.has(k));
+  check(orphans.length === 0, `every key in admin/${file} names a path the generator still emits`,
+    `${orphans.length} orphaned: ${orphans.slice(0, 8).join(', ')}${orphans.length > 8 ? ' …' : ''}`);
+  const shapeless = keys.filter((k) => !Array.isArray(dict[k]) || dict[k].length !== 2);
+  check(shapeless.length === 0, `every entry in admin/${file} is an [English source, translation] pair`,
+    shapeless.slice(0, 8).join(', '));
+  const stale = keys.filter((k) => REFERENCE.has(k) && Array.isArray(dict[k]) && dict[k][0] !== REFERENCE.get(k));
+  check(stale.length === 0, `every translation in admin/${file} still answers the English the generator emits`,
+    stale.slice(0, 6).map((k) => `${k}\n        dictionary: ${dict[k][0]}\n        emitted:    ${REFERENCE.get(k)}`).join('\n      '));
+  const untranslated = [...REFERENCE.keys()].filter((k) => dict[k] === undefined);
+  const ceiling = UNTRANSLATED_CEILING[file];
+  check(ceiling === undefined || untranslated.length <= ceiling,
+    `admin/${file} leaves no more strings in English than it did (${untranslated.length} of ${REFERENCE.size}, ceiling ${ceiling})`,
+    `${untranslated.length - (ceiling ?? 0)} more than the ceiling — add the entries, or lower the ceiling deliberately`);
+  console.log(`  · admin/${file}: ${keys.length} entries · ${untranslated.length} emitted paths left in English`);
 }
 
 const failed = results.filter((ok) => !ok).length;
