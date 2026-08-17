@@ -1,14 +1,4 @@
 #!/usr/bin/env node
-// stomme-gen — generate the Sveltia CMS "blocks" builder widget from the site's block
-// catalog and splice it into the site's admin config between the generated-block
-// markers. Runs in the CONSUMER's project (process.cwd()).
-//
-//   npx stomme-gen                 (or wire to "cms:gen" in package.json)
-//
-// Reads:  <cwd>/src/blocks/schema.ts   (override: STOMME_SCHEMA)
-// Writes: <cwd>/public/admin/config.yml (override: STOMME_CONFIG)
-// The consumer's schema.ts imports field helpers from '@gronare/stomme/kit'; Node strips
-// the TS types on import (Node 22.6+).
 import { readFileSync, writeFileSync, readdirSync, copyFileSync, cpSync, mkdirSync, existsSync, rmSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -18,42 +8,27 @@ import { renderGallery } from '../admin/blocks-gallery.mjs';
 const root = process.cwd();
 const here = dirname(fileURLToPath(import.meta.url));
 
-// CMS bundle: Sveltia CMS, pinned. Swapped into each site's public/admin/index.html on
-// build (replacing the legacy Decap CDN tag). Bump deliberately — Sveltia is pre-1.0.
-// Override for a local/vendored copy with STOMME_SVELTIA_SRC (e.g. /admin/sveltia-cms.js).
+// Pinned CMS bundle, swapped into each site's public/admin/index.html on build: bump deliberately — Sveltia is pre-1.0 and the editor is coupled to its DOM. STOMME_SVELTIA_SRC points at a local/vendored copy instead.
 const SVELTIA_CMS_SRC = process.env.STOMME_SVELTIA_SRC || 'https://unpkg.com/@sveltia/cms@0.190.0/dist/sveltia-cms.js';
 
-// Load the site's TS config/catalog through jiti rather than a bare dynamic import.
-// Node's built-in type-stripping refuses any .ts file under node_modules, so a plain
-// import of schema.ts / site.config.ts breaks the moment their import graph reaches the
-// installed package's .ts (e.g. '@gronare/stomme/kit', './catalog') — which is exactly
-// where a real registry install lives. jiti transpiles .ts everywhere, including
-// node_modules, and resolves each module's bare specifiers from its own location.
+// Loaded through jiti rather than a bare dynamic import: Node's own type-stripping refuses any .ts file under node_modules, so importing schema.ts / site.config.ts breaks the moment its import graph reaches the installed package's .ts ('@gronare/stomme/kit', './catalog') — which is exactly what a registry install is. jiti transpiles .ts everywhere and resolves each module's bare specifiers from its own location.
 const jiti = createJiti(import.meta.url);
 const schemaPath = resolve(root, process.env.STOMME_SCHEMA || 'src/blocks/schema.ts');
 const configPath = resolve(root, process.env.STOMME_CONFIG || 'public/admin/config.yml');
 
-// CMS-less site (public/admin removed — e.g. handed over to a customer who edits the
-// markdown directly): everything this generator produces lives under public/admin, so
-// there is nothing to do. Graceful no-op keeps `pnpm build` (which runs stomme-gen) working.
+// No config.yml means the site has no public/admin at all (handed to a customer who edits the markdown), and everything this generator writes lives under public/admin — so exit 0 rather than fail the `pnpm build` that runs it.
 if (!existsSync(configPath)) {
   console.log(`stomme-gen: no ${process.env.STOMME_CONFIG || 'public/admin/config.yml'} — CMS-less site, nothing to generate`);
   process.exit(0);
 }
 
-// The site's catalog. Loaded via jiti so its bare '@gronare/stomme/kit' import resolves
-// against the consumer's node_modules and transpiles cleanly even when installed there.
 const { BLOCKS: SITE_BLOCKS } = await jiti.import(schemaPath);
 if (!Array.isArray(SITE_BLOCKS)) {
   console.error(`No BLOCKS export found in ${schemaPath}`);
   process.exit(1);
 }
 
-// Addon block catalog — the slots dir (STOMME_SLOTS_DIR, the same one supplying slot components,
-// addon collections, addon routes and addon CMS panes) may ship a `block-catalog.mjs` exporting
-// `BLOCKS`: the picker entries for the block types its `blocks.mjs` registers. Without this the
-// component would render but no editor could ever choose it. A site's own catalog wins on a type
-// clash, since its schema.ts is the file its owner edits.
+// STOMME_SLOTS_DIR may ship a `block-catalog.mjs` exporting `BLOCKS`: the picker entries for the types its `blocks.mjs` registers, without which the component renders but no editor can ever choose it. A site's own catalog wins on a type clash, since schema.ts is the file its owner edits.
 const BLOCKS = await (async () => {
   const slotsDir = process.env.STOMME_SLOTS_DIR;
   const file = slotsDir ? resolve(slotsDir, 'block-catalog.mjs') : null;
@@ -71,14 +46,9 @@ const BLOCKS = await (async () => {
   }
 })();
 
-// Collection→route map from the site's own config (no longer hardcoded). The site
-// exports `site` (a SiteConfig) from src/site.config.ts; Node strips its TS types.
-// Falls back to the package defaults when absent.
 let ROUTES = { services: '/services', towns: '/areas', blog: '/blog' };
 let FEATURES = null; // null = no `features` declared → fall back to folder-existence
-// Language of the generated /admin FIELD LABELS. Applied at generation time via
-// translateLabels() + admin/labels.<locale>.js — NOT a config.yml `locale:` line (Sveltia
-// ignores that; it is stripped below). 'en' = the untranslated English source.
+// Language of the generated /admin FIELD LABELS, applied at generation time via translateLabels() + admin/labels.<locale>.js — NOT a config.yml `locale:` line, which Sveltia ignores and which is stripped below. 'en' = the untranslated English source.
 let CMS_LOCALE = 'en';
 let CMS = null; // site.cms → generated `backend:` block (between # >>> cms:generated markers)
 let LISTINGS = []; // config-defined collections (news/for-sale/…) → editors + seeded index
@@ -97,10 +67,7 @@ try {
 } catch {
   /* no site.config — use defaults */
 }
-// The blog is an article listing in all but name — desugar it so one code path
-// (editor, seeded index, dropdown source) covers blog + every listing. Honour the
-// features flag, or fall back to a posts folder for sites with no features config
-// (mirrors collectionEnabled). Skip if the site already declares a `posts` listing.
+// The blog is an article listing in all but name, so desugar it and let one code path (editor, seeded index, dropdown source) cover both; the posts-folder fallback mirrors collectionEnabled for sites with no `features` config.
 const blogEnabled = FEATURES
   ? !!FEATURES.blog
   : (() => { try { return readdirSync(resolve(root, 'src/content/posts')).some((f) => f.endsWith('.md')); } catch { return false; } })();
@@ -108,11 +75,6 @@ if (blogEnabled && !LISTINGS.some((l) => l.id === 'posts')) {
   LISTINGS.unshift({ id: 'posts', route: ROUTES.blog || '/blog', label: 'Blog', preset: 'article' });
 }
 
-// Optional look & feel ("style"). The theme directory is supplied entirely via
-// STOMME_THEMES_DIR (the engine hardcodes no theme location or repo name). When a style
-// is set the theme's colour SEED is written to src/content/theme/theme.md ONCE, on a site
-// that has no theme.md yet — never overwriting an existing one, so an editor keeps
-// ownership of the colours.
 if (STYLE && !process.env.STOMME_THEMES_DIR) {
   throw new Error(
     `stomme-gen: style "${STYLE}" is set but STOMME_THEMES_DIR is not. ` +
@@ -132,10 +94,7 @@ if (STYLE_DIR) {
   }
 }
 
-// Load every shipped admin label dictionary (labels.<locale>.js). FORWARD is the active
-// locale's dict (English ships none). REVERSE_ALL maps every translation back to English
-// so the pass can normalize a previously-localized config (incl. preserved hand-authored
-// labels) before re-localizing — making it idempotent and reversible across locale flips.
+// FORWARD is the active locale's dict (English ships none); REVERSE_ALL maps every shipped translation back to English so an already-localized config is normalized before re-localizing — that is what makes the pass idempotent and reversible across locale flips.
 let FORWARD = null;
 const REVERSE_ALL = {};
 try {
@@ -155,7 +114,6 @@ const MARKER_START = /# >>> (\w+):generated/;
 const q = (s) => `"${String(s).replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`;
 const pad = (n) => ' '.repeat(n);
 
-// ── Link picker options: every internal page route the editor can link to ──
 function labelFromFrontmatter(file, key) {
   try {
     const m = readFileSync(file, 'utf8').match(new RegExp(`^${key}:\\s*(.+?)\\s*$`, 'm'));
@@ -196,8 +154,6 @@ function pageRouteOptions() {
   return opts;
 }
 
-// Computed once: home + managed pages + every service + every town page. The
-// service/town route prefixes come from the site's config (ROUTES above).
 const PAGE_OPTIONS = [
   { label: '— No page —', value: '' }, // lets a link be cleared / left blank (e.g. a dropdown-only nav header)
   ...pageRouteOptions(),
@@ -219,7 +175,6 @@ function serviceOptions() {
 }
 const SERVICE_OPTIONS = serviceOptions();
 
-// FAQ question slugs (label = the question) for the faq block's entry picker.
 function faqOptions() {
   let files = [];
   try {
@@ -234,8 +189,6 @@ function faqOptions() {
 }
 const FAQ_OPTIONS = faqOptions();
 
-// Every distinct tag used across FAQ entries — the faq block's tag filter picks from
-// what's actually in use (add tags on the questions first, then filter by them here).
 function faqTagOptions() {
   let files = [];
   try {
@@ -257,10 +210,7 @@ const FAQ_TAG_OPTIONS = faqTagOptions();
 
 const OPTION_SOURCES = { '$pages': PAGE_OPTIONS, '$services': SERVICE_OPTIONS, '$faq': FAQ_OPTIONS, '$faqTags': FAQ_TAG_OPTIONS };
 
-// Optional collection kit: a block may declare a source `collection` (schema.ts).
-// A collection maps to src/content/<name>/ (its glob base). If that folder is
-// absent, drop the block from the CMS picker instead of offering one that can
-// never load content. Settings-backed blocks declare no collection and always show.
+// A block may declare a source `collection` — src/content/<name>/, its glob base. When that folder is absent the block is dropped from the picker instead of being offered with nothing to load. Settings-backed blocks declare none and always show.
 function collectionExists(name) {
   try {
     readdirSync(resolve(root, 'src/content', name));
@@ -269,51 +219,36 @@ function collectionExists(name) {
     return false;
   }
 }
-// When the site declares feature flags, gate the optional collections by them
-// (collection name → feature); otherwise fall back to folder-existence so sites
-// without a `features` config keep their old behaviour.
 const FEATURE_OF = { faq: 'faq', testimonials: 'testimonials', towns: 'areas', posts: 'blog', services: 'services' };
 function collectionEnabled(name) {
   if (name === 'home') return true; // every site has a home page
-  // Pages are enabled unless EXPLICITLY disabled (single-page tier). Deliberate legacy
-  // exception to "absent = off": the collection predates feature flags, and absent-means-off
-  // would orphan every existing site's page content.
+  // Pages are enabled unless EXPLICITLY disabled — a deliberate exception to "absent = off", since the collection predates feature flags and absent-means-off would orphan every existing site's page content.
   if (name === 'pages') return !(FEATURES && FEATURES.pages === false);
   if (FEATURES && FEATURE_OF[name]) return !!FEATURES[FEATURE_OF[name]];
   return collectionExists(name);
 }
-// The preset-list blocks only make sense with a matching listing present (postList
-// also covers the blog, which is an article listing in all but name) — hide otherwise.
 const hasCatalog = LISTINGS.some((l) => l.preset === 'catalog');
 const hasArticle = !!(FEATURES && FEATURES.blog) || LISTINGS.some((l) => l.preset === 'article');
 const presetOk = (b) => (b.type !== 'catalogList' || hasCatalog) && (b.type !== 'postList' || hasArticle);
 const AVAILABLE_BLOCKS = BLOCKS.filter((b) => (!b.collection || collectionEnabled(b.collection)) && presetOk(b));
 
-// Lookbook coverage guard: every block should carry a sample so /lookbook renders it and a
-// theme can be validated against the whole catalog. Warn (don't fail) on gaps.
 const NO_SAMPLE = BLOCKS.filter((b) => !(b.sample || (Array.isArray(b.samples) && b.samples.length)));
 if (NO_SAMPLE.length) console.warn(`  ⚠ lookbook: no sample for ${NO_SAMPLE.map((b) => b.type).join(', ')} — add \`sample\`/\`samples\` in the catalog (block won't render in /lookbook)`);
 const SKIPPED_BLOCKS = BLOCKS.filter((b) => (b.collection && !collectionEnabled(b.collection)) || !presetOk(b));
 
-// Nav dropdown sources: collections that render detail pages. The value encodes
-// "<collectionId>::<routeBase>" so Header can both query the collection and build
-// per-entry links. Feature collections with detail routes + every listing.
+// The menu value encodes "<collectionId>::<routeBase>" — Header splits on it to query the collection AND build per-entry links, so the separator is a contract.
 const MENU_OPTIONS = [];
 if (collectionEnabled('services')) MENU_OPTIONS.push({ label: 'Services', value: `services::${ROUTES.services || '/services'}` });
 if (collectionEnabled('towns')) MENU_OPTIONS.push({ label: 'Areas', value: `towns::${ROUTES.towns || '/areas'}` });
 for (const l of LISTINGS) MENU_OPTIONS.push({ label: l.label || l.id, value: `${l.id}::${l.route}` }); // blog is in LISTINGS too
 OPTION_SOURCES['$menus'] = MENU_OPTIONS;
 
-// Cluster the "add section" picker (and the gallery) by group. Sort is stable, so blocks
-// keep their catalog order within a group; unknown/missing groups fall to the end.
+// Cluster the "add section" picker (and the gallery) by group. The sort is STABLE, so blocks keep their catalog order within a group; an unknown or missing group ranks last.
 const GROUP_ORDER = ['Hero & headers', 'Text', 'Cards & lists', 'Media', 'Quote & highlight', 'Numbers', 'From collections', 'Calls to action', 'Automatic'];
 const groupRank = (b) => { const i = GROUP_ORDER.indexOf(b.group); return i === -1 ? GROUP_ORDER.length : i; };
 AVAILABLE_BLOCKS.sort((a, b) => groupRank(a) - groupRank(b));
 
-// Collapsed-row label for list items: the CMS defaults to the FIRST field's value (an
-// empty icon picker reads "No icon"). Derive a summary — eyebrow first when present,
-// then the item's identifying field. Empty placeholders render as nothing, so whichever
-// fields are filled show. An explicit `summary` on the Field def wins.
+// The CMS labels a collapsed row with the FIRST field's value (an empty icon picker reads "No icon"), so derive a summary instead — eyebrow when present, then the identifying field; empty placeholders render as nothing. An explicit `summary` on the Field def wins.
 const SUMMARY_PRIORITY = ['title', 'name', 'label', 'question', 'quote', 'heading', 'statement', 'term', 'caption', 'text', 'alt', 'value'];
 function listSummary(fields) {
   const names = fields.map((f) => f.name);
@@ -324,7 +259,6 @@ function listSummary(fields) {
   return parts.length ? parts.join(' ') : null;
 }
 
-// Emit a single field. Leaf widgets use flow style; list/object widgets expand.
 function emitField(f, indent) {
   const p = pad(indent);
   const parts = [`name: ${f.name}`, `label: ${q(f.label)}`, `widget: ${f.widget}`];
@@ -334,18 +268,12 @@ function emitField(f, indent) {
   if (f.media_folder) parts.push(`media_folder: ${q(f.media_folder)}`);
   if (f.public_folder) parts.push(`public_folder: ${q(f.public_folder)}`);
 
-  // Shared list/object collapse props (block-field convention, migration-free).
   const collapseProps = () => [
     ...(f.label_singular ? [`${p}  label_singular: ${q(f.label_singular)}`] : []),
     ...(f.collapsed !== undefined ? [`${p}  collapsed: ${f.collapsed}`] : []),
-    // minimize_collapsed intentionally NOT emitted: with per-item cards, collapsing the
-    // whole list behind a single "N items" row is a redundant extra click. Items stay
-    // visible as collapsed cards (collapsed:true) instead.
+    // minimize_collapsed deliberately NOT emitted: with per-item cards, hiding the whole list behind a single "N items" row is a redundant extra click.
   ];
-  // A BLOCK LIST inside a block: the same picker, one level down. `widget: 'blocks'` in a
-  // catalog field means "sections here too" — a container block needs the real type list, not a
-  // hand-copied subset. The nested list never offers container types again, so the CMS cannot
-  // build a doll's house.
+  // `widget: 'blocks'` in a catalog field means "sections here too": the container gets the real type list minus every container type, so the CMS cannot build a doll's house.
   if (f.widget === 'blocks') {
     const types = AVAILABLE_BLOCKS.filter((b) => !b.fields.some((x) => x.widget === 'blocks'));
     const lines = [`${p}- name: ${f.name}`, `${p}  label: ${q(f.label)}`, `${p}  widget: list`,
@@ -382,10 +310,7 @@ function emitField(f, indent) {
   if (f.widget === 'object' && f.fields) {
     const head = [`${p}- name: ${f.name}`, `${p}  label: ${q(f.label)}`, `${p}  widget: object`];
     if (f.required === false) head.push(`${p}  required: false`);
-    // Gate convention: an object whose first field is the boolean `enabled` renders as a
-    // switch-card (THEME_CSS GATED + editor.js). collapsed:false is load-bearing there —
-    // the switch must stay mounted in BOTH UI states (open/closed is the custom
-    // .stomme-open class, never Sveltia's disclosure) — so it is enforced.
+    // Gate convention: an object whose first field is the boolean `enabled` renders as a switch-card (THEME_CSS GATED + editor.js), and collapsed:false is load-bearing there — the switch must stay mounted in BOTH UI states, since open/closed is the custom .stomme-open class and never Sveltia's disclosure.
     const gated = f.fields[0]?.widget === 'boolean' && f.fields[0]?.name === 'enabled';
     if (gated) head.push(`${p}  collapsed: false`);
     else if (f.collapsed !== undefined) head.push(`${p}  collapsed: ${f.collapsed}`);
@@ -394,8 +319,7 @@ function emitField(f, indent) {
     head.push(`${p}  fields:`);
     return [...head, ...f.fields.map((sf) => emitField(sf, indent + 4))].join('\n');
   }
-  // A RELATION points at another collection, and its target is the whole field: without
-  // `collection` + `value_field` the CMS shows a picker that resolves nothing.
+  // A relation without `collection` + `value_field` shows a picker that resolves nothing.
   if (f.widget === 'relation') {
     const list = (v) => `[${(Array.isArray(v) ? v : [v]).map(q).join(', ')}]`;
     return [`${p}- name: ${f.name}`, `${p}  label: ${q(f.label)}`, `${p}  widget: relation`,
@@ -441,8 +365,6 @@ function emitWidget(indent) {
     `${p}  widget: list`,
     `${p}  required: false`,
     `${p}  collapsed: true`,
-    // Collapsed-item label: show the block's heading (or quote) so several of the same
-    // type are distinguishable at a glance; falls back to the type name when both empty.
     `${p}  summary: "{{fields.eyebrow}} {{fields.heading}}{{fields.quote}}"`,
     `${p}  types:`,
   ];
@@ -457,14 +379,7 @@ function emitWidget(indent) {
   return lines.join('\n');
 }
 
-// ── Nav links (generated) ───────────────────────────────────────────────────
-// Nav links use the same page-dropdown as blocks ($pages) instead of a free string,
-// and the page is required (a custom URL overrides it) so a link always resolves.
-// Each menu item can also become a dropdown — auto-filled from a collection ($menus)
-// or with manual sub-links.
-// REQUIRED object rendered chrome-less inline (no "Add Link" step — a nav label's
-// link is inherent; leave both fields blank for a dropdown-only header). collapsed:false
-// is load-bearing for the flat rendering (children must stay mounted).
+// Rendered chrome-less inline by the editor theme — a nav label's link is inherent, and both fields blank makes a dropdown-only header. collapsed:false is load-bearing for that flat rendering: the children must stay mounted.
 function navLinkField(pageHint = 'Pick a page on the site. Leave blank for a dropdown-only header (the label just opens its menu).') {
   return {
     name: 'link', label: 'Link', widget: 'object', collapsed: false, fields: [
@@ -474,8 +389,6 @@ function navLinkField(pageHint = 'Pick a page on the site. Leave blank for a dro
   };
 }
 
-// Footer link groups (quick links, the optional second group, legal) — each link gets the
-// standard page-dropdown + custom-URL pair, so they're generated (the page options are).
 function emitFooterLinks(indent) {
   const footerLink = () => ({
     name: 'link', label: 'Link', widget: 'object', collapsed: false, fields: [
@@ -507,8 +420,6 @@ function emitNavLinks(indent) {
       { name: 'children', label: '…or manual sub-links', widget: 'list', required: false, collapsed: true, label_singular: 'Sub-link', summary: '{{fields.label}}', fields: [{ name: 'label', label: 'Label', widget: 'string' }, navLinkField()] },
     ],
   };
-  // Genuinely optional (a header button exists or not) → keeps the on/off toggle,
-  // shown in the group's header row by the editor theme. collapsed:true = closed on load.
   const cta = {
     name: 'cta', label: 'Button', widget: 'object', required: false, collapsed: true, summary: '{{fields.label}}', fields: [
       { name: 'label', label: 'Label', widget: 'string' },
@@ -518,13 +429,7 @@ function emitNavLinks(indent) {
   return [emitField(items, indent), emitField(cta, indent)].join('\n');
 }
 
-// ── Thank-you page buttons (generated) ──────────────────────────────────────
-// The /thanks confirmation has a primary + optional second button. Each is a Button object
-// { label, link } — the SAME shape as the header CTA (reuses navLinkField), so the editor
-// is consistent: a Label + a Link with a page-dropdown ($pages) + custom-URL override.
-// Resolve at render via resolveLink (stomme/href).
-// Genuinely optional buttons keep the on/off toggle (in the group header, via the
-// editor theme); the link fields render inline — a button's link is inherent.
+// A thanks button is the same { label, link } shape as the header CTA (it reuses navLinkField) and is resolved at render by resolveLink (stomme/href).
 function buttonField(name, label, labelHint) {
   return {
     name, label, widget: 'object', required: false, collapsed: true, summary: '{{fields.label}}', fields: [
@@ -540,18 +445,8 @@ function emitThanksButtons(indent) {
   ].join('\n');
 }
 
-// ── Collection editors ──────────────────────────────────────────────────────
-// CMS editor sections for the conventional content collections. Emitted (gated
-// by collectionExists) into the `# >>> collections:generated` region so the CMS
-// sidebar gains an editor for whatever collections a site actually has — no more
-// hand-authoring them per site. A site with bespoke collections adds its own
-// editors outside the markers. Field shapes mirror the recommended content.config
-// schemas (towns/services match the TownPage/ServicePage templates).
-// No field-level media_folder — the CMS resolves it relative to the entry (breaks
-// uploads from subfolder entries); the global media_folder in config.yml is used.
-// Collections whose components sort by \`order\` declare \`reorder: true\`: Sveltia's entry
-// list gains a Reorder mode (drag rows, Done writes index+1 into \`order\` and commits).
-// The \`order\` field itself is \`widget: hidden\` — still serialized, never hand-edited.
+// No field-level media_folder in any editor below: the CMS resolves it relative to the entry, which breaks uploads from subfolder entries — the global media_folder in config.yml is the one that works.
+// A collection whose component sorts by `order` declares `reorder: true`: Sveltia gains a Reorder mode that writes index+1 into the hidden `order` field on Done.
 const COLLECTION_EDITORS = {
   home: `- name: home
   label: "Home page"
@@ -726,7 +621,6 @@ ${emitWidget(4)}
     - { name: body, label: "Long-form text (fallback)", widget: markdown, required: false, hint: "Only shown when no sections are built above. Prefer sections; this is the simple prose fallback." }`,
 };
 
-// A CMS editor for a config-defined listing, from its preset's field set.
 function listingEditor(l) {
   const articleFields = `    - { name: title, label: "Title", widget: string }
     - { name: date, label: "Date", widget: datetime, date_format: "YYYY-MM-DD", time_format: false }
@@ -734,8 +628,7 @@ function listingEditor(l) {
     - { name: cover, label: "Cover image", widget: image, required: false }
     - { name: showCover, label: "Show cover", widget: boolean, required: false, default: false, hint: "Show a cover on cards + the article — your image, or a themed default if none." }
     - { name: body, label: "Body", widget: markdown }`;
-  // Catalog specs are config-defined (Listing.specs) so every item shares the same fields.
-  // Each becomes a string field keyed by its stable key; labels are the site's own strings.
+  // A bare string spec keys off its position (spec_0, spec_1…), so renaming a label never orphans stored data — but REORDERING does. Give an explicit key to be safe.
   const specs = (Array.isArray(l.specs) ? l.specs : []).map((s, i) =>
     typeof s === 'string' ? { key: `spec_${i}`, label: s } : { key: s.key || `spec_${i}`, label: s.label });
   const specsField = specs.length
@@ -778,23 +671,7 @@ ${specs.map((s) => `        - { name: ${s.key}, label: ${q(s.label)}, widget: st
 ${l.preset === 'catalog' ? catalogFields : articleFields}`;
 }
 
-// Emit editor sections: the conventional collections the site has, then one per listing.
-// A hand-authored collection of the same name OUTSIDE the generated regions wins — its
-// generated counterpart is skipped, so a site keeping (or customizing) a static pane
-// never gets a duplicate collection (back-compatible, like the cms:generated markers).
-// ── Addon CMS panes (generic seam) ───────────────────────────────────────────
-// The slots dir (STOMME_SLOTS_DIR — the same one that supplies slot components, addon
-// collections and addon routes) may ship a `cms.mjs` at its root exporting `collections`:
-// an array of { feature, yaml }, or a FUNCTION returning one. The function is called with
-// the site's own { routes, features } and `blocks(indent)` — the very block picker the
-// engine's own page editors embed. Each entry's `yaml` is one Sveltia collection block
-// authored at indent 0, emitted into the collections:generated region only when
-// features[feature] is truthy.
-//
-// This is what lets an out-of-tree extension's pages be EDITED — and composed out of the
-// site's own blocks — like every other page, instead of being invisible to the CMS. The
-// engine names no feature and authors no pane: it hands over the config and splices back
-// whatever comes out. No dir / no file ⇒ nothing emitted, config.yml unchanged.
+// STOMME_SLOTS_DIR may ship a `cms.mjs` exporting `collections`: { feature, yaml } entries, or a function called with the site's own { routes, features }, `blocks(indent)` — the very picker the engine's own page editors embed — and `fields`. Each `yaml` is one collection authored at indent 0, emitted only when features[feature] is truthy; no dir / no file ⇒ config.yml unchanged.
 let ADDON_PANES = [];
 const ADDON_PANEL_FILES = {};
 {
@@ -807,8 +684,6 @@ const ADDON_PANEL_FILES = {};
       const entries = typeof declared === 'function'
         ? declared({
             routes: ROUTES, features: FEATURES, blocks: emitWidget,
-            // The house field shapes, so an addon's own pages ask for a button or a link the same
-            // way every other page does instead of hand-copying the YAML.
             fields: {
               button: (name, label, indent = 8, hint) => emitField(buttonField(name, label, hint), indent),
               link: (name, label, indent = 8, hint) =>
@@ -816,12 +691,7 @@ const ADDON_PANEL_FILES = {};
             },
           })
         : declared;
-      // The same manifest may also contribute FILES to a collection the engine already emits, so an
-      // extension's own setting lands where the owner looks for it — under Settings, beside the
-      // header and the identity — instead of as a lone collection at the bottom of the sidebar. The
-      // engine names no collection and no feature: it takes { <collection>: [ { feature, yaml } ] }
-      // and splices each entry into that collection's own `files:` list when the feature is on.
-      // Panel files get the same context collections get: a panel file is a page like any other, and the block picker is the site's own — an addon cannot reconstruct it.
+      // `panelFiles` is { <collection>: [ { feature, yaml } ] }: files spliced into the `files:` list of a collection the engine already emits, so an extension's own setting lands under Settings beside the header and the identity instead of as a lone collection at the bottom of the sidebar. Gated on the feature, and given the same context a collection gets — a panel file is a page like any other and the block picker is the site's own.
       const addonCtx = {
         routes: ROUTES, features: FEATURES, blocks: emitWidget,
         fields: {
@@ -855,6 +725,7 @@ const ADDON_PANEL_FILES = {};
   }
 }
 
+// A hand-authored collection of the same name OUTSIDE the generated regions wins: STATIC_COLLECTIONS suppresses its generated counterpart, so a site keeping (or customizing) a static pane never gets a duplicate.
 const generatedEditors = () => Object.keys(COLLECTION_EDITORS).filter(collectionEnabled).filter((n) => !STATIC_COLLECTIONS.has(n));
 function emitCollections(indent) {
   const p = pad(indent);
@@ -866,11 +737,7 @@ function emitCollections(indent) {
   return [...fixed, ...listing, ...addon].join('\n');
 }
 
-// ── CMS backend (generated) ──────────────────────────────────────────────────
-// Emit the `backend:` block from the site's `cms` config so config.yml auth
-// isn't hand-edited. Generic: only the fields the site sets are written. Defaults:
-// backend git-gateway, branch main. (No `cms:generated` markers in a site's
-// config.yml → nothing emitted, hand-authored backend preserved — back-compatible.)
+// Only the fields the site's `cms` config sets are written; the defaults are git-gateway on main. No `cms:generated` markers in a site's config.yml ⇒ nothing emitted and a hand-authored backend survives.
 function emitCms(indent) {
   const p = ' '.repeat(indent);
   const c = CMS || {};
@@ -880,29 +747,16 @@ function emitCms(indent) {
   if (c.baseUrl) L.push(`${p}  base_url: ${c.baseUrl}`);
   if (c.authEndpoint) L.push(`${p}  auth_endpoint: ${c.authEndpoint}`);
   if (c.apiRoot) L.push(`${p}  api_root: ${c.apiRoot}`);
-  // Disable Sveltia's built-in PAT sign-in on sites that use gateway OAuth (baseUrl set).
-  // Gated on baseUrl so solo/local sites with no auth server keep the token fallback.
+  // Gated on baseUrl: only a site with gateway OAuth loses Sveltia's built-in PAT sign-in — solo/local sites with no auth server keep the token fallback.
   if (c.baseUrl) L.push(`${p}  auth_methods: [oauth]`);
-  // Sveltia sends the OAuth `site_id` from `site_domain`; the gateway's same-window
-  // (Arc/mobile) fallback keys off it to find the site in KV. Defaults to the deploy host.
+  // Sveltia sends the OAuth `site_id` from `site_domain`, and the gateway's same-window (Arc/mobile) fallback keys off it to find the site in KV; it defaults to the deploy host.
   if (c.siteDomain) L.push(`${p}  site_domain: ${c.siteDomain}`);
   if (c.gatewayUrl) L.push(`${p}  gateway_url: ${c.gatewayUrl}`);
   if (c.identityUrl) L.push(`${p}  identity_url: ${c.identityUrl}`);
   return L.join('\n');
 }
 
-// ── Settings file-collection panes (generated) ──────────────────────────────
-// Identity / Contact / Theme / Header / Footer / Form-confirmation — the standard
-// settings panes. Generated (were hand-authored per site = the #8 propagation gap), so
-// engine changes here now flow to every site on `pnpm cms:gen`. The nav menu links +
-// thanks buttons reuse the same emitters as before (per-site $pages / $menus options).
-// Written at the canonical absolute indent (the `settings` collection sits at indent 2).
-// ── Share-cards settings pane (generated) ──────────────────────────────────
-// A SECOND file pane on site.md (Sveltia preserves each pane's other frontmatter on
-// save). Holds the site-default share image + the master switch + one section per
-// generatable type — a listing (article/catalog, blog folded), plus Service areas
-// (features.areas) and Services (features.services). The data lives at settings.ogImage
-// and settings.og.{enabled,types} (read by Head.astro / routes/og.ts / src/og-pages.ts).
+// A SECOND file pane on site.md — Sveltia preserves each pane's other frontmatter on save. The data lands at settings.ogImage and settings.og.{enabled,types}, read by Head.astro / routes/og.ts / src/og-pages.ts.
 function shareTypeList() {
   const out = [];
   if (collectionEnabled('towns')) out.push({ key: 'towns', label: 'Service areas', kind: 'towns' });
@@ -910,8 +764,7 @@ function shareTypeList() {
   for (const l of LISTINGS) out.push({ key: l.id, label: l.label || l.id, kind: l.preset });
   return out;
 }
-// The headline/second-line field pickers, by type kind: each type's KNOWN text fields
-// (keys must exist in src/og-pages.ts TYPE_FIELDS) + "Business name" (the site name).
+// Per type kind: that type's known text fields — the keys must exist in src/og-pages.ts TYPE_FIELDS — plus "Business name" (the site name).
 const SHARE_FIELDS = {
   towns: [['name', 'Town name'], ['title', 'Title'], ['heroSubtitle', 'Hero subtitle']],
   services: [['title', 'Title'], ['navLabel', 'Nav label'], ['summary', 'Summary']],
@@ -931,9 +784,7 @@ function emitShareType(t, indent) {
     `${p}- name: ${t.key}`,
     `${p}  label: ${q(t.label)}`,
     `${p}  widget: object`,
-    // Gate convention: collapsed:false is load-bearing — the enabled switch must stay
-    // mounted in both UI states; open/closed is the custom .stomme-open class, never
-    // Sveltia's disclosure (THEME_CSS GATED + editor.js).
+    // Gate convention: collapsed:false is load-bearing — the enabled switch must stay mounted in both UI states, since open/closed is the custom .stomme-open class and never Sveltia's disclosure (THEME_CSS GATED + editor.js).
     `${p}  collapsed: false`,
     `${p}  fields:`,
     `${p}    - { name: enabled, label: "Generate cards for these", widget: boolean, required: false, default: false }`,
@@ -973,10 +824,7 @@ function emitShareType(t, indent) {
 function emitShareCards(indent) {
   const p = pad(indent);
   const types = shareTypeList();
-  // The og + og.types wrappers exist only because of the data path (og.enabled,
-  // og.types.<key>) — the editor renders them CHROME-LESS (no card/header/collapse; see
-  // the data-key-path rules in THEME_CSS) so the pane reads flat: master toggle → type
-  // cards. `collapsed: false` is load-bearing: their content must always be visible.
+  // The og + og.types wrappers exist only for the data path (og.enabled, og.types.<key>): the editor renders them CHROME-LESS by data-key-path in THEME_CSS so the pane reads flat, and collapsed:false is load-bearing — their content must always be visible.
   const typeFields = types.length
     ? [`${p}        - name: types`, `${p}          label: "Per content type"`, `${p}          widget: object`,
        `${p}          collapsed: false`,
@@ -990,8 +838,7 @@ function emitShareCards(indent) {
     `${p}  file: "src/content/settings/site.md"`,
     `${p}  fields:`,
     `${p}    - { name: ogImage, label: "Site default share image", widget: image, required: false, media_folder: "/public/media/share", public_folder: "/media/share", hint: "Shown when a page is shared (iMessage, Slack, social) and it has no card of its own. Use ~1200×630px." }`,
-    // Always-rendered object (no `required: false`) so the master toggle + per-type
-    // sections show inline — Sveltia wraps an optional object in an "Add …" button.
+    // Always-rendered object (no `required: false`): Sveltia wraps an optional object behind an "Add …" button, which would hide the master toggle and the per-type sections.
     `${p}    - name: og`,
     `${p}      label: "Generated share cards"`,
     `${p}      widget: object`,
@@ -1002,6 +849,7 @@ function emitShareCards(indent) {
   ].join('\n');
 }
 
+// emitSettings takes no indent, unlike every other emitter: its panes are written at absolute indentation, with the `settings` collection itself at indent 2.
 function emitSettings() {
   const tp = emitTrackingPane(6);
   return `  - name: settings
@@ -1202,8 +1050,7 @@ ${emitThanksButtons(10)}
           - { name: showContact, label: "Show the direct-contact card", widget: boolean, required: false, default: true, hint: "Phone / email / hours from Site & contact." }${tp ? '\n' + tp : ''}${addonPanelFiles('settings', 6)}`;
 }
 
-// Files an out-of-tree extension contributes to a collection the engine emits. Appended last, so a
-// site's own settings can never be displaced by one.
+// Files an out-of-tree extension contributes to a collection the engine emits. Appended last, so a site's own settings can never be displaced by one.
 function addonPanelFiles(collection, indent) {
   const entries = ADDON_PANEL_FILES[collection] || [];
   if (!entries.length) return '';
@@ -1214,10 +1061,7 @@ function addonPanelFiles(collection, indent) {
     .join('\n');
 }
 
-// Tracking & cookies settings pane — only when the `tracking` feature is on (toggle with
-// stomme-enable). Emitted into a `tracking:generated` region on static-pane sites and folded
-// into emitSettings on generated-settings sites. The feature flag is the master switch; this
-// pane just holds the IDs. No IDs → the pane shows but nothing tracks.
+// Only emitted when the `tracking` feature is on: into a `tracking:generated` region on static-pane sites, folded into emitSettings on generated-settings ones. The feature flag is the master switch; this pane only holds the IDs.
 function trackingPaneYaml(indent) {
   const p = ' '.repeat(indent);
   return [
@@ -1237,10 +1081,8 @@ function emitTrackingPane(indent) {
 
 const EMITTERS = { blocks: emitWidget, collections: emitCollections, navlinks: emitNavLinks, thanksbuttons: emitThanksButtons, footerlinks: emitFooterLinks, settings: emitSettings, cms: emitCms, tracking: emitTrackingPane };
 
-// Fill every `# >>> NAME:generated … # <<< NAME:generated` region (idempotent).
 const lines = readFileSync(configPath, 'utf8').split('\n');
-// Top-level collections hand-authored OUTSIDE any generated region (indent-2 entries of
-// the `collections:` list) — these suppress their generated counterpart in emitCollections.
+// Top-level collections hand-authored OUTSIDE any generated region (indent-2 entries of `collections:`) — these suppress their generated counterpart in emitCollections.
 const STATIC_COLLECTIONS = new Set();
 {
   let inRegion = false;
@@ -1274,9 +1116,7 @@ if (total === 0) {
   console.error('No `# >>> blocks:generated` markers found in', configPath);
   process.exit(1);
 }
-// Localize label/label_singular/hint values: normalize any known translation back to
-// English, then map to the active locale. Unmapped values (custom labels, icon ids,
-// dynamic page options) pass through unchanged.
+// Normalize any known translation back to English, then map to the active locale; unmapped values (custom labels, icon ids, dynamic page options) pass through unchanged.
 function translateLabels(text) {
   return text.replace(/\b(label|label_singular|hint): "((?:[^"\\]|\\.)*)"/g, (m, key, val) => {
     const plain = val.replace(/\\"/g, '"').replace(/\\\\/g, '\\');
@@ -1287,11 +1127,7 @@ function translateLabels(text) {
   });
 }
 
-// Sveltia CMS config normalization. Sveltia ignores Decap's top-level `locale:` (that
-// only set Decap's UI language) and `local_backend:` (Sveltia's local edits use the File
-// System Access API, no proxy) — both emit console warnings, so strip them. Field LABELS
-// are still localized below via `translateLabels` (driven by CMS_LOCALE), independent of
-// the removed `locale:` line.
+// Sveltia ignores Decap's top-level `locale:` (Decap's own UI language) and `local_backend:` (Sveltia's local edits use the File System Access API, no proxy) and warns in the console about both, so strip them — field LABELS are localized by translateLabels instead.
 let yaml = out.join('\n');
 yaml = yaml.replace(/^locale:.*$\n?/m, '');
 yaml = yaml.replace(/^local_backend:.*$\n?/m, '');
@@ -1320,9 +1156,7 @@ for (const l of LISTINGS) COLLECTION_MEDIA[l.id] = l.preset === 'catalog' ? mSlu
   }
   yaml = injected.join('\n');
 }
-// Convention: collection-level `seo` groups render collapsed. Hand-authored panes (the
-// static home/pages SEO) predate this — normalize by inserting `collapsed: true` after
-// `widget: object` when the seo object doesn't set it. Idempotent.
+// Convention: collection-level `seo` groups render collapsed. Hand-authored panes predate it, so insert `collapsed: true` after `widget: object` when the seo object sets none. Idempotent.
 {
   const srcLines = yaml.split('\n');
   for (let i = 0; i < srcLines.length; i++) {
@@ -1351,19 +1185,13 @@ if (!/^media_libraries:/m.test(yaml)) {
     `      raster_image: { format: webp, quality: 82, width: 2048, height: 2048 }\n` +
     `      svg: { optimize: true }`);
 }
-// `output.omit_empty_optional_fields: true` — Sveltia otherwise writes every optional
-// field explicitly on save (e.g. `cta2Label: ''`). Our field policy is "absent = off"
-// (rule zero), so keep saved files minimal. Idempotent upsert at the top of the config.
+// Without `output.omit_empty_optional_fields` Sveltia writes every optional field explicitly on save (`cta2Label: ''`), against the field policy that absent = off. Idempotent upsert at the top of the config.
 if (!/^output:/m.test(yaml)) {
   yaml = `output:\n  omit_empty_optional_fields: true\n${yaml}`;
 }
 yaml = translateLabels(yaml);
 
-// MONOREPO: Sveltia's local mode requires the picked directory to BE the repository root (it
-// checks for `.git`), and every path in this file is resolved from there. A site that lives in a
-// subdirectory therefore needs its paths written from the repo root, which is what `cms.repoPath`
-// says ('sites/publik'). Only filesystem paths move: `public_folder` is a URL on the built site
-// and must not gain the prefix, or every image 404s.
+// Sveltia's local mode requires the picked directory to BE the repository root (it checks for `.git`) and resolves every path from there, so a site living in a subdirectory needs its paths written from the repo root — that is `cms.repoPath`. Only filesystem paths move: `public_folder` is a URL on the built site, and every image 404s if it gains the prefix.
 const REPO_PATH = String((CMS && CMS.repoPath) || '').trim().replace(/^\/+|\/+$/g, '');
 if (REPO_PATH) {
   yaml = yaml
@@ -1375,10 +1203,7 @@ if (REPO_PATH) {
 
 writeFileSync(configPath, yaml);
 
-// The slots dir may ship a `previews.js` registering preview templates for the collections it
-// contributes — the same seam shape as its collections, routes, CMS panes and blocks. Copied
-// beside the engine's own and loaded between it and the site's, so the engine's generic
-// templates are available to it and the site still has the last word.
+// The slots dir may ship a `previews.js` registering preview templates for the collections it contributes; copied beside the engine's own and loaded between it and the site's, so it can build on the engine's generic templates and the site still has the last word.
 try {
   const slotsDir = process.env.STOMME_SLOTS_DIR;
   const src = slotsDir ? resolve(slotsDir, 'previews.js') : null;
@@ -1394,9 +1219,6 @@ try {
   console.warn('  (addon previews copy skipped:', e.message + ')');
 }
 
-// Ship the engine's generic preview templates into the site's admin so live page
-// previews + readable settings previews work out of the box (loaded before the
-// site's own previews.js). Regenerated each run, so engine updates flow through.
 try {
   const previewsDest = resolve(root, 'public/admin/stomme-previews.js');
   mkdirSync(dirname(previewsDest), { recursive: true });
@@ -1405,8 +1227,7 @@ try {
   const LOGIN_LABELS = { en: 'Log in', sv: 'Logga in', da: 'Log ind', nb_no: 'Logg inn', nb: 'Logg inn', nn: 'Logg inn', de: 'Anmelden', fr: 'Se connecter', es: 'Iniciar sesión', it: 'Accedi', nl: 'Inloggen', pt: 'Entrar', fi: 'Kirjaudu sisään' };
   const loginLabel = LOGIN_LABELS[CMS_LOCALE] || LOGIN_LABELS[String(CMS_LOCALE).split(/[-_]/)[0]] || 'Log in';
   previewsSrc = previewsSrc.replace(/var LOGIN_LABEL = '[^']*'; \/\/ stomme:login-label/, `var LOGIN_LABEL = ${JSON.stringify(loginLabel)}; // stomme:login-label`);
-  // Register a styled preview for each config-defined listing collection (article →
-  // post preview, catalog → catalog preview); otherwise the CMS shows a raw field dump.
+  // A listing collection with no registered preview shows a raw field dump in the CMS.
   if (LISTINGS.length) {
     const regs = LISTINGS.map((l) => {
       const specs = (Array.isArray(l.specs) ? l.specs : []).map((s, i) =>
@@ -1420,8 +1241,7 @@ try {
   console.warn('  (stomme-previews.js copy skipped:', e.message + ')');
 }
 
-// Ship the editor enhancement (drag-and-drop section reordering). Regenerated each run.
-// The distinct FAQ tags are templated in so the tags editor can offer them as chips.
+// The distinct FAQ tags are templated into the editor script so the tags editor can offer them as chips.
 try {
   const editorDest = resolve(root, 'public/admin/stomme-editor.js');
   mkdirSync(dirname(editorDest), { recursive: true });
@@ -1433,13 +1253,7 @@ try {
   console.warn('  (stomme-editor.js copy skipped:', e.message + ')');
 }
 
-// Same-window auth handoff for /admin. Browsers that open the login in the current tab
-// instead of a popup (Arc, some mobile) have no live window.opener to receive the token,
-// so the gateway redirects back to /admin with the token in the URL fragment. This shim
-// persists it the way Sveltia does and reloads. It MUST run before the CMS bundle (whose
-// hash router would otherwise consume the fragment), so it's injected into <head>.
-// Managed here (idempotent via the markers) so every site gets it — and stays current —
-// on build, rather than living as a hand-edited per-site file.
+// Same-window auth handoff: browsers that open the login in the current tab instead of a popup (Arc, some mobile) have no live window.opener to receive the token, so the gateway redirects back to /admin with it in the URL fragment and this shim persists it the way Sveltia does. It MUST run before the CMS bundle, whose hash router would otherwise consume the fragment — hence <head>.
 const AUTH_SHIM = `      (function () {
         try {
           var m = (location.hash || '').match(/stomme_cms_token=([^&]+)/);
@@ -1469,15 +1283,12 @@ try {
   } else if (html.includes('</head>')) {
     html = html.replace('</head>', `    ${region}\n  </head>`); // inject once
   }
-  // Pin the CMS bundle to Sveltia: swap a legacy Decap CDN tag AND re-pin an existing
-  // Sveltia tag at any version (so a version bump propagates on cms:gen). Idempotent once at
-  // the pinned URL. `type="module"` is intentionally omitted — Sveltia warns if it's present.
+  // Re-pins an existing Sveltia tag at any version as well as swapping a legacy Decap one, so a version bump propagates on cms:gen. `type="module"` is deliberately omitted — Sveltia warns when it is present.
   html = html.replace(
     /<script\s+src="https:\/\/unpkg\.com\/(?:decap-cms|@sveltia\/cms)@[^"]*"><\/script>/,
     `<script src="${SVELTIA_CMS_SRC}"></script>`,
   );
-  // Load the editor enhancement (drag-and-drop) after the CMS bundle, cache-busted by a
-  // content hash so a plain reload always gets the current version.
+  // Loaded after the CMS bundle and cache-busted by a content hash, so a plain reload always gets the current version.
   {
     let src = ''; try { src = readFileSync(resolve(here, '../admin/editor.js'), 'utf8'); } catch (e) {}
     let h = 0; for (let i = 0; i < src.length; i++) h = (h * 31 + src.charCodeAt(i)) | 0;
@@ -1496,9 +1307,7 @@ try {
       html = html.replace(`<script src="${SVELTIA_CMS_SRC}"></script>`, `<script src="${SVELTIA_CMS_SRC}"></script>\n    ${tag}`);
     }
   }
-  // Editor theme (conservative): one hue drives Sveltia's light+dark schemes; system font;
-  // softer radii. CSS custom properties only — they inherit through the shadow DOM, and
-  // explicit colours would break the in-app light/dark toggle. Managed region, like the shim.
+  // Editor theme: CSS custom properties only — they inherit through the shadow DOM, and explicit colours would break Sveltia's in-app light/dark toggle.
   // `!important` is load-bearing: Sveltia injects its own `:root,:host{--sui-…}` at runtime after this style, so equal-specificity later rules would otherwise win.
   // Surfaces + accent derive from a per-mode ramp; kept NEUTRAL (near-zero saturation) so the editor reads as clean grey, with steeper lightness steps + darker borders for box definition. Accent is a desaturated slate — Sveltia bakes 80-100% saturation into --sui-primary-accent-color*, so each is overridden. Per site: set --sui-base-hue + raise accent saturation for a brand accent.
   const RAMP_LIGHT = `--sui-background-color-1-hsl: var(--sui-base-hue) 6% 100% !important; --sui-background-color-2-hsl: var(--sui-base-hue) 7% 96.5% !important; --sui-background-color-3-hsl: var(--sui-base-hue) 8% 93.5% !important; --sui-background-color-4-hsl: var(--sui-base-hue) 8% 89.5% !important; --sui-background-color-5-hsl: var(--sui-base-hue) 10% 81% !important; --sui-border-color-1-hsl: var(--sui-base-hue) 9% 56% !important; --sui-border-color-2-hsl: var(--sui-base-hue) 10% 77% !important; --sui-border-color-3-hsl: var(--sui-base-hue) 10% 83% !important;`;
@@ -1511,43 +1320,24 @@ try {
   const OBJ_ANY = `${OBJ}:has(${OBJ_DISC}[aria-expanded])`;
   const OBJ_C = `${OBJ}:has(${OBJ_DISC}[aria-expanded="false"])`;
   const OBJ_E = `${OBJ}:has(${OBJ_DISC}[aria-expanded="true"])`;
-  // OPT = an optional object (required:false → Sveltia renders an "Add …" checkbox at
-  // > .field-wrapper > .sui.checkbox, ALWAYS mounted). The deliberately class-heavy
-  // :has() argument out-specifies OBJ_C/OBJ_E (whose args carry :first-child + 2 attrs)
-  // so OPT rules win in the added states.
+  // OPT = an optional object (required:false → Sveltia mounts an "Add …" checkbox at > .field-wrapper > .sui.checkbox, ALWAYS present): the deliberately class-heavy :has() argument out-specifies OBJ_C/OBJ_E (whose arguments carry :first-child + two attributes) so OPT rules win in the added states.
   const OPT = `${OBJ}:has(> .field-wrapper > .sui.checkbox .inner > button.sui.button[role=checkbox])`;
   const OPT_ON = `${OPT}:has(> .field-wrapper > .sui.checkbox .inner > button[role=checkbox][aria-checked="true"])`;
   const OPT_E = `${OPT}:has(${OBJ_DISC}[aria-expanded="true"])`;
-  // GATED = an object whose first child field is the boolean `enabled` (the gate
-  // convention, mirrored in editor.js). The og wrapper is chrome-less — excluded.
-  // Gated objects are emitted collapsed:false (load-bearing: children stay mounted, so
-  // the gate switch exists in every state and the selector self-detects — no path list).
-  // TWO independent gestures: the switch toggles `enabled` (data); a card click toggles
-  // the .stomme-open class (editor.js), a pure UI open/closed state — Sveltia's own
-  // disclosure stays hidden (collapsing it would unmount the switch).
+  // GATED = an object whose first child field is the boolean `enabled` (the gate convention, mirrored in editor.js; the chrome-less og wrapper is excluded). Emitted collapsed:false so the children stay mounted, the switch exists in every state and the selector self-detects without a path list — and the two gestures are independent: the switch writes `enabled`, a card click toggles .stomme-open (editor.js) while Sveltia's own disclosure stays hidden, because collapsing it would unmount the switch.
   const KIDS = '> .field-wrapper > .wrapper > .item-list';
   const GATE_BOOL = `${KIDS} > section.field[data-field-type=boolean][data-key-path$=".enabled"]:first-child`;
   const GATED = `${OBJ}:not([data-key-path="og"]):has(${GATE_BOOL})`;
   // Chevron affordance shared by GATED + added-OPT cards (Material Symbols ships with Sveltia).
   const CHEVRON = `content:"expand_more"!important;font-family:"Material Symbols Outlined"!important;font-size:20px!important;line-height:1!important;flex:0 0 auto!important;opacity:.5!important;transform:rotate(-90deg)!important;transition:transform 160ms!important;`;
-  // LINK = a link-shaped object (page select + url string children) — self-detecting,
-  // rendered chrome-less inline. Children must be mounted (collapsed:false emitted).
+  // LINK = a link-shaped object (page select + url string children) — self-detecting, rendered chrome-less inline, children mounted via collapsed:false.
   const LINK = `${OBJ}:has(${KIDS} > section.field[data-field-type=select][data-key-path$=".page"]):has(${KIDS} > section.field[data-key-path$=".url"])`;
   // The centred 768px field column Sveltia uses — mirrored where we re-lay-out fields.
   const COL_PAD = 'max(16px, calc((100% - 768px) / 2))';
-  // Card outer width (border-box): the 768px column + 16px interior padding + 1px border
-  // per side, so a card's CHILD fields (16px field padding, own 768px .field-wrapper cap)
-  // land exactly on the same column as top-level fields. One width for every card kind.
-  // Cards cap at CARD_W only when the pane has room — narrow panes (preview open) get
-  // min(CARD_W, 100% - 32px): the card fills the pane minus the 16px field padding, same
-  // as section-list cards. Top-level PLAIN fields then need the inverse treatment (TOP_*
-  // below): their 768px column must shrink by the 34px card frame so inputs and labels
-  // keep landing on the card-child column at every pane width, not just wide ones.
+  // Card outer width (border-box) = the 768px column + 16px interior padding + 1px border per side, so a card's CHILD fields land on exactly the same column as top-level fields — one width for every card kind. It caps at min(CARD_W, 100% - 32px) so a narrow pane (preview open) fills the pane minus the 16px field padding, which is why top-level PLAIN fields need the inverse treatment (TOP_* below): their 768px column must shrink by the 34px card frame to keep landing on the card-child column at every pane width, not just wide ones.
   const CARD_W = '802px';
   const CARD_MAX = `min(${CARD_W}, 100% - 32px)`;
-  // Top-level fields (not nested in a card/item). Booleans align via padding (their own
-  // grid ignores the field-wrapper); lists keep the CARD_W wrapper; object cards release
-  // header/wrapper to the card width with stronger rules of their own.
+  // Top-level fields (not nested in a card/item): booleans align via padding because their own grid ignores the field-wrapper, lists keep the CARD_W wrapper, and object cards release header/wrapper to the card width with stronger rules of their own.
   const TOP = 'section.field:not(section.field section.field)';
   const TOP_PLAIN = `${TOP}:not([data-field-type=list]):not([data-field-type=boolean]):not([data-field-type=object])`;
   const TOP_LABELED = `${TOP}:not([data-field-type=boolean]):not([data-field-type=object])`;
@@ -1715,9 +1505,7 @@ try {
     .stomme-tag-chip:hover{background:var(--sui-primary-accent-color-translucent);border-color:var(--sui-primary-accent-color);color:var(--sui-primary-accent-color-text);border-style:solid;}`;
   const T_START = '<!-- >>> stomme-theme:generated (managed by stomme-gen — do not edit) -->';
   const T_END = '<!-- <<< stomme-theme:generated -->';
-  // External, content-hashed stylesheet: an inline <style> in index.html isn't cache-busted,
-  // so a plain reload keeps serving stale theme CSS (the recurring "nothing changed" trap).
-  // Versioned like stomme-editor.js so every reload gets the current styling.
+  // External, content-hashed stylesheet: an inline <style> in index.html is not cache-busted, so a plain reload keeps serving stale theme CSS.
   let th = 0; for (let i = 0; i < THEME_CSS.length; i++) th = (th * 31 + THEME_CSS.charCodeAt(i)) | 0;
   try { writeFileSync(resolve(root, 'public/admin/stomme-theme.css'), THEME_CSS); }
   catch (e) { console.warn('  (stomme-theme.css skipped:', e.message + ')'); }
@@ -1733,21 +1521,12 @@ try {
   console.warn('  (admin auth shim skipped:', e.message + ')');
 }
 
-// Resolve the site's stylesheet (inline the library @import) into the admin so the
-// CMS preview mockups reflect the site theme — tokens AND any class overrides the
-// site adds. previews.js loads it via registerPreviewStyle('/admin/stomme-site.css').
-// Re-run cms:gen after editing global.css to refresh it.
+// The site stylesheet with the library @import inlined, so the CMS preview mockups reflect the site theme — tokens and any class overrides the site adds. previews.js loads it as registerPreviewStyle('/admin/stomme-site.css'), and it only refreshes on cms:gen.
 try {
   const libCss = readFileSync(resolve(here, '../styles.css'), 'utf8');
-  // Inline the engine stylesheet (scoped @gronare/stomme or bare specifier — the raw import
-  // can't resolve in the browser and 404s under /admin/). The engine's body layout rules
-  // (flex column + full height, for the sticky footer) would shift the inline preview
-  // panes, so neutralize them right after the inlined block.
+  // The engine stylesheet is inlined because the raw import (scoped or bare) cannot resolve in the browser and 404s under /admin/; its body layout rules (flex column + full height, for the sticky footer) would shift the inline preview panes, so they are neutralized right after the inlined block.
   const PREVIEW_BODY_RESET = '\n/* admin preview: undo the sticky-footer body layout */\nbody{display:block;min-height:auto}\n';
-  // When a style is set, inline its tokens.css + theme.css right after the engine CSS and
-  // before the site's own rules — the same cascade position as the live build — so the CMS
-  // preview mockups are truthful. Reads are guarded: `astro build` (the integration) throws on
-  // a genuinely missing theme, so a warning here is enough.
+  // A style's tokens.css + theme.css are inlined after the engine CSS and before the site's own rules — the same cascade position as the live build — so the preview mockups are truthful. `astro build` throws on a genuinely missing theme, so a warning is enough here.
   let styleCss = '';
   if (STYLE_DIR) {
     const tokensP = resolve(STYLE_DIR, 'tokens.css');
@@ -1759,9 +1538,7 @@ try {
   }
   const siteCss = readFileSync(resolve(root, 'src/styles/global.css'), 'utf8')
     .replace(/@import\s+["'](?:@[\w-]+\/)?stomme\/styles\.css["'];?/, () => libCss + PREVIEW_BODY_RESET + styleCss);
-  // Theme tokens from theme.md → :root, so the INLINE preview mockups (Identity, Contact,
-  // …) use the site's actual colours, not the build-time defaults baked into styles.css.
-  // (iframe previews already load the real themed page.) Mirrors Base.astro's themeVars.
+  // theme.md tokens → :root so the INLINE preview mockups use the site's actual colours instead of the build-time defaults baked into styles.css (iframe previews already load the real themed page). Mirrors Base.astro's themeVars.
   let themeRoot = '';
   try {
     const tm = readFileSync(resolve(root, 'src/content/theme/theme.md'), 'utf8');
@@ -1778,10 +1555,7 @@ try {
   console.warn('  (stomme-site.css skipped:', e.message + ')');
 }
 
-// Ship the engine's default art (structural placeholder SVGs + the animated cover bg)
-// into the site's public/images. Engine-managed: overwritten each run, so improvements
-// flow with a version bump. A site that wants its own art sets a block's image field
-// instead of editing these files.
+// Engine-managed art, overwritten each run: a site that wants its own sets a block's image field instead of editing these files.
 try {
   const imgSrc = resolve(here, '../assets/images');
   if (existsSync(imgSrc)) cpSync(imgSrc, resolve(root, 'public/images'), { recursive: true });
@@ -1789,8 +1563,6 @@ try {
   console.warn('  (default images skipped:', e.message + ')');
 }
 
-// Generate the block gallery reference (public/admin/blocks.html) from the catalog, so an
-// editor can see what each section produces — Decap's own picker can't show pictograms.
 try {
   const t = (s) => (FORWARD && FORWARD[s] !== undefined ? FORWARD[s] : s);
   const html = renderGallery(AVAILABLE_BLOCKS, { t, groupOrder: GROUP_ORDER, locale: CMS_LOCALE });
@@ -1800,8 +1572,6 @@ try {
 }
 
 
-// Seed an editable index page per listing (once, if absent): pageHeader + the preset's
-// list block, pointed at the listing's collection + route. Edit or delete like any page.
 for (const l of LISTINGS) {
   try {
     const slug = l.route.replace(/^\/+/, '') || l.id;
@@ -1820,11 +1590,7 @@ for (const l of LISTINGS) {
   }
 }
 
-// Keep the engine's schema-manifest.json current with collections.ts. It's derived from
-// the engine's OWN schema (not the site's), so regenerate only when running against the
-// engine SOURCE — i.e. a monorepo build with the engine linked (`link:`). In a real
-// node_modules install the shipped manifest is authoritative and read-only, so skip.
-// gen-schema-manifest writes relative to its own dir, always the engine package.
+// Derived from the ENGINE's own schema, not the site's, so it is only regenerated when running against the engine SOURCE — a monorepo build with the engine linked. In a real node_modules install the shipped manifest is authoritative and read-only. gen-schema-manifest writes relative to its own dir, always the engine package.
 if (!here.includes('node_modules')) {
   try {
     const { generate } = await import('./gen-schema-manifest.mjs');
@@ -1842,22 +1608,13 @@ if (!here.includes('node_modules')) {
   }
 }
 
-// Per-site CUSTOM-DELTA manifest → public/admin/blocks-manifest.json. NOTE: same filename
-// as the engine's own blocks-manifest.json, but this one holds only the SITE's custom
-// subset — block types this site adds or SHADOWS over the engine defaults, projected
-// through the SAME contract (blocksToManifest) the engine manifest uses. The caller
-// merges this over the engine manifest so custom blocks get real field-level validation
-// instead of drift noise; an empty delta emits { "blocks": {} } (degrades to engine-only).
-// Unguarded on purpose: unlike the engine-manifest refresh above (which skips outside the
-// engine source), this must run wherever stomme is INSTALLED IN A SITE (node_modules or a
-// workspace link — cwd = site root, BLOCKS = the site's catalog).
+// Per-site CUSTOM-DELTA manifest: the same filename as the engine's own blocks-manifest.json, but holding only the SITE's custom subset — types it adds or SHADOWS — projected through the same blocksToManifest contract, which the caller merges over the engine manifest so custom blocks get field-level validation instead of drift noise. Unguarded on purpose, unlike the engine-manifest refresh above: this must run wherever stomme is INSTALLED IN A SITE (cwd = site root, BLOCKS = the site's catalog).
 try {
   const { blocksToManifest } = await import('./gen-blocks-manifest.mjs');
   const { defaultBlocks } = await jiti.import('@gronare/stomme/catalog');
   const engineManifest = blocksToManifest(defaultBlocks).blocks;
   const engineTypes = new Set(defaultBlocks.map((d) => d.type));
-  // Custom = a new block type (absent from engine) OR a same-type SHADOW whose field
-  // projection differs from the engine entry (e.g. an extra field or a widened option set).
+  // Custom = a type absent from the engine, OR a same-type SHADOW whose field projection differs (an extra field, a widened option set).
   const delta = BLOCKS.filter((b) => {
     if (!engineTypes.has(b.type)) return true;
     return JSON.stringify(blocksToManifest([b]).blocks[b.type]) !== JSON.stringify(engineManifest[b.type]);
@@ -1870,10 +1627,7 @@ try {
   console.log(`  ↳ custom blocks-manifest.json: ${names.length ? names.join(', ') : '(none — engine defaults only)'}`);
 } catch (e) {
   console.warn('  (custom blocks-manifest skipped:', e.message + ')');
-  // Fail safe: never leave a STALE delta from a previous build. The caller merges
-  // this file site-wins over the engine manifest, so a stale entry could MASK real drift on
-  // a block this site no longer shadows. Degrade to engine-only ({ "blocks": {} }) — the
-  // worst case is a custom block showing as drift noise again, never a silently masked one.
+  // Never leave a STALE delta from a previous build: the caller merges this file site-wins over the engine manifest, so a stale entry could MASK real drift on a block the site no longer shadows — degrading to engine-only shows drift noise again at worst.
   try {
     const outPath = resolve(root, 'public/admin/blocks-manifest.json');
     mkdirSync(dirname(outPath), { recursive: true });
