@@ -19,6 +19,8 @@ if (!existsSync(template)) {
   process.exit(1);
 }
 
+// Set while rewriting package.json, read again by the .npmrc step and the closing message.
+let fromCheckout = false;
 const dest = resolve(process.cwd(), arg);
 if (existsSync(dest)) {
   console.error(`Refusing to overwrite existing path: ${dest}`);
@@ -39,9 +41,16 @@ try {
   if (pkg.dependencies && '@gronare/stomme' in pkg.dependencies) {
     const repoRoot = resolve(here, '../../..');
     const enginePkg = resolve(repoRoot, 'packages/stomme');
-    const inMonorepo = template === starter && (dest === repoRoot || dest.startsWith(repoRoot + '/'));
-    pkg.dependencies['@gronare/stomme'] = inMonorepo
-      ? 'link:' + relative(dest, enginePkg).split('\\').join('/')
+    // Scaffolding from a checkout links to THAT checkout's engine, wherever the new site lands.
+    // The registry copy is scoped and needs a token, so a `latest` here would hand anyone who
+    // cloned the repo a site that cannot install — the documented quickstart is clone-and-scaffold.
+    fromCheckout = template === starter && existsSync(enginePkg);
+    // A relative link only holds inside the repo. Outside it the traversal is resolved against a
+    // path that may cross a symlink (macOS /tmp -> /private/tmp) and Vite then loads the engine
+    // twice under two names, so an absolute link is the one that survives.
+    const inRepo = dest === repoRoot || dest.startsWith(repoRoot + '/');
+    pkg.dependencies['@gronare/stomme'] = fromCheckout
+      ? 'link:' + (inRepo ? relative(dest, enginePkg).split('\\').join('/') : enginePkg)
       : 'latest';
   }
   writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + '\n');
@@ -54,12 +63,12 @@ const workspaceYaml = resolve(dest, 'pnpm-workspace.yaml');
 if (!existsSync(workspaceYaml)) {
   writeFileSync(
     workspaceYaml,
-    "allowBuilds:\n  '@parcel/watcher': true\n  esbuild: true\n  sharp: true\n",
+    "allowBuilds:\n  '@parcel/watcher': true\n  esbuild: true\n  sharp: true\n  workerd: true\n",
   );
 }
 //  2. The @gronare scope's registry. Auth is a secret and stays out of this committed file — a read:packages token belongs in the user's own ~/.npmrc.
 const npmrc = resolve(dest, '.npmrc');
-if (!existsSync(npmrc)) {
+if (!fromCheckout && !existsSync(npmrc)) {
   writeFileSync(
     npmrc,
     '@gronare:registry=https://npm.pkg.github.com\n' +
@@ -68,12 +77,24 @@ if (!existsSync(npmrc)) {
   );
 }
 
-console.log(`\n✓ Created ${arg}\n
+console.log(fromCheckout
+  ? `\n✓ Created ${arg}
+
+The engine is linked to this checkout, so nothing is fetched from a registry.
+
+Next:
+  cd ${arg}
+  pnpm install
+  pnpm dev         # site on :4321, CMS on /admin
+
+Then edit src/content/, recolor src/content/theme/theme.md, compose at /admin.\n`
+  : `\n✓ Created ${arg}
+
 Next:
   1. Add a GitHub token (read:packages) to your user ~/.npmrc:
        //npm.pkg.github.com/:_authToken=<token>
   2. cd ${arg}
-     pnpm install     # native builds are pre-approved in pnpm-workspace.yaml
-     pnpm dev         # site on :4321, CMS on /admin
+     pnpm install
+     pnpm dev       # site on :4321, CMS on /admin
 
 Then edit src/content/, recolor src/content/theme/theme.md, compose at /admin.\n`);
