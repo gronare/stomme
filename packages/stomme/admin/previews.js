@@ -1,18 +1,5 @@
-/*
- * stomme — CMS preview templates (engine-provided), for Sveltia CMS. Copied into
- * <site>/public/admin/stomme-previews.js by `stomme-gen`, loaded before the
- * site's own previews.js. `CMS`, `h` are globals from the Sveltia bundle.
- *
- * Pages get a LIVE preview (the real components via the /preview route). The
- * collections/settings/chrome get rich, styled mockups (the preview iframe has no
- * site CSS, so these are self-contained, themed by the library palette below).
- * A site adds bespoke previews for its own collections in public/admin/previews.js
- * (loaded after this) — re-registering a name overrides the generic one.
- */
-// Editors log in via email (Cloudflare Access), not GitHub — relabel the CMS's login
-// button. Its text contains "GitHub" in every UI language ("Login with GitHub",
-// "Logga in med GitHub", …), so match that; LOGIN_LABEL is localized by stomme-gen
-// from the site's cmsLocale. Standalone (no CMS globals); copied into every /admin.
+// Copied to <site>/public/admin/stomme-previews.js by stomme-gen and loaded BEFORE the site's own previews.js, so a site re-registering a name overrides the generic preview; `CMS` and `h` are Sveltia globals.
+// Editors log in by email, so the login button is relabelled by matching "GitHub" — the one substring its text carries in every UI language; this IIFE runs standalone (no CMS globals) in every /admin.
 (function () {
   var LOGIN_LABEL = 'Log in'; // stomme:login-label (localized by stomme-gen)
   function relabel() {
@@ -25,9 +12,7 @@
   relabel();
 })();
 
-// NOTE: the same-window auth handoff (Arc etc.) lives in /admin/index.html <head>, NOT
-// here — it must run BEFORE the CMS bundle, whose hash router would otherwise consume
-// the token in the URL fragment before this (post-bundle) script could read it.
+// The same-window auth handoff lives in /admin/index.html <head>, not here: it must run BEFORE the CMS bundle, whose hash router would otherwise consume the token in the URL fragment.
 
 (function () {
   if (typeof window.CMS === 'undefined' || typeof window.h === 'undefined') {
@@ -36,11 +21,7 @@
   }
   var h = window.h;
 
-  // Theme-driven palette. The preview iframe loads the site's resolved stylesheet
-  // (/admin/stomme-site.css, written by stomme-gen from src/styles/global.css),
-  // so these variables resolve to the SITE's tokens — edit global.css + re-run
-  // `cms:gen` and the mockups follow. The hex values are fallbacks for when that
-  // stylesheet is absent (e.g. an older site that hasn't regenerated).
+  // These hexes are only fallbacks — the preview iframe loads /admin/stomme-site.css (stomme-gen's copy of the site's global.css), so the var() references below resolve to the SITE's tokens.
   var BRAND = '#4338ca', INK = '#1f2937', SURFACE = '#e0e7ff', PAPER = '#ffffff',
       LINE = '#e5e7eb', MUTED = '#6b7280', HIGHLIGHT = '#f59e0b';
   var SANS = 'ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif';
@@ -57,8 +38,7 @@
     humanist: 'Verdana,"Segoe UI","Lucida Grande","Lucida Sans Unicode",Geneva,Tahoma,ui-sans-serif,sans-serif',
     script: '"Snell Roundhand","Brush Script MT","Segoe Script","Bradley Hand",ui-rounded,cursive',
     mono: MONO,
-    // Curated webfonts (src/fonts.ts WEBFONTS). The woff2 isn't loaded in the admin
-    // preview — the stack falls to system here, same as custom uploads behave.
+    // Curated webfonts (src/fonts.ts WEBFONTS); the woff2 is not loaded in the admin preview, so the stack falls to system here.
     inter: '"Inter Variable",' + SANS,
     'inter-tight': '"Inter Tight Variable",' + SANS,
   };
@@ -68,9 +48,7 @@
       cLine = 'var(--color-line,' + LINE + ')', cMuted = 'var(--color-muted,' + MUTED + ')';
   var fSans = 'var(--font-sans,' + SANS + ')', fMono = 'var(--font-mono,' + MONO + ')';
 
-  // Load the site's actual stylesheet first so the mockups match the live site
-  // (tokens + any class overrides). The raw rules below layer the preview-only
-  // scaffolding (.bk*) on top, themed via the variables above.
+  // The site's real stylesheet is registered first so the preview-only .bk* rules registered after it win on conflicts.
   window.CMS.registerPreviewStyle('/admin/stomme-site.css');
 
   var CSS = [
@@ -103,7 +81,6 @@
   function v(e, k) { var x = e.getIn(['data', k]); return x == null ? '' : x; }
   function note(t) { return h('p', { className: 'bk-note' }, t); }
 
-  // ── Live page preview: the REAL components via /preview (themed, no drift). ──
   function jsBlocks(entry) {
     var b = entry.getIn(['data', 'blocks']);
     return b && b.toJS ? b.toJS() : (Array.isArray(b) ? b : []);
@@ -114,28 +91,19 @@
     for (var i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
     return btoa(bin);
   }
-  // Keep the preview iframe MOUNTED across edits: render it once with the initial data in
-  // its src (so it SSR-renders), then on each re-render push the new draft via postMessage.
-  // The /preview page swaps its #preview-root in place — no navigation, no reload, no
-  // per-keystroke flicker. Returning the existing iframe's src UNCHANGED is what stops the
-  // CMS's React from reloading it; the visible update rides on the message instead.
+  // The iframe stays MOUNTED across edits: returning its src UNCHANGED is what stops the CMS's React from reloading (and flickering) it — new drafts ride in on postMessage and /preview swaps #preview-root in place.
   var FRAME_STYLE = { width: '100%', height: '100vh', border: '0', display: 'block', background: '#fff' };
-  // A short frame for an inline snippet (the Identity logo row) rather than a full page.
   var LOGO_FRAME_STYLE = { width: '100%', height: '88px', border: '0', display: 'block', background: 'transparent' };
-  // Per-id frame state. A React ref captures the real <iframe> node (the CMS renders the
-  // preview inside its own frame, so document.getElementById from here wouldn't find it).
+  // Per-id frame state; a React ref captures the real <iframe> node, since the CMS renders the preview inside its own frame where getElementById from here would not find it.
   var FRAMES = {};
   function liveFrame(id, baseSrc, data, style) {
     var rec = FRAMES[id] || (FRAMES[id] = {});
     if (!rec.ref) rec.ref = function (el) { rec.el = el; if (!el) rec.src = null; };
     if (!rec.src) {
-      // First mount (or after unmount): bake the current data into the src so it
-      // SSR-renders correctly immediately.
+      // First mount (or after unmount): bake the data into the src so the frame SSR-renders it immediately.
       var sep = baseSrc.indexOf('?') >= 0 ? '&' : '?';
       rec.src = baseSrc + sep + 'data=' + encodeURIComponent(data);
     } else if (rec.el && rec.el.contentWindow) {
-      // Already mounted: push the new draft; /preview swaps #preview-root in place. The
-      // src is unchanged, so the CMS's React keeps the iframe mounted — no reload.
       rec.el.contentWindow.postMessage({ type: 'stomme:preview', data: data }, '*');
     }
     return h('iframe', { src: rec.src, style: style || FRAME_STYLE, ref: rec.ref });
@@ -144,7 +112,6 @@
     return liveFrame('stomme-preview', '/preview', b64(jsBlocks(props.entry)));
   };
 
-  // ── Rich collection / settings / chrome mockups ─────────────────────────────
   var TestimonialPreview = function (props) {
     var e = props.entry;
     return h('div', { className: 'bk' },
@@ -183,7 +150,6 @@
     var brand = g('brand', BRAND), ink = g('ink', INK), onDark = g('onDark', '#fff'),
         surface = g('surface', SURFACE), paper = g('paper', PAPER), line = g('line', LINE), highlight = g('highlight', HIGHLIGHT);
     var secondary = g('secondary', '#3b82f6');
-    // Which accent the eyebrow marker uses (theme.eyebrowColor).
     var ebColorKey = g('eyebrowColor', 'brand');
     var ebAccent = ebColorKey === 'secondary' ? secondary : ebColorKey === 'highlight' ? highlight : brand;
     var muted = 'color-mix(in srgb, ' + ink + ' 55%, ' + paper + ')';
@@ -193,8 +159,6 @@
         dkLine = g('darkLine', 'color-mix(in srgb, ' + dkInk + ' 14%, transparent)');
     var dkCard = 'color-mix(in srgb, ' + dkInk + ' 7%, ' + dk + ')';
     var dkMuted = 'color-mix(in srgb, ' + dkInk + ' 56%, ' + dk + ')';
-    // Apply the chosen fonts so the preview reflects the pickers — including custom
-    // uploads, loaded via the CMS's getAsset (resolves the upload to a usable URL).
     var assetUrl = function (p) { try { return p && props.getAsset ? String(props.getAsset(p)) : null; } catch (_e) { return null; } };
     var dispCustom = assetUrl(g('fontCustomFile', ''));
     var bodyCustom = assetUrl(g('fontCustomBodyFile', '')) || dispCustom;
@@ -216,7 +180,6 @@
     var btn = function (label, bg, fg, border) {
       return h('span', { style: { display: 'inline-flex', borderRadius: '999px', padding: '11px 20px', fontWeight: 700, fontSize: '14px', background: bg, color: fg, border: border || '0' } }, label);
     };
-    // Eyebrow sample — reflects the site-wide eyebrow style picker (dash / bullet / bold).
     var eb = g('eyebrow', 'dash'), ebBold = eb === 'bold';
     var eyebrowSample = function (label, color) {
       var marker = eb === 'dash' ? { width: '18px', height: '2px' } : eb === 'bullet' ? { width: '7px', height: '7px', borderRadius: '50%' } : null;
@@ -254,9 +217,7 @@
         h('p', { style: { color: '#aab0bd', maxWidth: '48ch', margin: 0 } }, 'The gradient surface — a slate backdrop, good behind a tall or dark hero.')));
   };
 
-  // Header & footer: render the REAL components (real logo, nav, CTA, theme) via
-  // the /preview route fed the draft entry data — accurate, with no drift. (The
-  // /preview route handles ?kind=header|footer; see the starter's preview.astro.)
+  // Every ChromePreview kind must be handled by the site's /preview route (see the starter's preview.astro), where the real components render from the draft.
   var ChromePreview = function (kind) {
     return function (props) {
       var data = props.entry.get('data');
@@ -267,52 +228,31 @@
   var HeaderPreview = ChromePreview('header');
   var FooterPreview = ChromePreview('footer');
 
-  // Identity — the logo, browser-tab favicon, home-screen icon, social-share image and
-  // business name. Rendered ENTIRELY via /preview?kind=identity (a full-height iframe),
-  // so every asset is the SERVED file: an uploaded favicon/og image (/src/assets/uploads/…)
-  // and public-root defaults ('/favicon.svg') both resolve on the site origin. The CMS's
-  // getAsset only yields the raw /src path (unserved → 404), which is why the logo already
-  // rendered via /preview; the favicon + social share now do the same instead of getAsset.
+  // Goes through /preview rather than getAsset because getAsset yields the raw /src path, which is unserved (404); the iframe resolves uploads and public-root defaults on the site origin.
   var IdentityPreview = function (props) {
     var data = props.entry.get('data');
     data = data && data.toJS ? data.toJS() : (data || {});
     return liveFrame('stomme-preview-identity', '/preview?kind=identity', b64(data));
   };
 
-  // Share cards — rendered via /preview?kind=sharecards (a full-height
-  // iframe), the SAME served-asset fix as IdentityPreview: the site-default image
-  // (settings.ogImage → home hero → brand card) and the example generated card resolve on
-  // the site origin, so a public-root path like '/og-image.png' shows instead of getAsset
-  // 404ing to a broken "?". The /preview page reflects the pane's master toggle + the first
-  // enabled type's headlineField/sublineField/style/scrim/showLogo/accent.
+  // Same served-asset reason as IdentityPreview; /preview reflects the pane's master toggle plus the first enabled type's headlineField/sublineField/style/scrim/showLogo/accent.
   var ShareCardsPreview = function (props) {
     var data = props.entry.get('data');
     data = data && data.toJS ? data.toJS() : (data || {});
     return liveFrame('stomme-preview-sharecards', '/preview?kind=sharecards', b64(data));
   };
-  // Contact — render the REAL direct-contact card + Find-us block via /preview, fed the
-  // draft settings (the same live-render pattern as header/footer/thanks). No hand-built
-  // mockup to drift from the components.
   var ContactPreview = ChromePreview('contact');
 
   var arr = function (e, k) { var x = e.getIn(['data', k]); x = x && x.toJS ? x.toJS() : x; return Array.isArray(x) ? x : []; };
 
-  // Service-area landing (the towns collection → TownPage): render the REAL TownPage
-  // (hero + why body + districts + reasons + services as a ticked list) via
-  // /preview?kind=town, fed the draft — no hand-built mockup to drift.
   var TownPreview = ChromePreview('town');
 
-  // Service detail: render the REAL ServicePage (template chrome + the entry's composed
-  // blocks + rendered body) via /preview?kind=service — no hand-built mockup to drift.
   var ServicePreview = ChromePreview('service');
 
-  // Catalog (for-sale) listing item → CatalogPage. Price, status pill, category,
-  // a spec table, and the markdown body.
   var STATUS = { available: ['Available', '#d1fae5', '#047857'], reserved: ['Reserved', '#fef3c7', '#b45309'], sold: ['Sold', '#e2e8f0', '#475569'] };
   var CatalogPreview = function (props, specDefs) {
     var e = props.entry;
-    // Specs are keyed by the listing's config-defined keys; pair them with the labels
-    // stomme-gen passes in (specDefs). Fall back to legacy [{label,value}] if none given.
+    // Specs are keyed by the listing's config-defined keys and labelled from the specDefs stomme-gen passes in; entries written before that still carry their own [{label,value}].
     var specs = (specDefs && specDefs.length)
       ? specDefs.map(function (d) { var val = e.getIn(['data', 'specs', d.key]); return { label: d.label, value: val == null ? '' : val }; }).filter(function (r) { return r.value; })
       : arr(e, 'specs');
@@ -337,9 +277,6 @@
       note('For-sale item (CatalogPage); shown as a card in the catalog list.'));
   };
 
-  // Thank-you settings pane — renders the REAL /thanks page (via /preview?kind=thanks),
-  // so the preview shows the live confirmation with the site's theme + contact settings,
-  // exactly like the header/footer previews. Not a hand-built mockup.
   var ThanksPreview = ChromePreview('thanks');
 
   // Folder collections register by collection name; FILE collections by file name.
@@ -358,12 +295,7 @@
   window.CMS.registerPreviewTemplate('footer', FooterPreview);
   window.CMS.registerPreviewTemplate('thanks', ThanksPreview);
 
-  // Config-defined listing collections (news / for-sale / …) get the matching preset
-  // preview. stomme-gen appends stommeRegisterListing(id, preset, specs) calls for this
-  // site; `specs` is the catalog listing's [{key,label}] so the preview can label them.
-  // A collection whose entry is rendered by a page of its own: previewed through /preview?kind=,
-  // the same live frame the chrome panes use, with the draft passed along so the page shows what
-  // is being typed. Exposed for an addon's previews.js — the engine never names the kinds.
+  // Exposed for an addon's previews.js so the engine never names the preview kinds itself.
   window.stommeRegisterFramePage = function (name, kind) {
     window.CMS.registerPreviewTemplate(name, function (props) {
       var data = props.entry.get('data');
@@ -372,15 +304,12 @@
     });
   };
 
-  // Any collection whose entry IS a composed page (title/heading/intro + blocks) can reuse the
-  // live page preview. Exposed so an addon's own previews.js registers its pages without the
-  // engine naming them: stommeRegisterPage('confirmation').
+  // Exposed so an addon's previews.js can reuse the live page preview for its own composed-page collections.
   window.stommeRegisterPage = function (name) {
     window.CMS.registerPreviewTemplate(name, PagePreview);
   };
 
-  // Same, for a page whose heading and intro are FIELDS rather than a block: they are shown as
-  // the page header the real page renders them as, above the entry's own blocks.
+  // Same, for a page whose heading and intro are FIELDS rather than a block — synthesised into the pageHeader block the real page renders.
   window.stommeRegisterHeadedPage = function (name, headingField, introField) {
     window.CMS.registerPreviewTemplate(name, function (props) {
       var e = props.entry;
@@ -390,6 +319,7 @@
     });
   };
 
+  // stomme-gen appends a stommeRegisterListing(id, preset, specs) call per config-defined listing collection.
   window.stommeRegisterListing = function (id, preset, specs) {
     var tmpl = preset === 'catalog'
       ? function (props) { return CatalogPreview(props, specs); }
@@ -397,19 +327,14 @@
     window.CMS.registerPreviewTemplate(id, tmpl);
   };
 
-  // ── "Image" editor component for markdown bodies ────────────────────────────
-  // Overrides the default image button: caption + placement + size, no keyword
-  // typing. Stores `![alt](src "right small")` that renderMarkdown lays out, and
-  // round-trips back into the fields when editing.
+  // Replaces the default image button; placement/size are stored as keywords in the markdown title (`![alt](src "right small")`), which renderMarkdown parses back out.
   var ALIGN = ['center', 'left', 'right', 'wide'];
   var SIZE = ['small', 'large'];
   var IMAGE_COMPONENT = {
     id: 'image',
     label: 'Image',
     fields: [
-      // No field-level media_folder: the CMS resolves that relative to the entry, so a
-      // post in src/content/posts/ would upload to .../posts/src/assets/uploads and show
-      // an empty picker. The global media_folder (config.yml) is root-relative + works.
+      // No field-level media_folder — the CMS resolves it relative to the entry, so a post would upload to .../posts/src/assets/uploads and show an empty picker; config.yml's global root-relative one works.
       { name: 'image', label: 'Image', widget: 'image' },
       { name: 'alt', label: 'Caption', widget: 'string', required: false, hint: 'Shown as the caption (and alt text).' },
       { name: 'align', label: 'Placement', widget: 'select', default: 'center', options: [
@@ -438,9 +363,6 @@
   };
   window.CMS.registerEditorComponent(IMAGE_COMPONENT);
   // Sveltia's rich-text image button resolves the component named `linked-image` when
-  // `linked_images` is on (its default). Register the same definition under that id too so
-  // OUR caption/placement/size dialog is used instead of the built-in src/alt/title one.
-  // (The CMS ignores the extra registration — it has no `linked-image` built-in.) The stored
-  // markdown is unchanged: `![alt](src "align size")`.
+  // Sveltia's rich-text image button resolves the component named `linked-image` when `linked_images` is on (its default), so the same definition is registered under that id or the built-in src/alt/title dialog wins.
   try { window.CMS.registerEditorComponent(Object.assign({}, IMAGE_COMPONENT, { id: 'linked-image' })); } catch (e) {}
 })();

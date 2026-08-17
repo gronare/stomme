@@ -1,11 +1,4 @@
-// stomme CMS editor enhancement — list-item UX for EVERY reorderable list (sections,
-// in-block content lists, any collection list): whole-item drag reordering (a drop is
-// translated into Sveltia's own move-up/down clicks, so the SAVED order changes) and
-// click-anywhere expand/collapse, plus click-to-toggle on collapsible object groups
-// (SEO / Media / Layout / Appearance). All layout (pill + one-row collapsed items,
-// group cards) is pure CSS in gen-admin-blocks.mjs THEME_CSS — the summary is styled
-// where Sveltia renders it, never moved, so re-renders can't desync it. Light-DOM;
-// targets Sveltia internals — re-check on a Sveltia upgrade.
+// Light-DOM enhancement of Sveltia's own internals — re-check on a Sveltia upgrade. Drag-reorder is translated into Sveltia's move-up/down clicks so the SAVED order changes; layout lives in gen-admin-blocks.mjs THEME_CSS, styled where Sveltia renders it so re-renders cannot desync it.
 (function () {
   'use strict';
   var UP = 'arrow_upward', DOWN = 'arrow_downward';
@@ -28,8 +21,7 @@
   }
   function delay(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
 
-  // Drive Sveltia's move buttons one step at a time; each click swaps the row one slot,
-  // so tracking by INDEX is deterministic (content-identical items can't be confused).
+  // One click per step, so tracking by INDEX stays deterministic and content-identical items cannot be confused.
   async function reorder(list, from, dir, steps) {
     var idx = from;
     for (var s = 0; s < steps; s++) {
@@ -49,8 +41,7 @@
       n.classList.remove('stomme-drop-before', 'stomme-drop-after');
     });
   }
-  // Insertion gap under the cursor: index of the first item whose midpoint is below clientY
-  // (0 = above all, n = below all) — smooth across the whole list incl. inter-item margins.
+  // Insertion gap under the cursor: index of the first item whose midpoint is below clientY (0 = above all, n = below all), so inter-item margins are covered too.
   function gapAt(items, y) {
     for (var i = 0; i < items.length; i++) {
       var r = items[i].getBoundingClientRect();
@@ -61,8 +52,7 @@
   function enhanceList(list) {
     if (list.__stommeDnd) return;
     list.__stommeDnd = true;
-    // Handlers act only on drags whose item belongs to THIS list (dragged.parentElement
-    // check), so nested lists can't reorder each other; bubbled events fall through.
+    // The dragged.parentElement check keeps a handler to drags from THIS list, so nested lists cannot reorder each other and bubbled events fall through.
     list.addEventListener('dragover', function (e) {
       if (!dragged || dragged.parentElement !== list) return;
       e.preventDefault();
@@ -90,24 +80,21 @@
 
   function enhance(item) {
     if (!isReorderable(item)) return;
-    // Baseline: collapsed items stay grab-ready without a preceding press; expanded ones
-    // default off and rely on the per-press arming below.
+    // Collapsed items stay grab-ready without a preceding press; expanded ones default off and rely on the per-press arming below.
     if (toggleButton(item)) item.setAttribute('draggable', isCollapsed(item) ? 'true' : 'false');
     if (item.__stomme) return;
     item.__stomme = true;
     if (!toggleButton(item)) item.setAttribute('draggable', 'false');
     enhanceList(item.parentElement);
 
-    // Draggable is decided per-press: a grab outside controls/inputs (and outside nested
-    // items) drags THIS item; presses in inputs keep native text selection untouched.
+    // Draggable is decided per-press: a grab outside controls/inputs (and outside nested items) drags THIS item, while presses in inputs keep native text selection.
     item.addEventListener('mousedown', function (e) {
       var ok = !inControl(e.target) && e.target.closest('.item') === item;
       item.setAttribute('draggable', ok ? 'true' : 'false');
     });
     item.addEventListener('dragstart', function (e) {
       if (e.target !== item) {
-        // A native drag (image/selection) inside our own content must not hijack the item;
-        // a drag whose target sits in a NESTED item is that item's — fall through untouched.
+        // A native drag (image/selection) in our own content must not hijack the item; one whose target sits in a NESTED item belongs to that item and falls through.
         if (e.target.closest && e.target.closest('.item') === item) e.preventDefault();
         return;
       }
@@ -121,9 +108,7 @@
       dragged = null;
       clearDrop();
     });
-    // Plain click toggles: anywhere on a collapsed item, or on the item's own header when
-    // expanded. Real controls (disclosure/⋮/✕ buttons, inputs) keep their native behavior;
-    // a real drag suppresses the click, so drag and click never both fire.
+    // Plain click toggles: anywhere on a collapsed item, or the item's own header when expanded. Real controls keep their native behaviour, and a real drag suppresses the click.
     item.addEventListener('click', function (e) {
       if (inControl(e.target)) return;
       if (e.target.closest('.item') !== item) return; // clicks inside a nested item
@@ -136,11 +121,9 @@
     });
   }
 
-  // Collapsible object groups (SEO / Media / Layout / Appearance): same click-to-toggle —
-  // anywhere while collapsed, the label bar (the field's own <header>) while expanded.
+  // Collapsible object groups (SEO / Media / Layout / Appearance): click anywhere while collapsed, the label bar (the field's own <header>) while expanded.
   function objectToggle(field) { return field.querySelector(':scope > .field-wrapper > .wrapper > .header button[aria-expanded]'); }
-  // A link-shaped object (page select + url) renders chrome-less inline and must never
-  // collapse — its children have to stay mounted for the flat CSS to hold.
+  // A link-shaped object (page select + url) renders chrome-less inline and must never collapse — its children have to stay mounted for the flat CSS to hold.
   function isFlatLink(field) {
     var kids = field.querySelectorAll(':scope > .field-wrapper > .wrapper > .item-list > section.field');
     if (kids.length !== 2) return false;
@@ -150,10 +133,7 @@
     if (field.__stommeObj || !objectToggle(field)) return;
     field.__stommeObj = true;
     field.addEventListener('click', function (e) {
-      // Checked at CLICK time, not bind time: Sveltia lazy-mounts offscreen children as
-      // placeholders, so a gated card is indistinguishable from a plain group until it
-      // scrolls into view — a stale bind-time check would let this handler collapse the
-      // Sveltia object and unmount the gate switch. enhanceGated owns these cards.
+      // Checked at CLICK time, not bind time: Sveltia lazy-mounts offscreen children as placeholders, so until a card scrolls into view it is indistinguishable from a plain group and a stale check would collapse the object and unmount the gate switch.
       if (isGatedCard(field)) return;
       if (inControl(e.target)) return;
       if (e.target.closest('section.field') !== field) return; // clicks inside nested fields
@@ -161,12 +141,9 @@
       if (!b) return;
       if (b.getAttribute('aria-expanded') === 'true') {
         if (isFlatLink(field)) return; // inline links stay open
-        // Children still lazy-mounting (Sveltia placeholders): the group's kind is
-        // unknowable — a gated card mid-mount must not get its switch collapsed away.
+        // Children still lazy-mounting (Sveltia placeholders): the group's kind is unknowable, and a gated card mid-mount must not get its switch collapsed away.
         if (field.querySelector(':scope > .field-wrapper > .wrapper > .item-list > .placeholder')) return;
-        // Collapse from the card's own header row. Optional groups render their header
-        // display:contents (only the h4 has a box), so a hit on the field's bare row
-        // counts as the header too — without it the card is near-impossible to close.
+        // Optional groups render their header display:contents (only the h4 has a box), so a hit on the field's bare row has to count as the header — without it the card is near-impossible to close.
         var h = e.target.closest('header');
         if (!(h && h.parentElement === field) && e.target !== field) return;
       }
@@ -174,10 +151,7 @@
     });
   }
 
-  // Conditional visibility (Sveltia has no native dependent fields): an object whose FIRST
-  // child field is the boolean `enabled` uses that toggle to gate the object's remaining
-  // fields. Off → the rest are hidden. The name check matters: other leading booleans
-  // (e.g. a layout toggle followed by a columns field) must NOT hide their siblings.
+  // Sveltia has no dependent fields, so an object whose FIRST child is the boolean `enabled` gates its remaining fields. The name check matters: other leading booleans (a layout toggle before a columns field) must NOT hide their siblings.
   function gatedFields(obj) {
     var list = obj.querySelector(':scope > .field-wrapper > .wrapper > .item-list');
     if (!list) return null;
@@ -188,8 +162,7 @@
     if (!/\.enabled$/.test(fields[0].getAttribute('data-key-path') || '')) return null;
     return fields;
   }
-  // Gated switch-cards render as THEME_CSS ${GATED} everywhere EXCEPT the chrome-less og
-  // wrapper (whose master switch still gates its siblings via gateObject).
+  // Gated switch-cards render as THEME_CSS ${GATED} everywhere EXCEPT the chrome-less og wrapper, whose master switch still gates its siblings via gateObject.
   function isGatedCard(field) {
     return !!gatedFields(field) && (field.getAttribute('data-key-path') || '') !== 'og';
   }
@@ -199,18 +172,13 @@
     if (!fields) return;
     var sw = fields[0].querySelector('[role=switch]');
     var on = !!sw && sw.getAttribute('aria-checked') === 'true';
-    // 'important' so the hide also beats THEME_CSS display rules (e.g. the flattened
-    // share-cards og.types wrapper is display:flex!important).
+    // 'important' so the hide also beats THEME_CSS display rules (the flattened share-cards og.types wrapper is display:flex!important).
     for (var i = 1; i < fields.length; i++) {
       if (on) fields[i].style.removeProperty('display');
       else fields[i].style.setProperty('display', 'none', 'important');
     }
   }
-  // Gated switch-cards (styled by THEME_CSS ${GATED}): two INDEPENDENT gestures. The
-  // pinned switch toggles `enabled` (its own click, handled by Sveltia — it sits in the
-  // first child field, so the closest-section check below excludes it). A card click
-  // toggles the .stomme-open UI state: closed (default) = anywhere on the row opens;
-  // open = the header row closes. Open/closed never touches the data.
+  // Two INDEPENDENT gestures on a gated switch-card: the pinned switch toggles `enabled` (Sveltia's own click, in the first child field, excluded by the closest-section check), while a card click toggles the .stomme-open UI state and never touches the data.
   function enhanceGated(field) {
     if (field.__stommeGated || !isGatedCard(field)) return;
     field.__stommeGated = true;
@@ -225,10 +193,7 @@
     });
   }
 
-  // FAQ tag suggestions — Sveltia's select can't create new options, so `tags` stays a
-  // free list and the tags already used across FAQ entries (templated in by stomme-gen)
-  // render as click-to-add chips under it. A chip click drives Sveltia's own Add button
-  // and fills the new row; typing stays free for brand-new tags.
+  // Sveltia's select cannot create options, so `tags` stays a free list and the tags already used across FAQ entries (templated in by stomme-gen) render as chips that drive Sveltia's own Add button.
   var FAQ_TAGS = []; // stomme:faq-tags
   function tagInputs(section) {
     return section.querySelectorAll(':scope input[type="text"]');
@@ -241,7 +206,6 @@
     return vals;
   }
   function tagAddButton(section) {
-    // The list's own Add button: the last non-item button in the field wrapper.
     var btns = section.querySelectorAll(':scope > .field-wrapper button');
     for (var i = btns.length - 1; i >= 0; i--) if (!btns[i].closest('.item')) return btns[i];
     return null;

@@ -1,10 +1,5 @@
-// Swedish translations for the admin field/section/collection labels that stomme-gen
-// emits into config.yml. Keys are the exact English source strings; stomme-gen looks
-// each up when cmsLocale resolves here and leaves anything unmapped in English (so a
-// site's own custom labels, icon identifiers and dynamic page options stay as written).
-// Add a labels.<locale>.js alongside this to support another language.
+// Swedish admin labels for stomme-gen. Keys are the EXACT English source strings it emits into config.yml; anything unmapped is left in English, and a labels.<locale>.js alongside this adds another language.
 export default {
-  // ── section / block type names ──
   'Hero': 'Hero',
   'Page header': 'Sidhuvud',
   'Rich text': 'Formaterad text',
@@ -78,7 +73,6 @@ export default {
   'Right': 'Höger',
   'How wide the quote column is. Narrow reads best.': 'Hur bred citatkolumnen är. Smal läses bäst.',
   'Where the quote column sits in the section (the text stays left-aligned).': 'Var citatkolumnen sitter i sektionen (texten förblir vänsterställd).',
-  // ── tracking & cookies pane ──
   'Tracking & cookies': 'Spårning & cookies',
   'Enable tracking': 'Aktivera spårning',
   'Google Tag Manager ID': 'Google Tag Manager-ID',
@@ -110,7 +104,6 @@ export default {
   'Logo strip': 'Logotyprad',
   'Contact form': 'Kontaktformulär',
 
-  // ── common field labels ──
   'Heading': 'Rubrik',
   'Heading (H1)': 'Rubrik (H1)',
   'Heading (optional)': 'Rubrik (valfritt)',
@@ -149,7 +142,6 @@ export default {
   'Highlight': 'Markering',
   'Icon': 'Ikon',
 
-  // ── links / buttons ──
   'Button': 'Knapp',
   'Button label': 'Knapptext',
   'Button label (optional)': 'Knapptext (valfritt)',
@@ -163,7 +155,6 @@ export default {
   'Published': 'Publicerad',
   "Uncheck to hide the page — unpublished pages aren't built.": 'Avmarkera för att dölja sidan — avpublicerade sidor byggs inte.',
 
-  // ── images / media ──
   'Image': 'Bild',
   'Images': 'Bilder',
   'Alt text': 'Alt-text',
@@ -180,12 +171,10 @@ export default {
   'Logo alt text': 'Alt-text för logotyp',
   'Logo accent': 'Logotypaccent',
 
-  // ── contact ──
   'Email': 'E-post',
   'Phone': 'Telefon',
   'Phone (tel: link)': 'Telefon (tel:-länk)',
 
-  // ── layout / style options ──
   'Auto': 'Auto',
   'Full width': 'Full bredd',
   'Narrow (reading column)': 'Smal (läskolumn)',
@@ -206,7 +195,6 @@ export default {
   'Text on brand': 'Text på varumärke',
   'Background': 'Bakgrund',
 
-  // ── cover block (full-bleed photo / video) ──
   'Cover (full-bleed)': 'Helbild (full bredd)',
   'Full-bleed banner — a background photo or muted looping video, with overlaid heading, text and buttons.': 'Helbildsbanner — ett bakgrundsfoto eller en tyst loopad video, med rubrik, text och knappar ovanpå.',
   'Second button label': 'Andra knappens text',
@@ -242,7 +230,6 @@ export default {
   'Sticky header': 'Fäst sidhuvud',
   'Header stays fixed at the top while scrolling. Default: it scrolls away with the page.': 'Sidhuvudet stannar kvar högst upp vid scrollning. Standard: det rullar bort med sidan.',
 
-  // ── nav links + dropdowns ──
   '— No page —': '— Ingen sida —',
   'Dropdown from collection': 'Rullgardin från samling',
   '…or manual sub-links': '…eller egna underlänkar',
@@ -250,13 +237,11 @@ export default {
   'Optional. Fill a dropdown with every entry of a collection (e.g. all services). Overrides manual sub-links below.': 'Valfritt. Fyll en rullgardin med alla poster i en samling (t.ex. alla tjänster). Åsidosätter egna underlänkar nedan.',
   'Blog': 'Blogg',
 
-  // ── hero "highlights" + "motif" media ──
   'Highlights (icon + title + line)': 'Höjdpunkter (ikon + titel + rad)',
   'Motif (animated, no image)': 'Mönster (animerat, ingen bild)',
   'Highlights (if “Highlights” chosen)': 'Höjdpunkter (om ”Höjdpunkter” valts)',
   'Highlights': 'Höjdpunkter',
   'A few key points shown as a stacked panel beside the heading.': 'Några nyckelpunkter som visas som en panel bredvid rubriken.',
-  // ── grouped zones (block-field convention, Phase 2) ──
   'Media': 'Media',
   'Appearance': 'Utseende',
   'Size and placement — rarely needs changing.': 'Storlek och placering — behöver sällan ändras.',
@@ -276,17 +261,14 @@ export default {
   'The picture beside the text.': 'Bilden bredvid texten.',
   'Cover images on the cards.': 'Omslagsbilder på korten.',
   'The photo beside the page heading.': 'Fotot bredvid sidrubriken.',
-  // conditional-field triggers (hint standard: plain label + "used when" hint)
   'Used when Right-side media = Image.': 'Används när Media till höger = Bild.',
   'A few key points beside the heading. Used when Right-side media = Highlights.': 'Några nyckelpunkter bredvid rubriken. Används när Media till höger = Höjdpunkter.',
   'Used when Background = Video. Muted, looping MP4/WebM; the image shows until it plays.': 'Används när Bakgrund = Video. Tyst, loopad MP4/WebM; bilden visas tills den spelas.',
-  // ── textImage aside ──
   'Aside · heading': 'Sidoruta · rubrik',
   'Aside · text': 'Sidoruta · text',
   'Aside · button label': 'Sidoruta · knapptext',
   'Aside · button link': 'Sidoruta · knapplänk',
 
-  // ── settings / chrome collections ──
   'Settings': 'Inställningar',
   'Site & contact': 'Webbplats & kontakt',
   'Site name': 'Webbplatsnamn',
@@ -297,7 +279,6 @@ export default {
   'An icon/mark. The wordmark is the text below, set in your display font.': 'En ikon/ett märke. Ordmärket är texten nedan, satt i ditt rubriktypsnitt.',
   'Browser-tab icon — SVG recommended (scales to any size). Defaults to the shipped mark when empty.': 'Ikon i webbläsarfliken — SVG rekommenderas (skalar till alla storlekar). Tomt = det medföljande märket.',
   'iOS home-screen icon — a 180×180 PNG. Optional.': 'Hemskärmsikon för iOS — en PNG på 180×180. Valfritt.',
-  // ── Share-cards settings pane ──
   'Share cards': 'Delningskort',
   'Site default share image': 'Standardbild för delning',
   'Shown when a page is shared (iMessage, Slack, social) and it has no card of its own. Use ~1200×630px.': 'Visas när en sida delas (iMessage, Slack, sociala medier) och saknar eget kort. Använd ca 1200×630 px.',
@@ -331,7 +312,6 @@ export default {
   'Header': 'Sidhuvud',
   'Menu links': 'Menylänkar',
   'Footer': 'Sidfot',
-  // footer pane fields + hints
   'Dark footer': 'Mörk sidfot',
   'Use the dark surface for the footer.': 'Använd den mörka ytan för sidfoten.',
   'A line under the logo.': 'En rad under logotypen.',
@@ -345,7 +325,6 @@ export default {
   'Legal links (bottom bar)': 'Juridiska länkar (nedre raden)',
   'A path like /privacy, or a full URL.': 'En sökväg som /integritet, eller en fullständig URL.',
   'Appended to the © line.': 'Läggs till på ©-raden.',
-  // logo (Identity) + header/footer show toggles
   'Shown in the header and footer (each chooses what to display).': 'Visas i sidhuvud och sidfot (var och en väljer vad som visas).',
   'Show logo mark': 'Visa logotypmärke',
   'Show wordmark text': 'Visa ordmärkestext',
@@ -354,7 +333,6 @@ export default {
   'Show the logo image (set under Identity) in the footer.': 'Visa logotypbilden (anges under Identitet) i sidfoten.',
   'Show the wordmark text (set under Identity) in the footer.': 'Visa ordmärkestexten (anges under Identitet) i sidfoten.',
   'Theme colours': 'Temafärger',
-  // theme colour fields (role-based labels + hints)
   'Primary': 'Primärfärg',
   'Text on primary': 'Text på primärfärg',
   'Tinted surface': 'Tonad yta',
@@ -370,7 +348,6 @@ export default {
   'Secondary accent — badges, small highlights.': 'Sekundär accent — märken och små framhävningar.',
   'A second accent you deploy by choice (eyebrow, callout).': 'En andra accent som du sätter in medvetet (dårrad, framhävning).',
   'Attention accent — tags, badges, status. Used in isolation.': 'Uppmärksamhetsaccent — taggar, märken, status. Används enskilt.',
-  // eyebrow style + colour (site-wide)
   'Eyebrow style': 'Dårradsstil',
   'Eyebrow colour': 'Dårradsfärg',
   'The small label above headings (e.g. “OUR SERVICES”) — site-wide.': 'Den lilla etiketten ovanför rubriker (t.ex. ”VÅRA TJÄNSTER”) — för hela webbplatsen.',
@@ -383,7 +360,6 @@ export default {
   'Background for blocks set to the Dark surface. Empty = derived from Primary.': 'Bakgrund för block med ytan Mörk. Tom = härleds från primärfärgen.',
   'Text colour on dark sections. Empty = a light off-white.': 'Textfärg på mörka sektioner. Tom = ljust benvit.',
   'Card borders / dividers on dark sections. Empty = a faint light rule.': 'Kortkanter / avdelare på mörka sektioner. Tom = svag ljus linje.',
-  // fonts
   'Heading font': 'Rubriktypsnitt',
   'Body font': 'Brödtextstypsnitt',
   'Custom font file': 'Egen typsnittsfil',
@@ -391,7 +367,6 @@ export default {
   'Custom body font file': 'Eget brödtextstypsnitt (fil)',
   'Used when Heading font = Custom. A .woff2 / .woff / .ttf / .otf file (a font file, not an SVG).': 'Används när Rubriktypsnitt = Eget. En .woff2 / .woff / .ttf / .otf-fil (en typsnittsfil, inte en SVG).',
   'Used when Body font = Custom. Leave empty to reuse the heading font for body.': 'Används när Brödtextstypsnitt = Eget. Lämna tomt för att återanvända rubriktypsnittet.',
-  // logo text size/weight
   'Logo text size': 'Logotyp · textstorlek',
   'Logo text weight': 'Logotyp · textvikt',
   'Small': 'Liten',
@@ -420,7 +395,6 @@ export default {
   'SEO description': 'SEO-beskrivning',
   'Sections · build the page (drag to reorder)': 'Sektioner · bygg sidan (dra för att ändra ordning)',
 
-  // ── label_singular ──
   'Section': 'Sektion',
   'Card': 'Kort',
   'Key point': 'Nyckelpunkt',
@@ -431,7 +405,6 @@ export default {
   'Column': 'Kolumn',
   'Fact': 'Fakta',
 
-  // ── block gallery: group names + page chrome ──
   'Hero & headers': 'Hero & sidhuvuden',
   'Cards & lists': 'Kort & listor',
   'Quote & highlight': 'Citat & framhävning',
@@ -446,7 +419,6 @@ export default {
   'No matches.': 'Inga träffar.',
   'Reads from a collection': 'Läser från en samling',
 
-  // ── block gallery: one-line summaries (what each section produces) ──
   'Full-width intro — eyebrow, H1, text and a button, with an optional image, highlights list or animated motif beside it.': 'Intro i full bredd — dårrad, H1, text och knapp, med valfri bild, höjdpunktslista eller animerat mönster bredvid.',
   'Page title band (light or dark): eyebrow, H1, intro and an optional button.': 'Sidtitelband (ljust eller mörkt): dårrad, H1, ingress och en valfri knapp.',
   'A block of rich (markdown) text with an optional heading.': 'Ett block med formaterad text (markdown) och en valfri rubrik.',
@@ -473,7 +445,6 @@ export default {
   'Logo / partner strip, filled automatically from settings.': 'Logotyp-/partnerrad som fylls automatiskt från inställningarna.',
   'Contact form, rendered automatically.': 'Kontaktformulär som renderas automatiskt.',
 
-  // ── collection editors (testimonials · services · areas/towns · posts) ──
   'Name': 'Namn',
   'Role / company': 'Roll / företag',
   'Testimonial': 'Omdöme',
@@ -516,7 +487,6 @@ export default {
   'Show the newest post as a large lead card.': 'Visa det senaste inlägget som ett stort ledande kort.',
   'Show a cover on cards + the article — your image, or a themed default if none.': 'Visa en omslagsbild på korten + artikeln — din bild, eller en standardbild i temats stil om ingen finns.',
 
-  // ── catalog / listings ──
   'Catalog – items for sale (from a listing)': 'Katalog – varor till salu (från en listning)',
   'For-sale items from a catalog listing — filterable cards with cover, status badge, price and specs.': 'Varor till salu från en katalog-listning — filtrerbara kort med bild, statusmärke, pris och specifikationer.',
   'Price': 'Pris',
@@ -529,7 +499,6 @@ export default {
   'Reserved': 'Reserverad',
   'Sold': 'Såld',
 
-  // ── contact form + thank-you ──
   'Intro / description': 'Intro / beskrivning',
   'Field label — name': 'Fältetikett — namn',
   'Field label — email': 'Fältetikett — e-post',
@@ -544,7 +513,6 @@ export default {
   'Tick the parts to display. Anything with no info in Contact settings is skipped (e.g. the map needs an address with lat/lng).': 'Bocka i delarna som ska visas. Allt som saknar uppgifter i kontaktinställningarna hoppas över (t.ex. kartan behöver en adress med lat/lng).',
   'Shown as chips (Split) or a mono readout (Panel). Ignored in Classic.': 'Visas som chips (Delad) eller som text i monospace (Panel). Ignoreras i Klassisk.',
   'Opening hours': 'Öppettider',
-  // contact pane — address / hours / away / socials
   'Address': 'Adress',
   'Street': 'Gatuadress',
   'Postcode': 'Postnummer',
@@ -586,7 +554,6 @@ export default {
   'Home (/)': 'Startsida (/)',
   'A contact form with an optional direct-contact card. Heading, intro, field labels and layout are all editable.': 'Ett kontaktformulär med ett valfritt direktkontaktkort. Rubrik, intro, fältetiketter och layout går att redigera.',
 
-  // ── hints ──
   '1 or 2.': '1 eller 2.',
   '2 or 3.': '2 eller 3.',
   'E.g. "Read more". Shown only if the card has a link.': 'T.ex. ”Läs mer”. Visas bara om kortet har en länk.',
@@ -611,7 +578,6 @@ export default {
   'e.g. “Trusted by” or “Built on”.': 'T.ex. ”De litar på oss” eller ”Byggt på”.',
   'Blank uses the page title.': 'Tomt = sidans titel.',
   'Optional line under the heading. Blank = hidden.': 'Valfri rad under rubriken. Tomt = dold.',
-  // short hints for selects/booleans (hint standard pass)
   'Band puts the title on a dark full-width band.': 'Band lägger titeln på ett mörkt band i full bredd.',
   'Where the text sits on the cover.': 'Var texten sitter på helbilden.',
   'Tall fills most of the screen; Medium is a shorter band.': 'Hög fyller det mesta av skärmen; Mellan är ett kortare band.',

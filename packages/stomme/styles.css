@@ -1,14 +1,5 @@
-/* ─────────────────────────────────────────────────────────────────────────
- * stomme — the component library stylesheet. Import once in your site, then
- * override: recolor by setting the CSS variables below (e.g. via the theme
- * collection injected on <html>), or restyle any class in your own stylesheet
- * loaded after this one. No Tailwind dependency — plain, overridable classes.
- * ───────────────────────────────────────────────────────────────────────── */
-
 :root {
   --color-brand: #4338ca;
-  /* Pressed/hover shade of the brand — derived so it tracks any brand colour the
-     theme sets (it isn't a theme field). */
   --color-brand-press: color-mix(in srgb, var(--color-brand) 82%, #000);
   --color-ink: #1f2937;
   --color-on-dark: #ffffff;
@@ -16,15 +7,11 @@
   --color-paper: #ffffff;
   --color-muted: #6b7280;
   --color-line: #e5e7eb;
-  /* Secondary accent — a deployable second brand colour (theme sets it; default below).
-     Used where a block/eyebrow opts into it, never forced beside the primary. */
   --color-secondary: #0ea5e9;
   --color-highlight: #f59e0b;
   /* Which accent the eyebrow marker uses — overridden on <html> from theme.eyebrowColor. */
   --eyebrow-accent: var(--color-brand);
 
-  /* Dark sections (the `dark` surface). Defaults derive from --color-brand, so they
-     follow the brand with no setup; the theme editor can override each one. */
   --color-dark: color-mix(in srgb, var(--color-brand) 16%, #0c0e13);
   --color-dark-ink: #e9ebf1;
   --color-dark-line: color-mix(in srgb, var(--color-dark-ink) 14%, transparent);
@@ -39,11 +26,9 @@ html { background: var(--color-paper); color: var(--color-ink); }
 body { font-family: var(--font-sans); margin: 0; line-height: 1.6; min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; }
 body > main { flex: 1 0 auto; } /* sticky footer: main grows so the footer sits at the bottom on short pages */
 
-/* layout primitives */
 .section { max-width: 72rem; margin-inline: auto; padding: 2.75rem 1.5rem; }
 @media (min-width: 768px) { .section { padding-block: 3.75rem; } }
-/* Reading measure: a narrower column for text-led blocks (headers, prose, steps)
-   so line length stays legible while grids keep the full width. */
+/* Reading measure — a narrower column for text-led blocks so line length stays legible while grids keep the full width. */
 .section--read { max-width: 53rem; }
 .section-head { max-width: 52rem; }
 
@@ -55,9 +40,7 @@ body > main { flex: 1 0 auto; } /* sticky footer: main grows so the footer sits 
 
 .mono { font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.12em; font-size: 0.74rem; color: var(--color-muted); }
 .eyebrow { display: inline-flex; align-items: center; gap: 10px; }
-/* Eyebrow marker — site-wide style via [data-eyebrow] on <html> (theme.eyebrow).
-   Default: a brand dash. `bullet`: a brand dot. `bold`: no marker, but the eyebrow
-   itself goes heavy + wide-tracked (the cover/"helbild" treatment, extracted). */
+/* Eyebrow marker, site-wide via [data-eyebrow] on <html>: default is a dash, `bullet` a dot, `bold` drops the marker and puts the emphasis in weight + tracking instead. */
 .eyebrow::before { content: ""; width: 18px; height: 2px; background: var(--eyebrow-accent, var(--color-brand)); display: inline-block; }
 [data-eyebrow="bullet"] .eyebrow::before { width: 7px; height: 7px; border-radius: 50%; }
 [data-eyebrow="bold"] .eyebrow::before { display: none; }
@@ -72,10 +55,7 @@ body > main { flex: 1 0 auto; } /* sticky footer: main grows so the footer sits 
 .band { background: var(--color-surface); color: var(--color-ink); }
 .surface-tint { background: color-mix(in srgb, var(--color-surface) 30%, var(--color-paper)); }
 
-/* Dark surface — the "almost dark mode" section finish. Rather than restyle every
-   block, it remaps the design tokens the blocks already read: paper→a dark ground,
-   ink→light text, surface→a slightly-raised dark (elevated cards), line→a faint light
-   rule. Brand + highlight + on-dark keep their values so accents stay vivid. */
+/* The dark surface does not restyle blocks — it remaps the tokens they already read (paper -> dark ground, ink -> light, surface -> raised dark, line -> faint rule), while brand, highlight and on-dark keep their values so accents stay vivid. */
 .surface-dark {
   background: var(--color-dark);
   color: var(--color-dark-ink);
@@ -85,25 +65,19 @@ body > main { flex: 1 0 auto; } /* sticky footer: main grows so the footer sits 
   --color-surface: color-mix(in srgb, var(--color-dark-ink) 12%, var(--color-dark));
   --color-line: var(--color-dark-line);
 }
-/* Spots that hardcode light values the token remap can't reach. */
-/* Headings use the brand colour, which can be dark — force them light on the dark surface
-   (the gradient surface already does this). */
+/* The brand colour can itself be dark, so headings are forced light here. */
 .surface-dark .display { color: var(--color-dark-ink); }
 .surface-dark .hl-row { background: color-mix(in srgb, var(--color-dark-ink) 6%, var(--color-dark)); border-color: var(--color-dark-line); }
 .surface-dark .hl-ic { background: color-mix(in srgb, var(--color-brand) 22%, transparent); }
 .surface-dark .ico-badge { background: color-mix(in srgb, var(--color-brand) 28%, transparent); }
-/* StatPanel is already dark by design — let the wrapper show through instead of
-   painting its (now light) --color-ink ground over it. */
+/* StatPanel is already dark by design — letting the wrapper show through beats painting its now-light --color-ink ground over it. */
 .surface-dark .stat-panel { background: transparent; }
-/* Brand-coloured interactive bits stay legible on dark/gradient surfaces even when the
-   brand itself is dark (a near-black brand would otherwise vanish here): light eyebrow
-   marker + a light-filled primary button. */
+/* A near-black brand would vanish on these surfaces, so the eyebrow marker and the primary button switch to the light ink. */
 .surface-dark, .surface-gradient { --eyebrow-accent: var(--color-dark-ink); }
 .surface-dark .btn, .surface-gradient .btn { background: var(--color-dark-ink); color: var(--color-dark); }
 .surface-dark .btn:hover, .surface-gradient .btn:hover { background: color-mix(in srgb, var(--color-dark-ink) 82%, var(--color-dark)); color: var(--color-dark); }
 
-/* Gradient surface — the cover's slate gradient (+ brand glow) as a full-bleed section
-   background with light text. Same token remap as .surface-dark; headings go light. */
+/* Same token remap as .surface-dark, over the cover's slate gradient. */
 .surface-gradient {
   background: linear-gradient(120deg, #12151d, #222a3a 60%, #10131a);
   color: #e9ebf1;
@@ -116,21 +90,15 @@ body > main { flex: 1 0 auto; } /* sticky footer: main grows so the footer sits 
 .surface-gradient .display { color: #e9ebf1; }
 .surface-gradient .ico-badge { background: color-mix(in srgb, var(--color-brand) 28%, transparent); }
 .surface-gradient .stat-panel { background: transparent; }
-/* Tall hero (the height option) — fills the viewport; text position is selectable. */
 .section--hero-tall { display: flex; flex-direction: column; min-height: 100vh; min-height: 100dvh; }
-/* Print: viewport-height sections explode into pages of solid background (and can kill
-   the print job) — collapse them to their content when printing. */
+/* Print: viewport-height sections become pages of solid background and can kill the print job — collapse them to their content. */
 @media print {
   .section--hero-tall, .cover--h-tall, .cover--h-medium { min-height: 0; }
   body { min-height: 0; }
-  /* Entry animations never run in print — their pre-start `both` state (opacity 0 /
-     undrawn strokes) would leave the element invisible on paper. !important because the
-     base rules come later in the file (source order would silently win otherwise). */
+/* Animations off in print: their pre-start `both` state (opacity 0 / undrawn strokes) would print blank, and !important is needed because the base rules come later in the file. */
   .thanks-confirm, .letter-sheet, .letter-ink, .letter-postmark { animation: none !important; }
   .confirm-badge circle, .confirm-badge path { animation: none !important; stroke-dashoffset: 0; }
-  /* Looping decorative animations print at whatever phase the timer happens to be on —
-     freeze them so the same page always prints the same pixels (lookbook snapshots).
-     .cover__motion's SVG is inlined, so its internal .rise/.drift rules are reachable. */
+/* Freezing the loops makes a printed page (and a lookbook snapshot) identical every time; .cover__motion's SVG is inlined, so its internal .rise/.drift rules are reachable from here. */
   .cover__media--gradient, .hero-motif .hm-rise, .hero-motif .hm-float,
   .cover__motion .rise, .cover__motion .drift { animation: none !important; }
 }
@@ -140,28 +108,23 @@ body > main { flex: 1 0 auto; } /* sticky footer: main grows so the footer sits 
 
 .card { display: block; border: 1px solid var(--color-line); border-radius: 1rem; background: var(--color-paper); overflow: hidden; text-decoration: none; color: inherit; }
 
-/* Tinted placeholder — a fallback image (no upload) drawn as the brand colour masked by
-   the placeholder SVG's alpha, so the default art follows the theme. Keeps the image
-   class's box (width/aspect/radius); the mask replaces object-fit. */
+/* Tinted placeholder — the fallback art is the brand colour masked by the placeholder SVG's alpha, so the mask replaces object-fit while the image class's box is kept. */
 .ph-tint { display: block; background-color: var(--color-brand);
   -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
   -webkit-mask-position: center; mask-position: center;
   -webkit-mask-size: cover; mask-size: cover;
   -webkit-mask-mode: alpha; mask-mode: alpha; }
 
-/* hero */
 .hero-grid { display: grid; grid-template-columns: 1fr; gap: clamp(2rem, 5vw, 3.5rem); align-items: center; }
 @media (min-width: 920px) { .hero-grid.has-media { grid-template-columns: 1.1fr .9fr; } }
 .hero-grid > *, .hero-highlights .hl-row > div { min-width: 0; }
 .hero-media { border-radius: 18px; overflow: hidden; }
 .hero-img { display: block; width: 100%; height: auto; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 18px; border: 1px solid var(--color-line); }
 
-/* hero ticks — short checkmark lines under the intro (key points / reassurances) */
 .hero-ticks { list-style: none; margin: 1.5rem 0 0; padding: 0; display: flex; flex-direction: column; gap: 0.6rem; }
 .hero-ticks li { display: flex; gap: 0.75rem; align-items: baseline; color: var(--color-ink); }
 .hero-ticks__check { color: var(--block-accent, var(--color-brand)); font-weight: 800; flex: none; }
 
-/* hero highlights — an editable list of icon + title + line beside the heading */
 .hero-highlights { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
 .hero-highlights .hl-row { display: flex; gap: 14px; align-items: flex-start; background: var(--color-surface); border: 1px solid var(--color-line); border-radius: 14px; padding: 16px 18px; }
 .hero-highlights .hl-ic { flex: none; width: 42px; height: 42px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: var(--block-accent, var(--color-brand)); background: color-mix(in srgb, var(--block-accent, var(--color-brand)) 12%, var(--color-paper)); }
@@ -169,8 +132,6 @@ body > main { flex: 1 0 auto; } /* sticky footer: main grows so the footer sits 
 .hero-highlights .hl-t { font-weight: 800; color: var(--color-ink); letter-spacing: -.01em; overflow-wrap: break-word; }
 .hero-highlights .hl-d { font-size: .85rem; color: var(--color-muted); margin-top: 2px; overflow-wrap: break-word; }
 
-/* hero motif — a decorative, theme-tinted block animation on a dark panel (no content).
-   Blocks rise and settle on a loop; reduced-motion freezes them. */
 .hero-motif { position: relative; border-radius: 18px; overflow: hidden; aspect-ratio: 4 / 3.2;
   background: radial-gradient(120% 100% at 72% 8%, color-mix(in srgb, var(--color-brand) 14%, transparent), transparent 58%), linear-gradient(160deg, #1b2230, #11151c);
   color: color-mix(in srgb, var(--block-accent, var(--color-brand)) 80%, #fff); display: grid; place-items: center; }
@@ -183,20 +144,12 @@ body > main { flex: 1 0 auto; } /* sticky footer: main grows so the footer sits 
 @keyframes hm-drift { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
 @media (prefers-reduced-motion: reduce) { .hero-motif .hm-rise, .hero-motif .hm-float { animation: none; } }
 
-/* Cover — full-bleed photo / video banner with overlaid text. Text is always
-   light (it sits over a darkened media scrim), so colours are explicit here
-   rather than token-derived. */
-/* Dark base so the always-white cover text keeps contrast even when the media layer is
-   semi-transparent (the animated motion motif) or absent — opaque image/video/gradient
-   media sit on top of it, so it only shows through where there's nothing dark to read on. */
+/* Cover text is always #fff over a dark ground plus a scrim, so its colours are explicit rather than token-derived; the .cover background is that ground and shows through wherever the media layer is transparent or absent. */
 .cover { position: relative; display: flex; overflow: hidden; isolation: isolate; color: #fff; background: var(--color-dark); }
 .cover--h-tall { min-height: 100vh; min-height: 100dvh; }
 .cover--h-medium { min-height: 58vh; }
 .cover__media { position: absolute; inset: 0; z-index: -2; }
 .cover__img, .cover__video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
-/* Generated gradient background — no asset (the mockup's hero bg): a neutral blue-slate
-   diagonal band + a soft brand-coloured radial glow. The scrim (below) layers the
-   darkness for legibility. Slowly drifts (ken-burns). */
 .cover__media--gradient {
   background:
     linear-gradient(120deg, #12151d, #222a3a 60%, #10131a),
@@ -207,21 +160,13 @@ body > main { flex: 1 0 auto; } /* sticky footer: main grows so the footer sits 
 @media (prefers-reduced-motion: reduce) { .cover__media--gradient { animation: none; } }
 .cover__video { z-index: 1; }
 @media (prefers-reduced-motion: reduce) { .cover__video { display: none; } }
-/* Animated background — the inlined motion SVG, tinted to the brand (a touch lightened
-   so it reads on the dark gradient). Sits above the gradient, below the scrim. */
 .cover__media .cover__motion { position: absolute; inset: 0; z-index: 1; color: color-mix(in srgb, var(--color-brand) 78%, #ffffff); opacity: .9; }
 .cover__media .cover__motion svg { width: 100%; height: 100%; display: block; }
 .cover__scrim { position: absolute; inset: 0; z-index: -1; }
 .cover--ov-light .cover__scrim { background: linear-gradient(90deg, rgba(8,9,14,.5), transparent 70%), linear-gradient(0deg, rgba(8,9,14,.42), transparent 45%); }
 .cover--ov-medium .cover__scrim { background: linear-gradient(0deg, rgba(8,9,14,.7), transparent 55%), linear-gradient(90deg, rgba(8,9,14,.5), transparent 65%); }
 .cover--ov-strong .cover__scrim { background: linear-gradient(90deg, rgba(8,9,14,.9), rgba(8,9,14,.6) 50%, rgba(8,9,14,.32)), linear-gradient(0deg, rgba(8,9,14,.72), transparent 55%); }
-/* Header-legibility top scrim — when the page OPENS with the cover, the transparent
-   overlay header (white logo/nav) floats over uncontrolled footage, so darken the top
-   of the media too. It lives on the cover (not the header): the cover is full-bleed
-   from y=0, so the gradient starts under whatever overlays it (header, a site's own
-   strip) with no seam, and it MUST fade to the same colour at zero alpha —
-   rgba(8,9,14,0), never `transparent` or a box edge, both of which read as a hard
-   horizontal line over bright video. Mid-page covers have no header and skip it. */
+/* Top scrim for the overlay header's white logo/nav over uncontrolled footage. It lives on the cover so it starts at y=0 under whatever overlays it, and it MUST fade to rgba(8,9,14,0) — `transparent` or a box edge reads as a hard horizontal line over bright video. */
 main .cover:first-child .cover__scrim::before {
   content: ""; position: absolute; inset: 0 0 auto 0; height: min(30vh, 320px);
   background: linear-gradient(180deg, rgba(8,9,14,.6), rgba(8,9,14,.26) 55%, rgba(8,9,14,0));
@@ -232,8 +177,7 @@ main .cover:first-child .cover__scrim::before {
 .cover--center .cover__inner { align-self: center; }
 .cover--center .cover__h1, .cover--center .cover__intro { margin-inline: auto; }
 .cover--center .cover__cta { justify-content: center; }
-/* Cover eyebrow keeps its own bold/wide/no-marker treatment regardless of the site-wide
-   eyebrow style — a deliberate component override (it's the hero's signature look). */
+/* The cover eyebrow deliberately overrides the site-wide eyebrow style — bold, wide and marker-less is the hero's signature. */
 .cover__eyebrow { font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.16em; font-size: 0.74rem; font-weight: 700; color: color-mix(in srgb, var(--color-brand) 45%, #fff); }
 .cover__h1 { font-family: var(--font-display); font-weight: 800; letter-spacing: -0.02em; line-height: 1.04; font-size: clamp(2.4rem, 6vw, 4.6rem); color: #fff; margin: 0.8rem 0 0; max-width: 18ch; text-shadow: 0 2px 30px rgba(0,0,0,.35); }
 .cover--center .cover__h1 { max-width: 22ch; }
@@ -242,7 +186,6 @@ main .cover:first-child .cover__scrim::before {
 .cover__btn-ghost { background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.3); color: #fff; }
 .cover__btn-ghost:hover { background: rgba(255,255,255,.2); }
 
-/* feature grid */
 .feature-grid { display: grid; gap: 1.25rem; grid-template-columns: 1fr; margin-top: 2.5rem; }
 @media (min-width: 700px) { .feature-grid { grid-template-columns: repeat(3, 1fr); } }
 .feature-card { padding: 1.5rem; display: flex; flex-direction: column; align-items: flex-start; }
@@ -252,7 +195,6 @@ main .cover:first-child .cover__scrim::before {
 .ico-badge { display: inline-flex; width: 44px; height: 44px; align-items: center; justify-content: center; border-radius: 12px; background: color-mix(in srgb, var(--block-accent, var(--color-brand)) 12%, #fff); color: var(--block-accent, var(--color-brand)); }
 .ico-badge svg { width: 24px; height: 24px; }
 
-/* faq */
 .faq-grid { display: grid; grid-template-columns: 1fr; gap: 2.5rem; margin-top: 2.5rem; }
 @media (min-width: 860px) { .faq-grid { grid-template-columns: 1.5fr 1fr; } }
 .faq-list { border-top: 1px solid var(--color-line); margin: 0; }
@@ -263,7 +205,6 @@ main .cover:first-child .cover__scrim::before {
 .faq-aside__h { margin: 0.85rem 0 0; font-weight: 700; }
 .faq-aside__body { margin-top: 0.5rem; color: var(--color-muted); font-size: 0.95rem; }
 
-/* faq · accordion variant (native <details>, no JS) */
 .faq-acc { border-top: 1px solid var(--color-line); }
 .faq-acc__item { border-bottom: 1px solid var(--color-line); }
 .faq-acc__q { display: flex; align-items: center; gap: 1.25rem; padding: 1.25rem 0.25rem; cursor: pointer; list-style: none; }
@@ -279,7 +220,6 @@ main .cover:first-child .cover__scrim::before {
 .faq-acc__a { color: var(--color-muted); padding: 0 0 1.25rem 2.75rem; }
 .faq-acc__a p { margin: 0; max-width: 70ch; }
 
-/* faq · cards variant (brand top-rule, CTA as a card) */
 .faq-cards { margin-top: 2.5rem; display: grid; gap: 1.125rem; grid-template-columns: 1fr; }
 @media (min-width: 720px) { .faq-cards { grid-template-columns: 1fr 1fr; } }
 .faq-qcard { border: 1px solid var(--color-line); border-top: 2px solid var(--color-brand); border-radius: 0.9rem; padding: 1.5rem; background: color-mix(in srgb, var(--color-surface) 22%, var(--color-paper)); }
@@ -291,7 +231,6 @@ main .cover:first-child .cover__scrim::before {
 .faq-qcard__btn { align-self: flex-start; margin-top: 1.25rem; background: var(--color-on-dark); color: var(--color-brand); }
 .faq-qcard__btn:hover { background: color-mix(in srgb, var(--color-on-dark) 88%, var(--color-brand)); }
 
-/* faq · split variant (numbered index + reader panel) */
 .faq-split { margin-top: 2.5rem; display: grid; gap: 2rem; grid-template-columns: 1fr; }
 @media (min-width: 820px) { .faq-split { grid-template-columns: 18rem 1fr; gap: 3rem; } }
 .faq-idx { list-style: none; margin: 0; padding: 0; border-left: 1px solid var(--color-line); }
@@ -308,31 +247,25 @@ main .cover:first-child .cover__scrim::before {
 .faq-reader__cta { margin-top: 2rem; padding-top: 1.75rem; border-top: 1px solid var(--color-line); display: flex; gap: 1.25rem; align-items: center; flex-wrap: wrap; }
 .faq-reader__cta span { color: var(--color-muted); }
 
-/* cta panel */
 .cta-panel { border-radius: 1.25rem; padding: 3rem 2rem; text-align: center; }
 .cta-panel p.lead { margin: 1rem auto 0; max-width: 40rem; }
 
-/* partner strip */
 .partner-strip { border-block: 1px solid var(--color-line); background: color-mix(in srgb, var(--color-surface) 12%, var(--color-paper)); }
 .partner-strip .inner { text-align: center; padding-block: 2.5rem; }
 .partner-logos { display: flex; flex-wrap: wrap; justify-content: center; gap: 16px 40px; margin-top: 1.25rem; }
 .partner-logos span { font-family: var(--font-display); font-weight: 800; letter-spacing: -.01em; font-size: 1.05rem;
   color: color-mix(in srgb, var(--color-ink) 42%, var(--color-paper)); }
 
-/* chrome */
 .site-header { background: var(--color-paper); border-bottom: 1px solid var(--color-line); }
 .site-header .inner, .site-footer .inner { max-width: 72rem; margin-inline: auto; padding: 1rem 1.5rem; }
 .site-header .inner { display: flex; align-items: center; justify-content: flex-start; gap: 1rem; }
-/* Logo left; nav + CTA pushed to the right. The CTA lives in the bar (not the nav) so
-   it stays visible next to the hamburger on mobile. */
+/* The CTA sits in the bar rather than inside .site-nav so it stays visible next to the hamburger on mobile. */
 .site-nav { display: flex; gap: 1.25rem; align-items: center; flex-wrap: wrap; margin-left: auto; }
 .site-nav a { text-decoration: none; color: var(--color-ink); }
 .site-nav a:hover { color: var(--color-brand); }
-/* The CTA is an <a class="btn"> inside the nav — keep the button's on-dark text
-   (the nav link colour above would otherwise out-specify .btn). */
+/* The nav link colour above would out-specify .btn, so the CTA restates the button's on-dark text. */
 .site-nav a.btn { color: var(--color-on-dark); }
 .site-nav a.btn:hover { color: var(--color-on-dark); }
-/* nav dropdown — CSS-only flyout (hover + focus-within); inline accordion on mobile */
 .nav-item--menu { position: relative; display: inline-flex; align-items: center; }
 .nav-top { display: inline-flex; align-items: center; gap: 6px; text-decoration: none; color: var(--color-ink); cursor: pointer; }
 .nav-top:hover { color: var(--color-brand); }
@@ -341,14 +274,12 @@ main .cover:first-child .cover__scrim::before {
 .nav-submenu { position: absolute; top: calc(100% + 10px); left: 0; min-width: 224px; margin: 0; padding: 8px; list-style: none;
   background: var(--color-paper); border: 1px solid var(--color-line); border-radius: 12px; box-shadow: 0 24px 48px -24px rgba(0,0,0,0.35);
   opacity: 0; visibility: hidden; transform: translateY(-6px); transition: opacity 0.15s, transform 0.15s, visibility 0.15s; z-index: 50; }
-/* Transparent bridge over the 10px gap so moving the pointer from header to menu
-   doesn't drop :hover and close it. */
+/* Transparent bridge over the 10px gap — without it, moving the pointer from header to menu drops :hover and closes it. */
 .nav-submenu::before { content: ""; position: absolute; top: -10px; left: 0; right: 0; height: 10px; }
 .nav-item--menu:hover .nav-submenu, .nav-item--menu:focus-within .nav-submenu { opacity: 1; visibility: visible; transform: translateY(0); }
 .nav-submenu a { display: block; padding: 9px 12px; border-radius: 8px; text-decoration: none; color: var(--color-ink); }
 .nav-submenu a:hover { background: color-mix(in srgb, var(--color-surface) 30%, var(--color-paper)); color: var(--color-brand); }
 
-/* Hamburger toggle — hidden on desktop, shown on mobile. Animates to an X when open. */
 .nav-toggle { display: none; align-items: center; justify-content: center; width: 44px; height: 44px; margin-right: -10px; background: none; border: 0; cursor: pointer; color: var(--color-ink); }
 .nav-toggle__bars, .nav-toggle__bars::before, .nav-toggle__bars::after { display: block; width: 22px; height: 2px; background: currentColor; border-radius: 2px; transition: transform 0.2s, opacity 0.2s; }
 .nav-toggle__bars { position: relative; }
@@ -358,11 +289,9 @@ main .cover:first-child .cover__scrim::before {
 .site-header.nav-open .nav-toggle__bars::before { transform: translateY(7px) rotate(45deg); }
 .site-header.nav-open .nav-toggle__bars::after { transform: translateY(-7px) rotate(-45deg); }
 
-/* Mobile: hide the inline nav behind the hamburger; reveal it as a fold-out panel.
-   Dropdowns become inline accordions inside the panel. */
 @media (max-width: 820px) {
   .nav-toggle { display: inline-flex; }
-  .site-cta { margin-left: auto; }       /* keep the CTA in the bar, between nav and the hamburger */
+  .site-cta { margin-left: auto; }
   .site-header .inner { position: relative; }
   .site-nav { display: none; margin-left: 0; }
   .site-header.nav-open .site-nav {
@@ -371,19 +300,15 @@ main .cover:first-child .cover__scrim::before {
     background: var(--color-paper); border-top: 1px solid var(--color-line);
     box-shadow: 0 22px 40px -26px rgba(0,0,0,0.4); padding: 0.25rem 1.5rem 1rem;
   }
-  /* Full-width rows, like the FAQ accordion. Dropdown header = label (fills, navigates)
-     + caret button (right, toggles its submenu); submenu wraps full-width below. */
   .site-header.nav-open .site-nav > a { display: flex; align-items: center; width: 100%;
     padding: 0.9rem 0; border-bottom: 1px solid color-mix(in srgb, var(--color-line) 65%, transparent); }
   .nav-item--menu { display: flex; flex-wrap: wrap; align-items: center; width: 100%;
     border-bottom: 1px solid color-mix(in srgb, var(--color-line) 65%, transparent); }
-  /* the panel's own bottom edge closes the list — a divider under the last row is noise */
   .site-header.nav-open .site-nav > a:last-child,
   .site-header.nav-open .site-nav > .nav-item--menu:last-child { border-bottom: 0; }
   .nav-top { flex: 1; padding: 0.9rem 0; }
   .nav-caret-btn { padding: 0.9rem 0.4rem; margin: 0 -0.4rem 0 0; }
   .nav-caret-btn .nav-caret { width: 9px; height: 9px; opacity: 0.7; }
-  /* Accordion: submenu collapsed until the caret is tapped (.is-open). */
   .nav-submenu { flex-basis: 100%; width: 100%; display: none; position: static; opacity: 1; visibility: visible; transform: none; box-shadow: none;
     border: 0; border-left: 2px solid var(--color-line); border-radius: 0; min-width: 0; margin: 0 0 0.75rem 0.25rem; padding: 0; }
   .nav-submenu::before { display: none; }
@@ -392,29 +317,16 @@ main .cover:first-child .cover__scrim::before {
   .nav-item--menu.is-open .nav-caret { transform: rotate(-135deg) translateY(2px); }
 }
 
-/* Composed logo: an optional mark image beside the wordmark text, set in the
-   display font so it matches the headings. The text colour follows .logo (ink in
-   the light header, light in the dark footer / over a dark hero); the mark is its
-   own fixed-colour file that reads on either ground. */
+/* The logo mark is its own fixed-colour file, so it has to read on both the light header and the dark footer/hero — only the wordmark's colour follows .logo. */
 .logo { display: inline-flex; align-items: center; gap: 0.5rem; font-family: var(--font-display); font-weight: 600; font-size: 1.9rem; color: var(--color-ink); text-decoration: none; line-height: 1; }
 .logo .accent { color: var(--color-brand); }
 .logo-mark { display: block; height: 1.3em; width: auto; flex: 0 0 auto; }
 .logo-word { white-space: nowrap; }
 
-/* Transparent overlay header — when a page opens with a full-bleed cover, the header
-   floats over it (fixed, light text, no bar) so the hero runs to the top edge, then
-   turns solid (.solid, added on scroll past the hero) and over an open mobile panel
-   (.nav-open). Pages that don't open with a cover keep the normal in-flow solid header. */
-/* Sticky header (opt-in via nav.sticky). On normal pages it sticks to the top, opaque.
-   Default (no .is-sticky) the header is in normal flow and scrolls away with the page. */
+/* Sticky header, opt-in via nav.sticky; without .is-sticky the header is in normal flow and scrolls away with the page. */
 .site-header.is-sticky { position: sticky; top: 0; z-index: 50; }
 
-/* Transparent overlay header — the page opens with a full-bleed hero-type block: a cover,
-   or a hero set to a Dark/Gradient surface. The header floats over it with light text and
-   no bar. By default it is NOT sticky, so it's positioned over the hero (absolute) and
-   scrolls away with it — the logo/nav can never overlap the heading. When sticky it stays
-   fixed and turns solid (.solid, added on scroll past the hero) to stay legible; it also
-   goes solid over an open mobile panel (.nav-open). */
+/* Over a full-bleed cover or a dark/gradient hero the header floats with light text and no bar: absolute by default so it scrolls away with the hero and can never overlap the heading, fixed only when sticky, where .solid (added past the hero) and .nav-open restore legibility. */
 body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header {
   position: absolute; top: 0; left: 0; right: 0; z-index: 50;
   background: transparent; border-bottom-width: 0; color: #fff;
@@ -425,14 +337,11 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
 body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header .site-nav > a,
 body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header .nav-top,
 body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header .nav-toggle { color: #fff; }
-/* The dropdown panel is always a light popup, so its links keep the normal dark colour. */
 body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header .logo .accent { color: var(--color-brand); }
-/* solid state — sticky header scrolled past the hero, or the mobile menu is open */
 body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header.solid,
 body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header.nav-open {
   background: color-mix(in srgb, var(--color-paper) 96%, transparent);
-  /* reset the base #fff (set for the transparent state) so inherited bits like the
-     dropdown caret (currentColor) turn dark too, not just the explicitly-reset links */
+/* Resets the base #fff so inherited bits like the dropdown caret (currentColor) turn dark too, not just the explicitly-reset links. */
   color: var(--color-ink);
   -webkit-backdrop-filter: saturate(1.2) blur(8px); backdrop-filter: saturate(1.2) blur(8px);
   border-bottom: 1px solid var(--color-line); box-shadow: 0 12px 30px -24px rgba(0,0,0,0.5);
@@ -448,12 +357,9 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
 body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header.solid .logo .accent,
 body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header.nav-open .logo .accent { color: var(--color-brand); }
 
-/* No top margin — the footer sits flush against the last block (its own padding-block
-   gives the breathing room). A margin here showed the page background as a gap, which
-   reads as a stray white strip above a dark footer or after a coloured band. */
+/* No top margin on the footer: it showed the page background as a stray strip above a dark footer or after a coloured band, and the footer's own padding-block gives the room. */
 .site-footer { background: var(--color-surface); color: var(--color-ink); }
 .site-footer .inner { padding-block: 3rem; }
-/* Dark footer (footer.dark) — reuses the dark-section tokens so it matches dark blocks. */
 .site-footer--dark {
   background: var(--color-dark, #141821); color: var(--color-dark-ink, #e9ebf1);
   --color-ink: var(--color-dark-ink, #e9ebf1);
@@ -462,15 +368,13 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
 }
 .footer-grid { display: flex; gap: 40px 56px; flex-wrap: wrap; align-items: flex-start; }
 .footer-grid > :first-child { flex: 1 1 300px; }
-/* Link columns stay grouped + right-aligned: they wrap below the brand together
-   (never one-up/one-down), and margin-left:auto keeps them right even when wrapped. */
+/* The link columns wrap below the brand as one group (never one-up/one-down) and margin-left:auto keeps them right-aligned even when wrapped. */
 .footer-cols { display: flex; gap: 32px 56px; flex-wrap: wrap; margin-left: auto; }
 .footer-link { color: inherit; text-decoration: none; font-weight: 600; }
 .footer-link:hover { color: var(--color-brand); }
 .footer-links { list-style: none; padding: 0; margin: 1rem 0 0; }
 .footer-links li { margin: 4px 0; }
 .footer-towns { display: grid; grid-template-columns: repeat(2, auto); gap: 4px 2.5rem; }
-/* Bottom bar — © line + optional small-print legal links. */
 .footer-bar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px 20px; margin-top: 2.5rem; padding-top: 1.25rem; border-top: 1px solid var(--color-line); }
 .footer-legal { display: flex; flex-wrap: wrap; gap: 18px; list-style: none; margin: 0; padding: 0; font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.04em; }
 .footer-legal .footer-link { font-weight: 500; color: var(--color-muted); }
@@ -489,22 +393,15 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
 .prose-fig--right.prose-fig--small, .prose-fig--left.prose-fig--small { width: 30%; }
 .prose::after { content: ""; display: block; clear: both; }
 
-/* Prose pull-stat — a single inline figure under the text (Prose statValue/statLabel).
-   Big enough that the brand colour counts as large text (AA 3:1). */
+/* Prose pull-stat (Prose statValue/statLabel) — kept big enough that the brand colour counts as large text (AA 3:1). */
 .prose-stat { margin: 1.6rem 0 0; max-width: 72ch; border-top: 1px solid var(--color-line); padding-top: 1.4rem; display: flex; gap: 1.25rem; align-items: center; flex-wrap: wrap; }
 .prose-stat__n { font-family: var(--font-display); font-weight: 800; font-size: clamp(2.4rem, 4vw, 3.2rem); line-height: 1; letter-spacing: -0.01em; color: var(--color-brand); font-variant-numeric: tabular-nums; }
 .prose-stat__l { color: var(--color-muted); font-size: 0.95rem; max-width: 22rem; }
 
-/* ───────────────────────────────────────────────────────────────────────
-   Block component styles (moved out of scoped <style> so a site can override
-   any of them from its own global.css). Class-scoped; no bare element selectors.
-   ─────────────────────────────────────────────────────────────────────── */
+/* Block component styles live here rather than in scoped <style> so a site can override any of them from its own global.css — class-scoped, no bare element selectors. */
 
-/* BeforeAfter */
 .ba { position: relative; aspect-ratio: 16 / 10; border-radius: 16px; overflow: hidden; border: 1px solid var(--color-line); margin: 2rem 0 0; --pos: 50%; }
-  /* :global — rendered by Cover, so it isn't in this component's style scope. */
   .ba-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
-  /* Default (no uploaded images): the inlined structural art, tinted to the brand. */
   .ba-art { display: grid; place-items: center; color: var(--color-brand); background: color-mix(in srgb, var(--color-brand) 7%, var(--color-paper)); }
   .ba-art svg { width: 100%; height: 100%; display: block; }
   .ba-clip { position: absolute; inset: 0; clip-path: inset(0 calc(100% - var(--pos)) 0 0); }
@@ -523,7 +420,6 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
   .ba-tag-after { right: 12px; }
   .ba-range { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: ew-resize; }
 
-/* Callout */
 .callout {
     margin: 0;
     border-left: 4px solid var(--block-accent, var(--color-brand));
@@ -535,14 +431,12 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
     font-size: clamp(1.5rem, 3.5vw, 2.25rem);
     line-height: 1.3;
   }
-  /* width of the quote column + where it sits in the section. `narrow` is handled by
-     section--read on the section (same box as a narrow hero); these size the figure. */
+  /* These size the quote figure; `narrow` is the section's own section--read box, which is why no --narrow class exists here. */
   .callout--xnarrow { max-width: 34rem; }
   .callout--full { max-width: none; }
   .callout--center { margin-inline: auto; }
   .callout--right { margin-left: auto; }
 
-/* Definition — dictionary-style word entry */
 .definition--xnarrow { max-width: 34rem; }
   .definition--full { max-width: none; }
   .definition--center { margin-inline: auto; }
@@ -558,7 +452,6 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
   /* margin, not template whitespace, separates the note — Astro collapses the gap */
   .definition__note { color: var(--color-muted); margin-left: 0.35em; }
 
-/* Fragment — placed editorial aside; consecutive fragments drift across the page */
 .fragment { max-width: 28rem; }
   .fragment--right { margin-left: auto; margin-right: clamp(0rem, 6vw, 5rem); }
   .fragment--indent { margin-left: clamp(4rem, 18vw, 16rem); }
@@ -567,7 +460,6 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
   .fragment__body { margin: 1rem 0 0; color: var(--color-muted); }
   .fragment__link { margin: 1.5rem 0 0; }
 
-/* Checklist */
 .checklist {
     list-style: none;
     margin: 2.5rem 0 0;
@@ -603,7 +495,6 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
     color: var(--color-muted);
   }
 
-/* ContactForm */
 .contact-grid {
     display: grid;
     gap: 2.5rem;
@@ -634,8 +525,7 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
   /* No border reset: on a theme where .btn IS an outline button, the submit button would render as bare text with no frame. */
   .contact-form .btn { align-self: flex-start; cursor: pointer; }
 
-  /* Direct-contact card — shared by the contact-form aside, /thanks, and the inline
-     confirmation (DirectContact.astro). `--tint` is the soft brand-tinted variant. */
+  /* Direct-contact card — shared by the contact-form aside, /thanks and the inline confirmation (DirectContact.astro), so a change here lands in all three. */
   .direct-card {
     align-self: start;
     border: 1px solid var(--color-line);
@@ -661,7 +551,6 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
   .direct-card__email { margin: 0.5rem 0 0; }
   .direct-card__email a { font-weight: 600; color: var(--color-ink); text-decoration: none; }
   .direct-card__email a:hover { color: var(--color-brand); }
-  /* sections (hours / visit / follow) */
   .direct-card__sec { margin-top: 1.25rem; }
   .direct-card__h { font-size: 0.62rem; letter-spacing: 0.12em; color: var(--color-muted); margin: 0 0 0.5rem; font-weight: 600; }
   .direct-card__hours { margin: 0; display: flex; flex-direction: column; gap: 0.3rem; font-size: 0.92rem; font-variant-numeric: tabular-nums; }
@@ -670,17 +559,11 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
   .direct-card__hval { color: var(--color-ink); }
   .direct-card__hnote { margin: 0.4rem 0 0; color: var(--color-muted); font-size: 0.82rem; }
   .direct-card__addr { margin: 0; font-size: 0.95rem; line-height: 1.5; }
-  /* away + holiday notice — highlight-tinted */
   .direct-card__away, .direct-card__holiday { display: flex; gap: 0.55rem; align-items: flex-start; margin: 0 0 1.1rem; padding: 0.6rem 0.8rem; font-size: 0.88rem; line-height: 1.4; border-radius: 0.6rem;
     background: color-mix(in srgb, var(--color-highlight) 14%, var(--color-paper)); border: 1px solid color-mix(in srgb, var(--color-highlight) 35%, var(--color-paper)); }
   .direct-card__holiday { margin: 0 0 0.6rem; }
   .direct-card__away-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--color-highlight); margin-top: 0.4rem; flex: 0 0 auto; }
-  /* Map: the OSM embed paints its own attribution/links bar (Report a problem · ©
-     OpenStreetMap · Make a Donation) pinned to the bottom edge of the iframe. We can't
-     reach across the iframe boundary, so the wrapper clips it — the iframe is grown
-     120px taller and offset -60px, so an equal slice is cut off top + bottom: the
-     bottom takes the links bar with it (whatever it wraps to), while the centred marker
-     stays centred. Attribution is restored as our own small caption (.map-attrib). */
+  /* The OSM embed paints its own attribution bar on the iframe's bottom edge and we cannot reach across the boundary, so the iframe is grown 120px and offset -60px: an equal slice is cut top and bottom, taking the bar with it while the centred marker stays centred, and attribution returns as .map-attrib. */
   .direct-card__map { position: relative; overflow: hidden; margin-top: 1.25rem; border-radius: 0.75rem; border: 1px solid var(--color-line); aspect-ratio: 16 / 10; }
   .direct-card__map iframe { position: absolute; top: -60px; left: 0; width: 100%; height: calc(100% + 120px); border: 0; display: block; filter: saturate(0.92); }
   .map-attrib { margin: 0.4rem 0 0; font-size: 0.66rem; color: var(--color-muted); }
@@ -690,11 +573,8 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
   .direct-card__socials a:hover { border-color: var(--color-brand); }
   .direct-card__socials svg { width: 18px; height: 18px; }
   .direct-card__footer { margin: 1.6rem 0 0; color: var(--color-muted); }
-  /* contactCard block — a standalone, centred placement of the card. width:100% so it
-     fills up to its max in any container (incl. a flex/centred parent like the CMS
-     preview), instead of collapsing to its content width. */
+  /* width:100% so the card fills up to its max in a flex/centred parent (the CMS preview) instead of collapsing to its content width. */
   .contact-card-block { width: 100%; max-width: 460px; margin-inline: auto; }
-  /* findUs block — map beside address/contact/hours */
   .findus-block { width: min(72rem, 100% - 3rem); margin-inline: auto; padding: clamp(2.5rem, 6vw, 4rem) 0; }
   .findus { display: grid; grid-template-columns: 1.3fr 1fr; border: 1px solid var(--color-line); border-radius: 18px; overflow: hidden; background: var(--color-paper); }
   @media (max-width: 760px) { .findus { grid-template-columns: 1fr; } }
@@ -710,17 +590,13 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
   .findus__email { font-weight: 600; color: var(--color-ink); text-decoration: none; }
   .findus__hours { font-size: 0.95rem; }
 
-  /* Form block header (heading + intro own by the block) */
   .contact-head { margin-bottom: 2.5rem; }
   .contact-head .contact-h1 { font-family: var(--font-display); color: var(--color-ink); font-size: clamp(2rem, 4vw, 2.7rem); font-weight: 800; letter-spacing: -.02em; line-height: 1.08; margin: 0; max-width: 16ch; }
   .contact-head .contact-intro { color: var(--color-muted); font-size: 1.12rem; margin: 1rem 0 0; max-width: 52ch; }
-  /* Direct-contact card: top-aligned with the first INPUT (not its label), so the card's
-     border lines up with the input's. Offset = label line (0.74rem × 1.6) + input margin-top. */
+  /* Offset = label line (0.74rem x 1.6) + the input's margin-top, so the card's border lines up with the first INPUT's rather than with its label. */
   @media (min-width: 1024px) { .contact-grid .direct-card { align-self: start; margin-top: calc(0.74rem * 1.6 + 0.375rem); } }
-  /* Direct-contact off → single column, centred in the section. */
   .contact-grid--solo { grid-template-columns: 1fr; max-width: 580px; margin-inline: auto; }
 
-/* Contact confirmation — the inline "what you sent" (after submit) + the /thanks page */
   .confirm-badge { width: 68px; height: 68px; border-radius: 999px; display: grid; place-items: center; margin-bottom: 1.4rem;
     background: color-mix(in srgb, var(--color-brand) 12%, var(--color-paper));
     border: 1px solid color-mix(in srgb, var(--color-brand) 22%, var(--color-paper)); }
@@ -729,16 +605,12 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
   .confirm-eyebrow { margin: 0 0 .7rem; }
   .confirm-head { font-size: clamp(1.6rem, 3.5vw, 2.1rem); font-weight: 800; letter-spacing: -.02em; line-height: 1.1; margin: 0; max-width: 20ch; text-wrap: balance; }
   .confirm-lead { color: var(--color-muted); font-size: 1.08rem; margin: .9rem 0 0; max-width: 46ch; }
-  /* card section label — uses the shared .mono .eyebrow eyebrow so it follows the
-     site's eyebrow style + colour ([data-eyebrow] + --eyebrow-accent); this is just spacing */
+  /* Spacing only — the label reuses .mono .eyebrow so it follows the site's eyebrow style and colour. */
   .confirm-label { margin: 0 0 1rem; }
   .confirm-actions { margin-top: 1.6rem; display: flex; gap: .8rem; flex-wrap: wrap; align-items: center; }
-  /* Secondary/outline button (confirmation's optional 2nd button) — distinct from .btn-ghost,
-     which is the text-link phone CTA used in heroes. */
+  /* Outline button — distinct from .btn-ghost, which is the text-link phone CTA used in heroes. */
   .btn-outline { background: var(--color-paper); color: var(--color-brand); border: 1px solid var(--color-line); }
   .btn-outline:hover { border-color: color-mix(in srgb, var(--color-brand) 40%, var(--color-line)); }
-  /* /thanks page + Thank-you preview — centered confirmation, then a two-up of the
-     "what you sent" recap and a tinted direct-contact card (confirmation mockup parity). */
   .thanks-confirm { max-width: 760px; margin-inline: auto; text-align: center; padding-bottom: clamp(2.5rem, 6vw, 4.5rem); animation: confirm-rise .55s cubic-bezier(.2,.7,.3,1) both; }
   .thanks-confirm .confirm-badge { margin-inline: auto; }
   .thanks-confirm .confirm-head, .thanks-confirm .confirm-lead { margin-inline: auto; }
@@ -753,7 +625,6 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
   .confirm-recap-dl dd { margin: 0; overflow-wrap: anywhere; }
   .confirm-recap-dl .confirm-msg { grid-column: 1 / -1; border-top: 1px solid var(--color-line); padding-top: 1rem; margin-top: .1rem; }
   .confirm-recap-dl .confirm-msg dt { margin-bottom: .35rem; }
-  /* Phones: stack the recap label/value pairs so long field labels don't crush the value */
   @media (max-width: 540px) {
     .confirm-card { padding: 1.4rem 1.3rem; }
     .confirm-recap-dl { grid-template-columns: 1fr; gap: .15rem; }
@@ -770,7 +641,6 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
     .confirm-badge circle, .confirm-badge path { animation: none; stroke-dashoffset: 0; }
   }
 
-/* CtaBox */
 .ctabox {
     border-radius: 1.5rem;
     background: var(--color-brand);
@@ -795,7 +665,6 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
   .ctabox-link2 { display: inline-block; margin: 1.75rem 0 0 1.5rem; }
   .ctabox .btn-ghost, .ctabox .btn-ghost:hover { color: var(--color-on-dark); }
 
-  /* Split — copy beside a dark facts card (facts render as chips). */
   .ctabox--split {
     text-align: left;
     display: grid; gap: 2rem; grid-template-columns: 1fr; align-items: center;
@@ -804,10 +673,7 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
   @media (min-width: 800px) {
     .ctabox--split { grid-template-columns: 1.1fr 0.9fr; gap: clamp(2rem, 4vw, 3.5rem); }
   }
-  /* The facts card is a dark ops-style scene: the facts pinned top-left as mono
-     chip pills over a subtle brand glow. It is decorative (aria-hidden; the copy
-     carries the message) — sites can layer more scene art on it via ::before /
-     ::after (e.g. a site adds bespoke scene art in its global.css). */
+  /* The facts card is decorative (aria-hidden — the copy carries the message) and its ::before/::after are left free for a site to layer its own scene art on. */
   .ctabox-aside {
     list-style: none; margin: 0; padding: 0.85rem;
     position: relative; overflow: hidden; aspect-ratio: 16 / 9.5;
@@ -829,7 +695,6 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
   }
   .ctabox-chip b { color: var(--color-brand); font-weight: 600; letter-spacing: 0.06em; }
 
-  /* Panel — a dark box with the copy plus a mono key/value readout. */
   .ctabox--panel {
     text-align: left;
     background: var(--color-ink); color: var(--color-on-dark);
@@ -860,7 +725,6 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
     font-variant-numeric: tabular-nums;
   }
 
-/* Gallery */
 .gallery-grid { display: grid; gap: 1.25rem; grid-template-columns: 1fr; margin-top: 2.5rem; }
   @media (min-width: 640px) {
     .gallery-grid { grid-template-columns: repeat(2, 1fr); }
@@ -875,12 +739,10 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
     border: 1px solid var(--color-line);
     background: color-mix(in srgb, var(--color-surface) 12%, var(--color-paper));
   }
-  /* :global + height:auto — the <img> is rendered by Cover, so a scoped selector
-     wouldn't match it, and the placeholder's height attr must not force the height. */
+  /* height:auto — the placeholder's height attribute must not force the box height. */
   .gallery-img { display: block; width: 100%; height: auto; aspect-ratio: 4 / 3; object-fit: cover; }
   .gallery-cap { padding: 0.75rem 1rem; font-size: 0.9rem; color: var(--color-muted); }
 
-/* LinkChips (prefixed to avoid colliding with the hero flow's .chip) */
 .link-chip-row {
     margin-top: 1.5rem;
     display: flex;
@@ -905,10 +767,8 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
     color: var(--color-brand);
   }
 
-/* PageHeader */
 .page-header__heading { margin-top: 1rem; font-size: clamp(2.5rem, 6vw, 4rem); }
   .page-header__intro { max-width: 42rem; }
-  /* Airier headers — more room than a standard (tightened) section. */
   .page-header--light { padding-top: clamp(3rem, 6vw, 4.5rem); padding-bottom: clamp(2rem, 3vw, 3rem); }
 
   .page-header--dark { position: relative; overflow: hidden; }
@@ -923,11 +783,9 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
   }
   .page-header__inner { position: relative; padding-block: clamp(3.5rem, 8vw, 6rem); }
 
-  /* On-dark CTA button: white pill that inverts on hover. */
   .btn-on-dark.btn { background: var(--color-paper); color: var(--color-ink); }
   .btn-on-dark.btn:hover { background: var(--color-brand); color: var(--color-on-dark); }
 
-/* Pillars */
 .pillars__heading { margin-top: 0.75rem; }
   .pillars {
     margin-top: 3rem;
@@ -960,7 +818,6 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
     color: var(--color-muted);
   }
 
-/* Plans / pricing */
 .plans__heading { margin-top: 0.75rem; }
   .plans {
     margin-top: 2.5rem;
@@ -994,7 +851,6 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
     margin-top: 0.35rem;
   }
   .plan__period { font-size: 0.95rem; font-weight: 400; color: var(--color-muted); margin-left: 0.35em; white-space: nowrap; }
-  /* qualifier above the number ("from") so long prices don't wrap awkwardly */
   .plan__prefix { display: block; font-size: 0.85rem; font-weight: 400; color: var(--color-muted); line-height: 1.2; }
   .plan__desc { margin: 0.5rem 0 0; color: var(--color-muted); font-size: 0.95rem; }
   .plan__amount { white-space: nowrap; }
@@ -1004,10 +860,7 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
   .plan__features li::before { content: '✓'; position: absolute; left: 0; top: 0; color: var(--color-brand); font-weight: 700; }
   .plan__cta { margin-top: 1.5rem; align-self: flex-start; }
 
-/* PostList */
 .post-head { margin-bottom: 2.5rem; }
-  /* featured lead card (newest post) */
-  /* "Latest" tag on the featured post — the highlight (attention) accent in isolation. */
   .post-latest { position: absolute; top: 1rem; left: 1rem; z-index: 2;
     font-family: var(--font-mono); font-size: 0.62rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
     background: var(--color-highlight); color: color-mix(in srgb, #000 80%, var(--color-highlight)); padding: 4px 11px; border-radius: 999px; }
@@ -1029,7 +882,6 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
     transform: translateY(-3px);
     box-shadow: 0 18px 36px -28px color-mix(in srgb, var(--color-brand) 60%, transparent);
   }
-  /* Text-only featured post (no cover): one full-width column. */
   .post-feature--text { grid-template-columns: 1fr; }
   .post-feature__img { width: 100%; height: 100%; min-height: 230px; object-fit: cover; display: block; }
   .post-feature__body { padding: 2rem; display: flex; flex-direction: column; justify-content: center; }
@@ -1040,7 +892,6 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
     .post-feature__img { min-height: 170px; }
   }
 
-  /* card grid */
   .post-grid { display: grid; gap: 1.5rem; }
   @media (min-width: 640px) { .post-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
   @media (min-width: 900px) { .post-grid { grid-template-columns: repeat(var(--post-cols, 3), minmax(0, 1fr)); } }
@@ -1061,7 +912,6 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
     box-shadow: 0 18px 36px -28px color-mix(in srgb, var(--color-brand) 60%, transparent);
   }
   .post-card__img { width: 100%; height: 180px; object-fit: cover; display: block; }
-  /* Article cover (PostPage) — shown only when the post has one. */
   .post-article__cover { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 1rem; border: 1px solid var(--color-line); margin-bottom: 1.75rem; }
   .post-card__body { padding: 1.5rem; display: flex; flex-direction: column; flex: 1; }
   .post-title {
@@ -1083,7 +933,6 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
     color: var(--color-brand);
   }
 
-/* Catalog (listings) — for-sale cards + detail */
   .catalog-filters { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-bottom: 1.5rem; }
   .catalog-chip {
     font: inherit; font-size: 0.85rem; font-weight: 600; cursor: pointer;
@@ -1107,9 +956,6 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
     font-family: var(--font-mono); font-size: 0.64rem; font-weight: 700;
     letter-spacing: 0.06em; text-transform: uppercase; padding: 0.25rem 0.55rem; border-radius: 6px;
   }
-  /* Soft tinted pills — light background, darker same-hue text. Lighter look + readable. */
-  /* Status badges, themed from tokens: available = brand, reserved = highlight
-     (a caution mark — an attention accent), sold = neutral (ink-derived). */
   .b-avail { background: color-mix(in srgb, var(--color-brand) 16%, var(--color-paper)); color: color-mix(in srgb, var(--color-brand) 78%, #000); }
   .b-res { background: color-mix(in srgb, var(--color-highlight) 20%, var(--color-paper)); color: color-mix(in srgb, var(--color-highlight) 80%, #000); }
   .b-sold { background: color-mix(in srgb, var(--color-ink) 9%, var(--color-paper)); color: color-mix(in srgb, var(--color-ink) 55%, var(--color-paper)); }
@@ -1130,8 +976,7 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
   .catalog-thumbs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.6rem; margin-top: 0.6rem; }
   .catalog-thumb { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 8px; display: block; }
   .catalog-info { display: flex; flex-direction: column; align-items: flex-start; }
-  /* On the detail page the status is an in-flow pill above the title, not the
-     absolute card overlay (which would otherwise anchor to the page corner). */
+  /* On the detail page the pill is in flow above the title — left absolute it would anchor to the page corner. */
   .catalog-info .listing-badge { position: static; margin-bottom: 0.75rem; }
   .catalog-h1 { margin: 0.5rem 0 0; }
   .catalog-price { font-size: 1.9rem; font-weight: 800; color: var(--color-brand); margin: 0.4rem 0 0; letter-spacing: -0.02em; }
@@ -1142,22 +987,18 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
   .catalog-cta { margin-top: 0.5rem; }
   .catalog-body { margin-top: 2.5rem; }
 
-/* ServiceGrid */
 .service-grid { display: grid; gap: 1.25rem; grid-template-columns: 1fr; margin-top: 2.5rem; }
   @media (min-width: 640px) { .service-grid { grid-template-columns: repeat(2, 1fr); } }
   @media (min-width: 768px) { .service-grid { grid-template-columns: repeat(3, 1fr); } }
   @media (min-width: 1024px) { .service-grid { grid-template-columns: repeat(4, 1fr); } }
   .service-card { transition: border-color 0.15s; }
   .service-card:hover { border-color: var(--color-brand); }
-  /* :global — the <img> is rendered by Cover (a different component), so a scoped
-     selector wouldn't match it. */
   .service-card__img { aspect-ratio: 4 / 3; width: 100%; height: auto; object-fit: cover; display: block; }
   .service-card__body { padding: 1.4rem; }
   .service-card__body h3 { margin: 0; font-size: 1.1rem; font-weight: 700; color: var(--color-brand); }
   .service-card__body p { margin: 0.5rem 0 0; font-size: 0.92rem; color: var(--color-muted); }
   .service-card__more { display: inline-block; margin-top: 1rem; color: var(--color-brand); }
 
-/* SpecialistGrid */
 .specialist-grid { margin-top: 2.5rem; display: grid; gap: 1.5rem; grid-template-columns: 1fr; }
   @media (min-width: 640px) { .specialist-grid { grid-template-columns: repeat(2, 1fr); } }
   @media (min-width: 1024px) { .specialist-grid { grid-template-columns: repeat(4, 1fr); } }
@@ -1165,12 +1006,7 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
   .specialist__title { margin: 0; font-weight: 700; color: var(--color-ink); }
   .specialist__body { margin: 0.5rem 0 0; font-size: 0.9rem; color: var(--color-muted); }
 
-/* StatPanel */
-/* Background/foreground go through theme-overridable vars that DEFAULT to the
-   historic values (ink bg, on-dark fg), so untouched builds are byte-identical.
-   A theme (notably a dark-first one, where on-dark is a dark ink) can recolour
-   the whole panel with a single-class rule: `.stat-panel { --stat-panel-bg: …;
-   --stat-panel-fg: …; }` — every label, pill and rule below follows the fg. */
+/* Ground and foreground go through --stat-panel-bg / --stat-panel-fg, defaulting to the historic ink/on-dark, so a theme recolours every label, pill and rule below with one `.stat-panel { … }` rule. */
 .stat-panel { --stat-panel-bg: var(--color-ink); --stat-panel-fg: var(--color-on-dark); background: var(--stat-panel-bg); color: var(--stat-panel-fg); }
   .stat-panel__inner { max-width: 72rem; margin-inline: auto; padding: 5rem 1.5rem; display: grid; gap: 2.5rem; align-items: center; }
   @media (min-width: 1024px) { .stat-panel__inner { grid-template-columns: 1.1fr 0.9fr; } }
@@ -1180,7 +1016,6 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
   .stat-panel__body { margin-top: 1.25rem; max-width: 34rem; color: color-mix(in srgb, var(--stat-panel-fg) 75%, transparent); }
   .stat-panel__badges { margin-top: 1.75rem; display: flex; flex-wrap: wrap; gap: 0.625rem; }
   .stat-panel__pill { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; border: 1px solid color-mix(in srgb, var(--stat-panel-fg) 25%, transparent); border-radius: 999px; padding: 8px 14px; color: var(--stat-panel-fg); }
-  /* Optional stat columns (a comparison) — used instead of the single giant number. */
   .stat-panel__cols { margin-top: 2.5rem; display: grid; gap: 1.5rem; max-width: 34rem; }
   @media (min-width: 640px) { .stat-panel__cols { grid-template-columns: 1fr 1fr; } }
   .stat-panel__col { border-top: 1px solid color-mix(in srgb, var(--stat-panel-fg) 22%, transparent); padding-top: 1rem; }
@@ -1190,7 +1025,6 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
   .stat-panel__stat { text-align: center; }
   .stat-panel__value { display: block; font-family: var(--font-display); font-weight: 900; line-height: 1; font-size: clamp(5rem, 14vw, 11rem); letter-spacing: -0.05em; color: var(--block-accent, var(--color-brand)); }
 
-/* StatsBar */
 .facts-grid {
     margin: 0;
     display: grid;
@@ -1214,7 +1048,6 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
     color: var(--color-ink);
   }
 
-/* Steps */
 .steps__heading { margin-top: 0.75rem; }
   .steps-track {
     list-style: none;
@@ -1250,7 +1083,6 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
   .step__title { margin: 0.15rem 0 0; font-size: 1.1rem; font-weight: 700; color: var(--color-ink); }
   .step__body { margin: 0.35rem 0 0; color: var(--color-muted); }
 
-/* Testimonials */
 .testimonials-grid {
     margin-top: 2.5rem;
     display: grid;
@@ -1277,7 +1109,6 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
     color: var(--color-ink);
   }
 
-/* TextImage */
 .ti-grid { display: grid; align-items: center; gap: 2.5rem; grid-template-columns: 1fr; }
   @media (min-width: 1024px) {
     .ti-grid { grid-template-columns: repeat(2, 1fr); }
@@ -1287,11 +1118,9 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
   .ti-grid > * { min-width: 0; }
   .ti-text .prose { max-width: none; }
   .ti-body { margin-top: 1rem; }
-  /* :global + height:auto — rendered by Cover (different scope); height:auto keeps
-     the natural ratio instead of the placeholder's height attribute. */
+  /* height:auto keeps the natural ratio instead of the placeholder's height attribute. */
   .ti-img { display: block; width: 100%; height: auto; border-radius: 1rem; border: 1px solid var(--color-line); object-fit: cover; }
 
-/* TextQuote */
 .tq-grid { display: grid; align-items: center; gap: 2.5rem; grid-template-columns: 1fr; }
   @media (min-width: 1024px) {
     .tq-grid { gap: 4rem; grid-template-columns: 1.4fr 1fr; }
@@ -1306,7 +1135,6 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
   .tq-text { font-size: clamp(1.5rem, 3vw, 1.875rem); line-height: 1.3; margin: 0; }
   .tq-attr { margin-top: 1rem; color: var(--color-muted); }
 
-/* Thanks — letter variant: the submission as a postmarked letter */
 @keyframes letter-settle { from { opacity: 0; transform: rotate(-1.6deg) translateY(18px); } to { opacity: 1; transform: rotate(-1.6deg) translateY(0); } }
 @keyframes letter-stampdown { 0% { opacity: 0; transform: rotate(-11deg) scale(1.9); } 62% { opacity: 1; transform: rotate(-11deg) scale(0.94); } 80% { transform: rotate(-11deg) scale(1.04); } 100% { opacity: 1; transform: rotate(-11deg) scale(1); } }
 @keyframes letter-ink-in { from { opacity: 0; } to { opacity: 1; } }
@@ -1325,14 +1153,12 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
   .letter-rules i { display: block; border-top: 1px solid var(--color-line); }
   .letter-rules i:nth-child(2) { width: 92%; }
   .letter-rules i:nth-child(3) { width: 64%; }
-  /* The tilt lives on the base rule (the animation ends at the same transform) so the
-     stamp stays rotated when animations are off — reduced motion and print. */
+  /* The tilt lives on the base rule (the animation ends at the same transform) so the stamp stays rotated when animations are off — reduced motion and print. */
   .letter-postmark { position: absolute; top: -1.6rem; right: clamp(0.5rem, 4vw, 2.2rem); width: clamp(7rem, 16vw, 9.5rem); color: var(--color-ink); transform: rotate(-11deg); animation: letter-stampdown 0.55s 0.95s cubic-bezier(0.3, 1.6, 0.4, 1) both; }
   .letter-after { margin-top: clamp(3rem, 7vw, 4.5rem); }
   .letter-after .confirm-head { margin-top: 1.25rem; }
   @media (prefers-reduced-motion: reduce) { .letter-sheet, .letter-ink, .letter-postmark { animation: none !important; } }
 
-/* Cookie-consent banner — slim bottom bar (only rendered when tracking is on) */
 .consent {
   position: fixed; left: 0; right: 0; bottom: 0; z-index: 100;
   display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.75rem 1.5rem;

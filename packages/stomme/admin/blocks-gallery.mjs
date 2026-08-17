@@ -1,8 +1,4 @@
-// Render a standalone "block gallery" reference page from the catalog: every block the
-// site can add, grouped, with a crude wireframe pictogram, a one-line "what it produces"
-// and a filter box. stomme-gen writes the result to public/admin/blocks.html so an editor
-// can keep it open beside /admin. Block labels + group names are translated via `t`;
-// summaries stay in the catalog language (English) for now.
+// Standalone block-gallery reference page; stomme-gen writes the result to public/admin/blocks.html. Block labels and group names go through `t`, while summaries stay in the catalog language.
 
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
