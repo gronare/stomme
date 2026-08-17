@@ -1,22 +1,5 @@
 #!/usr/bin/env node
-// stomme-gen-schema — emit packages/stomme/schema-manifest.json: a machine-readable
-// list of every content collection's allowed TOP-LEVEL frontmatter fields, derived
-// from the zod schemas in collections.ts.
-//
-//   node bin/gen-schema-manifest.mjs        (or: pnpm --filter @gronare/stomme gen:schema-manifest)
-//
-// Why: the caller can't introspect Astro/zod, so the engine (which owns the schema)
-// ships this manifest. the caller fetches it raw at gronare/stomme@<release-sha> and
-// flags site content whose frontmatter carries keys the collection schema doesn't
-// accept (the `contact.hq`-style drift). See the docs.
-//
-// CONTRACT (the caller depends on this exact shape):
-//   { "collections": { "<name>": { "fields": [...], "passthrough": <bool>, "nested"?: {...} } },
-//     "presets":     { "<name>": { "fields": [...] } } }
-//
-// `passthrough: true` means the collection's schema carries a passthrough `blocks`
-// array (home/pages/services) — unknown BLOCK-level fields are retained, so the caller
-// validates only unexpected TOP-LEVEL collection keys, never block-level keys.
+// schema-manifest.json: every content collection's allowed TOP-LEVEL frontmatter fields, read from the zod schemas in collections.ts and published for tooling that cannot introspect Astro/zod. `passthrough: true` marks a collection whose schema carries a passthrough `blocks` array, meaning unknown BLOCK-level keys are retained and only unexpected top-level keys are unexpected.
 import { writeFileSync, realpathSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -28,8 +11,7 @@ const collectionsPath = resolve(pkgRoot, 'collections.ts');
 const outPath = resolve(pkgRoot, 'schema-manifest.json');
 const stubPath = resolve(here, '_astro-content-stub.mjs');
 
-// Peel zod's modifier wrappers (default / optional / nullable / effects) off a field
-// type to reach the type it actually describes.
+// Peels zod's default/optional/nullable/effects wrappers to reach the type underneath.
 function unwrap(type) {
   let cur = type;
   const seen = new Set();
@@ -43,7 +25,6 @@ function unwrap(type) {
   return cur;
 }
 
-// The field→type shape of a ZodObject (after unwrapping), or null for non-objects.
 function objectShape(type) {
   const u = unwrap(type);
   if (!u) return null;
@@ -51,15 +32,12 @@ function objectShape(type) {
   return shape && typeof shape === 'object' ? shape : null;
 }
 
-// Top-level field names a z.object(...) schema accepts.
 function fieldsOf(schema) {
   const shape = objectShape(schema);
   return shape ? Object.keys(shape) : [];
 }
 
-// One level of nested keys for object-typed fields (contact.address, settings.logo, …).
-// Optional/additive — the caller v1 validates top-level only. Array/record fields are
-// left out (their element shape isn't a top-level concern).
+// One level only, and array/record fields are left out on purpose — their element shape is not a top-level concern.
 function nestedOf(schema) {
   const shape = objectShape(schema);
   if (!shape) return undefined;
@@ -72,17 +50,14 @@ function nestedOf(schema) {
 }
 
 export async function generate({ write = true } = {}) {
-  // collections.ts imports `astro:content` (a virtual module that only exists inside an
-  // Astro build). Alias it to our stub so jiti can transpile+run the factory in plain
-  // Node; `astro/loaders` resolves natively.
+  // collections.ts imports the virtual astro:content, which exists only inside an Astro build, so jiti gets a stub for it; astro/loaders resolves natively.
   const jiti = createJiti(import.meta.url, { alias: { 'astro:content': stubPath } });
   const mod = await jiti.import(collectionsPath);
   if (typeof mod.stommeCollections !== 'function') {
     throw new Error(`stommeCollections export not found in ${collectionsPath}`);
   }
 
-  // No listings → the engine's fixed base collections only. Listing collections are
-  // per-site (config-defined); their shape is captured by the `presets` map instead.
+  // No listings means the fixed base collections only — listing collections are per-site, and their shape is carried by the `presets` map instead.
   const cols = mod.stommeCollections();
   const collections = {};
   for (const name of Object.keys(cols).sort()) {
@@ -94,8 +69,7 @@ export async function generate({ write = true } = {}) {
     collections[name] = entry;
   }
 
-  // Preset schemas (article / catalog) back the per-site listing collections; expose
-  // them so the caller can validate listing content whose collection id it can't know.
+  // Presets are exposed separately so listing content can be validated without knowing the site's collection id in advance.
   const presets = {};
   for (const [name, schema] of Object.entries(mod.PRESET_SCHEMAS ?? {})) {
     presets[name] = { fields: fieldsOf(schema) };
@@ -106,10 +80,7 @@ export async function generate({ write = true } = {}) {
   return manifest;
 }
 
-// Run when invoked directly (bin / script). Importers (stomme-gen) call generate().
-// realpathSync so an npm `.bin/*` symlink (npx stomme-gen-schema) still matches the
-// module realpath in import.meta.url — a plain resolve() leaves the symlink unresolved
-// and the guard silently no-ops.
+// realpathSync is required: a plain resolve() leaves an npm .bin/* symlink unresolved, the direct-invocation guard never matches, and the generator silently no-ops.
 const invokedDirectly = process.argv[1] && realpathSync(process.argv[1]) === fileURLToPath(import.meta.url);
 if (invokedDirectly) {
   const manifest = await generate();

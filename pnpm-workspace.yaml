@@ -2,10 +2,7 @@ packages:
   - 'packages/*'
   - 'sites/*'
   - 'starter'
-# Keep pnpm's supply-chain freshness gate on at 24h (minutes): the committed lockfile
-# may only pin dependency versions that have been public for >=24h. Set explicitly so it
-# also applies when this repo is used on a machine whose global pnpm config disables it.
-# `pnpm update` here will pick the newest version that has aged past the gate.
+# The committed lockfile may only pin versions public for >=24h; set explicitly so the gate also applies on a machine whose global pnpm config disables it.
 minimumReleaseAge: 1440
 allowBuilds:
   '@parcel/watcher': true

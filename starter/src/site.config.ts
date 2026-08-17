@@ -1,12 +1,10 @@
 import type { SiteConfig, StommeFeatures, Listing } from '@gronare/stomme/config';
 
-// ─────────────────────────────────────────────────────────────────────────────────────
 // site.config.ts — the single file that configures the engine for this site.
 // Three exports: `features` (on/off capabilities), `site` (routes, locale, wording),
 // and `listings` (config-defined collections). After changing ANYTHING here, re-run the
 // generator so /admin reflects it: `pnpm cms:gen` (or just `pnpm dev` / `pnpm build`,
 // which run it for you). Editing this file alone does not update the CMS until then.
-// ─────────────────────────────────────────────────────────────────────────────────────
 
 // FEATURES — optional capabilities. true → that collection's CMS editor, its blocks, and
 // its detail routes switch on (each is its own collection in the admin sidebar).

@@ -6,8 +6,7 @@ on:
   pull_request:
 
 jobs:
-  # Build + typecheck the starter. This is the regression
-  # net: a broken block, a type error, or a failing image/Astro build shows up here.
+  # The regression net: a broken block, a type error or a failing image/Astro build shows up here.
   sites:
     name: build + check (${{ matrix.site }})
     runs-on: ubuntu-latest
@@ -31,12 +30,7 @@ jobs:
         working-directory: ${{ matrix.site }}
         run: pnpm run build
 
-  # Production-runtime guard: build the starter with the Cloudflare adapter and
-  # serve dist/ on workerd (wrangler pages dev — no deploy), then assert /preview
-  # actually renders. Catches the class of bug that is invisible on the Node dev
-  # server, e.g. decoding ?data= with Node's Buffer (absent on workerd → an empty
-  # #preview-root on every deployed site). Core HTTP checks only — no browser; the
-  # optional CSP detector needs Playwright and is run locally (see the script header).
+  # Catches what the Node dev server cannot: decoding ?data= with Node's Buffer, absent on workerd, empties #preview-root on every deployed site. HTTP checks only — the CSP detector needs Playwright and runs locally.
   preview-workerd:
     name: preview smoke (workerd)
     runs-on: ubuntu-latest
@@ -52,9 +46,7 @@ jobs:
       - name: smoke /preview on workerd
         run: pnpm --filter @gronare/stomme test:preview-workerd -- --no-csp
 
-  # The seams an out-of-tree extension mounts on: slots, collections, routes, CMS panes and
-  # block types. A site with no slots dir builds identically with or without them, so a
-  # regression here stays invisible until a downstream extension breaks.
+  # A site with no slots dir builds identically with or without these seams, so a regression here stays invisible until a downstream extension breaks.
   addon-seams:
     name: addon seams (slots + routes + blocks + CMS panes)
     runs-on: ubuntu-latest
@@ -75,9 +67,7 @@ jobs:
       - name: slot mounting + gating
         run: pnpm --filter @gronare/stomme test:slots
 
-  # Engine behaviour that no build failure would surface: generated share cards, the
-  # unlisted-path rules behind noindex, and the dev-server middleware that makes /admin a
-  # working address.
+  # Engine behaviour no build failure would surface: generated share cards, the unlisted-path rules behind noindex, and the middleware that makes /admin a working dev address.
   engine-smokes:
     name: engine smokes (og + noindex + public index)
     runs-on: ubuntu-latest
@@ -96,12 +86,9 @@ jobs:
       - name: public directory index
         run: pnpm --filter @gronare/stomme test:public-index
 
-  # NB: the Sveltia DOM contract test (test:admin-contract) is deliberately NOT a
-  # per-PR job — between version bumps the pinned Sveltia (and its DOM) doesn't
-  # change, so it would be redundant every run. It runs whenever the pin is bumped.
+  # The Sveltia DOM contract test is deliberately not per-PR: between version bumps the pinned DOM does not change, so it runs when the pin is bumped instead.
 
-  # Catch syntax errors in the engine's plain-JS scripts (bins, integration,
-  # the CMS previews module) — none of these go through astro check.
+  # node --check on the plain-JS scripts — none of these go through astro check.
   engine-scripts:
     name: engine scripts syntax
     runs-on: ubuntu-latest

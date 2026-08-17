@@ -1,9 +1,5 @@
 #!/usr/bin/env node
-// stomme-new-block — scaffold a new block component in the CONSUMER's project.
-//
-//   npx stomme-new-block PromoBanner
-//
-// Creates <cwd>/src/blocks/<Name>.astro and prints the two edits to register it.
+// Scaffolds <cwd>/src/blocks/<Name>.astro in the consumer's project and prints the two edits needed to register it.
 import { writeFileSync, existsSync, mkdirSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 
@@ -15,7 +11,6 @@ if (!raw) {
   process.exit(1);
 }
 
-// PascalCase component name → camelCase block type.
 const Pascal = raw
   .replace(/[^a-zA-Z0-9]+/g, ' ')
   .replace(/\s+(.)/g, (_, c) => c.toUpperCase())

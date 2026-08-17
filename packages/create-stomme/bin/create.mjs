@@ -1,19 +1,11 @@
 #!/usr/bin/env node
-// create-stomme — scaffold a new site from the starter template.
-//
-//   pnpm dlx create-stomme my-site
-//   npm create stomme@latest my-site
-//
-// Copies the starter into <dir>, names it, and prints next steps. The template is
-// bundled at publish time (./template); in this monorepo it falls back to ../../../starter.
+// Copies the starter into <dir>, names it and prints next steps. See the README for how it is invoked.
 import { cpSync, existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { resolve, relative, dirname, basename } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const here = dirname(fileURLToPath(import.meta.url));
-// Prefer the live monorepo starter when it exists (dev/linked); the published package
-// has no starter sibling and falls back to the bundled ./template snapshot. This way a
-// lingering ./template never shadows the live starter, so publish needn't race to delete it.
+// The live monorepo starter wins when it exists, so a lingering ./template can never shadow it — publishing therefore needn't race to delete the snapshot.
 const starter = resolve(here, '../../../starter');
 const template = existsSync(starter) ? starter : resolve(here, '../template');
 
@@ -39,11 +31,7 @@ cpSync(template, dest, {
   filter: (src) => !SKIP.has(basename(src)),
 });
 
-// Name the package after the target directory and point the engine dependency right.
-// Inside this monorepo (cloned repo): a relative `link:` to packages/stomme — it is
-// path-based, so it survives the scaffold's own pnpm-workspace.yaml (which makes the
-// site its own workspace root and breaks `workspace:*`). Outside the repo: a registry
-// version, resolved from the package registry once @gronare/stomme is published.
+// Inside the monorepo the engine dependency is a relative `link:` because it is path-based and survives the scaffold's own pnpm-workspace.yaml, which makes the site its own workspace root and would break `workspace:*`. Outside, a registry version.
 try {
   const pkgPath = resolve(dest, 'package.json');
   const pkg = JSON.parse(readFileSync(pkgPath, 'utf8'));
@@ -61,11 +49,7 @@ try {
   /* leave package.json as-is if anything is unexpected */
 }
 
-// A standalone app needs two things the workspace used to provide. Write each only
-// if the template didn't already ship it.
-//  1. allowBuilds — pnpm 11 won't run a dependency's native build scripts
-//     (sharp/esbuild/@parcel/watcher) without approval; it reads the allowlist from
-//     pnpm-workspace.yaml. Without this, `pnpm install` stops with ERR_PNPM_IGNORED_BUILDS.
+// allowBuilds is required: pnpm 11 refuses to run a dependency's native build scripts (sharp/esbuild/@parcel/watcher) without an allowlist in pnpm-workspace.yaml, and `pnpm install` stops with ERR_PNPM_IGNORED_BUILDS.
 const workspaceYaml = resolve(dest, 'pnpm-workspace.yaml');
 if (!existsSync(workspaceYaml)) {
   writeFileSync(
@@ -73,9 +57,7 @@ if (!existsSync(workspaceYaml)) {
     "allowBuilds:\n  '@parcel/watcher': true\n  esbuild: true\n  sharp: true\n",
   );
 }
-//  2. registry mapping — tell pnpm that the @gronare scope lives on GitHub Packages.
-//     Auth is a secret, so it stays out of this committed file: add a token with
-//     read:packages to your *user* ~/.npmrc instead.
+//  2. The @gronare scope's registry. Auth is a secret and stays out of this committed file — a read:packages token belongs in the user's own ~/.npmrc.
 const npmrc = resolve(dest, '.npmrc');
 if (!existsSync(npmrc)) {
   writeFileSync(

@@ -1,12 +1,7 @@
-// The engine's collections (core + optional, all defined). Feature flags in
-// site.config decide which optional ones are shown (admin / blocks / routes); the
-// schemas always exist so nothing errors when a feature is off. Add your own
-// collections by spreading them in: `{ ...stommeCollections(), myCollection }`.
+// Every collection is defined here whatever the feature flags say — the schemas must exist so nothing errors when a feature is off. Add your own by spreading them in.
 import { stommeCollections } from '@gronare/stomme/collections';
 import { stommeAddonCollections } from '@gronare/stomme/addon-collections';
 import { listings } from './site.config.ts';
 
-// `listings` adds a collection per config-defined listing (news/for-sale/…);
-// `stommeAddonCollections()` merges any collections a build-time addon dir contributes
-// (empty when none — see STOMME_SLOTS_DIR).
+// stommeAddonCollections() merges whatever a build-time addon dir contributes, and is empty when there is none.
 export const collections = { ...stommeCollections(listings), ...stommeAddonCollections() };

@@ -3,16 +3,7 @@ import sitemap from '@astrojs/sitemap';
 import stomme from '@gronare/stomme/integration';
 import { site, features, listings } from './src/site.config.ts';
 
-// Build target — pick with STOMME_TARGET (default: netlify). Each has a `build:<target>`
-// script, e.g. `pnpm build` (netlify), `pnpm build:static`, `pnpm build:cloudflare`.
-//   netlify    → @astrojs/netlify  (preinstalled; the stomme integration injects /preview
-//                as an SSR function so the CMS live preview works)
-//   static     → no adapter; fully static dist/ for GitHub Pages / any web host (/preview
-//                is prerendered — live preview needs SSR). For a GH Pages *project* site
-//                set `base: '/<repo>'` too.
-//   cloudflare → @astrojs/cloudflare   ┐ opt-in: install the adapter first, e.g.
-//   vercel     → @astrojs/vercel       │ `pnpm add @astrojs/cloudflare`. Only the target you
-//   node       → @astrojs/node         ┘ actually build needs its adapter installed.
+// Build target, picked with STOMME_TARGET — see the README for what each one produces. Only the target you actually build needs its adapter installed.
 const TARGET = process.env.STOMME_TARGET || 'netlify';
 const STATIC = TARGET === 'static';
 const ADAPTERS = { netlify: '@astrojs/netlify', cloudflare: '@astrojs/cloudflare', vercel: '@astrojs/vercel', node: '@astrojs/node' };

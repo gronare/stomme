@@ -1,20 +1,5 @@
 #!/usr/bin/env node
-// stomme-lint-styles — the sentinel-leak detector (lookbook P3).
-//
-// A themed site recolors the engine ONLY through tokens (`:root` custom properties the
-// theme overrides at runtime). Any other color literal in styles.css is invisible to
-// theming — a site gets it whether it fits or not (the slate-navy gradient art cost
-// gronare three overrides). This lint extracts every color literal OUTSIDE the :root
-// token block and ratchets against a committed baseline:
-//
-//   node bin/lint-styles.mjs            exit 1 when a NEW literal (or more uses of an
-//                                       existing one) appears — tokenize it, derive it
-//                                       with color-mix(var(...)), or consciously accept
-//                                       it by regenerating the baseline
-//   node bin/lint-styles.mjs --update   rewrite the baseline to the current state
-//
-// The baseline (styles-colors.baseline.json, committed next to this script) is a
-// value→count map, stable across refactors that merely move lines.
+// Ratchets color literals found OUTSIDE the :root token block against a committed baseline (styles-colors.baseline.json, a value→count map): plain run fails on any new literal or extra use, --update accepts the current state. A literal outside :root is invisible to theming — a themed site gets it whether it fits or not.
 
 import { readFileSync, writeFileSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
@@ -27,13 +12,11 @@ const UPDATE = process.argv.includes('--update');
 
 const src = readFileSync(CSS, 'utf8');
 
-// Strip comments, then blank out the :root token block(s) — literals there are the
-// theme DEFAULTS (overridden at runtime), not leaks.
+// The :root block is blanked before matching: literals there are the theme DEFAULTS, overridden at runtime, not leaks.
 let css = src.replace(/\/\*[\s\S]*?\*\//g, (m) => m.replace(/[^\n]/g, ' '));
 css = css.replace(/:root\s*{[^}]*}/g, (m) => m.replace(/[^\n]/g, ' '));
 
-// Color literals: hex, rgb()/rgba(), hsl()/hsla(). Named colors are skipped — too many
-// false positives (e.g. `white-space`) for the two or three real uses.
+// Named colors are deliberately not matched — too many false positives (white-space) for the two or three real uses.
 const RE = /#[0-9a-fA-F]{3,8}\b|(?:rgba?|hsla?)\([^)]*\)/g;
 
 const found = new Map(); // literal -> { count, lines: [lineNo…] }

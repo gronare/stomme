@@ -61,7 +61,12 @@ pnpm build              # Netlify (adapter preinstalled) — deploy dist/ + the 
 pnpm build:cloudflare   # Cloudflare Pages (pnpm add @astrojs/cloudflare first)
 pnpm build:vercel       # Vercel          (pnpm add @astrojs/vercel first)
 pnpm build:node         # your own server (pnpm add @astrojs/node first)
+pnpm build:static       # no adapter — a fully static dist/ for GitHub Pages or any host
 ```
+
+`build:static` prerenders `/preview` instead of serving it, so the CMS live preview
+stops updating as you type; everything else works. For a GitHub Pages *project* site
+(`user.github.io/repo`), also set `base: '/<repo>'` in `astro.config.mjs`.
 
 On Netlify: connect the repo (or `netlify deploy`), build command `pnpm build`,
 publish directory `dist` — the contact endpoint and CMS preview ship as a
