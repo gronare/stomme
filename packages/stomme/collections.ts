@@ -1,26 +1,14 @@
-// The engine's content collections, as a factory. A site's content.config.ts is a
-// one-liner: `export const collections = { ...stommeCollections(), ...myOwn }`.
-//
-// All collections are ALWAYS defined (even the optional ones). An optional
-// collection with no content folder simply loads empty — harmless — and that's what
-// lets feature flags gate *routes/admin/blocks* without the schema disappearing
-// (so getCollection() never errors). Features decide what's shown; this decides what
-// exists. Schemas are the superset the templates + generated CMS editors expect.
+// Every collection is ALWAYS defined, optional ones included, and each schema is the superset the templates + generated CMS editors expect — features gate routes/admin/blocks, never the schema, so getCollection() can't error on a site that lacks the folder.
 import { defineCollection, z } from 'astro:content';
 import { glob } from 'astro/loaders';
 import { readdirSync } from 'node:fs';
 import { resolveListings, type Listing } from './src/config.ts';
 
-// `ogRaw` opts an item out of its generated share card (settings.og): the item's own
-// image is shared untouched instead of a card. Ignored when the master switch is off.
+// `ogRaw` opts an item out of its generated share card — its own image is shared untouched instead; ignored when settings.og.enabled is off.
 const seo = z.object({ title: z.string(), description: z.string(), image: z.string().optional(), ogRaw: z.boolean().optional() });
 const blocks = z.array(z.object({ type: z.string() }).passthrough()).default([]);
 const link = z.any().optional();
-// A collection with no content on this site (missing folder, or a scaffolded folder
-// holding only .gitkeep) loads empty via a no-op loader instead of a glob — same
-// result (getCollection → []), but without the glob-loader "No files found" warning
-// on every build. The first real entry (committed via CMS) flips it back to the glob
-// on the next build; a running dev server needs a restart.
+// A content-less collection loads via a no-op loader, not a glob, only to silence the "No files found" warning; the first committed entry flips it back to the glob on the NEXT build — a running dev server needs a restart.
 const hasMd = (dir: string) => {
   try { return readdirSync(dir, { recursive: true }).some((f) => String(f).endsWith('.md')); }
   catch { return false; }
@@ -31,7 +19,6 @@ const md = (name: string) =>
     : { name: 'stomme-empty', load: async () => {} };
 const dateField = z.union([z.string(), z.date()]).transform((d) => (d instanceof Date ? d.toISOString().slice(0, 10) : d));
 
-// Listing preset schemas — `article` (blog/news) and `catalog` (for-sale of anything).
 export const PRESET_SCHEMAS = {
   article: z.object({ title: z.string(), date: dateField, excerpt: z.string().default(''), cover: z.string().optional(), showCover: z.boolean().default(false) }),
   catalog: z.object({
@@ -47,59 +34,35 @@ export const PRESET_SCHEMAS = {
   }),
 } as const;
 
-// `listings` (from site.config) adds one collection per entry, keyed by id, using its
-// preset schema — so news/for-sale/… exist as real collections without bespoke code.
 export function stommeCollections(listings?: Listing[]) {
   const base: Record<string, ReturnType<typeof defineCollection>> = {
     home: defineCollection({ loader: md('home'), schema: z.object({ seo, blocks }) }),
     pages: defineCollection({ loader: md('pages'), schema: z.object({ title: z.string(), seo, blocks, published: z.boolean().default(false) }) }),
 
-    // Identity — business name, logo, icons. `name` is the company name (footer ©, contact
-    // card, LocalBusiness schema, logo aria-label), NOT a page title — pages set their own
-    // required seo.title/description. Contact details live in the `contact` collection;
-    // facts/partners live on their blocks (Stats / Logo-strip).
+    // `name` is the business name (footer ©, contact card, LocalBusiness schema, logo aria-label), never a page title — pages carry their own required seo.title/description.
     settings: defineCollection({
       loader: md('settings'),
       schema: z.object({
         name: z.string(),
-        // Logo lives with site identity (used in BOTH header and footer); each of those
-        // chooses whether to show the mark / wordmark via their own toggles.
+        // One logo for BOTH header and footer; each picks the mark / wordmark via its own showLogo + showWordmark.
         logo: z.object({ image: z.string().optional(), alt: z.string().optional(), textPre: z.string().default(''), textAccent: z.string().default('') }).default({}),
-        // Browser-tab icon (SVG recommended — scales to any size). Falls back to
-        // the shipped /favicon.svg when unset. `appleIcon` is the iOS home-screen PNG (180×180).
+        // Unset ⇒ the shipped /favicon.svg; `appleIcon` is the iOS home-screen PNG (180×180).
         favicon: z.string().optional(),
         appleIcon: z.string().optional(),
-        // Site default social-share image (og:image / Twitter card): the fallback shown
-        // for the start page and any page with no per-page override and no generated card.
         ogImage: z.string().optional(),
-        // Generated share cards — a presence-driven, layered, per-type model.
-        //
-        //   `enabled` is the MASTER switch (default FALSE = zero behaviour change):
-        //     OFF → og:image = per-page override (image/seo.image) ?? ogImage (Phase-1).
-        //     ON  → the layered system: per-page override → per-type generated card →
-        //           site default (ogImage → home-hero image → a generated brand card).
-        //
-        //   `types` holds ONE config per generatable type (key = a listing id, or
-        //   "towns"/"services"). When a type's `enabled` is true (and the master is on)
-        //   each of its items gets a build-time card: the item photo cropped to 1200×630
-        //   with a scrim + a headline/second line picked from the item's own fields +
-        //   an optional wordmark. All optional with defaults so existing content validates.
+        // `enabled` is the MASTER switch, default FALSE = zero behaviour change: off ⇒ og:image is the per-page override ?? ogImage; on ⇒ per-page override → per-type generated card → ogImage → home-hero image → a generated brand card. `types` is keyed by a listing id or "towns"/"services", and every field defaults so existing content still validates.
         og: z.object({
           enabled: z.boolean().default(false),
           types: z
             .record(
               z.object({
                 enabled: z.boolean().default(false),
-                // Card layout preset: editorial (bottom gradient — default),
-                // bold (centred statement), ops (left panel).
+                // editorial = bottom gradient, bold = centred statement, ops = left panel.
                 style: z.enum(['editorial', 'bold', 'ops']).default('editorial'),
-                // Which item field the headline (big line) is filled from; 'business' =
-                // the business name. Blank ⇒ the per-type default (towns: name, else title).
+                // The item field the big line comes from, or 'business' for the business name; blank ⇒ the per-type default (towns: name, else title).
                 headlineField: z.string().default(''),
-                // The smaller second line: an item field, 'business', or 'none'. Blank ⇒
-                // the per-type default (catalog: price, else none).
+                // The small second line: an item field, 'business' or 'none'; blank ⇒ the per-type default (catalog: price, else none).
                 sublineField: z.string().default(''),
-                // Gradient opacity over the photo, 0–100.
                 scrim: z.number().min(0).max(100).default(55),
                 showLogo: z.boolean().default(true),
                 // Accent colour (rule/bar + wordmark accent). Defaults to theme.brand.
@@ -111,18 +74,14 @@ export function stommeCollections(listings?: Listing[]) {
       }),
     }),
 
-    // Contact details — phone/email/hours + registration (used by the contact form,
-    // the direct-contact card, and the footer).
     contact: defineCollection({
       loader: md('contact'),
       schema: z.object({
         phone: z.string().default(''),
         phoneE164: z.string().default(''),
         email: z.string().default(''),
-        // Hide phone + email from scrapers: don't emit tel:/mailto: or the value in the
-        // HTML anywhere — render an obfuscated link that a page script reveals in-browser.
+        // On, neither tel:/mailto: nor the value itself may reach the HTML anywhere — an obfuscated link is emitted and a page script reveals it in-browser.
         protectContact: z.boolean().default(false),
-        // Structured address — feeds the card, the footer, the map, and the LocalBusiness schema.
         address: z.object({
           street: z.string().default(''),
           postcode: z.string().default(''),
@@ -131,12 +90,10 @@ export function stommeCollections(listings?: Listing[]) {
           lat: z.number().optional(),
           lng: z.number().optional(),
         }).default({}),
-        // Weekly hours as editable lines (days + hours text), an optional note under the
-        // list (e.g. "Closed 12–13 for lunch"), plus special/holiday lines.
         hours: z.array(z.object({ days: z.string(), hours: z.string() })).default([]),
         hoursNote: z.string().default(''),
         holidayHours: z.array(z.object({ when: z.string(), note: z.string() })).default([]),
-        // Global "we're away" banner — shows on every card; auto-hides past `until` (client-side).
+        // Shows on every contact card, and a page script hides it once `until` has passed.
         away: z.object({
           enabled: z.boolean().default(false),
           message: z.string().default(''),
@@ -157,24 +114,19 @@ export function stommeCollections(listings?: Listing[]) {
         surface: z.string().default('#e0e7ff'),
         paper: z.string().default('#ffffff'),
         line: z.string().default('#e5e7eb'),
-        // Secondary brand accent — a deployable second colour (eyebrow/callout choices).
         secondary: z.string().optional(),
         highlight: z.string().default('#f59e0b'),
-        // Dark-section tokens — optional. Left unset, they derive from `brand`
-        // (see styles.css :root). Set to override the dark surface exactly.
+        // Left unset these derive from `brand` (styles.css :root); set them to pin the dark surface exactly.
         dark: z.string().optional(),
         darkInk: z.string().optional(),
         darkLine: z.string().optional(),
-        // Fonts — a curated stack key (see src/fonts.ts) or 'custom'; + an optional
-        // uploaded font file used when a picker is set to 'custom'.
+        // A curated stack key (src/fonts.ts) or 'custom', in which case the matching uploaded file below is used.
         fontDisplay: z.string().optional(),
         fontBody: z.string().optional(),
-        fontCustomFile: z.string().optional(), // heading custom font
-        fontCustomBodyFile: z.string().optional(), // body custom font
-        // Site-wide eyebrow style (the small label above headings): dash marker,
-        // bullet marker, or the bold/wide cover treatment with no marker.
+        fontCustomFile: z.string().optional(),
+        fontCustomBodyFile: z.string().optional(),
+        // The marker on the small label above headings: a dash, a dot, or 'bold' — no marker, bold and wide-tracked instead.
         eyebrow: z.enum(['dash', 'bullet', 'bold']).default('dash'),
-        // Eyebrow marker colour — pick which accent the dash/bullet uses.
         eyebrowColor: z.enum(['brand', 'secondary', 'highlight']).default('brand'),
       }),
     }),
@@ -190,7 +142,6 @@ export function stommeCollections(listings?: Listing[]) {
         })).default([]),
         cta: z.object({ label: z.string(), link }).optional(),
         sticky: z.boolean().default(false),
-        // Which parts of the site logo (Identity settings) the header shows.
         showLogo: z.boolean().default(false),
         showWordmark: z.boolean().default(false),
       }),
@@ -204,23 +155,19 @@ export function stommeCollections(listings?: Listing[]) {
         showLinks: z.boolean().default(false),
         linksHeading: z.string().default(''),
         links: z.array(z.object({ label: z.string(), link })).default([]),
-        // Optional second link group (e.g. a services column beside the shortcuts).
         links2Heading: z.string().default(''),
         links2: z.array(z.object({ label: z.string(), link })).default([]),
         showTowns: z.boolean().default(false),
         townsHeading: z.string().default(''),
         legal: z.array(z.object({ label: z.string(), link })).default([]),
         note: z.string().default(''),
-        // Which parts of the site logo (Identity settings) the footer shows.
         showLogo: z.boolean().default(false),
         showWordmark: z.boolean().default(false),
       }),
     }),
 
-    // ── Optional (gated by features for admin/blocks/routes; always defined here) ──
     faq: defineCollection({ loader: md('faq'), schema: z.object({ question: z.string(), answer: z.string(), order: z.number().default(0), tags: z.array(z.string()).default([]) }) }),
-    // Contact-form confirmation copy (the "Thank-you" settings pane + /thanks page). All
-    // optional — blank falls back to the localized defaults.
+    // Blank fields fall back to the localized defaults, so every one of these is optional.
     thanks: defineCollection({ loader: md('thanks'), schema: z.object({ variant: z.string().optional(), heading: z.string().optional(), message: z.string().optional(), button: link, button2: link, showContact: z.boolean().default(false) }) }),
     tracking: defineCollection({ loader: md('tracking'), schema: z.object({ gtmId: z.string().default(''), ga4Id: z.string().default(''), metaPixelId: z.string().default(''), privacyUrl: z.string().default('') }) }),
 
@@ -258,12 +205,7 @@ export function stommeCollections(listings?: Listing[]) {
         // Grouped shape (block-field convention): the card/header photo lives in `media`.
         media: z.object({ image: z.string().optional(), imageAlt: z.string().optional() }).optional(),
         seo: seo.optional(),
-        // Optional COMPACT page-header for block-composed entries: ServicePage
-        // renders eyebrow + H1 (= title) + lede (= summary) + ✓ ticks + CTA with
-        // the image beside the text — lighter than a hero (that belongs to the
-        // homepage). All fields optional — ticks default to `bullets`; the primary
-        // CTA defaults to the service strings + contact route; image defaults to
-        // the entry's own `image` (the same art as its card in service lists).
+        // ServicePage upgrades a BLOCK-COMPOSED entry to a compact page-header when this is present, and renders the legacy layout when it isn't; everything is optional because ticks fall back to `bullets`, the CTA to the service strings + contact route, and the image to the entry's own `media.image`.
         hero: z
           .object({
             image: z.string().optional(),
@@ -279,15 +221,11 @@ export function stommeCollections(listings?: Listing[]) {
           })
           .passthrough() // tolerate older content (e.g. a leftover hero `media` key)
           .optional(),
-        // Optional composed sections (same block picker as pages) — rendered by
-        // ServicePage between the intro and the quote CTA, so a service detail can
-        // be fleshed out beyond the template (feature rows, steps, CTA bands…).
         blocks,
       }),
     }),
   };
 
-  // One collection per listing (skip ids that would clash with a base collection).
   for (const l of resolveListings(listings)) {
     if (!(l.id in base)) base[l.id] = defineCollection({ loader: md(l.id), schema: PRESET_SCHEMAS[l.preset] });
   }

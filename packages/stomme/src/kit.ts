@@ -1,27 +1,10 @@
-// ─────────────────────────────────────────────────────────────────────────
-// Block kit — the reusable, site-agnostic contract for the page builder.
-//
-// The ENGINE: field/block types + a few field helpers. The site supplies the
-// catalog (schema.ts) and the components. Labels here are English defaults; a
-// localised site can override them by passing its own field definitions.
-//
-// Consumed by:
-//   • the site's schema.ts          — to declare its BLOCKS
-//   • stomme-gen (bin)            — to emit the Sveltia CMS config
-// ─────────────────────────────────────────────────────────────────────────
 import { ICON_NAMES } from './icons.ts';
 
-// ── FIELD POLICY (engine invariant) ─────────────────────────────────────────
-// A new field must be OPT-IN: absent from the frontmatter = disabled / not shown.
-// Never write an `x !== false` (absent = on) fallback for a NEW field — an engine
-// update must not change what an existing site renders, and the CMS displays an
-// absent boolean as OFF regardless of `default:`, so absent-means-on makes the
-// CMS lie. (A dozen legacy `!== false` fields predate this rule; flipping them
-// requires seeding explicit values into every site's content first.)
+// FIELD POLICY (engine invariant): a new field is OPT-IN — absent from the frontmatter means off — and it must never get an `x !== false` fallback, because the CMS shows an absent boolean as OFF whatever `default:` says, so absent-means-on both changes what existing sites render and makes the editor lie. The dozen legacy `!== false` fields predate the rule and can only flip once every site's content carries an explicit value.
 export type Field = {
   name: string;
   label: string;
-  widget: 'string' | 'text' | 'image' | 'boolean' | 'number' | 'list' | 'object' | 'select' | 'markdown';
+  widget: 'string' | 'text' | 'image' | 'boolean' | 'number' | 'list' | 'object' | 'select' | 'markdown' | 'hidden' | 'file';
   required?: boolean;
   default?: unknown;
   hint?: string;
@@ -31,12 +14,9 @@ export type Field = {
   label_singular?: string; // list widgets: singular noun for the "Add …" button
   collapsed?: boolean; // object/list widgets: render collapsed (grouping convention)
   multiple?: boolean; // select: allow choosing several values
-  // For select widgets: a literal option list, or a sentinel the generator
-  // expands — '$pages' (all internal page routes), '$services' (service slugs),
-  // '$faq' (faq question slugs) or '$faqTags' (distinct tags used on faq entries).
+  // select only: a literal option list, or a sentinel stomme-gen expands — '$pages' (internal page routes), '$services' (service slugs), '$faq' (question slugs), '$faqTags' (distinct tags in use).
   options?: '$pages' | '$services' | '$faq' | '$faqTags' | { label: string; value: string }[];
-  // For image widgets: override where uploads are stored (absolute repo path). The generator
-  // sets these per collection; a field overrides only for special cases (e.g. favicon → root).
+  // image only: an ABSOLUTE repo path overriding where uploads land — the generator sets these per collection, a field overrides only for special cases (favicon → the public root).
   media_folder?: string;
   public_folder?: string;
 };
@@ -45,33 +25,18 @@ export type BlockDef = {
   type: string; // discriminator stored in frontmatter + key in the renderer registry
   label: string; // shown in the CMS "add block" picker
   fields: Field[]; // editorial fields; [] = self-contained block (reads its own data)
-  // Optional: the content collection this block reads its items from (e.g. `faq`,
-  // `posts`). Declares the dependency so the engine can treat collections as an
-  // optional "site kit" — `stomme-gen` drops the block from the CMS picker when
-  // that collection isn't present (no `src/content/<name>/`). Settings-backed
-  // blocks don't set this — settings always exists.
+  // The collection this block reads its items from — declaring it makes stomme-gen DROP the block from the CMS picker on a site with no `src/content/<name>/`, which is why settings-backed blocks leave it unset.
   collection?: string;
-  // Picker/gallery metadata (optional): `group` clusters the block in the "add section"
-  // ordering and the generated block gallery; `summary` is a one-line "what it produces";
-  // `shape` keys a crude wireframe pictogram in the gallery. Purely editorial aids.
+  // Picker + gallery metadata only, nothing at render: `group` clusters the block, `summary` is a one-line "what it produces", `shape` keys a wireframe pictogram.
   group?: string;
   summary?: string;
   shape?: string;
-  // Lookbook fixtures: representative content the /lookbook route renders so a theme can be
-  // validated against EVERY block. `samples` lists variants (`_label` annotates each).
-  // stomme-gen warns when a block has neither — keep them current with the fields.
+  // Lookbook fixtures the /lookbook route renders so a theme is validated against EVERY block; `samples` lists variants (`_label` annotates each) and stomme-gen warns when a block has neither.
   sample?: Record<string, unknown>;
   samples?: ({ _label?: string } & Record<string, unknown>)[];
 };
 
-// A link: pick a page from the dropdown OR type a custom URL (external / tel: /
-// mailto: / anchor). The custom URL wins if both are set. Resolve the stored
-// value with resolveLink() (stomme/href). The page dropdown options are filled
-// from real routes by stomme-gen. Backward-compatible with a plain string href.
-// REQUIRED object, rendered chrome-less inline (page + url side by side) by the
-// editor theme — a link is its label's companion, never behind an "Add …" step.
-// Both children optional + omit_empty_optional_fields: nothing filled = key absent.
-// collapsed:false is load-bearing: the flat rendering needs the children mounted.
+// A REQUIRED object with collapsed:false, both load-bearing: the editor theme renders it chrome-less inline (page + url side by side) rather than behind an "Add …" step, and that flat rendering needs the children mounted. Children stay optional so nothing-filled leaves the key absent; the custom url wins over the page, and resolveLink() (stomme/href) still accepts a legacy plain-string href.
 export const linkField = (name = 'href', label = 'Link'): Field => ({
   name,
   label,
@@ -83,11 +48,7 @@ export const linkField = (name = 'href', label = 'Link'): Field => ({
   ],
 });
 
-// A button/CTA: ONE optional group `{ label, link: {page,url} }` — the same shape the
-// header CTA and thanks buttons already use, so every button in the editor reads the
-// same: an on/off toggle in the group header (off = no button), then Label + the inline
-// link (page dropdown + custom URL). The inner object is literally named `link` so the
-// editor theme renders it chrome-less without a heading. Resolve with resolveButton().
+// One optional group `{ label, link }` whose inner object must be named exactly `link` or the editor theme stops rendering it chrome-less; the group toggle off means no button, and resolveButton() reads it.
 export const buttonField = (name: string, label = 'Button', opts: { hint?: string; labelHint?: string; optionalLabel?: boolean } = {}): Field => ({
   name,
   label,
@@ -102,29 +63,22 @@ export const buttonField = (name: string, label = 'Button', opts: { hint?: strin
   ],
 });
 
-// Common eyebrow + heading + intro trio most section blocks share.
 export const headingFields: Field[] = [
   { name: 'eyebrow', label: 'Eyebrow', widget: 'string', required: false, hint: 'Small uppercase label above the heading.' },
   { name: 'heading', label: 'Heading', widget: 'string', required: false },
   { name: 'intro', label: 'Intro', widget: 'text', required: false },
 ];
 
-// Same trio, but with the eyebrow/heading pre-filled via CMS `default:`. Use for a
-// collection-backed block that shipped with fixed chrome you want to keep as the
-// editable starting point — the editor sees real text (not a blank field whose
-// content comes from a hidden fallback) and can change or clear it. Prefer this
-// over component-side default copy. `intro` stays optional/off by default.
+// Pre-fills eyebrow/heading via CMS `default:` so the editor sees, and can clear, the shipped chrome as real text — always prefer this to a hidden component-side fallback.
 export const headingFieldsWith = (eyebrow?: string, heading?: string): Field[] => [
   { name: 'eyebrow', label: 'Eyebrow', widget: 'string', required: false, hint: 'Small uppercase label above the heading.', ...(eyebrow ? { default: eyebrow } : {}) },
   { name: 'heading', label: 'Heading', widget: 'string', required: false, ...(heading ? { default: heading } : {}) },
   { name: 'intro', label: 'Intro', widget: 'text', required: false },
 ];
 
-// Curated icon set — derived from the glyph library (src/icons.ts), the same
-// record Icon.astro renders from, so the picker and the glyphs can't drift.
+// Re-exported from the one record Icon.astro renders from — a hand-listed picker here would drift from the glyphs.
 export { ICON_NAMES };
 
-// An optional icon picker (used by cards).
 export const iconField = (name = 'icon', label = 'Icon'): Field => ({
   name,
   label,
@@ -134,8 +88,7 @@ export const iconField = (name = 'icon', label = 'Icon'): Field => ({
   hint: 'Optional icon.',
 });
 
-// Section background — lets a block opt into the rhythm surfaces. Handled
-// centrally by BlockRenderer (wraps the block in a full-bleed band).
+// BlockRenderer applies this centrally by wrapping the block in a full-bleed band — a block never paints its own surface.
 export const surfaceField: Field = {
   name: 'surface',
   label: 'Background',
@@ -152,8 +105,7 @@ export const surfaceField: Field = {
   hint: 'The surface behind the section — for rhythm between blocks.',
 };
 
-// Accent choice for a block's decorative accent (a rule, icon, or number). Sets
-// `--block-accent`; the eyebrow marker is unaffected (it follows theme.eyebrowColor).
+// Sets `--block-accent` for a rule, icon or number; the eyebrow marker is unaffected — it follows theme.eyebrowColor.
 export const accentField: Field = {
   name: 'accent',
   label: 'Accent',
@@ -168,8 +120,7 @@ export const accentField: Field = {
   hint: "This block's accent colour (rule, icon or number) — not the eyebrow.",
 };
 
-// Width toggle for text-led blocks (pageHeader / prose / steps): a narrow reading
-// column (default) or the full section width. Grids ignore this — they're always full.
+// Text-led blocks only (pageHeader / prose / steps) — grids ignore it, they are always full width.
 export const widthField: Field = {
   name: 'width',
   label: 'Width',
@@ -183,10 +134,7 @@ export const widthField: Field = {
   hint: 'Narrow keeps text legible; full uses the whole section width.',
 };
 
-// ── Grouping convention (block-field convention, Phase 2) ───────────────────
-// A collapsed `object` group. Groups are REQUIRED objects (no `required: false`)
-// so Sveltia renders them inline collapsed instead of behind an "Add …" button;
-// their children stay individually optional. The hint is the "when to open me" line.
+// A group is a REQUIRED object — add `required: false` and Sveltia hides it behind an "Add …" button instead of rendering it inline collapsed; the children are what stay optional.
 export const group = (name: string, label: string, hint: string, fields: Field[]): Field => ({
   name,
   label,
@@ -196,28 +144,19 @@ export const group = (name: string, label: string, hint: string, fields: Field[]
   fields,
 });
 
-// The `media` zone — the block's accompanying asset(s) + per-kind config. Pass a
-// summary (e.g. '{{fields.kind}}') when the group has a kind picker worth showing.
 export const mediaGroup = (hint: string, fields: Field[], summary?: string): Field => ({
   ...group('media', 'Media', hint, fields),
   ...(summary ? { summary } : {}),
 });
 
-// The `layout` zone — size/placement fields (height, align, width, columns, image side).
 export const layoutGroup = (fields: Field[]): Field =>
   group('layout', 'Layout', 'Size and placement — rarely needs changing.', fields);
 
-// The `style` zone — ALWAYS the last field of a block. Defaults to the engine pair
-// surface + accent; blocks that render only one pass the subset they actually use.
+// ALWAYS the last field of a block; defaults to the surface + accent pair, and a block that renders only one passes the subset it uses.
 export const styleGroup = (fields?: Field[]): Field =>
   group('style', 'Appearance', 'Background and accent colour — set once when the page is designed.', fields ?? [surfaceField, accentField]);
 
-// An image field. Uploads land in the served public/media tree via the collection-level
-// media_folder/public_folder the generator emits (organized per collection/entry); the
-// build-bridge copies public/media → src/assets/media so Astro's image pipeline (via
-// Cover.astro) optimises them at build. No field-level media_folder here — the generator's
-// collection-level folders are absolute (repo-root) and organize the whole media library;
-// field-level is emitted only for special cases (e.g. favicon → public root).
+// No field-level media_folder on purpose: uploads must go through the generator's absolute collection-level folders that organize the whole public/media library, which the build-bridge mirrors to src/assets/media so Astro's image pipeline (via Cover.astro) optimises them.
 export const imageField = (name = 'image', label = 'Image', hint?: string): Field => ({
   name,
   label,
@@ -226,7 +165,6 @@ export const imageField = (name = 'image', label = 'Image', hint?: string): Fiel
   ...(hint ? { hint } : {}),
 });
 
-// A reorderable list of title/body cards.
 export const cardListField: Field = {
   name: 'items',
   label: 'Cards',
@@ -241,10 +179,7 @@ export const cardListField: Field = {
   ],
 };
 
-// Like cardListField, but each card may optionally link somewhere — rendered as a
-// clickable card with a "read more" affordance by blocks that support it (e.g.
-// featureGrid). The link is a toggled group `{ label, link }` (buttonField shape, read
-// with resolveButton): off = plain card; label blank = the localized "Read more".
+// cardListField plus a toggled cta group — off leaves a plain card, on makes the whole card clickable in the blocks that support it (e.g. featureGrid).
 export const linkedCardListField: Field = {
   name: 'items',
   label: 'Cards',
