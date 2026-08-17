@@ -259,9 +259,8 @@ try {
 
 class AnchorMissing extends Error {}
 const substitute = (src, re, replacement, what) => {
-  const out = src.replace(re, replacement);
-  if (out === src) throw new AnchorMissing(`stomme-gen: ${what} — the declaration this rewrites is gone or renamed (${re})`);
-  return out;
+  if (!re.test(src)) throw new AnchorMissing(`stomme-gen: ${what} — the declaration this rewrites is gone or renamed (${re})`);
+  return src.replace(re, replacement);
 };
 
 try {

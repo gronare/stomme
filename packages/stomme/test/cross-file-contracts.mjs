@@ -50,6 +50,15 @@ const throwsOnMiss = /const substitute = \(src, re, replacement, what\) => \{/.t
 const escapesCatch = (gen.match(/if \(e instanceof AnchorMissing\) throw e;/g) || []).length >= 2;
 check(throwsOnMiss, 'a generator substitution that matches nothing throws');
 check(escapesCatch, 'that throw escapes the copy try/catch instead of degrading to a warning');
+const guardSrc = gen.match(/const substitute = \(src, re, replacement, what\) => \{[\s\S]*?\n\};/)?.[0];
+const substitute = guardSrc && new Function('AnchorMissing', `${guardSrc}\nreturn substitute;`)(class extends Error {});
+let identicalSurvives = false;
+try { substitute('  var FAQ_TAGS = [];\n', /var FAQ_TAGS = \[[^\]]*\];/, 'var FAQ_TAGS = [];', 'the FAQ tag list'); identicalSurvives = true; } catch {}
+let renameStillThrows = false;
+try { substitute('  var FAQ_TAGS_RENAMED = [];\n', /var FAQ_TAGS = \[[^\]]*\];/, 'var FAQ_TAGS = ["a"];', 'the FAQ tag list'); } catch { renameStillThrows = true; }
+check(identicalSurvives, 'a rewrite whose replacement equals the source is not mistaken for a missing anchor (a site whose FAQ entries carry no tags)');
+check(renameStillThrows, 'a genuinely renamed declaration still throws');
+
 const rewrites = [...gen.matchAll(/substitute\((\w+), (\/[^,]+\/),/g)].map((m) => m[2]);
 check(rewrites.length >= 2, `${rewrites.length} generated-asset rewrites are guarded`, rewrites.join('  '));
 for (const re of rewrites) {
@@ -68,7 +77,7 @@ const galleryKeys = new Set([
 check(REFERENCE.size > 500 && galleryKeys.size > 30,
   `the engine emits ${REFERENCE.size} translatable field paths and ${galleryKeys.size} gallery strings`);
 
-const UNTRANSLATED_CEILING = { 'labels.sv.js': 229 };
+const UNTRANSLATED_CEILING = { 'labels.sv.js': 225 };
 
 for (const file of readdirSync(resolve(pkg, 'admin')).filter((f) => /^labels\.[\w-]+\.js$/.test(f)).sort()) {
   const dict = (await import(resolve(pkg, 'admin', file))).default;
