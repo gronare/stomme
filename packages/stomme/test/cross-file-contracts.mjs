@@ -77,7 +77,7 @@ const galleryKeys = new Set([
 check(REFERENCE.size > 500 && galleryKeys.size > 30,
   `the engine emits ${REFERENCE.size} translatable field paths and ${galleryKeys.size} gallery strings`);
 
-const UNTRANSLATED_CEILING = { 'labels.sv.js': 225 };
+const UNTRANSLATED_CEILING = { 'labels.sv.js': 213 };
 
 for (const file of readdirSync(resolve(pkg, 'admin')).filter((f) => /^labels\.[\w-]+\.js$/.test(f)).sort()) {
   const dict = (await import(resolve(pkg, 'admin', file))).default;
