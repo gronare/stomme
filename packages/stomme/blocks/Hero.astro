@@ -6,16 +6,7 @@ import Icon from '../src/Icon.astro';
 import Emph from '../src/Emph.astro';
 import ContactLink from '../ContactLink.astro';
 
-// Library hero: a universal left column + a swappable, generic media slot:
-//   none        — text only
-//   image       — a picture beside the heading
-//   highlights   — an editable list of icon + title + line (key points / selling points)
-//   motif       — a decorative, theme-tinted block animation (no content)
-// Domain-specific media (e.g. an energy-flow diagram or a drone scene) live in the
-// consuming site as a custom hero registered over this one — see docs/customizing.md.
 interface Highlight { icon?: string; title: string; body?: string }
-// Grouped fields (block-field convention): `media` holds the kind picker (`kind`) +
-// its assets; `layout` holds size/placement; `style` holds surface + accent.
 interface Props {
   eyebrow?: string;
   heading: string;

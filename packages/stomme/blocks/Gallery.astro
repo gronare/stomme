@@ -1,9 +1,6 @@
 ---
 import Cover from '../src/Cover.astro';
 
-// Image gallery — heading + intro + a responsive grid of images with optional
-// captions. Falls back to a neutral placeholder when an image is missing, so the
-// block is safe to add before real photos exist.
 interface GalleryImage { image?: string; alt?: string; caption?: string }
 interface Props {
   eyebrow?: string;

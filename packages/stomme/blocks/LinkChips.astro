@@ -1,17 +1,11 @@
 ---
 import { getCollection } from 'astro:content';
 
-// Collection-backed (the `towns` collection) with editable chrome. The section
-// head renders only when given; CMS defaults pre-fill a new block. Needs a
-// `towns` collection in the consuming site (fields: name, order). The detail-page
-// route prefix comes from the site config (`site.routes.towns`, forwarded by
-// BlockRenderer) and must match the actual route folder under src/pages/.
-// `items` is a fixture override (lookbook samples) — not a CMS field. When given,
-// the collection is never queried; live pages always take the collection path.
 interface Props {
   eyebrow?: string;
   heading?: string;
   intro?: string;
+  // Fixture override (lookbook samples) — never a CMS field; when given the collection is never queried.
   items?: { id: string; data: { name: string } }[];
   site?: any;
 }

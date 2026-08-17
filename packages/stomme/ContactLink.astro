@@ -1,15 +1,5 @@
 ---
-// One contact link, used everywhere phone/email is shown (card, footer, Find-us,
-// Hero/PageHeader CTAs, FAQ aside). With `protect` off it's a plain tel:/mailto:
-// anchor. With `protect` on, the real value never reaches the HTML: it's obfuscated
-// into data attributes on a `.js-contact` link and rebuilt in-browser by the page
-// script the integration injects. See src/protect.ts for the encode/decode contract.
-//
-//   target  — the sensitive href value (E.164 number or email address)
-//   display — the sensitive visible text (the human-readable phone / email); masked
-//             until revealed. Omit when using `label`.
-//   label   — non-sensitive visible text (e.g. a CTA's own wording). Shown as-is, not
-//             masked; only the href is protected. Takes precedence over `display`.
+// With `protect` on the real value never reaches the HTML (encoded into data attrs, rebuilt in-browser — see src/protect.ts); `label` is rendered verbatim, so a sensitive value belongs in `display`, never `label`.
 import { encodeContact, maskContact } from './src/protect';
 interface Props {
   kind: 'tel' | 'mailto';

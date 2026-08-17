@@ -1,7 +1,4 @@
 ---
-// Pricing / plans block — a row of plan cards (name, price, period, description,
-// features, optional badge + CTA). One card can be highlighted as the default choice.
-// Styling reads theme tokens, so it follows the site's palette (monochrome on a B&W theme).
 import { resolveButton } from '../src/href';
 import Emph from '../src/Emph.astro';
 
@@ -27,8 +24,7 @@ interface Props {
   footnote?: string;
 }
 const { eyebrow, heading, intro, plans = [], footnote } = Astro.props;
-// If any plan carries a price prefix ("from"), every card reserves the prefix line so the
-// big numbers stay horizontally aligned across the group.
+// One plan with a price prefix ("from") makes every card reserve the prefix line, so the big numbers stay aligned across the group.
 const anyPrefix = plans.some((p) => p.pricePrefix);
 ---
 
@@ -49,9 +45,7 @@ const anyPrefix = plans.some((p) => p.pricePrefix);
           {p.price && (
             <div class="plan__price">
               {anyPrefix && <span class="plan__prefix">{p.pricePrefix ?? ' '}</span>}
-              {/* One source line, no template whitespace: the zero-width space is the ONLY
-                  break point between the two no-break spans (period gap = its margin), so
-                  the period stays on the line when it fits and wraps cleanly when not. */}
+              {/* ONE source line, no template whitespace: the zero-width space is the ONLY break point between the two no-break spans (the period gap is its margin), so the period stays on the line when it fits and wraps cleanly when not — never reflow this. */}
               <span class="plan__amount">{p.price}</span>{p.period && '\u200b'}{p.period && <span class="plan__period">{p.period}</span>}
             </div>
           )}

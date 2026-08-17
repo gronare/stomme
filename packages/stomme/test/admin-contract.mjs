@@ -1,18 +1,3 @@
-// Sveltia DOM contract test — the CI guard for editor-UX upgrades.
-//
-// The editor theme (THEME_CSS in gen-admin-blocks.mjs) and enhancements
-// (admin/editor.js) target UNDOCUMENTED Sveltia internals — class names, ARIA
-// state, DOM structure. A Sveltia bump can silently change those and break the
-// editor with no build error. This renders the real generated admin headlessly
-// via the test-repo backend (no auth / no folder-pick; pixels + login are the
-// wrong tool, per the design) and asserts every selector our CSS/JS relies on
-// still resolves — plus that editor.js still binds (draggable arming,
-// click-to-expand) against the live DOM. Any miss ⇒ non-zero exit ⇒ red PR.
-//
-// Honors STOMME_SVELTIA_SRC, so a pin-bump can be dry-run:
-//   STOMME_SVELTIA_SRC=https://unpkg.com/@sveltia/cms@X.Y.Z/dist/sveltia-cms.js \
-//     pnpm --filter @gronare/stomme test:admin-contract
-// See Resources/stomme-sveltia-upgrade-risks.md for the coupling this protects.
 import { chromium } from 'playwright-core';
 import http from 'node:http';
 import { execFileSync } from 'node:child_process';
@@ -26,14 +11,12 @@ const starter = resolve(here, '../../../starter');
 const PORT = process.env.PORT || 4577;
 const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/javascript', '.yml': 'text/yaml', '.css': 'text/css', '.json': 'application/json', '.svg': 'image/svg+xml', '.png': 'image/png' };
 
-// 1. Generate the starter admin, then copy it with the backend swapped to
-//    test-repo (in-memory, no auth) so a headless browser can open entries.
+// The copy swaps the backend to test-repo (in-memory, no auth) so a headless browser can open entries.
 console.log('· generating starter admin (cms:gen)…');
 execFileSync('pnpm', ['run', 'cms:gen'], { cwd: starter, stdio: 'inherit' });
 const srcAdmin = join(starter, 'public/admin');
 if (!existsSync(join(srcAdmin, 'config.yml'))) { console.error('✗ no starter admin generated'); process.exit(1); }
-// Serve under /admin/ — index.html references its assets (stomme-editor.js,
-// stomme-theme.css) by absolute /admin/ paths, exactly as deployed.
+// Served under /admin/ because index.html references stomme-editor.js + stomme-theme.css by absolute /admin/ paths, exactly as deployed.
 const root = mkdtempSync(join(tmpdir(), 'stomme-admin-'));
 cpSync(srcAdmin, join(root, 'admin'), { recursive: true });
 {
@@ -53,8 +36,7 @@ await new Promise((r) => srv.listen(PORT, r));
 
 let browser;
 const results = [];
-// A check returns true to pass; a STRING is a failure whose text names the DOM property that
-// moved — "fail" alone sends the next reader back to a browser to find out which half broke.
+// A check returns true to pass; a STRING is a failure whose text names the DOM property that moved.
 const check = async (name, fn) => {
   try {
     const r = await fn();
@@ -69,42 +51,33 @@ let optKeys = [];
 
 try {
   browser = await chromium.launch({ channel: 'chrome', headless: true });
-  // Tall viewport: Sveltia lazy-mounts offscreen fields as placeholders — below-the-fold
-  // widgets (share-card type cards, optional groups) must be mounted for the checks.
+  // Tall viewport: Sveltia lazy-mounts offscreen fields as placeholders, and the checks need them mounted.
   const page = await browser.newPage({ viewport: { width: 1280, height: 2600 } });
 
-  // Enter the test repo (Sveltia's no-auth login button).
   await page.goto(`http://localhost:${PORT}/admin/index.html`, { waitUntil: 'domcontentloaded' });
   await page.waitForFunction(() => [...document.querySelectorAll('button')].some((b) => /test repository/i.test(b.textContent || '')), null, { timeout: 30000 });
   await page.evaluate(() => { [...document.querySelectorAll('button')].find((b) => /test repository/i.test(b.textContent || '')).click(); });
   await page.waitForSelector('[role=listbox]', { timeout: 30000 });
 
-  // The engine assets must actually load — a 404 here silently disables the
-  // theme + enhancements and would make later checks lie about the cause.
+  // A 404 here silently disables the theme + enhancements and would make every later check lie about the cause.
   await check('stomme-editor.js + stomme-theme.css load (no 404)', () => page.evaluate(() => {
     const css = [...document.styleSheets].some((s) => (s.href || '').includes('stomme-theme.css') && s.cssRules.length > 0);
     return css && !!document.querySelector('script[src*="stomme-editor.js"]');
   }));
 
-  // ---- Share-cards pane first (read-only; a dirty draft can block later navs) ----
+  // Share-cards first: the pane is read-only, and a dirty draft blocks later navigations.
   await page.evaluate(() => { location.hash = '#/collections/settings/entries/sharecards'; });
   await page.waitForSelector('section.field[data-key-path="og"]', { timeout: 30000 });
   await check('share-cards wrapper ([data-key-path="og"])', () => has(page, 'section.field[data-field-type=object][data-key-path="og"]'));
   await check('master toggle ([data-key-path="og.enabled"] boolean)', () => has(page, 'section.field[data-field-type=boolean][data-key-path="og.enabled"]'));
 
-  // Gated switch-cards (editor.js .stomme-open): the enable switch and the open/closed
-  // UI state are INDEPENDENT gestures — closed by default, a card click toggles open,
-  // the switch only flips `enabled`. The starter's gated object is the contact `away`
-  // banner (og.types.* only exists on sites with item collections).
-  // Bounce via the collection list: a settings→settings hash hop (sharecards→contact)
-  // does not re-render the editor pane (SPA router quirk) and leaves it blank.
+  // Bounce via the collection list: a settings→settings hash hop does not re-render the editor pane (SPA router quirk) and leaves it blank.
   await page.evaluate(() => { location.hash = '#/collections/settings'; });
   await page.waitForTimeout(800);
   await page.evaluate(() => { location.hash = '#/collections/settings/entries/contact'; });
   await page.waitForSelector('section.field[data-key-path="phone"]', { timeout: 30000 });
   await check('gated card: closed by default, card click opens/closes (.stomme-open)', async () => {
-    // Sveltia lazy-mounts offscreen fields as placeholders — scroll the pane down until
-    // the away card and its gate switch are mounted.
+    // Scroll until the away card and its gate switch are mounted — Sveltia lazy-mounts offscreen fields as placeholders.
     for (let i = 0; i < 20; i++) {
       const ok = await page.evaluate(() => {
         if (document.querySelector('section.field[data-key-path="away.enabled"] [role=switch]')) return true;
@@ -154,7 +127,6 @@ try {
     }, res);
   });
 
-  // ---- A new page entry: object widget + the variable-type sections list ----
   await page.evaluate(() => { location.hash = '#/collections/pages/new'; });
   await page.waitForSelector('section.field[data-field-type=list]', { timeout: 30000 });
   await page.waitForTimeout(500);
@@ -164,8 +136,7 @@ try {
   await check('object widget renders', () => has(page, 'section.field[data-field-type=object]'));
   await check('object → .field-wrapper > .wrapper', () => has(page, 'section.field[data-field-type=object] > .field-wrapper > .wrapper'));
   await check('object child fields (.wrapper > .item-list > section.field, after expand)', async () => {
-    // Children render only while expanded; the disclosure path is the same one
-    // editor.js objectToggle() drives.
+    // Children render only while expanded, and this disclosure path is the one editor.js objectToggle() drives.
     await page.evaluate(() => {
       const b = document.querySelector('section.field[data-field-type=object] > .field-wrapper > .wrapper > .header button[aria-expanded="false"]');
       if (b) b.click();
@@ -175,17 +146,11 @@ try {
   });
   await check('object label bar (> header h4)', () => has(page, 'section.field[data-field-type=object] > header h4'));
   await check('list widget renders', () => has(page, 'section.field[data-field-type=list]'));
-  // The exact selector THEME_CSS hides. Its depth inside .toolbar.top varies by Sveltia
-  // version (a direct child beside .summary, or nested in a .label group), hence the
-  // descendant match. The toolbar's Add button ALSO carries aria-expanded, so the rule
-  // excludes menu buttons — the second half asserts that exclusion still separates the two
-  // (exactly one chevron matched, the Add button not), or the CSS silently hides "Add" and
-  // the list can no longer be filled.
+  // THEME_CSS hides this chevron, and the Add button also carries aria-expanded, so the rule excludes menu buttons — the second half asserts exactly one chevron and one menu button, or the CSS silently hides "Add" and the list can never be filled.
   await check('list toolbar chevron (.toolbar.top disclosure, not the Add menu button)', async () =>
     (await has(page, 'section.field[data-field-type=list] > .field-wrapper > .sui.group > .inner > .toolbar.top button[aria-expanded]:not([aria-haspopup])'))
     && (await page.evaluate(() => {
-      // Across the list's own toolbars: Add sits either in a sibling .toolbar.top.add or in
-      // an .actions group inside the one toolbar — both are in the CSS rule's scope.
+      // Add sits either in a sibling .toolbar.top.add or in an .actions group inside the one toolbar — both are in the CSS rule's scope.
       const inner = document.querySelector('section.field[data-field-type=list] > .field-wrapper > .sui.group > .inner');
       const bars = [...inner.querySelectorAll(':scope > .toolbar')];
       const chevrons = bars.flatMap((b) => [...b.querySelectorAll('button[aria-expanded]:not([aria-haspopup])')]);
@@ -193,12 +158,7 @@ try {
       return chevrons.length === 1 && menus.length === 1;
     })));
 
-  // Add a block: the list's own Add button (aria-haspopup=menu, never a row button) opens a
-  // menu with one role=menuitem per block type. 0.176 named that popup via aria-controls;
-  // 0.184 dropped the attribute and renders a plain [role=menu] — so resolve the popup by
-  // aria-controls when it is there and fall back to the open menu that holds the items.
-  // Still never a global [role=option] match: the command palette and collection nav are
-  // listboxes and would shadow it.
+  // 0.176 named the popup via aria-controls; 0.184 dropped it for a plain [role=menu] — resolve by aria-controls when present, else the open menu holding the items, and never a global [role=option] match (the command palette and collection nav are listboxes and would shadow it).
   await check('add-item picker opens (menu button → role=menuitem types)', async () => {
     const id = await page.evaluate(() => {
       const list = document.querySelector('section.field[data-field-type=list]');
@@ -240,14 +200,12 @@ try {
     return has(page, '.item > .item-body > .summary');
   });
   await check('editor.js click-to-expand (row click flips aria-expanded)', async () => {
-    // Synthetic click on the collapsed row (target = the item, not a control):
-    // editor.js must translate it into the disclosure's own click.
+    // A synthetic click on the collapsed row (target = the item, not a control) — editor.js must translate it into the disclosure's own click.
     await page.evaluate(() => { document.querySelector('section.field[data-field-type=list] .item').click(); });
     await page.waitForFunction(() => document.querySelector('.item > .header > div:first-child > button[aria-expanded="true"]'), null, { timeout: 5000 });
     return true;
   });
 
-  // ---- Form confirmation pane: boolean switch + optional-object "Add" checkbox ----
   await page.evaluate(() => { location.hash = '#/collections/settings/entries/thanks'; });
   await page.waitForSelector('section.field[data-field-type=boolean]', { timeout: 30000 });
   await page.waitForTimeout(500);
@@ -267,10 +225,7 @@ try {
   });
   await check('optional-object "Add" checkbox (> .field-wrapper > .sui.checkbox)', () => has(page, 'section.field[data-field-type=object] > .field-wrapper > .sui.checkbox'));
   await check('optional-object toggle is button[role=checkbox][aria-checked]', () => has(page, '.sui.checkbox .inner > button[role=checkbox][aria-checked]'));
-  // ---- Optional-object cards, whole lifecycle, EVERY card in the pane ----
-  // These carry the thanks buttons, the header CTA and per-entry SEO on every site.
-  // One aspect per check so a red names the DOM property that moved, and every card is driven
-  // (not just the first match) — a regression that only reaches the second card is the same bug.
+  // Every optional-object card in the pane is driven, one aspect per check, so a red names the DOM property that moved and a regression reaching only the second card still shows.
   await check('optional-object: the pane has optional-object cards to drive', async () => {
     const keys = await page.evaluate(() => [...document.querySelectorAll('section.field[data-field-type=object]')]
       .filter((o) => o.querySelector(':scope > .field-wrapper > .sui.checkbox .inner > button[role=checkbox][aria-checked="false"]'))
@@ -302,8 +257,7 @@ try {
     return l ? l.querySelectorAll(':scope > section.field').length : -1;
   }, card(i));
   const clickCard = (i) => page.evaluate((s) => { document.querySelector(s).dispatchEvent(new MouseEvent('click', { bubbles: true })); }, card(i));
-  // The chevron rotates through a 160ms transition, so it is read by polling to settle — an
-  // instant read lands on the pre-transition value and would fail on every green run.
+  // The chevron rotates through a 160ms transition, so poll until it settles — an instant read lands on the pre-transition value and would fail on every green run.
   const chevron = (i) => page.evaluate((s) => {
     const h = document.querySelector(`${s} > header`);
     if (!h) return null;
@@ -336,10 +290,7 @@ try {
     return true;
   }));
 
-  // Arming is its own contract: editor.js owns click-to-expand on these cards, so a card that
-  // mounts without being armed is inert no matter how intact the rest of the DOM looks. Waiting
-  // on it also takes the observer's scheduling out of the gesture checks below — those must fail
-  // on a DOM change, never on which frame the scan happened to land in.
+  // A card that mounts unarmed is inert however intact the rest of the DOM looks, and waiting on arming keeps the gesture checks below failing on a DOM change rather than on the observer's scheduling.
   await check('optional-object: editor.js ARMS the freshly mounted card (click-to-expand bound)', eachCard(async (i) => {
     try { await page.waitForFunction((s) => !!document.querySelector(s).__stommeObj, card(i), { timeout: 5000 }); }
     catch { return 'editor.js never bound enhanceObject — objectToggle() finds no > .field-wrapper > .wrapper > .header button[aria-expanded]'; }
@@ -359,8 +310,7 @@ try {
     return n === 0 ? true : `${n} child section.field(s) rendered while collapsed — the one-row card is not collapsed`;
   }));
 
-  // The only affordance that says a card can be opened: THEME_CSS ${CHEVRON} on the card's own
-  // header. Lose it and the card still works but reads as dead — no other check would notice.
+  // THEME_CSS ${CHEVRON} on the card's own header is the ONLY affordance saying the card opens — lose it and the card still works but reads as dead, and no other check would notice.
   await check('optional-object: collapsed card shows the rotated chevron (> header ::before)', eachCard(async (i) => {
     const c = await chevron(i);
     if (!c) return 'the card has no own > header to hang the chevron on';
@@ -395,7 +345,7 @@ try {
 
 const failed = results.filter(([ok]) => !ok);
 console.log(`\n${results.length - failed.length}/${results.length} contract checks passed`);
-// Names stay in RUN ORDER: one broken step cascades (no list row ⇒ every row check after it fails), and only the order separates a root cause from its fallout. Opt-in — no env, no file.
+// Names stay in RUN ORDER: one broken step cascades (no list row ⇒ every row check after it fails), and only the order separates a root cause from its fallout.
 if (process.env.STOMME_CONTRACT_REPORT) {
   writeFileSync(process.env.STOMME_CONTRACT_REPORT, JSON.stringify({
     passed: results.length - failed.length, total: results.length, failed: failed.map(([, name, why]) => (why ? `${name} — ${why}` : name)),

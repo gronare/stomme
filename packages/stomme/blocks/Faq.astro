@@ -4,23 +4,13 @@ import Icon from '../src/Icon.astro';
 import { resolveButton } from '../src/href';
 import ContactLink from '../ContactLink.astro';
 
-// Collection-backed: Q&A from the `faq` collection; chrome + the contact aside
-// are editable fields (CMS defaults supply the starting copy). Needs a `faq`
-// collection + the `contact` collection's email in the consuming site.
-//
-// `variant` picks the layout:
-//   list      — open Q&A list + a contact aside (default)
-//   accordion — collapsible rows (native <details>, no JS), numbered, + aside
-//   cards      — two-column cards with a brand top-rule; the aside becomes a CTA card
-//   split      — numbered index + a single reader panel with an embedded CTA
-//                (JS-enhanced; without JS all answers show, degrading to a list)
 interface Props {
   layout?: { variant?: 'list' | 'accordion' | 'cards' | 'split' };
   eyebrow?: string;
   heading?: string;
   intro?: string;
-  entries?: string[]; // picked question slugs (in order); empty = all, by `order`
-  tag?: string; // …or filter by an entry tag (a service slug, a town, any label)
+  entries?: string[];
+  tag?: string;
   asideHeading?: string;
   asideBody?: string;
   asideCta?: { label?: string; link?: unknown };
@@ -28,19 +18,14 @@ interface Props {
   asideCtaLabel?: string;
   asideHref?: unknown;
   asideCtaHref?: unknown; // plain-string alias accepted from content
-  // Fixture override (lookbook samples) — not a CMS field. When given, the collection
-  // is never queried; live pages always take the collection path.
+  // Fixture override (lookbook samples) — never a CMS field; when given the collection is never queried.
   items?: { id: string; data: { question: string; answer: string } }[];
 }
 const { eyebrow, heading, intro, entries, tag, asideHeading, asideBody, asideCta, asideCtaLabel, asideHref, asideCtaHref } = Astro.props;
 const variant = Astro.props.layout?.variant ?? 'list';
 const fixture = Astro.props.items;
 const all = fixture ?? (await getCollection('faq'));
-// Page-scoped FAQs, two ways (picked entries win over the tag filter):
-//   entries — hand-picked question slugs, shown in the picked order.
-//   tag     — every question carrying this tag (a service slug, a town, any label), by
-//             `order` — new questions with the tag flow to the page automatically.
-// Neither set = the whole collection.
+// Picked entries win over the tag filter; neither set = the whole collection, by `order`.
 const items = Array.isArray(entries) && entries.length
   ? (entries.map((id) => all.find((e) => e.id === id)).filter((e) => e != null) as typeof all)
   : [...all]
@@ -159,9 +144,7 @@ const n = (i: number) => String(i + 1).padStart(2, '0');
 </section>
 
 <script>
-  // `split` enhancement: show one panel at a time, switched by the index. Without
-  // JS the `.js` class is never added, so every .faq-panel stays visible (a readable
-  // list). Bundled + deduped by Astro, so it wires every instance on the page.
+  // Without JS the `.js` class is never added, so every .faq-panel stays visible (a readable list).
   document.querySelectorAll('.faq-split').forEach((root) => {
     root.classList.add('js');
     const panels = root.querySelectorAll('.faq-panel');

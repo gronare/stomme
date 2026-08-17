@@ -2,12 +2,6 @@
 import { resolveButton } from '../src/href';
 import Emph from '../src/Emph.astro';
 
-// Compact call-to-action box. Three layouts, all theme-token driven:
-//   classic — a single brand-coloured panel, centered (the default; unchanged).
-//   split   — asymmetric: copy on one side, a dark facts card on the other.
-//   panel   — a dark panel with the copy plus a mono key/value readout.
-// `facts` (label + value) feeds the split card's chips and the panel readout;
-// it is ignored by classic. Distinct from ctaPanel (which sits on a surface band).
 interface Fact { label?: string; value?: string }
 interface Props {
   eyebrow?: string;

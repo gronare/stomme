@@ -1,32 +1,4 @@
 #!/usr/bin/env node
-/*
- * stomme — smoke for the addon CMS-pane seam (bin/gen-admin-blocks.mjs, "Addon CMS panes").
- * The slots dir may ship a `cms.mjs` at its root exporting `collections`: an array of
- * { feature, yaml }, or a function returning one, called with the site's own
- * { routes, features }. Each pane is spliced into the collections:generated region only
- * when the site's flag is on — so an out-of-tree extension's pages are EDITABLE like every
- * other page instead of being invisible to the CMS.
- *
- * Runs the real generator over the `starter` site with a throwaway STOMME_SLOTS_DIR stub.
- * Run with:  pnpm --filter @gronare/stomme test:addon-cms
- *
- * ASSERTS
- *   1. A pane whose feature is ON in the starter (faq) lands in config.yml, at the region's
- *      indent, and the function form receives the site's own routes (the pane's hint carries
- *      routes.formSuccess = '/thanks').
- *   2. A pane whose feature is OFF (blog) is not emitted.
- *   3. A malformed entry is skipped with a warning, and the generator still succeeds.
- *   4. WITHOUT the slots dir, the generated config.yml is byte-identical to the tracked one —
- *      the seam costs a site with no addons nothing.
- *   5. `panelFiles` — the same manifest may contribute FILES to a collection the engine already
- *      emits. An ON entry lands in THAT collection's own `files:` (Settings, after the engine's
- *      own panes) with the site's routes and block picker in hand; an OFF one is not emitted; a
- *      malformed one warns without costing the rest; and an entry naming a collection the engine
- *      does not emit lands nowhere at all.
- *
- * starter/public/admin/config.yml is regenerated in place (as admin-contract.mjs already
- * does) and restored from its pre-run bytes in `finally`.
- */
 import { spawnSync } from 'node:child_process';
 import { mkdtempSync, writeFileSync, readFileSync, rmSync } from 'node:fs';
 import { resolve, dirname, join } from 'node:path';
@@ -54,8 +26,6 @@ const ORIGINAL = readFileSync(CONFIG, 'utf8');
 let stub;
 try {
   stub = mkdtempSync(join(tmpdir(), 'stomme-addon-cms-'));
-  // A file collection is the shape a single editable page uses (the engine's own
-  // "Form confirmation" pane is one), so the stub mirrors a real addon page.
   writeFileSync(join(stub, 'cms.mjs'), `export const collections = ({ routes, blocks }) => [
   {
     feature: 'faq',
@@ -98,8 +68,7 @@ export const panelFiles = ({ routes, blocks }) => ({
   if (!withStub.ok) console.error(withStub.out);
   check(/^ {2}- name: addon_on$/m.test(withStub.yml), "the ON pane is emitted at the collections indent");
   check(withStub.yml.includes('success route is /thanks'), "the manifest function receives the site's own routes");
-  // The pane composes out of the SITE's blocks, so an addon page is stylable like any other.
-  // Authored at 8 in the pane, +2 for the region indent, exactly like the engine's own editors.
+  // Authored at 8 in the pane, +2 for the region indent — hence the 10-space match.
   check(/^ {10}- name: blocks$/m.test(withStub.yml), "the manifest function receives the site's own block picker");
   check(!withStub.yml.includes('addon_off'), 'a pane whose feature is OFF is not emitted');
   check(!withStub.yml.includes('- name: broken'), 'a malformed entry is not emitted');
@@ -111,7 +80,6 @@ export const panelFiles = ({ routes, blocks }) => ({
   );
   check(region.includes('- name: addon_on'), 'the pane lands inside the collections:generated region');
 
-  // ── panelFiles: files spliced into a collection the engine already emits ──────────
   const settings = withStub.yml.slice(
     withStub.yml.indexOf('# >>> settings:generated'),
     withStub.yml.indexOf('# <<< settings:generated'),

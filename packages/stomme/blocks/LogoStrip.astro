@@ -1,5 +1,4 @@
 ---
-// Partner / client names with an optional lead-in. Content lives on the block instance.
 interface Props { lead?: string; logos?: string[] }
 const { lead, logos } = Astro.props;
 const names = Array.isArray(logos) ? logos.filter(Boolean) : [];

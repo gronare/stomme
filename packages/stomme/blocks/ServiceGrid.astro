@@ -2,19 +2,12 @@
 import Cover from '../src/Cover.astro';
 import { getCollection } from 'astro:content';
 
-// Collection-backed cards from the `services` collection, each linking to a detail
-// page at `${site.routes.services}/<slug>`. Pass a curated `services` slug list to
-// show a subset in the chosen order; omit to show all by `order`. Needs a `services`
-// collection (fields: navLabel, summary, order, image?, imageAlt?) in the consuming
-// site + a matching route folder (see stomme/ServicePage.astro). Each card shows
-// the service image, falling back to the service.svg placeholder when none is set.
-// `items` is a fixture override (lookbook samples) — not a CMS field. When given,
-// the collection is never queried; live pages always take the collection path.
 interface Props {
   eyebrow?: string;
   heading?: string;
   intro?: string;
   services?: string[];
+  // Fixture override (lookbook samples) — never a CMS field; when given the collection is never queried.
   items?: { id: string; data: Record<string, any> }[];
   site?: any;
 }

@@ -2,14 +2,6 @@
 import { getCollection } from 'astro:content';
 import Cover from '../src/Cover.astro';
 
-// Collection-backed blog index — a featured lead card (newest post) + a grid of cards
-// with cover images. The section head is optional (pair with a pageHeader, or set its
-// own eyebrow/heading). Needs a `posts` collection (title, date, excerpt, cover).
-//
-// Route prefix, date locale and the "read more" string come from the site config
-// (`site`, forwarded by BlockRenderer); the prefix must match the route under src/pages/.
-// `items` is a fixture override (lookbook samples) — not a CMS field. When given,
-// the collection is never queried; live pages always take the collection path.
 interface Props {
   eyebrow?: string;
   heading?: string;
@@ -18,6 +10,7 @@ interface Props {
   layout?: { featured?: boolean; columns?: number };
   source?: string;
   base?: string;
+  // Fixture override (lookbook samples) — never a CMS field; when given the collection is never queried.
   items?: { id: string; data: Record<string, any> }[];
   site?: any;
 }
@@ -25,9 +18,7 @@ const { eyebrow, heading, intro, source = 'posts', base, site } = Astro.props;
 const showImages = Astro.props.media?.showImages ?? false;
 const featured = Astro.props.layout?.featured ?? false;
 const columns = Astro.props.layout?.columns ?? 3;
-// Item titles sit one level below the section heading when there is one (h2 → h3),
-// but directly below the page h1 when the list has no heading (→ h2), so the heading
-// outline never skips a level. Astro renders a Capitalized string var as that HTML tag.
+// h3 under a section heading, else h2 under the page h1 — never a skipped level. Astro renders a Capitalized string var as that HTML tag.
 const ItemHeading = heading ? 'h3' : 'h2';
 const prefix = base ?? site?.routes?.blog ?? '/blog';
 const locale = site?.locale ?? 'en-US';
@@ -38,8 +29,6 @@ const fmt = (d: string) => new Date(d).toLocaleDateString(locale, { year: 'numer
 const lead = featured && all.length > 1 ? all[0] : null;
 const rest = lead ? all.slice(1) : all;
 const PLACE = '/images/placeholders/service.svg';
-// Show a cover when the post opts in (showCover): its uploaded image, or the brand-tinted
-// default if none. Otherwise the card is text-only. The index mixes both kinds cleanly.
 const leadHasImg = !!(lead && showImages && lead.data.showCover);
 const hasImg = (p: any) => !!(showImages && p.data.showCover);
 ---

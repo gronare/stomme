@@ -1,14 +1,9 @@
 ---
 import Cover from '../src/Cover.astro';
-// Default art (no images set): the structural wireframe→built pair, inlined so its
-// currentColor tints to the brand. Uploaded before/after images render via Cover.
+// Inlined (not <img>) so the default art's currentColor tints to the brand.
 import beforeArt from '../assets/images/placeholders/before.svg?raw';
 import afterArt from '../assets/images/placeholders/after.svg?raw';
 
-// Before / after slider — drag (or use the keyboard-accessible range input) to
-// wipe between two images via a CSS clip driven by a custom property. The section
-// chrome (eyebrow/heading/intro) wraps the bespoke slider previously kept in a
-// separate BeforeAfter component — inlined here so the block is self-contained.
 interface Props {
   eyebrow?: string;
   heading?: string;

@@ -1,76 +1,13 @@
 #!/usr/bin/env node
-/*
- * stomme — production-runtime smoke test for the CMS live-preview (/preview).
- *
- * WHY THIS EXISTS
- * ---------------
- * The CMS iframes `/preview?data=<base64 JSON of page blocks>`; that SSR route
- * decodes the data and renders the real block components into `#preview-root`.
- * Sites deploy to Cloudflare Pages, where SSR runs on the `workerd` runtime —
- * NOT Node. A class of bug reproduces ONLY on workerd, never on the Node dev
- * server (localhost:4321) where every other test runs:
- *
- *   `/preview` once decoded with Node's `Buffer.from(raw, 'base64')`. `Buffer`
- *   does not exist on workerd → decode threw → `#preview-root` rendered EMPTY on
- *   every deployed site. Green everywhere in dev; broken in production.
- *
- * This test closes that blind spot: it builds a real site with the Cloudflare
- * adapter (`build:cloudflare`) and serves the output on workerd locally via
- * `wrangler pages dev ./dist` (miniflare/workerd — no deploy, no CF account),
- * then asserts the preview actually renders.
- *
- * WHAT IT ASSERTS
- * ---------------
- *   CORE (hard pass/fail, no browser — gates the exit code):
- *     1. GET /preview?data=<known blocks> returns HTTP 200.
- *     2. `#preview-root` is NON-EMPTY and contains the heading we encoded
- *        (proves base64+UTF-8 decode + block render round-tripped on workerd).
- *     3. The worker logs contain no `Buffer`/`ReferenceError`/`is not defined`
- *        (the decode-threw signature).
- *
- *   CSP (optional, needs Playwright — a DETECTOR, off the exit code by default):
- *     4. Load /preview in a real browser and report Content-Security-Policy
- *        violations. `/preview` ships a strict CSP (script-src 'self' 'nonce-…'
- *        + sha256 hashes of the first-party is:inline scripts, no unsafe-inline;
- *        hoisted component scripts are never HTML-inlined — see integration.mjs).
- *        First-party scripts (header scroll-toggle, FAQ accordion, morph) are
- *        expected to run violation-free; any violation is a regression in the
- *        hash sweep or inline-limit config. Reported as a warning so it can't
- *        mask the core Buffer guard; pass --strict-csp to make violations fatal.
- *        Skips cleanly if Playwright isn't installed.
- *
- * USAGE
- * -----
- *   node packages/stomme/test/smoke-preview-workerd.mjs          # build + serve + assert
- *   pnpm --filter @gronare/stomme test:preview-workerd           # same, via script
- *
- *   Flags:
- *     --site <dir>    site to build/serve (repo-relative). Default: starter
- *     --port <n>      workerd port. Default: 8799
- *     --no-build      reuse an existing dist/ (must be a cloudflare build)
- *     --no-csp        skip the browser CSP detector entirely
- *     --strict-csp    make CSP violations fatal (exit 1)
- *     --csp-channel <name>  drive an installed browser instead of a downloaded
- *                     Chromium (e.g. `chrome`, `msedge`) — handy locally when
- *                     `playwright install chromium` hasn't been run
- *     --keep          leave the workerd server running after the run (debug)
- *
- * REQUIREMENTS
- * ------------
- *   The served site needs the Cloudflare adapter + wrangler as devDeps:
- *     pnpm --filter <site> add -D @astrojs/cloudflare wrangler
- *   (the `starter` site already has both). Playwright is optional and only
- *   needed for the CSP detector: `pnpm add -D playwright && npx playwright install chromium`.
- */
+// Flags: --site <dir> (default starter) · --port <n> (8799) · --no-build (reuse an existing cloudflare dist/) · --no-csp (skip the browser detector) · --strict-csp (violations exit 1) · --csp-channel <name> (use an installed browser instead of downloaded Chromium) · --keep (leave workerd up) · --ip / --compatibility-date.
 import { spawn, spawnSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
-const REPO_ROOT = resolve(HERE, '../../..'); // packages/stomme/test → repo root
+const REPO_ROOT = resolve(HERE, '../../..');
 
-// ── args ─────────────────────────────────────────────────────────────────────
 const args = process.argv.slice(2);
 const flag = (name) => args.includes(name);
 const opt = (name, def) => { const i = args.indexOf(name); return i >= 0 && args[i + 1] ? args[i + 1] : def; };
@@ -86,9 +23,7 @@ const siteDir = resolve(REPO_ROOT, SITE);
 const distDir = resolve(siteDir, 'dist');
 const base = `http://127.0.0.1:${PORT}`;
 
-// ── the known payload — mirrors admin/previews.js b64() EXACTLY (btoa over the
-//    UTF-8 bytes of JSON.stringify), so the test exercises the real encoding the
-//    CMS uses. The heading carries non-ASCII to prove UTF-8 round-trips. ───────
+// Mirrors admin/previews.js b64() EXACTLY (btoa over the UTF-8 bytes of JSON.stringify), and the marker carries non-ASCII so a broken UTF-8 round-trip shows.
 const MARKER = 'WORKERD-SMOKE ✓ Åäö 日本';
 const BLOCKS = [{ type: 'hero', eyebrow: 'SMOKE', heading: MARKER, intro: 'preview render probe', media: { kind: 'none' } }];
 function b64(obj) {
@@ -120,8 +55,7 @@ async function waitFor(url, ms) {
   return false;
 }
 
-// Inner HTML of #preview-root (from its opening tag to end of doc — we only need
-// to know it's non-empty and carries the marker, not to parse it).
+// From the opening tag to end of doc — enough to know it's non-empty and carries the marker, no parsing needed.
 function previewRootInner(html) {
   const m = html.match(/id="preview-root"[^>]*>([\s\S]*)/);
   return m ? m[1] : null;
@@ -130,7 +64,6 @@ function previewRootInner(html) {
 async function main() {
   log(`site=${SITE} port=${PORT} strictCsp=${STRICT_CSP} noCsp=${NO_CSP}`);
 
-  // 1. Build with the Cloudflare adapter (→ dist/_worker.js on workerd).
   if (!NO_BUILD) {
     log('building for cloudflare (STOMME_TARGET=cloudflare)…');
     if (!run('pnpm', ['run', 'build:cloudflare'], siteDir)) return fail('build:cloudflare failed');
@@ -139,13 +72,9 @@ async function main() {
     return fail(`no ${SITE}/dist/_worker.js — not a Cloudflare (SSR) build. Run build:cloudflare (or drop --no-build).`);
   }
 
-  // 2. Serve dist/ on workerd via wrangler pages dev.
   const wrangler = [resolve(siteDir, 'node_modules/.bin/wrangler'), resolve(REPO_ROOT, 'node_modules/.bin/wrangler')]
     .find(existsSync) || 'wrangler';
-  // Pin a fixed, supported compatibility date. `wrangler pages dev` otherwise defaults
-  // it to today, which the bundled workerd binary (a day or two behind the calendar)
-  // rejects — a calendar-triggered CI failure unrelated to the build. Any past date the
-  // binary supports works; this only needs workerd to boot and serve /preview.
+  // Pin a supported compatibility date: `wrangler pages dev` otherwise defaults to today, which the bundled workerd binary (a day or two behind the calendar) rejects — a calendar-triggered CI failure.
   const compatDate = process.env.SMOKE_COMPAT_DATE || '2025-11-01';
   log(`starting workerd: ${wrangler} pages dev dist --port ${PORT} --compatibility-date ${compatDate}`);
   const workerLog = [];
@@ -163,7 +92,6 @@ async function main() {
 
   let ok = true;
 
-  // ── CORE assertion 1+2: /preview renders the blocks on workerd. ─────────────
   const res = await fetch(`${base}/preview?data=${DATA}`);
   const html = await res.text();
   if (res.status !== 200) ok = fail(`/preview returned HTTP ${res.status} (expected 200)`);
@@ -179,13 +107,11 @@ async function main() {
     log('OK  /preview 200, #preview-root non-empty and contains the encoded heading (UTF-8 round-trip)');
   }
 
-  // ── CORE assertion 3: no decode-threw signature in the worker logs. ─────────
   const logText = workerLog.join('');
   const badLog = logText.match(/Buffer is not defined|ReferenceError|is not defined/);
   if (badLog) ok = fail(`worker log carries a runtime error: "${badLog[0]}"`);
   else log('OK  no Buffer/ReferenceError in the worker logs');
 
-  // ── OPTIONAL assertion 4: CSP violations (Playwright, detector). ────────────
   if (!NO_CSP) {
     let pw = null;
     try { pw = (await import('playwright')).chromium; }

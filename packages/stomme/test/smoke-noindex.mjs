@@ -1,13 +1,4 @@
 #!/usr/bin/env node
-/*
- * stomme — unit smoke for `isUnlisted` (src/config.ts), the rule behind `site.noindex`.
- *
- * A site may keep a path unlisted: the page is served as usual so a link somebody already holds
- * keeps working, and Head.astro marks it noindex so search engines leave it alone. The match is on
- * WHOLE SEGMENTS, because a prefix match on raw strings would silently take '/booking' with '/book'.
- *
- * Run with:  node packages/stomme/test/smoke-noindex.mjs
- */
 import assert from 'node:assert/strict';
 import { isUnlisted } from '../src/config.ts';
 

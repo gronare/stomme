@@ -5,13 +5,7 @@ import Cover from '../src/Cover.astro';
 // The animated background is inlined (not <img>) so its currentColor tints to the brand.
 import motionSvg from '../assets/images/placeholders/motion.svg?raw';
 
-// Full-bleed cover banner — a background photo or a muted looping video with
-// overlaid heading, intro and up to two buttons. The image always renders
-// behind the video, so it doubles as the poster / reduced-motion fallback
-// (the video is hidden under prefers-reduced-motion). Generic by design — no
-// domain-specific media, unlike the hero's flow/ops panels.
-// Grouped fields (block-field convention): `media` holds the background kind picker
-// (`kind`) + its assets and the darkening overlay; `layout` holds placement.
+// With kind=video the image still renders behind it, doubling as the poster and the prefers-reduced-motion fallback.
 interface Props {
   eyebrow?: string;
   heading: string;

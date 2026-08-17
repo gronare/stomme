@@ -1,9 +1,4 @@
 ---
-// Cookie-consent banner — a slim bottom bar, shown only when tracking is enabled and
-// the visitor hasn't chosen yet. Accepting flips Google Consent Mode + Meta pixel to
-// granted (see Tracking.astro); declining leaves everything denied. The choice is
-// remembered; a footer link with [data-consent-reopen] reopens it. No tracking → this
-// renders nothing (no cookies means no banner is needed).
 import { getEntry } from 'astro:content';
 import { resolveSite, resolveFeatures } from './src/config';
 import { site as siteConfig, features } from '@stomme/config';

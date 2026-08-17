@@ -4,18 +4,6 @@ import CtaBox from './blocks/CtaBox.astro';
 import { getEntry } from 'astro:content';
 import { resolveSite, type SiteConfig } from './src/config';
 
-// Rich service-area landing rendered from a `towns` collection entry. Use it in a
-// site's /<towns>/[slug].astro route: do getStaticPaths there, then
-//   <Base title=... description=...><TownPage town={entry} config={site} /></Base>
-// All chrome strings come from site.strings.town (English defaults; override per-site,
-// `{name}` is interpolated); the CTAs link to site.routes.contact. Expects a `towns`
-// schema with: name, title?, heroSubtitle?, heroNote?, why?, problems?, districts?,
-// localCase?, services?, media { image?, imageAlt? }, seo?.
-//
-// The sections below map 1:1 to engine blocks, so a later "towns as blocks" migration
-// (giving the collection a `blocks` field) is a straight field→block conversion with no
-// visual change:  hero→hero · why→prose · problems→featureGrid · districts→(chips, dark)
-// · reasons→featureGrid · localCase→statPanel/quote · services→checklist · close→ctaBox.
 interface Props {
   town: { id: string; data: any };
   config?: SiteConfig;
@@ -118,7 +106,6 @@ const jsonLd = {
 <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
 
 <style>
-  /* Hero — copy beside the town image (stacks on narrow). */
   .town-hero { padding-bottom: clamp(2.5rem, 5vw, 3.75rem); }
   .town-hero__grid { display: grid; gap: 2.75rem; align-items: center; grid-template-columns: 1fr; }
   @media (min-width: 920px) { .town-hero__grid--media { grid-template-columns: 1.08fr 0.92fr; } }
@@ -136,7 +123,6 @@ const jsonLd = {
 
   .town-h2 { font-size: clamp(1.6rem, 3vw, 2.4rem); }
 
-  /* Why — split heading | prose. */
   .town-why { border-top: 1px solid var(--color-line); }
   .town-why__grid { display: grid; gap: 2.5rem; grid-template-columns: 1fr; align-items: start; }
   @media (min-width: 920px) { .town-why__grid { grid-template-columns: 0.9fr 1.1fr; } }
@@ -145,7 +131,6 @@ const jsonLd = {
   .town-prose p:first-child { font-size: 1.12rem; font-weight: 500; }
   .town-prose p:not(:first-child) { color: var(--color-muted); }
 
-  /* Problems — annotated cards with a brand top-bar. */
   .town-problems { padding-top: 0; }
   .town-prob-grid { display: grid; gap: 1.1rem; grid-template-columns: 1fr; margin-top: 1.75rem; }
   @media (min-width: 820px) { .town-prob-grid { grid-template-columns: repeat(3, 1fr); } }
@@ -153,23 +138,19 @@ const jsonLd = {
   .town-prob::before { content: ""; position: absolute; top: 0; left: 1.5rem; width: 34px; height: 5px; background: var(--color-brand); border-radius: 0 0 4px 4px; }
   .town-prob p { margin-top: 0.4rem; color: var(--color-ink); font-size: 0.98rem; }
 
-  /* Districts — full-bleed dark coverage band (tokens remapped by .surface-dark). */
   .town-chips { margin-top: 1.5rem; display: flex; flex-wrap: wrap; gap: 0.7rem; }
   .town-chip { font-family: var(--font-mono); font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase;
     border: 1px solid var(--color-line); border-radius: 999px; padding: 10px 18px; color: var(--color-ink);
     background: color-mix(in srgb, var(--color-ink) 4%, var(--color-paper)); display: inline-flex; align-items: center; gap: 0.6rem; }
   .town-chip::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--color-brand); flex: none; }
 
-  /* Reasons — 3-up cards. */
   .town-reasons { display: grid; gap: 1.1rem; grid-template-columns: 1fr; }
   @media (min-width: 820px) { .town-reasons { grid-template-columns: repeat(3, 1fr); } }
   .town-reason { border: 1px solid var(--color-line); border-radius: 1rem; background: var(--color-paper); padding: 1.6rem; }
-  /* Brand heading on light: keep it ≥18.66px/700 so it qualifies as large text (3:1),
-     matching how the engine keeps vivid brands legible without recolouring. */
+  /* Keep ≥18.66px/700 so a vivid brand colour on light still qualifies as large text (3:1). */
   .town-reason h3 { margin: 0; font-weight: 700; color: var(--color-brand); font-size: 1.25rem; }
   .town-reason p { margin: 0.55rem 0 0; font-size: 0.95rem; color: var(--color-muted); }
 
-  /* Local case — pale surface panel with a pulled quote. */
   .town-case-sec { padding-top: 0; }
   .town-case { background: color-mix(in srgb, var(--color-surface) 60%, var(--color-paper));
     border: 1px solid color-mix(in srgb, var(--color-surface) 70%, var(--color-line));
@@ -177,7 +158,6 @@ const jsonLd = {
   .town-case__quote { margin: 1rem 0 0; font-weight: 700; text-transform: none; letter-spacing: 0;
     font-size: clamp(1.2rem, 2.2vw, 1.55rem); line-height: 1.3; color: var(--color-ink); max-width: 46rem; }
 
-  /* Services — carded tick grid. */
   .town-services-sec { padding-top: 0; }
   .town-svc { margin: 1.75rem 0 0; padding: 0; list-style: none; display: grid; gap: 0.7rem; grid-template-columns: 1fr; }
   @media (min-width: 640px) { .town-svc { grid-template-columns: repeat(2, 1fr); } }

@@ -1,22 +1,4 @@
 #!/usr/bin/env node
-/*
- * stomme — build-level smoke for the addon BLOCK registry (integration.mjs, the
- * '@stomme/addon-blocks' alias). The slots dir may ship a `blocks.mjs` at its root exporting
- * `{ type: Component }`; BlockRenderer merges it into its own registry, so an addon can add a
- * block type without the engine naming one.
- *
- * Pure static builds of the `starter` site with a throwaway STOMME_SLOTS_DIR stub (removed in
- * finally) — no browser. Run with:  pnpm --filter @gronare/stomme test:addon-blocks
- *
- * ASSERTS
- *   1. WITH the stub, a page whose blocks include the addon's type renders the addon component.
- *   2. An unknown type still renders the renderer's own "Unknown block" notice, so a typo is
- *      visible rather than silent.
- *   3. WITHOUT STOMME_SLOTS_DIR the same page renders the notice — nothing is injected.
- *
- * The page is written into the starter's own pages dir and removed in finally, so no tracked
- * file is touched.
- */
 import { spawnSync } from 'node:child_process';
 import { mkdtempSync, writeFileSync, rmSync, existsSync, readFileSync } from 'node:fs';
 import { resolve, dirname, join } from 'node:path';

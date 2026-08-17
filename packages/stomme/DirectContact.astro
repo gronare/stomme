@@ -3,10 +3,6 @@ import { getEntry } from 'astro:content';
 import ContactLink from './ContactLink.astro';
 import { site } from '@stomme/config';
 const copy: Record<string, string> = (site as any)?.strings?.contact ?? {};
-// Direct-contact card — ONE component, fed by the Contact settings, with per-placement
-// display toggles (show). Used by the contact-form aside, /thanks, the contactCard block,
-// and the findUs block. Phone in the brand colour; an optional away banner (global, from
-// settings) shows on top and auto-hides past its date (client-side).
 interface Address { street?: string; postcode?: string; city?: string; country?: string; lat?: number; lng?: number }
 interface Show { phone?: boolean; email?: boolean; hours?: boolean; address?: boolean; socials?: boolean; map?: boolean }
 interface Props {
@@ -22,7 +18,7 @@ interface Props {
   footer?: string;
   show?: Show;
 }
-// Fed from the Contact settings by default; any prop can override (e.g. a CMS preview draft).
+// `data` overrides the settings lookup so the CMS preview can render a draft.
 const p = Astro.props as Props & { data?: any };
 const c = (p.data ?? (await getEntry('contact', 'contact').catch(() => null))?.data ?? {}) as any;
 const label = p.label ?? 'Direct contact';
@@ -43,7 +39,7 @@ const protect = !!c.protectContact;
 // Every part is opt-in: a placement passes the ones it wants, absent means hidden.
 const s = {
   phone: show.phone === true, email: show.email === true,
-  hours: !!show.hours, address: !!show.address, socials: !!show.socials, map: !!show.map,
+  hours: show.hours === true, address: show.address === true, socials: show.socials === true, map: show.map === true,
 };
 const addrLine2 = [address.postcode, address.city].filter(Boolean).join(' ');
 const hasAddr = !!(address.street || addrLine2 || address.country);

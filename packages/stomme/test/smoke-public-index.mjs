@@ -1,31 +1,4 @@
 #!/usr/bin/env node
-/*
- * stomme — dev-server smoke for the public directory-index middleware (integration.mjs,
- * `publicIndexPlugin`). Vite's own public middleware matches exact filenames only, so a
- * DIRECTORY address out of public/ reaches neither sirv nor Astro's router: '/admin' 404s in
- * dev while the same address works in production — and both the README and create-stomme tell
- * the owner the CMS is there. The plugin rewrites '<dir>' to '<dir>/index.html' when that file
- * exists under public/, and leaves everything else to the next handler.
- *
- * Runs a real `astro dev` on the `starter` site and asks it over HTTP — the dev server is where
- * the bug lives, so nothing below is a stand-in for it. No build, no browser.
- * Run with:  pnpm --filter @gronare/stomme test:public-index
- *
- * ASSERTS
- *   1. GET /admin serves public/admin/index.html (the CMS opens on the address we document).
- *   2. GET /admin/ (the trailing-slash address the dev server redirects to) does the same.
- *   3. GET /admin/config.yml still serves the file itself — the rewrite takes no exact hit away.
- *   4. A query string does not prevent the rewrite (?token=… is how the CMS comes back from OAuth).
- *   5. A public directory with no index.html (/images/placeholders) is NOT rewritten — 404,
- *      never a directory listing.
- *   6. An unknown address still 404s, so the middleware invents no pages.
- *   7. A path that cannot be decoded, and one carrying '..', are handed on rather than served —
- *      and the server keeps serving afterwards.
- *
- * The port is checked free first and the dev server is started in its own process group: a
- * stranger already listening — or a leftover server from an earlier run — would answer every
- * assertion here and make the run meaningless.
- */
 import { spawn } from 'node:child_process';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';

@@ -2,10 +2,6 @@
 import { getEntry } from 'astro:content';
 import DirectContact from '../DirectContact.astro';
 
-// Contact form block — self-contained: heading, intro, field labels, submit text and the
-// direct-contact toggle are all editable on the block. On submit it stashes a recap of
-// what was sent in sessionStorage and goes to /thanks, which renders the confirmation +
-// recap (one place — no inline duplicate). No-JS posts to the endpoint, which 303s to /thanks.
 interface Props {
   site?: any; eyebrow?: string; heading?: string; intro?: string;
   labelName?: string; labelEmail?: string; labelMessage?: string;
@@ -23,7 +19,7 @@ const L = {
   direct: c.direct ?? 'Direct contact',
   honeypot: c.honeypot ?? 'Leave this field empty',
 };
-const showPhoneField = showPhone === true; // opt-in (rule zero): absent = hidden
+const showPhoneField = showPhone === true; // opt-in — absent means hidden
 const showAside = showDirectContact === true; // opt-in: absent or off → full-width form
 
 const settings = (await getEntry('settings', 'site'))!.data;
@@ -32,14 +28,11 @@ const contactLine = [settings.name, contact.address?.city, contact.orgNr && `Org
   .filter(Boolean)
   .join(' · ');
 
-// Post to the form gateway (spam-gate + rate limit at the edge; the caller stores + sends).
-// `contact.endpoint` is the dedicated form worker; falls back to the legacy cms.baseUrl for
-// sites not yet migrated, then to the per-site /api/contact if un-wired.
+// Legacy fallback for sites not yet on the dedicated form worker: cms.baseUrl, then the per-site /api/contact when un-wired.
 const contactAction = site?.contact?.endpoint
   ? `${site.contact.endpoint}/contact`
   : site?.cms?.baseUrl ? `${site.cms.baseUrl}/contact` : '/api/contact';
-// No-JS fallback: the worker 303s here after a successful submit (KV is gone, so the
-// success path travels with the form). JS submits ignore this and go to /thanks themselves.
+// No-JS fallback — the worker 303s here after a successful submit; JS submits go to /thanks themselves.
 const successPath = site?.routes?.formSuccess ?? '/thanks';
 
 // The "what you sent" recap on /thanks is labelled with this form's own field labels.
@@ -85,9 +78,7 @@ const recapLabels = JSON.stringify({ email: L.email, phone: L.phone, message: L.
     )}
   </div>
   <script is:inline>
-    // Progressive enhancement: submit via fetch, stash a recap of what was sent in
-    // sessionStorage, then go to /thanks (it renders the confirmation + recap — one place,
-    // no inline duplicate). No-JS just POSTs and the endpoint 303s to /thanks.
+    // Progressive enhancement — stash the recap, then go to /thanks; without JS the POST goes straight to the endpoint, which 303s there.
     (function () {
       var form = document.currentScript.closest('section').querySelector('.contact-form');
       if (!form) return;

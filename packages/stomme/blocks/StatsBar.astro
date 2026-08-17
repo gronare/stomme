@@ -1,6 +1,4 @@
 ---
-// A label/value facts grid. The facts live on the block instance (add a Stats block
-// where you want them), so different pages can show different numbers.
 interface Props { items?: { label: string; value: string }[] }
 const { items } = Astro.props;
 const facts = Array.isArray(items) ? items : [];

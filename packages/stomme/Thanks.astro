@@ -1,13 +1,4 @@
 ---
-// Contact-form confirmation — the real /thanks page AND the CMS "Thank-you" preview render
-// this (via /preview?kind=thanks), so the preview shows the live page with the site theme.
-// Presentational: the caller resolves copy/links/recap and passes them in.
-//
-// Two layouts (thanks settings `variant`):
-//   classic — centered success + the "what you sent" recap card + direct-contact card.
-//   letter  — the submission rendered as a POSTMARKED LETTER: the visitor's message on a
-//             tilted paper sheet with a perforated stamp, and a circular postal
-//             cancellation (site · town, the eyebrow word, year) that stamps down.
 import DirectContact from './DirectContact.astro';
 import Emph from './src/Emph.astro';
 interface Recap {
@@ -42,11 +33,9 @@ const {
 } = Astro.props;
 
 const hasRecap = !!recap && !!(recap.email || recap.phone || recap.message);
-const hasDirect = showContact === true; // opt-in (rule zero); the route gates this on contact actually existing
+const hasDirect = showContact === true; // opt-in — absent means hidden
 const twoCol = hasRecap && hasDirect;
 
-// Letter chrome: the postmark ring reads "<site> · <town>", its centre is the eyebrow word
-// ("Message sent"), the stamp carries the site's initial. Year is stamped at build time.
 const ring = [who, town].filter(Boolean).join(' · ').toUpperCase();
 const stampInitial = (who || 'g').trim().charAt(0).toLowerCase();
 const toLine = [who, town].filter(Boolean).join(', ').toLowerCase();
@@ -131,9 +120,7 @@ const year = new Date().getFullYear();
 
 {variant === 'letter' ? (
   <script is:inline>
-    // The letter variant writes the visitor's own submission ONTO the sheet: from-line,
-    // phone (its own line — never wrapped mid-number) and the message body. A direct
-    // visit has no stash → the ruled-lines letter stands on its own.
+    // The phone gets its own line so a number never wraps mid-number; no sessionStorage stash (direct visit / no-JS) → the blank ruled letter stands on its own.
     (function () {
       var raw; try { raw = sessionStorage.getItem('stomme:recap'); } catch (e) { return; }
       if (!raw) return;
@@ -148,10 +135,7 @@ const year = new Date().getFullYear();
   </script>
 ) : (
   <script is:inline>
-    // A real form submit lands here from /thanks with a recap of what was sent stashed in
-    // sessionStorage (the page is static — it ships no submitted data). Build the "what you
-    // sent" card from it, drop it into the two-up, then clear it so a refresh won't re-show.
-    // No stash (direct visit / no-JS) → nothing happens, the generic thank-you stands alone.
+    // The page is static and ships no submitted data: build the recap card from the sessionStorage stash, then clear it so a refresh won't re-show. No stash → the generic thank-you stands alone.
     (function () {
       var raw; try { raw = sessionStorage.getItem('stomme:recap'); } catch (e) { return; }
       if (!raw) return;

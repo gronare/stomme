@@ -72,6 +72,18 @@ Each carries its own data, so different pages can show different numbers.
 The contact blocks read the `contact` settings for the actual phone/email/address; their
 fields control wording and which parts appear.
 
+## Choosing between similar blocks
+
+Five pairs are easy to mix up. Each row says what makes the block different, not what it is:
+
+| Block | What sets it apart |
+|---|---|
+| `pillars` | airy columns with a large brand numeral and a top rule — unlike `featureGrid` (boxed, small numeral) or `specialistGrid` (border-top, denser) |
+| `specialistGrid` | denser than `pillars` (no large numeral), flatter than `featureGrid` (no box or icon) — a longer list of capabilities under one service |
+| `ctaBox` | three layouts (classic / split / panel); `facts` feeds the split card's chips and the panel's readout and is ignored by classic. `ctaPanel` is the one that sits on a surface band |
+| `prose` | its pull-stat (`statValue` + `statLabel`) is for the one headline figure a text section earns — `statsBar` is the row for several |
+| `definition` | a dictionary entry (term, word class, numbered senses); `width` and `align` behave as they do in `callout` |
+
 ## Chrome (not blocks)
 
 `stomme/Header.astro` and `stomme/Footer.astro` render the site header/footer

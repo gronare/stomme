@@ -1,33 +1,15 @@
 ---
 import Cover from './src/Cover.astro';
-// The renderer comes through the @stomme/renderer alias (the site's wrapper when
-// src/blocks/BlockRenderer.astro exists, else the engine renderer) so a service's
-// blocks get the site's custom blocks. Same resolution the lookbook route uses.
+// @stomme/renderer resolves to the site's own BlockRenderer when it has one, so a service's blocks get the site's custom blocks — importing the engine renderer directly loses them.
 import BlockRenderer from '@stomme/renderer';
 import { render } from 'astro:content';
 import { resolveLink, resolveButton } from './src/href';
 import { resolveSite, type SiteConfig } from './src/config';
 
-// Service detail page rendered from a `services` collection entry (its markdown
-// body becomes the article). Use in a site's /<services>/[slug].astro route: do
-// getStaticPaths there, then
-//   <Base title=... description=...><ServicePage service={entry} config={site} /></Base>
-// Chrome strings come from site.strings.service; CTA links to site.routes.contact.
-// Expects a `services` schema with: title, navLabel, summary?, bullets?, media { image?, imageAlt? },
-// seo? + a markdown body + optional `blocks` (composed sections, same
-// picker as pages — rendered between the intro and the quote CTA).
-//
-// A block-composed entry may additionally carry a `hero` frontmatter group. That
-// renders a COMPACT page-header instead of the plain one: eyebrow (service string),
-// H1 = title, lede = summary, ✓ ticks, primary CTA (contact) plus an optional quiet
-// second link (e.g. a "#process" jump), with the service image beside the text.
-// Deliberately lighter than the hero block — the big landing-page hero belongs to
-// the homepage; a detail page opens like a section, not another landing page.
-// No `hero` → the plain header, exactly as before (fleet-safe).
 interface Props {
-  service?: any; // CollectionEntry<'services'> (the live route)
-  data?: any; // OR draft frontmatter (the CMS preview) …
-  bodyHtml?: string; // … with the markdown body pre-rendered to HTML
+  service?: any;
+  data?: any; // the CMS preview passes draft frontmatter + a pre-rendered body instead of an entry
+  bodyHtml?: string;
   config?: SiteConfig;
 }
 const { service, data: draftData, bodyHtml, config } = Astro.props;
@@ -36,19 +18,15 @@ const site = resolveSite(config);
 const t = site.strings.service;
 const contact = site.routes.contact ?? '/contact';
 const Content = service ? (await render(service)).Content : null;
-// Composed entries own the whole page below the header (everything is a section);
-// the template's body/bullets/image + the quote-CTA band are the LEGACY layout, kept
-// for entries without blocks so existing sites render unchanged.
+// The template body/bullets/image + quote-CTA band are the LEGACY layout, kept for entries without blocks.
 const hasBlocks = Array.isArray(data.blocks) && data.blocks.length > 0;
-// The hero group only upgrades block-composed entries — the legacy layout already
-// renders bullets/image itself and must not double them.
+// The hero group only upgrades block-composed entries — the legacy layout renders bullets/image itself and would double them.
 const hero = hasBlocks && data.hero && typeof data.hero === 'object' ? data.hero : null;
 const hdTicks: string[] = hero
   ? (Array.isArray(hero.ticks) && hero.ticks.length > 0 ? hero.ticks : (data.bullets ?? []))
   : [];
 const hdImage = hero ? (hero.image ?? data.media?.image) : undefined;
-// Primary CTA always renders (label/link default to the service strings + contact route);
-// `cta`/`cta2` are the grouped shape, the flat pairs are legacy content.
+// Legacy flat pairs (ctaHref/ctaLabel/cta2*) — still rendered via the resolveLink/resolveButton fallback.
 const hdCta = hero ? resolveLink(hero.cta?.link ?? hero.ctaHref, contact) : contact;
 const hdCtaLabel = hero ? (hero.cta?.label || hero.ctaLabel || t.cta) : t.cta;
 const hdBtn2 = hero ? resolveButton(hero.cta2, hero.cta2Label, hero.cta2Href) : null;
@@ -114,15 +92,11 @@ const hdBtn2 = hero ? resolveButton(hero.cta2, hero.cta2Label, hero.cta2Href) : 
 )}
 
 <style>
-  /* Compact page-header (block-composed entries with a `hero` group). Reads as a
-     section intro: section-level heading size (not the hero scale), tighter bottom
-     padding, image in the side column. */
   .service-hd { padding-bottom: 1.5rem; }
   @media (min-width: 768px) { .service-hd { padding-block: 3rem 2.25rem; } }
   .service-hd__grid { display: grid; grid-template-columns: 1fr; gap: 2rem; align-items: center; }
   @media (min-width: 920px) { .service-hd__grid.has-media { grid-template-columns: 1.1fr 0.9fr; gap: clamp(2rem, 4vw, 3.5rem); } }
-  /* :global — the image comes out of the Cover child component, so it doesn't
-     carry this component's scope attribute. */
+  /* :global — the image comes out of the Cover child, so it carries no scope attribute of this component. */
   .service-hd__grid > :global(*) { min-width: 0; }
   .service-hd__h1 { margin-top: 1rem; }
   .service-hd__lede { max-width: 36rem; }
