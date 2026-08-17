@@ -19,6 +19,7 @@ Not published to a registry yet — clone the repository and scaffold from it. S
 | `@gronare/stomme/addon-collections` | `stommeAddonCollections()` — collections contributed by an out-of-tree addon dir. |
 | `@gronare/stomme/kit` | `SiteConfig`-independent field/block types and field helpers for building a catalog. |
 | `@gronare/stomme/config` | `SiteConfig` / `StommeFeatures` / `Listing` types, defaults, and the per-locale string sets. |
+| `@gronare/stomme/virtual-aliases` | Ambient declarations for the `@stomme/*` aliases the integration creates at build time. An extension adds `/// <reference types="@gronare/stomme/virtual-aliases" />` and gets typed `site`, `features` and `listings` instead of casts. |
 | `@gronare/stomme/styles.css` | Design tokens + every component class (override the tokens to rebrand). |
 | `@gronare/stomme/Header.astro`, `Footer.astro` | Themeable site chrome. |
 | `@gronare/stomme/Head.astro` | Title, description, Open Graph, Twitter card, favicon, canonical and noindex. |

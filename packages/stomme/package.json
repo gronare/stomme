@@ -38,7 +38,8 @@
     "./PostPage.astro": "./PostPage.astro",
     "./CatalogPage.astro": "./CatalogPage.astro",
     "./routes/*": "./routes/*",
-    "./blocks/*": "./blocks/*"
+    "./blocks/*": "./blocks/*",
+    "./virtual-aliases": "./virtual-aliases.d.ts"
   },
   "scripts": {
     "typecheck": "tsc --noEmit -p tsconfig.json",
@@ -84,7 +85,8 @@
     "ServicePage.astro",
     "PostPage.astro",
     "CatalogPage.astro",
-    "styles.css"
+    "styles.css",
+    "virtual-aliases.d.ts"
   ],
   "dependencies": {
     "@fontsource/inter": "^5.2.8",
