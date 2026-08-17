@@ -1,19 +1,5 @@
-// Build-time OG-card renderer (settings.og, Phase 2): the page's photo sharp-cropped
-// to 1200×630 as the background (or a brand gradient when there is none), a transparent
-// gradient scrim, and title/tagline/wordmark composited on top per the `style` preset —
-// satori (flex layout → SVG) + resvg (SVG → PNG).
-//
-// Deliberately plain .mjs, and loaded ONLY via the runtime dynamic import in
-// routes/og.ts (through the __STOMME_OG_RENDERER__ file URL the integration defines) —
-// never through the site's Vite bundle. Bundling is exactly what must not happen here:
-// sharp/@resvg are native (Rollup chokes on .node binaries), and externalizing bare
-// specifiers doesn't survive pnpm isolation (they aren't in the SITE's node_modules).
-// Loaded from its real package location, node resolves every dep naturally.
-//
-// Fonts: the engine ships no font files (src/fonts.ts wires site-side variable woff2,
-// which satori can't parse) — the static @fontsource woffs are direct deps for exactly
-// this. Card typography is fixed Inter / Inter Tight regardless of the site theme:
-// brand-consistent with the engine's default type, and deterministic across sites.
+// Deliberately plain .mjs, loaded ONLY as a runtime dynamic import from routes/og.ts and never through the site's Vite bundle: sharp/@resvg are native (Rollup chokes on .node binaries) and externalized bare specifiers don't survive pnpm isolation.
+// Card typography is fixed Inter / Inter Tight regardless of the site theme — the static @fontsource woffs are direct deps because satori can't parse the variable woff2 src/fonts.ts wires site-side.
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { createRequire } from 'node:module';
@@ -26,17 +12,6 @@ const require = createRequire(import.meta.url);
 export const OG_WIDTH = 1200;
 export const OG_HEIGHT = 630;
 
-// renderOgCard input:
-//   title           string (required) — the resolved headline (routes/og.ts picks it
-//                   from the item field the type's headlineField selects)
-//   tagline         string — the resolved second line ('' = none)
-//   wordmark        string | { pre, accent } — settings.logo.textPre/textAccent
-//   bgImageBuffer   Buffer | null — item photo; null → solid brand background
-//   og              { style: 'editorial'|'bold'|'ops', scrim: 0–100, showLogo,
-//                     accent } (a settings.og.types[<key>] config)
-//   theme           { brand, ink, onDark, dark } (theme collection)
-
-// ── fonts ────────────────────────────────────────────────────────────────────
 let fonts = null;
 function loadFonts() {
   if (fonts) return fonts;
@@ -50,7 +25,6 @@ function loadFonts() {
   return fonts;
 }
 
-// ── colour helpers ───────────────────────────────────────────────────────────
 // Theme colours are hex from the CMS colour widget; anything unparseable falls back.
 function hexToRgb(hex, fallback) {
   const v = (hex || '').trim();
@@ -68,11 +42,10 @@ function hexToRgb(hex, fallback) {
 }
 const rgba = ([r, g, b], a) => `rgba(${r},${g},${b},${Math.min(1, Math.max(0, a)).toFixed(3)})`;
 
-// ── satori element tree (object form — no JSX in the package) ────────────────
+// satori element tree in object form — the package ships no JSX pipeline.
 const el = (type, style, children) =>
   ({ type, props: children == null ? { style } : { style, children } });
 
-// Headline size adapts to length so long titles still fit at 1200px wide.
 const titleSize = (t, base) => (t.length > 70 ? base - 20 : t.length > 40 ? base - 10 : base);
 
 function buildTree(input, bgDataUri) {
@@ -93,8 +66,7 @@ function buildTree(input, bgDataUri) {
   if (bgDataUri) {
     layers.push({ type: 'img', props: { src: bgDataUri, width: OG_WIDTH, height: OG_HEIGHT, style: { position: 'absolute', top: 0, left: 0, width: OG_WIDTH, height: OG_HEIGHT, objectFit: 'cover' } } });
   } else {
-    // Solid theme-brand background — no photo, but never blank. A faint dark wash from
-    // the bottom keeps the overlay text legible on a light brand colour.
+    // A faint dark wash keeps the overlay text legible on a light brand colour.
     layers.push(el('div', {
       position: 'absolute', top: 0, left: 0, width: OG_WIDTH, height: OG_HEIGHT,
       backgroundColor: rgba(brand, 1),
@@ -131,7 +103,6 @@ function buildTree(input, bgDataUri) {
 
   let content;
   if (style === 'ops') {
-    // Left info panel: full-height accent bar, text column vertically centred.
     content = [
       el('div', { position: 'absolute', top: 0, left: 0, width: 10, height: OG_HEIGHT, backgroundColor: accent }),
       ...(hasWordmark ? [el('div', { position: 'absolute', top: 56, left: 74, display: 'flex' }, [wordmarkEl])] : []),
@@ -142,7 +113,6 @@ function buildTree(input, bgDataUri) {
       ]),
     ];
   } else if (style === 'bold') {
-    // Big centred statement under a heavy scrim.
     content = [
       el('div', { position: 'absolute', top: 0, left: 0, width: OG_WIDTH, height: OG_HEIGHT, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '0 96px' }, [
         titleEl(titleSize(input.title, 70), { textAlign: 'center' }),
@@ -152,7 +122,6 @@ function buildTree(input, bgDataUri) {
       ...(hasWordmark ? [el('div', { position: 'absolute', bottom: 52, left: 0, width: OG_WIDTH, display: 'flex', justifyContent: 'center' }, [wordmarkEl])] : []),
     ];
   } else {
-    // editorial (default): gradient rises from the bottom, text bottom-left.
     content = [
       ...(hasWordmark ? [el('div', { position: 'absolute', top: 56, left: 64, display: 'flex' }, [wordmarkEl])] : []),
       el('div', { position: 'absolute', bottom: 0, left: 0, width: OG_WIDTH, display: 'flex', flexDirection: 'column', padding: '0 64px 60px', maxWidth: 980 }, [
@@ -166,10 +135,7 @@ function buildTree(input, bgDataUri) {
   return el('div', { display: 'flex', position: 'relative', width: OG_WIDTH, height: OG_HEIGHT, fontFamily: 'Inter' }, [...layers, ...content]);
 }
 
-// ── background sources ───────────────────────────────────────────────────────
-// Content image values are served paths: '/media/…' (CMS media folder, on disk under
-// public/media as-is) or '/…' under public/ — plus the odd absolute URL. Returns the raw
-// bytes, or null when unresolvable (caller falls to the brand background).
+// Content image values are served paths resolved on disk under public/ ('src/…' from the project root instead); null means unresolvable, and the caller falls back to the brand background.
 export async function loadImageSource(src, root = process.cwd()) {
   if (!src) return null;
   try {
@@ -186,12 +152,10 @@ export async function loadImageSource(src, root = process.cwd()) {
   }
 }
 
-// ── the card ─────────────────────────────────────────────────────────────────
 export async function renderOgCard(input) {
   let bgDataUri = null;
   if (input.bgImageBuffer) {
-    // Exact 1200×630 centre-crop; flattened + jpeg-encoded so satori embeds a small,
-    // alpha-free raster (the scrim provides all the darkening).
+    // Flattened + jpeg-encoded so satori embeds a small, alpha-free raster (the scrim provides all the darkening).
     const bg = await sharp(input.bgImageBuffer)
       .resize(OG_WIDTH, OG_HEIGHT, { fit: 'cover' })
       .flatten({ background: '#ffffff' })
@@ -203,7 +167,6 @@ export async function renderOgCard(input) {
   return Buffer.from(new Resvg(svg, { fitTo: { mode: 'width', value: OG_WIDTH } }).render().asPng());
 }
 
-// ── build-safe fallbacks (a card failure must NEVER fail the build) ──────────
 // settings.ogImage bytes → plain 1200×630 PNG (no overlay — it's already a designed card).
 export async function rawImagePng(buf) {
   return sharp(buf).resize(OG_WIDTH, OG_HEIGHT, { fit: 'cover' }).flatten({ background: '#ffffff' }).png().toBuffer();

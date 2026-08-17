@@ -1,4 +1,2 @@
-// Fallback target for the @stomme/addon-blocks alias when no blocks module is supplied (or
-// STOMME_SLOTS_DIR is unset): exports an empty registry, so a site with no addon dir renders
-// exactly the library blocks. See the addon blocks alias in integration.mjs.
+// Fallback for the @stomme/addon-blocks alias when STOMME_SLOTS_DIR supplies no blocks module: an empty registry leaves a site rendering exactly the library blocks.
 export const blocks = {};

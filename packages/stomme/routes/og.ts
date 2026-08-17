@@ -1,24 +1,8 @@
-// Injected by the stomme integration at /og/[...slug] — the generated-OG-card
-// endpoint (settings.og). Prerendered: each item of a TYPE-ENABLED collection (and the
-// site-default brand card when needed) emits one static 1200×630 PNG — see src/og-pages.ts,
-// the same enumeration Head.astro resolves og:image with. Slug carries the page path
-// (e.g. /og/news/x.png); the site-default card is /og/default.png.
-//
-// The master switch is CONTENT (settings.og.enabled), which doesn't exist yet at
-// astro:config:setup — so the route is always injected and gates itself here:
-// disabled ⇒ getStaticPaths returns [] ⇒ nothing is emitted, and the renderer's
-// native deps are never even loaded (dynamic import inside the build step).
-//
-// Bulletproof by contract: a card failure must NEVER fail the build. Every step
-// falls through with a warning — full card → card on the brand background →
-// settings.ogImage as a plain PNG → solid brand colour → a 1×1 placeholder.
+// The master switch is CONTENT (settings.og.enabled), which doesn't exist yet at astro:config:setup — so the integration always injects this route and it gates itself in getStaticPaths, leaving the renderer's native deps unloaded when disabled.
+// A card failure must NEVER fail the build: every step falls through with a warning — full card → card on the brand background → settings.ogImage as a plain PNG → solid brand colour → a 1×1 placeholder.
 export const prerender = true;
 
-// The renderer's absolute file:// URL, injected by the integration as a Vite define.
-// It MUST be loaded as a runtime dynamic import of that URL — NOT bundled: its deps
-// (sharp/@resvg) are native binaries Rollup can't ingest, and externalized bare
-// specifiers wouldn't resolve from a consuming site's dist under pnpm isolation.
-// Imported from its real package location, node resolves everything naturally.
+// The renderer's absolute file:// URL, a Vite define from the integration: it MUST be loaded as a runtime dynamic import of that URL and never bundled — sharp/@resvg are native binaries Rollup can't ingest, and externalized bare specifiers wouldn't resolve from a consuming site's dist under pnpm isolation.
 declare const __STOMME_OG_RENDERER__: string;
 
 import type { APIRoute } from 'astro';
@@ -31,13 +15,11 @@ export async function getStaticPaths() {
   const settings = (await getEntry('settings', 'site'))?.data;
   if (!settings?.og?.enabled) return [];
   const pages = await ogPages({ features, routes: site.routes, listings });
-  // Only entries that actually need a rendered card (a per-type item, or the site-default
-  // brand card). Raw-override / site-default entries carry a URL, not a PNG to emit.
+  // Raw-override and site-default entries carry a URL, not a PNG to emit.
   return pages.filter((p) => p.card).map((p) => ({ params: { slug: p.slug }, props: { page: p } }));
 }
 
-// Local last resort: og.ts exports EMPTY_PNG, but if that module itself fails to load
-// (native-dep trouble), nothing from it is reachable — keep an independent copy.
+// An independent copy of src/og.mjs's EMPTY_PNG: if that module fails to load at all, nothing it exports is reachable.
 const EMPTY_PNG = Buffer.from(
   'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg==',
   'base64',
@@ -49,8 +31,7 @@ async function buildPng(page: OgPage): Promise<Buffer> {
 
   let og; // the renderer module — loaded lazily so disabled sites never touch native deps
   try {
-    // Variable indirection on purpose: a define-substituted string literal inside
-    // import() gets statically resolved and bundled by Rollup even with @vite-ignore.
+    // Variable indirection on purpose: a define-substituted string literal inside import() gets statically resolved and bundled by Rollup even with @vite-ignore.
     const rendererUrl: string = __STOMME_OG_RENDERER__;
     og = await import(/* @vite-ignore */ rendererUrl);
   } catch (e) {
@@ -64,12 +45,10 @@ async function buildPng(page: OgPage): Promise<Buffer> {
   const name = settings.name || '';
   const vars: Record<string, string> = page.vars ?? {};
 
-  // The site-default brand card (no typeKey): the business name on the brand background,
-  // no wordmark/tagline (the name is already the headline). Otherwise the per-type config.
+  // The site-default brand card (no typeKey) carries no wordmark or tagline — the business name is already the headline.
   const isDefault = !page.typeKey;
   const t = (page.typeKey && settings.og?.types?.[page.typeKey]) || {};
-  // Headline + second line are picked FIELDS ('business' = the site name, 'none' = off);
-  // unset falls to the per-type default the field picker shows.
+  // Headline and second line are picked FIELDS: 'business' = the site name, 'none' = off, unset falls to the per-type default.
   const pick = (key?: string) => (!key || key === 'none' ? '' : key === 'business' ? name : vars[key] ?? '');
   const headline = pick(t.headlineField || page.headlineDefault || 'title') || vars.title || name;
   const subline = isDefault ? '' : pick(t.sublineField || page.sublineDefault || 'none');
@@ -83,7 +62,6 @@ async function buildPng(page: OgPage): Promise<Buffer> {
     theme,
   };
 
-  // 1. The full card — page photo background when the page has one.
   const bg = await og.loadImageSource(page.image);
   if (page.image && !bg) warn(`background image not found (${page.image}) — using the brand background`);
   try {
@@ -91,7 +69,6 @@ async function buildPng(page: OgPage): Promise<Buffer> {
   } catch (e) {
     warn('card generation failed', e);
   }
-  // 2. Same card on the brand background (a bad/undecodable photo shouldn't unbrand the page).
   if (bg) {
     try {
       return await og.renderOgCard(input);
@@ -99,7 +76,6 @@ async function buildPng(page: OgPage): Promise<Buffer> {
       warn('brand-background card failed too', e);
     }
   }
-  // 3. The static share image (Phase-1 behaviour, as a PNG at the card URL).
   if (settings.ogImage) {
     try {
       const raw = await og.loadImageSource(settings.ogImage);
@@ -109,7 +85,6 @@ async function buildPng(page: OgPage): Promise<Buffer> {
       warn('settings.ogImage fallback failed', e);
     }
   }
-  // 4. Solid brand colour; 5. a valid empty PNG.
   try {
     return await og.solidPng(theme.brand);
   } catch (e) {

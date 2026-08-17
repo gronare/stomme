@@ -2,12 +2,7 @@
 import { Image } from 'astro:assets';
 import type { ImageMetadata } from 'astro';
 
-// Renders a content image through Astro's optimizer when it's a real uploaded
-// raster image (served at /media/… ; the build-bridge copies public/media → src/assets/media
-// so Astro can optimize it). A user-set public-root path
-// image renders as a plain <img>. With NO image, it falls back to the placeholder SVG
-// drawn as a brand-tinted CSS mask, so the default art follows the theme (an <img>
-// can't inherit currentColor). width/height are optional.
+// With no image the placeholder SVG is drawn as a CSS mask so the default art takes the brand tint — an <img> can't inherit currentColor.
 interface Props {
   src?: string; // value stored in frontmatter (may be undefined)
   alt: string;
@@ -19,6 +14,7 @@ interface Props {
 }
 const { src, alt, width, height, placeholder, class: cls, loading = 'lazy' } = Astro.props;
 
+// Uploads are optimizable only because the build-bridge mirrors public/media → src/assets/media; any other path falls through to a plain <img>.
 const uploads = import.meta.glob<{ default: ImageMetadata }>(
   '/src/assets/media/**/*.{jpg,jpeg,png,webp,avif}',
 );

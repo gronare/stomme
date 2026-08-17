@@ -1,32 +1,19 @@
-// Font picker for the theme. Curated, ready-to-use stacks (system / web-safe — no
-// external requests, no GDPR concern) plus an optional custom uploaded font. The
-// theme's `fontDisplay` / `fontBody` choose a key here (or 'custom'); Base injects the
-// resolved stacks as --font-display / --font-sans, and an @font-face for a
-// custom upload. Option VALUES must match the keys below (hand-authored in config.yml).
+// The theme's `fontDisplay` / `fontBody` name a key here (or 'custom'). The picker's option VALUES are hand-authored in bin/gen-admin-blocks.mjs and the CMS preview repeats these stacks in admin/previews.js — both have to match these keys.
 export const FONT_STACKS: Record<string, string> = {
   system: 'ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
   serif: '"Iowan Old Style", "Palatino Linotype", Palatino, Georgia, "Times New Roman", serif',
   grotesk: '"Helvetica Neue", Helvetica, Arial, "Segoe UI", system-ui, sans-serif',
   rounded: 'ui-rounded, "SF Pro Rounded", "Hiragino Maru Gothic ProN", "Segoe UI", system-ui, sans-serif',
   slab: 'Rockwell, "Rockwell Nova", "Roboto Slab", "DejaVu Serif", Georgia, serif',
-  // Geometric sans (Futura family). Web-safe stack: Futura on macOS/iOS, Century Gothic on
-  // Windows, else a generic geometric fallback. For pixel-consistent rendering everywhere,
-  // upload a self-hosted geometric (e.g. Jost) via the Custom font picker.
   geometric: 'Futura, "Futura PT", "Century Gothic", "Avenir Next", "URW Geometric", ui-sans-serif, system-ui, sans-serif',
-  // Condensed sans — narrow, space-efficient headlines (posters, signage, tight nav).
   condensed: '"Arial Narrow", "Helvetica Neue Condensed", "Roboto Condensed", "Liberation Sans Narrow", ui-sans-serif, sans-serif',
-  // Humanist sans — open, legible, warm; screen-first (Verdana family). Good for body-heavy sites.
   humanist: 'Verdana, "Segoe UI", "Lucida Grande", "Lucida Sans Unicode", Geneva, Tahoma, ui-sans-serif, sans-serif',
-  // Script / handwritten — for wordmarks and accents only, never body copy.
   script: '"Snell Roundhand", "Brush Script MT", "Segoe Script", "Bradley Hand", ui-rounded, cursive',
   mono: 'ui-monospace, "SF Mono", Menlo, Consolas, monospace',
 };
 
 export interface Webfont { family: string; fallbackFamily: string; fallback: string; }
-// Curated self-hosted webfonts. The real @font-face is authored by resolveFonts
-// (latin subset woff2, variable weight) so only latin ships; a capsize metric-
-// matched Arial fallback makes the swap shift-free. Self-hosted (GDPR-safe); the
-// woff2 is a static, content-hashed, cached-forever asset fetched once per user.
+// resolveFonts authors the real @font-face (latin-subset variable woff2); the capsize metric-matched Arial fallback is what makes the swap shift-free.
 export const WEBFONTS: Record<string, Webfont> = {
   inter: {
     family: 'Inter Variable', fallbackFamily: 'Inter Fallback',
@@ -46,7 +33,7 @@ const mimeOf = (path: string) =>
 const fontFace = (family: string, url: string) =>
   `@font-face{font-family:"${family}";src:url("${url}") format("${formatOf(url)}");font-display:swap;font-weight:100 900;}`;
 
-// Custom uploaded fonts resolve here (engine-owned, like Cover.astro's image glob): theme stores the served /media/fonts/… path, the build-bridge mirrors public/media → src/assets/media, Vite ?url-hashes it. Eager glob = URL strings only; a font is fetched only when its @font-face applies (unused uploads cost deploy bytes, not a page-load fetch).
+// The theme stores the served /media/fonts/… path; the build-bridge mirrors public/media → src/assets/media and Vite ?url-hashes it. Eager glob = URL strings only, so an unused upload costs deploy bytes, not a fetch.
 const uploadedFontUrls = import.meta.glob('/src/assets/media/**/*.{woff2,woff,ttf,otf}', { query: '?url', import: 'default', eager: true }) as Record<string, string>;
 const uploadFontUrl = (p?: string | null): string | null => {
   if (!p) return null;
@@ -54,7 +41,7 @@ const uploadFontUrl = (p?: string | null): string | null => {
   return key ? (uploadedFontUrls[key] ?? null) : null;
 };
 
-// Resolve the theme's fonts → CSS vars + @font-face + preloads. webfontUrls (curated-webfont key → served latin woff2) stays SITE-provided; custom uploads resolve via the glob above.
+// webfontUrls (curated-webfont key → served latin woff2) stays SITE-provided; custom uploads resolve through the glob above.
 export function resolveFonts(
   theme: { fontDisplay?: string; fontBody?: string; fontCustomFile?: string; fontCustomBodyFile?: string } = {},
   webfontUrls: Record<string, string> = {},
@@ -82,8 +69,7 @@ export function resolveFonts(
   const preloads: { href: string; type: string }[] = [];
   if (customDisplayUrl) { faces.push(fontFace('StommeFontDisplay', customDisplayUrl)); preloads.push({ href: customDisplayUrl, type: mimeOf(customDisplayUrl) }); }
   if (customBodyUrl) { faces.push(fontFace('StommeFontBody', customBodyUrl)); preloads.push({ href: customBodyUrl, type: mimeOf(customBodyUrl) }); }
-  // Curated webfonts: one @font-face + fallback + preload per distinct wired key
-  // (display == body dedupes to a single pair).
+  // One @font-face + fallback + preload per distinct wired key (display == body dedupes to a single pair).
   const webfontKeys = [...new Set([theme.fontDisplay, theme.fontBody])].filter(
     (k): k is string => !!k && !!WEBFONTS[k] && !!webfontUrls[k],
   );

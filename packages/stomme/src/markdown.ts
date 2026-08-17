@@ -2,12 +2,7 @@ import { marked } from 'marked';
 import { getImage } from 'astro:assets';
 import type { ImageMetadata } from 'astro';
 
-// Render CMS markdown to HTML and lay out inline images. Placement is set by the
-// image *title* keyword — `![caption](src "right")` — so images stay inline in the
-// body text yet get controlled positioning:
-//   (none) → centred & contained   left / right → float, text wraps
-//   wide → breakout                 + small | large → size
-// Uploads are optimised via Astro; alt → caption, title keyword → placement/size.
+// Placement and size come from the image *title* keywords — `![caption](src "right small")` — and alt becomes the caption.
 const uploads = import.meta.glob<{ default: ImageMetadata }>(
   '/src/assets/media/**/*.{jpg,jpeg,png,webp,avif}',
 );

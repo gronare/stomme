@@ -1,20 +1,9 @@
 import type { APIRoute } from 'astro';
 import { getEntry } from 'astro:content';
+// @ts-expect-error — virtual alias, no static types.
+import { site } from '@stomme/config';
 
-// Contact-form handler (SSR endpoint). A site exposes it at /api/contact:
-//   export { POST, prerender } from '@gronare/stomme/contact';
-// The ContactForm block POSTs name/email/phone/message + a bot-field honeypot here.
-// Sends via Resend: from a verified COMPANY sender (env CONTACT_FROM — one verified
-// domain serves every site), TO the business inbox (env CONTACT_TO, else the CMS
-// contact email), reply-to the visitor.
-//
-// Responds JSON to fetch (the block shows an inline "what you sent" confirmation),
-// or 303→/thanks for a plain (no-JS) form POST.
-//
-// Env (Cloudflare: Pages var/secret on locals.runtime.env; Netlify/node: process.env):
-//   RESEND_API_KEY  (secret, required)
-//   CONTACT_FROM    (required — e.g. 'forms@your-company.com'; must be a Resend-verified domain)
-//   CONTACT_TO      (optional override; default = contact.email)
+// Contact-form handler (SSR endpoint) wired at /api/contact: CONTACT_FROM must sit on a Resend-verified domain, CONTACT_TO defaults to the CMS contact email, and on Cloudflare the env arrives on locals.runtime.env rather than in import.meta.env.
 
 export const prerender = false;
 
@@ -27,14 +16,12 @@ export const POST: APIRoute = async ({ request, locals, redirect }) => {
   const wantsJson =
     (request.headers.get('accept') || '').includes('application/json') ||
     request.headers.get('x-requested-with') === 'fetch';
-  const ok = (body: any) => (wantsJson ? new Response(JSON.stringify(body), { status: 200, headers: { 'Content-Type': 'application/json' } }) : redirect('/thanks', 303));
+  const ok = (body: any) => (wantsJson ? new Response(JSON.stringify(body), { status: 200, headers: { 'Content-Type': 'application/json' } }) : redirect(site?.routes?.formSuccess ?? '/thanks', 303));
   const fail = (msg: string, status: number) => (wantsJson ? new Response(JSON.stringify({ ok: false, error: msg }), { status, headers: { 'Content-Type': 'application/json' } }) : new Response(msg, { status }));
 
   if (form.get('bot-field')) return ok({ ok: true }); // honeypot → silently "succeed"
 
-  // Per-IP rate limit: blocks spam bursts and keeps us under Resend's per-second send
-  // limit. Uses the STOMME_RL KV binding on the Pages project; skipped if it isn't bound
-  // (older sites simply don't rate-limit). 5 submissions / 10 min per IP per site.
+  // Per-IP rate limit (5 per 10 min) that also keeps us under Resend's per-second cap; skipped when the STOMME_RL KV binding is absent, so older sites simply don't rate-limit.
   const rlKv = (locals as any)?.runtime?.env?.STOMME_RL;
   if (rlKv) {
     const ip = request.headers.get('CF-Connecting-IP') || request.headers.get('x-forwarded-for') || 'unknown';
@@ -62,7 +49,7 @@ export const POST: APIRoute = async ({ request, locals, redirect }) => {
 
   const subject = `New enquiry from ${name || email || 'website'}`;
   const text = [`Name:  ${name}`, `Email: ${email}`, `Phone: ${phone}`, '', message].join('\n');
-  // Per-customer tracking: tag by site host (sanitised to Resend's allowed tag chars).
+  // Sanitised to Resend's allowed tag characters.
   const siteTag = new URL(request.url).hostname.replace(/[^a-zA-Z0-9_-]/g, '-');
 
   const res = await fetch('https://api.resend.com/emails', {

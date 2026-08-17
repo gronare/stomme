@@ -1,8 +1,5 @@
 ---
-// Renders a named glyph from the engine icon library (src/icons.ts) — referenced
-// by name from block data (hero flow, feature cards, contact card). Static inline
-// SVG only: zero JS, no external requests. An unknown/legacy name degrades to the
-// fallback glyph instead of breaking the page.
+// An unknown or legacy name degrades to the fallback glyph instead of breaking the page.
 import { ICONS, FALLBACK_ICON } from './icons.ts';
 interface Props { name?: string; class?: string }
 const { name = FALLBACK_ICON, class: cls } = Astro.props;

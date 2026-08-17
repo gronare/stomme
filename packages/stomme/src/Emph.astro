@@ -1,7 +1,5 @@
 ---
-// Inline emphasis for heading-ish fields: `*words*` render as an underlined <em>
-// (styled via `.display em` — an underline, not italics). Lets editors stress the
-// payoff clause of a heading or pull quote without a markdown widget.
+// `*words*` becomes an <em>, which styles.css renders as an underline, not italics.
 interface Props { text?: string }
 const parts = String(Astro.props.text ?? '').split(/\*([^*]+)\*/);
 ---

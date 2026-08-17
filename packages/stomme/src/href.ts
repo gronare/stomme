@@ -1,7 +1,4 @@
-// Resolve a link field to an href string. Accepts:
-//   • an object { page, url }  — the linkField() shape (url wins over page)
-//   • a plain string           — legacy/back-compat (returned as-is)
-//   • nothing                  — the fallback
+// Accepts the linkField() object { page, url } (url wins), a bare string (legacy, returned as-is), or nothing.
 export function resolveLink(value: unknown, fallback = '/'): string {
   if (!value) return fallback;
   if (typeof value === 'string') return value;
@@ -12,9 +9,7 @@ export function resolveLink(value: unknown, fallback = '/'): string {
   return fallback;
 }
 
-// Resolve a buttonField() group `{ label, link }` to { label, href } — null = no button.
-// Legacy args accept the pre-group pair (ctaLabel + ctaHref etc.) so an engine update
-// keeps rendering existing sites' content unchanged (kit FIELD POLICY).
+// The legacy args are the pre-group pair (ctaLabel + ctaHref etc.), still accepted so an engine update keeps rendering existing sites' content unchanged (kit FIELD POLICY).
 export function resolveButton(button: unknown, legacyLabel?: unknown, legacyHref?: unknown, fallback = '/'): { label: string; href: string } | null {
   const b = (button && typeof button === 'object' ? button : {}) as { label?: unknown; link?: unknown };
   const label = typeof b.label === 'string' && b.label ? b.label : typeof legacyLabel === 'string' && legacyLabel ? legacyLabel : '';

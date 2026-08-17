@@ -1,7 +1,4 @@
 ---
-// Generic block renderer with the library blocks built in. Pass `blocks`; the
-// default registry maps the standard types to the library components. Add or
-// override with the optional `registry` prop (your custom blocks win on key clash).
 import Hero from '../blocks/Hero.astro';
 import CoverHero from '../blocks/CoverHero.astro';
 import PageHeader from '../blocks/PageHeader.astro';
@@ -78,13 +75,8 @@ interface Props {
 }
 const { blocks = [], registry = {}, config, features } = Astro.props;
 const reg = { ...defaults, ...(addonBlocks ?? {}), ...registry };
-// Resolved per-site config (routes/locale/strings), forwarded to every block as
-// `site` so blocks needn't be wired individually.
 const site = resolveSite(config);
-// Feature gating. contactForm is the only block gated here and it defaults ON, so a page
-// that passes no `features` (or doesn't set the flag) renders exactly as before (rule
-// zero). Only an explicit contactForm:false drops the block. Gating SKIPS existing blocks
-// — it never injects one — so a page with no contactForm block is unaffected.
+// Gating only ever filters blocks out, never injects one, and contactForm defaults ON — so a page that passes no `features` renders exactly as before.
 const feats = resolveFeatures(features);
 const rendered = feats.contactForm === false ? blocks.filter((b) => b.type !== 'contactForm') : blocks;
 
@@ -100,7 +92,6 @@ const surfaceClass: Record<string, string> = { tint: 'surface-tint', band: 'band
         </div>
       );
     }
-    // Grouped shape (block-field convention): the surface lives at style.surface.
     const surf = block.style?.surface ? surfaceClass[block.style.surface] : undefined;
     return surf ? (
       <div class={surf}>
