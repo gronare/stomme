@@ -3,33 +3,13 @@ import { resolve, dirname } from 'node:path';
 import { mkdirSync, writeFileSync, existsSync, readFileSync, readdirSync, cpSync, rmSync, statSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 
-// stomme Astro integration — injects collection-detail routes.
-//
-//   import stomme from '@gronare/stomme/integration';
-//   import { site, features, listings } from './src/site.config.ts';
-//   integrations: [stomme({ features, routes: site.routes, listings })]
-//
-// Two route sources, both rendered inside the SITE's Base (wired via aliases) so chrome
-// + theme match:
-//  1. Feature flags (blog/areas/services) — fixed package entrypoints, as before.
-//  2. `listings` — for each, a prerendered detail entrypoint is generated into .astro/ and
-//     injected at `<route>/[slug]`. The entrypoint hardcodes the listing's collection +
-//     preset template (PostPage for `article`, CatalogPage for `catalog`). The index page
-//     is a seeded managed page (stomme-gen), so only detail routes are injected here.
 function resolveListings(l) {
   return (Array.isArray(l) ? l : [])
     .filter((x) => x && x.id && x.route && (x.preset === 'article' || x.preset === 'catalog'))
     .map((x) => ({ ...x, route: x.route.startsWith('/') ? x.route : `/${x.route}` }));
 }
 
-// /preview CSP allow-list: sha256 hashes of every first-party `is:inline` script body
-// found in the given source trees (engine package, the site's src/, slots dir). The
-// Astro compiler emits `is:inline` bodies byte-for-byte (verified against built HTML,
-// compressHTML on), so a hash of the source text matches the rendered element and the
-// scripts execute under the preview's strict CSP without 'unsafe-inline'. Recomputed on
-// every build (the entrypoint is regenerated), so editing a script re-hashes it.
-// Skipped: set:html (dynamic content — tracking/consent stay CSP-blocked in preview by
-// design), src= (external file), define:vars (the compiler rewrites the body).
+// sha256 of every first-party is:inline script body in the given trees, for /preview's CSP: the Astro compiler emits those bodies byte-for-byte (compressHTML on), so a source hash matches the rendered element and the script runs without 'unsafe-inline'. Deliberately skipped, and so CSP-blocked in preview: set:html (dynamic content), define:vars (the compiler rewrites the body), src= (external file).
 function inlineScriptHashes(dirs) {
   const hashes = new Set();
   const stack = dirs.filter((d) => d && existsSync(d));
@@ -55,11 +35,7 @@ function inlineScriptHashes(dirs) {
   return [...hashes].sort();
 }
 
-// Live-preview target, injected at /preview (generated so prerender is a literal
-// Astro can statically resolve — a Vite `define` is substituted too late for the
-// route scanner, which then prerenders the route and freezes it with empty blocks).
-// SSR on server targets so the CMS draft (?data=) renders the real components;
-// prerendered on `static` builds, where SSR (and thus live preview) isn't available.
+// Generated rather than a shipped file so prerender is a literal Astro's route scanner can statically resolve — a Vite define is substituted too late, and the route is then prerendered and frozen with empty blocks.
 function previewEntrypoint(isStatic, scriptHashes = []) {
   return `---
 export const prerender = ${isStatic ? 'true' : 'false'};
@@ -80,18 +56,6 @@ import TownPage from '@gronare/stomme/TownPage.astro';
 import { renderMarkdown } from '@gronare/stomme/markdown';
 import AddonPreview from '@stomme/addon-preview';
 
-// Reflected-XSS hardening. /preview renders attacker-controlled ?data= (markdown body,
-// block content) through set:html; on SSR it is an unauthenticated public GET. A strict
-// CSP means an injected inline <script> or on*= handler cannot run — there is no
-// 'unsafe-inline' for scripts. Allowed to execute: same-origin bundled scripts ('self' —
-// hoisted component scripts are never inlined, see assetsInlineLimit in the integration),
-// the per-response nonce (the morph script below), and the build-time sha256 hashes of
-// the engine/site's own is:inline scripts (header toggle, thanks, contact reveal — see
-// inlineScriptHashes). An attacker can't mint a fitting hash or guess the nonce, so
-// injected script stays inert. Styles keep 'unsafe-inline' (components author inline
-// style=, which is not script execution). frame-src allows the OpenStreetMap embed the
-// contact/FindUs components render. On SSR the header is authoritative; a
-// <meta http-equiv> in <head> is the fallback for prerendered/static output.
 const nonce = crypto.randomUUID().replace(/-/g, '');
 const csp = "default-src 'self'; script-src 'self' 'nonce-" + nonce + "'${scriptHashes.length ? ' ' + scriptHashes.join(' ') : ''}; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self'; frame-src 'self' https://www.openstreetmap.org; object-src 'none'; base-uri 'none'; frame-ancestors 'self'; form-action 'self'";
 Astro.response.headers.set('Content-Security-Policy', csp);
@@ -100,8 +64,7 @@ const kind = Astro.url.searchParams.get('kind');
 const raw = Astro.url.searchParams.get('data');
 function decode() {
   if (!raw) return null;
-  // workerd (Cloudflare SSR) has no Node Buffer — decode with atob + TextDecoder,
-  // mirroring b64()'s btoa(TextEncoder) encode so UTF-8 round-trips on every runtime.
+  // workerd (Cloudflare SSR) has no Node Buffer: atob + TextDecoder must mirror admin/previews.js b64()'s btoa(TextEncoder) encode or UTF-8 breaks.
   try { return JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(raw), (c) => c.charCodeAt(0)))); }
   catch { return null; }
 }
@@ -114,9 +77,6 @@ const towns = kind === 'footer'
   ? (await getCollection('towns')).sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0)).map((t) => ({ id: t.id, name: t.data.name }))
   : [];
 
-// Thank-you: render the real Thanks component with the draft copy over the localized
-// defaults + the site's contact settings, so the preview matches the live /thanks page.
-// A submission has no real data in a preview, so the "what you sent" recap is mocked.
 let thanks = null;
 if (kind === 'thanks') {
   const rs = resolveSite(site);
@@ -149,33 +109,19 @@ if (kind === 'thanks') {
   };
 }
 
-// Contact settings: render the REAL components fed the draft settings, so the
-// preview is the live card + Find-us block (no hand-built mockup that can drift).
 const contactDraft = kind === 'contact' && draft && typeof draft === 'object' ? draft : null;
 
-// Service entry: render the REAL ServicePage (template chrome + the entry's composed
-// blocks) from the draft, with the markdown body pre-rendered.
 const serviceDraft = kind === 'service' && draft && typeof draft === 'object' ? draft : null;
 const serviceHtml = serviceDraft ? await renderMarkdown(serviceDraft.body || '') : '';
 
-// Town entry: render the REAL TownPage (hero + why body + districts + reasons +
-// services as a ticked list) from the draft. TownPage takes town={ id, data }.
 const townDraft = kind === 'town' && draft && typeof draft === 'object' ? draft : null;
 
-// Identity: render the composed logo (mark + wordmark) with the SAME uploaded-vs-public
-// resolution as Header — an uploaded logo (/media/… → /src/assets/media via the build-bridge)
-// goes through Astro's image optimizer, so the CMS Identity pane shows the real optimized
-// image. A hand-built mockup using the CMS's getAsset only had a raw path, which isn't served.
 const identityDraft = kind === 'identity' && draft && typeof draft === 'object' ? draft : null;
 const idLogo = (identityDraft && identityDraft.logo) || {};
 const idUploads = import.meta.glob('/src/assets/media/**/*.{jpg,jpeg,png,webp,avif}');
-// Content stores the served /media/… path; the optimizable copy lives at /src/assets/media/…
-// (synced from public/media by the build-bridge). Map one to the other.
+// Content stores the served /media/… path; the optimizable copy lives at /src/assets/media/… (synced from public/media by the build-bridge), so swap the 7-char /media/ prefix.
 const idLogoKey = idLogo.image && idLogo.image.startsWith('/media/') ? '/src/assets/media/' + idLogo.image.slice(7) : null;
 const idOptimized = idLogoKey && idUploads[idLogoKey] ? idUploads[idLogoKey] : null;
-// Favicon / apple-icon / social-share image the SAME way: a /media/… asset resolves to its
-// built URL; public-root paths ('/favicon.svg', an /images/… default) are already served and
-// pass through. This is what the CMS Identity pane needs — getAsset yields only the raw path.
 const idAssetUrls = import.meta.glob('/src/assets/media/**/*', { query: '?url', import: 'default', eager: true });
 const idAsset = (p) => (!p ? '' : (typeof p === 'string' && p.startsWith('/media/') ? (idAssetUrls['/src/assets/media/' + p.slice(7)] || p) : p));
 const idName = (identityDraft && identityDraft.name) || 'Your business';
@@ -184,11 +130,6 @@ const idApple = idAsset(identityDraft && identityDraft.appleIcon);
 const idOg = idAsset(identityDraft && identityDraft.ogImage);
 const idLabel = 'font-family:ui-monospace,Menlo,monospace;font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;color:#6b7280;margin:0 0 10px';
 
-// Share cards: render the SAME layered model the real system uses, from the
-// draft settings, so every image resolves on-site (no getAsset / broken img in the iframe).
-// Site default = ogImage → home-hero image → a brand-colour card with the business name.
-// When the master is on and a type is enabled, also show an example generated card built
-// from that type's headlineField/sublineField/style/scrim/showLogo/accent + a sample item.
 const shareDraft = kind === 'sharecards' && draft && typeof draft === 'object' ? draft : null;
 const scName = (shareDraft && shareDraft.name) || 'Your business';
 const scOgImage = idAsset(shareDraft && shareDraft.ogImage);
@@ -209,8 +150,7 @@ if (shareDraft && scOg.enabled) {
   const key = Object.keys(scTypes).find((k) => scTypes[k] && scTypes[k].enabled);
   if (key) {
     const t = scTypes[key] || {};
-    // Resolve the type's headline/second-line FIELD picks against a sample item of the
-    // matching kind (mirrors routes/og.ts: 'business' = site name, 'none' = off).
+    // Field picks resolve against a sample item of the matching kind, mirroring routes/og.ts ('business' = site name, 'none' = off) — keep the two in sync.
     const scKind = key === 'towns' ? 'towns' : key === 'services' ? 'services'
       : (((listings || []).find((l) => l.id === key) || {}).preset === 'catalog' ? 'catalog' : 'article');
     const scSamples = {
@@ -243,9 +183,7 @@ if (shareDraft && scOg.enabled) {
   }
 }
 ---
-{/* Static/prerendered fallback: no response header is emitted, so carry the CSP in a
-    <meta http-equiv>. Astro relocates a leading <meta> in a page that renders a layout
-    into the document <head>. Harmless (redundant) alongside the SSR header. */}
+{/* Static/prerendered output emits no response header, so carry the CSP in a leading <meta> that Astro relocates into the document <head>; redundant but harmless under SSR. */}
 <meta http-equiv="Content-Security-Policy" content={csp} />
 {kind === 'header' ? (
   <Base title="Preview" chrome={false}><div id="preview-root"><Header nav={navDraft} /></div></Base>
@@ -325,8 +263,7 @@ if (shareDraft && scOg.enabled) {
       {scExample ? (
         <>
         <div style="position:relative;max-width:420px;aspect-ratio:1200 / 630;border-radius:14px;overflow:hidden;background:linear-gradient(135deg,#6b7a88 0%,#3a4552 55%,#232a33 100%);box-shadow:0 8px 30px rgba(0,0,0,.22)">
-          {/* A generated card's background is the ITEM's own photo — a neutral stand-in here,
-              NOT the finished site-default image (which already has baked-in text → double text). */}
+          {/* A generated card's background is the ITEM's own photo — a neutral stand-in here, NOT the site-default image, which already has baked-in text (double text). */}
           <div style={'position:absolute;inset:0;background:' + scExample.scrim}></div>
           {scExample.showLogo && <div style="position:absolute;top:7%;left:7%;font-weight:800;font-size:1rem;color:#fff">{scName}</div>}
           <div style={'position:absolute;inset:0;display:flex;flex-direction:column;justify-content:' + scExample.justify + ';align-items:' + scExample.align + ';padding:7%;box-sizing:border-box;color:#fff'}>
@@ -445,11 +382,7 @@ const { entry } = Astro.props;
 `;
 }
 
-// Injected on every page (deferred module). Reveals scraper-protected contact links:
-// the real tel:/mailto: + the number/email are reversed+base64 in data-t/data-d on a
-// `.js-contact` anchor (Contact `protectContact` toggle), never in the served HTML.
-// Decode mirrors src/protect.ts encodeContact — keep the two in sync. No-op when the
-// page has no protected links.
+// Injected on every page (deferred module): reveals scraper-protected contact links by decoding the reversed+base64 tel:/mailto: held in data-t/data-d on a.js-contact. Mirrors encodeContact in src/protect.ts — keep the two in sync.
 const REVEAL = `
 (function () {
   function dec(s) { return s ? atob(s).split('').reverse().join('') : ''; }
@@ -465,21 +398,10 @@ const REVEAL = `
 })();
 `;
 
-// Theme "style" support (optional). When a site sets `style` (or STOMME_STYLE is set), the
-// engine splices a theme's tokens.css + theme.css into the site's own global.css, immediately
-// after the engine stylesheet @import and before the site's authored rules. The resulting
-// cascade is engine < tokens < theme < site — no !important anywhere. The theme directory is
-// resolved from STOMME_THEMES_DIR or a `themes/themes` checkout beside the engine repo.
-// A named style whose theme.css is missing throws at build (a silent neutral fallback would
-// ship unstyled pixels). Without a style this plugin is never registered — output is unchanged.
+// Optional theme "style": splices a theme's tokens.css + theme.css into the site's global.css immediately after the engine stylesheet @import, giving the cascade engine < tokens < theme < site with no !important. A named style whose theme.css is missing throws at build — a silent neutral fallback would ship unstyled pixels.
 const STYLE_IMPORT_RE = /@import\s+["'](?:@[\w-]+\/)?stomme\/styles\.css["'];?/;
-// The site's stylesheet is `src/styles/global.css`; match by basename so a realpath'd id
-// (see below) still resolves. `?query` / backslash forms are normalized before the test.
 const GLOBAL_CSS_RE = /(^|\/)global\.css$/;
-// A custom property left in the spliced output. Unlike a CSS comment it survives
-// minification, so the astro:build:done guard can confirm the theme layer actually
-// reached the emitted CSS — a green build that silently shipped no theme is the failure
-// this whole path exists to prevent.
+// A custom property, not a CSS comment: it survives minification, so the astro:build:done guard can prove the theme layer actually reached the emitted CSS.
 const STYLE_SENTINEL = '--stomme-style';
 
 function styleThemePlugin(style, styleDir) {
@@ -489,16 +411,10 @@ function styleThemePlugin(style, styleDir) {
     name: 'stomme:style',
     enforce: 'pre',
     transform(code, id) {
-      // Identify the seam by the engine @import it carries + a global.css basename, NOT by
-      // an exact filesystem path. Vite resolves module ids to their realpath, which diverges
-      // from a `resolve(config.root, …)` path under symlinked / pnpm checkouts (notably Linux
-      // CI): the old `id === globalCssPath` check then silently no-ops and the site ships
-      // unthemed with a green build. Content + basename matching fires in every build pass
-      // (server AND client) and in dev, regardless of how the id was resolved.
+      // Identify the seam by the engine @import it carries plus a global.css basename, never an exact filesystem path: Vite resolves module ids to their realpath, which diverges from a resolve(config.root, …) path under symlinked / pnpm checkouts, and a path-equality check then silently no-ops and ships the site unthemed with a green build.
       const bare = id.split('?')[0].replace(/\\/g, '/');
       if (!GLOBAL_CSS_RE.test(bare)) return null;
       if (!STYLE_IMPORT_RE.test(code)) return null;
-      // Reload in dev when the theme files change.
       if (existsSync(tokensPath)) this.addWatchFile(tokensPath);
       this.addWatchFile(themePath);
       const tokens = existsSync(tokensPath) ? readFileSync(tokensPath, 'utf8') : '';
@@ -512,8 +428,6 @@ function styleThemePlugin(style, styleDir) {
   };
 }
 
-// Build-end assertion: when a style is set, at least one emitted stylesheet (or inlined
-// <style>) must carry the sentinel. Cheap + target-agnostic — only .css/.html are read.
 function emittedCssHasStyle(dir) {
   const stack = [dir];
   while (stack.length) {
@@ -534,28 +448,14 @@ export default function stomme(options = {}) {
   const features = options.features || {};
   const routes = options.routes || {};
   const listings = resolveListings(options.listings);
-  // Optional look & feel. `style` names a theme directory; unset ⇒ no theme layer added.
   const style = options.style || process.env.STOMME_STYLE;
-  // The blog is an article listing in all but name — fold it in so detail routes go
-  // through the same generated entrypoint (PostPage) as any listing.
   if (features.blog && !listings.some((l) => l.id === 'posts')) {
     listings.unshift({ id: 'posts', route: routes.blog || '/blog', label: 'Blog', preset: 'article' });
   }
   const layout = options.layout || 'src/layouts/Base.astro';
   const configPath = options.config || 'src/site.config.ts';
 
-// Theme-coverage lookbook (/lookbook): renders EVERY block from the site's catalog (via the
-// samples on each BlockDef), a surface sweep, and the shared templates — so a custom theme
-// can be validated against 100% of the engine ("does anything look unthemed?"). Always on in
-// `astro dev`; included in builds only with STOMME_LOOKBOOK=1.
-//
-// The section list lives in ONE generated module (lookbook-data.mjs) shared by two routes:
-// /lookbook (the human index, one long page — unchanged output) and /lookbook/<slug> (one
-// page per section, chrome-less). The per-slug pages are the A/B check's capture units:
-// each section renders at the top of its own page, so a height change in one block can't
-// shift the screenshots of the others (the old whole-book PDF cascaded a single change
-// into "every page after it differs"). Slugs derive from the section LABEL only — never a
-// positional index — so adding a sample can't rename the slugs of untouched sections.
+// Theme-coverage lookbook (/lookbook): every block in the site's catalog via its samples, a surface sweep, and the shared templates. Slugs for the per-section pages derive from the section LABEL only — never a positional index — so adding a sample cannot rename the slugs of untouched sections and invalidate their A/B captures.
 function lookbookDataModule() {
   return `// Generated by stomme — shared lookbook section enumeration (index + per-slug pages).
 export function buildSections(BLOCKS) {
@@ -569,15 +469,12 @@ export function buildSections(BLOCKS) {
       sections.push({ kind: 'blocks', label: b.type + (s._label ? ' · ' + s._label : ''), blocks: [{ type: b.type, ...data }] });
     }
   }
-  // Surface sweep: one representative block on every surface.
   const fg = BLOCKS.find((b) => b.type === 'featureGrid');
   const fgS = fg && (fg.sample || (Array.isArray(fg.samples) && fg.samples[0]));
   if (fgS) for (const s of ['tint', 'band', 'dark', 'gradient']) {
     const data = { ...fgS }; delete data._label;
     sections.push({ kind: 'blocks', label: 'surface · ' + s, blocks: [{ type: 'featureGrid', ...data, heading: 'On the ' + s + ' surface', style: { ...(data.style || {}), surface: s } }] });
   }
-  // Shared templates + the site chrome (header/footer render on the chrome page only —
-  // per-slug pages are chrome-less so a header tweak diffs ONE capture, not all of them).
   sections.push({ kind: 'thanks', label: 'template · thanks — classic' });
   sections.push({ kind: 'thanks-letter', label: 'template · thanks — letter' });
   sections.push({ kind: 'service', label: 'template · service page (ServicePage)' });
@@ -593,7 +490,6 @@ export function buildSections(BLOCKS) {
   return sections;
 }
 
-// Deterministic template fixtures, shared by the index and the per-slug pages.
 export function templateFixtures(rs) {
   const t = rs.strings.thanks;
   return {
@@ -627,8 +523,6 @@ import { buildSections, templateFixtures, LB as lb } from './lookbook-data.mjs';
 
 const rs = resolveSite(site);
 const sections = buildSections(BLOCKS);
-// The one-page index renders block sections in the main sweep and the templates after
-// it (the chrome section is the page's own Base chrome — nothing extra to render).
 const all = sections.filter((s) => s.kind === 'blocks');
 const templates = sections.filter((s) => s.kind !== 'blocks' && s.kind !== 'chrome');
 const missing = all.filter((s) => s.missing).length;
@@ -655,10 +549,6 @@ const { thanksProps, serviceFixture, townFixture } = templateFixtures(rs);
 `;
 }
 
-// One lookbook section per page (/lookbook/<slug>) — the A/B check's capture unit.
-// chrome={false} isolates the section from the site header/footer (they get their own
-// 'chrome' page); a Base that predates the chrome prop simply ignores it and degrades
-// to per-page chrome (still per-block, just noisier on header changes).
 function lookbookBlockEntrypoint() {
   return `---
 export const prerender = true;
@@ -732,15 +622,9 @@ function publicIndexPlugin(publicDir) {
         } catch (e) {
           logger?.warn(`media build-bridge skipped: ${e?.message || e}`);
         }
-        // Let the package route entrypoints import the SITE's Base + config — and, for the
-        // lookbook, the site's block catalog + renderer (so site-custom blocks render too).
         const siteRenderer = resolve(root, 'src/blocks/BlockRenderer.astro');
 
-        // Component slots — optional components mounted at named engine extension points,
-        // supplied entirely via STOMME_SLOTS_DIR (mirrors STOMME_THEMES_DIR; the engine
-        // hardcodes no slot location or repo name). Each slot aliases to the supplied file
-        // when present, else to a noop that renders nothing, so a site with no slots dir
-        // builds exactly as before.
+        // Component slots — optional components at named engine extension points, supplied entirely via STOMME_SLOTS_DIR; the engine hardcodes no slot location or repo name. Each name aliases to the supplied file, else to a noop that renders nothing, so a site with no slots dir builds unchanged.
         const SLOT_NAMES = ['footer-end', 'header-start', 'header-nav-end', 'header-end'];
         const slotsDir = process.env.STOMME_SLOTS_DIR;
         const slotNoop = resolve(pkgDir, 'src/SlotNoop.astro');
@@ -753,31 +637,21 @@ function publicIndexPlugin(publicDir) {
           if (on) slotsOn.push(name);
         }
 
-        // Addon collections — the slots dir may ship a `collections.mjs` at its root that
-        // adds content collections. Mirrors the slot alias exactly: '@stomme/addon-collections'
-        // resolves to that file when present, else to a noop that exports {}. A site's
-        // content.config spreads stommeAddonCollections() (which imports this alias) beside
-        // stommeCollections(), so the dir can add collections without the engine naming any.
-        // No dir / no file ⇒ {} ⇒ the site's collections are unchanged.
+        // Same seam for content collections: a collections.mjs at the slots dir root, else a noop exporting {}. A site's content.config spreads stommeAddonCollections() (which imports this alias) beside stommeCollections(), so the dir can add collections without the engine naming any.
         const addonCollectionsFile = slotsDir ? resolve(slotsDir, 'collections.mjs') : null;
         const addonCollectionsOn = !!(addonCollectionsFile && existsSync(addonCollectionsFile));
         slotAlias['@stomme/addon-collections'] = addonCollectionsOn
           ? addonCollectionsFile
           : resolve(pkgDir, 'src/AddonCollectionsNoop.mjs');
 
-        // Addon blocks — the same seam for BLOCK TYPES. A `blocks.mjs` at the slots dir root
-        // exports `{ type: Component }`, which BlockRenderer merges into its own registry (a
-        // site's own registry still wins on a key clash). No dir / no file ⇒ {} ⇒ the library
-        // blocks and nothing else. The engine never names an addon's block types.
+        // Same seam for BLOCK TYPES: a blocks.mjs exporting { type: Component }, which BlockRenderer merges into its own registry — the site's own registry still wins a key clash. The engine never names an addon's block types.
         const addonBlocksFile = slotsDir ? resolve(slotsDir, 'blocks.mjs') : null;
         const addonBlocksOn = !!(addonBlocksFile && existsSync(addonBlocksFile));
         slotAlias['@stomme/addon-blocks'] = addonBlocksOn
           ? addonBlocksFile
           : resolve(pkgDir, 'src/AddonBlocksNoop.mjs');
 
-        // Addon preview — the /preview route renders this component for any `kind` it does not
-        // know itself, so an addon's own page can be previewed BY ITS OWN COMPONENTS rather than
-        // by a hand-built mockup. `preview.astro` at the slots dir root; noop renders nothing.
+        // Same seam for /preview: a preview.astro at the slots dir root renders any kind the engine does not know itself, so an addon's page is previewed by its own components; the noop renders nothing.
         const addonPreviewFile = slotsDir ? resolve(slotsDir, 'preview.astro') : null;
         const addonPreviewOn = !!(addonPreviewFile && existsSync(addonPreviewFile));
         slotAlias['@stomme/addon-preview'] = addonPreviewOn
@@ -796,30 +670,19 @@ function publicIndexPlugin(publicDir) {
                 ...slotAlias,
               },
             },
-            // Dev server must be allowed to read slot files outside the project root — and the
-            // project root itself, which the list replaces rather than extends (a site's own
-            // src/styles/global.css 403s otherwise, with slots wired).
+            // fs.allow REPLACES the default list rather than extending it, so the project root must be listed beside slotsDir — a site's own src/styles/global.css 403s otherwise, with slots wired.
             ...(slotsDir ? { server: { fs: { allow: [slotsDir, root] } } } : {}),
-            // Never inline hoisted component <script> chunks into the HTML (Astro inlines
-            // chunks under 4 KB by default). As external /_astro/*.js files they are
-            // covered by the /preview CSP's script-src 'self'; inlined they'd need
-            // per-build hashes the SSR route can't know. Functionally identical on live
-            // pages — larger scripts (page.js) were external already. Non-JS assets
-            // (images, css) return undefined → Vite's default limit still applies.
+            // Never inline hoisted component <script> chunks into the HTML (Astro inlines chunks under 4 KB by default): as external /_astro/*.js files they fall under the /preview CSP's script-src 'self', while inlined they would need per-build hashes the SSR route cannot know. Non-JS assets return undefined, so Vite's default limit still applies.
             build: { assetsInlineLimit: (path) => (/\.m?js$/.test(path) ? false : undefined) },
           },
         });
 
-        // Reveal scraper-protected phone/email links in the browser (see REVEAL).
         injectScript('page', REVEAL);
 
         const enabled = [];
         for (const name of slotsOn) enabled.push(`slot:${name}`);
         const outDir = resolve(root, '.astro/stomme');
 
-        // Optional theme "style": splice the theme layer into the site's global.css.
-        // The themes directory is supplied entirely via STOMME_THEMES_DIR — the engine
-        // hardcodes no theme location or repo name, so any theme collection can be used.
         if (style) {
           const themesDir = process.env.STOMME_THEMES_DIR;
           if (!themesDir) {
@@ -842,15 +705,9 @@ function publicIndexPlugin(publicDir) {
           enabled.push(`style:${style}`);
         }
 
-        // 0. Live-preview route — generated with a literal prerender per target.
-        // Skip it if the site ships its own src/pages/preview.astro (a richer preview
-        // that can use the site's renderer + custom blocks); that one wins, no collision.
         const isStatic = (process.env.STOMME_TARGET || 'netlify') === 'static';
 
-        // Contact endpoint: injected on adapter builds so a `static` build stays truly
-        // adapterless (an SSR route without an adapter fails the whole build). A site
-        // that ships its own src/pages/api/contact.ts keeps it — we skip to avoid a
-        // duplicate route (rule zero for existing sites).
+        // Contact endpoint on adapter builds only: an SSR route without an adapter fails the whole build, so a static target must stay adapterless. A site that ships its own src/pages/api/contact.ts keeps it — skip to avoid a duplicate route.
         const siteContact = resolve(root, 'src/pages/api/contact.ts');
         if (!isStatic && !existsSync(siteContact)) {
           injectRoute({ pattern: '/api/contact', entrypoint: resolve(pkgDir, 'routes/contact.ts') });
@@ -863,17 +720,12 @@ function publicIndexPlugin(publicDir) {
         } else {
           const previewFile = resolve(outDir, 'preview.astro');
           mkdirSync(outDir, { recursive: true });
-          // Hash sweep covers the engine's components, the site's own (custom blocks,
-          // Base chrome) and any slot components — everything that can render in /preview.
           const cspHashes = inlineScriptHashes([pkgDir, resolve(root, 'src'), slotsDir]);
           writeFileSync(previewFile, previewEntrypoint(isStatic, cspHashes));
           injectRoute({ pattern: '/preview', entrypoint: previewFile });
           enabled.push(`/preview${isStatic ? ' (static)' : ''}`);
         }
 
-        // 0b. 404 page — a real not-found (the host serves dist/404.html with a 404 status)
-        // instead of the soft-404 where unmatched paths fall back to the home page with 200.
-        // Skip if the site ships its own src/pages/404.*.
         const site404 = ['404.astro', '404.md', '404.mdx', '404.html']
           .some((f) => existsSync(resolve(root, 'src/pages', f)));
         if (site404) {
@@ -883,33 +735,23 @@ function publicIndexPlugin(publicDir) {
           enabled.push('/404');
         }
 
-        // 0c. Generated OG cards (/og/<page>.png) — prerendered, branded 1200×630 share
-        // cards (routes/og.ts). Always injected: the master switch is CONTENT
-        // (settings.og.enabled), which doesn't exist yet at config-setup time, so the
-        // endpoint gates itself — disabled ⇒ getStaticPaths returns [] ⇒ zero pages
-        // emitted and the renderer's native deps (satori/resvg/sharp) are never loaded.
-        // The renderer (src/og.mjs) must NOT go through the site bundle (native deps) —
-        // the endpoint runtime-imports it from its real package location via this define.
+        // The OG renderer must NOT go through the site bundle — its deps are native (satori/resvg/sharp) — so the endpoint runtime-imports it from its real package location via this define.
         updateConfig({ vite: { define: { __STOMME_OG_RENDERER__: JSON.stringify(pathToFileURL(resolve(pkgDir, 'src/og.mjs')).href) } } });
         injectRoute({ pattern: '/og/[...slug]', entrypoint: '@gronare/stomme/routes/og.ts' });
         enabled.push('/og/[...slug]');
 
-        // 0d. Lookbook — the theme-coverage page (every block/variant/surface/template).
-        // Always available in dev; included in builds only when STOMME_LOOKBOOK=1.
         if (command === 'dev' || process.env.STOMME_LOOKBOOK) {
           mkdirSync(outDir, { recursive: true });
           writeFileSync(resolve(outDir, 'lookbook-data.mjs'), lookbookDataModule());
           const lookbookFile = resolve(outDir, 'lookbook.astro');
           writeFileSync(lookbookFile, lookbookEntrypoint());
           injectRoute({ pattern: '/lookbook', entrypoint: lookbookFile });
-          // Per-section capture pages for the A/B check (dist/lookbook/<slug>/).
           const lookbookBlockFile = resolve(outDir, 'lookbook-block.astro');
           writeFileSync(lookbookBlockFile, lookbookBlockEntrypoint());
           injectRoute({ pattern: '/lookbook/[slug]', entrypoint: lookbookBlockFile });
           enabled.push('/lookbook', '/lookbook/[slug]');
         }
 
-        // 1. Fixed feature routes (areas/services). Blog is handled as a listing below.
         const routed = [
           { on: features.areas, prefix: routes.towns || '/areas', entrypoint: '@gronare/stomme/routes/town.astro' },
           { on: features.services, prefix: routes.services || '/services', entrypoint: '@gronare/stomme/routes/service.astro' },
@@ -920,17 +762,7 @@ function publicIndexPlugin(publicDir) {
           enabled.push(`${r.prefix}/[slug]`);
         }
 
-        // 1b. Addon routes — the slots dir may ship a `routes.mjs` at its root exporting an
-        // array of { feature, pattern, entrypoint }, or a FUNCTION returning one. Each is
-        // injected only when the site has that flag on (features[feature] truthy);
-        // `entrypoint` is an absolute path into the dir (already in server.fs.allow above).
-        // Data-driven: the engine names no feature and hardcodes no pattern. No dir / no
-        // manifest ⇒ nothing injected.
-        //
-        // The function form receives the site's own config — `routes` above all — so an addon
-        // derives its patterns from the site's configured, localizable paths (the same map
-        // /services and /thanks come from) instead of shipping a fixed URL. The engine still
-        // names nothing: it hands over the map and injects whatever comes back.
+        // Addon routes — a routes.mjs at the slots dir root exporting an array of { feature, pattern, entrypoint }, or a function handed { routes, features } so an addon derives its patterns from the site's own configured, localizable paths instead of a fixed URL. The engine names no feature and hardcodes no pattern; entrypoint is an absolute path into the dir, already in server.fs.allow above.
         if (slotsDir) {
           const routesManifest = resolve(slotsDir, 'routes.mjs');
           if (existsSync(routesManifest)) {
@@ -938,8 +770,6 @@ function publicIndexPlugin(publicDir) {
             try {
               mod = await import(pathToFileURL(routesManifest).href);
             } catch (e) {
-              // A broken manifest otherwise throws a raw import stack out of
-              // astro:config:setup — surface a clear, generic cause instead.
               throw new Error(
                 `stomme: failed to load routes manifest from STOMME_SLOTS_DIR (${routesManifest}): ${e?.message || e}`,
               );
@@ -951,19 +781,13 @@ function publicIndexPlugin(publicDir) {
                 ? declared({ routes, features })
                 : declared;
             } catch (e) {
-              // The manifest refused the site's config (e.g. two of its pages configured onto
-              // colliding paths). That is a real misconfiguration — fail the build rather than
-              // ship a site whose pages shadow each other.
               throw new Error(
                 `stomme: the routes manifest in STOMME_SLOTS_DIR (${routesManifest}) rejected this site's config: ${e?.message || e}`,
               );
             }
             if (!Array.isArray(addonRoutes)) addonRoutes = [];
             for (const r of addonRoutes) {
-              // Validate each entry before injecting — a malformed/incomplete entry is
-              // skipped with a warning, never injected (an invalid pattern or a missing
-              // entrypoint file would otherwise fail the whole build deep in Astro's route
-              // scan). Mirrors how the slot / addon-collections aliases guard with existsSync.
+              // Validate before injecting: an invalid pattern or a missing entrypoint file would otherwise fail the whole build deep in Astro's route scan, so a malformed entry is skipped with a warning instead.
               if (!r || typeof r.feature !== 'string' || !r.feature) {
                 logger.warn('addon routes: skipped an entry with a missing/invalid "feature" (expected a non-empty string)');
                 continue;
@@ -976,7 +800,6 @@ function publicIndexPlugin(publicDir) {
                 logger.warn(`addon routes: skipped "${r.pattern}" — entrypoint not found (${r.entrypoint || 'missing'})`);
                 continue;
               }
-              // Feature-gated: only inject when the site has this flag on (unchanged).
               if (!features[r.feature]) continue;
               injectRoute({ pattern: r.pattern, entrypoint: r.entrypoint });
               enabled.push(r.pattern);
@@ -984,7 +807,6 @@ function publicIndexPlugin(publicDir) {
           }
         }
 
-        // 2. Listing detail routes — one generated, prerendered entrypoint each.
         const listingsDir = resolve(outDir, 'listings');
         for (const l of listings) {
           const file = resolve(listingsDir, `${l.id}.astro`);
@@ -997,15 +819,9 @@ function publicIndexPlugin(publicDir) {
         logger?.info(enabled.length ? `routes: ${enabled.join(', ')}` : 'no feature/listing routes enabled');
       },
 
-      // When a style is configured, prove the theme layer reached the emitted CSS. The
-      // splice runs in a Vite transform whose reach varies by target/build-pass; if it ever
-      // silently no-ops (e.g. a realpath'd id, a future Astro change), the site would ship a
-      // GREEN build with no theme — the worst outcome. Hard-fail instead. Cheap: scans only
-      // the emitted .css/.html for the sentinel custom property.
       'astro:build:done': ({ dir, logger }) => {
         const outDir = fileURLToPath(dir);
-        // favicon/apple-touch-icon must serve from the ROOT (Apple/iOS); they upload into the
-        // scoped /media/icons folder (keeps the CMS browser clean), so copy them to root here.
+        // favicon/apple-touch-icon must serve from the ROOT (Apple/iOS) but upload into the scoped /media/icons folder, so copy them up here.
         try {
           const iconsDir = resolve(outDir, 'media/icons');
           if (existsSync(iconsDir)) {

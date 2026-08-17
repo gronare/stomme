@@ -19,9 +19,9 @@ export const features: StommeFeatures = {
 
 // SITE — configuration handed to the blocks and page templates.
 export const site: SiteConfig = {
-  // Optional look & feel: a theme directory name supplied at build time (via a themes
-  // checkout beside the engine, or STOMME_THEMES_DIR). Leave unset for the neutral engine
-  // default. Example: style: 'bruket'
+  // Optional look & feel: a theme directory name, looked up under STOMME_THEMES_DIR at
+  // build time. Leave unset for the neutral engine default. Setting it without that env
+  // var fails the build rather than shipping unstyled. Example: style: 'bruket'
   // style: undefined,
 
   // Route prefixes for collection pages. For the feature-backed ones (blog/areas/services)

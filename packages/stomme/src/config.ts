@@ -15,7 +15,7 @@ export interface SiteConfig {
   noindex?: string[];
   // BCP47 language + region. Drives date/number formatting and which built-in wording is used ('sv' and 'en' shipped, else English); `strings` overrides individual phrases.
   locale?: string;
-  // Theme directory name, resolved at build from STOMME_THEMES_DIR. Unset means no theme layer; a name whose theme.css is missing fails the build rather than shipping unstyled.
+  // Theme directory name, looked up under STOMME_THEMES_DIR. Leave it unset for no theme layer — but SETTING it without that env var, or naming a directory with no theme.css, fails the build rather than shipping unstyled.
   style?: string;
   // Lives in code, not CMS content: the CMS rewrites managed files on save and would drop it. cfToken is the cookieless Cloudflare beacon, so no consent banner is needed.
   analytics?: { cfToken?: string };
