@@ -45,9 +45,9 @@ export const site: SiteConfig = {
 ```
 
 Pass it through your `BlockRenderer` wrapper (see below). Defaults are neutral
-English, so a site only sets what differs. **A route prefix must match the actual
-route folder** under `src/pages/` (e.g. `routes.blog: '/blogg'` ⇒
-`src/pages/blogg/[slug].astro`).
+English, so a site only sets what differs. A route prefix is the URL base the
+engine injects the detail route at — there is no folder to create under
+`src/pages/`, and the scaffold has none.
 
 ### The two locale fields
 
@@ -130,39 +130,10 @@ as a choice in the CMS, add it to the hero's `media` options in `src/blocks/sche
 and re-run `pnpm cms:gen`. Put any styles in `src/styles/global.css` (it loads after
 the library, so it wins).
 
-## Features (optional collections)
+## Features and listings
 
-Optional capabilities are **feature flags** in `src/site.config.ts` — flip one to
-`true` and its content collection, CMS editor, block(s), and detail route all switch
-on. A flag that's missing (or the whole `features` object) is **false**, so new engine
-features never appear until you opt in.
-
-```ts
-// src/site.config.ts
-export const features: StommeFeatures = {
-  blog: true,          // posts collection + /<routes.blog>/[slug] + postList block
-  areas: true,         // towns collection + /<routes.towns>/[slug] + linkChips + TownPage
-  services: false,     // services collection + /<routes.services>/[slug] + serviceGrid + ServicePage
-  testimonials: true,  // testimonials collection + testimonials block (no route)
-  faq: true,           // faq collection + faq block (no route)
-};
-```
-
-| Feature | Collection | Block | Detail route |
-|---|---|---|---|
-| `blog` | `posts` | `postList` | `/<routes.blog>/[slug]` |
-| `areas` | `towns` | `linkChips` | `/<routes.towns>/[slug]` |
-| `services` | `services` | `serviceGrid` | `/<routes.services>/[slug]` |
-| `testimonials` | `testimonials` | `testimonials` | — |
-| `faq` | `faq` | `faq` | — |
-
-How it works (set up once by the scaffold; you only edit the flags afterwards):
-
-1. **Collections** — `src/content.config.ts` is `export const collections = { ...stommeCollections() }`. All collections are always defined (empty until you add content), so nothing errors when a feature is off.
-2. **Routes** — `astro.config.mjs` runs `stomme({ features, routes: kit.routes })`, which **injects** the detail route for each enabled, route-backed feature (rendered inside your own `Base` layout). No per-site route files.
-3. **Admin + blocks** — `cms:gen` reads `features` and emits the CMS editor + un-gates the block only for enabled features.
-
-So to add a blog: set `blog: true`, run `pnpm dev` (or `cms:gen`), and add posts in the CMS — no code. (Detail-route prefixes come from `kit.routes`.)
+Optional collections, and listings you shape to their purpose, are in
+[features.md](features.md).
 
 ## Images
 

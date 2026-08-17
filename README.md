@@ -133,8 +133,10 @@ a network service, the same freedoms must be passed on.
 
 ## Docs
 
+- [docs/features.md](docs/features.md) — optional collections, and listings: a blog
+  shaped to its purpose (news, a for-sale catalog, a case-study index).
 - [docs/customizing.md](docs/customizing.md) — theming, custom blocks, config,
-  collections, images, admin previews, the contact form's handler.
+  images, admin previews, the contact form's handler.
 - [docs/blocks-reference.md](docs/blocks-reference.md) — every built-in block and
   its fields.
 
