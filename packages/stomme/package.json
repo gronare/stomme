@@ -41,6 +41,7 @@
     "./blocks/*": "./blocks/*"
   },
   "scripts": {
+    "typecheck": "tsc --noEmit -p tsconfig.json",
     "gen:schema-manifest": "node bin/gen-schema-manifest.mjs",
     "gen:blocks-manifest": "node bin/gen-blocks-manifest.mjs",
     "test:preview-workerd": "node test/smoke-preview-workerd.mjs",

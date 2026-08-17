@@ -30,6 +30,21 @@ jobs:
         working-directory: ${{ matrix.site }}
         run: pnpm run build
 
+  # astro check runs from starter/ and reaches the engine through node_modules, where TypeScript reports nothing — the engine's own sources are only checked here.
+  engine-types:
+    name: engine typecheck (tsc)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: tsc --noEmit (packages/stomme)
+        run: pnpm --filter @gronare/stomme typecheck
+
   # Catches what the Node dev server cannot: decoding ?data= with Node's Buffer, absent on workerd, empties #preview-root on every deployed site. HTTP checks only — the CSP detector needs Playwright and runs locally.
   preview-workerd:
     name: preview smoke (workerd)

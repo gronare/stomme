@@ -7,7 +7,6 @@ declare const __STOMME_OG_RENDERER__: string;
 
 import type { APIRoute } from 'astro';
 import { getEntry } from 'astro:content';
-// @ts-expect-error — virtual alias to the site's src/site.config.ts (integration-wired).
 import { site, features, listings } from '@stomme/config';
 import { ogPages, type OgPage } from '../src/og-pages.ts';
 

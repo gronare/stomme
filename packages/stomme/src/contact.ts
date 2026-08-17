@@ -1,6 +1,5 @@
 import type { APIRoute } from 'astro';
 import { getEntry } from 'astro:content';
-// @ts-expect-error — virtual alias, no static types.
 import { site } from '@stomme/config';
 
 // Contact-form handler (SSR endpoint) wired at /api/contact: CONTACT_FROM must sit on a Resend-verified domain, CONTACT_TO defaults to the CMS contact email, and on Cloudflare the env arrives on locals.runtime.env rather than in import.meta.env.
