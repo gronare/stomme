@@ -16,7 +16,7 @@ const root = process.cwd();
 const here = dirname(fileURLToPath(import.meta.url));
 
 // Pinned CMS bundle, swapped into each site's public/admin/index.html on build: bump deliberately — Sveltia is pre-1.0 and the editor is coupled to its DOM. STOMME_SVELTIA_SRC points at a local/vendored copy instead.
-const SVELTIA_CMS_SRC = process.env.STOMME_SVELTIA_SRC || 'https://unpkg.com/@sveltia/cms@0.190.0/dist/sveltia-cms.js';
+const SVELTIA_CMS_SRC = process.env.STOMME_SVELTIA_SRC || 'https://unpkg.com/@sveltia/cms@0.193.0/dist/sveltia-cms.js';
 
 // Loaded through jiti rather than a bare dynamic import: Node's own type-stripping refuses any .ts file under node_modules, so importing schema.ts / site.config.ts breaks the moment its import graph reaches the installed package's .ts ('@gronare/stomme/kit', './catalog') — which is exactly what a registry install is. jiti transpiles .ts everywhere and resolves each module's bare specifiers from its own location.
 const jiti = createJiti(import.meta.url);
