@@ -4,8 +4,9 @@ The built-in library blocks (`@gronare/stomme/catalog`). Most section blocks acc
 `surface` (`standard` / `tint` / `band` / `dark` / `gradient`) — the renderer wraps
 them in a full-bleed band. Several also accept `accent` (`brand` / `secondary` /
 `highlight`), which colours that block's rule/icon/number (not the eyebrow — that
-follows `theme.eyebrowColor`). Add your own blocks alongside these (see
-[customizing](customizing.md)).
+follows `theme.eyebrowColor`). Both are set under the block's `style` group —
+`style.surface`, `style.accent` — and the tables below name them bare. Add your own
+blocks alongside these (see [customizing](customizing.md)).
 
 ## Content & layout
 
