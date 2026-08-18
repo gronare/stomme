@@ -52,6 +52,7 @@
     "test:admin-contract": "node test/admin-contract.mjs",
     "test:noindex": "node test/smoke-noindex.mjs",
     "test:addon-blocks": "node test/smoke-addon-blocks.mjs",
+    "test:addon-lookbook": "node test/smoke-addon-lookbook.mjs",
     "test:public-index": "node test/smoke-public-index.mjs",
     "test:slots": "node test/smoke-slots.mjs",
     "lint:comments": "node bin/lint-comments.mjs .",

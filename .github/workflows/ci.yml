@@ -88,6 +88,8 @@ jobs:
         run: pnpm --filter @gronare/stomme test:addon-cms
       - name: block registry
         run: pnpm --filter @gronare/stomme test:addon-blocks
+      - name: block registry in the lookbook
+        run: pnpm --filter @gronare/stomme test:addon-lookbook
       - name: slot mounting + gating
         run: pnpm --filter @gronare/stomme test:slots
 

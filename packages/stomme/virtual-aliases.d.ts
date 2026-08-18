@@ -19,6 +19,10 @@ declare module '@stomme/addon-blocks' {
   export const blocks: Record<string, import('astro/runtime/server/index.js').AstroComponentFactory>;
 }
 
+declare module '@stomme/addon-catalog' {
+  export const BLOCKS: Array<Record<string, unknown>>;
+}
+
 declare module '@stomme/addon-collections' {
   export const collections: Record<string, unknown>;
 }

@@ -142,6 +142,12 @@ export default function stomme(options = {}) {
           ? addonBlocksFile
           : resolve(pkgDir, 'src/addon-blocks-noop.mjs');
 
+        const addonCatalogFile = slotsDir ? resolve(slotsDir, 'block-catalog.mjs') : null;
+        const addonCatalogOn = !!(addonCatalogFile && existsSync(addonCatalogFile));
+        slotAlias['@stomme/addon-catalog'] = addonCatalogOn
+          ? addonCatalogFile
+          : resolve(pkgDir, 'src/addon-catalog-noop.mjs');
+
         const addonPreviewFile = slotsDir ? resolve(slotsDir, 'preview.astro') : null;
         const addonPreviewOn = !!(addonPreviewFile && existsSync(addonPreviewFile));
         slotAlias['@stomme/addon-preview'] = addonPreviewOn
