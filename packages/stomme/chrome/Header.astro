@@ -132,12 +132,11 @@ const resolved = await Promise.all(
       var darkHero = document.querySelector('main .surface-dark:first-child .hero-grid, main .surface-gradient:first-child .hero-grid');
       var hero = cover || (darkHero && darkHero.closest('.surface-dark, .surface-gradient'));
       if (!hero) return;
-      var inner = hero.querySelector('.cover__inner, .hero-grid');
       var trigger = 0;
       var measure = function () {
         var headerH = header.offsetHeight || 64;
-        var top = inner ? inner.getBoundingClientRect().top + window.scrollY : hero.offsetHeight * 0.5;
-        trigger = Math.max(0, top - headerH - 16);
+        var bottom = hero.getBoundingClientRect().bottom + window.scrollY;
+        trigger = Math.max(0, bottom - headerH - 16);
       };
       var onScroll = function () { header.classList.toggle('solid', window.scrollY > trigger); };
       measure(); onScroll();
