@@ -11,7 +11,11 @@
   --color-highlight: #f59e0b;
   /* Which accent the eyebrow marker uses — overridden on <html> from theme.eyebrowColor. */
   --eyebrow-accent: var(--color-brand);
-  --header-bottom: 5.5rem;
+  --safe-t: env(safe-area-inset-top, 0px);
+  --safe-r: env(safe-area-inset-right, 0px);
+  --safe-b: env(safe-area-inset-bottom, 0px);
+  --safe-l: env(safe-area-inset-left, 0px);
+  --header-bottom: calc(5.5rem + var(--safe-t));
 
   --color-dark: color-mix(in srgb, var(--color-brand) 16%, #0c0e13);
   --color-dark-ink: #e9ebf1;
@@ -27,7 +31,7 @@ html { background: var(--color-paper); color: var(--color-ink); }
 body { font-family: var(--font-sans); margin: 0; line-height: 1.6; min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; }
 body > main { flex: 1 0 auto; }
 
-.section { max-width: 72rem; margin-inline: auto; padding: 2.75rem 1.5rem; }
+.section { max-width: 72rem; margin-inline: auto; padding: 2.75rem max(1.5rem, var(--safe-r)) 2.75rem max(1.5rem, var(--safe-l)); }
 @media (min-width: 768px) { .section { padding-block: 3.75rem; } }
 .section--read { max-width: 53rem; }
 .section-head { max-width: 52rem; }
@@ -163,7 +167,7 @@ main .cover:first-child .cover__scrim::before {
   content: ""; position: absolute; inset: 0 0 auto 0; height: min(30vh, 320px);
   background: linear-gradient(180deg, rgba(8,9,14,.6), rgba(8,9,14,.26) 55%, rgba(8,9,14,0));
 }
-.cover__inner { position: relative; z-index: 2; align-self: flex-end; max-width: 72rem; width: 100%; margin-inline: auto; padding: var(--cover-clear, 0px) 1.5rem 4rem; }
+.cover__inner { position: relative; z-index: 2; align-self: flex-end; max-width: 72rem; width: 100%; margin-inline: auto; padding: var(--cover-clear, 0px) max(1.5rem, var(--safe-r)) 4rem max(1.5rem, var(--safe-l)); }
 main .cover:first-child .cover__inner { --cover-clear: calc(var(--header-bottom) + 1rem); }
 .cover--center .cover__inner { padding-bottom: max(4rem, var(--cover-clear, 0px)); }
 @media (min-width: 768px) { .cover__inner { padding-bottom: 5rem; } .cover--center .cover__inner { padding-bottom: max(5rem, var(--cover-clear, 0px)); } }
@@ -249,8 +253,8 @@ main .cover:first-child .cover__inner { --cover-clear: calc(var(--header-bottom)
 .partner-logos span { font-family: var(--font-display); font-weight: 800; letter-spacing: -.01em; font-size: 1.05rem;
   color: color-mix(in srgb, var(--color-ink) 42%, var(--color-paper)); }
 
-.site-header { background: var(--color-paper); border-bottom: 1px solid var(--color-line); }
-.site-header .inner, .site-footer .inner { max-width: 72rem; margin-inline: auto; padding: 1rem 1.5rem; }
+.site-header { background: var(--color-paper); border-bottom: 1px solid var(--color-line); padding-top: var(--safe-t); }
+.site-header .inner, .site-footer .inner { max-width: 72rem; margin-inline: auto; padding: 1rem max(1.5rem, var(--safe-r)) 1rem max(1.5rem, var(--safe-l)); }
 .site-header .inner { display: flex; align-items: center; justify-content: flex-start; gap: 1rem; }
 .site-nav { display: flex; gap: 1.25rem; align-items: center; flex-wrap: wrap; margin-left: auto; }
 .site-nav a { text-decoration: none; color: var(--color-ink); }
@@ -290,7 +294,7 @@ main .cover:first-child .cover__inner { --cover-clear: calc(var(--header-bottom)
     display: flex; flex-direction: column; align-items: stretch; gap: 0;
     position: absolute; top: 100%; left: 0; right: 0; z-index: 60;
     background: var(--color-paper); border-top: 1px solid var(--color-line);
-    box-shadow: 0 22px 40px -26px rgba(0,0,0,0.4); padding: 0.25rem 1.5rem 1rem;
+    box-shadow: 0 22px 40px -26px rgba(0,0,0,0.4); padding: 0.25rem max(1.5rem, var(--safe-r)) 1rem max(1.5rem, var(--safe-l));
   }
   .site-header.nav-open .site-nav > a { display: flex; align-items: center; width: 100%;
     padding: 0.9rem 0; border-bottom: 1px solid color-mix(in srgb, var(--color-line) 65%, transparent); }
@@ -346,7 +350,7 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
 body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header.nav-open .logo .accent { color: var(--color-brand); }
 
 .site-footer { background: var(--color-surface); color: var(--color-ink); }
-.site-footer .inner { padding-block: 3rem; }
+.site-footer .inner { padding-top: 3rem; padding-bottom: calc(3rem + var(--safe-b)); }
 .site-footer--dark {
   background: var(--color-dark, #141821); color: var(--color-dark-ink, #e9ebf1);
   --color-ink: var(--color-dark-ink, #e9ebf1);
@@ -984,7 +988,7 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
 
 /* Ground and foreground go through --stat-panel-bg / --stat-panel-fg, defaulting to the historic ink/on-dark, so a theme recolours every label, pill and rule below with one `.stat-panel { … }` rule. */
 .stat-panel { --stat-panel-bg: var(--color-ink); --stat-panel-fg: var(--color-on-dark); background: var(--stat-panel-bg); color: var(--stat-panel-fg); }
-  .stat-panel__inner { max-width: 72rem; margin-inline: auto; padding: 5rem 1.5rem; display: grid; gap: 2.5rem; align-items: center; }
+  .stat-panel__inner { max-width: 72rem; margin-inline: auto; padding: 5rem max(1.5rem, var(--safe-r)) 5rem max(1.5rem, var(--safe-l)); display: grid; gap: 2.5rem; align-items: center; }
   @media (min-width: 1024px) { .stat-panel__inner { grid-template-columns: 1.1fr 0.9fr; } }
   .stat-panel .mono { color: color-mix(in srgb, var(--stat-panel-fg) 65%, transparent); }
   .stat-panel__h { color: var(--stat-panel-fg); margin-top: 0.75rem; font-size: clamp(2rem, 4vw, 3rem); }
