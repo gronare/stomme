@@ -75,6 +75,7 @@ const resolved = await Promise.all(
       ) : (
         <a href={i.href || homeHref}>{i.label}</a>
       ))}
+      {nav.cta && <a class="btn nav-cta" href={resolveLink(nav.cta.link, homeHref)}>{nav.cta.label}</a>}
     </nav>
     <SlotHeaderNavEnd />
     {nav.cta && <a class="btn site-cta" href={resolveLink(nav.cta.link, homeHref)}>{nav.cta.label}</a>}
@@ -117,6 +118,23 @@ const resolved = await Promise.all(
         a.addEventListener('click', function () { setOpen(false); });
       });
     }
+
+    var inner = header.querySelector('.inner');
+    var cta = header.querySelector('.site-cta');
+    var fitCta = function () {
+      if (!cta || !inner) return;
+      header.classList.remove('cta-in-menu');
+      var cs = getComputedStyle(inner);
+      var room = inner.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+      var kids = [].filter.call(inner.children, function (el) { return getComputedStyle(el).display !== 'none'; });
+      var gap = parseFloat(cs.columnGap) || 0;
+      var used = kids.reduce(function (sum, el) { return sum + el.getBoundingClientRect().width; }, 0) + gap * Math.max(0, kids.length - 1);
+      if (used > room) header.classList.add('cta-in-menu');
+    };
+    fitCta();
+    window.addEventListener('resize', fitCta, { passive: true });
+    if (window.ResizeObserver) new ResizeObserver(fitCta).observe(inner);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitCta);
 
     var publishBottom = function () {
       document.documentElement.style.setProperty('--header-bottom', (header.offsetTop + header.offsetHeight) + 'px');
