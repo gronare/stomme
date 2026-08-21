@@ -11,6 +11,7 @@
   --color-highlight: #f59e0b;
   /* Which accent the eyebrow marker uses — overridden on <html> from theme.eyebrowColor. */
   --eyebrow-accent: var(--color-brand);
+  --header-bottom: 5.5rem;
 
   --color-dark: color-mix(in srgb, var(--color-brand) 16%, #0c0e13);
   --color-dark-ink: #e9ebf1;
@@ -93,6 +94,8 @@ body > main { flex: 1 0 auto; }
   .cover__media--gradient, .hero-motif .hm-rise, .hero-motif .hm-float,
   .cover__motion .rise, .cover__motion .drift { animation: none !important; }
 }
+main > :is(.surface-dark, .surface-gradient):first-child:has(.hero-grid) > .section { padding-top: max(2.75rem, calc(var(--header-bottom) + 1rem)); }
+main > :is(.surface-dark, .surface-gradient):first-child:has(.hero-grid) > .section--hero-center { padding-bottom: max(2.75rem, calc(var(--header-bottom) + 1rem)); }
 .section--hero-top { justify-content: flex-start; }
 .section--hero-center { justify-content: center; }
 .section--hero-bottom { justify-content: flex-end; }
@@ -160,8 +163,10 @@ main .cover:first-child .cover__scrim::before {
   content: ""; position: absolute; inset: 0 0 auto 0; height: min(30vh, 320px);
   background: linear-gradient(180deg, rgba(8,9,14,.6), rgba(8,9,14,.26) 55%, rgba(8,9,14,0));
 }
-.cover__inner { position: relative; z-index: 2; align-self: flex-end; max-width: 72rem; width: 100%; margin-inline: auto; padding: 0 1.5rem 4rem; }
-@media (min-width: 768px) { .cover__inner { padding-bottom: 5rem; } }
+.cover__inner { position: relative; z-index: 2; align-self: flex-end; max-width: 72rem; width: 100%; margin-inline: auto; padding: var(--cover-clear, 0px) 1.5rem 4rem; }
+main .cover:first-child .cover__inner { --cover-clear: calc(var(--header-bottom) + 1rem); }
+.cover--center .cover__inner { padding-bottom: max(4rem, var(--cover-clear, 0px)); }
+@media (min-width: 768px) { .cover__inner { padding-bottom: 5rem; } .cover--center .cover__inner { padding-bottom: max(5rem, var(--cover-clear, 0px)); } }
 .cover--center { text-align: center; }
 .cover--center .cover__inner { align-self: center; }
 .cover--center .cover__h1, .cover--center .cover__intro { margin-inline: auto; }

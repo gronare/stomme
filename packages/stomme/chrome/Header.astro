@@ -118,6 +118,14 @@ const resolved = await Promise.all(
       });
     }
 
+    var publishBottom = function () {
+      document.documentElement.style.setProperty('--header-bottom', (header.offsetTop + header.offsetHeight) + 'px');
+    };
+    publishBottom();
+    window.addEventListener('resize', publishBottom, { passive: true });
+    if (window.ResizeObserver) new ResizeObserver(publishBottom).observe(header);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(publishBottom);
+
     var initOverlay = function () {
       if (!header.classList.contains('is-sticky')) return;
       var cover = document.querySelector('main .cover:first-child');
