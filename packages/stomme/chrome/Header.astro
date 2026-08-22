@@ -121,20 +121,41 @@ const resolved = await Promise.all(
 
     var inner = header.querySelector('.inner');
     var cta = header.querySelector('.site-cta');
-    var fitCta = function () {
-      if (!cta || !inner) return;
-      header.classList.remove('cta-in-menu');
-      var cs = getComputedStyle(inner);
-      var room = inner.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
-      var kids = [].filter.call(inner.children, function (el) { return getComputedStyle(el).display !== 'none'; });
-      var gap = parseFloat(cs.columnGap) || 0;
-      var used = kids.reduce(function (sum, el) { return sum + el.getBoundingClientRect().width; }, 0) + gap * Math.max(0, kids.length - 1);
-      if (used > room) header.classList.add('cta-in-menu');
+    var round = function (v) { return String(Math.round(v * 1000) / 1000); };
+    var setZoom = function (z) {
+      header.style.setProperty('--header-zoom', round(z));
+      document.documentElement.style.setProperty('--header-zoom', round(z));
     };
-    fitCta();
-    window.addEventListener('resize', fitCta, { passive: true });
-    if (window.ResizeObserver) new ResizeObserver(fitCta).observe(inner);
-    if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitCta);
+    // Measured at zoom 1, where every length is in plain px: the row scales linearly with --header-zoom, so the factor that fits is room over use; the open menu is absolute and full-width, so it is not a row child.
+    var fit = function () {
+      setZoom(1);
+      var cs = getComputedStyle(inner);
+      var room = inner.getBoundingClientRect().width - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+      var gap = parseFloat(cs.columnGap) || 0, used = -gap;
+      [].forEach.call(inner.children, function (el) {
+        var k = getComputedStyle(el);
+        if (k.display === 'none' || k.position === 'absolute' || k.position === 'fixed') return;
+        used += el.getBoundingClientRect().width + (parseFloat(k.marginLeft) || 0) + (parseFloat(k.marginRight) || 0) + gap;
+      });
+      return Math.min(1, room / Math.max(used, 1));
+    };
+    var lastWidth = -1, fitting = false;
+    // The row is drawn at its designed size while it fits the viewport and scaled down only by what it needs; the button keeps its place down to 85% of that size, then moves into the menu and the row takes the space.
+    var fitRow = function (force) {
+      if (!inner || fitting) return;
+      var w = header.clientWidth;
+      if (!force && w === lastWidth) return;
+      fitting = true; lastWidth = w;
+      header.classList.remove('cta-in-menu');
+      var z = fit();
+      if (cta && mobile.matches && z < 0.85) { header.classList.add('cta-in-menu'); z = fit(); }
+      setZoom(z < 1 ? Math.max(0.3, z * 0.995) : 1);
+      fitting = false;
+    };
+    fitRow(true);
+    window.addEventListener('resize', function () { fitRow(false); }, { passive: true });
+    if (window.ResizeObserver) new ResizeObserver(function () { fitRow(false); }).observe(header);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { fitRow(true); });
 
     var publishBottom = function () {
       document.documentElement.style.setProperty('--header-bottom', (header.offsetTop + header.offsetHeight) + 'px');
