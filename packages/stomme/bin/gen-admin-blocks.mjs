@@ -11,6 +11,7 @@ import { makeEmitters } from '../src/emit-fields.mjs';
 import { createJiti } from 'jiti';
 import { renderGallery } from '../admin/blocks-gallery.mjs';
 import { rewriteLabels, listingAliases } from '../src/label-paths.mjs';
+import { r2LibraryYaml, resolveMediaConfig } from '../src/media-config.mjs';
 
 const root = process.cwd();
 const here = dirname(fileURLToPath(import.meta.url));
@@ -57,12 +58,14 @@ let CMS_LOCALE = 'en';
 let CMS = null;
 let LISTINGS = [];
 let STYLE = process.env.STOMME_STYLE || null;
+let MEDIA = resolveMediaConfig(null);
 try {
   const mod = await jiti.import(resolve(root, 'src/site.config.ts'));
   if (mod.site && mod.site.routes) ROUTES = { ...ROUTES, ...mod.site.routes };
   if (mod.site && mod.site.cmsLocale) CMS_LOCALE = mod.site.cmsLocale;
   if (mod.site && mod.site.cms) CMS = mod.site.cms;
   if (mod.site && mod.site.style) STYLE = mod.site.style;
+  if (mod.site && mod.site.media) MEDIA = resolveMediaConfig(mod.site.media);
   if (mod.features) FEATURES = { blog: false, areas: false, services: false, testimonials: false, faq: false, tracking: false, ...mod.features };
   if (Array.isArray(mod.listings))
     LISTINGS = mod.listings
@@ -224,6 +227,7 @@ if (!/^media_libraries:/m.test(yaml)) {
     `      raster_image: { format: webp, quality: 82, width: 2048, height: 2048 }\n` +
     `      svg: { optimize: true }`);
 }
+if (!/^  cloudflare_r2:/m.test(yaml)) yaml = yaml.replace(/^media_libraries:\n/m, (l) => l + r2LibraryYaml(MEDIA));
 // Without `output.omit_empty_optional_fields` Sveltia writes every optional field explicitly on save (`cta2Label: ''`), against the field policy that absent = off. Idempotent upsert at the top of the config.
 if (!/^output:/m.test(yaml)) {
   yaml = `output:\n  omit_empty_optional_fields: true\n${yaml}`;

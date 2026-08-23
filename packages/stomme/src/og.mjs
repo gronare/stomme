@@ -1,6 +1,6 @@
 // Deliberately plain .mjs, loaded ONLY as a runtime dynamic import from routes/og.ts and never through the site's Vite bundle: sharp/@resvg are native (Rollup chokes on .node binaries) and externalized bare specifiers don't survive pnpm isolation.
 // Card typography is fixed Inter / Inter Tight regardless of the site theme — the static @fontsource woffs are direct deps because satori can't parse the variable woff2 src/fonts.ts wires site-side.
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { createRequire } from 'node:module';
 import satori from 'satori';
@@ -140,8 +140,9 @@ export async function loadImageSource(src, root = process.cwd()) {
       return Buffer.from(await res.arrayBuffer());
     }
     const rel = src.replace(/^\//, '');
-    const path = rel.startsWith('src/') ? resolve(root, rel) : resolve(root, 'public', rel);
-    return readFileSync(path);
+    if (rel.startsWith('src/')) return readFileSync(resolve(root, rel));
+    const mirrored = resolve(root, 'src/assets', rel);
+    return readFileSync(existsSync(mirrored) ? mirrored : resolve(root, 'public', rel));
   } catch {
     return null;
   }

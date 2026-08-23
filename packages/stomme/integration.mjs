@@ -4,6 +4,9 @@ import { mkdirSync, writeFileSync, existsSync, readFileSync, readdirSync, cpSync
 import { createHash } from 'node:crypto';
 import { previewEntrypoint, listingEntrypoint, lookbookDataModule, lookbookEntrypoint, lookbookBlockEntrypoint, REVEAL } from './src/entrypoints.mjs';
 import { publicIndexPlugin } from './src/vite-public-index.mjs';
+import { createJiti } from 'jiti';
+import { resolveMediaConfig } from './src/media-config.mjs';
+import { resolveMirrorPointers } from './src/media-pointers.mjs';
 
 function resolveListings(l) {
   return (Array.isArray(l) ? l : [])
@@ -83,6 +86,13 @@ function emittedCssHasStyle(dir) {
   return false;
 }
 
+// site.config.ts is read through jiti for the same reason the generator does: a bare import of a .ts file under node_modules fails on its own import graph.
+async function siteMediaConfig(configFile) {
+  if (!existsSync(configFile)) return resolveMediaConfig(null);
+  const mod = await createJiti(import.meta.url).import(configFile);
+  return resolveMediaConfig(mod.site?.media);
+}
+
 export default function stomme(options = {}) {
   const features = options.features || {};
   const routes = options.routes || {};
@@ -93,6 +103,8 @@ export default function stomme(options = {}) {
   }
   const layout = options.layout || 'src/layouts/Base.astro';
   const configPath = options.config || 'src/site.config.ts';
+  let resolvedMedia = [];
+  let mediaMirror = '';
 
   return {
     name: 'stomme',
@@ -116,6 +128,9 @@ export default function stomme(options = {}) {
         } catch (e) {
           logger?.warn(`media build-bridge skipped: ${e?.message || e}`);
         }
+        mediaMirror = resolve(root, 'src/assets/media');
+        const media = await siteMediaConfig(resolve(root, configPath));
+        resolvedMedia = media.pointers && existsSync(mediaMirror) ? await resolveMirrorPointers({ dir: mediaMirror, command, logger }) : [];
         const siteRenderer = resolve(root, 'src/blocks/BlockRenderer.astro');
 
         const SLOT_NAMES = ['footer-end', 'header-start', 'header-nav-end', 'header-end'];
@@ -315,6 +330,7 @@ export default function stomme(options = {}) {
 
       'astro:build:done': ({ dir, logger }) => {
         const outDir = fileURLToPath(dir);
+        for (const rel of resolvedMedia) cpSync(resolve(mediaMirror, rel), resolve(outDir, 'media', rel));
         try {
           const iconsDir = resolve(outDir, 'media/icons');
           if (existsSync(iconsDir)) {
