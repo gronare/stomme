@@ -11,7 +11,7 @@ import { makeEmitters } from '../src/emit-fields.mjs';
 import { createJiti } from 'jiti';
 import { renderGallery } from '../admin/blocks-gallery.mjs';
 import { rewriteLabels, listingAliases } from '../src/label-paths.mjs';
-import { r2LibraryYaml, resolveMediaConfig } from '../src/media-config.mjs';
+import { r2LibraryYaml, resolveMediaConfig, withMaxFileSize } from '../src/media-config.mjs';
 
 const root = process.cwd();
 const here = dirname(fileURLToPath(import.meta.url));
@@ -228,6 +228,7 @@ if (!/^media_libraries:/m.test(yaml)) {
     `      svg: { optimize: true }`);
 }
 if (!/^  cloudflare_r2:/m.test(yaml)) yaml = yaml.replace(/^media_libraries:\n/m, (l) => l + r2LibraryYaml(MEDIA));
+yaml = withMaxFileSize(yaml, MEDIA);
 // Without `output.omit_empty_optional_fields` Sveltia writes every optional field explicitly on save (`cta2Label: ''`), against the field policy that absent = off. Idempotent upsert at the top of the config.
 if (!/^output:/m.test(yaml)) {
   yaml = `output:\n  omit_empty_optional_fields: true\n${yaml}`;

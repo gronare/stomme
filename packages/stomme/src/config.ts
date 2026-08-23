@@ -53,10 +53,10 @@ export interface SiteConfig {
   media?: MediaConfig;
 }
 
-// Where Sveltia keeps uploads. `git` commits them under public/media; with `pointers`, a file there may instead be a content-addressed pointer that the build resolves from STOMME_MEDIA_URL (signed with STOMME_MEDIA_SECRET), which is how a proxy in front of the git backend keeps the bytes elsewhere. `r2` adds Sveltia's own Cloudflare R2 library: uploads go straight from the browser to the bucket and content holds absolute URLs under publicUrl.
+// Where Sveltia keeps uploads. `git` commits them under public/media; with `pointers`, a file there may instead be a content-addressed pointer that the build resolves from STOMME_MEDIA_URL (signed with STOMME_MEDIA_SECRET), which is how a proxy in front of the git backend keeps the bytes elsewhere. `r2` adds Sveltia's own Cloudflare R2 library: uploads go straight from the browser to the bucket and content holds absolute URLs under publicUrl. `maxFileSize` (bytes) makes Sveltia refuse a larger upload in the browser; unset means no cap.
 export type MediaConfig =
-  | { storage?: 'git'; pointers?: boolean }
-  | { storage: 'r2'; accountId: string; bucket: string; accessKeyId: string; publicUrl: string; prefix?: string; jurisdiction?: 'default' | 'eu' | 'fedramp' };
+  | { storage?: 'git'; pointers?: boolean; maxFileSize?: number }
+  | { storage: 'r2'; accountId: string; bucket: string; accessKeyId: string; publicUrl: string; prefix?: string; jurisdiction?: 'default' | 'eu' | 'fedramp'; maxFileSize?: number };
 
 // A missing flag — or a missing `features` object — resolves to false, so a new engine feature never turns itself on for an existing site. contactForm and pages are the two deliberate exceptions.
 export interface StommeFeatures {
