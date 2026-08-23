@@ -28,7 +28,7 @@
 
 *, *::before, *::after { box-sizing: border-box; }
 html { background: var(--color-paper); color: var(--color-ink); }
-body { font-family: var(--font-sans); background: var(--color-paper); overflow-wrap: break-word; -webkit-hyphens: auto; hyphens: auto; margin: 0; line-height: 1.6; min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; }
+body { font-family: var(--font-sans); background: var(--color-paper); overflow-wrap: break-word; margin: 0; line-height: 1.6; min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; }
 @media (max-width: 820px) {
   body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)):not(:has(.site-header.solid)):not(:has(.site-header.nav-open)) { background: var(--color-dark); }
 }
@@ -64,7 +64,8 @@ body > main > * { background: var(--color-paper); }
 [data-eyebrow="bold"] .eyebrow { font-weight: 700; letter-spacing: 0.16em; }
 
 .btn { display: inline-block; background: var(--color-brand); color: var(--color-on-dark); font-weight: 600; padding: 0.6rem 1.3rem; border-radius: 0.7rem; text-decoration: none; white-space: nowrap; }
-/* Chrome and button labels are never hyphenated; a button wraps its label only where the viewport is narrower than a label can be, which is a zoomed phone. */
+/* Auto hyphenation fills lines rather than rescuing words, so it is on only at the widths a zoomed phone has, where a Swedish compound otherwise breaks mid-syllable; chrome and button labels never hyphenate, and a button wraps its label only there. */
+@media (max-width: 330px) { body { -webkit-hyphens: auto; hyphens: auto; } }
 .site-header, .btn, .ctabox-btn { -webkit-hyphens: manual; hyphens: manual; }
 /* A mono line hyphenates only a long word, so a short one wraps at the space instead of SNABBA-RE; anywhere is the floor that lets a grid column shrink below a word it cannot split. */
 .mono { -webkit-hyphenate-limit-before: 5; -webkit-hyphenate-limit-after: 4; hyphenate-limit-chars: 12 5 4; overflow-wrap: anywhere; }
