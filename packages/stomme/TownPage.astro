@@ -107,8 +107,8 @@ const jsonLd = {
 
 <style>
   .town-hero { padding-bottom: clamp(2.5rem, 5vw, 3.75rem); }
-  .town-hero__grid { display: grid; gap: 2.75rem; align-items: center; grid-template-columns: 1fr; }
-  @media (min-width: 920px) { .town-hero__grid--media { grid-template-columns: 1.08fr 0.92fr; } }
+  .town-hero__grid { display: grid; gap: 2.75rem; align-items: center; grid-template-columns: minmax(0, 1fr); }
+  @media (min-width: 920px) { .town-hero__grid--media { grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr); } }
   .town-h1 { margin-top: 1rem; max-width: 15ch; }
   .town-sub { color: var(--color-ink); font-size: 1.15rem; max-width: 42rem; margin-top: 1.2rem; }
   .town-fieldnote { margin-top: 1.4rem; max-width: 34rem; display: flex; gap: 0.8rem; align-items: baseline;
@@ -116,6 +116,7 @@ const jsonLd = {
     border: 1px solid color-mix(in srgb, var(--color-surface) 70%, var(--color-line));
     border-radius: 0.9rem; padding: 0.9rem 1.1rem; color: var(--color-ink); }
   .town-fieldnote__k { flex: none; font-size: 0.64rem; letter-spacing: 0.14em; color: var(--color-ink); }
+  .town-fieldnote > span { min-width: 0; }
   .town-hero__cta { margin-top: 1.9rem; display: flex; gap: 1.25rem; align-items: center; flex-wrap: wrap; }
   .town-jump { color: var(--color-ink); text-decoration: none; font-weight: 600; font-size: 0.95rem; border-bottom: 2px solid var(--color-brand); padding-bottom: 2px; }
   .town-jump:hover { color: var(--color-brand); }
@@ -124,8 +125,8 @@ const jsonLd = {
   .town-h2 { font-size: clamp(1.6rem, 3vw, 2.4rem); }
 
   .town-why { border-top: 1px solid var(--color-line); }
-  .town-why__grid { display: grid; gap: 2.5rem; grid-template-columns: 1fr; align-items: start; }
-  @media (min-width: 920px) { .town-why__grid { grid-template-columns: 0.9fr 1.1fr; } }
+  .town-why__grid { display: grid; gap: 2.5rem; grid-template-columns: minmax(0, 1fr); align-items: start; }
+  @media (min-width: 920px) { .town-why__grid { grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); } }
   .town-why__grid .town-h2 { margin-top: 0.8rem; max-width: 15ch; }
   .town-prose { display: flex; flex-direction: column; gap: 1.1rem; max-width: 40rem; font-size: 1.05rem; color: var(--color-ink); }
   .town-prose p:first-child { font-size: 1.12rem; font-weight: 500; }

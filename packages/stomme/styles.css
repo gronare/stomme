@@ -835,10 +835,11 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
   .plans {
     margin-top: 2.5rem;
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     gap: 1.25rem;
   }
   @media (min-width: 720px) { .plans { grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); } }
+  @media (max-width: 320px) { .plan__amount { white-space: normal; } }
   .plan {
     display: flex;
     flex-direction: column;
@@ -1151,7 +1152,7 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
 @keyframes letter-settle { from { opacity: 0; transform: rotate(-1.6deg) translateY(18px); } to { opacity: 1; transform: rotate(-1.6deg) translateY(0); } }
 @keyframes letter-stampdown { 0% { opacity: 0; transform: rotate(-11deg) scale(1.9); } 62% { opacity: 1; transform: rotate(-11deg) scale(0.94); } 80% { transform: rotate(-11deg) scale(1.04); } 100% { opacity: 1; transform: rotate(-11deg) scale(1); } }
 @keyframes letter-ink-in { from { opacity: 0; } to { opacity: 1; } }
-.thanks-letter { max-width: 44rem; margin-inline: auto; }
+.thanks-letter { max-width: 44rem; margin-inline: auto; overflow-x: clip; }
   .letter-wrap { padding-top: 1.75rem; }
   .letter-sheet { position: relative; background: var(--color-paper); border: 1px solid var(--color-ink); padding: clamp(1.5rem, 4vw, 2.75rem); transform: rotate(-1.6deg); animation: letter-settle 0.7s cubic-bezier(0.2, 0.7, 0.3, 1) both; }
   .letter-sheet::before { content: ""; position: absolute; inset: 10px -11px -11px 10px; border: 1px solid var(--color-line); z-index: -1; background: var(--color-paper); transform: rotate(1.2deg); }
