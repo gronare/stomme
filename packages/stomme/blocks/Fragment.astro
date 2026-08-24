@@ -17,7 +17,7 @@ const btn = resolveButton(cta, linkLabel, link);
 ---
 
 {(statement || body) && (
-  <section class="section">
+  <section data-stomme-block="fragment" class="section">
     <div class:list={['fragment', `fragment--${placement}`]}>
       {eyebrow && <span class="mono eyebrow fragment__eyebrow">{eyebrow}</span>}
       {statement && <p class="display fragment__statement"><Emph text={statement} /></p>}

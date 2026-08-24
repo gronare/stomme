@@ -15,7 +15,7 @@ const accentVar = accent === 'secondary' ? 'var(--color-secondary)' : accent ===
 ---
 
 {quote && (
-  <section class:list={['section', { 'section--read': width === 'narrow' }]}>
+  <section data-stomme-block="callout" class:list={['section', { 'section--read': width === 'narrow' }]}>
     <figure class:list={['callout', `callout--${width}`, `callout--${align}`]} style={`--block-accent:${accentVar}`}>
       {eyebrow && <span class="mono eyebrow">{eyebrow}</span>}
       <blockquote class="display callout__quote"><Emph text={quote} /></blockquote>

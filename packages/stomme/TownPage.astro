@@ -28,7 +28,7 @@ const jsonLd = {
   areaServed: { '@type': 'City', name: data.name },
 };
 ---
-<section class="section town-hero">
+<section data-stomme-page="town" data-stomme-entry={town.id} class="section town-hero">
   <div class:list={['town-hero__grid', { 'town-hero__grid--media': !!data.media?.image }]}>
     <div class="town-hero__copy">
       <span class="mono eyebrow">{fill(t.eyebrow)}</span>

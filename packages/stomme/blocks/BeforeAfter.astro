@@ -22,7 +22,7 @@ const beforeAlt = Astro.props.beforeAlt ?? tagBefore;
 const afterAlt = Astro.props.afterAlt ?? tagAfter;
 ---
 
-<section class="section">
+<section data-stomme-block="beforeAfter" class="section">
   {(eyebrow || heading || intro) && (
     <div class="section-head">
       {eyebrow && <span class="mono eyebrow">{eyebrow}</span>}

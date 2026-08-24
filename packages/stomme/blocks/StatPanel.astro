@@ -16,7 +16,7 @@ const { eyebrow, heading, body, badges = [], statValue, statLabel, stats = [] } 
 const accent = Astro.props.style?.accent ?? 'brand';
 const accentVar = accent === 'secondary' ? 'var(--color-secondary)' : accent === 'highlight' ? 'var(--color-highlight)' : 'var(--color-brand)';
 ---
-<section class="stat-panel" style={`--block-accent:${accentVar}`}>
+<section data-stomme-block="statPanel" class="stat-panel" style={`--block-accent:${accentVar}`}>
   <div class="stat-panel__inner">
     <div class="stat-panel__main">
       {eyebrow && <span class="mono eyebrow">{eyebrow}</span>}

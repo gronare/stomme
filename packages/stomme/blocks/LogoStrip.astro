@@ -4,7 +4,7 @@ const { lead, logos } = Astro.props;
 const names = Array.isArray(logos) ? logos.filter(Boolean) : [];
 ---
 {names.length > 0 && (
-  <section class="partner-strip">
+  <section data-stomme-block="logoStrip" class="partner-strip">
     <div class="section" style="text-align:center">
       {lead && <p class="mono">{lead}</p>}
       <div class="partner-logos">{names.map((p) => <span>{p}</span>)}</div>

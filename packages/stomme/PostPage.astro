@@ -12,7 +12,7 @@ const site = resolveSite(config);
 const html = await renderMarkdown(post.body ?? '');
 const date = post.data.date ? new Date(post.data.date).toLocaleDateString(site.locale, { year: 'numeric', month: 'long', day: 'numeric' }) : '';
 ---
-<article class="section section--read">
+<article data-stomme-page="news" data-stomme-entry={post.id} class="section section--read">
   {post.data.showCover && (
     <Cover src={post.data.cover} alt={post.data.title} placeholder="/images/placeholders/service.svg" width={1100} height={620} loading="eager" class="post-article__cover" />
   )}

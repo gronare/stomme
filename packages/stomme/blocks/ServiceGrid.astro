@@ -20,7 +20,7 @@ const services = (
     : [...all].sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0))
 ) as typeof all;
 ---
-<section class="section">
+<section data-stomme-block="serviceGrid" class="section">
   {(eyebrow || heading || intro) && (
     <div class="section-head">
       {eyebrow && <span class="mono eyebrow">{eyebrow}</span>}

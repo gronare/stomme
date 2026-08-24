@@ -12,7 +12,7 @@ const width = Astro.props.layout?.width ?? 'narrow';
 ---
 
 {(heading || items.length > 0) && (
-  <section id={anchor || undefined} class:list={['section', { 'section--read': width !== 'full' }]}>
+  <section data-stomme-block="steps" id={anchor || undefined} class:list={['section', { 'section--read': width !== 'full' }]}>
     {(eyebrow || heading || intro) && (
       <div class="section-head">
         {eyebrow && <span class="mono eyebrow">{eyebrow}</span>}

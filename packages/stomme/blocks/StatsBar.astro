@@ -4,7 +4,7 @@ const { items } = Astro.props;
 const facts = Array.isArray(items) ? items : [];
 ---
 {facts.length > 0 && (
-  <section class="section">
+  <section data-stomme-block="statsBar" class="section">
     <dl class="facts-grid">
       {facts.map((f) => (
         <div class="fact">

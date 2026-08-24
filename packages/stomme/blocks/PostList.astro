@@ -31,7 +31,7 @@ const leadHasImg = !!(lead && showImages && lead.data.showCover);
 const hasImg = (p: any) => !!(showImages && p.data.showCover);
 ---
 {all.length > 0 && (
-  <section class="section">
+  <section data-stomme-block="postList" class="section">
     {(eyebrow || heading || intro) && (
       <div class="section-head post-head">
         {eyebrow && <span class="mono eyebrow">{eyebrow}</span>}

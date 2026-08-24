@@ -22,7 +22,7 @@ const contact = ((await getEntry('contact', 'contact').catch(() => null))?.data 
 ---
 
 {variant === 'dark' ? (
-  <section class="band page-header page-header--dark">
+  <section data-stomme-block="pageHeader" class="band page-header page-header--dark">
     <div class="page-header__glow" aria-hidden="true"></div>
     <div class:list={['section', 'page-header__inner', { 'section--read': read }]}>
       {eyebrow && <span class="mono eyebrow">{eyebrow}</span>}
@@ -37,7 +37,7 @@ const contact = ((await getEntry('contact', 'contact').catch(() => null))?.data 
     </div>
   </section>
 ) : (
-  <section class:list={['section', 'page-header', 'page-header--light', { 'section--read': read }]}>
+  <section data-stomme-block="pageHeader" class:list={['section', 'page-header', 'page-header--light', { 'section--read': read }]}>
     {eyebrow && <span class="mono eyebrow">{eyebrow}</span>}
     <h1 class="display display--hero page-header__heading"><Emph text={heading} /></h1>
     {intro && <p class="intro page-header__intro">{intro}</p>}

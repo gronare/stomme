@@ -46,7 +46,7 @@ const videoSrc =
     ? (videoUrl || (videoKey && (videoFiles as Record<string, string>)[videoKey]) || video || undefined)
     : undefined;
 ---
-<section class:list={['cover', `cover--${align}`, `cover--h-${height}`, `cover--ov-${overlay}`]}>
+<section data-stomme-block="cover" class:list={['cover', `cover--${align}`, `cover--h-${height}`, `cover--ov-${overlay}`]}>
   <div class:list={['cover__media', { 'cover__media--gradient': media === 'gradient' || media === 'animated' }]}>
     {media !== 'gradient' && media !== 'animated' && (
       <Cover

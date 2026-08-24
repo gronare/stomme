@@ -24,7 +24,7 @@ const shownFacts = (facts ?? []).filter((f) => f && (f.label || f.value));
 const hasFacts = variant !== 'classic' && shownFacts.length > 0;
 ---
 
-<section class="section">
+<section data-stomme-block="ctaBox" class="section">
   <div class:list={['ctabox', `ctabox--${variant}`]}>
     <div class="ctabox-copy">
       {eyebrow && <span class="mono ctabox-eyebrow">{eyebrow}</span>}

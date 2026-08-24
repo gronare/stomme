@@ -18,7 +18,7 @@ const accent = Astro.props.style?.accent ?? 'brand';
 const readMore = site?.strings?.readMore ?? 'Read more';
 const accentVar = accent === 'secondary' ? 'var(--color-secondary)' : accent === 'highlight' ? 'var(--color-highlight)' : 'var(--color-brand)';
 ---
-<section class="section" style={`--block-accent:${accentVar}`}>
+<section data-stomme-block="featureGrid" class="section" style={`--block-accent:${accentVar}`}>
   {(eyebrow || heading || intro) && (
     <div class="section-head">
       {eyebrow && <span class="mono eyebrow">{eyebrow}</span>}

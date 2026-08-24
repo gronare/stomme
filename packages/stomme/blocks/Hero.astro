@@ -40,7 +40,7 @@ const showHighlights = kind === 'highlights' && highlights.length > 0;
 const showMotif = kind === 'motif';
 const hasMedia = showImage || showHighlights || showMotif;
 ---
-<section class:list={['section', { 'section--hero-tall': height === 'tall', 'section--read': width === 'narrow' }, height === 'tall' && `section--hero-${align}`]} style={`--block-accent:${accentVar}`}>
+<section data-stomme-block="hero" class:list={['section', { 'section--hero-tall': height === 'tall', 'section--read': width === 'narrow' }, height === 'tall' && `section--hero-${align}`]} style={`--block-accent:${accentVar}`}>
   <div class:list={['hero-grid', { 'has-media': hasMedia }]}>
     <div>
       {eyebrow && <span class="mono eyebrow">{eyebrow}</span>}

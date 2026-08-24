@@ -32,7 +32,7 @@ const cats = [...new Set(items.map((i) => i.data.category).filter(Boolean))];
 const PLACE = '/images/placeholders/service.svg';
 ---
 {items.length > 0 && (
-  <section class="section">
+  <section data-stomme-block="catalogList" class="section">
     {(eyebrow || heading || intro) && (
       <div class="section-head post-head">
         {eyebrow && <span class="mono eyebrow">{eyebrow}</span>}

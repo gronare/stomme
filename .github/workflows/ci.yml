@@ -93,9 +93,9 @@ jobs:
       - name: slot mounting + gating
         run: pnpm --filter @gronare/stomme test:slots
 
-  # Engine behaviour no build failure would surface: generated share cards, the unlisted-path rules behind noindex, and the middleware that makes /admin a working dev address.
+  # Engine behaviour no build failure would surface: generated share cards, the unlisted-path rules behind noindex, the middleware that makes /admin a working dev address, and the metrics beacon staying absent until a site names an endpoint.
   engine-smokes:
-    name: engine smokes (og + noindex + public index)
+    name: engine smokes (og + noindex + public index + metrics)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -111,6 +111,8 @@ jobs:
         run: pnpm --filter @gronare/stomme test:noindex
       - name: public directory index
         run: pnpm --filter @gronare/stomme test:public-index
+      - name: metrics beacon
+        run: pnpm --filter @gronare/stomme test:metrics
 
   # The Sveltia DOM contract test is deliberately not per-PR: between version bumps the pinned DOM does not change, so it runs when the pin is bumped instead.
 
@@ -130,6 +132,7 @@ jobs:
           node --check packages/stomme/integration.mjs
           node --check packages/stomme/admin/previews.js
           node --check packages/stomme/test/smoke-preview-workerd.mjs
+          node --check packages/stomme/test/smoke-metrics.mjs
 
   # The manifests are published artifacts: tooling reads them raw at a tagged ref to check
   # site content against the engine's schema. One that lags its generator (collections.ts /

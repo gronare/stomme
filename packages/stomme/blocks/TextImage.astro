@@ -15,7 +15,7 @@ const flip = Astro.props.layout?.flip ?? false;
 const html = await renderMarkdown(body);
 ---
 
-<section class="section">
+<section data-stomme-block="textImage" class="section">
   <div class="ti-grid">
     <div class={flip ? 'ti-text ti-second' : 'ti-text'}>
       {heading && <h2 class="display">{heading}</h2>}

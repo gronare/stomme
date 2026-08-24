@@ -15,7 +15,7 @@ const align = Astro.props.layout?.align ?? 'left';
 ---
 
 {term && (
-  <section class:list={['section', { 'section--read': width === 'narrow' }]}>
+  <section data-stomme-block="definition" class:list={['section', { 'section--read': width === 'narrow' }]}>
     <div class:list={['definition', `definition--${width}`, `definition--${align}`]}>
       {eyebrow && <span class="mono eyebrow definition__eyebrow">{eyebrow}</span>}
       <div class="definition__entry">

@@ -29,7 +29,7 @@ const hdCtaLabel = hero ? (hero.cta?.label || hero.ctaLabel || t.cta) : t.cta;
 const hdBtn2 = hero ? resolveButton(hero.cta2, hero.cta2Label, hero.cta2Href) : null;
 ---
 {hero && (
-<section class="section service-hd">
+<section data-stomme-page="service" data-stomme-entry={service?.id} class="section service-hd">
   <div class:list={['service-hd__grid', { 'has-media': !!hdImage }]}>
     <div>
       <span class="mono eyebrow">{t.eyebrow}</span>
@@ -56,7 +56,7 @@ const hdBtn2 = hero ? resolveButton(hero.cta2, hero.cta2Label, hero.cta2Href) : 
 </section>
 )}
 {!hero && (
-<section class="section service-page">
+<section data-stomme-page="service" data-stomme-entry={service?.id} class="section service-page">
   <span class="mono eyebrow">{t.eyebrow}</span>
   <h1 class="display display--hero service-h1">{data.title}</h1>
   {data.summary && <p class="intro service-lede">{data.summary}</p>}

@@ -15,7 +15,7 @@ const accentVar = accent === 'secondary' ? 'var(--color-secondary)' : accent ===
 const html = await renderMarkdown(body);
 ---
 
-<section class="section">
+<section data-stomme-block="textQuote" class="section">
   <div class:list={['tq-grid', { 'tq-flip': flip }]}>
     <div class:list={['prose', 'tq-body', { 'tq-second': flip }]} set:html={html} />
     {quote && (

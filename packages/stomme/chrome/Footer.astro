@@ -6,6 +6,7 @@ import { resolveLink } from '../src/href';
 import ContactLink from '../src/ContactLink.astro';
 // Rendered flush after .inner's close tag — on its own line the newline would collapse to a space on every page of every site.
 import SlotFooterEnd from '@stomme/slot-footer-end';
+import Metrics from './Metrics.astro';
 
 interface NavData {}
 interface FooterData { dark?: boolean; tagline?: string; showLinks?: boolean; linksHeading?: string; links?: { label: string; link?: unknown }[]; links2Heading?: string; links2?: { label: string; link?: unknown }[]; showTowns?: boolean; townsHeading?: string; legal?: { label: string; link?: unknown }[]; note?: string; showLogo?: boolean; showWordmark?: boolean }
@@ -89,5 +90,5 @@ const year = new Date().getFullYear();
         </ul>
       )}
     </div>
-  </div><SlotFooterEnd />
+  </div><SlotFooterEnd /><Metrics />
 </footer>

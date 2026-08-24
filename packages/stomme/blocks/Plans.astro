@@ -27,7 +27,7 @@ const anyPrefix = plans.some((p) => p.pricePrefix);
 ---
 
 {(heading || plans.length > 0) && (
-  <section class="section">
+  <section data-stomme-block="plans" class="section">
     {(eyebrow || heading || intro) && (
       <div class="section-head">
         {eyebrow && <span class="mono eyebrow">{eyebrow}</span>}

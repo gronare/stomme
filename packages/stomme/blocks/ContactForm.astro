@@ -34,7 +34,7 @@ const successPath = site?.routes?.formSuccess ?? '/thanks';
 
 const recapLabels = JSON.stringify({ email: L.email, phone: L.phone, message: L.message });
 ---
-<section class="section">
+<section data-stomme-block="contactForm" class="section">
   {(heading || intro) && (
     <div class="contact-head">
       {eyebrow && <span class="mono eyebrow">{eyebrow}</span>}

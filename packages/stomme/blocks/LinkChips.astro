@@ -12,7 +12,7 @@ const { eyebrow, heading, intro, site } = Astro.props;
 const prefix = site?.routes?.towns ?? '/areas';
 const towns = Astro.props.items ?? (await getCollection('towns')).sort((a, b) => a.data.order - b.data.order);
 ---
-<section class="section">
+<section data-stomme-block="linkChips" class="section">
   {(eyebrow || heading || intro) && (
     <div class="section-head">
       {eyebrow && <span class="mono eyebrow">{eyebrow}</span>}

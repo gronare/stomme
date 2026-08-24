@@ -1,0 +1,58 @@
+---
+import { site } from '@stomme/config';
+
+const raw = String((site as any)?.metrics?.endpoint || '').trim();
+let endpoint = '';
+try { endpoint = new URL(raw).protocol === 'https:' ? raw : ''; } catch { endpoint = ''; }
+---
+{endpoint && (
+  <script is:inline data-stomme-metrics data-endpoint={endpoint}>
+(function () {
+const D = document, L = location, u = D.currentScript?.dataset.endpoint;
+if (!u || navigator.webdriver) return;
+// text/plain, never application/json: a JSON content type preflights the beacon cross-origin and a refused preflight drops it silently. The body stays JSON.
+const pg = D.querySelector('[data-stomme-page]'), q = new URLSearchParams(L.search);
+// Every beacon carries p + k: the collector 400s a body without a path, whatever its type.
+const send = (b) => {
+b = JSON.stringify(Object.assign({ p: L.pathname, k: pg?.dataset.stommePage || 'page' }, b));
+try { if (navigator.sendBeacon(u, new Blob([b], { type: 'text/plain' }))) return; } catch (e) {}
+try { fetch(u, { method: 'POST', body: b, keepalive: true, mode: 'no-cors' }); } catch (e) {}
+};
+send({ t: 'pv', e: pg?.dataset.stommeEntry || '', r: D.referrer, u: { s: q.get('utm_source') || '', m: q.get('utm_medium') || '' } });
+const B = [...D.querySelectorAll('[data-stomme-block]')], items = [], had = {};
+const mark = (n, act) => {
+const i = B.indexOf(n), k = i + act;
+if (i < 0 || items.length > 39 || had[k]) return;
+had[k] = 1;
+items.push({ block: n.dataset.stommeBlock, pos: i, act });
+};
+try {
+const io = new IntersectionObserver((es) => es.forEach((x) => x.isIntersecting && (mark(x.target, 'seen'), io.unobserve(x.target))), { threshold: 0.5 });
+B.forEach((n) => io.observe(n));
+} catch (e) {}
+const ev = (type, detail) => send({ t: 'ev', d: { type, detail } });
+D.addEventListener('click', ({ target: t }) => {
+if (!t.closest) return;
+const a = t.closest('a[href]'), h = a?.getAttribute('href') || '', b = t.closest('[data-stomme-block]');
+if (b) mark(b, 'click');
+if (/^tel:/i.test(h)) ev('tel', h);
+else if (/^mailto:/i.test(h)) ev('mailto', h);
+else if (a && /^https?:$/.test(a.protocol) && a.host !== L.host) ev('outbound', a.host);
+}, true);
+D.addEventListener('submit', ({ target: t }) => t.closest?.('.contact-form') && ev('form', L.pathname), true);
+const v = { lcp: 0, cls: 0, inp: 0 };
+const obs = (type, f, durationThreshold) => { try { new PerformanceObserver((l) => l.getEntries().forEach(f)).observe({ type, buffered: true, durationThreshold }); } catch (e) {} };
+obs('largest-contentful-paint', (x) => v.lcp = x.startTime | 0);
+obs('layout-shift', (x) => x.hadRecentInput || (v.cls += x.value));
+obs('event', (x) => x.duration > v.inp && (v.inp = x.duration | 0), 16);
+let done = 0;
+const flush = () => {
+if (done++) return;
+if (items.length) send({ t: 'blk', d: { items } });
+send({ t: 'vit', d: { lcp: v.lcp, cls: (v.cls * 1000 | 0) / 1000, inp: v.inp } });
+};
+addEventListener('pagehide', flush);
+addEventListener('visibilitychange', () => D.visibilityState == 'hidden' && flush());
+})();
+  </script>
+)}

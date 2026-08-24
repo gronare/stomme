@@ -12,6 +12,7 @@ export interface SiteConfig {
   locale?: string;
   style?: string;
   analytics?: { cfToken?: string };
+  metrics?: { endpoint?: string };
   cmsLocale?: string;
   strings?: {
     readMore?: string;

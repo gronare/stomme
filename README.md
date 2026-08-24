@@ -77,6 +77,40 @@ publish directory `dist` — the contact endpoint and CMS preview ship as a
 serverless function automatically. Set `RESEND_API_KEY`, `CONTACT_FROM` and
 `CONTACT_TO` in the site's environment to make the contact form deliver.
 
+## Analytics
+
+Two independent layers, both silent until configured.
+
+**First-party metrics.** Point `metrics.endpoint` at an `https:` URL you control and the
+engine ships one small inline script — no external file, no cookies, no `localStorage`,
+no consent banner to gate:
+
+```ts
+// src/site.config.ts
+export const site: SiteConfig = {
+  metrics: { endpoint: 'https://metrics.example.com/collect' },
+};
+```
+
+It beacons a pageview, contact intents (`tel:`, `mailto:`, contact-form submits and
+outbound links), which blocks were seen or clicked, and LCP/CLS/INP — with
+`navigator.sendBeacon`, falling back to `fetch(keepalive)`. Bodies are JSON, sent as
+`text/plain` so a cross-origin preflight can never lose a beacon. To identify what was
+on screen, page templates carry `data-stomme-page` (`town`, `service`, `news`,
+`listing`, `404`) plus `data-stomme-entry`, and every block carries
+`data-stomme-block="<type>"`.
+
+Leave `metrics` unset and nothing is emitted — the script is not in the HTML at all.
+A non-`https:` endpoint is ignored the same way.
+
+**Cloudflare Web Analytics.** `analytics.cfToken` drops in Cloudflare's beacon tag. The
+token is issued in the Cloudflare dashboard, so it goes with `build:cloudflare`; on a
+Netlify, Vercel, Node or `build:static` deploy it buys you nothing unless that site is
+served through Cloudflare as well.
+
+Both are separate from `Tracking.astro` (GTM / GA4 / Meta Pixel), which is a
+consent-gated marketing layer behind the `tracking` feature flag.
+
 ## The contact form
 
 The form is a plain `<form method="POST">` that also submits over `fetch` when JavaScript

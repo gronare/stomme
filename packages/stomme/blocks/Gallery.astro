@@ -15,7 +15,7 @@ const cols = columns === 2 ? 2 : 3;
 ---
 
 {(heading || images.length > 0) && (
-  <section class="section">
+  <section data-stomme-block="gallery" class="section">
     {(eyebrow || heading || intro) && (
       <div class="section-head">
         {eyebrow && <span class="mono eyebrow">{eyebrow}</span>}

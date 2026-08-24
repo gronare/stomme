@@ -12,7 +12,7 @@ interface Props {
 const { eyebrow, heading, intro, cta, label, href } = Astro.props;
 const btn = resolveButton(cta, label, href);
 ---
-<section class="section">
+<section data-stomme-block="ctaPanel" class="section">
   <div class="band cta-panel">
     {eyebrow && <span class="mono">{eyebrow}</span>}
     {heading && <h2 class="display" style="margin-top:0.5rem">{heading}</h2>}

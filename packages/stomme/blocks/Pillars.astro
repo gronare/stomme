@@ -9,7 +9,7 @@ const { eyebrow, heading, intro, items = [] } = Astro.props;
 ---
 
 {(heading || items.length > 0) && (
-  <section class="section">
+  <section data-stomme-block="pillars" class="section">
     {(eyebrow || heading || intro) && (
       <div class="section-head">
         {eyebrow && <span class="mono eyebrow">{eyebrow}</span>}
