@@ -20,6 +20,9 @@ const KEEP = flag('--keep');
 
 const siteDir = resolve(REPO_ROOT, SITE);
 const distDir = resolve(siteDir, 'dist');
+const wranglerConfig = resolve(distDir, 'server/wrangler.json');
+const workerEntry = resolve(distDir, 'server/entry.mjs');
+const clientDir = resolve(distDir, 'client');
 const base = `http://127.0.0.1:${PORT}`;
 
 // Mirrors admin/previews.js b64() EXACTLY (btoa over the UTF-8 bytes of JSON.stringify), and the marker carries non-ASCII so a broken UTF-8 round-trip shows.
@@ -36,7 +39,11 @@ const DATA = b64(BLOCKS);
 const log = (...a) => console.log('[smoke]', ...a);
 const fail = (msg) => { console.error('\n[smoke] FAIL:', msg); return false; };
 let child = null;
-const cleanup = () => { if (child && !KEEP) { try { child.kill('SIGTERM'); } catch {} } };
+// Own process group: wrangler forks workerd, and a TERM to wrangler alone leaves workerd holding the port.
+const cleanup = () => {
+  if (!child || KEEP) return;
+  try { process.kill(-child.pid, 'SIGTERM'); } catch { try { child.kill('SIGTERM'); } catch {} }
+};
 process.on('exit', cleanup);
 process.on('SIGINT', () => { cleanup(); process.exit(130); });
 
@@ -54,6 +61,10 @@ async function waitFor(url, ms) {
   return false;
 }
 
+async function portBusy() {
+  try { await fetch(base + '/'); return true; } catch { return false; }
+}
+
 function previewRootInner(html) {
   const m = html.match(/id="preview-root"[^>]*>([\s\S]*)/);
   return m ? m[1] : null;
@@ -62,23 +73,25 @@ function previewRootInner(html) {
 async function main() {
   log(`site=${SITE} port=${PORT} strictCsp=${STRICT_CSP} noCsp=${NO_CSP}`);
 
+  // Without this the run passes against a leftover server: wrangler fails to bind, and every assertion below reads a stale build.
+  if (await portBusy()) return fail(`something is already listening on ${base} — refusing to test against a server this run did not start.`);
+
   if (!NO_BUILD) {
     log('building for cloudflare (STOMME_TARGET=cloudflare)…');
     if (!run('pnpm', ['run', 'build:cloudflare'], siteDir)) return fail('build:cloudflare failed');
   }
-  if (!existsSync(resolve(distDir, '_worker.js'))) {
-    return fail(`no ${SITE}/dist/_worker.js — not a Cloudflare (SSR) build. Run build:cloudflare (or drop --no-build).`);
+  for (const [path, what] of [[workerEntry, 'server/entry.mjs'], [wranglerConfig, 'server/wrangler.json'], [clientDir, 'client/']]) {
+    if (!existsSync(path)) {
+      return fail(`no ${SITE}/dist/${what} — not a Cloudflare (Workers) build. Run build:cloudflare (or drop --no-build).`);
+    }
   }
 
   const wrangler = [resolve(siteDir, 'node_modules/.bin/wrangler'), resolve(REPO_ROOT, 'node_modules/.bin/wrangler')]
     .find(existsSync) || 'wrangler';
-  // Pin a supported compatibility date: `wrangler pages dev` otherwise defaults to today, which the bundled workerd binary (a day or two behind the calendar) rejects — a calendar-triggered CI failure.
-  const compatDate = process.env.SMOKE_COMPAT_DATE || '2025-11-01';
-  log(`starting workerd: ${wrangler} pages dev dist --port ${PORT} --compatibility-date ${compatDate}`);
+  log(`starting workerd: ${wrangler} dev --config dist/server/wrangler.json --port ${PORT}`);
   const workerLog = [];
-  child = spawn(wrangler, ['pages', 'dev', 'dist', '--port', String(PORT), '--ip', '127.0.0.1',
-    '--compatibility-date', compatDate],
-    { cwd: siteDir, env: process.env });
+  child = spawn(wrangler, ['dev', '--config', wranglerConfig, '--port', String(PORT), '--ip', '127.0.0.1'],
+    { cwd: siteDir, env: process.env, stdio: ['ignore', 'pipe', 'pipe'], detached: true });
   child.stdout.on('data', (d) => workerLog.push(d.toString()));
   child.stderr.on('data', (d) => workerLog.push(d.toString()));
 

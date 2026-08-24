@@ -41,9 +41,10 @@ try {
     process.exit(1);
   }
   // Own process group: `pnpm run` is just a shell around astro, and a TERM to the shell leaves the server alive and listening.
-  child = spawn(ASTRO, ['dev', '--port', String(PORT), '--host', '127.0.0.1'], {
+  // ASTRO_DEV_BACKGROUND opts out of Astro's agent detection, which would otherwise detach the server into a process this run cannot kill; --ignore-lock then keeps it off the lock file a developer's own dev server owns.
+  child = spawn(ASTRO, ['dev', '--port', String(PORT), '--host', '127.0.0.1', '--ignore-lock'], {
     cwd: STARTER,
-    env: { ...process.env, STOMME_SLOTS_DIR: '' },
+    env: { ...process.env, STOMME_SLOTS_DIR: '', ASTRO_DEV_BACKGROUND: '1' },
     stdio: ['ignore', 'pipe', 'pipe'],
     detached: true,
   });

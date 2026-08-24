@@ -61,7 +61,7 @@ share cards prerender, while `/preview` and `/api/contact` are served on demand.
 
 ```bash
 pnpm build              # Netlify (adapter preinstalled) — deploy dist/ + the generated function
-pnpm build:cloudflare   # Cloudflare Pages (pnpm add @astrojs/cloudflare first)
+pnpm build:cloudflare   # Cloudflare Workers (adapter preinstalled) — deploy with `wrangler deploy -c dist/server/wrangler.json`
 pnpm build:vercel       # Vercel          (pnpm add @astrojs/vercel first)
 pnpm build:node         # your own server (pnpm add @astrojs/node first)
 pnpm build:static       # no adapter — a fully static dist/ for GitHub Pages or any host
