@@ -54,7 +54,7 @@ export interface SiteConfig {
   media?: MediaConfig;
 }
 
-// Where Sveltia keeps uploads. `git` commits them under public/media; with `pointers`, a file there may instead be a content-addressed pointer that the build resolves from STOMME_MEDIA_URL (signed with STOMME_MEDIA_SECRET), which is how a proxy in front of the git backend keeps the bytes elsewhere. `r2` adds Sveltia's own Cloudflare R2 library: uploads go straight from the browser to the bucket and content holds absolute URLs under publicUrl. `maxFileSize` (bytes) makes Sveltia refuse a larger upload in the browser; unset means no cap.
+// Where Sveltia keeps uploads. `git` commits them under public/media. `r2` adds Sveltia's own Cloudflare R2 library: uploads go straight from the browser to the bucket and content holds absolute URLs under publicUrl. `maxFileSize` (bytes) makes Sveltia refuse a larger upload in the browser; unset means no cap. A `pointers` key is tolerated and ignored, so older site configs keep parsing.
 export type MediaConfig =
   | { storage?: 'git'; pointers?: boolean; maxFileSize?: number }
   | { storage: 'r2'; accountId: string; bucket: string; accessKeyId: string; publicUrl: string; prefix?: string; jurisdiction?: 'default' | 'eu' | 'fedramp'; maxFileSize?: number };

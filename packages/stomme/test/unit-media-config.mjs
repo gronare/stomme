@@ -9,18 +9,16 @@ const check = (ok, name, detail = '') => {
 const eq = (got, want, name) => check(got === want, name, `got ${JSON.stringify(got)}\n    want ${JSON.stringify(want)}`);
 const throws = (fn, re, name) => { try { fn(); check(false, name, 'did not throw'); } catch (e) { check(re.test(e.message), name, e.message); } };
 
-eq(JSON.stringify(resolveMediaConfig(undefined)), '{"storage":"git","pointers":false}', 'no media config is git without pointers and without a cap');
-eq(JSON.stringify(resolveMediaConfig({})), '{"storage":"git","pointers":false}', 'an empty object is git without pointers');
-eq(JSON.stringify(resolveMediaConfig({ storage: 'git', pointers: true })), '{"storage":"git","pointers":true}', 'git with pointers');
+eq(JSON.stringify(resolveMediaConfig(undefined)), '{"storage":"git"}', 'no media config is git without a cap');
+eq(JSON.stringify(resolveMediaConfig({})), '{"storage":"git"}', 'an empty object is git');
+eq(JSON.stringify(resolveMediaConfig({ storage: 'git', pointers: true })), '{"storage":"git"}', 'a leftover pointers flag is ignored');
 eq(resolveMediaConfig({ maxFileSize: 26214400 }).maxFileSize, 26214400, 'maxFileSize is carried in bytes');
 throws(() => resolveMediaConfig({ maxFileSize: '25MB' }), /positive integer/, 'a non-integer cap throws');
 throws(() => resolveMediaConfig({ maxFileSize: 0 }), /positive integer/, 'a zero cap throws');
-eq(resolveMediaConfig({ pointers: 'yes' }).pointers, false, 'pointers must be literally true');
 throws(() => resolveMediaConfig({ storage: 's3' }), /"git" or "r2"/, 'an unknown storage throws');
 throws(() => resolveMediaConfig({ storage: 'r2', bucket: 'b' }), /accountId, accessKeyId, publicUrl/, 'r2 names every missing key');
 
 const r2 = resolveMediaConfig({ storage: 'r2', accountId: 'acc', bucket: 'site-media', accessKeyId: 'k'.repeat(64), publicUrl: 'https://media.example.se', jurisdiction: 'eu' });
-eq(r2.pointers, false, 'r2 never resolves pointers');
 eq(r2LibraryYaml(r2),
   '  cloudflare_r2:\n    access_key_id: "' + 'k'.repeat(64) + '"\n    bucket: "site-media"\n    account_id: "acc"\n    public_url: "https://media.example.se"\n    jurisdiction: "eu"\n',
   'the r2 library is emitted flat under media_libraries with only the keys given');

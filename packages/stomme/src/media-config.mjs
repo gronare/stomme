@@ -9,11 +9,11 @@ const maxFileSize = (m) => {
 export function resolveMediaConfig(media) {
   const m = media && typeof media === 'object' ? media : {};
   const storage = m.storage ?? 'git';
-  if (storage === 'git') return { storage, pointers: m.pointers === true, maxFileSize: maxFileSize(m) };
+  if (storage === 'git') return { storage, maxFileSize: maxFileSize(m) };
   if (storage !== 'r2') throw new Error(`stomme: site.media.storage must be "git" or "r2", got ${JSON.stringify(storage)}`);
   const missing = R2_KEYS.filter((k) => !m[k]);
   if (missing.length) throw new Error(`stomme: site.media with storage "r2" needs ${missing.join(', ')}`);
-  return { storage, pointers: false, maxFileSize: maxFileSize(m), accountId: m.accountId, bucket: m.bucket, accessKeyId: m.accessKeyId, publicUrl: m.publicUrl, prefix: m.prefix, jurisdiction: m.jurisdiction };
+  return { storage, maxFileSize: maxFileSize(m), accountId: m.accountId, bucket: m.bucket, accessKeyId: m.accessKeyId, publicUrl: m.publicUrl, prefix: m.prefix, jurisdiction: m.jurisdiction };
 }
 
 // The cap lives under media_libraries.all so it applies to every provider; the line is written or removed so the config says exactly what site.media says.

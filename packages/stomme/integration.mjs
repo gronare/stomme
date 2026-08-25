@@ -6,7 +6,6 @@ import { previewEntrypoint, listingEntrypoint, lookbookDataModule, lookbookEntry
 import { publicIndexPlugin } from './src/vite-public-index.mjs';
 import { createJiti } from 'jiti';
 import { resolveMediaConfig } from './src/media-config.mjs';
-import { resolveMirrorPointers } from './src/media-pointers.mjs';
 
 function resolveListings(l) {
   return (Array.isArray(l) ? l : [])
@@ -103,8 +102,6 @@ export default function stomme(options = {}) {
   }
   const layout = options.layout || 'src/layouts/Base.astro';
   const configPath = options.config || 'src/site.config.ts';
-  let resolvedMedia = [];
-  let mediaMirror = '';
 
   return {
     name: 'stomme',
@@ -128,9 +125,6 @@ export default function stomme(options = {}) {
         } catch (e) {
           logger?.warn(`media build-bridge skipped: ${e?.message || e}`);
         }
-        mediaMirror = resolve(root, 'src/assets/media');
-        const media = await siteMediaConfig(resolve(root, configPath));
-        resolvedMedia = media.pointers && existsSync(mediaMirror) ? await resolveMirrorPointers({ dir: mediaMirror, command, logger }) : [];
         const siteRenderer = resolve(root, 'src/blocks/BlockRenderer.astro');
 
         const SLOT_NAMES = ['footer-end', 'header-start', 'header-nav-end', 'header-end'];
@@ -330,7 +324,6 @@ export default function stomme(options = {}) {
 
       'astro:build:done': ({ dir, logger }) => {
         const outDir = fileURLToPath(dir);
-        for (const rel of resolvedMedia) cpSync(resolve(mediaMirror, rel), resolve(outDir, 'media', rel));
         try {
           const iconsDir = resolve(outDir, 'media/icons');
           if (existsSync(iconsDir)) {
