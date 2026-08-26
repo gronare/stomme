@@ -171,11 +171,13 @@ const resolved = await Promise.all(
       var darkHero = document.querySelector('main .surface-dark:first-child .hero-grid, main .surface-gradient:first-child .hero-grid');
       var hero = cover || (darkHero && darkHero.closest('.surface-dark, .surface-gradient'));
       if (!hero) return;
+      var text = hero.querySelector('.cover__inner, .hero-grid > *') || hero;
       var trigger = 0;
+      // The cover pads its text box down by --cover-clear to clear the header, so the text starts at the content top, not at the border box.
       var measure = function () {
         var headerH = header.offsetHeight || 64;
-        var bottom = hero.getBoundingClientRect().bottom + window.scrollY;
-        trigger = Math.max(0, bottom - headerH - 16);
+        var top = text.getBoundingClientRect().top + window.scrollY + parseFloat(getComputedStyle(text).paddingTop);
+        trigger = Math.max(0, top - headerH);
       };
       var onScroll = function () { header.classList.toggle('solid', window.scrollY > trigger); };
       measure(); onScroll();
