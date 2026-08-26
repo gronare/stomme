@@ -1,8 +1,10 @@
 ---
 import { getEntry } from 'astro:content';
 import ContactLink from '../src/ContactLink.astro';
-interface Props { heading?: string; showHours?: boolean; data?: any }
-const { heading = 'Find us', showHours, data } = Astro.props;
+interface Props { heading?: string; showHours?: boolean; data?: any; site?: any }
+const { heading, showHours, data, site } = Astro.props;
+const copy = site?.strings?.contact ?? {};
+const title = heading || copy.findUs || 'Find us';
 const c = (data ?? (await getEntry('contact', 'contact').catch(() => null))?.data ?? {}) as any;
 const protect = !!c.protectContact;
 const a = c.address ?? {};
@@ -21,12 +23,12 @@ const showHrs = showHours === true;
   <div class="findus">
     {hasMap && (
       <div class="findus__map">
-        <iframe src={mapSrc} loading="lazy" title="Map" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        <iframe src={mapSrc} loading="lazy" title={copy.map ?? 'Map'} referrerpolicy="no-referrer-when-downgrade"></iframe>
         <p class="findus__attrib">© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a></p>
       </div>
     )}
     <div class:list={['findus__info', !hasMap && 'findus__info--solo']}>
-      {heading && <h2 class="findus__h">{heading}</h2>}
+      {title && <h2 class="findus__h">{title}</h2>}
       {hasAddr && (
         <p class="findus__addr">{a.street}{a.street && <br />}{cityLine}{cityLine && <br />}{a.country}</p>
       )}

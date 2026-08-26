@@ -51,5 +51,5 @@ export async function referenceLabels() {
   const onPaths = new Set(scanLabels(on.yaml, { aliases: listingAliases(LISTINGS) }).map((h) => h.path));
   if (![...byPath.keys()].some((k) => !onPaths.has(k)))
     throw new Error('label reference: the features-off pass contributed no path of its own — each gate hides strings the other shows, so both must run');
-  return { byPath, blocks: on.blocks, groups: on.groups };
+  return { byPath, blocks: on.blocks, groups: on.groups, yamls: [on.yaml, off.yaml] };
 }

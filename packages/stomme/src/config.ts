@@ -17,8 +17,9 @@ export interface SiteConfig {
   strings?: {
     readMore?: string;
     latest?: string;
-    contact?: { name?: string; email?: string; phone?: string; message?: string; submit?: string; direct?: string; honeypot?: string };
-    beforeAfter?: { before?: string; after?: string };
+    contact?: { name?: string; email?: string; phone?: string; message?: string; submit?: string; direct?: string; honeypot?: string; hours?: string; visit?: string; findUs?: string; follow?: string; map?: string; reveal?: string; error?: string };
+    beforeAfter?: { before?: string; after?: string; compare?: string };
+    footer?: { links?: string; areas?: string };
     town?: {
       eyebrow?: string;
       heading?: string;
@@ -116,8 +117,15 @@ export function resolveListings(l?: Listing[]): (Omit<Listing, 'specs'> & { spec
 const STRINGS_EN = {
   readMore: 'Read more',
   latest: 'Latest',
-  contact: { name: 'Name', email: 'Email', phone: 'Phone', message: 'Describe your project', submit: 'Send request', direct: 'Direct contact', honeypot: 'Leave this field empty', hours: 'Opening hours', visit: 'Visit' },
-  beforeAfter: { before: 'Before', after: 'After' },
+  contact: {
+    name: 'Name', email: 'Email', phone: 'Phone', message: 'Describe your project', submit: 'Send request',
+    direct: 'Direct contact', honeypot: 'Leave this field empty', hours: 'Opening hours', visit: 'Visit',
+    findUs: 'Find us', follow: 'Follow', map: 'Map',
+    reveal: 'Contact details — enable JavaScript to reveal',
+    error: 'Sorry — could not send. Please try again or email us directly.',
+  },
+  beforeAfter: { before: 'Before', after: 'After', compare: 'Drag to compare before and after' },
+  footer: { links: 'Links', areas: 'Areas' },
   town: {
     eyebrow: 'Local service: {name}',
     heading: '{name}',
@@ -164,8 +172,15 @@ const STRINGS_EN = {
 const STRINGS_SV: typeof STRINGS_EN = {
   readMore: 'Läs mer',
   latest: 'Senaste',
-  contact: { name: 'Namn', email: 'E-post', phone: 'Telefon', message: 'Beskriv ditt projekt', submit: 'Skicka förfrågan', direct: 'Direktkontakt', honeypot: 'Lämna fältet tomt', hours: 'Öppettider', visit: 'Hitta hit' },
-  beforeAfter: { before: 'Före', after: 'Efter' },
+  contact: {
+    name: 'Namn', email: 'E-post', phone: 'Telefon', message: 'Beskriv ditt projekt', submit: 'Skicka förfrågan',
+    direct: 'Direktkontakt', honeypot: 'Lämna fältet tomt', hours: 'Öppettider', visit: 'Hitta hit',
+    findUs: 'Hitta hit', follow: 'Följ oss', map: 'Karta',
+    reveal: 'Kontaktuppgifter, aktivera JavaScript för att visa dem',
+    error: 'Det gick inte att skicka. Försök igen eller mejla oss direkt.',
+  },
+  beforeAfter: { before: 'Före', after: 'Efter', compare: 'Dra för att jämföra före och efter' },
+  footer: { links: 'Länkar', areas: 'Områden' },
   town: {
     eyebrow: 'Lokal tjänst: {name}',
     heading: '{name}',
@@ -217,6 +232,8 @@ function baseStrings(locale?: string, cmsLocale?: string) {
   return {
     ...STRINGS_EN, ...b,
     contact: { ...STRINGS_EN.contact, ...b.contact },
+    beforeAfter: { ...STRINGS_EN.beforeAfter, ...b.beforeAfter },
+    footer: { ...STRINGS_EN.footer, ...b.footer },
     town: { ...STRINGS_EN.town, ...b.town },
     service: { ...STRINGS_EN.service, ...b.service },
     listingStatus: { ...STRINGS_EN.listingStatus, ...b.listingStatus },
@@ -259,6 +276,7 @@ export function resolveSite(c?: SiteConfig) {
       thanks: { ...base.thanks, ...((s && (s as any).thanks) || {}) },
       notFound: { ...base.notFound, ...((s && (s as any).notFound) || {}) },
       beforeAfter: { ...base.beforeAfter, ...((s && (s as any).beforeAfter) || {}) },
+      footer: { ...base.footer, ...((s && (s as any).footer) || {}) },
       consent: { ...base.consent, ...((s && (s as any).consent) || {}) },
     },
     listings: resolveListings(c && c.listings),

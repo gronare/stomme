@@ -1320,8 +1320,8 @@ collections:
                     options:
                       - { label: "basics", value: "basics" }
                       - { label: "editing", value: "editing" }
-                  - { name: asideHeading, label: "Aside · heading", widget: string, required: false, default: "Still have questions?" }
-                  - { name: asideBody, label: "Aside · text", widget: text, required: false, default: "Get in touch and we'll help you out." }
+                  - { name: asideHeading, label: "Aside · heading", widget: string, required: false, hint: "Suggestion: \"Still have questions?\". Blank hides the aside." }
+                  - { name: asideBody, label: "Aside · text", widget: text, required: false, hint: "Suggestion: \"Get in touch and we'll help you out.\"." }
                   - name: asideCta
                     label: "Aside · button"
                     widget: object
@@ -1519,11 +1519,11 @@ collections:
                   - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
                   - { name: heading, label: "Heading", widget: string, required: false, hint: "Blank uses the page title." }
                   - { name: intro, label: "Intro / description", widget: text, required: false, hint: "Optional line under the heading. Blank = hidden." }
-                  - { name: labelName, label: "Field label — name", widget: string, default: "Name" }
-                  - { name: labelEmail, label: "Field label — email", widget: string, default: "Email" }
+                  - { name: labelName, label: "Field label — name", widget: string, required: false, hint: "Blank uses the site wording (\"Name\")." }
+                  - { name: labelEmail, label: "Field label — email", widget: string, required: false, hint: "Blank uses the site wording (\"Email\")." }
                   - { name: showPhone, label: "Show the phone field", widget: boolean, required: false, default: true }
-                  - { name: labelMessage, label: "Field label — message", widget: string, default: "Describe your project", hint: "e.g. \"What can we help you with?\" — word it for your business." }
-                  - { name: submitLabel, label: "Submit button text", widget: string, default: "Send request", hint: "The form's submit button." }
+                  - { name: labelMessage, label: "Field label — message", widget: string, required: false, hint: "Blank uses the site wording (\"Describe your project\"). Word it for your business." }
+                  - { name: submitLabel, label: "Submit button text", widget: string, required: false, hint: "The form's submit button. Blank uses the site wording (\"Send request\")." }
                   - { name: showDirectContact, label: "Show the direct-contact card", widget: boolean, required: false, default: true, hint: "Off → the form fills the width (no phone/email card)." }
               - name: contactCard
                 label: "Contact card"
@@ -1543,13 +1543,13 @@ collections:
                       - { label: "Address", value: "address" }
                       - { label: "Mini-map", value: "map" }
                       - { label: "Social links", value: "socials" }
-                  - { name: label, label: "Card heading", widget: string, required: false, default: "Direct contact" }
+                  - { name: label, label: "Card heading", widget: string, required: false, hint: "Blank uses the site wording (\"Direct contact\")." }
                   - { name: tint, label: "Tinted background", widget: boolean, required: false, default: true }
               - name: findUs
                 label: "Find us (map)"
                 widget: object
                 fields:
-                  - { name: heading, label: "Heading", widget: string, required: false, default: "Find us" }
+                  - { name: heading, label: "Heading", widget: string, required: false, hint: "Blank uses the site wording (\"Find us\")." }
                   - { name: showHours, label: "Show opening hours", widget: boolean, required: false, default: true }
   - name: pages
     media_folder: "/public/media/pages/{{slug}}"
@@ -2858,8 +2858,8 @@ collections:
                 options:
                   - { label: "basics", value: "basics" }
                   - { label: "editing", value: "editing" }
-              - { name: asideHeading, label: "Aside · heading", widget: string, required: false, default: "Still have questions?" }
-              - { name: asideBody, label: "Aside · text", widget: text, required: false, default: "Get in touch and we'll help you out." }
+              - { name: asideHeading, label: "Aside · heading", widget: string, required: false, hint: "Suggestion: \"Still have questions?\". Blank hides the aside." }
+              - { name: asideBody, label: "Aside · text", widget: text, required: false, hint: "Suggestion: \"Get in touch and we'll help you out.\"." }
               - name: asideCta
                 label: "Aside · button"
                 widget: object
@@ -3057,11 +3057,11 @@ collections:
               - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
               - { name: heading, label: "Heading", widget: string, required: false, hint: "Blank uses the page title." }
               - { name: intro, label: "Intro / description", widget: text, required: false, hint: "Optional line under the heading. Blank = hidden." }
-              - { name: labelName, label: "Field label — name", widget: string, default: "Name" }
-              - { name: labelEmail, label: "Field label — email", widget: string, default: "Email" }
+              - { name: labelName, label: "Field label — name", widget: string, required: false, hint: "Blank uses the site wording (\"Name\")." }
+              - { name: labelEmail, label: "Field label — email", widget: string, required: false, hint: "Blank uses the site wording (\"Email\")." }
               - { name: showPhone, label: "Show the phone field", widget: boolean, required: false, default: true }
-              - { name: labelMessage, label: "Field label — message", widget: string, default: "Describe your project", hint: "e.g. \"What can we help you with?\" — word it for your business." }
-              - { name: submitLabel, label: "Submit button text", widget: string, default: "Send request", hint: "The form's submit button." }
+              - { name: labelMessage, label: "Field label — message", widget: string, required: false, hint: "Blank uses the site wording (\"Describe your project\"). Word it for your business." }
+              - { name: submitLabel, label: "Submit button text", widget: string, required: false, hint: "The form's submit button. Blank uses the site wording (\"Send request\")." }
               - { name: showDirectContact, label: "Show the direct-contact card", widget: boolean, required: false, default: true, hint: "Off → the form fills the width (no phone/email card)." }
           - name: contactCard
             label: "Contact card"
@@ -3081,13 +3081,13 @@ collections:
                   - { label: "Address", value: "address" }
                   - { label: "Mini-map", value: "map" }
                   - { label: "Social links", value: "socials" }
-              - { name: label, label: "Card heading", widget: string, required: false, default: "Direct contact" }
+              - { name: label, label: "Card heading", widget: string, required: false, hint: "Blank uses the site wording (\"Direct contact\")." }
               - { name: tint, label: "Tinted background", widget: boolean, required: false, default: true }
           - name: findUs
             label: "Find us (map)"
             widget: object
             fields:
-              - { name: heading, label: "Heading", widget: string, required: false, default: "Find us" }
+              - { name: heading, label: "Heading", widget: string, required: false, hint: "Blank uses the site wording (\"Find us\")." }
               - { name: showHours, label: "Show opening hours", widget: boolean, required: false, default: true }
   - name: faq
     media_folder: "/public/media/faq"
@@ -3381,7 +3381,7 @@ collections:
           - { name: showWordmark, label: "Show wordmark text", widget: boolean, required: false, default: true, hint: "Show the wordmark text (set under Identity) in the footer." }
           - { name: tagline, label: "Tagline", widget: string, required: false, hint: "A line under the logo." }
           - { name: showLinks, label: "Show quick links", widget: boolean, required: false, default: true }
-          - { name: linksHeading, label: "Quick links · heading", widget: string, required: false, default: "Links" }
+          - { name: linksHeading, label: "Quick links · heading", widget: string, required: false, hint: "The heading above the quick links, e.g. \"Links\"." }
           - name: links
             label: "Quick links"
             widget: list
@@ -3459,7 +3459,7 @@ collections:
                       - { label: "Contact (/contact)", value: "/contact" }
                   - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto: — overrides the page above." }
           - { name: showTowns, label: "Show service areas", widget: boolean, required: false, default: false, hint: "Adds a column linking every entry in the Areas collection." }
-          - { name: townsHeading, label: "Service areas · heading", widget: string, required: false, default: "Areas" }
+          - { name: townsHeading, label: "Service areas · heading", widget: string, required: false, hint: "The heading above the service-area column, e.g. \"Areas\"." }
           - { name: note, label: "Note", widget: string, required: false, hint: "Appended to the © line." }
       - label: "Form confirmation"
         name: thanks

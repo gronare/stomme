@@ -1,6 +1,8 @@
 ---
 // With `protect` on the real value never reaches the HTML (encoded into data attrs, rebuilt in-browser — see src/protect.ts); `label` is rendered verbatim, so a sensitive value belongs in `display`, never `label`.
 import { encodeContact, maskContact } from './protect';
+import { site } from '@stomme/config';
+import { resolveSite } from './config';
 interface Props {
   kind: 'tel' | 'mailto';
   target: string;
@@ -13,6 +15,7 @@ interface Props {
 }
 const { kind, target, display = '', label, protect = false, class: className, prefix = '', suffix = '' } = Astro.props;
 const visible = label ?? display;
+const revealLabel = resolveSite(site).strings.contact.reveal;
 ---
 {protect ? (
   <a
@@ -21,7 +24,7 @@ const visible = label ?? display;
     data-k={kind}
     data-t={encodeContact(target)}
     data-d={label ? undefined : encodeContact(display)}
-    aria-label="Contact details — enable JavaScript to reveal"
+    aria-label={revealLabel}
   >{prefix}{label ? label : <span class="js-contact-val">{maskContact(display)}</span>}{suffix}</a>
 ) : (
   <a class:list={[className]} href={`${kind}:${target}`}>{prefix}{visible}{suffix}</a>

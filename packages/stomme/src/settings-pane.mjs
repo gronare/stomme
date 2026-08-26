@@ -296,7 +296,7 @@ ${emitNavLinks(10)}
           - { name: showLinks, label: "Show quick links", widget: boolean, required: false, default: true }
 ${emitFooterLinks(10)}
           - { name: showTowns, label: "Show service areas", widget: boolean, required: false, default: false, hint: "Adds a column linking every entry in the Areas collection." }
-          - { name: townsHeading, label: "Service areas · heading", widget: string, required: false, default: "Areas" }
+          - { name: townsHeading, label: "Service areas · heading", widget: string, required: false, hint: "The heading above the service-area column, e.g. \\"Areas\\"." }
           - { name: note, label: "Note", widget: string, required: false, hint: "Appended to the © line." }
       - label: "Form confirmation"
         name: thanks

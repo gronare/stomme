@@ -159,7 +159,7 @@ export function makeEmitters({ q, pad, AVAILABLE_BLOCKS, OPTION_SOURCES }) {
       ],
     });
     const fields = [
-      { name: 'linksHeading', label: 'Quick links · heading', widget: 'string', required: false, default: 'Links' },
+      { name: 'linksHeading', label: 'Quick links · heading', widget: 'string', required: false, hint: 'The heading above the quick links, e.g. "Links".' },
       linkList('links', 'Quick links'),
       { name: 'links2Heading', label: 'Second link group · heading', widget: 'string', required: false, hint: 'Optional extra column, e.g. your services.' },
       linkList('links2', 'Second link group'),

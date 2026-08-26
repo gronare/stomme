@@ -67,7 +67,38 @@ for (const re of rewrites) {
   if (target) check(new RegExp(body).test(target), `the declaration ${body.split(' =')[0]} still exists for the generator to rewrite`);
 }
 
-const { byPath: REFERENCE, blocks, groups } = await referenceLabels();
+const { byPath: REFERENCE, blocks, groups, yamls } = await referenceLabels();
+
+// Sveltia writes every declared default into blocks the editor never touched, so a default on a free-text widget puts words on a live page nobody wrote. Suggested wording goes in the hint; select/boolean/number/colour defaults are visual no-ops and stay.
+const FREE_TEXT = /^(string|text|markdown)$/;
+const bare = (s) => s.replace(/"(?:[^"\\]|\\.)*"/g, '""');
+const freeTextDefaults = [];
+for (const yaml of yamls) {
+  const lines = yaml.split('\n');
+  for (let i = 0; i < lines.length; i++) {
+    const l = bare(lines[i]);
+    const flow = l.match(/^\s*-?\s*\{(.*)\}\s*$/);
+    if (flow) {
+      const w = flow[1].match(/(?:^|,)\s*widget:\s*([a-z]+)/);
+      const name = flow[1].match(/(?:^|,)\s*name:\s*([\w-]+)/);
+      if (w && FREE_TEXT.test(w[1]) && /(?:^|,)\s*default:/.test(flow[1])) freeTextDefaults.push(name ? name[1] : lines[i].trim());
+      continue;
+    }
+    const block = l.match(/^(\s*)widget:\s*([a-z]+)\s*$/);
+    if (!block || !FREE_TEXT.test(block[2])) continue;
+    const indent = block[1].length;
+    for (let j = i + 1; j < lines.length; j++) {
+      const n = bare(lines[j]);
+      if (!n.trim()) continue;
+      const col = n.length - n.trimStart().length;
+      if (col < indent || /^\s*-/.test(n)) break;
+      if (col === indent && /^\s*default:/.test(n)) freeTextDefaults.push(lines[j].trim());
+    }
+  }
+}
+check(freeTextDefaults.length === 0,
+  'no string/text/markdown field in the generated config declares a default — a default there is page copy Sveltia writes into blocks nobody edited',
+  [...new Set(freeTextDefaults)].join(', '));
 const gallerySrc = read('admin/blocks-gallery.mjs');
 const galleryKeys = new Set([
   ...[...gallerySrc.matchAll(/\bt\('([\w.]+)'/g)].map((m) => m[1]),
@@ -77,7 +108,8 @@ const galleryKeys = new Set([
 check(REFERENCE.size > 500 && galleryKeys.size > 30,
   `the engine emits ${REFERENCE.size} translatable field paths and ${galleryKeys.size} gallery strings`);
 
-const UNTRANSLATED_CEILING = { 'labels.sv.js': 213 };
+// What is left is deliberate: icon and font names (identifiers, not prose), hidden fields nobody sees, and labels a site supplies for its own listings. Every other emitted path carries a translation, either by path or by the English-text fallback.
+const UNTRANSLATED_CEILING = { 'labels.sv.js': 126 };
 
 for (const file of readdirSync(resolve(pkg, 'admin')).filter((f) => /^labels\.[\w-]+\.js$/.test(f)).sort()) {
   const dict = (await import(resolve(pkg, 'admin', file))).default;

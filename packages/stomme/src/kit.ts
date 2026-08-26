@@ -64,10 +64,11 @@ export const headingFields: Field[] = [
   { name: 'intro', label: 'Intro', widget: 'text', required: false },
 ];
 
-export const headingFieldsWith = (eyebrow?: string, heading?: string): Field[] => [
-  { name: 'eyebrow', label: 'Eyebrow', widget: 'string', required: false, hint: 'Small uppercase label above the heading.', ...(eyebrow ? { default: eyebrow } : {}) },
-  { name: 'heading', label: 'Heading', widget: 'string', required: false, ...(heading ? { default: heading } : {}) },
-  { name: 'intro', label: 'Intro', widget: 'text', required: false },
+// Suggested wording belongs in the hint, never in `default:` — Sveltia materializes every declared default into EXISTING blocks on save, so a default here writes an eyebrow into a block whose editor never touched it.
+export const headingFieldsSuggesting = (eyebrow: string, heading: string): Field[] => [
+  { ...headingFields[0], hint: `Small uppercase label above the heading. Suggestion: "${eyebrow}".` },
+  { ...headingFields[1], hint: `Suggestion: "${heading}".` },
+  headingFields[2],
 ];
 
 export { ICON_NAMES };

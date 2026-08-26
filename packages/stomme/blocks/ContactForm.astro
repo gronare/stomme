@@ -17,6 +17,7 @@ const L = {
   submit: submitLabel || (c.submit ?? 'Send request'),
   direct: c.direct ?? 'Direct contact',
   honeypot: c.honeypot ?? 'Leave this field empty',
+  error: c.error ?? 'Sorry — could not send. Please try again or email us directly.',
 };
 const showPhoneField = showPhone === true;
 const showAside = showDirectContact === true;
@@ -43,7 +44,7 @@ const recapLabels = JSON.stringify({ email: L.email, phone: L.phone, message: L.
     </div>
   )}
   <div class:list={['contact-grid', !showAside && 'contact-grid--solo']}>
-    <form method="POST" action={contactAction} class="contact-form" data-recap-labels={recapLabels} data-success={successPath}>
+    <form method="POST" action={contactAction} class="contact-form" data-recap-labels={recapLabels} data-success={successPath} data-error={L.error}>
       {/* Honeypot — hidden INLINE so no stylesheet-subset context (CMS preview) can show it. */}
       <p class="hp" aria-hidden="true" style="display:none"><label>{L.honeypot} <input name="bot-field" tabindex="-1" autocomplete="off" /></label></p>
       <input type="hidden" name="_success" value={successPath} />
@@ -95,7 +96,7 @@ const recapLabels = JSON.stringify({ email: L.email, phone: L.phone, message: L.
           if (btn) btn.disabled = false;
           var msg = form.querySelector('.contact-error');
           if (!msg) { msg = document.createElement('p'); msg.className = 'contact-error'; form.appendChild(msg); }
-          msg.textContent = 'Sorry — could not send. Please try again or email us directly.';
+          msg.textContent = form.dataset.error;
         }
       });
     })();

@@ -1,4 +1,4 @@
-import { headingFields, headingFieldsWith, buttonField, imageField, iconField, surfaceField, accentField, widthField, cardListField, linkedCardListField, mediaGroup, layoutGroup, styleGroup, type BlockDef } from './src/kit.ts';
+import { headingFields, headingFieldsSuggesting, buttonField, imageField, iconField, surfaceField, accentField, widthField, cardListField, linkedCardListField, mediaGroup, layoutGroup, styleGroup, type BlockDef } from './src/kit.ts';
 
 const RAW_BLOCKS: BlockDef[] = [
   {
@@ -462,7 +462,7 @@ const RAW_BLOCKS: BlockDef[] = [
     summary: 'Customer testimonials from your Testimonials collection.',
     shape: 'quote',
     collection: 'testimonials',
-    fields: [...headingFieldsWith('Happy customers', 'References'), styleGroup([surfaceField])],
+    fields: [...headingFieldsSuggesting('Happy customers', 'References'), styleGroup([surfaceField])],
   },
   {
     type: 'linkChips',
@@ -471,7 +471,7 @@ const RAW_BLOCKS: BlockDef[] = [
     summary: 'Chip links from your Areas collection (e.g. towns you serve).',
     shape: 'chips',
     collection: 'towns',
-    fields: [...headingFieldsWith('Service areas', 'Where we work'), styleGroup([surfaceField])],
+    fields: [...headingFieldsSuggesting('Service areas', 'Where we work'), styleGroup([surfaceField])],
   },
   {
     type: 'postList',
@@ -551,8 +551,8 @@ const RAW_BLOCKS: BlockDef[] = [
       ...headingFields,
       { name: 'entries', label: 'Questions shown', widget: 'select', options: '$faq', multiple: true, required: false, hint: 'Pick specific questions (in order). Leave empty to use the tag filter or show all.' },
       { name: 'tag', label: 'Tag filter', widget: 'select', options: '$faqTags', required: false, hint: 'Show every question carrying this tag (tags are set on the questions). Ignored when questions are picked above.' },
-      { name: 'asideHeading', label: 'Aside · heading', widget: 'string', required: false, default: 'Still have questions?' },
-      { name: 'asideBody', label: 'Aside · text', widget: 'text', required: false, default: "Get in touch and we'll help you out." },
+      { name: 'asideHeading', label: 'Aside · heading', widget: 'string', required: false, hint: 'Suggestion: "Still have questions?". Blank hides the aside.' },
+      { name: 'asideBody', label: 'Aside · text', widget: 'text', required: false, hint: 'Suggestion: "Get in touch and we\'ll help you out.".' },
       buttonField('asideCta', 'Aside · button', { labelHint: 'E.g. "Contact".' }),
       layoutGroup([
         { name: 'variant', label: 'Layout', widget: 'select', required: false, default: 'list', hint: 'How the questions are presented.', options: [{ label: 'List', value: 'list' }, { label: 'Accordion', value: 'accordion' }, { label: 'Cards', value: 'cards' }, { label: 'Split (index + reader)', value: 'split' }] },
@@ -586,11 +586,11 @@ const RAW_BLOCKS: BlockDef[] = [
       { name: 'eyebrow', label: 'Eyebrow', widget: 'string', required: false, hint: 'Small uppercase label above the heading.' },
       { name: 'heading', label: 'Heading', widget: 'string', required: false, hint: 'Blank uses the page title.' },
       { name: 'intro', label: 'Intro / description', widget: 'text', required: false, hint: 'Optional line under the heading. Blank = hidden.' },
-      { name: 'labelName', label: 'Field label — name', widget: 'string', default: 'Name' },
-      { name: 'labelEmail', label: 'Field label — email', widget: 'string', default: 'Email' },
+      { name: 'labelName', label: 'Field label — name', widget: 'string', required: false, hint: 'Blank uses the site wording ("Name").' },
+      { name: 'labelEmail', label: 'Field label — email', widget: 'string', required: false, hint: 'Blank uses the site wording ("Email").' },
       { name: 'showPhone', label: 'Show the phone field', widget: 'boolean', required: false, default: true },
-      { name: 'labelMessage', label: 'Field label — message', widget: 'string', default: 'Describe your project', hint: 'e.g. "What can we help you with?" — word it for your business.' },
-      { name: 'submitLabel', label: 'Submit button text', widget: 'string', default: 'Send request', hint: 'The form\'s submit button.' },
+      { name: 'labelMessage', label: 'Field label — message', widget: 'string', required: false, hint: 'Blank uses the site wording ("Describe your project"). Word it for your business.' },
+      { name: 'submitLabel', label: 'Submit button text', widget: 'string', required: false, hint: 'The form\'s submit button. Blank uses the site wording ("Send request").' },
       { name: 'showDirectContact', label: 'Show the direct-contact card', widget: 'boolean', required: false, default: true, hint: 'Off → the form fills the width (no phone/email card).' },
     ],
   },
@@ -609,7 +609,7 @@ const RAW_BLOCKS: BlockDef[] = [
           { label: 'Mini-map', value: 'map' },
           { label: 'Social links', value: 'socials' },
         ] },
-      { name: 'label', label: 'Card heading', widget: 'string', required: false, default: 'Direct contact' },
+      { name: 'label', label: 'Card heading', widget: 'string', required: false, hint: 'Blank uses the site wording ("Direct contact").' },
       { name: 'tint', label: 'Tinted background', widget: 'boolean', required: false, default: true },
     ],
   },
@@ -617,7 +617,7 @@ const RAW_BLOCKS: BlockDef[] = [
     type: 'findUs', label: 'Find us (map)', group: 'Calls to action', shape: 'split',
     summary: 'A map beside the address, contact and hours — auto-filled from Contact settings. Needs lat/lng on the address.',
     fields: [
-      { name: 'heading', label: 'Heading', widget: 'string', required: false, default: 'Find us' },
+      { name: 'heading', label: 'Heading', widget: 'string', required: false, hint: 'Blank uses the site wording ("Find us").' },
       { name: 'showHours', label: 'Show opening hours', widget: 'boolean', required: false, default: true },
     ],
   },
