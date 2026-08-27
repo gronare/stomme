@@ -95,6 +95,9 @@ body > main > * { background: var(--color-paper); }
 .surface-dark, .surface-gradient { --eyebrow-accent: var(--color-dark-ink); }
 .surface-dark .btn, .surface-gradient .btn { background: var(--color-dark-ink); color: var(--color-dark); }
 .surface-dark .btn:hover, .surface-gradient .btn:hover { background: color-mix(in srgb, var(--color-dark-ink) 82%, var(--color-dark)); color: var(--color-dark); }
+/* Without this the secondary button loses to `.surface-dark .btn` and comes out identical to the primary. */
+.surface-dark .btn-outline, .surface-gradient .btn-outline { background: transparent; color: var(--color-dark-ink); border-color: var(--color-dark-line); }
+.surface-dark .btn-outline:hover, .surface-gradient .btn-outline:hover { background: color-mix(in srgb, var(--color-dark-ink) 12%, transparent); color: var(--color-dark-ink); }
 
 .surface-gradient {
   background: linear-gradient(120deg, #12151d, #222a3a 60%, #10131a);
@@ -596,7 +599,7 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
   @media (max-width: 760px) { .findus { grid-template-columns: 1fr; } }
   .findus__map { position: relative; overflow: hidden; min-height: 320px; }
   .findus__map iframe { position: absolute; top: -60px; left: 0; width: 100%; height: calc(100% + 120px); min-height: calc(320px + 120px); border: 0; display: block; }
-  .findus__attrib { position: absolute; right: 0.45rem; bottom: 0.4rem; z-index: 1; margin: 0; padding: 0.1rem 0.45rem; font-size: 0.6rem; color: var(--color-muted); background: color-mix(in srgb, var(--color-paper) 82%, transparent); border-radius: 0.3rem; }
+  .findus__attrib { position: absolute; right: 0.45rem; bottom: 0.4rem; z-index: 1; margin: 0; padding: 0.1rem 0.45rem; font-size: 0.69rem; color: var(--color-muted); background: color-mix(in srgb, var(--color-paper) 92%, transparent); border-radius: 0.3rem; }
   .findus__attrib a { color: inherit; }
   .findus__info { padding: clamp(1.8rem, 3vw, 2.4rem); display: flex; flex-direction: column; gap: 1.05rem; align-self: center; }
   .findus__h { font-family: var(--font-display); font-weight: 800; font-size: clamp(1.4rem, 2.5vw, 1.9rem); letter-spacing: -0.02em; margin: 0; }
@@ -755,6 +758,73 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
   }
   .gallery-img { display: block; width: 100%; height: auto; aspect-ratio: 4 / 3; object-fit: cover; }
   .gallery-cap { padding: 0.75rem 1rem; font-size: 0.9rem; color: var(--color-muted); }
+
+.collage { margin: 0; border: 1px solid var(--color-line); border-radius: 1rem; overflow: hidden; background: var(--color-paper); }
+  /* The grid's own background paints the 3px gaps, so the hairlines between tiles need no borders of their own. */
+  .collage__grid { --collage-h: clamp(13rem, 30vw, 20rem); display: grid; gap: 3px; height: var(--collage-h); background: var(--color-line); }
+  .collage__grid[data-tiles="1"] { grid-template-columns: 1fr; }
+  .collage__grid[data-tiles="2"] { grid-template-columns: 1.2fr 1fr; }
+  .collage__grid[data-tiles="3"] { grid-template-columns: 1.2fr 1fr 1fr; }
+  .collage__grid[data-tiles="4"] { grid-template-columns: 1.6fr 1fr 1fr; grid-template-rows: 1fr 1fr; }
+  .collage__grid[data-tiles="4"] .collage__tile:first-child { grid-row: span 2; }
+  .collage__grid[data-tiles="4"] .collage__tile:last-child { grid-column: span 2; }
+  .collage__grid[data-tiles="5"] { grid-template-columns: 2fr 1fr 1fr; grid-template-rows: 1fr 1fr; }
+  .collage__grid[data-tiles="5"] .collage__tile:first-child { grid-row: span 2; }
+  .collage__tile { position: relative; display: block; min-width: 0; margin: 0; padding: 0; border: 0; overflow: hidden; cursor: pointer; background: var(--color-surface); }
+  .collage__img { display: block; width: 100%; height: 100%; object-fit: cover; }
+  .collage__tile:focus-visible { outline: 3px solid var(--color-brand); outline-offset: -3px; }
+  .collage__more { position: absolute; right: 0.5rem; bottom: 0.5rem; padding: 4px 10px; border-radius: 999px; font-size: 0.78rem; font-weight: 600; color: var(--color-on-dark); background: color-mix(in srgb, var(--color-dark) 82%, transparent); }
+  .collage__cap { padding: 0.65rem 1rem; font-size: 0.85rem; color: var(--color-muted); border-top: 1px solid var(--color-line); }
+  @media (max-width: 560px) {
+    .collage__grid { --collage-h: clamp(17rem, 88vw, 26rem); }
+    .collage__grid[data-tiles="3"], .collage__grid[data-tiles="4"], .collage__grid[data-tiles="5"] { grid-template-columns: 1fr 1fr; }
+    .collage__grid[data-tiles="3"] { grid-template-rows: 1.4fr 1fr; }
+    .collage__grid[data-tiles="4"], .collage__grid[data-tiles="5"] { grid-template-rows: 1.6fr 1fr 1fr; }
+    .collage__grid[data-tiles="3"] .collage__tile:first-child,
+    .collage__grid[data-tiles="4"] .collage__tile:first-child,
+    .collage__grid[data-tiles="5"] .collage__tile:first-child { grid-row: auto; grid-column: 1 / -1; }
+    .collage__grid[data-tiles="4"] .collage__tile:last-child { grid-column: 1 / -1; }
+  }
+  /* [open] carries the layout so a closed dialog keeps the UA's display:none and stays out of the page. */
+  .collage__viewer[open] { display: flex; flex-direction: column; align-items: center; gap: 0.7rem; }
+  .collage__viewer { width: min(96vw, 72rem); max-width: none; max-height: 92vh; padding: 0; border: 0; background: transparent; color: var(--color-on-dark); overflow: visible; }
+  .collage__viewer::backdrop { background: color-mix(in srgb, var(--color-dark) 92%, transparent); }
+  /* The nav sits inside the stage, not the dialog: anchored to the dialog it collides with the close button whenever the picture is short. */
+  .collage__stage { position: relative; width: 100%; min-height: 9rem; display: grid; place-items: center; }
+  .collage__slide { display: none; margin: 0; }
+  .collage__slide.is-on { display: block; }
+  .collage__full { display: block; width: auto; height: auto; max-width: 100%; max-height: 76vh; object-fit: contain; border-radius: 0.75rem; }
+  .collage__full.ph-tint { width: min(100%, 46rem); aspect-ratio: 4 / 3; }
+  .collage__slidecap { margin: 0.6rem 0 0; text-align: center; font-size: 0.85rem; color: color-mix(in srgb, var(--color-on-dark) 78%, transparent); }
+  .collage__count { margin: 0; font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.08em; color: color-mix(in srgb, var(--color-on-dark) 72%, transparent); }
+  .collage__nav, .collage__close { position: absolute; border: 0; cursor: pointer; line-height: 1; color: var(--color-on-dark); background: color-mix(in srgb, var(--color-dark) 78%, transparent); border-radius: 999px; }
+  .collage__nav { top: 50%; transform: translateY(-50%); width: 2.75rem; height: 2.75rem; font-size: 1.7rem; }
+  .collage__prev { left: 0.4rem; }
+  .collage__next { right: 0.4rem; }
+  .collage__close { top: 0.4rem; right: 0.4rem; width: 2.25rem; height: 2.25rem; font-size: 1.35rem; }
+  .collage__viewer[data-count="1"] .collage__nav { display: none; }
+  .collage__nav:focus-visible, .collage__close:focus-visible { outline: 3px solid var(--color-on-dark); outline-offset: 2px; }
+  @media (prefers-reduced-motion: no-preference) {
+    .collage__viewer[open] { animation: collage-open 0.18s ease-out; }
+    @keyframes collage-open { from { opacity: 0; transform: scale(0.985); } }
+  }
+
+.mapblock { border: 1px solid var(--color-line); border-radius: 1rem; overflow: hidden; background: var(--color-paper); }
+  .mapblock__map { position: relative; background: var(--color-surface); }
+  .mapblock__img { display: block; width: 100%; height: clamp(11rem, 26vw, 17rem); object-fit: cover; }
+  /* The dot is last in the stack so translate(-50%,-100%) lands ITS tip on the coordinate, not the label's edge. */
+  .mapblock__pin { position: absolute; transform: translate(-50%, -100%); display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .mapblock__pindot { width: 15px; height: 15px; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); background: var(--color-brand); border: 2.5px solid var(--color-paper); }
+  .mapblock__pinlabel { padding: 3px 9px; border-radius: 999px; font-size: 0.7rem; font-weight: 600; white-space: nowrap; color: var(--color-on-dark); background: color-mix(in srgb, var(--color-dark) 88%, transparent); }
+  /* An OpenStreetMap-derived picture must carry visible attribution, so this sits over the image and never swallows a click meant for it. */
+  /* The chip is 92% opaque, not the 82% used elsewhere: over a dark map tile a thinner one drops the attribution under 4.5:1. */
+  .mapblock__credit { position: absolute; right: 0.4rem; bottom: 0.4rem; pointer-events: none; padding: 2px 7px; border-radius: 0.3rem; font-size: 0.69rem; line-height: 1.5; color: var(--color-muted); background: color-mix(in srgb, var(--color-paper) 92%, transparent); }
+  .mapblock__row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.9rem; padding: 0.95rem 1.1rem; }
+  .mapblock__where { margin: 0; display: flex; flex-direction: column; gap: 2px; }
+  .mapblock__addr { font-weight: 700; color: var(--color-ink); }
+  .mapblock__note { font-size: 0.88rem; color: var(--color-muted); }
+  .mapblock__links { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+  .mapblock__links .btn { font-size: 0.9rem; padding: 0.5rem 1rem; }
 
 .link-chip-row {
     margin-top: 1.5rem;

@@ -1,4 +1,4 @@
-import { headingFields, headingFieldsSuggesting, buttonField, imageField, iconField, surfaceField, accentField, widthField, cardListField, linkedCardListField, mediaGroup, layoutGroup, styleGroup, type BlockDef } from './src/kit.ts';
+import { headingFields, headingFieldsSuggesting, buttonField, imageField, iconField, surfaceField, accentField, widthField, cardListField, linkedCardListField, group, mediaGroup, layoutGroup, styleGroup, type BlockDef } from './src/kit.ts';
 
 const RAW_BLOCKS: BlockDef[] = [
   {
@@ -286,6 +286,25 @@ const RAW_BLOCKS: BlockDef[] = [
       layoutGroup([
         { name: 'columns', label: 'Columns', widget: 'number', required: false, default: 3, hint: '2 or 3.' },
       ]),
+      styleGroup([surfaceField]),
+    ],
+  },
+  {
+    type: 'collage',
+    label: 'Collage (image viewer)',
+    group: 'Media',
+    summary: 'A collage of fixed height — one leading picture, a few tiles, and a chip that opens every image in a viewer. Replaces stacked full-width photos on a content page.',
+    shape: 'gallery',
+    fields: [
+      {
+        name: 'images', label: 'Images', widget: 'list', required: false, collapsed: true, label_singular: 'Image',
+        hint: 'The first five build the collage; every image, including the rest, opens in the viewer.',
+        fields: [
+          imageField('image', 'Image'),
+          { name: 'alt', label: 'Alt text', widget: 'string', required: false, hint: 'Describe the picture for screen readers and search engines.' },
+        ],
+      },
+      { name: 'caption', label: 'Caption', widget: 'string', required: false, hint: 'One line under the collage.' },
       styleGroup([surfaceField]),
     ],
   },
@@ -621,6 +640,26 @@ const RAW_BLOCKS: BlockDef[] = [
       { name: 'showHours', label: 'Show opening hours', widget: 'boolean', required: false, default: true },
     ],
   },
+  {
+    type: 'map', label: 'Find your way (static map)', group: 'Calls to action', shape: 'split',
+    summary: 'A map picture with the address and two buttons that hand the route to Google Maps or Apple Maps. No third-party script runs on the page.',
+    fields: [
+      { name: 'address', label: 'Address', widget: 'string', hint: 'Shown in bold, and used for the route when no coordinates are given.' },
+      { name: 'note', label: 'Note', widget: 'string', required: false, hint: 'A quiet line beside the address, e.g. how far it is to the lift.' },
+      mediaGroup('The map picture, and where the pin sits on it.', [
+        imageField('image', 'Map image', 'A static map exported once and uploaded like any other picture.'),
+        { name: 'imageAlt', label: 'Alt text', widget: 'string', required: false },
+        { name: 'credit', label: 'Image credit', widget: 'string', required: false, hint: 'Printed over the picture. A map drawn from OpenStreetMap must credit it: © OpenStreetMap contributors.' },
+        { name: 'pinX', label: 'Pin from the left (%)', widget: 'number', required: false, hint: '0 to 100. Leave both blank for no pin.' },
+        { name: 'pinY', label: 'Pin from the top (%)', widget: 'number', required: false, hint: '0 to 100.' },
+      ]),
+      group('coords', 'Coordinates', 'Latitude and longitude land the map app on the door instead of the street. Blank sends the address instead.', [
+        { name: 'lat', label: 'Latitude', widget: 'number', required: false },
+        { name: 'lng', label: 'Longitude', widget: 'number', required: false },
+      ]),
+      styleGroup([surfaceField]),
+    ],
+  },
 ];
 
 const LOREM = 'A short supporting line of body copy, long enough to wrap on narrow columns.';
@@ -679,6 +718,10 @@ const SAMPLES: Record<string, ({ _label?: string } & Record<string, unknown>)[]>
     { _label: 'single + heading (split on themed sites)', eyebrow: 'Included', heading: 'A checklist with a heading', layout: { columns: 1 }, items: [{ text: 'One' }, { text: 'Two' }] },
   ],
   gallery: [{ eyebrow: 'Gallery', heading: 'Image grid (placeholders)', layout: { columns: 3 }, images: [{ alt: 'One' }, { alt: 'Two' }, { alt: 'Three' }] }],
+  collage: [
+    { _label: 'three · strip', images: [{ alt: 'The leading picture' }, { alt: 'A second' }, { alt: 'A third' }], caption: 'A caption line under the collage.' },
+    { _label: 'five tiles · +N opens the viewer', images: [{ alt: 'The leading picture' }, { alt: 'A second' }, { alt: 'A third' }, { alt: 'A fourth' }, { alt: 'A fifth' }, { alt: 'Only in the viewer' }, { alt: 'Also only in the viewer' }] },
+  ],
   beforeAfter: [{ eyebrow: 'Before & after', heading: 'Drag the divider' }],
   textImage: [{ heading: 'Text beside an image', body: `${LOREM}\n\nSecond paragraph.`, layout: { flip: false } }],
   textQuote: [{ body: `${LOREM} ${LOREM}`, quote: 'A pulled-out line that carries the point.', attribution: 'Someone, Somewhere' }],
@@ -732,6 +775,10 @@ const SAMPLES: Record<string, ({ _label?: string } & Record<string, unknown>)[]>
   contactForm: [{ eyebrow: 'Contact', heading: 'Get in touch', intro: 'The real form, themed.', showPhone: true, showDirectContact: true }],
   contactCard: [{ show: ['phone', 'email', 'hours'], label: 'Direct contact', tint: true }],
   findUs: [{ heading: 'Find us', showHours: true }],
+  map: [
+    { _label: 'address only', address: 'Sample Street 22B, 2420 Sampletown', note: '100 m to the lift' },
+    { _label: 'pin + coordinates + credit', address: 'Sample Street 22B, 2420 Sampletown', note: '2 h 30 min from the city', media: { pinX: 56, pinY: 40, credit: '© OpenStreetMap contributors' }, coords: { lat: 61.3141, lng: 12.2643 } },
+  ],
 };
 
 export const defaultBlocks: BlockDef[] = RAW_BLOCKS.map((b) => (SAMPLES[b.type] ? { ...b, samples: SAMPLES[b.type] } : b));

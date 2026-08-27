@@ -280,6 +280,53 @@
         }
       ]
     },
+    "collage": {
+      "label": "Collage (image viewer)",
+      "group": "Media",
+      "shape": "gallery",
+      "fields": [
+        {
+          "name": "images",
+          "widget": "list",
+          "required": false,
+          "fields": [
+            {
+              "name": "image",
+              "widget": "image",
+              "required": false
+            },
+            {
+              "name": "alt",
+              "widget": "string",
+              "required": false
+            }
+          ]
+        },
+        {
+          "name": "caption",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "style",
+          "widget": "object",
+          "fields": [
+            {
+              "name": "surface",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "standard",
+                "tint",
+                "band",
+                "dark",
+                "gradient"
+              ]
+            }
+          ]
+        }
+      ]
+    },
     "contactCard": {
       "label": "Contact card",
       "group": "Calls to action",
@@ -1532,6 +1579,87 @@
             "name": "name",
             "widget": "string"
           }
+        }
+      ]
+    },
+    "map": {
+      "label": "Find your way (static map)",
+      "group": "Calls to action",
+      "shape": "split",
+      "fields": [
+        {
+          "name": "address",
+          "widget": "string"
+        },
+        {
+          "name": "note",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "media",
+          "widget": "object",
+          "fields": [
+            {
+              "name": "image",
+              "widget": "image",
+              "required": false
+            },
+            {
+              "name": "imageAlt",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "credit",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "pinX",
+              "widget": "number",
+              "required": false
+            },
+            {
+              "name": "pinY",
+              "widget": "number",
+              "required": false
+            }
+          ]
+        },
+        {
+          "name": "coords",
+          "widget": "object",
+          "fields": [
+            {
+              "name": "lat",
+              "widget": "number",
+              "required": false
+            },
+            {
+              "name": "lng",
+              "widget": "number",
+              "required": false
+            }
+          ]
+        },
+        {
+          "name": "style",
+          "widget": "object",
+          "fields": [
+            {
+              "name": "surface",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "standard",
+                "tint",
+                "band",
+                "dark",
+                "gradient"
+              ]
+            }
+          ]
         }
       ]
     },

@@ -1048,6 +1048,40 @@ collections:
                           - { label: "Accent band", value: "band" }
                           - { label: "Dark", value: "dark" }
                           - { label: "Gradient", value: "gradient" }
+              - name: collage
+                label: "Collage (image viewer)"
+                widget: object
+                fields:
+                  - name: images
+                    label: "Images"
+                    widget: list
+                    required: false
+                    label_singular: "Image"
+                    collapsed: true
+                    hint: "The first five build the collage; every image, including the rest, opens in the viewer."
+                    summary: "{{fields.alt}}"
+                    fields:
+                      - { name: image, label: "Image", widget: image, required: false }
+                      - { name: alt, label: "Alt text", widget: string, required: false, hint: "Describe the picture for screen readers and search engines." }
+                  - { name: caption, label: "Caption", widget: string, required: false, hint: "One line under the collage." }
+                  - name: style
+                    label: "Appearance"
+                    widget: object
+                    collapsed: true
+                    hint: "Background and accent colour — set once when the page is designed."
+                    fields:
+                      - name: surface
+                        label: "Background"
+                        widget: select
+                        required: false
+                        default: "standard"
+                        hint: "The surface behind the section — for rhythm between blocks."
+                        options:
+                          - { label: "Standard (white)", value: "standard" }
+                          - { label: "Tinted", value: "tint" }
+                          - { label: "Accent band", value: "band" }
+                          - { label: "Dark", value: "dark" }
+                          - { label: "Gradient", value: "gradient" }
               - name: beforeAfter
                 label: "Before / after"
                 widget: object
@@ -1551,6 +1585,49 @@ collections:
                 fields:
                   - { name: heading, label: "Heading", widget: string, required: false, hint: "Blank uses the site wording (\"Find us\")." }
                   - { name: showHours, label: "Show opening hours", widget: boolean, required: false, default: true }
+              - name: map
+                label: "Find your way (static map)"
+                widget: object
+                fields:
+                  - { name: address, label: "Address", widget: string, hint: "Shown in bold, and used for the route when no coordinates are given." }
+                  - { name: note, label: "Note", widget: string, required: false, hint: "A quiet line beside the address, e.g. how far it is to the lift." }
+                  - name: media
+                    label: "Media"
+                    widget: object
+                    collapsed: true
+                    hint: "The map picture, and where the pin sits on it."
+                    fields:
+                      - { name: image, label: "Map image", widget: image, required: false, hint: "A static map exported once and uploaded like any other picture." }
+                      - { name: imageAlt, label: "Alt text", widget: string, required: false }
+                      - { name: credit, label: "Image credit", widget: string, required: false, hint: "Printed over the picture. A map drawn from OpenStreetMap must credit it: © OpenStreetMap contributors." }
+                      - { name: pinX, label: "Pin from the left (%)", widget: number, required: false, hint: "0 to 100. Leave both blank for no pin." }
+                      - { name: pinY, label: "Pin from the top (%)", widget: number, required: false, hint: "0 to 100." }
+                  - name: coords
+                    label: "Coordinates"
+                    widget: object
+                    collapsed: true
+                    hint: "Latitude and longitude land the map app on the door instead of the street. Blank sends the address instead."
+                    fields:
+                      - { name: lat, label: "Latitude", widget: number, required: false }
+                      - { name: lng, label: "Longitude", widget: number, required: false }
+                  - name: style
+                    label: "Appearance"
+                    widget: object
+                    collapsed: true
+                    hint: "Background and accent colour — set once when the page is designed."
+                    fields:
+                      - name: surface
+                        label: "Background"
+                        widget: select
+                        required: false
+                        default: "standard"
+                        hint: "The surface behind the section — for rhythm between blocks."
+                        options:
+                          - { label: "Standard (white)", value: "standard" }
+                          - { label: "Tinted", value: "tint" }
+                          - { label: "Accent band", value: "band" }
+                          - { label: "Dark", value: "dark" }
+                          - { label: "Gradient", value: "gradient" }
   - name: pages
     media_folder: "/public/media/pages/{{slug}}"
     public_folder: "/media/pages/{{slug}}"
@@ -2586,6 +2663,40 @@ collections:
                       - { label: "Accent band", value: "band" }
                       - { label: "Dark", value: "dark" }
                       - { label: "Gradient", value: "gradient" }
+          - name: collage
+            label: "Collage (image viewer)"
+            widget: object
+            fields:
+              - name: images
+                label: "Images"
+                widget: list
+                required: false
+                label_singular: "Image"
+                collapsed: true
+                hint: "The first five build the collage; every image, including the rest, opens in the viewer."
+                summary: "{{fields.alt}}"
+                fields:
+                  - { name: image, label: "Image", widget: image, required: false }
+                  - { name: alt, label: "Alt text", widget: string, required: false, hint: "Describe the picture for screen readers and search engines." }
+              - { name: caption, label: "Caption", widget: string, required: false, hint: "One line under the collage." }
+              - name: style
+                label: "Appearance"
+                widget: object
+                collapsed: true
+                hint: "Background and accent colour — set once when the page is designed."
+                fields:
+                  - name: surface
+                    label: "Background"
+                    widget: select
+                    required: false
+                    default: "standard"
+                    hint: "The surface behind the section — for rhythm between blocks."
+                    options:
+                      - { label: "Standard (white)", value: "standard" }
+                      - { label: "Tinted", value: "tint" }
+                      - { label: "Accent band", value: "band" }
+                      - { label: "Dark", value: "dark" }
+                      - { label: "Gradient", value: "gradient" }
           - name: beforeAfter
             label: "Before / after"
             widget: object
@@ -3089,6 +3200,49 @@ collections:
             fields:
               - { name: heading, label: "Heading", widget: string, required: false, hint: "Blank uses the site wording (\"Find us\")." }
               - { name: showHours, label: "Show opening hours", widget: boolean, required: false, default: true }
+          - name: map
+            label: "Find your way (static map)"
+            widget: object
+            fields:
+              - { name: address, label: "Address", widget: string, hint: "Shown in bold, and used for the route when no coordinates are given." }
+              - { name: note, label: "Note", widget: string, required: false, hint: "A quiet line beside the address, e.g. how far it is to the lift." }
+              - name: media
+                label: "Media"
+                widget: object
+                collapsed: true
+                hint: "The map picture, and where the pin sits on it."
+                fields:
+                  - { name: image, label: "Map image", widget: image, required: false, hint: "A static map exported once and uploaded like any other picture." }
+                  - { name: imageAlt, label: "Alt text", widget: string, required: false }
+                  - { name: credit, label: "Image credit", widget: string, required: false, hint: "Printed over the picture. A map drawn from OpenStreetMap must credit it: © OpenStreetMap contributors." }
+                  - { name: pinX, label: "Pin from the left (%)", widget: number, required: false, hint: "0 to 100. Leave both blank for no pin." }
+                  - { name: pinY, label: "Pin from the top (%)", widget: number, required: false, hint: "0 to 100." }
+              - name: coords
+                label: "Coordinates"
+                widget: object
+                collapsed: true
+                hint: "Latitude and longitude land the map app on the door instead of the street. Blank sends the address instead."
+                fields:
+                  - { name: lat, label: "Latitude", widget: number, required: false }
+                  - { name: lng, label: "Longitude", widget: number, required: false }
+              - name: style
+                label: "Appearance"
+                widget: object
+                collapsed: true
+                hint: "Background and accent colour — set once when the page is designed."
+                fields:
+                  - name: surface
+                    label: "Background"
+                    widget: select
+                    required: false
+                    default: "standard"
+                    hint: "The surface behind the section — for rhythm between blocks."
+                    options:
+                      - { label: "Standard (white)", value: "standard" }
+                      - { label: "Tinted", value: "tint" }
+                      - { label: "Accent band", value: "band" }
+                      - { label: "Dark", value: "dark" }
+                      - { label: "Gradient", value: "gradient" }
   - name: faq
     media_folder: "/public/media/faq"
     public_folder: "/media/faq"

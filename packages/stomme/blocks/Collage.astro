@@ -1,0 +1,83 @@
+---
+import Cover from '../src/Cover.astro';
+
+interface CollageImage { image?: string; alt?: string }
+interface Props {
+  images?: CollageImage[];
+  caption?: string;
+  site?: any;
+}
+const { caption, site } = Astro.props;
+const images = (Astro.props.images ?? []).filter((img) => img && (img.image || img.alt));
+const copy = site?.strings?.collage ?? {};
+const fill = (s: string, vals: Record<string, string>) => s.replace(/\{(\w+)\}/g, (_m, k) => vals[k] ?? _m);
+const openLabel = copy.open ?? 'Open the image viewer';
+const counter = copy.counter ?? '{i} of {n}';
+// Five is the whole point of the block: a leading picture and four tiles stay a door, more becomes a wall.
+const tiles = images.slice(0, 5);
+const rest = images.length - tiles.length;
+---
+
+{images.length > 0 && (
+  <section data-stomme-block="collage" class="section">
+    <figure class="collage">
+      <div class="collage__grid" data-tiles={tiles.length}>
+        {tiles.map((img, i) => (
+          <button type="button" class="collage__tile" data-i={i} aria-label={img.alt ? undefined : openLabel}>
+            <Cover src={img.image} alt={img.alt ?? ''} placeholder="/images/placeholder.svg" width={900} height={675} class="collage__img" />
+            {i === tiles.length - 1 && rest > 0 && (
+              <span class="collage__more">{rest === 1 ? (copy.more1 ?? '+1 image') : fill(copy.more ?? '+{n} images', { n: String(rest) })}</span>
+            )}
+          </button>
+        ))}
+      </div>
+      {caption && <figcaption class="collage__cap">{caption}</figcaption>}
+    </figure>
+
+    <dialog class="collage__viewer" data-count={images.length} aria-label={copy.viewer ?? 'Image viewer'}>
+      <div class="collage__stage">
+        {images.map((img, i) => (
+          <figure class:list={['collage__slide', { 'is-on': i === 0 }]}>
+            <Cover src={img.image} alt={img.alt ?? ''} placeholder="/images/placeholder.svg" width={1600} height={1200} class="collage__full" />
+            {img.alt && <figcaption class="collage__slidecap">{img.alt}</figcaption>}
+          </figure>
+        ))}
+        <button type="button" class="collage__nav collage__prev" aria-label={copy.prev ?? 'Previous image'}>‹</button>
+        <button type="button" class="collage__nav collage__next" aria-label={copy.next ?? 'Next image'}>›</button>
+      </div>
+      <p class="collage__count" data-fmt={counter}>{fill(counter, { i: '1', n: String(images.length) })}</p>
+      <button type="button" class="collage__close" aria-label={copy.close ?? 'Close'}>×</button>
+    </dialog>
+  </section>
+)}
+
+<script>
+  document.querySelectorAll('[data-stomme-block="collage"]').forEach((root) => {
+    const dialog = root.querySelector('.collage__viewer') as HTMLDialogElement | null;
+    if (!dialog) return;
+    const slides = [...dialog.querySelectorAll('.collage__slide')];
+    const count = dialog.querySelector('.collage__count') as HTMLElement | null;
+    let at = 0;
+    const show = (n: number) => {
+      at = (n + slides.length) % slides.length;
+      slides.forEach((s, k) => s.classList.toggle('is-on', k === at));
+      const fmt = count?.dataset.fmt;
+      if (count && fmt) count.textContent = fmt.replace('{i}', String(at + 1)).replace('{n}', String(slides.length));
+    };
+    root.querySelectorAll('.collage__tile').forEach((tile) => tile.addEventListener('click', () => {
+      show(Number((tile as HTMLElement).dataset.i) || 0);
+      dialog.showModal();
+      (dialog.querySelector('.collage__close') as HTMLElement | null)?.focus();
+    }));
+    dialog.querySelector('.collage__prev')?.addEventListener('click', () => show(at - 1));
+    dialog.querySelector('.collage__next')?.addEventListener('click', () => show(at + 1));
+    dialog.querySelector('.collage__close')?.addEventListener('click', () => dialog.close());
+    dialog.addEventListener('click', (e) => { if (e.target === dialog) dialog.close(); });
+    dialog.addEventListener('keydown', (e) => {
+      const key = (e as KeyboardEvent).key;
+      if (key !== 'ArrowLeft' && key !== 'ArrowRight') return;
+      e.preventDefault();
+      show(key === 'ArrowLeft' ? at - 1 : at + 1);
+    });
+  });
+</script>

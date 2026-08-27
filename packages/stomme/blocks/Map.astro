@@ -1,0 +1,52 @@
+---
+import Cover from '../src/Cover.astro';
+
+interface Props {
+  address?: string;
+  note?: string;
+  media?: { image?: string; imageAlt?: string; credit?: string; pinX?: number; pinY?: number };
+  coords?: { lat?: number; lng?: number };
+  site?: any;
+}
+const { address, note, site } = Astro.props;
+const media = Astro.props.media ?? {};
+const coords = Astro.props.coords ?? {};
+const copy = site?.strings?.map ?? {};
+const num = (v: unknown) => (typeof v === 'number' && Number.isFinite(v) ? v : null);
+const lat = num(coords.lat);
+const lng = num(coords.lng);
+// A coordinate pair is already URL-safe, and both map apps read the raw comma; only the address needs escaping.
+const dest = lat !== null && lng !== null ? `${lat},${lng}` : encodeURIComponent(String(address ?? ''));
+const google = `https://www.google.com/maps/dir/?api=1&destination=${dest}`;
+const apple = `https://maps.apple.com/?daddr=${dest}`;
+const pinX = num(media.pinX);
+const pinY = num(media.pinY);
+const pin = pinX !== null && pinY !== null;
+---
+
+{(address || media.image) && (
+  <section data-stomme-block="map" class="section">
+    <div class="mapblock">
+      <div class="mapblock__map">
+        <Cover src={media.image} alt={media.imageAlt ?? ''} placeholder="/images/placeholder.svg" width={1400} height={560} class="mapblock__img" />
+        {pin && (
+          <span class="mapblock__pin" style={`left:${pinX}%;top:${pinY}%`} aria-hidden="true">
+            {address && <span class="mapblock__pinlabel">{address}</span>}
+            <i class="mapblock__pindot"></i>
+          </span>
+        )}
+        {media.credit && <span class="mapblock__credit">{media.credit}</span>}
+      </div>
+      <div class="mapblock__row">
+        <p class="mapblock__where">
+          {address && <b class="mapblock__addr">{address}</b>}
+          {note && <span class="mapblock__note">{note}</span>}
+        </p>
+        <div class="mapblock__links">
+          <a class="btn" href={google} target="_blank" rel="noopener">{copy.google ?? 'Open in Google Maps'}</a>
+          <a class="btn btn-outline" href={apple} target="_blank" rel="noopener">{copy.apple ?? 'Apple Maps'}</a>
+        </div>
+      </div>
+    </div>
+  </section>
+)}

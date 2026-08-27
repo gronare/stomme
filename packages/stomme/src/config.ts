@@ -19,6 +19,8 @@ export interface SiteConfig {
     latest?: string;
     contact?: { name?: string; email?: string; phone?: string; message?: string; submit?: string; direct?: string; honeypot?: string; hours?: string; visit?: string; findUs?: string; follow?: string; map?: string; reveal?: string; error?: string };
     beforeAfter?: { before?: string; after?: string; compare?: string };
+    collage?: { more?: string; more1?: string; open?: string; viewer?: string; prev?: string; next?: string; close?: string; counter?: string };
+    map?: { google?: string; apple?: string };
     footer?: { links?: string; areas?: string };
     town?: {
       eyebrow?: string;
@@ -125,6 +127,11 @@ const STRINGS_EN = {
     error: 'Sorry — could not send. Please try again or email us directly.',
   },
   beforeAfter: { before: 'Before', after: 'After', compare: 'Drag to compare before and after' },
+  collage: {
+    more: '+{n} images', more1: '+1 image', open: 'Open the image viewer', viewer: 'Image viewer',
+    prev: 'Previous image', next: 'Next image', close: 'Close', counter: '{i} of {n}',
+  },
+  map: { google: 'Open in Google Maps', apple: 'Apple Maps' },
   footer: { links: 'Links', areas: 'Areas' },
   town: {
     eyebrow: 'Local service: {name}',
@@ -180,6 +187,11 @@ const STRINGS_SV: typeof STRINGS_EN = {
     error: 'Det gick inte att skicka. Försök igen eller mejla oss direkt.',
   },
   beforeAfter: { before: 'Före', after: 'Efter', compare: 'Dra för att jämföra före och efter' },
+  collage: {
+    more: '+{n} bilder', more1: '+1 bild', open: 'Öppna bildvisaren', viewer: 'Bildvisare',
+    prev: 'Föregående bild', next: 'Nästa bild', close: 'Stäng', counter: '{i} av {n}',
+  },
+  map: { google: 'Öppna i Google Maps', apple: 'Apple Kartor' },
   footer: { links: 'Länkar', areas: 'Områden' },
   town: {
     eyebrow: 'Lokal tjänst: {name}',
@@ -233,6 +245,8 @@ function baseStrings(locale?: string, cmsLocale?: string) {
     ...STRINGS_EN, ...b,
     contact: { ...STRINGS_EN.contact, ...b.contact },
     beforeAfter: { ...STRINGS_EN.beforeAfter, ...b.beforeAfter },
+    collage: { ...STRINGS_EN.collage, ...b.collage },
+    map: { ...STRINGS_EN.map, ...b.map },
     footer: { ...STRINGS_EN.footer, ...b.footer },
     town: { ...STRINGS_EN.town, ...b.town },
     service: { ...STRINGS_EN.service, ...b.service },
@@ -276,6 +290,8 @@ export function resolveSite(c?: SiteConfig) {
       thanks: { ...base.thanks, ...((s && (s as any).thanks) || {}) },
       notFound: { ...base.notFound, ...((s && (s as any).notFound) || {}) },
       beforeAfter: { ...base.beforeAfter, ...((s && (s as any).beforeAfter) || {}) },
+      collage: { ...base.collage, ...((s && (s as any).collage) || {}) },
+      map: { ...base.map, ...((s && (s as any).map) || {}) },
       footer: { ...base.footer, ...((s && (s as any).footer) || {}) },
       consent: { ...base.consent, ...((s && (s as any).consent) || {}) },
     },
