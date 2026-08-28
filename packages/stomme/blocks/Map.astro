@@ -23,8 +23,21 @@ const pinX = num(media.pinX);
 const pinY = num(media.pinY);
 const pin = pinX !== null && pinY !== null;
 const key = typeof site?.maps?.key === 'string' ? site.maps.key.trim() : '';
-const embeddable = key !== '' && lat !== null && lng !== null;
-const embedTitle = String(copy.embedTitle ?? 'Google map of {address}').replace('{address}', address || `${lat},${lng}`);
+// An unrecognised provider reads as unset, so a typo on a keyed site keeps the map it already has instead of silently losing it.
+const named = site?.maps?.provider === 'osm' || site?.maps?.provider === 'google' ? site.maps.provider : '';
+const provider = named || (key !== '' ? 'google' : '');
+const osm = provider === 'osm';
+const embeddable = lat !== null && lng !== null && (osm || (provider === 'google' && key !== ''));
+const embedLabel = (osm ? copy.embedOsm : copy.embed) ?? (osm ? 'Show in OpenStreetMap' : 'Show in Google Maps');
+const embedNote = (osm ? copy.embedNoteOsm : copy.embedNote)
+  ?? `The map loads from ${osm ? 'OpenStreetMap' : 'Google'} only once you click.`;
+const embedTitle = String((osm ? copy.embedTitleOsm : copy.embedTitle) ?? `${osm ? 'OpenStreetMap map' : 'Google map'} of {address}`)
+  .replace('{address}', address || `${lat},${lng}`);
+const span = (v: number, by: number) => (v + by).toFixed(6);
+// OpenStreetMap frames by box rather than zoom: ±0.008 lon by ±0.004 lat is the same neighbourhood Google shows at zoom 15.
+const bbox = osm && lat !== null && lng !== null
+  ? `${span(lng, -0.008)},${span(lat, -0.004)},${span(lng, 0.008)},${span(lat, 0.004)}`
+  : '';
 ---
 
 {(address || media.image) && (
@@ -40,9 +53,10 @@ const embedTitle = String(copy.embedTitle ?? 'Google map of {address}').replace(
         )}
         {media.credit && <span class="mapblock__credit">{media.credit}</span>}
         {embeddable && (
-          <div class="mapblock__embed" data-stomme-map-embed data-key={key} data-q={`${lat},${lng}`} data-title={embedTitle}>
-            <button type="button" class="btn mapblock__embedbtn">{copy.embed ?? 'Show in Google Maps'}</button>
-            <span class="mapblock__embednote">{copy.embedNote ?? 'The map loads from Google only once you click.'}</span>
+          <div class="mapblock__embed" data-stomme-map-embed data-provider={provider} data-key={key}
+            data-q={`${lat},${lng}`} data-bbox={bbox} data-title={embedTitle}>
+            <button type="button" class="btn mapblock__embedbtn">{embedLabel}</button>
+            <span class="mapblock__embednote">{embedNote}</span>
           </div>
         )}
       </div>
@@ -62,7 +76,10 @@ const embedTitle = String(copy.embedTitle ?? 'Google map of {address}').replace(
               frame.allowFullscreen = true;
               const q = encodeURIComponent(bar.getAttribute('data-q') || '');
               const k = encodeURIComponent(bar.getAttribute('data-key') || '');
-              frame.src = 'https://www.google.com/maps/embed/v1/place?key=' + k + '&q=' + q + '&zoom=15';
+              const bbox = encodeURIComponent(bar.getAttribute('data-bbox') || '');
+              frame.src = bar.getAttribute('data-provider') === 'osm'
+                ? 'https://www.openstreetmap.org/export/embed.html?bbox=' + bbox + '&layer=mapnik&marker=' + q
+                : 'https://www.google.com/maps/embed/v1/place?key=' + k + '&q=' + q + '&zoom=15';
               canvas.appendChild(frame);
               bar.remove();
             });

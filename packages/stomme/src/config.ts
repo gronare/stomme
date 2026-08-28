@@ -12,7 +12,7 @@ export interface SiteConfig {
   locale?: string;
   style?: string;
   analytics?: { cfToken?: string };
-  maps?: { key?: string };
+  maps?: { provider?: 'google' | 'osm'; key?: string };
   metrics?: { endpoint?: string };
   cmsLocale?: string;
   strings?: {
@@ -21,7 +21,11 @@ export interface SiteConfig {
     contact?: { name?: string; email?: string; phone?: string; message?: string; submit?: string; direct?: string; honeypot?: string; hours?: string; visit?: string; findUs?: string; follow?: string; map?: string; reveal?: string; error?: string };
     beforeAfter?: { before?: string; after?: string; compare?: string };
     collage?: { more?: string; more1?: string; open?: string; viewer?: string; prev?: string; next?: string; close?: string; counter?: string };
-    map?: { google?: string; apple?: string; embed?: string; embedNote?: string; embedTitle?: string };
+    map?: {
+      google?: string; apple?: string;
+      embed?: string; embedNote?: string; embedTitle?: string;
+      embedOsm?: string; embedNoteOsm?: string; embedTitleOsm?: string;
+    };
     footer?: { links?: string; areas?: string };
     town?: {
       eyebrow?: string;
@@ -136,6 +140,8 @@ const STRINGS_EN = {
     google: 'Open in Google Maps', apple: 'Apple Maps',
     embed: 'Show in Google Maps', embedNote: 'The map loads from Google only once you click.',
     embedTitle: 'Google map of {address}',
+    embedOsm: 'Show in OpenStreetMap', embedNoteOsm: 'The map loads from OpenStreetMap only once you click.',
+    embedTitleOsm: 'OpenStreetMap map of {address}',
   },
   footer: { links: 'Links', areas: 'Areas' },
   town: {
@@ -200,6 +206,8 @@ const STRINGS_SV: typeof STRINGS_EN = {
     google: 'Öppna i Google Maps', apple: 'Apple Kartor',
     embed: 'Visa i Google Maps', embedNote: 'Kartan laddas från Google först när du klickar.',
     embedTitle: 'Google-karta över {address}',
+    embedOsm: 'Visa i OpenStreetMap', embedNoteOsm: 'Kartan laddas från OpenStreetMap först när du klickar.',
+    embedTitleOsm: 'OpenStreetMap-karta över {address}',
   },
   footer: { links: 'Länkar', areas: 'Områden' },
   town: {

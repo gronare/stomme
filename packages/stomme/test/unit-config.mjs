@@ -131,6 +131,23 @@ eq(resolveSite({ strings: { readMore: 'More →' } }).strings.readMore, 'More �
 eq(resolveSite({ locale: 'sv', strings: { listingCta: 'Boka' } }).strings.listingCta, 'Boka', 'listingCta is overridable');
 eq(resolveSite({ locale: 'sv', strings: { listingCta: '' } }).strings.listingCta, 'Kontakta oss', 'an empty listingCta falls back rather than rendering a blank button');
 
+// ── map providers ───────────────────────────────────────────────────────────
+eq(EN.map.embed, 'Show in Google Maps', 'the google consent button');
+eq(EN.map.embedOsm, 'Show in OpenStreetMap', 'the openstreetmap consent button');
+eq(sv.map.embed, 'Visa i Google Maps', 'the google consent button is Swedish on a Swedish site');
+eq(sv.map.embedNote, 'Kartan laddas fr\u00e5n Google f\u00f6rst n\u00e4r du klickar.',
+  'the google consent line names the provider and the click');
+eq(sv.map.embedOsm, 'Visa i OpenStreetMap', 'the openstreetmap consent button is Swedish on a Swedish site');
+eq(sv.map.embedNoteOsm, 'Kartan laddas fr\u00e5n OpenStreetMap f\u00f6rst n\u00e4r du klickar.',
+  'the openstreetmap consent line names the provider and the click');
+check(sv.map.embedTitle.includes('{address}') && sv.map.embedTitleOsm.includes('{address}'),
+  'both frame titles carry the address placeholder the block fills in');
+
+eq(resolveSite({ maps: { provider: 'osm' } }).maps, { provider: 'osm' },
+  'the map provider reaches the blocks through the resolved site');
+eq(resolveSite({ maps: { key: 'AIza' } }).maps, { key: 'AIza' }, 'so does a key on its own');
+eq(resolveSite().maps, undefined, 'no maps config resolves to nothing for the block to read');
+
 // ── routes ──────────────────────────────────────────────────────────────────
 eq(resolveSite({ routes: { blog: '/news' } }).routes, { ...SITE_DEFAULTS.routes, blog: '/news' },
   'overriding one route keeps the other defaults');
