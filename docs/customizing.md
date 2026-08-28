@@ -144,6 +144,17 @@ render optimized. Use `@gronare/stomme/Cover.astro` for structured image fields,
 + `"small"`/`"large"`). The CMS "Image" button (registered by the engine previews)
 writes that markdown for editors. Never write a raw `<img src={cmsValue}>`.
 
+An optimized upload keeps its own shape — `Cover.astro` passes only a target width to
+Astro, so nothing is cropped at build time. Where a class boxes the image (the hero is
+`4 / 3`), give the box another shape with the ratio variable rather than `aspect-ratio`:
+
+```css
+.hero-img { --hero-ratio: 1600 / 520; }
+```
+
+`aspect-ratio: auto` is the one value to avoid: it drops the `width`/`height` attributes
+along with the class's ratio, and the box measures 0 high until the file arrives.
+
 ## Admin previews
 
 `stomme-gen` copies the engine's `stomme-previews.js` into `public/admin/` —

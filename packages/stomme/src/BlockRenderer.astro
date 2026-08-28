@@ -84,6 +84,8 @@ const feats = resolveFeatures(features);
 const rendered = feats.contactForm === false ? blocks.filter((b) => b.type !== 'contactForm') : blocks;
 
 const surfaceClass: Record<string, string> = { tint: 'surface-tint', band: 'band', dark: 'surface-dark', gradient: 'surface-gradient' };
+const H1_BLOCKS = new Set(['hero', 'cover', 'pageHeader']);
+const pageHasH1 = rendered.some((b) => H1_BLOCKS.has(b.type));
 ---
 {
   rendered.map((block) => {
@@ -98,10 +100,10 @@ const surfaceClass: Record<string, string> = { tint: 'surface-tint', band: 'band
     const surf = block.style?.surface ? surfaceClass[block.style.surface] : undefined;
     return surf ? (
       <div class={surf}>
-        <Component {...block} site={site} />
+        <Component {...block} site={site} pageHasH1={pageHasH1} />
       </div>
     ) : (
-      <Component {...block} site={site} />
+      <Component {...block} site={site} pageHasH1={pageHasH1} />
     );
   })
 }

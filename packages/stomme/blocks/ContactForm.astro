@@ -6,8 +6,11 @@ interface Props {
   site?: any; eyebrow?: string; heading?: string; intro?: string;
   labelName?: string; labelEmail?: string; labelMessage?: string;
   submitLabel?: string; showPhone?: boolean; showDirectContact?: boolean;
+  pageHasH1?: boolean;
 }
-const { site, eyebrow, heading, intro, labelName, labelEmail, labelMessage, submitLabel, showPhone, showDirectContact } = Astro.props;
+const { site, eyebrow, heading, intro, labelName, labelEmail, labelMessage, submitLabel, showPhone, showDirectContact, pageHasH1 } = Astro.props;
+// A form-only contact page has no other heading to be the page's h1, so the block takes the rank the page leaves open.
+const Heading = pageHasH1 ? 'h2' : 'h1';
 const c = site?.strings?.contact ?? {};
 const L = {
   name: labelName || (c.name ?? 'Name'),
@@ -39,7 +42,7 @@ const recapLabels = JSON.stringify({ email: L.email, phone: L.phone, message: L.
   {(heading || intro) && (
     <div class="contact-head">
       {eyebrow && <span class="mono eyebrow">{eyebrow}</span>}
-      {heading && <h1 class="contact-h1" style={eyebrow ? 'margin-top:0.75rem' : ''}>{heading}</h1>}
+      {heading && <Heading class="contact-h1" style={eyebrow ? 'margin-top:0.75rem' : ''}>{heading}</Heading>}
       {intro && <p class="contact-intro">{intro}</p>}
     </div>
   )}

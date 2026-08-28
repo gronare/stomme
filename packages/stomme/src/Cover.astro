@@ -21,11 +21,13 @@ const uploads = import.meta.glob<{ default: ImageMetadata }>(
 const key = src && src.startsWith('/media/') ? `/src/assets/media/${src.slice('/media/'.length)}` : null;
 const optimized = key && uploads[key] ? uploads[key] : null;
 const dims = { ...(width ? { width } : {}), ...(height ? { height } : {}) };
+// A width AND a height reach sharp as a crop box, so an optimized upload takes the width alone and keeps its own shape; the plain <img> keeps both, its only ratio before the file lands.
+const optimizedDims = width ? { width } : dims;
 ---
 
 {
   optimized ? (
-    <Image src={optimized()} alt={alt} {...dims} class={cls} loading={loading} />
+    <Image src={optimized()} alt={alt} {...optimizedDims} class={cls} loading={loading} />
   ) : src ? (
     <img src={src} alt={alt} {...dims} loading={loading} class={cls} decoding="async" />
   ) : (

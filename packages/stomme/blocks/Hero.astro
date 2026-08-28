@@ -64,7 +64,7 @@ const hasMedia = showImage || showHighlights || showMotif;
 
     {showImage && (
       <div class="hero-media">
-        <Cover src={image} alt={imageAlt ?? heading} placeholder="/images/placeholder.svg" width={1000} height={750} class="hero-img" />
+        <Cover src={image} alt={imageAlt ?? heading} placeholder="/images/placeholder.svg" width={1000} height={750} loading="eager" class="hero-img" />
       </div>
     )}
 

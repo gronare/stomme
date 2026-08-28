@@ -152,9 +152,25 @@ const resolved = await Promise.all(
       setZoom(z < 1 ? Math.max(0.3, z * 0.995) : 1);
       fitting = false;
     };
+    var queued = false;
+    var refit = function () {
+      if (queued) return;
+      queued = true;
+      requestAnimationFrame(function () { queued = false; fitRow(true); });
+    };
     fitRow(true);
     window.addEventListener('resize', function () { fitRow(false); }, { passive: true });
-    if (window.ResizeObserver) new ResizeObserver(function () { fitRow(false); }).observe(header);
+    // Slot content mounts into the row after first paint while the header's own box never changes, so what has to be watched is the row's children.
+    if (window.ResizeObserver) {
+      var rowSize = new ResizeObserver(refit);
+      var watchRow = function () {
+        rowSize.disconnect();
+        rowSize.observe(header);
+        [].forEach.call(inner.children, function (el) { rowSize.observe(el); });
+      };
+      watchRow();
+      if (window.MutationObserver) new MutationObserver(function () { watchRow(); refit(); }).observe(inner, { childList: true, subtree: true });
+    }
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { fitRow(true); });
 
     var publishBottom = function () {
