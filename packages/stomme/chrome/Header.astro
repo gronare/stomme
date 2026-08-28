@@ -51,6 +51,12 @@ async function childrenOf(item: NavItem): Promise<{ label: string; href: string 
 const resolved = await Promise.all(
   items.map(async (i) => ({ label: i.label, href: resolveLink(i.link, ''), children: await childrenOf(i) })),
 );
+const path = Astro.url.pathname.replace(/\/+$/, '') || '/';
+const isActive = (href: string) => {
+  const h = (href || '').replace(/\/+$/, '') || '/';
+  if (!href) return false;
+  return h === path || (h !== '/' && path.startsWith(h + '/'));
+};
 ---
 <header class:list={['site-header', { 'is-sticky': nav.sticky }]}>
   <div class="inner">
@@ -65,15 +71,15 @@ const resolved = await Promise.all(
       {resolved.map((i) => i.children.length ? (
         <div class="nav-item nav-item--menu">
           {i.href
-            ? <a class="nav-top" href={i.href} aria-haspopup="true">{i.label}</a>
-            : <span class="nav-top" role="button" tabindex="0" aria-haspopup="true">{i.label}</span>}
+            ? <a class:list={['nav-top', { 'is-active': isActive(i.href) || i.children.some((c) => isActive(c.href)) }]} href={i.href} aria-current={isActive(i.href) ? 'page' : undefined} aria-haspopup="true">{i.label}</a>
+            : <span class:list={['nav-top', { 'is-active': i.children.some((c) => isActive(c.href)) }]} role="button" tabindex="0" aria-haspopup="true">{i.label}</span>}
           <button class="nav-caret-btn" type="button" aria-label="Show submenu" aria-expanded="false"><span class="nav-caret" aria-hidden="true"></span></button>
           <ul class="nav-submenu">
-            {i.children.map((c) => <li><a href={c.href}>{c.label}</a></li>)}
+            {i.children.map((c) => <li><a href={c.href} aria-current={isActive(c.href) ? 'page' : undefined}>{c.label}</a></li>)}
           </ul>
         </div>
       ) : (
-        <a href={i.href || homeHref}>{i.label}</a>
+        <a href={i.href || homeHref} aria-current={isActive(i.href || homeHref) ? 'page' : undefined}>{i.label}</a>
       ))}
       {nav.cta && <a class="btn nav-cta" href={resolveLink(nav.cta.link, homeHref)}>{nav.cta.label}</a>}
     </nav>
