@@ -12,6 +12,7 @@ export interface SiteConfig {
   locale?: string;
   style?: string;
   analytics?: { cfToken?: string };
+  maps?: { key?: string };
   metrics?: { endpoint?: string };
   cmsLocale?: string;
   strings?: {
@@ -20,7 +21,7 @@ export interface SiteConfig {
     contact?: { name?: string; email?: string; phone?: string; message?: string; submit?: string; direct?: string; honeypot?: string; hours?: string; visit?: string; findUs?: string; follow?: string; map?: string; reveal?: string; error?: string };
     beforeAfter?: { before?: string; after?: string; compare?: string };
     collage?: { more?: string; more1?: string; open?: string; viewer?: string; prev?: string; next?: string; close?: string; counter?: string };
-    map?: { google?: string; apple?: string };
+    map?: { google?: string; apple?: string; embed?: string; embedNote?: string; embedTitle?: string };
     footer?: { links?: string; areas?: string };
     town?: {
       eyebrow?: string;
@@ -131,7 +132,11 @@ const STRINGS_EN = {
     more: '+{n} images', more1: '+1 image', open: 'Open the image viewer', viewer: 'Image viewer',
     prev: 'Previous image', next: 'Next image', close: 'Close', counter: '{i} of {n}',
   },
-  map: { google: 'Open in Google Maps', apple: 'Apple Maps' },
+  map: {
+    google: 'Open in Google Maps', apple: 'Apple Maps',
+    embed: 'Show in Google Maps', embedNote: 'The map loads from Google only once you click.',
+    embedTitle: 'Google map of {address}',
+  },
   footer: { links: 'Links', areas: 'Areas' },
   town: {
     eyebrow: 'Local service: {name}',
@@ -191,7 +196,11 @@ const STRINGS_SV: typeof STRINGS_EN = {
     more: '+{n} bilder', more1: '+1 bild', open: 'Öppna bildvisaren', viewer: 'Bildvisare',
     prev: 'Föregående bild', next: 'Nästa bild', close: 'Stäng', counter: '{i} av {n}',
   },
-  map: { google: 'Öppna i Google Maps', apple: 'Apple Kartor' },
+  map: {
+    google: 'Öppna i Google Maps', apple: 'Apple Kartor',
+    embed: 'Visa i Google Maps', embedNote: 'Kartan laddas från Google först när du klickar.',
+    embedTitle: 'Google-karta över {address}',
+  },
   footer: { links: 'Länkar', areas: 'Områden' },
   town: {
     eyebrow: 'Lokal tjänst: {name}',
@@ -298,6 +307,7 @@ export function resolveSite(c?: SiteConfig) {
     listings: resolveListings(c && c.listings),
     cms: c && c.cms,
     contact: c && c.contact,
+    maps: c && c.maps,
     media: c && c.media,
   };
 }

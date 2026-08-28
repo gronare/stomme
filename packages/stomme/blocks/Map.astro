@@ -22,6 +22,9 @@ const apple = `https://maps.apple.com/?daddr=${dest}`;
 const pinX = num(media.pinX);
 const pinY = num(media.pinY);
 const pin = pinX !== null && pinY !== null;
+const key = typeof site?.maps?.key === 'string' ? site.maps.key.trim() : '';
+const embeddable = key !== '' && lat !== null && lng !== null;
+const embedTitle = String(copy.embedTitle ?? 'Google map of {address}').replace('{address}', address || `${lat},${lng}`);
 ---
 
 {(address || media.image) && (
@@ -36,7 +39,36 @@ const pin = pinX !== null && pinY !== null;
           </span>
         )}
         {media.credit && <span class="mapblock__credit">{media.credit}</span>}
+        {embeddable && (
+          <div class="mapblock__embed" data-stomme-map-embed data-key={key} data-q={`${lat},${lng}`} data-title={embedTitle}>
+            <button type="button" class="btn mapblock__embedbtn">{copy.embed ?? 'Show in Google Maps'}</button>
+            <span class="mapblock__embednote">{copy.embedNote ?? 'The map loads from Google only once you click.'}</span>
+          </div>
+        )}
       </div>
+      {embeddable && (
+        <script is:inline>
+          for (const bar of document.querySelectorAll('[data-stomme-map-embed]:not([data-stomme-bound])')) {
+            bar.setAttribute('data-stomme-bound', '');
+            const canvas = bar.closest('.mapblock__map');
+            const button = bar.querySelector('button');
+            if (!canvas || !button) continue;
+            button.addEventListener('click', () => {
+              if (canvas.querySelector('iframe')) return;
+              const frame = document.createElement('iframe');
+              frame.className = 'mapblock__frame';
+              frame.title = bar.getAttribute('data-title') || '';
+              frame.loading = 'lazy';
+              frame.allowFullscreen = true;
+              const q = encodeURIComponent(bar.getAttribute('data-q') || '');
+              const k = encodeURIComponent(bar.getAttribute('data-key') || '');
+              frame.src = 'https://www.google.com/maps/embed/v1/place?key=' + k + '&q=' + q + '&zoom=15';
+              canvas.appendChild(frame);
+              bar.remove();
+            });
+          }
+        </script>
+      )}
       <div class="mapblock__row">
         <p class="mapblock__where">
           {address && <b class="mapblock__addr">{address}</b>}

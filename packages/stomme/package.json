@@ -57,6 +57,7 @@
     "test:public-index": "node test/smoke-public-index.mjs",
     "test:slots": "node test/smoke-slots.mjs",
     "test:metrics": "node test/smoke-metrics.mjs",
+    "test:maps": "node test/smoke-maps.mjs",
     "lint:comments": "node bin/lint-comments.mjs .",
     "test:contracts": "node test/cross-file-contracts.mjs",
     "test:emit-fields": "node test/unit-emit-fields.mjs",

@@ -293,6 +293,7 @@ main .cover:first-child .cover__inner { --cover-clear: calc(var(--header-bottom)
 .site-nav { display: flex; gap: calc(1.25 * var(--header-rem)); align-items: center; flex-wrap: wrap; margin-left: auto; }
 .site-nav a { text-decoration: none; color: var(--color-ink); }
 .site-nav a:hover { color: var(--color-brand); }
+.site-nav a[aria-current='page'], .nav-top.is-active { color: var(--color-brand); text-decoration: underline; text-underline-offset: 6px; text-decoration-thickness: 2px; }
 /* The nav link colour above would out-specify .btn, so the CTA restates the button's on-dark text. */
 .site-nav a.btn { color: var(--color-on-dark); }
 .site-nav a.btn:hover { color: var(--color-on-dark); }
@@ -822,6 +823,10 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
   /* An OpenStreetMap-derived picture must carry visible attribution, so this sits over the image and never swallows a click meant for it. */
   /* The chip is 92% opaque, not the 82% used elsewhere: over a dark map tile a thinner one drops the attribution under 4.5:1. */
   .mapblock__credit { position: absolute; right: 0.4rem; bottom: 0.4rem; pointer-events: none; padding: 2px 7px; border-radius: 0.3rem; font-size: 0.69rem; line-height: 1.5; color: var(--color-muted); background: color-mix(in srgb, var(--color-paper) 92%, transparent); }
+  .mapblock__frame { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+  .mapblock__embed { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.5rem; padding: 1rem; text-align: center; background: color-mix(in srgb, var(--color-paper) 58%, transparent); }
+  .mapblock__embedbtn { font-size: 0.9rem; padding: 0.5rem 1rem; }
+  .mapblock__embednote { max-width: 22rem; padding: 3px 9px; border-radius: 0.35rem; font-size: 0.78rem; line-height: 1.5; color: var(--color-ink); background: color-mix(in srgb, var(--color-paper) 82%, transparent); }
   .mapblock__row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.9rem; padding: 0.95rem 1.1rem; }
   .mapblock__where { margin: 0; display: flex; flex-direction: column; gap: 2px; }
   .mapblock__addr { font-weight: 700; color: var(--color-ink); }

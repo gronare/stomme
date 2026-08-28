@@ -95,7 +95,7 @@ jobs:
 
   # Engine behaviour no build failure would surface: generated share cards, the unlisted-path rules behind noindex, the middleware that makes /admin a working dev address, and the metrics beacon staying absent until a site names an endpoint.
   engine-smokes:
-    name: engine smokes (og + noindex + public index + metrics)
+    name: engine smokes (og + noindex + public index + metrics + maps)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -113,6 +113,8 @@ jobs:
         run: pnpm --filter @gronare/stomme test:public-index
       - name: metrics beacon
         run: pnpm --filter @gronare/stomme test:metrics
+      - name: two-click google map
+        run: pnpm --filter @gronare/stomme test:maps
 
   # The Sveltia DOM contract test is deliberately not per-PR: between version bumps the pinned DOM does not change, so it runs when the pin is bumped instead.
 
