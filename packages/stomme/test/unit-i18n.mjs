@@ -16,7 +16,7 @@ const {
   resolveLocales, splitLocalePath, localePathFor, localeHref, localeRoutes, localeLinker, localizeLinks,
   localeEntryId, stripLocaleSuffix, localePagePath, basePagePath, localeEndonym,
   defaultLocaleEntries, pickLocaleEntry, htmlLang, pageLang, hreflangLinks, localeSwitcher,
-  localeConfig, sitemapI18n,
+  localeConfig, sitemapI18n, siteRouteBases,
 } = await jiti.import(resolve(PKG, 'src/i18n.ts'));
 const stubbed = createJiti(import.meta.url, { alias: { 'astro:content': resolve(PKG, 'bin/_astro-content-stub.mjs') } });
 const { localeAwareId } = await stubbed.import(resolve(PKG, 'collections.ts'));
@@ -85,7 +85,7 @@ eq(localeHref('/omradet', 'no', R), '/no/omradet', 'the same rule holds for ever
 eq(localeHref('/guider/vinter', 'en', R), '/en/guider/vinter', 'a nested page slug is prefixed too');
 eq(localeHref('/', 'en', R), '/en/', 'a link home lands on the locale front page');
 eq(localeHref('/bokning/stugan', 'en', R), '/bokning/stugan',
-  'a booking route has no locale route — the link stays bare instead of pointing at a 404');
+  'a site that declares no route of its own for a path leaves the link bare instead of pointing at a 404');
 eq(localeHref('/tack', 'en', R), '/tack', "the form confirmation is built once — it is not prefixed");
 eq(localeHref('/utkast', 'en', R), '/utkast', 'an unpublished page is not served in any language, prefixed or not');
 eq(localeHref('/nagot-okant', 'en', R), '/nagot-okant', 'an unknown path is left alone — refuse rather than guess');
@@ -101,6 +101,34 @@ eq(localeHref('tel:+4670', 'en', R), 'tel:+4670', 'a tel: link is left alone');
 eq(localeHref('//cdn.example.com/x', 'en', R), '//cdn.example.com/x', 'a protocol-relative link is left alone');
 eq(localeHref('', 'en', R), '', 'an empty href stays empty — a nav item with no link must not become a link home');
 check(localeRoutes(PLAIN, PAGES).served.size === 0, 'a site with no locales serves no locale routes at all');
+
+// integration.mjs injects a twin of every enabled addon route under each non-default locale, so the addon paths the site declares answer in every language — the engine's own routes (/tack, listings, towns, services) are still built once.
+console.log('\n· the addon routes the site serves are prefixed too');
+const BOOKING_SITE = {
+  ...SITE,
+  routes: {
+    booking: '/bokning', bookingManage: '/min-bokning', bookingAction: 'boka',
+    blog: '/blogg', contact: '/kontakt', formSuccess: '/tack',
+  },
+};
+const BR = localeRoutes(BOOKING_SITE, PAGES);
+eq(BR.routeBases, ['/bokning', '/min-bokning'],
+  "the bases are the site's own route values, the engine's own routes and the bare child segments left out");
+eq(localeHref('/bokning', 'en', BR), '/en/bokning', 'the base itself is prefixed — the addon page reads its language off the URL');
+eq(localeHref('/bokning/stugan', 'en', BR), '/en/bokning/stugan', 'a dynamic page under the base is prefixed with it');
+eq(localeHref('/bokning/stugan/boka', 'en', BR), '/en/bokning/stugan/boka', 'however deep the path runs');
+eq(localeHref('/min-bokning', 'no', BR), '/no/min-bokning', 'each guest page is its own base, in every locale');
+eq(localeHref('/min-bokning?token=abc', 'en', BR), '/en/min-bokning?token=abc', 'a query rides along to the prefixed page');
+eq(localeHref('/bokning/', 'en', BR), '/en/bokning/', 'a trailing slash is preserved here as well');
+eq(localeHref('/bokning', 'sv', BR), '/bokning', 'the default locale is never a prefix');
+eq(localeHref('/tack', 'en', BR), '/tack', "the form confirmation is one of the engine's own routes — built once, so it stays bare");
+eq(localeHref('/blogg/nyhet', 'en', BR), '/blogg/nyhet', 'and so is a listing route');
+eq(localeHref('/bokningar', 'en', BR), '/bokningar', 'a path that merely starts with the same letters is not under the base');
+eq(localeHref('/boka', 'en', BR), '/boka', 'a bare route segment names a child, not a path — it is no base of its own');
+eq(localeHref('/nagot-okant', 'en', BR), '/nagot-okant', 'an unknown path is still left alone');
+eq(localeLinker(BOOKING_SITE, 'en', PAGES)('/bokning/stugan'), '/en/bokning/stugan', 'the mapper the components use follows the same rule');
+eq(localeHref('/bokning', 'en', localeRoutes({ ...PLAIN, routes: BOOKING_SITE.routes }, PAGES)), '/bokning',
+  'a single-language site serves no twins — every addon path stays bare');
 
 console.log('\n· the linker the components use');
 const link = localeLinker(SITE, 'en', PAGES);
@@ -218,11 +246,31 @@ eq(localeSwitcher('/', SITE, TRANSLATED).map((l) => l.href), ['/', '/en/', '/no/
   'on the front page the switcher is the three front pages');
 eq(localeSwitcher('/areas/oslo', SITE, TRANSLATED).map((l) => l.href), ['/areas/oslo', '/en/', '/no/'],
   'a route with no page entry sends the other locales to their front page');
+eq(localeSwitcher('/en/bokning', BOOKING_SITE, TRANSLATED).map((l) => l.href), ['/bokning', '/en/bokning', '/no/bokning'],
+  'an addon page is served in every language, so the switcher offers the page itself rather than the front page');
+eq(localeSwitcher('/en/bokning', BOOKING_SITE, TRANSLATED).map((l) => l.current), [false, true, false],
+  'and the language the addon page is being read in is the current one');
+eq(localeSwitcher('/en/bokning/stugan', BOOKING_SITE, TRANSLATED).map((l) => l.href),
+  ['/bokning/stugan', '/en/bokning/stugan', '/no/bokning/stugan'], 'a dynamic addon page keeps its own path across the languages');
+eq(localeSwitcher('/bokning', BOOKING_SITE, TRANSLATED).map((l) => l.href), ['/bokning', '/en/bokning', '/no/bokning'],
+  'the same three targets seen from the default language');
+eq(hreflangLinks('/en/bokning', BOOKING_SITE, 'https://ex.se', TRANSLATED).map((a) => a.hreflang), ['sv-SE', 'en', 'no', 'x-default'],
+  'the head of an addon page names every language and closes with x-default');
+eq(hreflangLinks('/en/bokning', BOOKING_SITE, 'https://ex.se', TRANSLATED).map((a) => a.href),
+  ['https://ex.se/bokning', 'https://ex.se/en/bokning', 'https://ex.se/no/bokning', 'https://ex.se/bokning'],
+  'each alternate is the same addon path under that language');
 
 // ── sitemap ─────────────────────────────────────────────────────────────────
 console.log('\n· sitemap alternates');
 eq(sitemapI18n(SITE), { i18n: { defaultLocale: 'sv', locales: { sv: 'sv-SE', en: 'en', no: 'no' } } },
   'the sitemap integration gets the same locale-to-tag map the head uses');
+
+// ── addon route bases never include the single-language terms page ──────────
+{
+  const bases = siteRouteBases({ routes: { booking: '/bokning', bookingTerms: '/bokningsvillkor', bookingManage: '/min-bokning' } });
+  check(bases.includes('/bokning') && bases.includes('/min-bokning'), 'booking bases are prefixable');
+  check(!bases.includes('/bokningsvillkor'), 'the terms page has no locale twin, so a prefixed link to it would 404');
+}
 
 // ── a page's own address per language ───────────────────────────────────────
 console.log('\n· an address of its own, per language');

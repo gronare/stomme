@@ -318,6 +318,9 @@ export default function stomme(options = {}) {
           enabled.push(`${r.prefix}/[slug]`);
         }
 
+        const locales = resolveLocaleList(options.locales ?? (await siteLocales(resolve(root, configPath))));
+        const addonRouted = [];
+
         if (slotsDir) {
           const routesManifest = resolve(slotsDir, 'routes.mjs');
           if (existsSync(routesManifest)) {
@@ -356,12 +359,12 @@ export default function stomme(options = {}) {
               }
               if (!features[r.feature]) continue;
               injectRoute({ pattern: r.pattern, entrypoint: r.entrypoint });
+              addonRouted.push(r);
               enabled.push(r.pattern);
             }
           }
         }
 
-        const locales = resolveLocaleList(options.locales ?? (await siteLocales(resolve(root, configPath))));
         for (const loc of locales.slice(1)) {
           const localeDir = resolve(outDir, 'locale', loc);
           mkdirSync(localeDir, { recursive: true });
@@ -372,6 +375,11 @@ export default function stomme(options = {}) {
           writeFileSync(pagesFile, localePagesEntrypoint(loc));
           injectRoute({ pattern: `/${loc}/[...slug]`, entrypoint: pagesFile });
           enabled.push(`/${loc}`, `/${loc}/[...slug]`);
+          // The same entrypoint, never a wrapper: the addon pages read their language off the URL, so a twin under the prefix answers in that language on its own, dynamic patterns and their static paths included.
+          for (const r of addonRouted) {
+            injectRoute({ pattern: `/${loc}${r.pattern}`, entrypoint: r.entrypoint });
+            enabled.push(`/${loc}${r.pattern}`);
+          }
         }
 
         const listingsDir = resolve(outDir, 'listings');
