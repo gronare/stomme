@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import assert from 'node:assert/strict';
-import { isUnlisted } from '../src/config.ts';
+import { canonicalBounceHost, demoHost, isUnlisted } from '../src/config.ts';
 
 const cases = [
   ['/book', ['/book'], true, 'the prefix itself'],
@@ -17,4 +17,17 @@ const cases = [
 for (const [path, list, want, why] of cases) {
   assert.equal(isUnlisted(path, list), want, `${why}: isUnlisted(${path}, ${JSON.stringify(list)})`);
 }
-console.log(`ok — ${cases.length} unlisted-path cases`);
+
+const hostCases = [
+  ['https://bakkebyvegen22b.se', 'bakkebyvegen22b.se', 'a real domain bounces the demo hosts to it'],
+  ['https://site.pages.dev', '', 'a pages.dev address is the demo itself'],
+  ['https://site.gronare.workers.dev', '', 'a workers.dev address is the demo itself'],
+  ['', '', 'no address at all'],
+  ['not a url', '', 'an unparseable address'],
+];
+for (const [url, want, why] of hostCases) {
+  assert.equal(canonicalBounceHost(url), want, `${why}: canonicalBounceHost(${JSON.stringify(url)})`);
+}
+assert.equal(demoHost('site.pages.dev') && demoHost('x.gronare.workers.dev') && !demoHost('bakkebyvegen22b.se'), true, 'demoHost covers both suffixes and nothing else');
+
+console.log(`ok — ${cases.length} unlisted-path cases, ${hostCases.length + 1} demo-host cases`);

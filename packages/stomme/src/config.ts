@@ -368,6 +368,20 @@ export function isUnlisted(pathname: string, noindex?: string[]): boolean {
   });
 }
 
+const DEMO_HOST_SUFFIXES = ['.pages.dev', '.workers.dev'];
+
+export function demoHost(hostname?: string): boolean {
+  const h = String(hostname || '');
+  return DEMO_HOST_SUFFIXES.some((s) => h.endsWith(s));
+}
+
+// '' when the site's own address is a demo host: a demo has no real domain to send anyone to, and bouncing it to itself would loop.
+export function canonicalBounceHost(siteUrl?: string | URL): string {
+  let host = '';
+  try { host = new URL(String(siteUrl || '')).hostname; } catch { return ''; }
+  return !host || demoHost(host) ? '' : host;
+}
+
 // `locale` renders the chrome in another language than the site's own: the site's `strings` overrides are written in the default language, so they are dropped whenever the requested language is not that one.
 export function resolveSite(c?: SiteConfig, locale?: string) {
   const lang = (t?: string) => String(t || '').split(/[-_]/)[0].toLowerCase();

@@ -66,6 +66,10 @@ try {
   check(emitted('about') && emitted('en/about') && emitted('no/about'),
     'a page no translation renamed still answers on the filename in every language');
 
+  const bounce = html('omradet');
+  check(bounce.includes('location.replace') && bounce.includes('example.com') && bounce.includes(".endsWith('.pages.dev')"),
+    'a demo-host visit bounces to the real domain, and only a demo-host visit');
+
   const alts = alternates(html('omradet'));
   check(JSON.stringify(alts) === JSON.stringify([['sv-SE', 'https://example.com/omradet/'], ['en', 'https://example.com/en/the-area/'], ['no', 'https://example.com/no/omraadet/'], ['x-default', 'https://example.com/omradet/']]),
     'the head names every language by the URL that language answers on', JSON.stringify(alts));
