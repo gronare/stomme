@@ -183,10 +183,20 @@ try {
   await check('variable-type pill (.item > .header .type)', () => has(page, '.item > .header .type'));
   await check('item disclosure (.header > div:first-child > button[aria-expanded])', () => has(page, '.item > .header > div:first-child > button[aria-expanded]'));
   await check('item body (.item-body)', () => has(page, '.item > .item-body'));
-  await check('move buttons (arrow_upward/arrow_downward icons)', () => page.evaluate(() =>
-    [...document.querySelectorAll('.item > .header button .material-symbols-outlined')].some((i) => /^arrow_(up|down)ward$/.test((i.textContent || '').trim()))));
-  await check('editor.js binds (draggable armed on the item)', () =>
-    page.waitForFunction(() => document.querySelector('.item[draggable]'), null, { timeout: 5000 }).then(() => true));
+  const handleBox = () => page.evaluate(() => {
+    const h = document.querySelector('section.field[data-field-type=list] .item > .header button.drag-handle[data-action="reorder"]');
+    if (!h) return null;
+    const r = h.getBoundingClientRect();
+    const s = document.querySelector('section.field[data-field-type=list] .item > .item-body > .summary')?.getBoundingClientRect();
+    return { w: Math.round(r.width), h: Math.round(r.height), left: Math.round(r.left), summaryRight: s ? Math.round(s.right) : null };
+  });
+  await check('reorder handle (.header button.drag-handle[data-action=reorder]) renders visibly', async () => {
+    const b = await handleBox();
+    if (!b) return 'no > .header button.drag-handle[data-action=reorder] — Sveltia moved or renamed its reorder handle';
+    return b.w > 0 && b.h > 0 ? true : `the handle renders at ${b.w}×${b.h}px — THEME_CSS hides it and the list cannot be reordered`;
+  });
+  await check('editor.js binds (click-to-expand armed on the item)', () =>
+    page.waitForFunction(() => !!document.querySelector('section.field[data-field-type=list] .item')?.__stomme, null, { timeout: 5000 }).then(() => true));
   await check('collapse via disclosure → .item-body > .summary renders', async () => {
     await page.evaluate(() => {
       const b = document.querySelector('.item > .header > div:first-child > button[aria-expanded="true"]');
@@ -194,6 +204,13 @@ try {
     });
     await page.waitForFunction(() => document.querySelector('.item > .header > div:first-child > button[aria-expanded="false"]'), null, { timeout: 5000 });
     return has(page, '.item > .item-body > .summary');
+  });
+  await check('collapsed one-row layout keeps the reorder handle visible, right of the summary', async () => {
+    const b = await handleBox();
+    if (!b) return 'the handle vanished from the collapsed row';
+    if (!(b.w > 0 && b.h > 0)) return `the handle renders at ${b.w}×${b.h}px in the collapsed row`;
+    if (b.summaryRight === null) return 'no .item-body > .summary to order the handle against';
+    return b.left >= b.summaryRight ? true : `the handle sits at x=${b.left}, left of the summary's right edge ${b.summaryRight} — the one-row order rule no longer holds`;
   });
   await check('editor.js click-to-expand (row click flips aria-expanded)', async () => {
     await page.evaluate(() => { document.querySelector('section.field[data-field-type=list] .item').click(); });

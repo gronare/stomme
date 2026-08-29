@@ -68,7 +68,7 @@ const applied = [...new Set([
   ...[...read('admin/editor.js').matchAll(/classList\.(?:add|toggle)\('(stomme-[a-z-]+)'/g)].map((m) => m[1]),
   ...[...read('admin/editor.js').matchAll(/className = '(stomme-[a-z-]+)'/g)].map((m) => m[1]),
 ])];
-check(applied.length >= 5, `admin/editor.js applies ${applied.length} stomme-* classes`, applied.join(', '));
+check(applied.includes('stomme-open'), `admin/editor.js applies ${applied.length} stomme-* classes, the gate card's stomme-open among them`, applied.join(', '));
 for (const cls of applied) check(css.includes(`.${cls}`), `.${cls} has a rule in THEME_CSS`);
 
 console.log('\n· the shell ships and cache-busts this exact string');

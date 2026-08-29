@@ -1,106 +1,16 @@
 (function () {
   'use strict';
-  var UP = 'arrow_upward', DOWN = 'arrow_downward';
-
-  function iconOf(btn) { var i = btn.querySelector('.material-symbols-outlined'); return i ? (i.textContent || '').trim() : ''; }
   // The expand/collapse disclosure — first header group's button; NOT the aria-expanded ⋮ menu button.
   function toggleButton(item) { return item.querySelector(':scope > .header > div:first-child > button[aria-expanded]'); }
   function isCollapsed(item) { var b = toggleButton(item); return !!b && b.getAttribute('aria-expanded') === 'false'; }
-  function moveButton(item, icon) {
-    var btns = item.querySelectorAll(':scope > .header button');
-    for (var i = 0; i < btns.length; i++) if (iconOf(btns[i]) === icon) return btns[i];
-    return null;
-  }
-  function isReorderable(item) { return !!(moveButton(item, UP) || moveButton(item, DOWN)); }
-  function rowItems(list) {
-    return Array.prototype.filter.call(list.children, function (c) {
-      return c.classList && c.classList.contains('item') && isReorderable(c);
-    });
-  }
+  function isListItem(item) { return !!item.closest('section.field[data-field-type="list"]') && !!toggleButton(item); }
   function delay(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
 
-  async function reorder(list, from, dir, steps) {
-    var idx = from;
-    for (var s = 0; s < steps; s++) {
-      var cur = rowItems(list)[idx];
-      if (!cur) return;
-      var btn = moveButton(cur, dir < 0 ? UP : DOWN);
-      if (!btn || btn.disabled || btn.getAttribute('aria-disabled') === 'true') return;
-      btn.click();
-      idx += dir;
-      await delay(120);
-    }
-  }
-
-  var dragged = null;
-  function clearDrop() {
-    document.querySelectorAll('.stomme-drop-before, .stomme-drop-after').forEach(function (n) {
-      n.classList.remove('stomme-drop-before', 'stomme-drop-after');
-    });
-  }
-  function gapAt(items, y) {
-    for (var i = 0; i < items.length; i++) {
-      var r = items[i].getBoundingClientRect();
-      if (y < r.top + r.height / 2) return i;
-    }
-    return items.length;
-  }
-  function enhanceList(list) {
-    if (list.__stommeDnd) return;
-    list.__stommeDnd = true;
-    list.addEventListener('dragover', function (e) {
-      if (!dragged || dragged.parentElement !== list) return;
-      e.preventDefault();
-      e.dataTransfer.dropEffect = 'move';
-      var items = rowItems(list), from = items.indexOf(dragged), g = gapAt(items, e.clientY);
-      clearDrop();
-      if (g === from || g === from + 1) return;
-      if (items[g - 1]) items[g - 1].classList.add('stomme-drop-after');
-      if (items[g]) items[g].classList.add('stomme-drop-before');
-    });
-    list.addEventListener('dragleave', function (e) { if (e.target === list) clearDrop(); });
-    list.addEventListener('drop', function (e) {
-      if (!dragged || dragged.parentElement !== list) return;
-      e.preventDefault();
-      clearDrop();
-      var items = rowItems(list), from = items.indexOf(dragged), g = gapAt(items, e.clientY);
-      if (from < 0 || g === from || g === from + 1) return;
-      if (g < from) reorder(list, from, -1, from - g);
-      else reorder(list, from, 1, g - from - 1);
-    });
-  }
-
-  function inTextEntry(t) { return !!(t.closest && t.closest('input, textarea, select, [contenteditable]')); }
   function inControl(t) { return !!(t.closest && t.closest('button, a, input, textarea, select, [contenteditable], [role="menu"], [role="listbox"]')); }
 
   function enhance(item) {
-    if (!isReorderable(item)) return;
-    if (toggleButton(item)) item.setAttribute('draggable', isCollapsed(item) ? 'true' : 'false');
-    if (item.__stomme) return;
+    if (item.__stomme || !isListItem(item)) return;
     item.__stomme = true;
-    if (!toggleButton(item)) item.setAttribute('draggable', 'false');
-    enhanceList(item.parentElement);
-
-    // Draggable is decided per-press: a grab outside controls/inputs (and outside nested items) drags THIS item, while presses in inputs keep native text selection.
-    item.addEventListener('mousedown', function (e) {
-      var ok = !inControl(e.target) && e.target.closest('.item') === item;
-      item.setAttribute('draggable', ok ? 'true' : 'false');
-    });
-    item.addEventListener('dragstart', function (e) {
-      if (e.target !== item) {
-        if (e.target.closest && e.target.closest('.item') === item) e.preventDefault();
-        return;
-      }
-      dragged = item;
-      e.dataTransfer.effectAllowed = 'move';
-      try { e.dataTransfer.setData('text/plain', 'stomme-item'); } catch (x) {}
-      item.classList.add('stomme-dragging');
-    });
-    item.addEventListener('dragend', function () {
-      item.classList.remove('stomme-dragging');
-      dragged = null;
-      clearDrop();
-    });
     item.addEventListener('click', function (e) {
       if (inControl(e.target)) return;
       if (e.target.closest('.item') !== item) return;
