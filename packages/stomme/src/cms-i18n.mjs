@@ -1,5 +1,5 @@
-// The page-like content the CMS localizes. Everything else — settings, contact, theme, tracking, and every sync-owned addon pane — stays single-language: a locale file for them would fork data, not copy.
-export const LOCALIZED_EDITORS = ['home', 'pages', 'nav'];
+// The visitor-facing content the CMS localizes. Everything else — settings, contact, theme, tracking, and every sync-owned addon pane — stays single-language: a locale file for them would fork data, not copy.
+export const LOCALIZED_EDITORS = ['home', 'pages', 'nav', 'faq', 'footer'];
 
 const TRANSLATABLE = new Set(['string', 'text', 'markdown', 'object', 'list', 'blocks']);
 

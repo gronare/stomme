@@ -29,6 +29,31 @@ blocks:
 ---
 `;
 
+const EN_QUESTION = 'This question is written in English.';
+const EN_TAGLINE = 'The footer, written in English.';
+const EN_LINK = 'About, read in English';
+
+const faqEntry = (question, answer) => `---
+question: ${JSON.stringify(question)}
+answer: ${JSON.stringify(answer)}
+order: 1
+tags: [basics]
+---
+`;
+
+// What Sveltia writes for a translation: the text fields in the new language, the toggles duplicated from the default locale.
+const footerEntry = (tagline, label) => `---
+showLogo: true
+showWordmark: true
+showLinks: true
+tagline: ${JSON.stringify(tagline)}
+links:
+  - label: ${JSON.stringify(label)}
+    link:
+      page: /about
+---
+`;
+
 function write(rel, body) {
   const file = resolve(STARTER, rel);
   mkdirSync(dirname(file), { recursive: true });
@@ -52,6 +77,8 @@ try {
   write('src/content/pages/omradet.md', page('Området'));
   write('src/content/pages/omradet.en.md', page('The area', 'the-area'));
   write('src/content/pages/omradet.no.md', page('Området', 'omraadet'));
+  write('src/content/faq/what-is-this.en.md', faqEntry(EN_QUESTION, 'This answer is written in English.'));
+  write('src/content/footer/footer.en.md', footerEntry(EN_TAGLINE, EN_LINK));
 
   console.log('· static build with three languages, the switcher left at its default…');
   rmSync(DIST, { recursive: true, force: true });
@@ -87,6 +114,23 @@ try {
   check(/<a class="lang-switch__row"[^>]*href="\/en\/the-area"/.test(nav),
     "the switcher's own targets are the translated addresses");
   check(/aria-label="Byt språk"/.test(nav), 'the control says what it does, in the language of the page');
+
+  const home = { sv: html(''), en: html('en'), no: html('no') };
+  const BASE_QUESTION = 'What is this starter?';
+  check(home.sv.includes(BASE_QUESTION) && !home.sv.includes(EN_QUESTION), 'the site reads its own language on its own front page');
+  check(home.en.includes(EN_QUESTION) && !home.en.includes(BASE_QUESTION),
+    'a translated FAQ question replaces the original under /en/ — it is not shown beside it');
+  check((home.en.split(EN_QUESTION).length - 1) === (home.sv.split(BASE_QUESTION).length - 1),
+    'the translation is rendered exactly as many times as the question it replaced — the locale file is no second entry');
+  check(home.en.includes('How do I add a page?'), 'a question nobody translated still answers under /en/, in the default language');
+  check(home.no.includes(BASE_QUESTION) && !home.no.includes(EN_QUESTION), 'and a language with no file of its own falls back the same way');
+
+  check(home.en.includes(EN_TAGLINE) && !home.sv.includes(EN_TAGLINE), 'the footer under /en/ is the translated footer');
+  check(home.no.includes('A block-built starter'), 'an untranslated footer falls back to the one the site started with');
+  check(/<p class="mono eyebrow">Links<\/p>/.test(home.en) && /<p class="mono eyebrow">Explore<\/p>/.test(home.sv),
+    "a heading the translation leaves empty falls back to the chrome's own word for it, in the page's language");
+  check(new RegExp(`href="/en/about" class="footer-link">${EN_LINK}<`).test(home.en),
+    'a translated footer link keeps its page — and lands on the address that page has in this language');
 
   console.log('· the same site with the switcher set to flags…');
   writeFileSync(resolve(STARTER, 'src/content/settings/site.md'),

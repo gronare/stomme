@@ -147,6 +147,29 @@ eq(defaultLocaleEntries(ENTRIES, SITE).map((e) => e.id), ['kontakt', 'om-oss', '
 eq(stripLocaleSuffix('kontakt.en', L.locales), { id: 'kontakt', locale: 'en' }, 'a configured locale suffix is recognised');
 eq(stripLocaleSuffix('kontakt.de', L.locales), { id: 'kontakt.de', locale: null }, 'a suffix the site has no locale for is part of the id');
 
+console.log('\n· the FAQ list is the untranslated entries, read in the page\'s language');
+const FAQ = [
+  { id: 'pris', data: { question: 'Vad kostar det?', order: 2, tags: ['pris'] } },
+  { id: 'pris.en', data: { question: 'What does it cost?', order: 99, tags: ['price'] } },
+  { id: 'tid', data: { question: 'Hur lång tid tar det?', order: 1, tags: ['pris'] } },
+];
+const faqBase = defaultLocaleEntries(FAQ, SITE);
+eq(faqBase.map((e) => e.id), ['pris', 'tid'], 'a translated question is not a second question — it is listed once, under its own id');
+eq([...faqBase].sort((a, b) => a.data.order - b.data.order).map((e) => e.id), ['tid', 'pris'],
+  'the order that decides the list is the untranslated one, whatever a translation says');
+eq(faqBase.filter((e) => e.data.tags.includes('pris')).map((e) => e.id), ['pris', 'tid'],
+  'and so are the tags a block filters on');
+eq(pickLocaleEntry(FAQ, 'pris', 'en', L).entry.data.question, 'What does it cost?', 'a question with a translation is read in that language');
+eq(pickLocaleEntry(FAQ, 'tid', 'en', L).entry.data.question, 'Hur lång tid tar det?', 'one without still answers under /en/, in the default language');
+eq(pickLocaleEntry(FAQ, 'pris', 'no', L).entry.data.question, 'Vad kostar det?', 'a locale with no file of its own falls back the same way');
+
+console.log('\n· the footer entry follows the page it is under');
+const FOOTER = [{ id: 'footer' }, { id: 'footer.en' }];
+eq(localeEntryId('footer', 'en', L.default), 'footer.en', 'the footer is a file collection localized like any other entry');
+eq(pickLocaleEntry(FOOTER, 'footer', 'en', L).entry.id, 'footer.en', 'a translated footer is the one rendered under /en/');
+eq(pickLocaleEntry(FOOTER, 'footer', 'no', L).entry.id, 'footer', 'an untranslated language falls back to the footer the site started with');
+eq(pickLocaleEntry(FOOTER, 'footer', 'sv', L).entry.id, 'footer', 'the default language reads the unsuffixed file');
+
 // ── <html lang> ─────────────────────────────────────────────────────────────
 console.log('\n· the language the page declares');
 eq(htmlLang('sv', SITE), 'sv-SE', "the default locale keeps the site's full language tag");
@@ -332,7 +355,7 @@ check(!i18nConfigBlock(['sv', 'en']).includes('save_all_locales'),
   'the deprecated save_all_locales is never emitted — 0.201.2 warns on it and drops it at 1.0');
 eq(localeFilePath('src/content/home/home.md'), 'src/content/home/home.{{locale}}.md',
   'a file collection carries the locale in its path — Sveltia needs the placeholder to write per-locale files');
-eq(LOCALIZED_EDITORS, ['home', 'pages', 'nav'], 'only the page-like editors are localized — settings and sync-owned data are not');
+eq(LOCALIZED_EDITORS, ['home', 'pages', 'nav', 'faq', 'footer'], 'only the visitor-facing editors are localized — settings and sync-owned data are not');
 
 console.log('\n· every field declares its i18n, or Sveltia drops it on save');
 eq(i18nFlagFor({ widget: 'string' }), 'true', 'text is translated');
@@ -395,7 +418,7 @@ check(/\n      i18n: true\n      fields:/.test(onEditors.COLLECTION_EDITORS.home
 check(/\n  slug: "\{\{slug\}\}"\n  i18n: true\n/.test(onEditors.COLLECTION_EDITORS.pages), 'a localized pages collection declares i18n');
 check(onEditors.COLLECTION_EDITORS.pages.includes('name: published, label: "Published", widget: boolean, default: true, required: false, hint: "Uncheck to hide the page — unpublished pages aren\'t built.", i18n: duplicate'),
   'publication is one decision for every language, not one per translation');
-check(onEditors.COLLECTION_EDITORS.faq === offEditors.COLLECTION_EDITORS.faq, 'an editor outside the localized set is untouched');
+check(onEditors.COLLECTION_EDITORS.testimonials === offEditors.COLLECTION_EDITORS.testimonials, 'an editor outside the localized set is untouched');
 check(onEditors.COLLECTION_EDITORS.pages.includes('name: url, label: "Address in this language"'),
   'a localized pages editor offers the page its own address per language');
 check(/pattern: \["\^\[a-z0-9\]\+\(\?:-\[a-z0-9\]\+\)\*\$"/.test(onEditors.COLLECTION_EDITORS.pages),
@@ -404,6 +427,16 @@ check(/name: url,[^\n]*, i18n: true \}/.test(onEditors.COLLECTION_EDITORS.pages)
   'the address is translated per locale, not duplicated — one address for every language would defeat the field');
 check(!offEditors.COLLECTION_EDITORS.pages.includes('name: url'),
   'a single-language site is offered no address field — its address is the filename and nothing else');
+
+check(/\n  slug: "\{\{slug\}\}"\n  i18n: true\n/.test(onEditors.COLLECTION_EDITORS.faq), 'a localized faq collection declares i18n');
+check(!/i18n:/.test(offEditors.COLLECTION_EDITORS.faq), 'a single-language faq editor carries no i18n at all');
+check(onEditors.COLLECTION_EDITORS.faq.includes('name: question, label: "Question", widget: string, i18n: true')
+  && onEditors.COLLECTION_EDITORS.faq.includes('name: answer, label: "Answer", widget: text, i18n: true'),
+  'the question and its answer are what a translator writes');
+check(onEditors.COLLECTION_EDITORS.faq.includes('name: order, widget: hidden, required: false, default: 0, i18n: duplicate'),
+  'the sort order is one decision for every language — a translation must not reorder the list');
+check(/\n      i18n: duplicate\n      field: \{ name: tag, label: "Tag", widget: string, i18n: duplicate \}/.test(onEditors.COLLECTION_EDITORS.faq),
+  'the tags are duplicated down to the tag itself — a translated tag would scope the question to nothing');
 
 const settingsYaml = (LOCALES) => makeSettingsPane({
   q, pad, emitWidget: E.emitWidget, emitNavLinks: E.emitNavLinks, emitFooterLinks: E.emitFooterLinks, emitThanksButtons: E.emitThanksButtons,
@@ -414,6 +447,26 @@ check(settingsYaml(['sv', 'en', 'no']).includes('- name: languageSwitcher'), 'a 
 check(/- \{ label: "Globe with a language list", value: globe \}/.test(settingsYaml(['sv', 'en', 'no'])), 'the globe is one of the two variants');
 check(settingsYaml(['sv', 'en', 'no']).includes('default: globe'), 'and it is the one a site gets without choosing');
 check(!settingsYaml(['sv']).includes('languageSwitcher'), 'a single-language site sees no switcher setting — it renders no switcher either');
+
+const multiSettings = settingsYaml(['sv', 'en', 'no']);
+check(/^ {2}- name: settings\n {4}label: "Settings"\n {4}i18n: true\n/.test(multiSettings),
+  'the Settings collection declares i18n — a file flag inside a collection without one localizes nothing');
+check(multiSettings.includes('file: "src/content/footer/footer.{{locale}}.md"'), "the footer's file path carries the locale placeholder");
+check(/file: "src\/content\/footer\/footer\.\{\{locale\}\}\.md"\n {8}i18n: true\n {8}fields:/.test(multiSettings),
+  'and the footer FILE declares i18n too');
+check(settingsYaml(['sv']).includes('file: "src/content/footer/footer.md"') && !settingsYaml(['sv']).includes('{{locale}}'),
+  'a single-language site keeps the one footer file it had');
+check(settingsYaml([]) === settingsYaml(['sv']), 'the settings pane is byte-identical whether or not a single locale is named');
+for (const [field, flag] of [['tagline', 'true'], ['note', 'true'], ['townsHeading', 'true'], ['linksHeading', 'true']])
+  check(new RegExp(`name: ${field},[^\\n]*, i18n: ${flag} \\}`).test(multiSettings), `the footer's ${field} is written per language`);
+for (const [field, flag] of [['dark', 'duplicate'], ['showLinks', 'duplicate'], ['showTowns', 'duplicate']])
+  check(new RegExp(`name: ${field},[^\\n]*, i18n: ${flag} \\}`).test(multiSettings), `the footer's ${field} is one setting for every language`);
+const footerPane = multiSettings.slice(multiSettings.indexOf('- name: footer'), multiSettings.indexOf('- label: "Form confirmation"'));
+check((footerPane.match(/\bi18n:/g) || []).length === (footerPane.match(/\bwidget:/g) || []).length + 1,
+  'every field under the footer declares its i18n, plus the file itself — an undeclared key is deleted from the translation on save',
+  `i18n=${(footerPane.match(/\bi18n:/g) || []).length} widget=${(footerPane.match(/\bwidget:/g) || []).length}`);
+check(/- name: page\n\s+label: "Page"\n\s+widget: select\n[\s\S]*?\n\s+i18n: duplicate\n\s+options:/.test(footerPane),
+  'a footer link keeps pointing at the same page in every language — the address per language is the linker\'s job');
 // Sveltia writes its canonical-slug key (`translationKey`) into the frontmatter only when the slug template carries a `| localize` filter — that is the sole trigger (Aue → jue → ede in 0.201.2). Our slug is the same in every language, so nothing undeclared is ever written; a `| localize` here would start writing a key no schema knows.
 for (const name of LOCALIZED_EDITORS.filter((n) => onEditors.COLLECTION_EDITORS[n]))
   check(!/\|\s*localize/.test(onEditors.COLLECTION_EDITORS[name]) && !onEditors.COLLECTION_EDITORS[name].includes('canonical_slug'),

@@ -49,19 +49,19 @@ ${emitWidget(4, on('pages'))}`,
   create: true
   reorder: true
   summary: "{{fields.question}}"
-  slug: "{{slug}}"
+  slug: "{{slug}}"${line('faq', 2, 'i18n: true')}
   fields:
-    - { name: question, label: "Question", widget: string }
-    - { name: answer, label: "Answer", widget: text }
-    - { name: order, widget: hidden, required: false, default: 0 }
+    - { name: question, label: "Question", widget: string${inline('faq', 'true')} }
+    - { name: answer, label: "Answer", widget: text${inline('faq', 'true')} }
+    - { name: order, widget: hidden, required: false, default: 0${inline('faq', 'duplicate')} }
     - name: tags
       label: "Tags"
       widget: list
       required: false
       collapsed: true
       summary: "{{fields.tag}}"
-      hint: "Scope the question to pages: an FAQ block filtered on a tag (e.g. a service or town) shows every question carrying it. Click a suggested tag to add it, or type a new one."
-      field: { name: tag, label: "Tag", widget: string }`,
+      hint: "Scope the question to pages: an FAQ block filtered on a tag (e.g. a service or town) shows every question carrying it. Click a suggested tag to add it, or type a new one."${line('faq', 6, 'i18n: duplicate')}
+      field: { name: tag, label: "Tag", widget: string${inline('faq', 'duplicate')} }`,
   testimonials: `- name: testimonials
   label: "Testimonials"
   label_singular: "Testimonial"

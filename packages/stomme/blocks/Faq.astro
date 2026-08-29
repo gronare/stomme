@@ -2,6 +2,8 @@
 import { getCollection, getEntry } from 'astro:content';
 import Icon from '../src/Icon.astro';
 import { resolveButton } from '../src/href';
+import { resolveLocales, splitLocalePath, defaultLocaleEntries, pickLocaleEntry } from '../src/i18n';
+import { site } from '@stomme/config';
 import ContactLink from '../src/ContactLink.astro';
 
 interface Props {
@@ -23,11 +25,15 @@ const { eyebrow, heading, intro, entries, tag, asideHeading, asideBody, asideCta
 const variant = Astro.props.layout?.variant ?? 'list';
 const fixture = Astro.props.items;
 const all = fixture ?? (await getCollection('faq'));
-const items = Array.isArray(entries) && entries.length
-  ? (entries.map((id) => all.find((e) => e.id === id)).filter((e) => e != null) as typeof all)
-  : [...all]
+const locales = resolveLocales(site);
+const base = fixture ?? defaultLocaleEntries(all, site);
+const listed = Array.isArray(entries) && entries.length
+  ? (entries.map((id) => base.find((e) => e.id === id)).filter((e) => e != null) as typeof base)
+  : [...base]
       .filter((e) => !tag || ((e.data as any).tags ?? []).includes(tag))
       .sort((a, b) => a.data.order - b.data.order);
+const locale = splitLocalePath(Astro.url.pathname, locales).locale;
+const items = fixture ? listed : listed.map((f) => pickLocaleEntry(all, f.id, locale, locales).entry ?? f);
 const contact = ((await getEntry('contact', 'contact').catch(() => null))?.data ?? {}) as any;
 const emailFallback = contact.email ? `mailto:${contact.email}` : '/';
 const asideBtn = resolveButton(asideCta, asideCtaLabel, asideHref ?? asideCtaHref, emailFallback);

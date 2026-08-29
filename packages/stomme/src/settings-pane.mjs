@@ -1,10 +1,12 @@
-import { i18nConfigBlock, localeFilePath } from './cms-i18n.mjs';
+import { i18nConfigBlock, localeFilePath, LOCALIZED_EDITORS } from './cms-i18n.mjs';
 
 export function makeSettingsPane({ q, pad, emitWidget, emitNavLinks, emitFooterLinks, emitThanksButtons, COLLECTION_EDITORS, listingEditor, collectionEnabled, FEATURES, LISTINGS, CMS, LOCALES = [], ADDON_PANES, ADDON_PANEL_FILES, getStaticCollections }) {
 const multiLocale = LOCALES.length > 1;
-const navI18n = multiLocale;
-const navLine = (indent, text) => (navI18n ? `\n${' '.repeat(indent)}${text}` : '');
-const navInline = (value) => (navI18n ? `, i18n: ${value}` : '');
+const on = (name) => multiLocale && LOCALIZED_EDITORS.includes(name);
+const anyLocalized = ['nav', 'footer'].some(on);
+const line = (name, indent, text) => (on(name) ? `\n${' '.repeat(indent)}${text}` : '');
+const inline = (name, value) => (on(name) ? `, i18n: ${value}` : '');
+const filePath = (name, path) => (on(name) ? localeFilePath(path) : path);
 const generatedEditors = () => Object.keys(COLLECTION_EDITORS).filter(collectionEnabled).filter((n) => !getStaticCollections().has(n));
 function emitCollections(indent) {
   const p = pad(indent);
@@ -141,7 +143,7 @@ function emitLanguageSwitcher(indent) {
 function emitSettings() {
   const tp = emitTrackingPane(6);
   return `  - name: settings
-    label: "Settings"${navLine(4, 'i18n: true')}
+    label: "Settings"${anyLocalized ? '\n    i18n: true' : ''}
     files:
       - name: site
         label: "Identity"
@@ -301,25 +303,25 @@ ${emitShareCards(6)}
           - { name: fontCustomBodyFile, label: "Custom body font file", widget: file, required: false, media_folder: "/public/media/fonts", public_folder: "/media/fonts", hint: "Used when Body font = Custom. Leave empty to reuse the heading font for body." }
       - name: nav
         label: "Header"
-        file: "${navI18n ? localeFilePath('src/content/navigation/nav.md') : 'src/content/navigation/nav.md'}"${navLine(8, 'i18n: true')}
+        file: "${filePath('nav', 'src/content/navigation/nav.md')}"${line('nav', 8, 'i18n: true')}
         fields:
-          - { name: sticky, label: "Sticky header", widget: boolean, required: false, default: false, hint: "Header stays fixed at the top while scrolling. Default: it scrolls away with the page."${navInline('duplicate')} }
-          - { name: showLogo, label: "Show logo mark", widget: boolean, required: false, default: true, hint: "Show the logo image (set under Identity) in the header."${navInline('duplicate')} }
-          - { name: showWordmark, label: "Show wordmark text", widget: boolean, required: false, default: true, hint: "Show the wordmark text (set under Identity) in the header."${navInline('duplicate')} }
-${emitNavLinks(10, navI18n)}
+          - { name: sticky, label: "Sticky header", widget: boolean, required: false, default: false, hint: "Header stays fixed at the top while scrolling. Default: it scrolls away with the page."${inline('nav', 'duplicate')} }
+          - { name: showLogo, label: "Show logo mark", widget: boolean, required: false, default: true, hint: "Show the logo image (set under Identity) in the header."${inline('nav', 'duplicate')} }
+          - { name: showWordmark, label: "Show wordmark text", widget: boolean, required: false, default: true, hint: "Show the wordmark text (set under Identity) in the header."${inline('nav', 'duplicate')} }
+${emitNavLinks(10, on('nav'))}
       - name: footer
         label: "Footer"
-        file: "src/content/footer/footer.md"
+        file: "${filePath('footer', 'src/content/footer/footer.md')}"${line('footer', 8, 'i18n: true')}
         fields:
-          - { name: dark, label: "Dark footer", widget: boolean, required: false, default: false, hint: "Use the dark surface for the footer." }
-          - { name: showLogo, label: "Show logo mark", widget: boolean, required: false, default: true, hint: "Show the logo image (set under Identity) in the footer." }
-          - { name: showWordmark, label: "Show wordmark text", widget: boolean, required: false, default: true, hint: "Show the wordmark text (set under Identity) in the footer." }
-          - { name: tagline, label: "Tagline", widget: string, required: false, hint: "A line under the logo." }
-          - { name: showLinks, label: "Show quick links", widget: boolean, required: false, default: true }
-${emitFooterLinks(10)}
-          - { name: showTowns, label: "Show service areas", widget: boolean, required: false, default: false, hint: "Adds a column linking every entry in the Areas collection." }
-          - { name: townsHeading, label: "Service areas · heading", widget: string, required: false, hint: "The heading above the service-area column, e.g. \\"Areas\\"." }
-          - { name: note, label: "Note", widget: string, required: false, hint: "Appended to the © line." }
+          - { name: dark, label: "Dark footer", widget: boolean, required: false, default: false, hint: "Use the dark surface for the footer."${inline('footer', 'duplicate')} }
+          - { name: showLogo, label: "Show logo mark", widget: boolean, required: false, default: true, hint: "Show the logo image (set under Identity) in the footer."${inline('footer', 'duplicate')} }
+          - { name: showWordmark, label: "Show wordmark text", widget: boolean, required: false, default: true, hint: "Show the wordmark text (set under Identity) in the footer."${inline('footer', 'duplicate')} }
+          - { name: tagline, label: "Tagline", widget: string, required: false, hint: "A line under the logo."${inline('footer', 'true')} }
+          - { name: showLinks, label: "Show quick links", widget: boolean, required: false, default: true${inline('footer', 'duplicate')} }
+${emitFooterLinks(10, on('footer'))}
+          - { name: showTowns, label: "Show service areas", widget: boolean, required: false, default: false, hint: "Adds a column linking every entry in the Areas collection."${inline('footer', 'duplicate')} }
+          - { name: townsHeading, label: "Service areas · heading", widget: string, required: false, hint: "The heading above the service-area column, e.g. \\"Areas\\"."${inline('footer', 'true')} }
+          - { name: note, label: "Note", widget: string, required: false, hint: "Appended to the © line."${inline('footer', 'true')} }
       - label: "Form confirmation"
         name: thanks
         file: "src/content/thanks/thanks.md"

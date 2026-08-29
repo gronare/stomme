@@ -162,7 +162,7 @@ export function makeEmitters({ q, pad, AVAILABLE_BLOCKS, OPTION_SOURCES }) {
     };
   }
 
-  function emitFooterLinks(indent) {
+  function emitFooterLinks(indent, i18n = false) {
     const footerLink = () => ({
       name: 'link', label: 'Link', widget: 'object', collapsed: false, fields: [
         { name: 'page', label: 'Page', widget: 'select', options: '$pages', required: false, hint: 'Pick a page on the site.' },
@@ -182,7 +182,7 @@ export function makeEmitters({ q, pad, AVAILABLE_BLOCKS, OPTION_SOURCES }) {
       linkList('links2', 'Second link group'),
       linkList('legal', 'Legal links (bottom bar)'),
     ];
-    return fields.map((f) => emitField(f, indent)).join('\n');
+    return fields.map((f) => emitField(f, indent, i18n)).join('\n');
   }
   function emitNavLinks(indent, i18n = false) {
     const items = {
