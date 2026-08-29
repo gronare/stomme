@@ -25,7 +25,6 @@ const check = (ok, name, detail = '') => {
   console.log(`${ok ? '✓' : '✗'} ${name}${ok || !detail ? '' : `\n    ${detail}`}`);
 };
 
-// All three surfaces on ONE page: the panel is shared, so what a provider does to the map block it must do to the contact surfaces in the same build.
 const MAP_PAGE = `---
 title: "Probe Map"
 seo:
@@ -136,7 +135,6 @@ const noGoogleAtRest = (b, label) => {
     urls.filter((u) => !u.startsWith('https://www.google.com/maps/dir/')).slice(0, 3).join(' '));
 };
 
-// The contact surfaces have no picture of their own, so a provider that resolves is the whole reason a box exists there.
 const panelOn = (b, label) => {
   check(b.findus.includes('class="findus__map"') && b.findus.includes('class="mappanel mappanel--fill"'),
     `${label}: the find-us map column holds the shared panel`);
@@ -172,7 +170,6 @@ const oneHandler = (b, count, label) => {
     `${label}: ${count} surfaces, ${count} copies of ONE handler byte for byte (${b.handlers.length} scripts, ${distinct} distinct)`);
 };
 
-// The chip is one button, so every assertion about the resting copy reads the same element the visitor clicks.
 const chipOf = (section) => section.match(/<button[^>]*class="mapchip"[\s\S]*?<\/button>/)?.[0] ?? '';
 const inside = (chip, tag) => chip.match(new RegExp(`<${tag}>([^<]*)</${tag}>`))?.[1] ?? '';
 

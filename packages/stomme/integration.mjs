@@ -92,20 +92,14 @@ async function siteMediaConfig(configFile) {
   return resolveMediaConfig(mod.site?.media);
 }
 
-// The block's own resolution, kept in step by hand: an unnamed provider with a key is google, and only a keyed google map has a static image to proxy.
-function hasGoogleMap(maps) {
-  const key = typeof maps?.key === 'string' ? maps.key.trim() : '';
-  const named = maps?.provider === 'osm' || maps?.provider === 'google' ? maps.provider : '';
-  return (named || (key !== '' ? 'google' : '')) === 'google' && key !== '';
-}
-
-async function siteMaps(configFile) {
-  if (!existsSync(configFile)) return null;
+async function siteHasGoogleMap(configFile, pointsFile) {
+  if (!existsSync(configFile)) return false;
   try {
-    const mod = await createJiti(import.meta.url).import(configFile);
-    return mod.site?.maps ?? null;
+    const jiti = createJiti(import.meta.url);
+    const [mod, points] = await Promise.all([jiti.import(configFile), jiti.import(pointsFile)]);
+    return points.mapProvider(mod.site) === 'google' && points.mapKey(mod.site) !== '';
   } catch {
-    return null;
+    return false;
   }
 }
 
@@ -252,8 +246,8 @@ export default function stomme(options = {}) {
           enabled.push('/api/contact');
         }
 
-        // The map still is served from the site's own origin so the visitor's browser never reaches Google before the click; without an adapter there is no endpoint to serve it, and the block falls back to the uploaded picture.
-        const mapProxy = !isStatic && hasGoogleMap(await siteMaps(resolve(root, configPath)));
+        // No adapter, no endpoint: a static build never injects the route, and the panel falls back to the uploaded picture.
+        const mapProxy = !isStatic && await siteHasGoogleMap(resolve(root, configPath), resolve(pkgDir, 'src/map-point.ts'));
         if (mapProxy) {
           injectRoute({ pattern: '/map/[point].png', entrypoint: resolve(pkgDir, 'routes/map.ts') });
           enabled.push('/map/[point].png');

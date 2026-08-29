@@ -1,4 +1,4 @@
-// Injected by the stomme integration at /map/[point].png, on adapter builds whose site config resolves to a keyed Google map. Nothing is stored on this side: the Maps Platform terms forbid caching the image (3.2.3(b)), so only Google's own Cache-Control travels back with it.
+// Nothing is cached on this side: the Maps Platform terms (3.2.3(b)) forbid storing the image, so only Google's own Cache-Control travels back with it.
 export const prerender = false;
 
 import type { APIRoute } from 'astro';

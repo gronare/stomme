@@ -821,7 +821,6 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
 
 /* The box owns its height, not the still inside it: the click handler removes that still once the iframe has painted, and a box that borrowed its height would collapse under the absolutely positioned frame. */
 .mappanel { position: relative; height: clamp(11rem, 26vw, 17rem); background: var(--color-surface); }
-  /* A host that sizes its own box passes fill, and the panel takes that height instead of the map block's. */
   .mappanel--fill { height: 100%; }
   .mappanel__img { display: block; width: 100%; height: 100%; object-fit: cover; }
   /* The dot is last in the stack so translate(-50%,-100%) lands ITS tip on the coordinate, not the label's edge. */

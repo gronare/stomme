@@ -22,7 +22,7 @@ const key = mapKey(site);
 const provider = mapProvider(site);
 const osm = provider === 'osm';
 const embeddable = lat !== null && lng !== null && (osm || (provider === 'google' && key !== ''));
-// Google's own still, fetched through the site's own origin: the visitor's browser reaches no third party until the chip is clicked.
+// The still goes through the site's own origin: a direct maps.googleapis.com src would hand the visitor's IP to Google before any click.
 const point = __STOMME_MAP_PROXY__ && provider === 'google' && key !== '' ? mapPoint(lat, lng) : null;
 const picture = point !== null || !!still.image;
 const placed = point === null && pinX !== null && pinY !== null;
