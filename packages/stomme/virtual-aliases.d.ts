@@ -5,6 +5,9 @@ declare module '@stomme/config' {
   export const listings: import('./src/config.ts').Listing[];
 }
 
+// A Vite define from the integration, true only on the builds where it injected /map/[point].png — the map block reads it to decide whether a first-party still can be requested at all.
+declare const __STOMME_MAP_PROXY__: boolean;
+
 declare module '@stomme/base' {
   const Base: import('astro/runtime/server/index.js').AstroComponentFactory;
   export default Base;

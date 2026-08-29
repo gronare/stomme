@@ -1597,7 +1597,7 @@ collections:
                     collapsed: true
                     hint: "The map picture, and where the pin sits on it."
                     fields:
-                      - { name: image, label: "Map image", widget: image, required: false, hint: "A static map exported once and uploaded like any other picture." }
+                      - { name: image, label: "Map image", widget: image, required: false, hint: "A static map exported once and uploaded like any other picture. A site with a Google map key shows the Google still instead and never reads this one." }
                       - { name: imageAlt, label: "Alt text", widget: string, required: false }
                       - { name: credit, label: "Image credit", widget: string, required: false, hint: "Printed over the picture. A map drawn from OpenStreetMap must credit it: © OpenStreetMap contributors." }
                       - { name: pinX, label: "Pin from the left (%)", widget: number, required: false, hint: "0 to 100. Leave both blank for no pin." }
@@ -3212,7 +3212,7 @@ collections:
                 collapsed: true
                 hint: "The map picture, and where the pin sits on it."
                 fields:
-                  - { name: image, label: "Map image", widget: image, required: false, hint: "A static map exported once and uploaded like any other picture." }
+                  - { name: image, label: "Map image", widget: image, required: false, hint: "A static map exported once and uploaded like any other picture. A site with a Google map key shows the Google still instead and never reads this one." }
                   - { name: imageAlt, label: "Alt text", widget: string, required: false }
                   - { name: credit, label: "Image credit", widget: string, required: false, hint: "Printed over the picture. A map drawn from OpenStreetMap must credit it: © OpenStreetMap contributors." }
                   - { name: pinX, label: "Pin from the left (%)", widget: number, required: false, hint: "0 to 100. Leave both blank for no pin." }

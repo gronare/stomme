@@ -155,16 +155,26 @@ eq(resolveSite({ locale: 'sv', strings: { listingCta: 'Boka' } }).strings.listin
 eq(resolveSite({ locale: 'sv', strings: { listingCta: '' } }).strings.listingCta, 'Kontakta oss', 'an empty listingCta falls back rather than rendering a blank button');
 
 // ── map providers ───────────────────────────────────────────────────────────
-eq(EN.map.embed, 'Show in Google Maps', 'the google consent button');
-eq(EN.map.embedOsm, 'Show in OpenStreetMap', 'the openstreetmap consent button');
-eq(sv.map.embed, 'Visa i Google Maps', 'the google consent button is Swedish on a Swedish site');
-eq(sv.map.embedNote, 'Kartan laddas fr\u00e5n Google f\u00f6rst n\u00e4r du klickar.',
-  'the google consent line names the provider and the click');
-eq(sv.map.embedOsm, 'Visa i OpenStreetMap', 'the openstreetmap consent button is Swedish on a Swedish site');
-eq(sv.map.embedNoteOsm, 'Kartan laddas fr\u00e5n OpenStreetMap f\u00f6rst n\u00e4r du klickar.',
-  'the openstreetmap consent line names the provider and the click');
+eq(EN.map.embed, 'Show interactive map', 'the chip promises the interactive map, not a provider');
+eq(EN.map.embedOsm, 'Show interactive map', 'the openstreetmap chip carries the very same label');
+eq(EN.map.embedNote, 'Loads from Google when you click', 'the note under the label names the provider and the click');
+eq(EN.map.embedLoading, 'Loading the map from Google', 'the label the chip swaps to while the frame loads');
+eq(EN.map.embedLoadingOsm, 'Loading the map from OpenStreetMap', 'and the openstreetmap one names openstreetmap');
+eq(sv.map.embed, 'Visa interaktiv karta', 'the chip label is Swedish on a Swedish site');
+eq(sv.map.embedNote, 'Laddas fr\u00e5n Google n\u00e4r du klickar',
+  'the google note names the provider and the click');
+eq(sv.map.embedLoading, 'Laddar kartan fr\u00e5n Google', 'the Swedish loading label names Google');
+eq(sv.map.embedOsm, 'Visa interaktiv karta', 'the openstreetmap chip label is Swedish on a Swedish site');
+eq(sv.map.embedNoteOsm, 'Laddas fr\u00e5n OpenStreetMap n\u00e4r du klickar',
+  'the openstreetmap note names the provider and the click');
+eq(sv.map.embedLoadingOsm, 'Laddar kartan fr\u00e5n OpenStreetMap', 'the Swedish loading label names openstreetmap');
+eq(no.map.embedLoading, 'Laster kartet fra Google', 'Norwegian has the loading label too');
+eq(sv.map.google, 'V\u00e4gbeskrivning i Google Maps', 'the directions button says what it hands over');
+eq(sv.map.apple, 'V\u00e4gbeskrivning i Apple Kartor', 'and so does the Apple one');
 check(sv.map.embedTitle.includes('{address}') && sv.map.embedTitleOsm.includes('{address}'),
   'both frame titles carry the address placeholder the block fills in');
+check(!/[.]$/.test(sv.map.embedNote) && !/[.]$/.test(sv.map.embedLoading),
+  'the chip lines are labels, not sentences, so neither ends in a full stop');
 
 eq(resolveSite({ maps: { provider: 'osm' } }).maps, { provider: 'osm' },
   'the map provider reaches the blocks through the resolved site');

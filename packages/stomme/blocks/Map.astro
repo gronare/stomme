@@ -1,5 +1,6 @@
 ---
 import Cover from '../src/Cover.astro';
+import { mapPoint } from '../src/map-point.ts';
 
 interface Props {
   address?: string;
@@ -21,16 +22,20 @@ const google = `https://www.google.com/maps/dir/?api=1&destination=${dest}`;
 const apple = `https://maps.apple.com/?daddr=${dest}`;
 const pinX = num(media.pinX);
 const pinY = num(media.pinY);
-const pin = pinX !== null && pinY !== null;
 const key = typeof site?.maps?.key === 'string' ? site.maps.key.trim() : '';
 // An unrecognised provider reads as unset, so a typo on a keyed site keeps the map it already has instead of silently losing it.
 const named = site?.maps?.provider === 'osm' || site?.maps?.provider === 'google' ? site.maps.provider : '';
 const provider = named || (key !== '' ? 'google' : '');
 const osm = provider === 'osm';
 const embeddable = lat !== null && lng !== null && (osm || (provider === 'google' && key !== ''));
-const embedLabel = (osm ? copy.embedOsm : copy.embed) ?? (osm ? 'Show in OpenStreetMap' : 'Show in Google Maps');
+// Google's own still, fetched through the site's own origin: the visitor's browser reaches no third party until the chip is clicked.
+const point = __STOMME_MAP_PROXY__ && provider === 'google' && key !== '' ? mapPoint(lat, lng) : null;
+const pin = point !== null || (pinX !== null && pinY !== null);
+const embedLabel = (osm ? copy.embedOsm : copy.embed) ?? 'Show interactive map';
 const embedNote = (osm ? copy.embedNoteOsm : copy.embedNote)
-  ?? `The map loads from ${osm ? 'OpenStreetMap' : 'Google'} only once you click.`;
+  ?? `Loads from ${osm ? 'OpenStreetMap' : 'Google'} when you click`;
+const embedLoading = (osm ? copy.embedLoadingOsm : copy.embedLoading)
+  ?? `Loading the map from ${osm ? 'OpenStreetMap' : 'Google'}`;
 const embedTitle = String((osm ? copy.embedTitleOsm : copy.embedTitle) ?? `${osm ? 'OpenStreetMap map' : 'Google map'} of {address}`)
   .replace('{address}', address || `${lat},${lng}`);
 const span = (v: number, by: number) => (v + by).toFixed(6);
@@ -44,44 +49,68 @@ const bbox = osm && lat !== null && lng !== null
   <section data-stomme-block="map" class="section">
     <div class="mapblock">
       <div class="mapblock__map">
-        <Cover src={media.image} alt={media.imageAlt ?? ''} placeholder="/images/placeholder.svg" width={1400} height={560} class="mapblock__img" />
+        {point !== null ? (
+          <img class="mapblock__img" src={`/map/${point}.png`} width="1280" height="640"
+            alt={media.imageAlt ?? ''} loading="lazy" decoding="async" />
+        ) : (
+          <Cover src={media.image} alt={media.imageAlt ?? ''} placeholder="/images/placeholder.svg" width={1400} height={560} class="mapblock__img" />
+        )}
         {pin && (
-          <span class="mapblock__pin" style={`left:${pinX}%;top:${pinY}%`} aria-hidden="true">
+          <span class="mapblock__pin" style={point !== null ? 'left:50%;top:50%' : `left:${pinX}%;top:${pinY}%`} aria-hidden="true">
             {address && <span class="mapblock__pinlabel">{address}</span>}
             <i class="mapblock__pindot"></i>
           </span>
         )}
-        {media.credit && <span class="mapblock__credit">{media.credit}</span>}
+        {point === null && media.credit && <span class="mapblock__credit">{media.credit}</span>}
         {embeddable && (
-          <div class="mapblock__embed" data-stomme-map-embed data-provider={provider} data-key={key}
-            data-q={`${lat},${lng}`} data-bbox={bbox} data-title={embedTitle}>
-            <button type="button" class="btn mapblock__embedbtn">{embedLabel}</button>
-            <span class="mapblock__embednote">{embedNote}</span>
-          </div>
+          <button type="button" class="mapchip" data-stomme-map-embed data-provider={provider} data-key={key}
+            data-q={`${lat},${lng}`} data-bbox={bbox} data-title={embedTitle} data-loading-label={embedLoading}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M9 4 3 6.5v13L9 17l6 2.5 6-2.5v-13L15 6.5 9 4Z" />
+              <path d="M9 4v13M15 6.5v13" />
+            </svg>
+            <span><b>{embedLabel}</b><small>{embedNote}</small></span>
+          </button>
         )}
       </div>
       {embeddable && (
         <script is:inline>
-          for (const bar of document.querySelectorAll('[data-stomme-map-embed]:not([data-stomme-bound])')) {
-            bar.setAttribute('data-stomme-bound', '');
-            const canvas = bar.closest('.mapblock__map');
-            const button = bar.querySelector('button');
-            if (!canvas || !button) continue;
-            button.addEventListener('click', () => {
+          for (const chip of document.querySelectorAll('[data-stomme-map-embed]:not([data-stomme-bound])')) {
+            chip.setAttribute('data-stomme-bound', '');
+            const canvas = chip.closest('.mapblock__map');
+            if (!canvas) continue;
+            chip.addEventListener('click', () => {
               if (canvas.querySelector('iframe')) return;
+              chip.setAttribute('data-loading', '');
+              chip.setAttribute('aria-busy', 'true');
+              chip.disabled = true;
+              const label = chip.querySelector('b');
+              const loading = chip.getAttribute('data-loading-label');
+              if (label && loading) label.textContent = loading;
+              const note = chip.querySelector('small');
+              if (note) note.remove();
+              const icon = chip.querySelector('svg');
+              if (icon) {
+                const spinner = document.createElement('i');
+                spinner.className = 'spin';
+                icon.replaceWith(spinner);
+              }
               const frame = document.createElement('iframe');
               frame.className = 'mapblock__frame';
-              frame.title = bar.getAttribute('data-title') || '';
+              frame.title = chip.getAttribute('data-title') || '';
               frame.loading = 'lazy';
               frame.allowFullscreen = true;
-              const q = encodeURIComponent(bar.getAttribute('data-q') || '');
-              const k = encodeURIComponent(bar.getAttribute('data-key') || '');
-              const bbox = encodeURIComponent(bar.getAttribute('data-bbox') || '');
-              frame.src = bar.getAttribute('data-provider') === 'osm'
+              const q = encodeURIComponent(chip.getAttribute('data-q') || '');
+              const k = encodeURIComponent(chip.getAttribute('data-key') || '');
+              const bbox = encodeURIComponent(chip.getAttribute('data-bbox') || '');
+              frame.src = chip.getAttribute('data-provider') === 'osm'
                 ? 'https://www.openstreetmap.org/export/embed.html?bbox=' + bbox + '&layer=mapnik&marker=' + q
                 : 'https://www.google.com/maps/embed/v1/place?key=' + k + '&q=' + q + '&zoom=15';
+              frame.addEventListener('load', () => {
+                chip.remove();
+                for (const gone of canvas.querySelectorAll('.mapblock__img, .mapblock__pin')) gone.remove();
+              });
               canvas.appendChild(frame);
-              bar.remove();
             });
           }
         </script>
@@ -92,8 +121,8 @@ const bbox = osm && lat !== null && lng !== null
           {note && <span class="mapblock__note">{note}</span>}
         </p>
         <div class="mapblock__links">
-          <a class="btn" href={google} target="_blank" rel="noopener">{copy.google ?? 'Open in Google Maps'}</a>
-          <a class="btn btn-outline" href={apple} target="_blank" rel="noopener">{copy.apple ?? 'Apple Maps'}</a>
+          <a class="btn" href={google} target="_blank" rel="noopener">{copy.google ?? 'Directions in Google Maps'}</a>
+          <a class="btn btn-outline" href={apple} target="_blank" rel="noopener">{copy.apple ?? 'Directions in Apple Maps'}</a>
         </div>
       </div>
     </div>

@@ -839,7 +839,7 @@ export default {
   "block.map.media.label": ["Media", "Media"],
   "block.map.media.hint": ["The map picture, and where the pin sits on it.", "Kartbilden, och var nålen sitter på den."],
   "block.map.media.image.label": ["Map image", "Kartbild"],
-  "block.map.media.image.hint": ["A static map exported once and uploaded like any other picture.", "En stillbildskarta som exporteras en gång och laddas upp som vilken bild som helst."],
+  "block.map.media.image.hint": ["A static map exported once and uploaded like any other picture. A site with a Google map key shows the Google still instead and never reads this one.", "En stillbildskarta som exporteras en gång och laddas upp som vilken bild som helst. En sajt med Google-kartnyckel visar Googles egen stillbild i stället och läser aldrig den här."],
   "block.map.media.imageAlt.label": ["Alt text", "Alt-text"],
   "block.map.media.credit.label": ["Image credit", "Bildkälla"],
   "block.map.media.credit.hint": ["Printed over the picture. A map drawn from OpenStreetMap must credit it: © OpenStreetMap contributors.", "Skrivs över bilden. En karta ritad ur OpenStreetMap måste ange källan: © OpenStreetMap-bidragsgivare."],

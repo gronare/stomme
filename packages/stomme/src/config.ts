@@ -26,8 +26,8 @@ export interface SiteConfig {
     collage?: { more?: string; more1?: string; open?: string; viewer?: string; prev?: string; next?: string; close?: string; counter?: string };
     map?: {
       google?: string; apple?: string;
-      embed?: string; embedNote?: string; embedTitle?: string;
-      embedOsm?: string; embedNoteOsm?: string; embedTitleOsm?: string;
+      embed?: string; embedNote?: string; embedLoading?: string; embedTitle?: string;
+      embedOsm?: string; embedNoteOsm?: string; embedLoadingOsm?: string; embedTitleOsm?: string;
     };
     footer?: { links?: string; areas?: string };
     town?: {
@@ -140,10 +140,12 @@ const STRINGS_EN = {
     prev: 'Previous image', next: 'Next image', close: 'Close', counter: '{i} of {n}',
   },
   map: {
-    google: 'Open in Google Maps', apple: 'Apple Maps',
-    embed: 'Show in Google Maps', embedNote: 'The map loads from Google only once you click.',
+    google: 'Directions in Google Maps', apple: 'Directions in Apple Maps',
+    embed: 'Show interactive map', embedNote: 'Loads from Google when you click',
+    embedLoading: 'Loading the map from Google',
     embedTitle: 'Google map of {address}',
-    embedOsm: 'Show in OpenStreetMap', embedNoteOsm: 'The map loads from OpenStreetMap only once you click.',
+    embedOsm: 'Show interactive map', embedNoteOsm: 'Loads from OpenStreetMap when you click',
+    embedLoadingOsm: 'Loading the map from OpenStreetMap',
     embedTitleOsm: 'OpenStreetMap map of {address}',
   },
   footer: { links: 'Links', areas: 'Areas' },
@@ -206,10 +208,12 @@ const STRINGS_SV: typeof STRINGS_EN = {
     prev: 'Föregående bild', next: 'Nästa bild', close: 'Stäng', counter: '{i} av {n}',
   },
   map: {
-    google: 'Öppna i Google Maps', apple: 'Apple Kartor',
-    embed: 'Visa i Google Maps', embedNote: 'Kartan laddas från Google först när du klickar.',
+    google: 'Vägbeskrivning i Google Maps', apple: 'Vägbeskrivning i Apple Kartor',
+    embed: 'Visa interaktiv karta', embedNote: 'Laddas från Google när du klickar',
+    embedLoading: 'Laddar kartan från Google',
     embedTitle: 'Google-karta över {address}',
-    embedOsm: 'Visa i OpenStreetMap', embedNoteOsm: 'Kartan laddas från OpenStreetMap först när du klickar.',
+    embedOsm: 'Visa interaktiv karta', embedNoteOsm: 'Laddas från OpenStreetMap när du klickar',
+    embedLoadingOsm: 'Laddar kartan från OpenStreetMap',
     embedTitleOsm: 'OpenStreetMap-karta över {address}',
   },
   footer: { links: 'Länkar', areas: 'Områden' },
@@ -272,10 +276,12 @@ const STRINGS_NO: typeof STRINGS_EN = {
     prev: 'Forrige bilde', next: 'Neste bilde', close: 'Lukk', counter: '{i} av {n}',
   },
   map: {
-    google: 'Åpne i Google Maps', apple: 'Apple Kart',
-    embed: 'Vis i Google Maps', embedNote: 'Kartet lastes fra Google først når du klikker.',
+    google: 'Veibeskrivelse i Google Maps', apple: 'Veibeskrivelse i Apple Kart',
+    embed: 'Vis interaktivt kart', embedNote: 'Lastes fra Google når du klikker',
+    embedLoading: 'Laster kartet fra Google',
+    embedOsm: 'Vis interaktivt kart', embedNoteOsm: 'Lastes fra OpenStreetMap når du klikker',
+    embedLoadingOsm: 'Laster kartet fra OpenStreetMap',
     embedTitle: 'Google-kart over {address}',
-    embedOsm: 'Vis i OpenStreetMap', embedNoteOsm: 'Kartet lastes fra OpenStreetMap først når du klikker.',
     embedTitleOsm: 'OpenStreetMap-kart over {address}',
   },
   footer: { links: 'Lenker', areas: 'Områder' },

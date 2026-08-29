@@ -92,6 +92,23 @@ async function siteMediaConfig(configFile) {
   return resolveMediaConfig(mod.site?.media);
 }
 
+// The block's own resolution, kept in step by hand: an unnamed provider with a key is google, and only a keyed google map has a static image to proxy.
+function hasGoogleMap(maps) {
+  const key = typeof maps?.key === 'string' ? maps.key.trim() : '';
+  const named = maps?.provider === 'osm' || maps?.provider === 'google' ? maps.provider : '';
+  return (named || (key !== '' ? 'google' : '')) === 'google' && key !== '';
+}
+
+async function siteMaps(configFile) {
+  if (!existsSync(configFile)) return null;
+  try {
+    const mod = await createJiti(import.meta.url).import(configFile);
+    return mod.site?.maps ?? null;
+  } catch {
+    return null;
+  }
+}
+
 // Read from the site config rather than taken as an integration option, so switching a site's languages on needs no astro.config edit.
 async function siteLocales(configFile) {
   if (!existsSync(configFile)) return [];
@@ -234,6 +251,15 @@ export default function stomme(options = {}) {
           injectRoute({ pattern: '/api/contact', entrypoint: resolve(pkgDir, 'routes/contact.ts') });
           enabled.push('/api/contact');
         }
+
+        // The map still is served from the site's own origin so the visitor's browser never reaches Google before the click; without an adapter there is no endpoint to serve it, and the block falls back to the uploaded picture.
+        const mapProxy = !isStatic && hasGoogleMap(await siteMaps(resolve(root, configPath)));
+        if (mapProxy) {
+          injectRoute({ pattern: '/map/[point].png', entrypoint: resolve(pkgDir, 'routes/map.ts') });
+          enabled.push('/map/[point].png');
+        }
+        updateConfig({ vite: { define: { __STOMME_MAP_PROXY__: JSON.stringify(mapProxy) } } });
+
         const sitePreview = ['preview.astro', 'preview.ts', 'preview.js', 'preview.mdx']
           .some((f) => existsSync(resolve(root, 'src/pages', f)));
         if (sitePreview) {

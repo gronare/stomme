@@ -647,7 +647,7 @@ const RAW_BLOCKS: BlockDef[] = [
       { name: 'address', label: 'Address', widget: 'string', hint: 'Shown in bold, and used for the route when no coordinates are given.' },
       { name: 'note', label: 'Note', widget: 'string', required: false, hint: 'A quiet line beside the address, e.g. how far it is to the lift.' },
       mediaGroup('The map picture, and where the pin sits on it.', [
-        imageField('image', 'Map image', 'A static map exported once and uploaded like any other picture.'),
+        imageField('image', 'Map image', 'A static map exported once and uploaded like any other picture. A site with a Google map key shows the Google still instead and never reads this one.'),
         { name: 'imageAlt', label: 'Alt text', widget: 'string', required: false },
         { name: 'credit', label: 'Image credit', widget: 'string', required: false, hint: 'Printed over the picture. A map drawn from OpenStreetMap must credit it: © OpenStreetMap contributors.' },
         { name: 'pinX', label: 'Pin from the left (%)', widget: 'number', required: false, hint: '0 to 100. Leave both blank for no pin.' },
