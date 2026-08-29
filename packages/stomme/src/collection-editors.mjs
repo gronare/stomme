@@ -5,6 +5,9 @@ const on = (name) => !!localized(name);
 const line = (name, indent, text) => (on(name) ? `\n${' '.repeat(indent)}${text}` : '');
 const inline = (name, value) => (on(name) ? `, i18n: ${value}` : '');
 const filePath = (name, path) => (on(name) ? localeFilePath(path) : path);
+const pageUrlField = () => (on('pages')
+  ? '\n    - { name: url, label: "Address in this language", widget: string, required: false, pattern: ["^[a-z0-9]+(?:-[a-z0-9]+)*$", "Lowercase a-z, digits and hyphens only"], hint: "Empty = the same address as the default language. Applies to the translations; the address in the site\'s own language is the page name.", i18n: true }'
+  : '');
 // No field-level media_folder in any editor below: the CMS resolves it relative to the entry, which breaks uploads from subfolder entries — the global media_folder in config.yml is the one that works.
 const COLLECTION_EDITORS = {
   home: `- name: home
@@ -29,7 +32,7 @@ ${emitWidget(8, on('home'))}`,
   create: true
   slug: "{{slug}}"${line('pages', 2, 'i18n: true')}
   fields:
-    - { name: title, label: "Title", widget: string${inline('pages', 'true')} }
+    - { name: title, label: "Title", widget: string${inline('pages', 'true')} }${pageUrlField()}
     - { name: published, label: "Published", widget: boolean, default: true, required: false, hint: "Uncheck to hide the page — unpublished pages aren't built."${inline('pages', 'duplicate')} }
     - name: seo
       label: "SEO"

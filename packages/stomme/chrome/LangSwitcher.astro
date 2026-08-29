@@ -1,0 +1,64 @@
+---
+import type { LocaleChoice } from '../src/i18n';
+
+interface Props { langs: LocaleChoice[]; variant?: 'globe' | 'flags'; label: string }
+const { langs, variant = 'globe', label } = Astro.props;
+const current = langs.find((l) => l.current) ?? langs[0];
+const FLAGS: Record<string, { viewBox: string; body: string }> = {
+  sv: { viewBox: '0 0 16 16', body: '<rect width="16" height="16" fill="#005293"/><rect x="5" width="2.5" height="16" fill="#fecb00"/><rect y="6.75" width="16" height="2.5" fill="#fecb00"/>' },
+  en: { viewBox: '0 0 16 16', body: '<rect width="16" height="16" fill="#012169"/><path d="M0 0l16 16M16 0L0 16" stroke="#fff" stroke-width="3.2"/><path d="M0 0l16 16M16 0L0 16" stroke="#c8102e" stroke-width="1.9"/><path d="M8 0v16M0 8h16" stroke="#fff" stroke-width="5.3"/><path d="M8 0v16M0 8h16" stroke="#c8102e" stroke-width="3.2"/>' },
+  no: { viewBox: '0 0 16 16', body: '<rect width="16" height="16" fill="#ba0c2f"/><path d="M6 0v16M0 8h16" stroke="#fff" stroke-width="4.4"/><path d="M6 0v16M0 8h16" stroke="#00205b" stroke-width="2.2"/>' },
+  da: { viewBox: '0 0 16 16', body: '<rect width="16" height="16" fill="#c8102e"/><path d="M6 0v16M0 8h16" stroke="#fff" stroke-width="2.6"/>' },
+  de: { viewBox: '0 0 16 16', body: '<rect width="16" height="5.34" fill="#000"/><rect y="5.34" width="16" height="5.33" fill="#dd0000"/><rect y="10.67" width="16" height="5.33" fill="#ffce00"/>' },
+  fi: { viewBox: '0 0 16 16', body: '<rect width="16" height="16" fill="#fff"/><path d="M6 0v16M0 8h16" stroke="#003580" stroke-width="4"/>' },
+  fr: { viewBox: '0 0 16 16', body: '<rect width="16" height="16" fill="#fff"/><rect width="5.33" height="16" fill="#002395"/><rect x="10.67" width="5.33" height="16" fill="#ed2939"/>' },
+  es: { viewBox: '0 0 16 16', body: '<rect width="16" height="16" fill="#aa151b"/><rect y="4" width="16" height="8" fill="#f1bf00"/>' },
+  it: { viewBox: '0 0 16 16', body: '<rect width="16" height="16" fill="#fff"/><rect width="5.33" height="16" fill="#009246"/><rect x="10.67" width="5.33" height="16" fill="#ce2b37"/>' },
+};
+const FLAG_ALIAS: Record<string, string> = { nb: 'no', nn: 'no' };
+const flagOf = (locale: string) => {
+  const short = locale.split('-')[0];
+  return FLAGS[FLAG_ALIAS[short] || short];
+};
+---
+{variant === 'flags' ? (
+  <span class="lang-flags" role="group" aria-label={label}>
+    {langs.map((l) => {
+      const flag = flagOf(l.locale);
+      return (
+        <a
+          class:list={['lang-flag', { 'is-current': l.current, 'lang-flag--text': !flag }]}
+          href={l.href}
+          hreflang={l.locale}
+          aria-label={l.label}
+          aria-current={l.current ? 'page' : undefined}
+        >
+          {flag
+            ? <svg class="lang-flag__mark" viewBox={flag.viewBox} aria-hidden="true" focusable="false" set:html={flag.body} />
+            : <span class="lang-flag__code">{l.code}</span>}
+        </a>
+      );
+    })}
+  </span>
+) : (
+  <details class="lang-switch">
+    <summary class="lang-switch__summary" aria-label={label}>
+      <svg class="lang-switch__globe" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true" focusable="false">
+        <circle cx="12" cy="12" r="9" />
+        <path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18" />
+      </svg>
+      <span class="lang-switch__code">{current?.code}</span>
+      <span class="lang-switch__caret" aria-hidden="true"></span>
+    </summary>
+    <ul class="lang-switch__panel">
+      {langs.map((l) => (
+        <li>
+          <a class:list={['lang-switch__row', { 'is-current': l.current }]} href={l.href} hreflang={l.locale} aria-current={l.current ? 'page' : undefined}>
+            <span class="lang-switch__check" aria-hidden="true">{l.current ? '✓' : ''}</span>
+            <span>{l.label}</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </details>
+)}

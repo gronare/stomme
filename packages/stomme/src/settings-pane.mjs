@@ -1,7 +1,8 @@
 import { i18nConfigBlock, localeFilePath } from './cms-i18n.mjs';
 
 export function makeSettingsPane({ q, pad, emitWidget, emitNavLinks, emitFooterLinks, emitThanksButtons, COLLECTION_EDITORS, listingEditor, collectionEnabled, FEATURES, LISTINGS, CMS, LOCALES = [], ADDON_PANES, ADDON_PANEL_FILES, getStaticCollections }) {
-const navI18n = LOCALES.length > 1;
+const multiLocale = LOCALES.length > 1;
+const navI18n = multiLocale;
 const navLine = (indent, text) => (navI18n ? `\n${' '.repeat(indent)}${text}` : '');
 const navInline = (value) => (navI18n ? `, i18n: ${value}` : '');
 const generatedEditors = () => Object.keys(COLLECTION_EDITORS).filter(collectionEnabled).filter((n) => !getStaticCollections().has(n));
@@ -123,6 +124,20 @@ function emitShareCards(indent) {
   ].join('\n');
 }
 
+function emitLanguageSwitcher(indent) {
+  if (!multiLocale) return '';
+  const p = pad(indent);
+  return ['', `${p}- name: languageSwitcher`,
+    `${p}  label: "Language switcher"`,
+    `${p}  widget: select`,
+    `${p}  required: false`,
+    `${p}  default: globe`,
+    `${p}  hint: "How a visitor changes language in the header. Only shown when more than one language is on."`,
+    `${p}  options:`,
+    `${p}    - { label: "Globe with a language list", value: globe }`,
+    `${p}    - { label: "Flags", value: flags }`].join('\n');
+}
+
 function emitSettings() {
   const tp = emitTrackingPane(6);
   return `  - name: settings
@@ -144,7 +159,7 @@ function emitSettings() {
               - { name: textPre, label: "Wordmark text", widget: string, required: false }
               - { name: textAccent, label: "Wordmark accent (in brand colour)", widget: string, required: false }
           - { name: favicon, label: "Favicon", widget: image, required: false, media_folder: "/public/media/icons", public_folder: "/", hint: "Browser-tab icon — SVG recommended (scales to any size). Defaults to the shipped mark when empty." }
-          - { name: appleIcon, label: "Home-screen icon", widget: image, required: false, media_folder: "/public/media/icons", public_folder: "/", hint: "iOS home-screen icon — a 180×180 PNG. Optional." }
+          - { name: appleIcon, label: "Home-screen icon", widget: image, required: false, media_folder: "/public/media/icons", public_folder: "/", hint: "iOS home-screen icon — a 180×180 PNG. Optional." }${emitLanguageSwitcher(10)}
 ${emitShareCards(6)}
       - name: contact
         label: "Contact"

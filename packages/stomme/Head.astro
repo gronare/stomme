@@ -1,5 +1,5 @@
 ---
-import { getEntry } from 'astro:content';
+import { getEntry, getCollection } from 'astro:content';
 // @ts-expect-error — virtual alias, no static types.
 import { site, features, listings } from '@stomme/config';
 import { resolveShareImage } from './src/og-pages.ts';
@@ -33,10 +33,11 @@ const ogImage = servedShareImage
   : undefined;
 const ogUrl = Astro.site ? new URL(Astro.url.pathname, Astro.site).href : undefined;
 
+const locales = resolveLocales(site);
 // The noindex list is written in site paths, so a locale copy of an unlisted page has to be measured against the same path or it would be the one that gets indexed.
-const listPath = splitLocalePath(Astro.url.pathname, resolveLocales(site)).path;
+const listPath = splitLocalePath(Astro.url.pathname, locales).path;
 const noindex = isUnlisted(listPath, site?.noindex) || (Astro.site ? new URL(Astro.site).hostname.endsWith('.pages.dev') : false);
-const alternates = hreflangLinks(Astro.url.pathname, site, Astro.site);
+const alternates = hreflangLinks(Astro.url.pathname, site, Astro.site, locales.enabled ? await getCollection('pages') : []);
 ---
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>{title ?? settings.name}</title>

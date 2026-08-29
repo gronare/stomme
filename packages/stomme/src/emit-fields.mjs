@@ -19,6 +19,7 @@ export function makeEmitters({ q, pad, AVAILABLE_BLOCKS, OPTION_SOURCES }) {
     const parts = [`name: ${f.name}`, `label: ${q(f.label)}`, `widget: ${f.widget}`];
     if (f.required === false) parts.push('required: false');
     if (f.default !== undefined) parts.push(`default: ${typeof f.default === 'string' ? q(f.default) : f.default}`);
+    if (f.pattern) parts.push(`pattern: [${f.pattern.map(q).join(', ')}]`);
     if (f.hint) parts.push(`hint: ${q(f.hint)}`);
     if (f.media_folder) parts.push(`media_folder: ${q(f.media_folder)}`);
     if (f.public_folder) parts.push(`public_folder: ${q(f.public_folder)}`);

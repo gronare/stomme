@@ -21,6 +21,7 @@ export interface SiteConfig {
   strings?: {
     readMore?: string;
     latest?: string;
+    changeLanguage?: string;
     contact?: { name?: string; email?: string; phone?: string; message?: string; submit?: string; direct?: string; honeypot?: string; hours?: string; visit?: string; findUs?: string; follow?: string; map?: string; reveal?: string; error?: string };
     beforeAfter?: { before?: string; after?: string; compare?: string };
     collage?: { more?: string; more1?: string; open?: string; viewer?: string; prev?: string; next?: string; close?: string; counter?: string };
@@ -127,6 +128,7 @@ export function resolveListings(l?: Listing[]): (Omit<Listing, 'specs'> & { spec
 const STRINGS_EN = {
   readMore: 'Read more',
   latest: 'Latest',
+  changeLanguage: 'Change language',
   contact: {
     name: 'Name', email: 'Email', phone: 'Phone', message: 'Describe your project', submit: 'Send request',
     direct: 'Direct contact', honeypot: 'Leave this field empty', hours: 'Opening hours', visit: 'Visit',
@@ -195,6 +197,7 @@ const STRINGS_EN = {
 const STRINGS_SV: typeof STRINGS_EN = {
   readMore: 'Läs mer',
   latest: 'Senaste',
+  changeLanguage: 'Byt språk',
   contact: {
     name: 'Namn', email: 'E-post', phone: 'Telefon', message: 'Beskriv ditt projekt', submit: 'Skicka förfrågan',
     direct: 'Direktkontakt', honeypot: 'Lämna fältet tomt', hours: 'Öppettider', visit: 'Hitta hit',
@@ -263,6 +266,7 @@ const STRINGS_SV: typeof STRINGS_EN = {
 const STRINGS_NO: typeof STRINGS_EN = {
   readMore: 'Les mer',
   latest: 'Siste',
+  changeLanguage: 'Bytt språk',
   contact: {
     name: 'Navn', email: 'E-post', phone: 'Telefon', message: 'Beskriv prosjektet ditt', submit: 'Send forespørsel',
     direct: 'Direktekontakt', honeypot: 'La feltet stå tomt', hours: 'Åpningstider', visit: 'Finn fram',

@@ -13,6 +13,21 @@ function resolveListings(l) {
     .map((x) => ({ ...x, route: x.route.startsWith('/') ? x.route : `/${x.route}` }));
 }
 
+// The `pages` entries as astro.config can see them, before Astro's content layer exists: sitemapI18n has to know whether any translation carries its own address, and that decision is made while the config object is still being built.
+export function localePages(root = process.cwd()) {
+  const dir = resolve(root, 'src/content/pages');
+  let files = [];
+  try { files = readdirSync(dir, { recursive: true }).map(String).filter((f) => f.endsWith('.md')); }
+  catch { return []; }
+  const field = (src, key) => src.match(new RegExp(`^${key}:\\s*(.+?)\\s*$`, 'm'))?.[1].replace(/^["']|["']$/g, '').trim();
+  return files.map((f) => {
+    let src = '';
+    try { src = readFileSync(resolve(dir, f), 'utf8'); } catch { return null; }
+    const id = f.replace(/\.md$/, '').split('/').map((s) => s.toLowerCase()).join('/');
+    return { id, data: { published: field(src, 'published') === 'true', url: field(src, 'url') } };
+  }).filter(Boolean);
+}
+
 // sha256 of every first-party is:inline script body in the given trees, for /preview's CSP: the Astro compiler emits those bodies byte-for-byte (compressHTML on), so a source hash matches the rendered element and the script runs without 'unsafe-inline'. Deliberately skipped, and so CSP-blocked in preview: set:html (dynamic content), define:vars (the compiler rewrites the body), src= (external file).
 function inlineScriptHashes(dirs) {
   const hashes = new Set();

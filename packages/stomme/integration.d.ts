@@ -12,3 +12,4 @@ export interface StommeIntegrationOptions {
   locales?: string[];
 }
 export default function stomme(options?: StommeIntegrationOptions): AstroIntegration;
+export function localePages(root?: string): { id: string; data: { published: boolean; url?: string } }[];

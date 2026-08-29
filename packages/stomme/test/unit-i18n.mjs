@@ -7,13 +7,14 @@ import { fileURLToPath } from 'node:url';
 import { buildOptionSources } from '../src/option-sources.mjs';
 import { makeEmitters } from '../src/emit-fields.mjs';
 import { makeCollectionEditors } from '../src/collection-editors.mjs';
+import { makeSettingsPane } from '../src/settings-pane.mjs';
 import { i18nFlagFor, i18nConfigBlock, localeFilePath, resolveCmsLocales, LOCALIZED_EDITORS } from '../src/cms-i18n.mjs';
 
 const PKG = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const jiti = createJiti(import.meta.url);
 const {
   resolveLocales, splitLocalePath, localePathFor, localeHref, localeRoutes, localeLinker, localizeLinks,
-  localeEntryId, stripLocaleSuffix,
+  localeEntryId, stripLocaleSuffix, localePagePath, basePagePath, localeEndonym,
   defaultLocaleEntries, pickLocaleEntry, htmlLang, pageLang, hreflangLinks, localeSwitcher,
   localeConfig, sitemapI18n,
 } = await jiti.import(resolve(PKG, 'src/i18n.ts'));
@@ -39,7 +40,7 @@ check(resolveLocales({ ...PLAIN, locales: ['sv', 'sv'] }).enabled === false, 'th
 eq(pageLang('/en/kontakt', PLAIN), 'sv-SE', "without locales even an /en/ path renders the site's own lang");
 eq(pageLang('/', {}), 'en', 'a config with no locale at all still lands on en');
 eq(hreflangLinks('/kontakt', PLAIN, 'https://x.se'), [], 'no locales emits no alternates');
-eq(localeSwitcher('/kontakt', PLAIN, ['kontakt']), [], 'no locales renders no switcher');
+eq(localeSwitcher('/kontakt', PLAIN, [{ id: 'kontakt', data: { published: true } }]), [], 'no locales renders no switcher');
 eq(sitemapI18n(PLAIN), {}, 'no locales adds nothing to the sitemap config');
 eq(localeHref('/kontakt', 'en', localeRoutes(PLAIN, [{ id: 'kontakt', data: { published: true } }])), '/kontakt',
   'no locales leaves every href alone');
@@ -174,9 +175,15 @@ eq(hreflangLinks('/kontakt', SITE).map((a) => a.href), ['/kontakt', '/en/kontakt
 
 // ── the switcher ────────────────────────────────────────────────────────────
 console.log('\n· the language switcher');
-const TRANSLATED = ['kontakt', 'kontakt.en', 'home', 'home.no'];
+const TRANSLATED = [
+  { id: 'kontakt', data: { published: true } },
+  { id: 'kontakt.en', data: { published: false } },
+  { id: 'home' },
+  { id: 'home.no' },
+];
 const sw = localeSwitcher('/kontakt', SITE, TRANSLATED);
-eq(sw.map((l) => l.label), ['SV', 'EN', 'NO'], 'the switcher is the locale codes, in configured order');
+eq(sw.map((l) => l.code), ['SV', 'EN', 'NO'], 'each row carries the locale code, in configured order');
+eq(sw.map((l) => l.label), ['Svenska', 'English', 'Norsk'], 'the label is what the language calls itself');
 eq(sw.map((l) => l.href), ['/kontakt', '/en/kontakt', '/no/'],
   'a locale with a translation links to the page; one without links to its front page');
 eq(sw.map((l) => l.current), [true, false, false], 'the locale being read is marked current');
@@ -193,6 +200,100 @@ eq(localeSwitcher('/areas/oslo', SITE, TRANSLATED).map((l) => l.href), ['/areas/
 console.log('\n· sitemap alternates');
 eq(sitemapI18n(SITE), { i18n: { defaultLocale: 'sv', locales: { sv: 'sv-SE', en: 'en', no: 'no' } } },
   'the sitemap integration gets the same locale-to-tag map the head uses');
+
+// ── a page's own address per language ───────────────────────────────────────
+console.log('\n· an address of its own, per language');
+const URL_PAGES = [
+  { id: 'omradet', data: { published: true } },
+  { id: 'omradet.en', data: { published: true, url: 'the-area' } },
+  { id: 'omradet.no', data: { published: true, url: 'omraadet' } },
+  { id: 'kontakt', data: { published: true } },
+  { id: 'kontakt.en', data: { published: true } },
+  { id: 'home' },
+  { id: 'home.no' },
+];
+const UR = localeRoutes(SITE, URL_PAGES);
+eq([...UR.served].sort(), ['/', '/kontakt', '/omradet'], 'the served set is still written in the default language');
+eq(localeHref('/omradet', 'en', UR), '/en/the-area', 'a link to the page lands on the address that language uses');
+eq(localeHref('/omradet', 'no', UR), '/no/omraadet', 'each language has its own address');
+eq(localeHref('/omradet', 'sv', UR), '/omradet', 'the default language is the filename, unprefixed');
+eq(localeHref('/kontakt', 'en', UR), '/en/kontakt', 'a translation that names no address keeps the filename');
+eq(localeHref('/omradet#karta', 'en', UR), '/en/the-area#karta', 'a fragment rides along to the translated address');
+eq(localeHref('/omradet/', 'en', UR), '/en/the-area/', 'a trailing slash survives the rename');
+eq(localeLinker(SITE, 'en', URL_PAGES)('/omradet'), '/en/the-area', 'the mapper the components use maps the same way');
+eq(localePagePath('/omradet', 'en', UR), '/the-area', 'the slug the /en/ catch-all builds its static path from');
+eq(basePagePath('/the-area', 'en', UR), '/omradet', 'and the entry that path resolves back to');
+eq(basePagePath('/kontakt', 'en', UR), '/kontakt', 'an untranslated address resolves back to itself');
+eq(basePagePath('/the-area', 'no', UR), '/the-area', 'one language\'s address is not another language\'s — no is left with the path as written');
+check(UR.custom === true, 'the routes report that some translation carries an address of its own');
+check(localeRoutes(SITE, PAGES).custom === false, 'a site whose translations all keep the filename reports none');
+
+console.log('\n· an address the site cannot serve fails the build');
+const throws = (fn, re, name) => {
+  let msg = '';
+  try { fn(); } catch (e) { msg = e.message; }
+  check(re.test(msg), name, `got ${msg || '(no error was thrown)'}`);
+};
+throws(() => localeRoutes(SITE, [
+  { id: 'omradet', data: { published: true } },
+  { id: 'omradet.en', data: { published: true, url: 'The Area' } },
+]), /omradet\.en\.md/, 'an address that is not a slug fails the build and names the file');
+throws(() => localeRoutes(SITE, [
+  { id: 'omradet', data: { published: true } },
+  { id: 'omradet.en', data: { published: true, url: 'omr/adet' } },
+]), /omradet\.en\.md/, 'a slash is not a slug either — the address is one segment');
+throws(() => localeRoutes(SITE, [
+  { id: 'omradet', data: { published: true } },
+  { id: 'omradet.en', data: { published: true, url: 'kontakt' } },
+  { id: 'kontakt', data: { published: true } },
+]), /omradet\.en\.md and src\/content\/pages\/kontakt\.md/, 'two pages on one address in one language fail the build and name both');
+
+console.log('\n· an address on the default-language file is ignored, loudly');
+const warnings = [];
+const realWarn = console.warn;
+console.warn = (m) => warnings.push(String(m));
+const DR = localeRoutes(SITE, [{ id: 'omradet', data: { published: true, url: 'the-area' } }]);
+console.warn = realWarn;
+eq(localeHref('/omradet', 'en', DR), '/en/omradet', 'the default language keeps its filename as the address');
+check(warnings.some((w) => w.includes('src/content/pages/omradet.md')),
+  'and the build says which file it ignored it in', warnings.join(' | '));
+check(DR.custom === false, 'an ignored address is not an address — the sitemap alternates stay');
+
+console.log('\n· the switcher and the head follow the same addresses');
+eq(localeSwitcher('/omradet', SITE, URL_PAGES).map((l) => l.href), ['/omradet', '/en/the-area', '/no/omraadet'],
+  'each language points at its own address for the page being read');
+eq(localeSwitcher('/en/the-area', SITE, URL_PAGES).map((l) => l.href), ['/omradet', '/en/the-area', '/no/omraadet'],
+  'the same three targets seen from a translated address');
+eq(localeSwitcher('/en/the-area', SITE, URL_PAGES).map((l) => l.current), [false, true, false],
+  'the language whose address you are on is the current one');
+eq(localeSwitcher('/en/kontakt', SITE, URL_PAGES).map((l) => l.href), ['/kontakt', '/en/kontakt', '/no/'],
+  'an untranslated language still gets its front page, addresses or not');
+eq(hreflangLinks('/omradet', SITE, 'https://ex.se', URL_PAGES).map((a) => a.href),
+  ['https://ex.se/omradet', 'https://ex.se/en/the-area', 'https://ex.se/no/omraadet', 'https://ex.se/omradet'],
+  'every alternate names the URL that language actually answers on');
+eq(hreflangLinks('/en/the-area', SITE, 'https://ex.se', URL_PAGES).map((a) => a.href),
+  ['https://ex.se/omradet', 'https://ex.se/en/the-area', 'https://ex.se/no/omraadet', 'https://ex.se/omradet'],
+  'the set is the same seen from the translated address');
+eq(hreflangLinks('/kontakt', SITE, 'https://ex.se', URL_PAGES).map((a) => a.href),
+  ['https://ex.se/kontakt', 'https://ex.se/en/kontakt', 'https://ex.se/no/kontakt', 'https://ex.se/kontakt'],
+  'a page no language renamed keeps the plain prefixed set');
+eq(hreflangLinks('/omradet/', SITE, 'https://ex.se', URL_PAGES).map((a) => a.href),
+  ['https://ex.se/omradet/', 'https://ex.se/en/the-area/', 'https://ex.se/no/omraadet/', 'https://ex.se/omradet/'],
+  'the trailing slash is still the canonical\'s');
+
+console.log('\n· the sitemap gives up rather than guess');
+eq(sitemapI18n(SITE, PAGES), { i18n: { defaultLocale: 'sv', locales: { sv: 'sv-SE', en: 'en', no: 'no' } } },
+  'translations that keep the filename keep the prefix-substituted alternates');
+eq(sitemapI18n(SITE, URL_PAGES), {},
+  'one page with an address of its own drops them all — prefix substitution would name URLs nothing serves');
+eq(sitemapI18n(PLAIN, URL_PAGES), {}, 'a site with no locales still adds nothing');
+
+console.log('\n· what a language calls itself');
+eq(localeEndonym('sv'), 'Svenska', 'the switcher lists the language in its own words');
+eq(localeEndonym('en'), 'English', 'and the same for every locale the table knows');
+eq(localeEndonym('nb-NO'), 'Norsk bokmål', 'a region tag reads its base language');
+eq(localeEndonym('pt'), 'PT', 'a language the table has no name for shows its own code');
+eq(localeEndonym(''), '', 'an empty locale invents nothing');
 
 // ── entry ids ───────────────────────────────────────────────────────────────
 console.log('\n· the content loader keeps the locale in the id');
@@ -295,6 +396,24 @@ check(/\n  slug: "\{\{slug\}\}"\n  i18n: true\n/.test(onEditors.COLLECTION_EDITO
 check(onEditors.COLLECTION_EDITORS.pages.includes('name: published, label: "Published", widget: boolean, default: true, required: false, hint: "Uncheck to hide the page — unpublished pages aren\'t built.", i18n: duplicate'),
   'publication is one decision for every language, not one per translation');
 check(onEditors.COLLECTION_EDITORS.faq === offEditors.COLLECTION_EDITORS.faq, 'an editor outside the localized set is untouched');
+check(onEditors.COLLECTION_EDITORS.pages.includes('name: url, label: "Address in this language"'),
+  'a localized pages editor offers the page its own address per language');
+check(/pattern: \["\^\[a-z0-9\]\+\(\?:-\[a-z0-9\]\+\)\*\$"/.test(onEditors.COLLECTION_EDITORS.pages),
+  'the editor refuses anything but a slug before it reaches the build');
+check(/name: url,[^\n]*, i18n: true \}/.test(onEditors.COLLECTION_EDITORS.pages),
+  'the address is translated per locale, not duplicated — one address for every language would defeat the field');
+check(!offEditors.COLLECTION_EDITORS.pages.includes('name: url'),
+  'a single-language site is offered no address field — its address is the filename and nothing else');
+
+const settingsYaml = (LOCALES) => makeSettingsPane({
+  q, pad, emitWidget: E.emitWidget, emitNavLinks: E.emitNavLinks, emitFooterLinks: E.emitFooterLinks, emitThanksButtons: E.emitThanksButtons,
+  COLLECTION_EDITORS: {}, listingEditor: () => '', collectionEnabled: () => false, FEATURES: {}, LISTINGS: [], CMS: null,
+  LOCALES, ADDON_PANES: [], ADDON_PANEL_FILES: {}, getStaticCollections: () => new Set(),
+}).emitSettings();
+check(settingsYaml(['sv', 'en', 'no']).includes('- name: languageSwitcher'), 'a multilingual site picks how the header offers the languages');
+check(/- \{ label: "Globe with a language list", value: globe \}/.test(settingsYaml(['sv', 'en', 'no'])), 'the globe is one of the two variants');
+check(settingsYaml(['sv', 'en', 'no']).includes('default: globe'), 'and it is the one a site gets without choosing');
+check(!settingsYaml(['sv']).includes('languageSwitcher'), 'a single-language site sees no switcher setting — it renders no switcher either');
 // Sveltia writes its canonical-slug key (`translationKey`) into the frontmatter only when the slug template carries a `| localize` filter — that is the sole trigger (Aue → jue → ede in 0.201.2). Our slug is the same in every language, so nothing undeclared is ever written; a `| localize` here would start writing a key no schema knows.
 for (const name of LOCALIZED_EDITORS.filter((n) => onEditors.COLLECTION_EDITORS[n]))
   check(!/\|\s*localize/.test(onEditors.COLLECTION_EDITORS[name]) && !onEditors.COLLECTION_EDITORS[name].includes('canonical_slug'),

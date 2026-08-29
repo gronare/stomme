@@ -93,6 +93,7 @@
     "pages": {
       "fields": [
         "title",
+        "url",
         "seo",
         "blocks",
         "published"
@@ -160,6 +161,7 @@
         "logo",
         "favicon",
         "appleIcon",
+        "languageSwitcher",
         "ogImage",
         "og"
       ],

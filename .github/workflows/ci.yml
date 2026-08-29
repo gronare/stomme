@@ -115,6 +115,8 @@ jobs:
         run: pnpm --filter @gronare/stomme test:metrics
       - name: two-click google map
         run: pnpm --filter @gronare/stomme test:maps
+      - name: per-language page addresses + the header switcher
+        run: pnpm --filter @gronare/stomme test:locale-urls
 
   # The Sveltia DOM contract test is deliberately not per-PR: between version bumps the pinned DOM does not change, so it runs when the pin is bumped instead.
 

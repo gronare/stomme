@@ -44,7 +44,8 @@ export const PRESET_SCHEMAS = {
 export function stommeCollections(listings?: Listing[]) {
   const base: Record<string, ReturnType<typeof defineCollection>> = {
     home: defineCollection({ loader: md('home'), schema: z.object({ seo, blocks }) }),
-    pages: defineCollection({ loader: md('pages'), schema: z.object({ title: z.string(), seo, blocks, published: z.boolean().default(false) }) }),
+    // The slug rule lives in src/i18n.ts and fails the build there; a second rule here would drift.
+    pages: defineCollection({ loader: md('pages'), schema: z.object({ title: z.string(), url: z.string().optional(), seo, blocks, published: z.boolean().default(false) }) }),
 
     settings: defineCollection({
       loader: md('settings'),
@@ -53,6 +54,7 @@ export function stommeCollections(listings?: Listing[]) {
         logo: z.object({ image: z.string().optional(), alt: z.string().optional(), textPre: z.string().default(''), textAccent: z.string().default('') }).default({}),
         favicon: z.string().optional(),
         appleIcon: z.string().optional(),
+        languageSwitcher: z.enum(['globe', 'flags']).default('globe'),
         ogImage: z.string().optional(),
         og: z.object({
           enabled: z.boolean().default(false),

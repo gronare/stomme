@@ -297,9 +297,34 @@ main .cover:first-child .cover__inner { --cover-clear: calc(var(--header-bottom)
 /* The nav link colour above would out-specify .btn, so the CTA restates the button's on-dark text. */
 .site-nav a.btn { color: var(--color-on-dark); }
 .site-nav a.btn:hover { color: var(--color-on-dark); }
-.nav-langs { display: inline-flex; align-items: center; gap: calc(0.7 * var(--header-rem)); }
-.site-nav .nav-lang { font-size: 0.85em; letter-spacing: 0.06em; text-transform: uppercase; color: var(--color-muted, var(--color-ink)); }
-.site-nav .nav-lang[aria-current='page'] { color: var(--color-brand); text-decoration: none; }
+/* The switcher rides on whatever colour the header row is wearing — an overlay header on a dark hero repaints .site-header, and .site-nav a would otherwise pin these back to ink. */
+.nav-langs { display: inline-flex; align-items: center; color: inherit; }
+.site-nav .nav-langs a { color: inherit; text-decoration: none; }
+.site-nav .nav-langs a:hover { color: inherit; }
+.nav-langs :focus-visible { outline: 2px solid currentColor; outline-offset: 2px; border-radius: 0.5rem; }
+
+.lang-switch { position: relative; }
+.lang-switch__summary { display: inline-flex; align-items: center; gap: calc(0.35 * var(--header-rem)); padding: calc(0.25 * var(--header-rem)) calc(0.4 * var(--header-rem)); border-radius: 0.6rem; cursor: pointer; list-style: none; font-size: 0.85em; letter-spacing: 0.06em; }
+.lang-switch__summary::-webkit-details-marker { display: none; }
+.lang-switch__globe { width: 1.15em; height: 1.15em; flex: none; }
+.lang-switch__code { font-weight: 600; }
+.lang-switch__caret { width: 6px; height: 6px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(45deg) translateY(-2px); opacity: 0.6; }
+.lang-switch[open] .lang-switch__caret { transform: rotate(-135deg) translateY(2px); }
+/* Anchored to the row's right edge: the panel is wider than its summary, and on a narrow viewport a left-anchored one runs off the screen. */
+.lang-switch__panel { position: absolute; top: calc(100% + 8px); right: 0; min-width: 11rem; margin: 0; padding: 6px; list-style: none; z-index: 60;
+  background: var(--color-paper); color: var(--color-ink); border: 1px solid var(--color-line); border-radius: 12px; box-shadow: 0 24px 48px -24px rgba(0,0,0,0.35); }
+.site-nav .nav-langs .lang-switch__row { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 8px; color: var(--color-ink); white-space: nowrap; }
+.site-nav .nav-langs .lang-switch__row:hover { background: color-mix(in srgb, var(--color-surface) 30%, var(--color-paper)); color: var(--color-brand); }
+.site-nav .nav-langs .lang-switch__row.is-current { color: var(--color-brand); font-weight: 600; }
+.lang-switch__check { width: 1em; flex: none; }
+
+.lang-flags { display: inline-flex; align-items: center; gap: calc(0.45 * var(--header-rem)); }
+.lang-flag { display: inline-flex; align-items: center; justify-content: center; width: 1.55em; height: 1.55em; border-radius: 50%; opacity: 0.55; transition: opacity 0.15s, box-shadow 0.15s; }
+.lang-flag:hover, .lang-flag:focus-visible { opacity: 1; }
+.lang-flag.is-current { opacity: 1; box-shadow: 0 0 0 2px color-mix(in srgb, currentColor 55%, transparent); }
+.lang-flag__mark { width: 100%; height: 100%; border-radius: 50%; display: block; }
+.lang-flag--text { width: auto; padding: 0 calc(0.35 * var(--header-rem)); border-radius: 0.5rem; }
+.lang-flag__code { font-size: 0.78em; font-weight: 600; letter-spacing: 0.06em; }
 .nav-item--menu { position: relative; display: inline-flex; align-items: center; }
 .nav-top { display: inline-flex; align-items: center; gap: 6px; text-decoration: none; color: var(--color-ink); cursor: pointer; }
 .nav-top:hover { color: var(--color-brand); }
@@ -340,7 +365,9 @@ main .cover:first-child .cover__inner { --cover-clear: calc(var(--header-bottom)
   .site-header.nav-open .site-nav > a:last-child,
   .site-header.nav-open .site-nav > .nav-item--menu:last-child { border-bottom: 0; }
   .site-header.cta-in-menu.nav-open .site-nav > a.nav-cta { justify-content: center; text-align: center; white-space: normal; margin: var(--header-rem) 0 calc(0.25 * var(--header-rem)); padding: calc(0.8 * var(--header-rem)) calc(1.3 * var(--header-rem)); border: 0; border-radius: calc(0.7 * var(--header-rem)); }
-  .site-header.nav-open .site-nav > .nav-langs { padding: calc(0.9 * var(--header-rem)) 0; }
+  .site-header.nav-open .site-nav > .nav-langs { padding: calc(0.9 * var(--header-rem)) 0; border-top: 1px solid color-mix(in srgb, var(--color-line) 65%, transparent); }
+  .site-header.nav-open .lang-switch__summary { padding-left: 0; }
+  .site-header.nav-open .lang-switch__panel { right: auto; left: 0; }
   .nav-top { flex: 1; padding: calc(0.9 * var(--header-rem)) 0; }
   .nav-caret-btn { padding: calc(0.9 * var(--header-rem)) calc(0.4 * var(--header-rem)); margin: 0 calc(-0.4 * var(--header-rem)) 0 0; }
   .nav-caret-btn .nav-caret { width: 9px; height: 9px; opacity: 0.7; }

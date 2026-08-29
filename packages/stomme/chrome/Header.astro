@@ -4,6 +4,8 @@ import { Image } from 'astro:assets';
 import type { ImageMetadata } from 'astro';
 import { resolveLink } from '../src/href';
 import { resolveLocales, splitLocalePath, localeEntryId, localeLinker, localeSwitcher } from '../src/i18n';
+import { resolveSite } from '../src/config';
+import LangSwitcher from './LangSwitcher.astro';
 // @ts-expect-error — virtual alias, no static types.
 import { site } from '@stomme/config';
 import SlotHeaderStart from '@stomme/slot-header-start';
@@ -19,7 +21,7 @@ interface NavData {
   showLogo?: boolean;
   showWordmark?: boolean;
 }
-interface SiteData { name?: string; logo?: { textPre?: string; textAccent?: string; image?: string; alt?: string } }
+interface SiteData { name?: string; languageSwitcher?: 'globe' | 'flags'; logo?: { textPre?: string; textAccent?: string; image?: string; alt?: string } }
 interface Props { nav?: NavData; settings?: SiteData }
 
 let { nav, settings } = Astro.props;
@@ -29,11 +31,9 @@ const navId = localeEntryId('nav', here.locale, locales.default);
 if (!nav) nav = ((navId !== 'nav' && (await getEntry('navigation', navId))) || (await getEntry('navigation', 'nav'))!).data as NavData;
 if (!settings) settings = (await getEntry('settings', 'site'))!.data as SiteData;
 const langs = locales.enabled
-  ? localeSwitcher(Astro.url.pathname, site, [
-      ...(await getCollection('pages')).map((e) => e.id),
-      ...(await getCollection('home')).map((e) => e.id),
-    ])
+  ? localeSwitcher(Astro.url.pathname, site, [...(await getCollection('pages')), ...(await getCollection('home'))])
   : [];
+const langLabel = resolveSite(site, here.locale).strings.changeLanguage;
 
 const logo = settings.logo ?? {};
 const showMark = nav.showLogo === true && !!logo.image;
@@ -103,7 +103,7 @@ const isActive = (href: string) => {
       {nav.cta && <a class="btn nav-cta" href={inLocale(resolveLink(nav.cta.link, homeHref))}>{nav.cta.label}</a>}
       {langs.length > 1 && (
         <span class="nav-langs">
-          {langs.map((l) => <a class="nav-lang" href={l.href} hreflang={l.locale} aria-current={l.current ? 'page' : undefined}>{l.label}</a>)}
+          <LangSwitcher langs={langs} variant={settings.languageSwitcher} label={langLabel} />
         </span>
       )}
     </nav>
@@ -137,6 +137,19 @@ const isActive = (href: string) => {
         else { top.blur(); }
       });
     });
+
+    var langSwitch = header.querySelector('.lang-switch');
+    if (langSwitch) {
+      document.addEventListener('click', function (e) {
+        if (langSwitch.open && !langSwitch.contains(e.target)) langSwitch.open = false;
+      });
+      document.addEventListener('keydown', function (e) {
+        if (e.key !== 'Escape' || !langSwitch.open) return;
+        langSwitch.open = false;
+        var summary = langSwitch.querySelector('summary');
+        if (summary) summary.focus();
+      });
+    }
 
     if (toggle) {
       var setOpen = function (open) {

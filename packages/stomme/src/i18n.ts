@@ -13,18 +13,42 @@ export interface AlternateLink {
 
 export interface LocaleEntry {
   id: string;
-  data?: { published?: boolean } & Record<string, unknown>;
+  data?: { published?: boolean; url?: string } & Record<string, unknown>;
 }
 
 export interface LocaleRoutes {
   locales: ResolvedLocales;
   served: Set<string>;
+  // Per locale: the site path a page is written under → the path that locale serves it on, and the same mapping read backwards.
+  localized: Map<string, Map<string, string>>;
+  bases: Map<string, Map<string, string>>;
+  custom: boolean;
+}
+
+export interface LocaleChoice {
+  locale: string;
+  code: string;
+  label: string;
+  href: string;
+  current: boolean;
 }
 
 const shortLang = (tag?: string) => String(tag || '').split(/[-_]/)[0].toLowerCase();
 
 // A trailing language subtag on an entry id — `kontakt.en`, `kontakt.nb-no`. Only ever honoured against the site's own locale list, so a page really called `plan.b` keeps its id.
 const LOCALE_SUFFIX = /\.([a-z]{2,3}(?:-[a-z0-9]{2,8})?)$/i;
+
+const PAGE_URL = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+
+const ENDONYMS: Record<string, string> = {
+  sv: 'Svenska', en: 'English', no: 'Norsk', nb: 'Norsk bokmål', nn: 'Norsk nynorsk',
+  da: 'Dansk', de: 'Deutsch', fi: 'Suomi', fr: 'Français', es: 'Español', it: 'Italiano',
+};
+
+export function localeEndonym(locale: string): string {
+  const code = String(locale || '');
+  return ENDONYMS[shortLang(code)] || code.toUpperCase();
+}
 
 export function resolveLocales(site?: Pick<SiteConfig, 'locales' | 'locale' | 'cmsLocale'>): ResolvedLocales {
   const raw = Array.isArray(site?.locales) ? site!.locales! : [];
@@ -108,19 +132,77 @@ export function pageLang(pathname: string, site?: SiteConfig, rendered?: string)
   return htmlLang(rendered || splitLocalePath(pathname, l).locale, site);
 }
 
+const pageFile = (id: string, locale: string | null) => `src/content/pages/${id}${locale ? `.${locale}` : ''}.md`;
+
+// One warning per file for the whole build: localeRoutes is rebuilt for every component on every page, and the editor needs to read the line once, not once per render.
+const warnedDefaultUrl = new Set<string>();
+
+function customUrl(entry: LocaleEntry | undefined, id: string, locale: string): string {
+  const raw = entry && entry.data && entry.data.url;
+  const slug = typeof raw === 'string' ? raw.trim() : '';
+  if (!slug) return '';
+  if (!PAGE_URL.test(slug)) {
+    throw new Error(`stomme i18n: "${slug}" in ${pageFile(id, locale)} is not a usable address — use lowercase a-z, digits and single hyphens, e.g. "the-area".`);
+  }
+  return slug;
+}
+
 // The paths a locale actually answers on. integration.mjs injects exactly two routes per non-default locale — `/<loc>` and `/<loc>/[...slug]` — and the second one's static paths are the published, non-suffixed `pages` entries (localePagesEntrypoint). Everything else a site serves (addon routes, /tack, listings, towns, services, 404) is built once, in the default language.
 export function localeRoutes(site: SiteConfig | undefined, pages: readonly LocaleEntry[] = []): LocaleRoutes {
   const locales = resolveLocales(site);
   const served = new Set<string>();
-  if (locales.enabled) {
-    served.add('/');
-    for (const p of pages) {
-      if (!p || !p.data || !p.data.published) continue;
-      if (stripLocaleSuffix(p.id, locales.locales).locale !== null) continue;
-      served.add(normalizeLocalePath(`/${p.id}`));
-    }
+  const localized = new Map<string, Map<string, string>>();
+  const bases = new Map<string, Map<string, string>>();
+  let custom = false;
+  if (!locales.enabled) return { locales, served, localized, bases, custom };
+  served.add('/');
+  const own: LocaleEntry[] = [];
+  const byId = new Map<string, LocaleEntry>();
+  for (const p of pages) {
+    if (!p) continue;
+    byId.set(p.id, p);
+    if (!p.data || !p.data.published) continue;
+    if (stripLocaleSuffix(p.id, locales.locales).locale !== null) continue;
+    served.add(normalizeLocalePath(`/${p.id}`));
+    own.push(p);
   }
-  return { locales, served };
+  // The default language's address is the filename: nav items, block links and every hand-written href name it, so a `url` beside it would break them rather than move the page.
+  for (const p of own) {
+    if (typeof p.data!.url !== 'string' || !p.data!.url.trim() || warnedDefaultUrl.has(p.id)) continue;
+    warnedDefaultUrl.add(p.id);
+    console.warn(`stomme i18n: ignoring \`url\` in ${pageFile(p.id, null)} — the address in ${locales.default} is the file's own name. Set \`url\` in the translations instead.`);
+  }
+  for (const loc of locales.locales) {
+    const forward = new Map<string, string>([['/', '/']]);
+    const back = new Map<string, string>([['/', '/']]);
+    const claimed = new Map<string, string>();
+    for (const p of own) {
+      const from = normalizeLocalePath(`/${p.id}`);
+      const slug = loc === locales.default ? '' : customUrl(byId.get(localeEntryId(p.id, loc, locales.default)), p.id, loc);
+      const to = slug ? `/${slug}` : from;
+      if (slug) custom = true;
+      const file = pageFile(p.id, slug ? loc : null);
+      const taken = claimed.get(to);
+      if (taken) throw new Error(`stomme i18n: /${loc}${to} is the address of two pages — ${taken} and ${file}. Give one of them a different \`url\`.`);
+      claimed.set(to, file);
+      forward.set(from, to);
+      back.set(to, from);
+    }
+    localized.set(loc, forward);
+    bases.set(loc, back);
+  }
+  return { locales, served, localized, bases, custom };
+}
+
+// The path a locale serves a page on, the prefix left off — `/omradet` read in en with `url: the-area` is `/the-area`.
+export function localePagePath(path: string, locale: string, routes: LocaleRoutes): string {
+  const base = normalizeLocalePath(path);
+  return routes.localized.get(locale)?.get(base) ?? base;
+}
+
+export function basePagePath(path: string, locale: string, routes: LocaleRoutes): string {
+  const p = normalizeLocalePath(path);
+  return routes.bases.get(locale)?.get(p) ?? p;
 }
 
 // A prefix is added only to a path this locale is known to serve — a link to anything else would be a 404 in that language rather than a translation, so it is left as it is and answers in the default language.
@@ -131,8 +213,14 @@ export function localeHref(href: string, locale: string, routes: LocaleRoutes): 
   if (!l.enabled || !prefix) return h;
   if (!h.startsWith('/') || h.startsWith('//')) return h;
   if (h === prefix || h.startsWith(`${prefix}/`)) return h;
-  if (!routes.served.has(normalizeLocalePath(h))) return h;
-  return h === '/' ? `${prefix}/` : prefix + h;
+  const cut = h.search(/[?#]/);
+  const written = cut === -1 ? h : h.slice(0, cut);
+  const rest = cut === -1 ? '' : h.slice(cut);
+  const base = normalizeLocalePath(written);
+  if (!routes.served.has(base)) return h;
+  const to = localePagePath(base, locale, routes);
+  const slash = written.length > 1 && written.endsWith('/');
+  return `${prefix}${to === '/' ? '/' : to + (slash ? '/' : '')}${rest}`;
 }
 
 export function localeLinker(site: SiteConfig | undefined, locale: string, pages: readonly LocaleEntry[] = []): (href: string) => string {
@@ -190,14 +278,16 @@ export function localePathFor(path: string, locale: string, l: ResolvedLocales):
 }
 
 // Every locale is listed because every locale URL is built: an untranslated page still answers there, in the default language. x-default points at the default locale.
-export function hreflangLinks(pathname: string, site?: SiteConfig, base?: URL | string | null): AlternateLink[] {
+export function hreflangLinks(pathname: string, site?: SiteConfig, base?: URL | string | null, pages: readonly LocaleEntry[] = []): AlternateLink[] {
   const l = resolveLocales(site);
   if (!l.enabled) return [];
-  const { path } = splitLocalePath(pathname, l);
+  const routes = localeRoutes(site, pages);
+  const here = splitLocalePath(pathname, l);
+  const path = basePagePath(here.path, here.locale, routes);
   // The alternate has to name the same URL the canonical does, trailing slash included, or the two tell a crawler about two different pages.
   const slashed = String(pathname || '/').length > 1 && String(pathname).endsWith('/');
   const at = (loc: string) => {
-    const p = localePathFor(path, loc, l);
+    const p = localePathFor(localePagePath(path, loc, routes), loc, l);
     const withSlash = slashed && !p.endsWith('/') ? `${p}/` : p;
     return base ? new URL(withSlash, base).href : withSlash;
   };
@@ -214,28 +304,31 @@ export function localeConfig(site: SiteConfig | undefined, locale: string): Site
   return { ...rest, locale: htmlLang(locale, site), cmsLocale: locale };
 }
 
-export function localeSwitcher(
-  pathname: string,
-  site: SiteConfig | undefined,
-  translatedIds: Iterable<string> = [],
-): { locale: string; label: string; href: string; current: boolean }[] {
+export function localeSwitcher(pathname: string, site: SiteConfig | undefined, entries: readonly LocaleEntry[] = []): LocaleChoice[] {
   const l = resolveLocales(site);
   if (!l.enabled) return [];
-  const { locale: current, path } = splitLocalePath(pathname, l);
+  const routes = localeRoutes(site, entries);
+  const here = splitLocalePath(pathname, l);
+  const path = basePagePath(here.path, here.locale, routes);
   const id = path === '/' ? 'home' : path.slice(1);
-  const ids = [...translatedIds];
+  const ids = entries.map((e) => e.id);
   // An untranslated page has nowhere to send you in that language but its front page. The language you are already reading always points at the page you are on, translated or not.
   return l.locales.map((loc) => ({
     locale: loc,
-    label: loc.toUpperCase(),
-    href: loc === current || hasTranslation(ids, id, loc, l) ? localePathFor(path, loc, l) : localePathFor('/', loc, l),
-    current: loc === current,
+    code: loc.toUpperCase(),
+    label: localeEndonym(loc),
+    href: loc === here.locale || hasTranslation(ids, id, loc, l)
+      ? localePathFor(localePagePath(path, loc, routes), loc, l)
+      : localePathFor('/', loc, l),
+    current: loc === here.locale,
   }));
 }
 
-export function sitemapI18n(site?: SiteConfig): { i18n?: { defaultLocale: string; locales: Record<string, string> } } {
+// The sitemap integration derives an alternate by swapping the locale prefix onto the same path, so the moment one page answers on a different address in one language every alternate it writes is a guess. The in-page hreflang set names the real URLs.
+export function sitemapI18n(site?: SiteConfig, pages: readonly LocaleEntry[] = []): { i18n?: { defaultLocale: string; locales: Record<string, string> } } {
   const l = resolveLocales(site);
   if (!l.enabled) return {};
+  if (localeRoutes(site, pages).custom) return {};
   const locales: Record<string, string> = {};
   for (const loc of l.locales) locales[loc] = htmlLang(loc, site);
   return { i18n: { defaultLocale: l.default, locales } };
