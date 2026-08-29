@@ -2,7 +2,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { resolve, dirname } from 'node:path';
 import { mkdirSync, writeFileSync, existsSync, readFileSync, readdirSync, cpSync, rmSync, statSync } from 'node:fs';
 import { createHash } from 'node:crypto';
-import { previewEntrypoint, listingEntrypoint, lookbookDataModule, lookbookEntrypoint, lookbookBlockEntrypoint, REVEAL } from './src/entrypoints.mjs';
+import { previewEntrypoint, listingEntrypoint, lookbookDataModule, lookbookEntrypoint, lookbookBlockEntrypoint, localeHomeEntrypoint, localePagesEntrypoint, REVEAL } from './src/entrypoints.mjs';
 import { publicIndexPlugin } from './src/vite-public-index.mjs';
 import { createJiti } from 'jiti';
 import { resolveMediaConfig } from './src/media-config.mjs';
@@ -90,6 +90,22 @@ async function siteMediaConfig(configFile) {
   if (!existsSync(configFile)) return resolveMediaConfig(null);
   const mod = await createJiti(import.meta.url).import(configFile);
   return resolveMediaConfig(mod.site?.media);
+}
+
+// Read from the site config rather than taken as an integration option, so switching a site's languages on needs no astro.config edit.
+async function siteLocales(configFile) {
+  if (!existsSync(configFile)) return [];
+  try {
+    const mod = await createJiti(import.meta.url).import(configFile);
+    return Array.isArray(mod.site?.locales) ? mod.site.locales : [];
+  } catch {
+    return [];
+  }
+}
+
+function resolveLocaleList(list) {
+  const clean = [...new Set((Array.isArray(list) ? list : []).map((l) => String(l || '').trim().toLowerCase()).filter(Boolean))];
+  return clean.length < 2 ? [] : clean;
 }
 
 export default function stomme(options = {}) {
@@ -308,6 +324,19 @@ export default function stomme(options = {}) {
               enabled.push(r.pattern);
             }
           }
+        }
+
+        const locales = resolveLocaleList(options.locales ?? (await siteLocales(resolve(root, configPath))));
+        for (const loc of locales.slice(1)) {
+          const localeDir = resolve(outDir, 'locale', loc);
+          mkdirSync(localeDir, { recursive: true });
+          const homeFile = resolve(localeDir, 'index.astro');
+          writeFileSync(homeFile, localeHomeEntrypoint(loc));
+          injectRoute({ pattern: `/${loc}`, entrypoint: homeFile });
+          const pagesFile = resolve(localeDir, 'page.astro');
+          writeFileSync(pagesFile, localePagesEntrypoint(loc));
+          injectRoute({ pattern: `/${loc}/[...slug]`, entrypoint: pagesFile });
+          enabled.push(`/${loc}`, `/${loc}/[...slug]`);
         }
 
         const listingsDir = resolve(outDir, 'listings');

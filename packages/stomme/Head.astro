@@ -4,6 +4,7 @@ import { getEntry } from 'astro:content';
 import { site, features, listings } from '@stomme/config';
 import { resolveShareImage } from './src/og-pages.ts';
 import { isUnlisted } from './src/config.ts';
+import { hreflangLinks, resolveLocales, splitLocalePath } from './src/i18n.ts';
 
 interface Props {
   title?: string;
@@ -32,13 +33,17 @@ const ogImage = servedShareImage
   : undefined;
 const ogUrl = Astro.site ? new URL(Astro.url.pathname, Astro.site).href : undefined;
 
-const noindex = isUnlisted(Astro.url.pathname, site?.noindex) || (Astro.site ? new URL(Astro.site).hostname.endsWith('.pages.dev') : false);
+// The noindex list is written in site paths, so a locale copy of an unlisted page has to be measured against the same path or it would be the one that gets indexed.
+const listPath = splitLocalePath(Astro.url.pathname, resolveLocales(site)).path;
+const noindex = isUnlisted(listPath, site?.noindex) || (Astro.site ? new URL(Astro.site).hostname.endsWith('.pages.dev') : false);
+const alternates = hreflangLinks(Astro.url.pathname, site, Astro.site);
 ---
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>{title ?? settings.name}</title>
 {description && <meta name="description" content={description} />}
 {noindex && <meta name="robots" content="noindex, nofollow" />}
 {ogUrl && <link rel="canonical" href={ogUrl} />}
+{alternates.map((a) => <link rel="alternate" hreflang={a.hreflang} href={a.href} />)}
 <meta property="og:title" content={ogTitle} />
 {description && <meta property="og:description" content={description} />}
 <meta property="og:type" content="website" />

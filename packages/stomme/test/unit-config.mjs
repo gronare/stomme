@@ -119,6 +119,29 @@ check(groups.length >= 8 && untranslated.length === 0,
   `all ${groups.length} string groups are translated in the Swedish set — a group added to English only would ship English to a Swedish site`,
   untranslated.join(', '));
 
+const no = resolveSite({ locale: 'no' }).strings;
+eq(no.readMore, 'Les mer', 'a Norwegian locale resolves the Norwegian string set');
+eq(resolveSite({ locale: 'nb-NO' }).strings.readMore, 'Les mer', 'bokmal (nb-NO) resolves the Norwegian set');
+eq(resolveSite({ locale: 'nn' }).strings.readMore, 'Les mer', 'nynorsk resolves the Norwegian set too');
+const keyPaths = (o, prefix = '') => Object.entries(o).flatMap(([k, v]) =>
+  v && typeof v === 'object' && !Array.isArray(v) ? keyPaths(v, `${prefix}${k}.`) : [`${prefix}${k}`]);
+const enKeys = keyPaths(EN).sort();
+eq(keyPaths(no).sort(), enKeys, `the Norwegian set has the same ${enKeys.length} keys as English — a missing one would render undefined`);
+eq(keyPaths(sv).sort(), enKeys, 'the Swedish set has the same keys as English');
+const noUntranslated = groups.filter((g) => Object.keys(EN[g]).every((k) => JSON.stringify(EN[g][k]) === JSON.stringify(no[g][k])));
+check(noUntranslated.length === 0,
+  `all ${groups.length} string groups are translated in the Norwegian set`, noUntranslated.join(', '));
+
+// ── a locale override renders the chrome in another language than the site's own ──
+eq(resolveSite({ locale: 'sv-SE' }, 'no').strings.readMore, 'Les mer', 'resolveSite(config, locale) resolves that locale instead of the site default');
+eq(resolveSite({ locale: 'sv-SE' }, 'no').locale, 'no', 'the override is reported as the resolved locale');
+eq(resolveSite({ locale: 'sv-SE', strings: { readMore: 'Mer' } }, 'no').strings.readMore, 'Les mer',
+  "the site's own string overrides are written in its default language, so a foreign locale drops them");
+eq(resolveSite({ locale: 'sv-SE', strings: { readMore: 'Mer' } }, 'sv').strings.readMore, 'Mer',
+  'the same language as the site keeps its string overrides');
+eq(resolveSite({ locale: 'sv-SE', strings: { readMore: 'Mer' } }).strings.readMore, 'Mer',
+  'no override argument leaves resolveSite exactly as it was');
+
 const deepMerged = groups.filter((g) => {
   const keys = Object.keys(EN[g]);
   const out = resolveSite({ locale: 'sv', strings: { [g]: { [keys[0]]: 'OVERRIDDEN' } } }).strings[g];

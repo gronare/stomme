@@ -1,7 +1,10 @@
 import { resolve } from 'node:path';
 import { readdirSync, readFileSync } from 'node:fs';
 
-export function buildOptionSources({ root, ROUTES, FEATURES, LISTINGS, BLOCKS }) {
+export function buildOptionSources({ root, ROUTES, FEATURES, LISTINGS, BLOCKS, LOCALES = [] }) {
+  // A translation is the same page in another language, never a second link target.
+  const isLocaleFile = (f) => LOCALES.length > 1 && LOCALES.some((l) => f.toLowerCase().endsWith(`.${l}.md`));
+
   function labelFromFrontmatter(file, key) {
     try {
       const m = readFileSync(file, 'utf8').match(new RegExp(`^${key}:\\s*(.+?)\\s*$`, 'm'));
@@ -14,7 +17,7 @@ export function buildOptionSources({ root, ROUTES, FEATURES, LISTINGS, BLOCKS })
   function collectionOptions(dir, routePrefix, labelKey) {
     let files = [];
     try {
-      files = readdirSync(resolve(root, dir)).filter((f) => f.endsWith('.md'));
+      files = readdirSync(resolve(root, dir)).filter((f) => f.endsWith('.md') && !isLocaleFile(f));
     } catch {
       return [];
     }
@@ -30,7 +33,7 @@ export function buildOptionSources({ root, ROUTES, FEATURES, LISTINGS, BLOCKS })
     const opts = [{ label: 'Home (/)', value: '/' }];
     let files = [];
     try {
-      files = readdirSync(resolve(root, 'src/content/pages')).filter((f) => f.endsWith('.md'));
+      files = readdirSync(resolve(root, 'src/content/pages')).filter((f) => f.endsWith('.md') && !isLocaleFile(f));
     } catch {
     }
     for (const f of files.sort()) {
@@ -51,7 +54,7 @@ export function buildOptionSources({ root, ROUTES, FEATURES, LISTINGS, BLOCKS })
   function serviceOptions() {
     let files = [];
     try {
-      files = readdirSync(resolve(root, 'src/content/services')).filter((f) => f.endsWith('.md'));
+      files = readdirSync(resolve(root, 'src/content/services')).filter((f) => f.endsWith('.md') && !isLocaleFile(f));
     } catch {
       return [];
     }
@@ -65,7 +68,7 @@ export function buildOptionSources({ root, ROUTES, FEATURES, LISTINGS, BLOCKS })
   function faqOptions() {
     let files = [];
     try {
-      files = readdirSync(resolve(root, 'src/content/faq')).filter((f) => f.endsWith('.md'));
+      files = readdirSync(resolve(root, 'src/content/faq')).filter((f) => f.endsWith('.md') && !isLocaleFile(f));
     } catch {
       return [];
     }
@@ -79,7 +82,7 @@ export function buildOptionSources({ root, ROUTES, FEATURES, LISTINGS, BLOCKS })
   function faqTagOptions() {
     let files = [];
     try {
-      files = readdirSync(resolve(root, 'src/content/faq')).filter((f) => f.endsWith('.md'));
+      files = readdirSync(resolve(root, 'src/content/faq')).filter((f) => f.endsWith('.md') && !isLocaleFile(f));
     } catch {
       return [];
     }

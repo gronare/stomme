@@ -1,4 +1,9 @@
-export function makeSettingsPane({ q, pad, emitWidget, emitNavLinks, emitFooterLinks, emitThanksButtons, COLLECTION_EDITORS, listingEditor, collectionEnabled, FEATURES, LISTINGS, CMS, ADDON_PANES, ADDON_PANEL_FILES, getStaticCollections }) {
+import { i18nConfigBlock, localeFilePath } from './cms-i18n.mjs';
+
+export function makeSettingsPane({ q, pad, emitWidget, emitNavLinks, emitFooterLinks, emitThanksButtons, COLLECTION_EDITORS, listingEditor, collectionEnabled, FEATURES, LISTINGS, CMS, LOCALES = [], ADDON_PANES, ADDON_PANEL_FILES, getStaticCollections }) {
+const navI18n = LOCALES.length > 1;
+const navLine = (indent, text) => (navI18n ? `\n${' '.repeat(indent)}${text}` : '');
+const navInline = (value) => (navI18n ? `, i18n: ${value}` : '');
 const generatedEditors = () => Object.keys(COLLECTION_EDITORS).filter(collectionEnabled).filter((n) => !getStaticCollections().has(n));
 function emitCollections(indent) {
   const p = pad(indent);
@@ -23,6 +28,8 @@ function emitCms(indent) {
   if (c.siteDomain) L.push(`${p}  site_domain: ${c.siteDomain}`);
   if (c.gatewayUrl) L.push(`${p}  gateway_url: ${c.gatewayUrl}`);
   if (c.identityUrl) L.push(`${p}  identity_url: ${c.identityUrl}`);
+  const i18n = i18nConfigBlock(LOCALES, indent);
+  if (i18n) L.push(i18n);
   return L.join('\n');
 }
 
@@ -119,7 +126,7 @@ function emitShareCards(indent) {
 function emitSettings() {
   const tp = emitTrackingPane(6);
   return `  - name: settings
-    label: "Settings"
+    label: "Settings"${navLine(4, 'i18n: true')}
     files:
       - name: site
         label: "Identity"
@@ -279,12 +286,12 @@ ${emitShareCards(6)}
           - { name: fontCustomBodyFile, label: "Custom body font file", widget: file, required: false, media_folder: "/public/media/fonts", public_folder: "/media/fonts", hint: "Used when Body font = Custom. Leave empty to reuse the heading font for body." }
       - name: nav
         label: "Header"
-        file: "src/content/navigation/nav.md"
+        file: "${navI18n ? localeFilePath('src/content/navigation/nav.md') : 'src/content/navigation/nav.md'}"${navLine(8, 'i18n: true')}
         fields:
-          - { name: sticky, label: "Sticky header", widget: boolean, required: false, default: false, hint: "Header stays fixed at the top while scrolling. Default: it scrolls away with the page." }
-          - { name: showLogo, label: "Show logo mark", widget: boolean, required: false, default: true, hint: "Show the logo image (set under Identity) in the header." }
-          - { name: showWordmark, label: "Show wordmark text", widget: boolean, required: false, default: true, hint: "Show the wordmark text (set under Identity) in the header." }
-${emitNavLinks(10)}
+          - { name: sticky, label: "Sticky header", widget: boolean, required: false, default: false, hint: "Header stays fixed at the top while scrolling. Default: it scrolls away with the page."${navInline('duplicate')} }
+          - { name: showLogo, label: "Show logo mark", widget: boolean, required: false, default: true, hint: "Show the logo image (set under Identity) in the header."${navInline('duplicate')} }
+          - { name: showWordmark, label: "Show wordmark text", widget: boolean, required: false, default: true, hint: "Show the wordmark text (set under Identity) in the header."${navInline('duplicate')} }
+${emitNavLinks(10, navI18n)}
       - name: footer
         label: "Footer"
         file: "src/content/footer/footer.md"

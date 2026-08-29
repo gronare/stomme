@@ -10,6 +10,9 @@ export interface SiteConfig {
   };
   noindex?: string[];
   locale?: string;
+  // Content locales, default first. Fewer than two turns the whole i18n layer off — no locale routes, no hreflang, no switcher, and the CMS gets no i18n declaration.
+  locales?: string[];
+  localeTags?: Record<string, string>;
   style?: string;
   analytics?: { cfToken?: string };
   maps?: { provider?: 'google' | 'osm'; key?: string };
@@ -253,7 +256,73 @@ const STRINGS_SV: typeof STRINGS_EN = {
   },
 };
 
-const STRINGS_BY_LANG: Record<string, typeof STRINGS_EN> = { en: STRINGS_EN, sv: STRINGS_SV };
+const STRINGS_NO: typeof STRINGS_EN = {
+  readMore: 'Les mer',
+  latest: 'Siste',
+  contact: {
+    name: 'Navn', email: 'E-post', phone: 'Telefon', message: 'Beskriv prosjektet ditt', submit: 'Send forespørsel',
+    direct: 'Direktekontakt', honeypot: 'La feltet stå tomt', hours: 'Åpningstider', visit: 'Finn fram',
+    findUs: 'Finn fram', follow: 'Følg oss', map: 'Kart',
+    reveal: 'Kontaktopplysninger, slå på JavaScript for å vise dem',
+    error: 'Det gikk ikke å sende. Prøv igjen, eller send oss en e-post direkte.',
+  },
+  beforeAfter: { before: 'Før', after: 'Etter', compare: 'Dra for å sammenligne før og etter' },
+  collage: {
+    more: '+{n} bilder', more1: '+1 bilde', open: 'Åpne bildeviseren', viewer: 'Bildeviser',
+    prev: 'Forrige bilde', next: 'Neste bilde', close: 'Lukk', counter: '{i} av {n}',
+  },
+  map: {
+    google: 'Åpne i Google Maps', apple: 'Apple Kart',
+    embed: 'Vis i Google Maps', embedNote: 'Kartet lastes fra Google først når du klikker.',
+    embedTitle: 'Google-kart over {address}',
+    embedOsm: 'Vis i OpenStreetMap', embedNoteOsm: 'Kartet lastes fra OpenStreetMap først når du klikker.',
+    embedTitleOsm: 'OpenStreetMap-kart over {address}',
+  },
+  footer: { links: 'Lenker', areas: 'Områder' },
+  town: {
+    eyebrow: 'Lokal tjeneste: {name}',
+    heading: '{name}',
+    cta: 'Be om tilbud',
+    whyHeading: 'Hvorfor velge oss i {name}?',
+    problemsHeading: 'Vanlige problemer vi løser',
+    districtsHeading: 'Hvor vi jobber i {name}',
+    caseHeading: 'Lokalt eksempel',
+    fieldNote: 'Feltnotat',
+    reasons: [],
+    servicesHeading: 'Våre tjenester i {name}',
+    servicesCta: 'Ta kontakt i dag',
+    ctaEyebrow: 'Gratis tilbud',
+    ctaHeading: 'Be om tilbud i {name}',
+  },
+  service: { eyebrow: 'Tjeneste', quoteEyebrow: 'Gratis tilbud', quoteHeading: 'Vil du vite hva det koster?', cta: 'Be om tilbud' },
+  listingStatus: { available: 'Tilgjengelig', reserved: 'Reservert', sold: 'Solgt', all: 'Alle' },
+  listingCta: 'Ta kontakt',
+  thanks: {
+    eyebrow: 'Sendt',
+    heading: 'Takk{name} — meldingen er på vei.',
+    lead: 'Vi har fått meldingen din og svarer innen én virkedag.',
+    recapLabel: 'Det du sendte',
+    talkLabel: 'Heller snakke?',
+    home: 'Til forsiden',
+    to: 'til',
+    from: 'fra',
+  },
+  notFound: {
+    title: 'Fant ikke siden',
+    heading: 'Fant ikke siden',
+    lead: 'Siden du leter etter finnes ikke, eller den kan ha blitt flyttet.',
+    home: 'Til forsiden',
+  },
+  consent: {
+    text: 'Vi bruker informasjonskapsler til statistikk og for å gjøre nettstedet bedre.',
+    accept: 'Godta',
+    decline: 'Avslå',
+    more: 'Les mer',
+    settings: 'Innstillinger for informasjonskapsler',
+  },
+};
+
+const STRINGS_BY_LANG: Record<string, typeof STRINGS_EN> = { en: STRINGS_EN, sv: STRINGS_SV, no: STRINGS_NO, nb: STRINGS_NO, nn: STRINGS_NO };
 
 function baseStrings(locale?: string, cmsLocale?: string) {
   const lang = String(locale || cmsLocale || 'en').split(/[-_]/)[0].toLowerCase();
@@ -289,12 +358,15 @@ export function isUnlisted(pathname: string, noindex?: string[]): boolean {
   });
 }
 
-export function resolveSite(c?: SiteConfig) {
-  const s = c && c.strings;
-  const base = baseStrings(c && c.locale, c && c.cmsLocale);
+// `locale` renders the chrome in another language than the site's own: the site's `strings` overrides are written in the default language, so they are dropped whenever the requested language is not that one.
+export function resolveSite(c?: SiteConfig, locale?: string) {
+  const lang = (t?: string) => String(t || '').split(/[-_]/)[0].toLowerCase();
+  const own = lang((c && c.locale) || (c && c.cmsLocale) || SITE_DEFAULTS.locale);
+  const s = !locale || lang(locale) === own ? c && c.strings : undefined;
+  const base = baseStrings(locale || (c && c.locale), c && c.cmsLocale);
   return {
     routes: { ...SITE_DEFAULTS.routes, ...(c && c.routes) },
-    locale: (c && c.locale) || SITE_DEFAULTS.locale,
+    locale: locale || (c && c.locale) || SITE_DEFAULTS.locale,
     cmsLocale: (c && c.cmsLocale) || SITE_DEFAULTS.cmsLocale,
     strings: {
       ...base,

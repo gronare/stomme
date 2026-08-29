@@ -12,6 +12,7 @@ import { createJiti } from 'jiti';
 import { renderGallery } from '../admin/blocks-gallery.mjs';
 import { rewriteLabels, listingAliases } from '../src/label-paths.mjs';
 import { r2LibraryYaml, resolveMediaConfig, withMaxFileSize } from '../src/media-config.mjs';
+import { resolveCmsLocales, LOCALIZED_EDITORS } from '../src/cms-i18n.mjs';
 
 const root = process.cwd();
 const here = dirname(fileURLToPath(import.meta.url));
@@ -59,10 +60,12 @@ let CMS = null;
 let LISTINGS = [];
 let STYLE = process.env.STOMME_STYLE || null;
 let MEDIA = resolveMediaConfig(null);
+let LOCALES = [];
 try {
   const mod = await jiti.import(resolve(root, 'src/site.config.ts'));
   if (mod.site && mod.site.routes) ROUTES = { ...ROUTES, ...mod.site.routes };
   if (mod.site && mod.site.cmsLocale) CMS_LOCALE = mod.site.cmsLocale;
+  if (mod.site && mod.site.locales) LOCALES = resolveCmsLocales(mod.site.locales);
   if (mod.site && mod.site.cms) CMS = mod.site.cms;
   if (mod.site && mod.site.style) STYLE = mod.site.style;
   if (mod.site && mod.site.media) MEDIA = resolveMediaConfig(mod.site.media);
@@ -124,15 +127,16 @@ const MARKER_START = /# >>> (\w+):generated/;
 const q = (s) => `"${String(s).replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`;
 const pad = (n) => ' '.repeat(n);
 
-const { PAGE_OPTIONS, FAQ_TAG_OPTIONS, OPTION_SOURCES, collectionEnabled, AVAILABLE_BLOCKS, SKIPPED_BLOCKS, GROUP_ORDER } = buildOptionSources({ root, ROUTES, FEATURES, LISTINGS, BLOCKS });
+const { PAGE_OPTIONS, FAQ_TAG_OPTIONS, OPTION_SOURCES, collectionEnabled, AVAILABLE_BLOCKS, SKIPPED_BLOCKS, GROUP_ORDER } = buildOptionSources({ root, ROUTES, FEATURES, LISTINGS, BLOCKS, LOCALES });
 
 const { listSummary, emitField, emitFlow, emitWidget, navLinkField, emitFooterLinks, emitNavLinks, buttonField, emitThanksButtons } = makeEmitters({ q, pad, AVAILABLE_BLOCKS, OPTION_SOURCES });
 
-const { COLLECTION_EDITORS, listingEditor } = makeCollectionEditors({ q, emitField, emitWidget, buttonField });
+const isLocalized = (name) => LOCALES.length > 1 && LOCALIZED_EDITORS.includes(name);
+const { COLLECTION_EDITORS, listingEditor } = makeCollectionEditors({ q, emitField, emitWidget, buttonField, localized: isLocalized });
 
 const { ADDON_PANES, ADDON_PANEL_FILES } = await loadAddonCms({ slotsDir: process.env.STOMME_SLOTS_DIR, ROUTES, FEATURES, emitWidget, emitField, buttonField, navLinkField });
 
-const { generatedEditors, emitCollections, emitCms, emitSettings, emitTrackingPane } = makeSettingsPane({ q, pad, emitWidget, emitNavLinks, emitFooterLinks, emitThanksButtons, COLLECTION_EDITORS, listingEditor, collectionEnabled, FEATURES, LISTINGS, CMS, ADDON_PANES, ADDON_PANEL_FILES, getStaticCollections: () => STATIC_COLLECTIONS });
+const { generatedEditors, emitCollections, emitCms, emitSettings, emitTrackingPane } = makeSettingsPane({ q, pad, emitWidget, emitNavLinks, emitFooterLinks, emitThanksButtons, COLLECTION_EDITORS, listingEditor, collectionEnabled, FEATURES, LISTINGS, CMS, LOCALES, ADDON_PANES, ADDON_PANEL_FILES, getStaticCollections: () => STATIC_COLLECTIONS });
 
 const EMITTERS = { blocks: emitWidget, collections: emitCollections, navlinks: emitNavLinks, thanksbuttons: emitThanksButtons, footerlinks: emitFooterLinks, settings: emitSettings, cms: emitCms, tracking: emitTrackingPane };
 
@@ -417,6 +421,7 @@ if (counts.collections) {
   const kept = [...STATIC_COLLECTIONS].filter((n) => COLLECTION_EDITORS[n] && collectionEnabled(n));
   if (kept.length) console.log(`  ↳ hand-authored panes kept (outside markers): ${kept.join(', ')}`);
   if (ADDON_PANES.length) console.log(`  ↳ addon panes: ${ADDON_PANES.map((e) => e.feature).join(', ')}`);
+  if (LOCALES.length) console.log(`  ↳ i18n: ${LOCALES.join(', ')} (default ${LOCALES[0]}) · localized: ${LOCALIZED_EDITORS.join(', ')}`);
 }
 if (SKIPPED_BLOCKS.length) {
   console.log(`  ↳ ${SKIPPED_BLOCKS.length} block(s) skipped — collection absent: ${SKIPPED_BLOCKS.map((b) => `${b.type}→${b.collection}`).join(', ')}`);

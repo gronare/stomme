@@ -1,38 +1,44 @@
-export function makeCollectionEditors({ q, emitField, emitWidget, buttonField }) {
+import { localeFilePath } from './cms-i18n.mjs';
+
+export function makeCollectionEditors({ q, emitField, emitWidget, buttonField, localized = () => false }) {
+const on = (name) => !!localized(name);
+const line = (name, indent, text) => (on(name) ? `\n${' '.repeat(indent)}${text}` : '');
+const inline = (name, value) => (on(name) ? `, i18n: ${value}` : '');
+const filePath = (name, path) => (on(name) ? localeFilePath(path) : path);
 // No field-level media_folder in any editor below: the CMS resolves it relative to the entry, which breaks uploads from subfolder entries — the global media_folder in config.yml is the one that works.
 const COLLECTION_EDITORS = {
   home: `- name: home
-  label: "Home page"
+  label: "Home page"${line('home', 2, 'i18n: true')}
   files:
     - name: home
       label: "Home"
-      file: "src/content/home/home.md"
+      file: "${filePath('home', 'src/content/home/home.md')}"${line('home', 6, 'i18n: true')}
       fields:
         - name: seo
           label: "SEO"
           widget: object
-          collapsed: true
+          collapsed: true${line('home', 10, 'i18n: true')}
           fields:
-            - { name: title, label: "SEO title", widget: string }
-            - { name: description, label: "SEO description", widget: text }
-${emitWidget(8)}`,
+            - { name: title, label: "SEO title", widget: string${inline('home', 'true')} }
+            - { name: description, label: "SEO description", widget: text${inline('home', 'true')} }
+${emitWidget(8, on('home'))}`,
   pages: `- name: pages
   label: "Pages"
   label_singular: "Page"
   folder: "src/content/pages"
   create: true
-  slug: "{{slug}}"
+  slug: "{{slug}}"${line('pages', 2, 'i18n: true')}
   fields:
-    - { name: title, label: "Title", widget: string }
-    - { name: published, label: "Published", widget: boolean, default: true, required: false, hint: "Uncheck to hide the page — unpublished pages aren't built." }
+    - { name: title, label: "Title", widget: string${inline('pages', 'true')} }
+    - { name: published, label: "Published", widget: boolean, default: true, required: false, hint: "Uncheck to hide the page — unpublished pages aren't built."${inline('pages', 'duplicate')} }
     - name: seo
       label: "SEO"
       widget: object
-      collapsed: true
+      collapsed: true${line('pages', 6, 'i18n: true')}
       fields:
-        - { name: title, label: "SEO title", widget: string }
-        - { name: description, label: "SEO description", widget: text }
-${emitWidget(4)}`,
+        - { name: title, label: "SEO title", widget: string${inline('pages', 'true')} }
+        - { name: description, label: "SEO description", widget: text${inline('pages', 'true')} }
+${emitWidget(4, on('pages'))}`,
   faq: `- name: faq
   label: "FAQ"
   label_singular: "Question"

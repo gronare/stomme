@@ -1,3 +1,5 @@
+import { i18nFlagFor } from './cms-i18n.mjs';
+
 export function makeEmitters({ q, pad, AVAILABLE_BLOCKS, OPTION_SOURCES }) {
   // The CMS labels a collapsed row with the FIRST field's value (an empty icon picker reads "No icon"), so derive a summary instead — eyebrow when present, then the identifying field; empty placeholders render as nothing. An explicit `summary` on the Field def wins.
   const SUMMARY_PRIORITY = ['title', 'name', 'label', 'question', 'quote', 'heading', 'statement', 'term', 'caption', 'text', 'alt', 'value'];
@@ -10,14 +12,17 @@ export function makeEmitters({ q, pad, AVAILABLE_BLOCKS, OPTION_SOURCES }) {
     return parts.length ? parts.join(' ') : null;
   }
 
-  function emitField(f, indent) {
+  function emitField(f, indent, i18n = false) {
     const p = pad(indent);
+    const flag = i18n ? i18nFlagFor(f) : null;
+    const i18nLine = flag ? [`${p}  i18n: ${flag}`] : [];
     const parts = [`name: ${f.name}`, `label: ${q(f.label)}`, `widget: ${f.widget}`];
     if (f.required === false) parts.push('required: false');
     if (f.default !== undefined) parts.push(`default: ${typeof f.default === 'string' ? q(f.default) : f.default}`);
     if (f.hint) parts.push(`hint: ${q(f.hint)}`);
     if (f.media_folder) parts.push(`media_folder: ${q(f.media_folder)}`);
     if (f.public_folder) parts.push(`public_folder: ${q(f.public_folder)}`);
+    if (flag) parts.push(`i18n: ${flag}`);
 
     const collapseProps = () => [
       ...(f.label_singular ? [`${p}  label_singular: ${q(f.label_singular)}`] : []),
@@ -35,14 +40,16 @@ export function makeEmitters({ q, pad, AVAILABLE_BLOCKS, OPTION_SOURCES }) {
         ...collapseProps(),
         ...(f.hint ? [`${p}  hint: ${q(f.hint)}`] : []),
         ...mediaProps(),
+        ...i18nLine,
         `${p}  summary: "{{fields.eyebrow}} {{fields.heading}}{{fields.quote}}"`,
         `${p}  types:`];
       for (const b of types) {
         lines.push(`${p}    - name: ${b.type}`, `${p}      label: ${q(b.label)}`, `${p}      widget: object`);
+        if (flag) lines.push(`${p}      i18n: true`);
         lines.push(`${p}      fields:`);
         lines.push(...(b.fields.length
-          ? b.fields.map((sf) => emitField(sf, indent + 8))
-          : [`${p}        - { name: _auto, label: "Auto", widget: hidden }`]));
+          ? b.fields.map((sf) => emitField(sf, indent + 8, i18n))
+          : [`${p}        - { name: _auto, label: "Auto", widget: hidden${flag ? ', i18n: duplicate' : ''} }`]));
       }
       return lines.join('\n');
     }
@@ -53,8 +60,9 @@ export function makeEmitters({ q, pad, AVAILABLE_BLOCKS, OPTION_SOURCES }) {
         ...collapseProps(),
         ...(f.hint ? [`${p}  hint: ${q(f.hint)}`] : []),
         ...mediaProps(),
+        ...i18nLine,
         ...(sum ? [`${p}  summary: ${q(sum)}`] : []),
-        `${p}  fields:`, ...f.fields.map((sf) => emitField(sf, indent + 4))].join('\n');
+        `${p}  fields:`, ...f.fields.map((sf) => emitField(sf, indent + 4, i18n))].join('\n');
     }
     if (f.widget === 'list' && f.field) {
       return [`${p}- name: ${f.name}`, `${p}  label: ${q(f.label)}`, `${p}  widget: list`,
@@ -62,7 +70,8 @@ export function makeEmitters({ q, pad, AVAILABLE_BLOCKS, OPTION_SOURCES }) {
         ...collapseProps(),
         ...(f.hint ? [`${p}  hint: ${q(f.hint)}`] : []),
         ...mediaProps(),
-        `${p}  field: ${emitFlow(f.field)}`].join('\n');
+        ...i18nLine,
+        `${p}  field: ${emitFlow(f.field, i18n)}`].join('\n');
     }
     if (f.widget === 'object' && f.fields) {
       const head = [`${p}- name: ${f.name}`, `${p}  label: ${q(f.label)}`, `${p}  widget: object`];
@@ -74,8 +83,9 @@ export function makeEmitters({ q, pad, AVAILABLE_BLOCKS, OPTION_SOURCES }) {
       if (f.summary) head.push(`${p}  summary: ${q(f.summary)}`);
       if (f.hint) head.push(`${p}  hint: ${q(f.hint)}`);
       head.push(...mediaProps());
+      head.push(...i18nLine);
       head.push(`${p}  fields:`);
-      return [...head, ...f.fields.map((sf) => emitField(sf, indent + 4))].join('\n');
+      return [...head, ...f.fields.map((sf) => emitField(sf, indent + 4, i18n))].join('\n');
     }
     if (f.widget === 'relation') {
       const list = (v) => `[${(Array.isArray(v) ? v : [v]).map(q).join(', ')}]`;
@@ -86,7 +96,8 @@ export function makeEmitters({ q, pad, AVAILABLE_BLOCKS, OPTION_SOURCES }) {
         ...(f.search_fields ? [`${p}  search_fields: ${list(f.search_fields)}`] : []),
         ...(f.display_fields ? [`${p}  display_fields: ${list(f.display_fields)}`] : []),
         ...(f.multiple ? [`${p}  multiple: true`] : []),
-        ...(f.hint ? [`${p}  hint: ${q(f.hint)}`] : [])].join('\n');
+        ...(f.hint ? [`${p}  hint: ${q(f.hint)}`] : []),
+        ...i18nLine].join('\n');
     }
     if (f.widget === 'select') {
       const opts = typeof f.options === 'string' ? OPTION_SOURCES[f.options] ?? [] : Array.isArray(f.options) ? f.options : [];
@@ -95,6 +106,7 @@ export function makeEmitters({ q, pad, AVAILABLE_BLOCKS, OPTION_SOURCES }) {
       if (f.required === false) out.push(`${p}  required: false`);
       if (f.default !== undefined) out.push(`${p}  default: ${Array.isArray(f.default) ? `[${f.default.map(q).join(', ')}]` : q(f.default)}`);
       if (f.hint) out.push(`${p}  hint: ${q(f.hint)}`);
+      out.push(...i18nLine);
       if (opts.length === 0) {
         out.push(`${p}  options: []`);
       } else {
@@ -106,13 +118,15 @@ export function makeEmitters({ q, pad, AVAILABLE_BLOCKS, OPTION_SOURCES }) {
     return `${p}- { ${parts.join(', ')} }`;
   }
 
-  function emitFlow(f) {
+  function emitFlow(f, i18n = false) {
+    const flag = i18n ? i18nFlagFor(f) : null;
     const parts = [`name: ${f.name}`, `label: ${q(f.label)}`, `widget: ${f.widget}`];
     if (f.required === false) parts.push('required: false');
+    if (flag) parts.push(`i18n: ${flag}`);
     return `{ ${parts.join(', ')} }`;
   }
 
-  function emitWidget(indent) {
+  function emitWidget(indent, i18n = false) {
     const p = pad(indent);
     const lines = [
       `${p}- name: blocks`,
@@ -121,15 +135,17 @@ export function makeEmitters({ q, pad, AVAILABLE_BLOCKS, OPTION_SOURCES }) {
       `${p}  widget: list`,
       `${p}  required: false`,
       `${p}  collapsed: true`,
+      ...(i18n ? [`${p}  i18n: true`] : []),
       `${p}  summary: "{{fields.eyebrow}} {{fields.heading}}{{fields.quote}}"`,
       `${p}  types:`,
     ];
     for (const b of AVAILABLE_BLOCKS) {
       lines.push(`${p}    - name: ${b.type}`, `${p}      label: ${q(b.label)}`, `${p}      widget: object`);
+      if (i18n) lines.push(`${p}      i18n: true`);
       if (b.fields.length === 0) {
-        lines.push(`${p}      fields:`, `${p}        - { name: _auto, label: "Auto", widget: hidden }`);
+        lines.push(`${p}      fields:`, `${p}        - { name: _auto, label: "Auto", widget: hidden${i18n ? ', i18n: duplicate' : ''} }`);
       } else {
-        lines.push(`${p}      fields:`, ...b.fields.map((f) => emitField(f, indent + 8)));
+        lines.push(`${p}      fields:`, ...b.fields.map((f) => emitField(f, indent + 8, i18n)));
       }
     }
     return lines.join('\n');
@@ -167,7 +183,7 @@ export function makeEmitters({ q, pad, AVAILABLE_BLOCKS, OPTION_SOURCES }) {
     ];
     return fields.map((f) => emitField(f, indent)).join('\n');
   }
-  function emitNavLinks(indent) {
+  function emitNavLinks(indent, i18n = false) {
     const items = {
       name: 'items', label: 'Menu links', widget: 'list', required: false, collapsed: true, label_singular: 'Menu link', summary: '{{fields.label}}', fields: [
         { name: 'label', label: 'Label', widget: 'string' },
@@ -182,7 +198,7 @@ export function makeEmitters({ q, pad, AVAILABLE_BLOCKS, OPTION_SOURCES }) {
         navLinkField(),
       ],
     };
-    return [emitField(items, indent), emitField(cta, indent)].join('\n');
+    return [emitField(items, indent, i18n), emitField(cta, indent, i18n)].join('\n');
   }
 
   function buttonField(name, label, labelHint) {

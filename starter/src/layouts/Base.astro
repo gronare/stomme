@@ -7,11 +7,13 @@ import Footer from '@gronare/stomme/Footer.astro';
 import Tracking from '@gronare/stomme/Tracking.astro';
 import ConsentBanner from '@gronare/stomme/ConsentBanner.astro';
 import StommeHead from '@gronare/stomme/Head.astro';
+import { pageLang } from '@gronare/stomme/i18n';
 import { site } from '../site.config';
 
 // Nothing in this repo passes `chrome`: the engine's generated CMS previews render into this layout with chrome={false} to isolate one component.
-interface Props { title?: string; description?: string; image?: string; chrome?: boolean }
-const { title, description, image, chrome = true } = Astro.props;
+// `lang` comes from the generated locale routes and names the language actually rendered, which is the default one whenever a page has no translation.
+interface Props { title?: string; description?: string; image?: string; chrome?: boolean; lang?: string }
+const { title, description, image, chrome = true, lang } = Astro.props;
 
 const theme = (await getEntry('theme', 'theme'))!.data;
 const footerCfg = ((await getEntry('footer', 'footer'))?.data ?? {}) as any;
@@ -41,7 +43,7 @@ const themeVars = [
 ].join(';');
 ---
 <!doctype html>
-<html lang={site.locale || 'en'} style={themeVars} data-eyebrow={theme.eyebrow}>
+<html lang={pageLang(Astro.url.pathname, site, lang)} style={themeVars} data-eyebrow={theme.eyebrow}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />

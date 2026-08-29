@@ -11,9 +11,19 @@ const hasMd = (dir: string) => {
   try { return readdirSync(dir, { recursive: true }).some((f) => String(f).endsWith('.md')); }
   catch { return false; }
 };
+// Astro's own entry id is the filename run through github-slugger, which drops the dot: `kontakt.en` would collapse into `kontakten` and the locale file could never be looked up. Same slug rules, one exception — a trailing language subtag survives.
+const LOCALE_TAIL = /\.([a-z]{2,3}(?:-[a-z0-9]{2,8})?)$/i;
+const slugSegment = (s: string) => s.toLowerCase().replace(/\s+/g, '-').replace(/[^\p{L}\p{N}\-_]+/gu, '');
+export function localeAwareId(entry: string): string {
+  const noExt = String(entry).replace(/\.[^./]+$/, '');
+  const tail = noExt.match(LOCALE_TAIL);
+  const stem = tail ? noExt.slice(0, -tail[0].length) : noExt;
+  const id = stem.split('/').map(slugSegment).join('/').replace(/\/index$/, '');
+  return tail ? `${id}.${tail[1].toLowerCase()}` : id;
+}
 const md = (name: string) =>
   hasMd(`./src/content/${name}`)
-    ? glob({ pattern: '**/*.md', base: `./src/content/${name}` })
+    ? glob({ pattern: '**/*.md', base: `./src/content/${name}`, generateId: ({ entry, data }) => (data?.slug ? String(data.slug) : localeAwareId(entry)) })
     : { name: 'stomme-empty', load: async () => {} };
 const dateField = z.union([z.string(), z.date()]).transform((d) => (d instanceof Date ? d.toISOString().slice(0, 10) : d));
 

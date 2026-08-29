@@ -336,6 +336,51 @@ const { entry } = Astro.props;
 `;
 }
 
+// One generated route per non-default locale rather than a `/[locale]/…` param: a literal first segment always outranks the site's own `/[...slug]`, so `/en/about` can never be resolved as a page called "en/about".
+export function localeHomeEntrypoint(locale) {
+  return `---
+import Base from '@stomme/base';
+import BlockRenderer from '@gronare/stomme/BlockRenderer.astro';
+import { getCollection } from 'astro:content';
+import { site, features } from '@stomme/config';
+import { resolveLocales, pickLocaleEntry, localeConfig, htmlLang } from '@gronare/stomme/i18n';
+
+const locales = resolveLocales(site);
+const { entry, locale } = pickLocaleEntry(await getCollection('home'), 'home', ${JSON.stringify(locale)}, locales);
+const { data } = entry;
+---
+<Base title={data.seo.title} description={data.seo.description} image={data.seo.image} lang={htmlLang(locale, site)}>
+  <BlockRenderer blocks={data.blocks} config={localeConfig(site, locale)} features={features} />
+</Base>
+`;
+}
+
+export function localePagesEntrypoint(locale) {
+  return `---
+import Base from '@stomme/base';
+import BlockRenderer from '@gronare/stomme/BlockRenderer.astro';
+import { getCollection } from 'astro:content';
+import { site, features } from '@stomme/config';
+import { resolveLocales, defaultLocaleEntries, pickLocaleEntry, localeConfig, htmlLang } from '@gronare/stomme/i18n';
+
+export async function getStaticPaths() {
+  const all = await getCollection('pages');
+  const locales = resolveLocales(site);
+  return defaultLocaleEntries(all, site)
+    .filter((p) => p.data.published)
+    .map((p) => {
+      const { entry, locale } = pickLocaleEntry(all, p.id, ${JSON.stringify(locale)}, locales);
+      return { params: { slug: p.id }, props: { page: entry, locale } };
+    });
+}
+const { page, locale } = Astro.props;
+---
+<Base title={page.data.seo.title} description={page.data.seo.description} image={page.data.seo.image} lang={htmlLang(locale, site)}>
+  <BlockRenderer blocks={page.data.blocks} config={localeConfig(site, locale)} features={features} />
+</Base>
+`;
+}
+
 export const REVEAL = `
 (function () {
   function dec(s) { return s ? atob(s).split('').reverse().join('') : ''; }
