@@ -11,6 +11,16 @@ export interface AlternateLink {
   href: string;
 }
 
+export interface LocaleEntry {
+  id: string;
+  data?: { published?: boolean } & Record<string, unknown>;
+}
+
+export interface LocaleRoutes {
+  locales: ResolvedLocales;
+  served: Set<string>;
+}
+
 const shortLang = (tag?: string) => String(tag || '').split(/[-_]/)[0].toLowerCase();
 
 // A trailing language subtag on an entry id — `kontakt.en`, `kontakt.nb-no`. Only ever honoured against the site's own locale list, so a page really called `plan.b` keeps its id.
@@ -98,13 +108,78 @@ export function pageLang(pathname: string, site?: SiteConfig, rendered?: string)
   return htmlLang(rendered || splitLocalePath(pathname, l).locale, site);
 }
 
-export function localeHref(href: string, locale: string, l: ResolvedLocales): string {
+// The paths a locale actually answers on. integration.mjs injects exactly two routes per non-default locale — `/<loc>` and `/<loc>/[...slug]` — and the second one's static paths are the published, non-suffixed `pages` entries (localePagesEntrypoint). Everything else a site serves (addon routes, /tack, listings, towns, services, 404) is built once, in the default language.
+export function localeRoutes(site: SiteConfig | undefined, pages: readonly LocaleEntry[] = []): LocaleRoutes {
+  const locales = resolveLocales(site);
+  const served = new Set<string>();
+  if (locales.enabled) {
+    served.add('/');
+    for (const p of pages) {
+      if (!p || !p.data || !p.data.published) continue;
+      if (stripLocaleSuffix(p.id, locales.locales).locale !== null) continue;
+      served.add(normalizeLocalePath(`/${p.id}`));
+    }
+  }
+  return { locales, served };
+}
+
+// A prefix is added only to a path this locale is known to serve — a link to anything else would be a 404 in that language rather than a translation, so it is left as it is and answers in the default language.
+export function localeHref(href: string, locale: string, routes: LocaleRoutes): string {
   const h = String(href || '');
+  const l = routes.locales;
   const prefix = localePrefix(locale, l.default);
   if (!l.enabled || !prefix) return h;
   if (!h.startsWith('/') || h.startsWith('//')) return h;
   if (h === prefix || h.startsWith(`${prefix}/`)) return h;
+  if (!routes.served.has(normalizeLocalePath(h))) return h;
   return h === '/' ? `${prefix}/` : prefix + h;
+}
+
+export function localeLinker(site: SiteConfig | undefined, locale: string, pages: readonly LocaleEntry[] = []): (href: string) => string {
+  const routes = localeRoutes(site, pages);
+  return (href: string) => localeHref(href, locale, routes);
+}
+
+// Block link fields as src/href.ts reads them: a `link` holding either a { page, url } object or a plain string, plus the legacy `ctaHref`/`href2`/… strings. Rewritten once here, so no block component has to know the page is being rendered in a language.
+const LINK_KEY = /^link$|href\d*$/i;
+const isPlain = (v: unknown): v is Record<string, unknown> =>
+  !!v && typeof v === 'object' && !Array.isArray(v) && (Object.getPrototypeOf(v) === Object.prototype || Object.getPrototypeOf(v) === null);
+
+function mapLinkValue(value: unknown, map: (href: string) => string): unknown {
+  if (typeof value === 'string') return map(value);
+  if (!isPlain(value)) return value;
+  let out = value;
+  for (const k of ['page', 'url']) {
+    const v = value[k];
+    if (typeof v !== 'string') continue;
+    const next = map(v);
+    if (next === v) continue;
+    if (out === value) out = { ...value };
+    out[k] = next;
+  }
+  return out;
+}
+
+export function localizeLinks<T>(value: T, map: (href: string) => string): T {
+  if (Array.isArray(value)) {
+    let out: unknown[] = value;
+    value.forEach((item, i) => {
+      const next = localizeLinks(item, map);
+      if (next === item) return;
+      if (out === value) out = [...value];
+      out[i] = next;
+    });
+    return out as unknown as T;
+  }
+  if (!isPlain(value)) return value;
+  let out: Record<string, unknown> = value;
+  for (const [k, v] of Object.entries(value)) {
+    const next = LINK_KEY.test(k) ? mapLinkValue(v, map) : localizeLinks(v, map);
+    if (next === v) continue;
+    if (out === value) out = { ...value };
+    out[k] = next;
+  }
+  return out as unknown as T;
 }
 
 export function localePathFor(path: string, locale: string, l: ResolvedLocales): string {

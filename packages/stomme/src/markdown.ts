@@ -12,8 +12,10 @@ const SIZES = new Set(['small', 'large']);
 const esc = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 const attr = (tag: string, name: string) => (tag.match(new RegExp(`\\b${name}="([^"]*)"`)) ?? ['', ''])[1];
 
-export async function renderMarkdown(md = ''): Promise<string> {
+// `link` rewrites the href of every inline link — the locale mapper, so a body's own [text](/page) lands in the language the page is read in.
+export async function renderMarkdown(md = '', link?: (href: string) => string): Promise<string> {
   let html = await marked.parse(md ?? '');
+  if (link) html = html.replace(/(<a\b[^>]*\bhref=")([^"]*)(")/g, (_m, pre, href, post) => pre + link(href) + post);
 
   for (const tag of new Set([...html.matchAll(/<img\b[^>]*>/g)].map((m) => m[0]))) {
     const src = attr(tag, 'src');

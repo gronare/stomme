@@ -104,6 +104,23 @@ try {
 
   check(!(await renderMarkdown('![Alt](/media/wide.jpg)')).includes('<img src="/media/wide.jpg"'),
     'no unprocessed <img> survives for an upload the pipeline handled');
+
+  console.log('\n· a body\'s own links follow the page\'s language');
+  const enLink = (h) => (h === '/kontakt' ? '/en/kontakt' : h);
+  eq(await renderMarkdown('Reach us via the [contact form](/kontakt).', enLink),
+    '<p>Reach us via the <a href="/en/kontakt">contact form</a>.</p>\n',
+    'an internal link in a markdown body is rewritten by the mapper');
+  eq(await renderMarkdown('See [booking](/bokning/stugan).', enLink),
+    '<p>See <a href="/bokning/stugan">booking</a>.</p>\n',
+    'a link the mapper leaves alone is written out unchanged');
+  eq(await renderMarkdown('[Us](https://x.se) and [mail](mailto:a@b.se)', enLink),
+    '<p><a href="https://x.se">Us</a> and <a href="mailto:a@b.se">mail</a></p>\n',
+    'external and mailto links pass through the mapper untouched');
+  check(!(await renderMarkdown('Reach us via the [contact form](/kontakt).')).includes('/en/'),
+    'without a mapper the body renders exactly as before');
+  check((await renderMarkdown('`<a href="/kontakt">`', enLink)).includes('/kontakt') === true
+    && !(await renderMarkdown('`<a href="/kontakt">`', enLink)).includes('/en/kontakt'),
+    'markup inside a code span is escaped text, not a link — the rewrite cannot reach it');
 } finally {
   rmSync(dir, { recursive: true, force: true });
 }

@@ -32,8 +32,10 @@ import ContactForm from '../blocks/ContactForm.astro';
 import ContactCard from '../blocks/ContactCard.astro';
 import FindUs from '../blocks/FindUs.astro';
 import MapBlock from '../blocks/Map.astro';
+import { getCollection } from 'astro:content';
 import { blocks as addonBlocks } from '@stomme/addon-blocks';
 import { resolveSite, resolveFeatures, type SiteConfig, type StommeFeatures } from './config';
+import { resolveLocales, splitLocalePath, localeLinker, localizeLinks } from './i18n';
 
 const defaults: Record<string, any> = {
   hero: Hero,
@@ -81,7 +83,11 @@ const { blocks = [], registry = {}, config, features } = Astro.props;
 const reg = { ...defaults, ...(addonBlocks ?? {}), ...registry };
 const site = resolveSite(config);
 const feats = resolveFeatures(features);
-const rendered = feats.contactForm === false ? blocks.filter((b) => b.type !== 'contactForm') : blocks;
+// The links follow the URL's language, not the rendered entry's: an untranslated page under /en/ still leads on to the English pages that do exist. resolveSite drops `locales`, so the raw config is what carries them.
+const locales = resolveLocales(config);
+const localeLink = localeLinker(config, splitLocalePath(Astro.url.pathname, locales).locale, locales.enabled ? await getCollection('pages') : []);
+const shown = feats.contactForm === false ? blocks.filter((b) => b.type !== 'contactForm') : blocks;
+const rendered = locales.enabled ? localizeLinks(shown, localeLink) : shown;
 
 const surfaceClass: Record<string, string> = { tint: 'surface-tint', band: 'band', dark: 'surface-dark', gradient: 'surface-gradient' };
 const H1_BLOCKS = new Set(['hero', 'cover', 'pageHeader']);
@@ -100,10 +106,10 @@ const pageHasH1 = rendered.some((b) => H1_BLOCKS.has(b.type));
     const surf = block.style?.surface ? surfaceClass[block.style.surface] : undefined;
     return surf ? (
       <div class={surf}>
-        <Component {...block} site={site} pageHasH1={pageHasH1} />
+        <Component {...block} site={site} pageHasH1={pageHasH1} localeLink={localeLink} />
       </div>
     ) : (
-      <Component {...block} site={site} pageHasH1={pageHasH1} />
+      <Component {...block} site={site} pageHasH1={pageHasH1} localeLink={localeLink} />
     );
   })
 }

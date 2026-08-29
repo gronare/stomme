@@ -8,10 +8,11 @@ interface Props {
   statValue?: string;
   statLabel?: string;
   layout?: { width?: 'narrow' | 'full' };
+  localeLink?: (href: string) => string;
 }
-const { eyebrow, heading, body = '', statValue, statLabel } = Astro.props;
+const { eyebrow, heading, body = '', statValue, statLabel, localeLink } = Astro.props;
 const width = Astro.props.layout?.width ?? 'narrow';
-const html = await renderMarkdown(body);
+const html = await renderMarkdown(body, localeLink);
 ---
 <section data-stomme-block="prose" class:list={['section', { 'section--read': width !== 'full' }]}>
   {eyebrow && <span class="mono eyebrow">{eyebrow}</span>}

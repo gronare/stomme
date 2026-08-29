@@ -7,12 +7,13 @@ interface Props {
   attribution?: string;
   layout?: { flip?: boolean };
   style?: { surface?: string; accent?: 'brand' | 'secondary' | 'highlight' };
+  localeLink?: (href: string) => string;
 }
-const { body = '', quote, attribution } = Astro.props;
+const { body = '', quote, attribution, localeLink } = Astro.props;
 const flip = Astro.props.layout?.flip ?? false;
 const accent = Astro.props.style?.accent ?? 'brand';
 const accentVar = accent === 'secondary' ? 'var(--color-secondary)' : accent === 'highlight' ? 'var(--color-highlight)' : 'var(--color-brand)';
-const html = await renderMarkdown(body);
+const html = await renderMarkdown(body, localeLink);
 ---
 
 <section data-stomme-block="textQuote" class="section">

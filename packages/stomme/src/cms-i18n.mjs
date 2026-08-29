@@ -19,6 +19,7 @@ export function localeFilePath(path) {
   return String(path).replace(/\.(\w+)$/, '.{{locale}}.$1');
 }
 
+// `initial_locales: default` is the literal string the bundle branches on (JL: `all` → every locale, `default` → [defaultLocale], an array → those plus the default). Without it a NEW entry opens with every locale pane enabled, and validation runs in each enabled pane — so the editor would have to write all three languages before the first save. Existing entries are unaffected: their enabled panes come from which locale files actually carry content.
 export function i18nConfigBlock(locales, indent = 0) {
   const list = resolveCmsLocales(locales);
   if (!list.length) return '';
@@ -28,6 +29,7 @@ export function i18nConfigBlock(locales, indent = 0) {
     `${p}  structure: multiple_files`,
     `${p}  locales: [${list.join(', ')}]`,
     `${p}  default_locale: ${list[0]}`,
+    `${p}  initial_locales: default`,
     `${p}  omit_default_locale_from_file_path: true`,
   ].join('\n');
 }

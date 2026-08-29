@@ -12,7 +12,8 @@ import { i18nFlagFor, i18nConfigBlock, localeFilePath, resolveCmsLocales, LOCALI
 const PKG = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const jiti = createJiti(import.meta.url);
 const {
-  resolveLocales, splitLocalePath, localePathFor, localeHref, localeEntryId, stripLocaleSuffix,
+  resolveLocales, splitLocalePath, localePathFor, localeHref, localeRoutes, localeLinker, localizeLinks,
+  localeEntryId, stripLocaleSuffix,
   defaultLocaleEntries, pickLocaleEntry, htmlLang, pageLang, hreflangLinks, localeSwitcher,
   localeConfig, sitemapI18n,
 } = await jiti.import(resolve(PKG, 'src/i18n.ts'));
@@ -40,7 +41,8 @@ eq(pageLang('/', {}), 'en', 'a config with no locale at all still lands on en');
 eq(hreflangLinks('/kontakt', PLAIN, 'https://x.se'), [], 'no locales emits no alternates');
 eq(localeSwitcher('/kontakt', PLAIN, ['kontakt']), [], 'no locales renders no switcher');
 eq(sitemapI18n(PLAIN), {}, 'no locales adds nothing to the sitemap config');
-eq(localeHref('/kontakt', 'en', resolveLocales(PLAIN)), '/kontakt', 'no locales leaves every href alone');
+eq(localeHref('/kontakt', 'en', localeRoutes(PLAIN, [{ id: 'kontakt', data: { published: true } }])), '/kontakt',
+  'no locales leaves every href alone');
 const plainEntries = [{ id: 'kontakt' }, { id: 'kontakt.en' }];
 check(defaultLocaleEntries(plainEntries, PLAIN) === plainEntries,
   'no locales returns the very same entry list — the pages route cannot change shape');
@@ -64,13 +66,67 @@ console.log('\n· building a path in another locale');
 eq(localePathFor('/kontakt', 'en', L), '/en/kontakt', 'a page path gains the prefix');
 eq(localePathFor('/', 'en', L), '/en/', 'the locale front page is the prefix itself');
 eq(localePathFor('/kontakt', 'sv', L), '/kontakt', 'the default locale is served unprefixed');
-eq(localeHref('/kontakt', 'en', L), '/en/kontakt', 'an internal link is rewritten into the current locale');
-eq(localeHref('/en/kontakt', 'en', L), '/en/kontakt', 'a link that already carries the prefix is not prefixed twice');
-eq(localeHref('https://example.com/x', 'en', L), 'https://example.com/x', 'an external link is left alone');
-eq(localeHref('#section', 'en', L), '#section', 'an anchor is left alone');
-eq(localeHref('mailto:a@b.se', 'en', L), 'mailto:a@b.se', 'a mailto link is left alone');
-eq(localeHref('//cdn.example.com/x', 'en', L), '//cdn.example.com/x', 'a protocol-relative link is left alone');
-eq(localeHref('/', 'en', L), '/en/', 'a link home lands on the locale front page');
+
+// The locale routes are `/<loc>` and `/<loc>/[...slug]` (integration.mjs) and the catch-all's static paths are the published, non-suffixed `pages` entries (localePagesEntrypoint) — everything else is built once, in the default language.
+console.log('\n· a link is prefixed only where the locale is served');
+const PAGES = [
+  { id: 'kontakt', data: { published: true } },
+  { id: 'omradet', data: { published: true } },
+  { id: 'utkast', data: { published: false } },
+  { id: 'kontakt.en', data: { published: false } },
+  { id: 'guider/vinter', data: { published: true } },
+];
+const R = localeRoutes(SITE, PAGES);
+eq([...R.served].sort(), ['/', '/guider/vinter', '/kontakt', '/omradet'],
+  'the served set is home plus every published page, translations and drafts left out');
+eq(localeHref('/kontakt', 'en', R), '/en/kontakt', 'a localized page is rewritten into the current locale');
+eq(localeHref('/omradet', 'no', R), '/no/omradet', 'the same rule holds for every locale in the list');
+eq(localeHref('/guider/vinter', 'en', R), '/en/guider/vinter', 'a nested page slug is prefixed too');
+eq(localeHref('/', 'en', R), '/en/', 'a link home lands on the locale front page');
+eq(localeHref('/bokning/stugan', 'en', R), '/bokning/stugan',
+  'a booking route has no locale route — the link stays bare instead of pointing at a 404');
+eq(localeHref('/tack', 'en', R), '/tack', "the form confirmation is built once — it is not prefixed");
+eq(localeHref('/utkast', 'en', R), '/utkast', 'an unpublished page is not served in any language, prefixed or not');
+eq(localeHref('/nagot-okant', 'en', R), '/nagot-okant', 'an unknown path is left alone — refuse rather than guess');
+eq(localeHref('/kontakt', 'sv', R), '/kontakt', 'the default locale is never a prefix');
+eq(localeHref('/en/kontakt', 'en', R), '/en/kontakt', 'a link that already carries the prefix is not prefixed twice');
+eq(localeHref('/no/kontakt', 'en', R), '/no/kontakt', 'a deliberate link into another locale is left as written');
+eq(localeHref('/kontakt#form', 'en', R), '/en/kontakt#form', 'a fragment rides along with the page it belongs to');
+eq(localeHref('/kontakt/', 'en', R), '/en/kontakt/', 'a trailing slash is preserved');
+eq(localeHref('https://example.com/x', 'en', R), 'https://example.com/x', 'an external link is left alone');
+eq(localeHref('#section', 'en', R), '#section', 'an anchor is left alone');
+eq(localeHref('mailto:a@b.se', 'en', R), 'mailto:a@b.se', 'a mailto link is left alone');
+eq(localeHref('tel:+4670', 'en', R), 'tel:+4670', 'a tel: link is left alone');
+eq(localeHref('//cdn.example.com/x', 'en', R), '//cdn.example.com/x', 'a protocol-relative link is left alone');
+eq(localeHref('', 'en', R), '', 'an empty href stays empty — a nav item with no link must not become a link home');
+check(localeRoutes(PLAIN, PAGES).served.size === 0, 'a site with no locales serves no locale routes at all');
+
+console.log('\n· the linker the components use');
+const link = localeLinker(SITE, 'en', PAGES);
+eq([link('/kontakt'), link('/bokning/stugan'), link('/')], ['/en/kontakt', '/bokning/stugan', '/en/'],
+  'one mapper per rendered page, so no component needs the route table');
+eq(localeLinker(PLAIN, 'en', PAGES)('/kontakt'), '/kontakt', 'without locales the mapper is the identity');
+
+console.log('\n· block link fields follow the page they are rendered on');
+const BLOCKS_IN = [
+  { type: 'cover', cta: { label: 'Boka', link: { page: '/bokning/stugan' } }, cta2: { label: 'Området', link: { page: '/omradet' } } },
+  { type: 'featureGrid', items: [{ title: 'A', link: '/kontakt' }, { title: 'B', link: 'https://x.se' }] },
+  { type: 'faq', asideCtaHref: '/kontakt', asideHref: '/tack' },
+  { type: 'ctaBox', href2: '/omradet', heading: 'Läs mer', media: { image: '/media/kontakt.jpg' } },
+];
+const OUT = localizeLinks(BLOCKS_IN, link);
+eq(OUT[0].cta.link.page, '/bokning/stugan', 'a CTA to a route without a locale keeps its bare path');
+eq(OUT[0].cta2.link.page, '/en/omradet', 'a CTA to a localized page is rewritten');
+eq(OUT[1].items[0].link, '/en/kontakt', 'a plain-string link field is rewritten as well');
+eq(OUT[1].items[1].link, 'https://x.se', 'an external item link is left alone');
+eq([OUT[2].asideCtaHref, OUT[2].asideHref], ['/en/kontakt', '/tack'], 'the legacy *Href fields go through the same rule');
+eq(OUT[3].href2, '/en/omradet', 'a numbered legacy href is a link field too');
+eq(OUT[3].media.image, '/media/kontakt.jpg', 'a media path is not a link — it is left untouched');
+eq(OUT[0].cta.label, 'Boka', 'labels and every other field are carried through unchanged');
+check(localizeLinks(BLOCKS_IN, (h) => h) === BLOCKS_IN, 'a pass that changes nothing returns the very same blocks');
+check(BLOCKS_IN[0].cta2.link.page === '/omradet', 'the source blocks are never mutated');
+const WITH_DATE = [{ type: 'post', date: new Date('2026-01-01'), link: '/kontakt' }];
+check(localizeLinks(WITH_DATE, link)[0].date instanceof Date, 'a Date in block data survives the pass as a Date');
 
 // ── the locale file, and what happens when there is none ────────────────────
 console.log('\n· the translation, or the fallback');
@@ -166,8 +222,13 @@ eq(resolveCmsLocales(['sv']), [], 'one locale writes no i18n declaration at all'
 eq(resolveCmsLocales(undefined), [], 'no locales writes no i18n declaration at all');
 eq(i18nConfigBlock([]), '', 'the declaration is empty without locales — a site keeps the config.yml it had');
 eq(i18nConfigBlock(['sv', 'en', 'no']),
-  'i18n:\n  structure: multiple_files\n  locales: [sv, en, no]\n  default_locale: sv\n  omit_default_locale_from_file_path: true',
+  'i18n:\n  structure: multiple_files\n  locales: [sv, en, no]\n  default_locale: sv\n  initial_locales: default\n  omit_default_locale_from_file_path: true',
   'file-per-locale, with the default locale left unsuffixed');
+// Sveltia 0.201.2 branches on the literal string: `all` opens every pane, `default` opens the default locale's only, an array names the extra ones. Validation runs in every OPEN pane, so without this a new entry cannot be saved until all three languages are written.
+check(/^ {2}initial_locales: default$/m.test(i18nConfigBlock(['sv', 'en', 'no'])),
+  'a new entry opens in the default language alone — the other panes are toggled on per entry');
+check(!i18nConfigBlock(['sv', 'en']).includes('save_all_locales'),
+  'the deprecated save_all_locales is never emitted — 0.201.2 warns on it and drops it at 1.0');
 eq(localeFilePath('src/content/home/home.md'), 'src/content/home/home.{{locale}}.md',
   'a file collection carries the locale in its path — Sveltia needs the placeholder to write per-locale files');
 eq(LOCALIZED_EDITORS, ['home', 'pages', 'nav'], 'only the page-like editors are localized — settings and sync-owned data are not');
@@ -234,6 +295,10 @@ check(/\n  slug: "\{\{slug\}\}"\n  i18n: true\n/.test(onEditors.COLLECTION_EDITO
 check(onEditors.COLLECTION_EDITORS.pages.includes('name: published, label: "Published", widget: boolean, default: true, required: false, hint: "Uncheck to hide the page — unpublished pages aren\'t built.", i18n: duplicate'),
   'publication is one decision for every language, not one per translation');
 check(onEditors.COLLECTION_EDITORS.faq === offEditors.COLLECTION_EDITORS.faq, 'an editor outside the localized set is untouched');
+// Sveltia writes its canonical-slug key (`translationKey`) into the frontmatter only when the slug template carries a `| localize` filter — that is the sole trigger (Aue → jue → ede in 0.201.2). Our slug is the same in every language, so nothing undeclared is ever written; a `| localize` here would start writing a key no schema knows.
+for (const name of LOCALIZED_EDITORS.filter((n) => onEditors.COLLECTION_EDITORS[n]))
+  check(!/\|\s*localize/.test(onEditors.COLLECTION_EDITORS[name]) && !onEditors.COLLECTION_EDITORS[name].includes('canonical_slug'),
+    `${name} keeps one slug for every language — no localized slug, so no translationKey is written into the content`);
 
 console.log('\n· the CMS link picker offers pages, not translations');
 const tmp = mkdtempSync(join(tmpdir(), 'stomme-i18n-'));
@@ -243,7 +308,8 @@ writeFileSync(join(tmp, 'src/content/pages/about.en.md'), '---\ntitle: About\n--
 const optsOf = (LOCALES) => buildOptionSources({ root: tmp, ROUTES: {}, FEATURES: { pages: true }, LISTINGS: [], BLOCKS: [], LOCALES })
   .PAGE_OPTIONS.map((o) => o.value);
 eq(optsOf(['sv', 'en', 'no']), ['', '/', '/about'], 'a translation is not offered as a second link target');
-eq(optsOf([]), ['', '/', '/about.en', '/about'], 'without locales every markdown file is a page, exactly as before');
+eq(optsOf([]), ['', '/', '/about'],
+  'a translation is a translation before the languages are switched on — the picker never offers /about.en');
 rmSync(tmp, { recursive: true, force: true });
 
 const passed = results.filter(Boolean).length;

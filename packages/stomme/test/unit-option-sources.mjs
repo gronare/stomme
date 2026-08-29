@@ -77,6 +77,41 @@ try {
     JSON.stringify(values(FAQ_TAG_OPTIONS)));
   check(OPTION_SOURCES['$faqTags'] === FAQ_TAG_OPTIONS, 'the tag options are exposed under $faqTags for the select emitter');
 
+  console.log('\n· translations are never link targets');
+  const loc = mkdtempSync(join(tmpdir(), 'stomme-option-sources-loc-'));
+  const putLoc = (dir, file, body) => {
+    mkdirSync(join(loc, dir), { recursive: true });
+    writeFileSync(join(loc, dir, file), body);
+  };
+  putLoc('src/content/pages', 'info.md', '---\ntitle: Info\n---\n');
+  putLoc('src/content/pages', 'info.en.md', '---\ntitle: "Guest information"\n---\n');
+  putLoc('src/content/pages', 'info.no.md', '---\ntitle: Informasjon\n---\n');
+  putLoc('src/content/pages', 'info.nb-no.md', '---\ntitle: Informasjon\n---\n');
+  putLoc('src/content/pages', 'plan.b.md', '---\ntitle: "Plan B"\n---\n');
+  putLoc('src/content/pages', 'rates.en.md', '---\ntitle: Rates\n---\n');
+  putLoc('src/content/pages', 'notes.v2.md', '---\ntitle: "Notes v2"\n---\n');
+  putLoc('src/content/services', 'tak.md', '---\nnavLabel: Tak\n---\n');
+  putLoc('src/content/services', 'tak.en.md', '---\nnavLabel: Roofing\n---\n');
+  putLoc('src/content/faq', 'pris.md', '---\nquestion: "Vad kostar det?"\ntags: [pris]\n---\n');
+  putLoc('src/content/faq', 'pris.en.md', '---\nquestion: "What does it cost?"\ntags: [price]\n---\n');
+  const locOpts = (over = {}) => buildOptionSources({ root: loc, ROUTES, FEATURES: ALL_ON, LISTINGS: [], BLOCKS, ...over });
+  const locPages = values(locOpts().PAGE_OPTIONS);
+  check(locPages.includes('/info') && !locPages.includes('/info.en') && !locPages.includes('/info.no'),
+    'a page whose stem ends in a language subtag, with the untranslated file beside it, is a translation — not a second link target',
+    JSON.stringify(locPages));
+  check(!locPages.includes('/info.nb-no'), 'a regional subtag (nb-no) is recognised as a translation too');
+  check(locPages.includes('/plan.b'), 'a one-letter tail is no language — plan.b is a page');
+  check(locPages.includes('/notes.v2'), 'a tail with a digit is no language — notes.v2 is a page');
+  check(locPages.includes('/rates.en'),
+    'a dotted name with NO untranslated sibling stays a page — the suffix alone never decides',
+    JSON.stringify(locPages));
+  check(values(locOpts().OPTION_SOURCES['$services']).join() === 'tak', 'the same rule holds for the services picker');
+  check(values(locOpts().OPTION_SOURCES['$faq']).join() === 'pris', 'and for the FAQ picker');
+  check(values(locOpts().FAQ_TAG_OPTIONS).join() === 'pris', "a translation's tags do not leak into the tag suggestions");
+  check(JSON.stringify(locPages) === JSON.stringify(values(locOpts({ LOCALES: ['sv', 'en', 'no'] }).PAGE_OPTIONS)),
+    'the verdict does not depend on the locales setting — a site can hold translations before it switches languages on');
+  rmSync(loc, { recursive: true, force: true });
+
   console.log('\n· a site missing every content folder');
   const bare = mkdtempSync(join(tmpdir(), 'stomme-option-sources-bare-'));
   const empty = buildOptionSources({ root: bare, ROUTES, FEATURES: ALL_ON, LISTINGS: [], BLOCKS: [] });

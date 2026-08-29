@@ -1,9 +1,24 @@
 import { resolve } from 'node:path';
 import { readdirSync, readFileSync } from 'node:fs';
 
-export function buildOptionSources({ root, ROUTES, FEATURES, LISTINGS, BLOCKS, LOCALES = [] }) {
-  // A translation is the same page in another language, never a second link target.
-  const isLocaleFile = (f) => LOCALES.length > 1 && LOCALES.some((l) => f.toLowerCase().endsWith(`.${l}.md`));
+export function buildOptionSources({ root, ROUTES, FEATURES, LISTINGS, BLOCKS }) {
+  // A translation is the same page in another language, never a second link target — and it is one whether or not the site has switched its languages on, or a site with the files in place but the setting still off offers /info.en in every picker. Both halves are load-bearing: a language subtag in the stem AND the untranslated sibling beside it, so a page genuinely called `plan.b` stays a page.
+  const LOCALE_TAIL = /\.([a-z]{2,3}(?:-[a-z0-9]{2,8})?)\.md$/i;
+  const isLocaleFile = (f, siblings) => {
+    const m = f.match(LOCALE_TAIL);
+    return !!m && siblings.has(`${f.slice(0, -m[0].length)}.md`);
+  };
+
+  function contentFiles(dir) {
+    let files = [];
+    try {
+      files = readdirSync(resolve(root, dir)).filter((f) => f.endsWith('.md'));
+    } catch {
+      return [];
+    }
+    const siblings = new Set(files);
+    return files.filter((f) => !isLocaleFile(f, siblings)).sort();
+  }
 
   function labelFromFrontmatter(file, key) {
     try {
@@ -15,13 +30,7 @@ export function buildOptionSources({ root, ROUTES, FEATURES, LISTINGS, BLOCKS, L
   }
 
   function collectionOptions(dir, routePrefix, labelKey) {
-    let files = [];
-    try {
-      files = readdirSync(resolve(root, dir)).filter((f) => f.endsWith('.md') && !isLocaleFile(f));
-    } catch {
-      return [];
-    }
-    return files.sort().map((f) => {
+    return contentFiles(dir).map((f) => {
       const slug = f.replace(/\.md$/, '');
       const route = `${routePrefix}/${slug}`;
       const label = labelFromFrontmatter(resolve(root, dir, f), labelKey) || slug;
@@ -31,12 +40,7 @@ export function buildOptionSources({ root, ROUTES, FEATURES, LISTINGS, BLOCKS, L
 
   function pageRouteOptions() {
     const opts = [{ label: 'Home (/)', value: '/' }];
-    let files = [];
-    try {
-      files = readdirSync(resolve(root, 'src/content/pages')).filter((f) => f.endsWith('.md') && !isLocaleFile(f));
-    } catch {
-    }
-    for (const f of files.sort()) {
+    for (const f of contentFiles('src/content/pages')) {
       const slug = f.replace(/\.md$/, '');
       const label = labelFromFrontmatter(resolve(root, 'src/content/pages', f), 'title') || slug;
       opts.push({ label: `${label} (/${slug})`, value: `/${slug}` });
@@ -52,13 +56,7 @@ export function buildOptionSources({ root, ROUTES, FEATURES, LISTINGS, BLOCKS, L
   ];
 
   function serviceOptions() {
-    let files = [];
-    try {
-      files = readdirSync(resolve(root, 'src/content/services')).filter((f) => f.endsWith('.md') && !isLocaleFile(f));
-    } catch {
-      return [];
-    }
-    return files.sort().map((f) => {
+    return contentFiles('src/content/services').map((f) => {
       const slug = f.replace(/\.md$/, '');
       return { label: labelFromFrontmatter(resolve(root, 'src/content/services', f), 'navLabel') || slug, value: slug };
     });
@@ -66,13 +64,7 @@ export function buildOptionSources({ root, ROUTES, FEATURES, LISTINGS, BLOCKS, L
   const SERVICE_OPTIONS = serviceOptions();
 
   function faqOptions() {
-    let files = [];
-    try {
-      files = readdirSync(resolve(root, 'src/content/faq')).filter((f) => f.endsWith('.md') && !isLocaleFile(f));
-    } catch {
-      return [];
-    }
-    return files.sort().map((f) => {
+    return contentFiles('src/content/faq').map((f) => {
       const slug = f.replace(/\.md$/, '');
       return { label: labelFromFrontmatter(resolve(root, 'src/content/faq', f), 'question') || slug, value: slug };
     });
@@ -80,12 +72,7 @@ export function buildOptionSources({ root, ROUTES, FEATURES, LISTINGS, BLOCKS, L
   const FAQ_OPTIONS = faqOptions();
 
   function faqTagOptions() {
-    let files = [];
-    try {
-      files = readdirSync(resolve(root, 'src/content/faq')).filter((f) => f.endsWith('.md') && !isLocaleFile(f));
-    } catch {
-      return [];
-    }
+    const files = contentFiles('src/content/faq');
     const tags = new Set();
     for (const f of files) {
       let src = '';

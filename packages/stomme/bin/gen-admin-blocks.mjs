@@ -127,7 +127,7 @@ const MARKER_START = /# >>> (\w+):generated/;
 const q = (s) => `"${String(s).replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`;
 const pad = (n) => ' '.repeat(n);
 
-const { PAGE_OPTIONS, FAQ_TAG_OPTIONS, OPTION_SOURCES, collectionEnabled, AVAILABLE_BLOCKS, SKIPPED_BLOCKS, GROUP_ORDER } = buildOptionSources({ root, ROUTES, FEATURES, LISTINGS, BLOCKS, LOCALES });
+const { PAGE_OPTIONS, FAQ_TAG_OPTIONS, OPTION_SOURCES, collectionEnabled, AVAILABLE_BLOCKS, SKIPPED_BLOCKS, GROUP_ORDER } = buildOptionSources({ root, ROUTES, FEATURES, LISTINGS, BLOCKS });
 
 const { listSummary, emitField, emitFlow, emitWidget, navLinkField, emitFooterLinks, emitNavLinks, buttonField, emitThanksButtons } = makeEmitters({ q, pad, AVAILABLE_BLOCKS, OPTION_SOURCES });
 
