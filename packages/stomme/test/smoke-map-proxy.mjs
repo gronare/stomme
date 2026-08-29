@@ -11,6 +11,7 @@ const DIST = resolve(STARTER, 'dist');
 const CONFIG = resolve(STARTER, 'src/site.config.ts');
 const ADMIN = resolve(STARTER, 'public/admin');
 const PAGE = resolve(STARTER, 'src/content/pages/probe-map.md');
+const CONTACT = resolve(STARTER, 'src/content/contact/contact.md');
 
 const args = process.argv.slice(2);
 const opt = (name, def) => { const i = args.indexOf(name); return i >= 0 && args[i + 1] ? args[i + 1] : def; };
@@ -41,15 +42,35 @@ blocks:
     coords:
       lat: ${LAT}
       lng: ${LNG}
+  - type: findUs
+    heading: Find us
+  - type: contactCard
+    label: Direct contact
+    show:
+      - phone
+      - map
 published: true
 ---
 `;
 
+const ADDRESS = /^address:\n(?:  \w+: .*\n)+/m;
+const ADDRESS_WITH_POINT = `address:
+  street: "Storgatan 1"
+  postcode: "111 22"
+  city: "Stockholm"
+  country: ""
+  lat: ${LAT}
+  lng: ${LNG}
+`;
+
 const config = readFileSync(CONFIG, 'utf8');
+const contact = readFileSync(CONTACT, 'utf8');
+if (!ADDRESS.test(contact)) throw new Error('smoke-map-proxy: the contact address block was not found in src/content/contact/contact.md');
 // stomme-gen rewrites public/admin from the pages that exist, so the probe page lands in the committed CMS config unless the originals are put back.
 const admin = readdirSync(ADMIN).map((f) => [join(ADMIN, f), readFileSync(join(ADMIN, f))]);
 const restore = () => {
   writeFileSync(CONFIG, config);
+  writeFileSync(CONTACT, contact);
   for (const [file, body] of admin) writeFileSync(file, body);
   rmSync(PAGE, { force: true });
 };
@@ -81,8 +102,11 @@ async function portBusy() {
 }
 
 // The match must stay inside ONE script element, or it starts at the first script in the document and swallows the block's own markup.
-const handlerOf = (html) =>
-  html.match(/<script[^>]*>(?:(?!<\/script>)[\s\S])*?data-stomme-map-embed(?:(?!<\/script>)[\s\S])*?<\/script>/)?.[0] ?? '';
+const handlersOf = (html) =>
+  [...html.matchAll(/<script[^>]*>(?:(?!<\/script>)[\s\S])*?data-stomme-map-embed(?:(?!<\/script>)[\s\S])*?<\/script>/g)].map((m) => m[0]);
+
+const sectionOf = (html, type) =>
+  html.match(new RegExp(`<section data-stomme-block="${type}"[\\s\\S]*?</section>`))?.[0] ?? '';
 
 async function main() {
   // Without this the run passes against a leftover server, and every assertion below reads a stale build.
@@ -92,6 +116,7 @@ async function main() {
   }
 
   writeFileSync(PAGE, MAP_PAGE);
+  writeFileSync(CONTACT, contact.replace(ADDRESS, ADDRESS_WITH_POINT));
   writeFileSync(CONFIG, config.replace(SITE_OPEN, `export const site: SiteConfig = {\n  maps: { key: ${JSON.stringify(KEY)} },`));
 
   if (!NO_BUILD) {
@@ -131,14 +156,26 @@ async function main() {
   check(page.status === 200, `/probe-map/ answers 200 (got ${page.status})`);
   check(new RegExp(`<img[^>]+src="/map/${POINT}\\.png"`).test(html),
     'the resting still is requested from the site\'s own origin, at the coordinate the block was given',
-    html.match(/<img[^>]*mapblock__img[^>]*>/)?.[0] ?? 'no mapblock image at all');
+    html.match(/<img[^>]*mappanel__img[^>]*>/)?.[0] ?? 'no map panel image at all');
+  const findus = sectionOf(html, 'findUs');
+  const card = sectionOf(html, 'contactCard');
+  check(new RegExp(`<img[^>]+src="/map/${POINT}\\.png"`).test(findus),
+    'the find-us map draws the SAME first-party still, at the coordinate the contact settings carry',
+    findus.match(/<img[^>]*>/)?.[0] ?? 'no image on the find-us surface at all');
+  check(new RegExp(`<img[^>]+src="/map/${POINT}\\.png"`).test(card),
+    'and so does the contact card\'s mini map',
+    card.match(/<img[^>]*>/)?.[0] ?? 'no image on the contact card at all');
+  const handlers = handlersOf(html);
+  check(handlers.length === 3 && new Set(handlers).size === 1,
+    `all three surfaces ship ONE handler, byte for byte (${handlers.length} scripts, ${new Set(handlers).size} distinct)`);
   const chip = html.match(/<button[^>]*class="mapchip"[\s\S]*?<\/button>/)?.[0] ?? '';
   check(/<b>(Show interactive map|Visa interaktiv karta)<\/b>/.test(chip),
     'the chip is the only way to the interactive map',
     chip.slice(0, 160));
   check(/<small>[^<]*(Google)[^<]*<\/small>/.test(chip), 'the chip names Google as what the click will load');
 
-  const outside = html.replace(handlerOf(html), '');
+  let outside = html;
+  for (const one of handlers) outside = outside.replace(one, '');
   check(!outside.includes('googleapis'), 'the static-map host is named nowhere the browser could read it as a request');
   const urls = [...outside.matchAll(/https?:\/\/[^"'\s]*google\.com[^"'\s]*/g)].map((m) => m[0]);
   check(urls.every((u) => u.startsWith('https://www.google.com/maps/dir/')),

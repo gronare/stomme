@@ -1,6 +1,8 @@
 ---
 import { getEntry } from 'astro:content';
 import ContactLink from '../src/ContactLink.astro';
+import MapPanel from '../src/MapPanel.astro';
+import { mapEmbeddable } from '../src/map-point.ts';
 interface Props { heading?: string; showHours?: boolean; data?: any; site?: any }
 const { heading, showHours, data, site } = Astro.props;
 const copy = site?.strings?.contact ?? {};
@@ -8,12 +10,9 @@ const title = heading || copy.findUs || 'Find us';
 const c = (data ?? (await getEntry('contact', 'contact').catch(() => null))?.data ?? {}) as any;
 const protect = !!c.protectContact;
 const a = c.address ?? {};
-const hasMap = a.lat != null && a.lng != null;
-const d = 0.006;
-const mapSrc = hasMap
-  ? `https://www.openstreetmap.org/export/embed.html?bbox=${a.lng - d}%2C${a.lat - d}%2C${a.lng + d}%2C${a.lat + d}&layer=mapnik&marker=${a.lat}%2C${a.lng}`
-  : '';
 const cityLine = [a.postcode, a.city].filter(Boolean).join(' ');
+const hasMap = mapEmbeddable(site, a.lat, a.lng);
+const mapLabel = [a.street, cityLine].filter(Boolean).join(', ');
 const hasAddr = !!(a.street || cityLine || a.country);
 const hours = (c.hours ?? []) as { days: string; hours: string }[];
 const hoursNote = c.hoursNote ?? '';
@@ -23,8 +22,7 @@ const showHrs = showHours === true;
   <div class="findus">
     {hasMap && (
       <div class="findus__map">
-        <iframe src={mapSrc} loading="lazy" title={copy.map ?? 'Map'} referrerpolicy="no-referrer-when-downgrade"></iframe>
-        <p class="findus__attrib">© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a></p>
+        <MapPanel lat={a.lat} lng={a.lng} address={mapLabel} site={site} fill />
       </div>
     )}
     <div class:list={['findus__info', !hasMap && 'findus__info--solo']}>

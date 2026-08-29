@@ -591,11 +591,8 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
     background: color-mix(in srgb, var(--color-highlight) 14%, var(--color-paper)); border: 1px solid color-mix(in srgb, var(--color-highlight) 35%, var(--color-paper)); }
   .direct-card__holiday { margin: 0 0 0.6rem; }
   .direct-card__away-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--color-highlight); margin-top: 0.4rem; flex: 0 0 auto; }
-  /* The OSM embed paints its own attribution bar on the iframe's bottom edge and we cannot reach across the boundary, so the iframe is grown 120px and offset -60px: an equal slice is cut top and bottom, taking the bar with it while the centred marker stays centred, and attribution returns as .map-attrib. */
-  .direct-card__map { position: relative; overflow: hidden; margin-top: 1.25rem; border-radius: 0.75rem; border: 1px solid var(--color-line); aspect-ratio: 16 / 10; }
-  .direct-card__map iframe { position: absolute; top: -60px; left: 0; width: 100%; height: calc(100% + 120px); border: 0; display: block; filter: saturate(0.92); }
-  .map-attrib { margin: 0.4rem 0 0; font-size: 0.66rem; color: var(--color-muted); }
-  .map-attrib a { color: inherit; }
+  /* display: grid, not block: the panel inside is the only child and must stretch to the box's own height rather than resolve a percentage against it. */
+  .direct-card__map { display: grid; overflow: hidden; margin-top: 1.25rem; border-radius: 0.75rem; border: 1px solid var(--color-line); aspect-ratio: 16 / 10; }
   .direct-card__socials { display: flex; gap: 0.5rem; flex-wrap: wrap; }
   .direct-card__socials a { width: 36px; height: 36px; border-radius: 0.55rem; display: grid; place-items: center; color: var(--color-brand); background: var(--color-paper); border: 1px solid var(--color-line); text-decoration: none; font-size: 0.72rem; padding: 0 0.4rem; }
   .direct-card__socials a:hover { border-color: var(--color-brand); }
@@ -605,10 +602,7 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
   .findus-block { width: min(72rem, 100% - 3rem); margin-inline: auto; padding: clamp(2.5rem, 6vw, 4rem) 0; }
   .findus { display: grid; grid-template-columns: 1.3fr 1fr; border: 1px solid var(--color-line); border-radius: 18px; overflow: hidden; background: var(--color-paper); }
   @media (max-width: 760px) { .findus { grid-template-columns: 1fr; } }
-  .findus__map { position: relative; overflow: hidden; min-height: 320px; }
-  .findus__map iframe { position: absolute; top: -60px; left: 0; width: 100%; height: calc(100% + 120px); min-height: calc(320px + 120px); border: 0; display: block; }
-  .findus__attrib { position: absolute; right: 0.45rem; bottom: 0.4rem; z-index: 1; margin: 0; padding: 0.1rem 0.45rem; font-size: 0.69rem; color: var(--color-muted); background: color-mix(in srgb, var(--color-paper) 92%, transparent); border-radius: 0.3rem; }
-  .findus__attrib a { color: inherit; }
+  .findus__map { display: grid; overflow: hidden; min-height: 320px; }
   .findus__info { padding: clamp(1.8rem, 3vw, 2.4rem); display: flex; flex-direction: column; gap: 1.05rem; align-self: center; }
   .findus__h { font-family: var(--font-display); font-weight: 800; font-size: clamp(1.4rem, 2.5vw, 1.9rem); letter-spacing: -0.02em; margin: 0; }
   .findus__addr { margin: 0; color: var(--color-ink); line-height: 1.5; }
@@ -818,26 +812,6 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
   }
 
 .mapblock { border: 1px solid var(--color-line); border-radius: 1rem; overflow: hidden; background: var(--color-paper); }
-  /* The box owns its height, not the still inside it: the click handler removes that still once the iframe has painted, and a box that borrowed its height would collapse under the absolutely positioned frame. */
-  .mapblock__map { position: relative; height: clamp(11rem, 26vw, 17rem); background: var(--color-surface); }
-  .mapblock__img { display: block; width: 100%; height: 100%; object-fit: cover; }
-  /* The dot is last in the stack so translate(-50%,-100%) lands ITS tip on the coordinate, not the label's edge. */
-  .mapblock__pin { position: absolute; transform: translate(-50%, -100%); display: flex; flex-direction: column; align-items: center; gap: 4px; }
-  .mapblock__pindot { width: 15px; height: 15px; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); background: var(--color-brand); border: 2.5px solid var(--color-paper); }
-  .mapblock__pinlabel { padding: 3px 9px; border-radius: 999px; font-size: 0.7rem; font-weight: 600; white-space: nowrap; color: var(--color-on-dark); background: color-mix(in srgb, var(--color-dark) 88%, transparent); }
-  @media (max-width: 479px) { .mapblock__pinlabel { display: none; } }
-  /* An OpenStreetMap-derived picture must carry visible attribution, so this sits over the image and never swallows a click meant for it. */
-  /* The chip is 92% opaque, not the 82% used elsewhere: over a dark map tile a thinner one drops the attribution under 4.5:1. */
-  .mapblock__credit { position: absolute; right: 0.4rem; bottom: 0.4rem; pointer-events: none; padding: 2px 7px; border-radius: 0.3rem; font-size: 0.69rem; line-height: 1.5; color: var(--color-muted); background: color-mix(in srgb, var(--color-paper) 92%, transparent); }
-  /* z-index, not source order alone: the iframe is appended last but must also cover the pin, which is positioned too. */
-  .mapblock__frame { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; z-index: 1; }
-  .mapchip { position: absolute; top: 12px; right: 12px; display: flex; align-items: center; gap: 10px; padding: 8px 14px 8px 10px; border: 1px solid var(--color-line); border-radius: 10px; background: color-mix(in srgb, var(--color-paper) 95%, transparent); color: var(--color-ink); text-align: left; font: inherit; cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,.08), 0 6px 18px -10px rgba(0,0,0,.35); }
-  .mapchip:hover { border-color: color-mix(in srgb, var(--color-line) 60%, var(--color-ink)); background: var(--color-paper); }
-  .mapchip:focus-visible { outline: 2px solid var(--color-brand); outline-offset: 2px; }
-  .mapchip svg { width: 20px; height: 20px; flex: none; color: var(--color-brand); }
-  .mapchip b { display: block; font-size: 0.82rem; font-weight: 700; line-height: 1.25; }
-  .mapchip small { display: block; font-size: 0.7rem; color: var(--color-muted); line-height: 1.3; }
-  .mapchip[data-loading] { cursor: default; }
   .mapblock__row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.9rem; padding: 0.95rem 1.1rem; }
   .mapblock__where { margin: 0; display: flex; flex-direction: column; gap: 2px; }
   .mapblock__addr { font-weight: 700; color: var(--color-ink); }
@@ -845,9 +819,32 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
   .mapblock__links { display: flex; flex-wrap: wrap; gap: 0.5rem; }
   .mapblock__links .btn { font-size: 0.9rem; padding: 0.5rem 1rem; }
 
-.spin { width: 18px; height: 18px; border-radius: 50%; border: 2.5px solid var(--color-line); border-top-color: var(--color-brand); flex: none; animation: stomme-spin 0.9s linear infinite; }
+/* The box owns its height, not the still inside it: the click handler removes that still once the iframe has painted, and a box that borrowed its height would collapse under the absolutely positioned frame. */
+.mappanel { position: relative; height: clamp(11rem, 26vw, 17rem); background: var(--color-surface); }
+  /* A host that sizes its own box passes fill, and the panel takes that height instead of the map block's. */
+  .mappanel--fill { height: 100%; }
+  .mappanel__img { display: block; width: 100%; height: 100%; object-fit: cover; }
+  /* The dot is last in the stack so translate(-50%,-100%) lands ITS tip on the coordinate, not the label's edge. */
+  .mappanel__pin { position: absolute; transform: translate(-50%, -100%); display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .mappanel__pindot { width: 15px; height: 15px; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); background: var(--color-brand); border: 2.5px solid var(--color-paper); }
+  .mappanel__pinlabel { padding: 3px 9px; border-radius: 999px; font-size: 0.7rem; font-weight: 600; white-space: nowrap; color: var(--color-on-dark); background: color-mix(in srgb, var(--color-dark) 88%, transparent); }
+  @media (max-width: 479px) { .mappanel__pinlabel { display: none; } }
+  /* An OpenStreetMap-derived picture must carry visible attribution, so this sits over the image and never swallows a click meant for it. */
+  /* The chip is 92% opaque, not the 82% used elsewhere: over a dark map tile a thinner one drops the attribution under 4.5:1. */
+  .mappanel__credit { position: absolute; right: 0.4rem; bottom: 0.4rem; pointer-events: none; padding: 2px 7px; border-radius: 0.3rem; font-size: 0.69rem; line-height: 1.5; color: var(--color-muted); background: color-mix(in srgb, var(--color-paper) 92%, transparent); }
+  /* z-index, not source order alone: the iframe is appended last but must also cover the pin, which is positioned too. */
+  .mappanel__frame { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; z-index: 1; }
+  .mapchip { position: absolute; top: 12px; right: 12px; display: flex; align-items: center; gap: 10px; padding: 8px 14px 8px 10px; border: 1px solid var(--color-line); border-radius: 10px; background: color-mix(in srgb, var(--color-paper) 95%, transparent); color: var(--color-ink); text-align: left; font: inherit; cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,.08), 0 6px 18px -10px rgba(0,0,0,.35); }
+  .mapchip:hover { border-color: color-mix(in srgb, var(--color-line) 60%, var(--color-ink)); background: var(--color-paper); }
+  .mapchip:focus-visible { outline: 2px solid var(--color-brand); outline-offset: 2px; }
+  .mapchip svg { width: 20px; height: 20px; flex: none; color: var(--color-brand); }
+  .mapchip b { display: block; font-size: 0.82rem; font-weight: 700; line-height: 1.25; }
+  .mapchip small { display: block; font-size: 0.7rem; color: var(--color-muted); line-height: 1.3; }
+  .mapchip[data-loading] { cursor: default; }
+
+.mappanel__spin { width: 18px; height: 18px; border-radius: 50%; border: 2.5px solid var(--color-line); border-top-color: var(--color-brand); flex: none; animation: stomme-spin 0.9s linear infinite; }
 @keyframes stomme-spin { to { transform: rotate(360deg); } }
-@media (prefers-reduced-motion: reduce) { .spin { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .mappanel__spin { animation: none; } }
 
 .link-chip-row {
     margin-top: 1.5rem;

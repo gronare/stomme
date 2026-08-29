@@ -21,3 +21,21 @@ export function parseMapPoint(raw: unknown): string | null {
   if (Math.abs(lat) > 90 || Math.abs(lng) > 180) return null;
   return raw;
 }
+
+export function mapKey(site: any): string {
+  return typeof site?.maps?.key === 'string' ? site.maps.key.trim() : '';
+}
+
+// An unrecognised provider reads as unset, so a typo on a keyed site keeps the map it already has instead of silently losing it.
+export function mapProvider(site: any): string {
+  const named = site?.maps?.provider === 'osm' || site?.maps?.provider === 'google' ? site.maps.provider : '';
+  return named || (mapKey(site) !== '' ? 'google' : '');
+}
+
+// A host that draws its own box around the panel must ask the same question the panel answers, or it leaves an empty one behind.
+export function mapEmbeddable(site: any, lat: unknown, lng: unknown): boolean {
+  if (typeof lat !== 'number' || !Number.isFinite(lat)) return false;
+  if (typeof lng !== 'number' || !Number.isFinite(lng)) return false;
+  const provider = mapProvider(site);
+  return provider === 'osm' || (provider === 'google' && mapKey(site) !== '');
+}

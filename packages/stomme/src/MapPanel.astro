@@ -1,0 +1,112 @@
+---
+import Cover from './Cover.astro';
+import { mapPoint, mapKey, mapProvider } from './map-point.ts';
+
+interface Props {
+  lat?: number;
+  lng?: number;
+  address?: string;
+  site?: any;
+  fill?: boolean;
+  still?: { image?: string; imageAlt?: string; credit?: string; pinX?: number; pinY?: number };
+}
+const { address, site, fill } = Astro.props;
+const still = Astro.props.still ?? {};
+const copy = site?.strings?.map ?? {};
+const num = (v: unknown) => (typeof v === 'number' && Number.isFinite(v) ? v : null);
+const lat = num(Astro.props.lat);
+const lng = num(Astro.props.lng);
+const pinX = num(still.pinX);
+const pinY = num(still.pinY);
+const key = mapKey(site);
+const provider = mapProvider(site);
+const osm = provider === 'osm';
+const embeddable = lat !== null && lng !== null && (osm || (provider === 'google' && key !== ''));
+// Google's own still, fetched through the site's own origin: the visitor's browser reaches no third party until the chip is clicked.
+const point = __STOMME_MAP_PROXY__ && provider === 'google' && key !== '' ? mapPoint(lat, lng) : null;
+const picture = point !== null || !!still.image;
+const placed = point === null && pinX !== null && pinY !== null;
+const pin = point !== null || placed || !picture;
+const embedLabel = (osm ? copy.embedOsm : copy.embed) ?? 'Show interactive map';
+const embedNote = (osm ? copy.embedNoteOsm : copy.embedNote)
+  ?? `Loads from ${osm ? 'OpenStreetMap' : 'Google'} when you click`;
+const embedLoading = (osm ? copy.embedLoadingOsm : copy.embedLoading)
+  ?? `Loading the map from ${osm ? 'OpenStreetMap' : 'Google'}`;
+const embedTitle = String((osm ? copy.embedTitleOsm : copy.embedTitle) ?? `${osm ? 'OpenStreetMap map' : 'Google map'} of {address}`)
+  .replace('{address}', address || `${lat},${lng}`);
+const span = (v: number, by: number) => (v + by).toFixed(6);
+// OpenStreetMap frames by box rather than zoom: ±0.008 lon by ±0.004 lat is the same neighbourhood Google shows at zoom 15.
+const bbox = osm && lat !== null && lng !== null
+  ? `${span(lng, -0.008)},${span(lat, -0.004)},${span(lng, 0.008)},${span(lat, 0.004)}`
+  : '';
+---
+
+{(picture || embeddable) && (
+  <div class:list={['mappanel', fill && 'mappanel--fill']}>
+    {point !== null ? (
+      <img class="mappanel__img" src={`/map/${point}.png`} width="1280" height="640"
+        alt={still.imageAlt ?? ''} loading="lazy" decoding="async" />
+    ) : still.image ? (
+      <Cover src={still.image} alt={still.imageAlt ?? ''} placeholder="/images/placeholder.svg" width={1400} height={560} class="mappanel__img" />
+    ) : null}
+    {pin && (
+      <span class="mappanel__pin" style={placed ? `left:${pinX}%;top:${pinY}%` : 'left:50%;top:50%'} aria-hidden="true">
+        {address && <span class="mappanel__pinlabel">{address}</span>}
+        <i class="mappanel__pindot"></i>
+      </span>
+    )}
+    {point === null && still.image && still.credit && <span class="mappanel__credit">{still.credit}</span>}
+    {embeddable && (
+      <button type="button" class="mapchip" data-stomme-map-embed data-provider={provider} data-key={key}
+        data-q={`${lat},${lng}`} data-bbox={bbox} data-title={embedTitle} data-loading-label={embedLoading}>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M9 4 3 6.5v13L9 17l6 2.5 6-2.5v-13L15 6.5 9 4Z" />
+          <path d="M9 4v13M15 6.5v13" />
+        </svg>
+        <span><b>{embedLabel}</b><small>{embedNote}</small></span>
+      </button>
+    )}
+    {embeddable && (
+      <script is:inline>
+        for (const chip of document.querySelectorAll('[data-stomme-map-embed]:not([data-stomme-bound])')) {
+          chip.setAttribute('data-stomme-bound', '');
+          const canvas = chip.closest('.mappanel');
+          if (!canvas) continue;
+          chip.addEventListener('click', () => {
+            if (canvas.querySelector('iframe')) return;
+            chip.setAttribute('data-loading', '');
+            chip.setAttribute('aria-busy', 'true');
+            chip.disabled = true;
+            const label = chip.querySelector('b');
+            const loading = chip.getAttribute('data-loading-label');
+            if (label && loading) label.textContent = loading;
+            const note = chip.querySelector('small');
+            if (note) note.remove();
+            const icon = chip.querySelector('svg');
+            if (icon) {
+              const spinner = document.createElement('i');
+              spinner.className = 'mappanel__spin';
+              icon.replaceWith(spinner);
+            }
+            const frame = document.createElement('iframe');
+            frame.className = 'mappanel__frame';
+            frame.title = chip.getAttribute('data-title') || '';
+            frame.loading = 'lazy';
+            frame.allowFullscreen = true;
+            const q = encodeURIComponent(chip.getAttribute('data-q') || '');
+            const k = encodeURIComponent(chip.getAttribute('data-key') || '');
+            const bbox = encodeURIComponent(chip.getAttribute('data-bbox') || '');
+            frame.src = chip.getAttribute('data-provider') === 'osm'
+              ? 'https://www.openstreetmap.org/export/embed.html?bbox=' + bbox + '&layer=mapnik&marker=' + q
+              : 'https://www.google.com/maps/embed/v1/place?key=' + k + '&q=' + q + '&zoom=15';
+            frame.addEventListener('load', () => {
+              chip.remove();
+              for (const gone of canvas.querySelectorAll('.mappanel__img, .mappanel__pin')) gone.remove();
+            });
+            canvas.appendChild(frame);
+          });
+        }
+      </script>
+    )}
+  </div>
+)}

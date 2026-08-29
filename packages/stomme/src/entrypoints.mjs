@@ -20,7 +20,7 @@ import { renderMarkdown } from '@gronare/stomme/markdown';
 import AddonPreview from '@stomme/addon-preview';
 
 const nonce = crypto.randomUUID().replace(/-/g, '');
-const csp = "default-src 'self'; script-src 'self' 'nonce-" + nonce + "'${scriptHashes.length ? ' ' + scriptHashes.join(' ') : ''}; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self'; frame-src 'self' https://www.openstreetmap.org; object-src 'none'; base-uri 'none'; frame-ancestors 'self'; form-action 'self'";
+const csp = "default-src 'self'; script-src 'self' 'nonce-" + nonce + "'${scriptHashes.length ? ' ' + scriptHashes.join(' ') : ''}; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self'; frame-src 'self' https://www.openstreetmap.org https://www.google.com; object-src 'none'; base-uri 'none'; frame-ancestors 'self'; form-action 'self'";
 Astro.response.headers.set('Content-Security-Policy', csp);
 
 const kind = Astro.url.searchParams.get('kind');

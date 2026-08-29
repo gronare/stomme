@@ -1,10 +1,13 @@
 ---
 import { getEntry } from 'astro:content';
 import ContactLink from './ContactLink.astro';
+import MapPanel from './MapPanel.astro';
 import { site } from '@stomme/config';
 import { resolveSite } from './config';
+import { mapEmbeddable } from './map-point.ts';
 // resolveSite, not site.strings: the raw config only holds what the site overrode, so reading it directly renders the English built-ins on a site whose locale has a translation.
-const copy: Record<string, string> = resolveSite(site).strings.contact;
+const resolved = resolveSite(site);
+const copy: Record<string, string> = resolved.strings.contact;
 interface Address { street?: string; postcode?: string; city?: string; country?: string; lat?: number; lng?: number }
 interface Show { phone?: boolean; email?: boolean; hours?: boolean; address?: boolean; socials?: boolean; map?: boolean }
 interface Props {
@@ -43,11 +46,8 @@ const s = {
 };
 const addrLine2 = [address.postcode, address.city].filter(Boolean).join(' ');
 const hasAddr = !!(address.street || addrLine2 || address.country);
-const hasMap = s.map && address.lat != null && address.lng != null;
-const d = 0.006;
-const mapSrc = hasMap
-  ? `https://www.openstreetmap.org/export/embed.html?bbox=${address.lng! - d}%2C${address.lat! - d}%2C${address.lng! + d}%2C${address.lat! + d}&layer=mapnik&marker=${address.lat}%2C${address.lng}`
-  : '';
+const hasMap = s.map && mapEmbeddable(resolved, address.lat, address.lng);
+const mapLabel = [address.street, addrLine2].filter(Boolean).join(', ');
 const showAway = !!(away.enabled && away.message);
 
 const ICONS: Record<string, string> = {
@@ -99,8 +99,9 @@ const slug = (p: string) => p.toLowerCase().replace(/[^a-z]/g, '');
 
   {hasMap && (
     <div class="direct-card__sec">
-      <div class="direct-card__map"><iframe src={mapSrc} loading="lazy" title={copy.map} referrerpolicy="no-referrer-when-downgrade"></iframe></div>
-      <p class="map-attrib">© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a></p>
+      <div class="direct-card__map">
+        <MapPanel lat={address.lat} lng={address.lng} address={mapLabel} site={resolved} fill />
+      </div>
     </div>
   )}
 
