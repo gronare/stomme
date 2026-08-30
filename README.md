@@ -20,7 +20,7 @@ blocks:
 
 ## What you get
 
-- **A component library** — 31 ready-made, styled blocks (hero, featureGrid,
+- **A component library** — 37 ready-made, styled blocks (hero, featureGrid,
   testimonials, faq, gallery, before/after, steps, plans, CTA, …). Recolor with CSS
   variables; no Tailwind required.
 - **A CMS page builder** — Sveltia CMS, generated from your block catalog, with a live

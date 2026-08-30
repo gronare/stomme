@@ -569,6 +569,25 @@ const RAW_BLOCKS: BlockDef[] = [
     ],
   },
   {
+    type: 'eventList',
+    label: 'Upcoming events',
+    group: 'From collections',
+    summary: 'Dated posts as a list of what is coming up — day and month beside the title, the time and a line of text. The reader\'s browser drops what has already been, so a page built months ago stays current.',
+    shape: 'list',
+    fields: [
+      ...headingFieldsSuggesting('Calendar', 'Upcoming'),
+      { name: 'source', label: 'source', widget: 'hidden', required: false },
+      { name: 'base', label: 'base', widget: 'hidden', required: false },
+      layoutGroup([
+        { name: 'limit', label: 'How many', widget: 'number', required: false, default: 6, hint: 'How many upcoming events to show; past events, when shown, do not count' },
+        { name: 'showPast', label: 'Show past events', widget: 'boolean', required: false, default: false, hint: 'Also list events whose date has passed' },
+      ]),
+      { name: 'emptyText', label: 'Empty text', widget: 'string', required: false, hint: 'Shown when nothing is upcoming' },
+      { name: 'feedLabel', label: 'Calendar link', widget: 'string', required: false, hint: 'Text of the calendar-subscription link; empty hides the link' },
+      styleGroup([surfaceField]),
+    ],
+  },
+  {
     type: 'catalogList',
     label: 'Catalog (for sale)',
     group: 'From collections',
@@ -829,6 +848,17 @@ const SAMPLES: Record<string, ({ _label?: string } & Record<string, unknown>)[]>
     { id: 'second', data: { title: 'A text-only card', date: '2026-04-01', excerpt: 'A shorter excerpt.' } },
     { id: 'third', data: { title: 'A card with the placeholder cover', date: '2026-03-01', excerpt: LOREM, showCover: true } },
   ] }],
+  eventList: [
+    { _label: 'fixture entries · upcoming + feed link', eyebrow: 'Calendar', heading: 'Upcoming', feedLabel: 'Add to your calendar', emptyText: 'Nothing is planned right now.', items: [
+      { id: 'meeting', data: { title: 'Annual meeting', eventDate: '2030-10-19', eventTime: '18.00–20.00', excerpt: 'In the common room, coffee from half past.' } },
+      { id: 'inspection', data: { title: 'Yearly inspection', eventDate: '2030-11-04', excerpt: LOREM } },
+      { id: 'workday', data: { title: 'Autumn work day', eventDate: '2030-11-22', eventTime: '10.00–14.00', excerpt: 'Rakes and bags provided.' } },
+    ] },
+    { _label: 'past dates listed and dimmed', heading: 'The whole year', layout: { showPast: true }, items: [
+      { id: 'spring', data: { title: 'Spring work day', eventDate: '2020-04-18', eventTime: '10.00–14.00', excerpt: 'A date that has been and gone.' } },
+      { id: 'autumn', data: { title: 'Autumn work day', eventDate: '2030-10-03', eventTime: '10.00–14.00', excerpt: 'Still ahead.' } },
+    ] },
+  ],
   catalogList: [{ _label: 'fixture entries · filters + images', eyebrow: 'For sale', heading: 'Catalog items', layout: { filters: true }, media: { showImages: true }, items: [
     { id: 'one', data: { title: 'First item', price: '12 500 kr', status: 'available', category: 'Alpha', date: '2026-05-01' } },
     { id: 'two', data: { title: 'Second item', price: '8 900 kr', status: 'reserved', category: 'Beta', date: '2026-04-01' } },

@@ -202,6 +202,9 @@ function listingEditor(l) {
   const articleFields = `    - { name: title, label: "Title", widget: string }
     - { name: date, label: "Date", widget: datetime, date_format: "YYYY-MM-DD", time_format: false }
     - { name: excerpt, label: "Excerpt", widget: text, required: false }
+    - { name: category, label: "Category", widget: string, required: false, hint: "Short label shown as a chip, e.g. Notice, Maintenance, Meeting" }
+    - { name: eventDate, label: "Event date", widget: datetime, date_format: "YYYY-MM-DD", time_format: false, required: false, hint: "Set when the post is about something happening on a date. It then also appears in the upcoming-events block and the calendar feed" }
+    - { name: eventTime, label: "Event time", widget: string, required: false, hint: "Free text, e.g. 10.00–12.00" }
     - { name: cover, label: "Cover image", widget: image, required: false }
     - { name: showCover, label: "Show cover", widget: boolean, required: false, default: false, hint: "Show a cover on cards + the article — your image, or a themed default if none." }
     - { name: body, label: "Body", widget: markdown }`;

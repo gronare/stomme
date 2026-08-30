@@ -1,0 +1,81 @@
+---
+import { getCollection } from 'astro:content';
+
+interface Props {
+  eyebrow?: string;
+  heading?: string;
+  intro?: string;
+  emptyText?: string;
+  feedLabel?: string;
+  layout?: { limit?: number; showPast?: boolean };
+  source?: string;
+  base?: string;
+  items?: { id: string; data: Record<string, any> }[];
+  site?: any;
+}
+const { eyebrow, heading, intro, emptyText, feedLabel, source = 'posts', base, site } = Astro.props;
+const limit = Astro.props.layout?.limit ?? 6;
+const showPast = Astro.props.layout?.showPast === true;
+const prefix = base ?? site?.routes?.blog ?? '/blog';
+const locale = site?.locale ?? 'en-US';
+const all = Astro.props.items ?? (await getCollection(source));
+const events = all
+  .filter((p: any) => p.data.eventDate)
+  .map((p: any) => ({ id: p.id, data: p.data, date: String(p.data.eventDate).slice(0, 10) }))
+  .sort((a: any, b: any) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
+// Parsed at local noon, never as the bare ISO string: `new Date('2026-10-19')` is UTC midnight, which is the 18th for every reader west of Greenwich.
+const noon = (d: string) => new Date(`${d}T12:00:00`);
+const day = (d: string) => String(noon(d).getDate());
+const month = (d: string) => noon(d).toLocaleDateString(locale, { month: 'short' });
+const now = new Date();
+const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+const feedHref = `${prefix}/calendar.ics`;
+const line = (d: Record<string, any>) => [d.eventTime, d.excerpt].filter(Boolean).join(' · ');
+---
+{events.length > 0 && (
+  <section data-stomme-block="eventList" id={anchor || undefined} class="section" data-limit={String(limit)} data-show-past={showPast ? '1' : '0'}>
+    {(eyebrow || heading || intro) && (
+      <div class="section-head post-head">
+        {eyebrow && <span class="mono eyebrow">{eyebrow}</span>}
+        {heading && <h2 class="display" style="margin-top:0.75rem">{heading}</h2>}
+        {intro && <p class="intro">{intro}</p>}
+      </div>
+    )}
+    <ol class="event-list">
+      {events.map((e) => (
+        <li class="event-row" data-date={e.date} data-past={e.date < today ? '' : undefined}>
+          <a href={`${prefix}/${e.id}`}>
+            <span class="event-day"><b>{day(e.date)}</b><small>{month(e.date)}</small></span>
+            <span class="event-body">
+              <b class="event-title">{e.data.title}</b>
+              {line(e.data) && <small>{line(e.data)}</small>}
+            </span>
+          </a>
+        </li>
+      ))}
+    </ol>
+    <p class="event-empty" hidden>{emptyText}</p>
+    {feedLabel && <p class="event-feed"><a href={feedHref}>{feedLabel}</a></p>}
+    <script is:inline>
+      (function () {
+        var root = document.currentScript.closest('[data-stomme-block="eventList"]');
+        if (!root) return;
+        var showPast = root.getAttribute('data-show-past') === '1';
+        var limit = parseInt(root.getAttribute('data-limit') || '0', 10) || 0;
+        var d = new Date();
+        var today = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+        var rows = root.querySelectorAll('.event-row');
+        var upcoming = 0;
+        for (var i = 0; i < rows.length; i++) {
+          var date = rows[i].getAttribute('data-date') || '';
+          var ahead = date >= today;
+          var keep = ahead ? (limit <= 0 || upcoming < limit) : showPast;
+          rows[i].hidden = !keep;
+          if (ahead && keep) upcoming++;
+        }
+        var empty = root.querySelector('.event-empty');
+        if (empty && !upcoming) empty.hidden = false;
+      })();
+    </script>
+  </section>
+)}

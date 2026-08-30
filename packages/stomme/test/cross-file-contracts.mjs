@@ -109,7 +109,7 @@ check(REFERENCE.size > 500 && galleryKeys.size > 30,
   `the engine emits ${REFERENCE.size} translatable field paths and ${galleryKeys.size} gallery strings`);
 
 // What is left is deliberate: icon and font names (identifiers, not prose), hidden fields nobody sees, and labels a site supplies for its own listings. Every other emitted path carries a translation, either by path or by the English-text fallback.
-const UNTRANSLATED_CEILING = { 'labels.sv.js': 126 };
+const UNTRANSLATED_CEILING = { 'labels.sv.js': 128 };
 
 for (const file of readdirSync(resolve(pkg, 'admin')).filter((f) => /^labels\.[\w-]+\.js$/.test(f)).sort()) {
   const dict = (await import(resolve(pkg, 'admin', file))).default;

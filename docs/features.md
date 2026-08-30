@@ -10,7 +10,7 @@ features never appear until you opt in.
 ```ts
 // src/site.config.ts
 export const features: StommeFeatures = {
-  blog: true,          // posts collection + /<routes.blog>/[slug] + postList block
+  blog: true,          // posts collection + /<routes.blog>/[slug] + postList + eventList blocks + /<routes.blog>/calendar.ics
   areas: true,         // towns collection + /<routes.towns>/[slug] + linkChips + TownPage
   services: false,     // services collection + /<routes.services>/[slug] + serviceGrid + ServicePage
   testimonials: true,  // testimonials collection + testimonials block (no route)
@@ -21,7 +21,7 @@ export const features: StommeFeatures = {
 
 | Feature | Collection | Block | Detail route |
 |---|---|---|---|
-| `blog` | `posts` | `postList` | `/<routes.blog>/[slug]` |
+| `blog` | `posts` | `postList`, `eventList` | `/<routes.blog>/[slug]`, `/<routes.blog>/calendar.ics` |
 | `areas` | `towns` | `linkChips` | `/<routes.towns>/[slug]` |
 | `services` | `services` | `serviceGrid` | `/<routes.services>/[slug]` |
 | `testimonials` | `testimonials` | `testimonials` | — |
@@ -35,6 +35,12 @@ How it works (set up once by the scaffold; you only edit the flags afterwards):
 3. **Admin + blocks** — `cms:gen` reads `features` and emits the CMS editor + un-gates the block only for enabled features.
 
 So to add a blog: set `blog: true`, run `pnpm dev` (or `cms:gen`), and add posts in the CMS — no code. (Detail-route prefixes come from `kit.routes`.)
+
+A post that carries an `eventDate` is also an event: it shows that date instead of
+its publish date in `postList`, lists itself in `eventList`, and gets a `VEVENT` in
+that listing's calendar feed, which a reader can subscribe to from their own calendar
+app. Every `article` listing gets one at `<listing route>/calendar.ics` — the blog's
+is at `/<routes.blog>/calendar.ics`.
 
 ## Listings — a blog you shape to its purpose
 

@@ -13,6 +13,7 @@
     "./markdown": "./src/markdown.ts",
     "./fonts": "./src/fonts.ts",
     "./config": "./src/config.ts",
+    "./calendar": "./src/calendar.ts",
     "./i18n": "./src/i18n.ts",
     "./contact": "./src/contact.ts",
     "./catalog": "./catalog.ts",

@@ -67,9 +67,13 @@
     '.bk-stats .l{font-family:' + fMono + ';font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:' + cMuted + ';margin-top:4px}',
     '.bk-note{margin-top:26px;font-size:.72rem;color:#9aa0ab;font-style:italic}',
     '.bk-post-date{font-family:' + fMono + ';font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;color:' + cMuted + '}',
+<<<<<<< HEAD
     '.bk-doc{display:flex;align-items:center;gap:14px;border:1px solid ' + cLine + ';border-radius:12px;padding:14px 16px;max-width:520px;margin-top:10px;background:' + cPaper + '}',
     '.bk-doc-icon{font-family:' + fMono + ';font-size:.62rem;font-weight:700;letter-spacing:.08em;color:' + cBrand + ';border:1px solid ' + cLine + ';border-radius:7px;padding:6px 9px;min-width:52px;text-align:center}',
     '.bk-doc-note{display:block;color:' + cMuted + ';font-size:.85rem;margin-top:2px}',
+=======
+    '.bk-post-cat{margin-left:8px;border-radius:999px;padding:3px 9px;font-size:.62rem;font-weight:700;background:color-mix(in srgb, ' + cBrand + ' 10%, transparent);color:' + cBrand + '}',
+>>>>>>> ae8b00a (Posts carry a category and an event date, an eventList block shows what is upcoming, and every article listing serves a calendar feed)
     '.bk-bullets{margin:18px 0 0;padding:0;list-style:none;max-width:60ch}',
     '.bk-bullets li{position:relative;padding-left:22px;margin-top:8px;color:' + cInk + '}',
     '.bk-bullets li:before{content:"✓";position:absolute;left:0;color:' + cBrand + ';font-weight:700}',
@@ -147,6 +151,9 @@
       (coverUrl && v(e, 'showCover')) ? h('img', { src: coverUrl, style: { width: '100%', aspectRatio: '16 / 9', objectFit: 'cover', borderRadius: '12px', display: 'block', marginBottom: '18px' } }) : null,
       h('p', { className: 'bk-post-date' }, v(e, 'date')),
       h('h1', { className: 'bk-h1' }, v(e, 'title')),
+      (v(e, 'eventDate') || v(e, 'category')) ? h('p', { className: 'bk-post-date' },
+        [v(e, 'eventDate'), v(e, 'eventTime')].filter(Boolean).join(' · '),
+        v(e, 'category') ? h('span', { className: 'bk-post-cat' }, v(e, 'category')) : null) : null,
       v(e, 'excerpt') ? h('p', { className: 'bk-intro' }, v(e, 'excerpt')) : null,
       h('div', { style: { marginTop: '18px', maxWidth: '60ch', color: cMuted } }, props.widgetFor ? props.widgetFor('body') : null),
       note('Blog post — the full article renders on its own page.'));

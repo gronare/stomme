@@ -1,7 +1,7 @@
 # @gronare/stomme
 
 A block-based CMS engine + component library for **Astro + Sveltia CMS**. Compose pages from
-31 styled, themeable blocks; edit them in a Git-backed CMS with a live preview of the real
+37 styled, themeable blocks; edit them in a Git-backed CMS with a live preview of the real
 components; ship static. Extend with your own blocks, routes and collections.
 
 Not published to a registry yet — clone the repository and scaffold from it. See the

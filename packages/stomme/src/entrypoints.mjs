@@ -336,6 +336,14 @@ const { entry } = Astro.props;
 `;
 }
 
+// The feed is generated per listing rather than injected once, because injectRoute carries no props: the collection id and route prefix have to be baked into the entrypoint.
+export function listingCalendarEntrypoint(l) {
+  return `export const prerender = true;
+import { calendarFeed } from '@gronare/stomme/calendar';
+export const GET = calendarFeed(${JSON.stringify(l.id)}, ${JSON.stringify(l.route)});
+`;
+}
+
 // One generated route per non-default locale rather than a `/[locale]/…` param: a literal first segment always outranks the site's own `/[...slug]`, so `/en/about` can never be resolved as a page called "en/about".
 export function localeHomeEntrypoint(locale) {
   return `---

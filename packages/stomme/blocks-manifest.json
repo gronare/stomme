@@ -907,6 +907,82 @@
         }
       ]
     },
+    "eventList": {
+      "label": "Upcoming events",
+      "group": "From collections",
+      "shape": "list",
+      "fields": [
+        {
+          "name": "eyebrow",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "heading",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "intro",
+          "widget": "text",
+          "required": false
+        },
+        {
+          "name": "source",
+          "widget": "hidden",
+          "required": false
+        },
+        {
+          "name": "base",
+          "widget": "hidden",
+          "required": false
+        },
+        {
+          "name": "layout",
+          "widget": "object",
+          "fields": [
+            {
+              "name": "limit",
+              "widget": "number",
+              "required": false
+            },
+            {
+              "name": "showPast",
+              "widget": "boolean",
+              "required": false
+            }
+          ]
+        },
+        {
+          "name": "emptyText",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "feedLabel",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "style",
+          "widget": "object",
+          "fields": [
+            {
+              "name": "surface",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "standard",
+                "tint",
+                "band",
+                "dark",
+                "gradient"
+              ]
+            }
+          ]
+        }
+      ]
+    },
     "factList": {
       "label": "Fact list (label + value)",
       "group": "Cards & lists",

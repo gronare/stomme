@@ -28,7 +28,7 @@ const md = (name: string) =>
 const dateField = z.union([z.string(), z.date()]).transform((d) => (d instanceof Date ? d.toISOString().slice(0, 10) : d));
 
 export const PRESET_SCHEMAS = {
-  article: z.object({ title: z.string(), date: dateField, excerpt: z.string().default(''), cover: z.string().optional(), showCover: z.boolean().default(false) }),
+  article: z.object({ title: z.string(), date: dateField, excerpt: z.string().default(''), category: z.string().default(''), eventDate: dateField.optional(), eventTime: z.string().default(''), cover: z.string().optional(), showCover: z.boolean().default(false) }),
   catalog: z.object({
     title: z.string(),
     price: z.string().default(''),

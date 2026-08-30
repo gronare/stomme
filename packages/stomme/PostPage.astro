@@ -10,7 +10,9 @@ interface Props {
 const { post, config } = Astro.props;
 const site = resolveSite(config);
 const html = await renderMarkdown(post.body ?? '');
-const date = post.data.date ? new Date(post.data.date).toLocaleDateString(site.locale, { year: 'numeric', month: 'long', day: 'numeric' }) : '';
+const fmt = (d: string) => new Date(d).toLocaleDateString(site.locale, { year: 'numeric', month: 'long', day: 'numeric' });
+const date = post.data.date ? fmt(post.data.date) : '';
+const eventLine = post.data.eventDate ? [fmt(post.data.eventDate), post.data.eventTime].filter(Boolean).join(' · ') : '';
 ---
 <article data-stomme-page="news" data-stomme-entry={post.id} class="section section--read">
   {post.data.showCover && (
@@ -18,6 +20,12 @@ const date = post.data.date ? new Date(post.data.date).toLocaleDateString(site.l
   )}
   {date && <p class="mono">{date}</p>}
   <h1 class="display display--hero" style="margin-top:0.5rem">{post.data.title}</h1>
+  {(eventLine || post.data.category) && (
+    <p class:list={['mono', { 'post-date--event': !!eventLine }]}>
+      {eventLine}
+      {post.data.category && <span class="post-cat">{post.data.category}</span>}
+    </p>
+  )}
   {post.data.excerpt && <p class="intro">{post.data.excerpt}</p>}
   <div class="prose" style="margin-top:1.5rem" set:html={html} />
 </article>

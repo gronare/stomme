@@ -2,7 +2,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { resolve, dirname } from 'node:path';
 import { mkdirSync, writeFileSync, existsSync, readFileSync, readdirSync, cpSync, rmSync, statSync } from 'node:fs';
 import { createHash } from 'node:crypto';
-import { previewEntrypoint, listingEntrypoint, lookbookDataModule, lookbookEntrypoint, lookbookBlockEntrypoint, localeHomeEntrypoint, localePagesEntrypoint, REVEAL } from './src/entrypoints.mjs';
+import { previewEntrypoint, listingEntrypoint, listingCalendarEntrypoint, lookbookDataModule, lookbookEntrypoint, lookbookBlockEntrypoint, localeHomeEntrypoint, localePagesEntrypoint, REVEAL } from './src/entrypoints.mjs';
 import { publicIndexPlugin } from './src/vite-public-index.mjs';
 import { createJiti } from 'jiti';
 import { resolveMediaConfig } from './src/media-config.mjs';
@@ -389,6 +389,12 @@ export default function stomme(options = {}) {
           writeFileSync(file, listingEntrypoint(l));
           injectRoute({ pattern: `${l.route}/[slug]`, entrypoint: file });
           enabled.push(`${l.route}/[slug]`);
+          if (l.preset === 'article') {
+            const calendarFile = resolve(listingsDir, `${l.id}-calendar.ts`);
+            writeFileSync(calendarFile, listingCalendarEntrypoint(l));
+            injectRoute({ pattern: `${l.route}/calendar.ics`, entrypoint: calendarFile });
+            enabled.push(`${l.route}/calendar.ics`);
+          }
         }
 
         logger?.info(enabled.length ? `routes: ${enabled.join(', ')}` : 'no feature/listing routes enabled');

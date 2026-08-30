@@ -127,6 +127,9 @@
         "title",
         "date",
         "excerpt",
+        "category",
+        "eventDate",
+        "eventTime",
         "cover",
         "showCover"
       ],
@@ -281,6 +284,9 @@
         "title",
         "date",
         "excerpt",
+        "category",
+        "eventDate",
+        "eventTime",
         "cover",
         "showCover"
       ]

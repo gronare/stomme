@@ -1131,6 +1131,40 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
     display: inline-block;
     color: var(--color-brand);
   }
+  .post-cat {
+    display: inline-block; margin-left: 0.6rem; vertical-align: 1px;
+    font-family: var(--font-mono); font-size: 0.62rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 3px 9px; border-radius: 999px;
+    background: color-mix(in srgb, var(--color-brand) 10%, transparent); color: var(--color-brand);
+  }
+  .post-date--event { color: var(--color-brand); font-weight: 700; }
+
+  .event-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.75rem; }
+  .event-row[hidden] { display: none; }
+  .event-row > a {
+    display: flex; align-items: center; gap: 1.1rem; padding: 1rem 1.25rem;
+    border: 1px solid var(--color-line); border-radius: 14px; background: var(--color-paper);
+    text-decoration: none; color: inherit; transition: border-color 0.18s, transform 0.18s, box-shadow 0.18s;
+  }
+  .event-row > a:hover {
+    border-color: var(--color-brand); transform: translateY(-2px);
+    box-shadow: 0 18px 36px -28px color-mix(in srgb, var(--color-brand) 60%, transparent);
+  }
+  .event-row[data-past] > a { opacity: 0.55; }
+  .event-day {
+    flex: 0 0 auto; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    width: 3.25rem; height: 3.25rem; border-radius: 12px;
+    background: color-mix(in srgb, var(--color-brand) 10%, transparent); color: var(--color-brand);
+  }
+  .event-day b { font-size: 1.2rem; font-weight: 700; line-height: 1; }
+  .event-day small { font-family: var(--font-mono); font-size: 0.58rem; letter-spacing: 0.08em; text-transform: uppercase; }
+  .event-body { display: flex; flex-direction: column; gap: 0.2rem; min-width: 0; }
+  .event-title { font-size: 1.05rem; font-weight: 700; color: var(--color-ink); }
+  .event-row > a:hover .event-title { color: var(--color-brand); }
+  .event-body small { font-size: 0.875rem; color: var(--color-muted); }
+  .event-empty { margin: 0; color: var(--color-muted); }
+  .event-feed { margin: 1.25rem 0 0; }
+  .event-feed a { font-family: var(--font-mono); font-size: 0.8rem; color: var(--color-brand); }
 
   .doc-group + .doc-group { margin-top: 2.25rem; }
   .doc-group h3 { margin: 0 0 0.9rem; }
