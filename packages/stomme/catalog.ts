@@ -564,6 +564,7 @@ const RAW_BLOCKS: BlockDef[] = [
       layoutGroup([
         { name: 'featured', label: 'Featured first post', widget: 'boolean', required: false, default: true, hint: 'Show the newest post as a large lead card.' },
         { name: 'columns', label: 'Columns', widget: 'number', required: false, default: 3, hint: '2 or 3.' },
+        { name: 'limit', label: 'Show at most', widget: 'number', required: false, hint: 'Newest first. Empty shows every post.' },
       ]),
       styleGroup([surfaceField]),
     ],

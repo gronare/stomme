@@ -2236,6 +2236,11 @@
               "name": "columns",
               "widget": "number",
               "required": false
+            },
+            {
+              "name": "limit",
+              "widget": "number",
+              "required": false
             }
           ]
         },

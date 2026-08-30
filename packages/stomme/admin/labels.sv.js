@@ -757,6 +757,8 @@ export default {
   "block.postList.layout.featured.hint": ["Show the newest post as a large lead card.", "Visa det senaste inlägget som ett stort ledande kort."],
   "block.postList.layout.columns.label": ["Columns", "Kolumner"],
   "block.postList.layout.columns.hint": ["2 or 3.", "2 eller 3."],
+  "block.postList.layout.limit.label": ["Show at most", "Visa högst"],
+  "block.postList.layout.limit.hint": ["Newest first. Empty shows every post.", "Nyast först. Tomt visar alla inlägg."],
   "block.postList.style.label": ["Appearance", "Utseende"],
   "block.postList.style.hint": ["Background and accent colour — set once when the page is designed.", "Bakgrund och accentfärg — sätts en gång när sidan formges."],
   "block.postList.style.surface.label": ["Background", "Bakgrund"],

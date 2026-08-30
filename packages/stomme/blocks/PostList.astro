@@ -7,7 +7,7 @@ interface Props {
   heading?: string;
   intro?: string;
   media?: { showImages?: boolean };
-  layout?: { featured?: boolean; columns?: number };
+  layout?: { featured?: boolean; columns?: number; limit?: number };
   source?: string;
   base?: string;
   items?: { id: string; data: Record<string, any> }[];
@@ -18,12 +18,14 @@ const { eyebrow, heading, intro, source = 'posts', base, site, anchor } = Astro.
 const showImages = Astro.props.media?.showImages ?? false;
 const featured = Astro.props.layout?.featured ?? false;
 const columns = Astro.props.layout?.columns ?? 3;
+const limit = Number(Astro.props.layout?.limit) || 0;
 const ItemHeading = heading ? 'h3' : 'h2';
 const prefix = base ?? site?.routes?.blog ?? '/blog';
 const locale = site?.locale ?? 'en-US';
 const readMore = site?.strings?.readMore ?? 'Read more';
 const latest = site?.strings?.latest ?? 'Latest';
-const all = Astro.props.items ?? (await getCollection(source)).sort((a, b) => (a.data.date < b.data.date ? 1 : -1));
+const sorted = Astro.props.items ?? (await getCollection(source)).sort((a, b) => (a.data.date < b.data.date ? 1 : -1));
+const all = limit > 0 ? sorted.slice(0, limit) : sorted;
 const fmt = (d: string) => new Date(d).toLocaleDateString(locale, { year: 'numeric', month: 'long', day: 'numeric' });
 const dateLine = (d: Record<string, any>) => (d.eventDate ? [fmt(d.eventDate), d.eventTime].filter(Boolean).join(' · ') : fmt(d.date));
 const lead = featured && all.length > 1 ? all[0] : null;
