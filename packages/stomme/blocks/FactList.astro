@@ -1,0 +1,41 @@
+---
+interface Props {
+  eyebrow?: string;
+  heading?: string;
+  intro?: string;
+  anchor?: string;
+  items?: { label?: string; value?: string }[];
+  layout?: { columns?: string };
+  style?: { surface?: string; accent?: 'brand' | 'secondary' | 'highlight' };
+  localeLink?: (href: string) => string;
+}
+const { eyebrow, heading, intro, anchor, items = [], localeLink } = Astro.props;
+const columns = Astro.props.layout?.columns ?? '1';
+const accent = Astro.props.style?.accent ?? 'brand';
+const accentVar = accent === 'secondary' ? 'var(--color-secondary)' : accent === 'highlight' ? 'var(--color-highlight)' : 'var(--color-brand)';
+const rows = items.filter((it) => it && (it.label || it.value));
+
+const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+// renderMarkdown wraps its output in <p>, which a <dd> row cannot carry, so the value escapes first and then takes links only.
+const linked = (s = '') => esc(s).replace(/\[([^\]]+)\]\(([^()\s]+)\)/g, (_m, text, href) => `<a href="${localeLink ? localeLink(href) : href}">${text}</a>`);
+---
+
+{rows.length > 0 && (
+  <section data-stomme-block="factList" id={anchor || undefined} class="section fact-list-section" style={`--block-accent:${accentVar}`}>
+    {(eyebrow || heading || intro) && (
+      <div class="section-head">
+        {eyebrow && <span class="mono eyebrow">{eyebrow}</span>}
+        {heading && <h2 class="display fact-list__heading">{heading}</h2>}
+        {intro && <p class="intro">{intro}</p>}
+      </div>
+    )}
+    <dl class="fact-list" style={`--fact-cols:${columns}`}>
+      {rows.map((it) => (
+        <div class="fact-list__row">
+          <dt class="fact-list__label">{it.label}</dt>
+          <dd class="fact-list__value" set:html={linked(it.value)} />
+        </div>
+      ))}
+    </dl>
+  </section>
+)}

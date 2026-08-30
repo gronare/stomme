@@ -9,6 +9,7 @@ const SHAPES = {
   gallery: '<i class="img"></i><i class="img"></i><i class="img"></i>',
   steps: '<i class="row"><b class="num">1</b><i class="ln w70"></i></i><i class="row"><b class="num">2</b><i class="ln w55"></i></i>',
   checklist: '<i class="row"><b class="tick">✓</b><i class="ln w70"></i></i><i class="row"><b class="tick">✓</b><i class="ln w55"></i></i>',
+  pairs: '<i class="prow"><b class="key"></b><i class="ln w60"></i></i><i class="prow"><b class="key"></b><i class="ln w80"></i></i><i class="prow"><b class="key"></b><i class="ln w50"></i></i>',
   quote: '<b class="qm">&rdquo;</b><i class="ln w80"></i><i class="ln w55"></i>',
   panel: '<i class="dark"><b class="big">42</b><i class="ln w50 lt"></i></i>',
   chips: '<i class="pill"></i><i class="pill"></i><i class="pill"></i><i class="pill"></i>',
@@ -89,6 +90,9 @@ footer{margin-top:50px;padding-top:14px;border-top:1px solid var(--rule);font-fa
 .wf .num{font:700 8px/1 var(--mono);color:#fff;background:var(--red);border-radius:50%;width:12px;height:12px;display:flex;align-items:center;justify-content:center;flex:0 0 12px}
 .wf .tick{font:700 9px/1 var(--mono);color:var(--red);flex:0 0 12px;text-align:center}
 .wf[data-shape=steps],.wf[data-shape=checklist]{flex-direction:column;justify-content:center;gap:7px}
+.wf .prow{display:flex;align-items:center;gap:6px;width:100%}
+.wf .key{flex:0 0 24px;height:5px;border-radius:2px;background:var(--line);opacity:.55}
+.wf[data-shape=pairs]{flex-direction:column;justify-content:center;gap:7px}
 .wf .qm{font:700 30px/0.7 var(--serif);color:var(--line)}
 .wf[data-shape=quote]{flex-direction:column;justify-content:center}
 .wf .dark{background:var(--ink);border-radius:4px;width:100%;height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:4px}

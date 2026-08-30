@@ -21,6 +21,7 @@ blocks alongside these (see [customizing](customizing.md)).
 | `specialistGrid` | Compact title + text grid with a brand top-rule | `eyebrow`/`heading`/`intro`, `items[]` (`title`, `body`) |
 | `steps` | A numbered process (bordered rows + badges) | `eyebrow`/`heading`/`intro`, `items[]` (`title`, `body`), `width` (`narrow`/`full`) |
 | `checklist` | Ticked list, 1–2 columns | `eyebrow`/`heading`/`intro`, `items[]` (`text`, `note`), `columns` |
+| `factList` | Rows of label + value (specs, what is included, opening hours) | `eyebrow`/`heading`/`intro`, `items[]` (`label`, `value`), `columns` (1/2/3), `accent` |
 | `gallery` | Responsive image grid with captions | `eyebrow`/`heading`/`intro`, `images[]` (`image`, `alt`, `caption`), `columns` |
 | `beforeAfter` | Draggable before/after image slider | `eyebrow`/`heading`/`intro`, `before`, `after` |
 | `definition` | A dictionary-style entry (term, word class, senses) | `eyebrow`, `term`, `wordClass`, `senses[]` (`text`, `note`), `width` |
@@ -75,7 +76,7 @@ fields control wording and which parts appear.
 
 ## Choosing between similar blocks
 
-Five pairs are easy to mix up. Each row says what makes the block different, not what it is:
+Six pairs are easy to mix up. Each row says what makes the block different, not what it is:
 
 | Block | What sets it apart |
 |---|---|
@@ -84,6 +85,7 @@ Five pairs are easy to mix up. Each row says what makes the block different, not
 | `ctaBox` | three layouts (classic / split / panel); `facts` feeds the split card's chips and the panel's readout and is ignored by classic. `ctaPanel` is the one that sits on a surface band |
 | `prose` | its pull-stat (`statValue` + `statLabel`) is for the one headline figure a text section earns — `statsBar` is the row for several |
 | `definition` | a dictionary entry (term, word class, numbered senses); `width` and `align` behave as they do in `callout` |
+| `factList` | one row per fact, label beside value — `statsBar` is the row of big headline numbers, `definition` is a single word being defined |
 
 ## Chrome (not blocks)
 

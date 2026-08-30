@@ -815,6 +815,87 @@
         }
       ]
     },
+    "factList": {
+      "label": "Fact list (label + value)",
+      "group": "Cards & lists",
+      "shape": "pairs",
+      "fields": [
+        {
+          "name": "eyebrow",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "heading",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "intro",
+          "widget": "text",
+          "required": false
+        },
+        {
+          "name": "items",
+          "widget": "list",
+          "required": false,
+          "fields": [
+            {
+              "name": "label",
+              "widget": "string"
+            },
+            {
+              "name": "value",
+              "widget": "text"
+            }
+          ]
+        },
+        {
+          "name": "layout",
+          "widget": "object",
+          "fields": [
+            {
+              "name": "columns",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "1",
+                "2",
+                "3"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "style",
+          "widget": "object",
+          "fields": [
+            {
+              "name": "surface",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "standard",
+                "tint",
+                "band",
+                "dark",
+                "gradient"
+              ]
+            },
+            {
+              "name": "accent",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "brand",
+                "secondary",
+                "highlight"
+              ]
+            }
+          ]
+        }
+      ]
+    },
     "faq": {
       "label": "FAQ",
       "group": "From collections",

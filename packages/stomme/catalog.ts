@@ -275,6 +275,32 @@ const RAW_BLOCKS: BlockDef[] = [
     ],
   },
   {
+    type: 'factList',
+    label: 'Fact list (label + value)',
+    group: 'Cards & lists',
+    summary: 'Rows of label and value — specifications, what is included, key facts.',
+    shape: 'pairs',
+    fields: [
+      ...headingFields,
+      {
+        name: 'items', label: 'Rows', widget: 'list', required: false, collapsed: true, label_singular: 'Row',
+        summary: '{{fields.label}} — {{fields.value}}',
+        fields: [
+          { name: 'label', label: 'Label', widget: 'string' },
+          { name: 'value', label: 'Value', widget: 'text', hint: 'Plain text; a markdown link [text](url) is allowed.' },
+        ],
+      },
+      layoutGroup([
+        {
+          name: 'columns', label: 'Columns', widget: 'select', required: false, default: '1',
+          hint: 'How many rows sit side by side on wide screens.',
+          options: [{ label: '1', value: '1' }, { label: '2', value: '2' }, { label: '3', value: '3' }],
+        },
+      ]),
+      styleGroup([surfaceField, accentField]),
+    ],
+  },
+  {
     type: 'gallery',
     label: 'Gallery',
     group: 'Media',
@@ -716,6 +742,14 @@ const SAMPLES: Record<string, ({ _label?: string } & Record<string, unknown>)[]>
   checklist: [
     { _label: 'two columns', eyebrow: 'Included', layout: { columns: 2 }, items: [{ text: 'First item' }, { text: 'Second item', note: 'With a supporting note.' }, { text: 'Third item' }, { text: 'Fourth item' }] },
     { _label: 'single + heading (split on themed sites)', eyebrow: 'Included', heading: 'A checklist with a heading', layout: { columns: 1 }, items: [{ text: 'One' }, { text: 'Two' }] },
+  ],
+  factList: [
+    { _label: 'one column', eyebrow: 'The facts', heading: 'Label and value, row by row', items: [
+      { label: 'Heating', value: 'District heating' }, { label: 'Broadband', value: '250/250 Mbit/s included' }, { label: 'Built', value: '1964, renovated 2021' },
+    ] },
+    { _label: 'two columns + a link in a value', layout: { columns: '2' }, items: [
+      { label: 'Opening hours', value: 'Weekdays 08–17' }, { label: 'Parking', value: 'Two spaces, [see the map](#)' }, { label: 'Lift', value: 'Yes, to every floor' }, { label: 'Deposit', value: '3 900 kr' },
+    ] },
   ],
   gallery: [{ eyebrow: 'Gallery', heading: 'Image grid (placeholders)', layout: { columns: 3 }, images: [{ alt: 'One' }, { alt: 'Two' }, { alt: 'Three' }] }],
   collage: [

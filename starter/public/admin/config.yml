@@ -1005,6 +1005,67 @@ collections:
                           - { label: "Accent band", value: "band" }
                           - { label: "Dark", value: "dark" }
                           - { label: "Gradient", value: "gradient" }
+              - name: factList
+                label: "Fact list (label + value)"
+                widget: object
+                fields:
+                  - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
+                  - { name: heading, label: "Heading", widget: string, required: false }
+                  - { name: intro, label: "Intro", widget: text, required: false }
+                  - name: items
+                    label: "Rows"
+                    widget: list
+                    required: false
+                    label_singular: "Row"
+                    collapsed: true
+                    summary: "{{fields.label}} — {{fields.value}}"
+                    fields:
+                      - { name: label, label: "Label", widget: string }
+                      - { name: value, label: "Value", widget: text, hint: "Plain text; a markdown link [text](url) is allowed." }
+                  - name: layout
+                    label: "Layout"
+                    widget: object
+                    collapsed: true
+                    hint: "Size and placement — rarely needs changing."
+                    fields:
+                      - name: columns
+                        label: "Columns"
+                        widget: select
+                        required: false
+                        default: "1"
+                        hint: "How many rows sit side by side on wide screens."
+                        options:
+                          - { label: "1", value: "1" }
+                          - { label: "2", value: "2" }
+                          - { label: "3", value: "3" }
+                  - name: style
+                    label: "Appearance"
+                    widget: object
+                    collapsed: true
+                    hint: "Background and accent colour — set once when the page is designed."
+                    fields:
+                      - name: surface
+                        label: "Background"
+                        widget: select
+                        required: false
+                        default: "standard"
+                        hint: "The surface behind the section — for rhythm between blocks."
+                        options:
+                          - { label: "Standard (white)", value: "standard" }
+                          - { label: "Tinted", value: "tint" }
+                          - { label: "Accent band", value: "band" }
+                          - { label: "Dark", value: "dark" }
+                          - { label: "Gradient", value: "gradient" }
+                      - name: accent
+                        label: "Accent"
+                        widget: select
+                        required: false
+                        default: "brand"
+                        hint: "This block's accent colour (rule, icon or number) — not the eyebrow."
+                        options:
+                          - { label: "Brand", value: "brand" }
+                          - { label: "Secondary", value: "secondary" }
+                          - { label: "Highlight", value: "highlight" }
               - name: gallery
                 label: "Gallery"
                 widget: object
@@ -2620,6 +2681,67 @@ collections:
                       - { label: "Accent band", value: "band" }
                       - { label: "Dark", value: "dark" }
                       - { label: "Gradient", value: "gradient" }
+          - name: factList
+            label: "Fact list (label + value)"
+            widget: object
+            fields:
+              - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
+              - { name: heading, label: "Heading", widget: string, required: false }
+              - { name: intro, label: "Intro", widget: text, required: false }
+              - name: items
+                label: "Rows"
+                widget: list
+                required: false
+                label_singular: "Row"
+                collapsed: true
+                summary: "{{fields.label}} — {{fields.value}}"
+                fields:
+                  - { name: label, label: "Label", widget: string }
+                  - { name: value, label: "Value", widget: text, hint: "Plain text; a markdown link [text](url) is allowed." }
+              - name: layout
+                label: "Layout"
+                widget: object
+                collapsed: true
+                hint: "Size and placement — rarely needs changing."
+                fields:
+                  - name: columns
+                    label: "Columns"
+                    widget: select
+                    required: false
+                    default: "1"
+                    hint: "How many rows sit side by side on wide screens."
+                    options:
+                      - { label: "1", value: "1" }
+                      - { label: "2", value: "2" }
+                      - { label: "3", value: "3" }
+              - name: style
+                label: "Appearance"
+                widget: object
+                collapsed: true
+                hint: "Background and accent colour — set once when the page is designed."
+                fields:
+                  - name: surface
+                    label: "Background"
+                    widget: select
+                    required: false
+                    default: "standard"
+                    hint: "The surface behind the section — for rhythm between blocks."
+                    options:
+                      - { label: "Standard (white)", value: "standard" }
+                      - { label: "Tinted", value: "tint" }
+                      - { label: "Accent band", value: "band" }
+                      - { label: "Dark", value: "dark" }
+                      - { label: "Gradient", value: "gradient" }
+                  - name: accent
+                    label: "Accent"
+                    widget: select
+                    required: false
+                    default: "brand"
+                    hint: "This block's accent colour (rule, icon or number) — not the eyebrow."
+                    options:
+                      - { label: "Brand", value: "brand" }
+                      - { label: "Secondary", value: "secondary" }
+                      - { label: "Highlight", value: "highlight" }
           - name: gallery
             label: "Gallery"
             widget: object

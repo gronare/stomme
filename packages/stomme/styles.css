@@ -551,6 +551,33 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
     color: var(--color-muted);
   }
 
+.fact-list {
+    margin: 2.5rem 0 0;
+    display: grid;
+    grid-template-columns: 1fr;
+    column-gap: 3rem;
+    row-gap: 0;
+  }
+  @media (min-width: 900px) {
+    .fact-list { grid-template-columns: repeat(var(--fact-cols, 1), minmax(0, 1fr)); }
+  }
+  .fact-list__heading { margin-top: 0.75rem; }
+  .fact-list__row {
+    display: grid;
+    grid-template-columns: minmax(7rem, 0.85fr) minmax(0, 1.35fr);
+    gap: 1rem;
+    padding-block: 0.85rem;
+    border-bottom: 1px solid var(--color-line);
+  }
+  .fact-list__label {
+    font-family: var(--font-display);
+    font-weight: 700;
+    color: var(--block-accent, var(--color-brand));
+    hyphens: auto;
+    overflow-wrap: anywhere;
+  }
+  .fact-list__value { margin: 0; }
+
 .contact-grid {
     display: grid;
     gap: 2.5rem;
