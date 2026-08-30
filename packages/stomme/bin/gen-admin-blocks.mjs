@@ -422,6 +422,26 @@ try {
   } catch {}
 }
 
+if (existsSync(resolve(root, 'public/favicon.svg')) && !existsSync(resolve(root, 'public/favicon.ico'))) {
+  try {
+    const sharp = (await import('sharp')).default;
+    const png = await sharp(resolve(root, 'public/favicon.svg'), { density: 288 }).resize(32, 32).png().toBuffer();
+    const header = Buffer.alloc(22);
+    header.writeUInt16LE(1, 2);
+    header.writeUInt16LE(1, 4);
+    header.writeUInt8(32, 6);
+    header.writeUInt8(32, 7);
+    header.writeUInt16LE(1, 10);
+    header.writeUInt16LE(32, 12);
+    header.writeUInt32LE(png.length, 14);
+    header.writeUInt32LE(22, 18);
+    writeFileSync(resolve(root, 'public/favicon.ico'), Buffer.concat([header, png]));
+    console.log('  ↳ favicon.ico generated from favicon.svg');
+  } catch {
+    console.log('  ↳ favicon.ico missing and not generated (sharp unavailable)');
+  }
+}
+
 console.log(`✓ stomme-gen: ${Object.entries(counts).map(([k, v]) => `${k}×${v}`).join(', ')} · ${AVAILABLE_BLOCKS.length} block types · ${PAGE_OPTIONS.length} link options`);
 if (counts.collections) {
   const editors = generatedEditors();

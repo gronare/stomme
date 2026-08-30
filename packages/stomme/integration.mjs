@@ -217,8 +217,7 @@ export default function stomme(options = {}) {
                 ...slotAlias,
               },
             },
-            // fs.allow REPLACES the default list rather than extending it, so the project root must be listed beside slotsDir — a site's own src/styles/global.css 403s otherwise, with slots wired.
-            ...(slotsDir ? { server: { fs: { allow: [slotsDir, root] } } } : {}),
+            ...(slotsDir ? { server: { fs: { allow: [slotsDir, root, pkgDir] } } } : {}),
             // Never inline hoisted component <script> chunks into the HTML (Astro inlines chunks under 4 KB by default): as external /_astro/*.js files they fall under the /preview CSP's script-src 'self', while inlined they would need per-build hashes the SSR route cannot know. Non-JS assets return undefined, so Vite's default limit still applies.
             build: { assetsInlineLimit: (path) => (/\.m?js$/.test(path) ? false : undefined) },
           },

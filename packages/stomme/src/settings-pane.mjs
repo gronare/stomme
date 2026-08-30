@@ -160,8 +160,8 @@ function emitSettings() {
               - { name: alt, label: "Logo alt text", widget: string, required: false }
               - { name: textPre, label: "Wordmark text", widget: string, required: false }
               - { name: textAccent, label: "Wordmark accent (in brand colour)", widget: string, required: false }
-          - { name: favicon, label: "Favicon", widget: image, required: false, media_folder: "/public/media/icons", public_folder: "/", hint: "Browser-tab icon — SVG recommended (scales to any size). Defaults to the shipped mark when empty." }
-          - { name: appleIcon, label: "Home-screen icon", widget: image, required: false, media_folder: "/public/media/icons", public_folder: "/", hint: "iOS home-screen icon — a 180×180 PNG. Optional." }${emitLanguageSwitcher(10)}
+          - { name: favicon, label: "Favicon", widget: image, required: false, media_folder: "/public/media/icons", public_folder: "/media/icons", hint: "Browser-tab icon — SVG recommended (scales to any size). Defaults to the shipped mark when empty." }
+          - { name: appleIcon, label: "Home-screen icon", widget: image, required: false, media_folder: "/public/media/icons", public_folder: "/media/icons", hint: "iOS home-screen icon — a 180×180 PNG. Optional." }${emitLanguageSwitcher(10)}
 ${emitShareCards(6)}
       - name: contact
         label: "Contact"
@@ -322,11 +322,12 @@ ${emitNavLinks(10, on('nav'))}
           - { name: showAddress, label: "Show the address", widget: boolean, required: false, default: false, hint: "Street and postcode from Site & contact, under the tagline. On, the tagline drops the town it repeats."${inline('footer', 'duplicate')} }
           - { name: showHours, label: "Show opening hours", widget: boolean, required: false, default: false, hint: "The opening hours from Site & contact, on one line."${inline('footer', 'duplicate')} }
           - { name: showSocials, label: "Show social links", widget: boolean, required: false, default: false, hint: "The social links from Site & contact."${inline('footer', 'duplicate')} }
+          - { name: showContact, label: "Show phone and email", widget: boolean, required: false, default: true, hint: "The phone number and email from Site & contact, on one line."${inline('footer', 'duplicate')} }
           - { name: showLinks, label: "Show quick links", widget: boolean, required: false, default: true${inline('footer', 'duplicate')} }
 ${emitFooterLinks(10, on('footer'))}
-          - { name: showTowns, label: "Show service areas", widget: boolean, required: false, default: false, hint: "Adds a column linking every entry in the Areas collection."${inline('footer', 'duplicate')} }
+${collectionEnabled('towns') ? `          - { name: showTowns, label: "Show service areas", widget: boolean, required: false, default: false, hint: "Adds a column linking every entry in the Areas collection."${inline('footer', 'duplicate')} }
           - { name: townsHeading, label: "Service areas · heading", widget: string, required: false, hint: "The heading above the service-area column, e.g. \\"Areas\\"."${inline('footer', 'true')} }
-          - { name: note, label: "Note", widget: string, required: false, hint: "Appended to the © line."${inline('footer', 'true')} }
+` : ''}          - { name: note, label: "Note", widget: string, required: false, hint: "Appended to the © line."${inline('footer', 'true')} }
       - label: "Form confirmation"
         name: thanks
         file: "src/content/thanks/thanks.md"

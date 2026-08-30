@@ -159,6 +159,7 @@ export function stommeCollections(listings?: Listing[]) {
         showAddress: z.boolean().default(false),
         showHours: z.boolean().default(false),
         showSocials: z.boolean().default(false),
+        showContact: z.boolean().default(true),
         legal: z.array(z.object({ label: z.string(), link })).default([]),
         note: z.string().default(''),
         showLogo: z.boolean().default(false),

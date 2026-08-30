@@ -1558,6 +1558,8 @@ export default {
   "settings.footer.showHours.hint": ["The opening hours from Site & contact, on one line.", "Öppettiderna från Webbplats & kontakt, på en rad."],
   "settings.footer.showSocials.label": ["Show social links", "Visa sociala länkar"],
   "settings.footer.showSocials.hint": ["The social links from Site & contact.", "De sociala länkarna från Webbplats & kontakt."],
+  "settings.footer.showContact.label": ["Show phone and email", "Visa telefon och mejl"],
+  "settings.footer.showContact.hint": ["The phone number and email from Site & contact, on one line.", "Telefonnumret och mejladressen från Webbplats & kontakt, på en rad."],
   "settings.footer.showLinks.label": ["Show quick links", "Visa snabblänkar"],
   "settings.footer.linksHeading.label": ["Quick links · heading", "Snabblänkar · rubrik"],
   "settings.footer.linksHeading.hint": ["The heading above the quick links, e.g. \"Links\".", "Rubriken ovanför snabblänkarna, t.ex. ”Länkar”."],

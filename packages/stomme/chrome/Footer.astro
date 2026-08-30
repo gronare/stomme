@@ -63,7 +63,7 @@ const year = new Date().getFullYear();
             {socials.map((s) => <li><a href={s.url} class="footer-link" target="_blank" rel="noopener">{s.platform}</a></li>)}
           </ul>
         )}
-        {(contact.phone || contact.email) && (
+        {footer.showContact !== false && (contact.phone || contact.email) && (
           <p style="margin:0.75rem 0 0">
             {contact.phone && <ContactLink kind="tel" class="footer-link" target={contact.phoneE164 || contact.phone} display={contact.phone} protect={!!contact.protectContact} />}
             {contact.phone && contact.email && <span> · </span>}

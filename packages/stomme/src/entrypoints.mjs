@@ -158,7 +158,7 @@ if (shareDraft && scOg.enabled) {
   <Base title="Preview"><div id="preview-root">
     <div style="display:flex;flex-direction:column;gap:2.25rem;padding:2.25rem 1.5rem">
       <div class="contact-card-block"><DirectContact data={contactDraft} tint={true} show={{ phone: true, email: true, hours: true, address: true, socials: true, map: true }} /></div>
-      <FindUs data={contactDraft} showHours={true} />
+      <FindUs data={contactDraft} showHours={true} site={resolveSite(site)} />
     </div>
   </div></Base>
 ) : kind === 'service' ? (

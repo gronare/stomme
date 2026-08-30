@@ -488,7 +488,7 @@ check(/\n      i18n: duplicate\n      field: \{ name: tag, label: "Tag", widget:
 
 const settingsYaml = (LOCALES) => makeSettingsPane({
   q, pad, emitWidget: E.emitWidget, emitNavLinks: E.emitNavLinks, emitFooterLinks: E.emitFooterLinks, emitThanksButtons: E.emitThanksButtons,
-  COLLECTION_EDITORS: {}, listingEditor: () => '', collectionEnabled: () => false, FEATURES: {}, LISTINGS: [], CMS: null,
+  COLLECTION_EDITORS: {}, listingEditor: () => '', collectionEnabled: (name) => name === 'towns', FEATURES: {}, LISTINGS: [], CMS: null,
   LOCALES, ADDON_PANES: [], ADDON_PANEL_FILES: {}, getStaticCollections: () => new Set(),
 }).emitSettings();
 check(settingsYaml(['sv', 'en', 'no']).includes('- name: languageSwitcher'), 'a multilingual site picks how the header offers the languages');
