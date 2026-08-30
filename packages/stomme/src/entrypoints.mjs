@@ -35,7 +35,7 @@ const draft = decode();
 let blocks = [];
 if (!kind && Array.isArray(draft)) blocks = draft;
 const navDraft = kind === 'header' && draft && typeof draft === 'object' ? draft : undefined;
-const footerDraft = kind === 'footer' && draft && typeof draft === 'object' ? draft : undefined;
+const footerDraft = kind === 'footer' && draft && typeof draft === 'object' ? { showContact: true, ...draft } : undefined;
 const towns = kind === 'footer'
   ? (await getCollection('towns')).sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0)).map((t) => ({ id: t.id, name: t.data.name }))
   : [];
