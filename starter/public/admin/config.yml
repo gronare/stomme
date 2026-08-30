@@ -228,6 +228,17 @@ collections:
                         options:
                           - { label: "Full width", value: "full" }
                           - { label: "Narrow (reading column)", value: "narrow" }
+                      - name: beside
+                        label: "Placement"
+                        widget: select
+                        required: false
+                        default: "below"
+                        hint: "On wide screens the block shares a row with the block above it; on small screens they stack."
+                        options:
+                          - { label: "Below the previous block", value: "below" }
+                          - { label: "Beside the previous block, equal widths", value: "equal" }
+                          - { label: "Beside the previous block, narrower", value: "narrow" }
+                          - { label: "Beside the previous block, wider", value: "wide" }
                   - name: style
                     label: "Appearance"
                     widget: object
@@ -368,6 +379,17 @@ collections:
                         options:
                           - { label: "Tall", value: "tall" }
                           - { label: "Medium", value: "medium" }
+                      - name: beside
+                        label: "Placement"
+                        widget: select
+                        required: false
+                        default: "below"
+                        hint: "On wide screens the block shares a row with the block above it; on small screens they stack."
+                        options:
+                          - { label: "Below the previous block", value: "below" }
+                          - { label: "Beside the previous block, equal widths", value: "equal" }
+                          - { label: "Beside the previous block, narrower", value: "narrow" }
+                          - { label: "Beside the previous block, wider", value: "wide" }
               - name: pageHeader
                 label: "Page header"
                 widget: object
@@ -423,6 +445,17 @@ collections:
                         options:
                           - { label: "Narrow (reading column)", value: "narrow" }
                           - { label: "Full width", value: "full" }
+                      - name: beside
+                        label: "Placement"
+                        widget: select
+                        required: false
+                        default: "below"
+                        hint: "On wide screens the block shares a row with the block above it; on small screens they stack."
+                        options:
+                          - { label: "Below the previous block", value: "below" }
+                          - { label: "Beside the previous block, equal widths", value: "equal" }
+                          - { label: "Beside the previous block, narrower", value: "narrow" }
+                          - { label: "Beside the previous block, wider", value: "wide" }
                   - name: style
                     label: "Appearance"
                     widget: object
@@ -465,6 +498,17 @@ collections:
                         options:
                           - { label: "Narrow (reading column)", value: "narrow" }
                           - { label: "Full width", value: "full" }
+                      - name: beside
+                        label: "Placement"
+                        widget: select
+                        required: false
+                        default: "below"
+                        hint: "On wide screens the block shares a row with the block above it; on small screens they stack."
+                        options:
+                          - { label: "Below the previous block", value: "below" }
+                          - { label: "Beside the previous block, equal widths", value: "equal" }
+                          - { label: "Beside the previous block, narrower", value: "narrow" }
+                          - { label: "Beside the previous block, wider", value: "wide" }
                   - name: style
                     label: "Appearance"
                     widget: object
@@ -504,6 +548,17 @@ collections:
                     hint: "Size and placement — rarely needs changing."
                     fields:
                       - { name: flip, label: "Image on left", widget: boolean, required: false, default: false }
+                      - name: beside
+                        label: "Placement"
+                        widget: select
+                        required: false
+                        default: "below"
+                        hint: "On wide screens the block shares a row with the block above it; on small screens they stack."
+                        options:
+                          - { label: "Below the previous block", value: "below" }
+                          - { label: "Beside the previous block, equal widths", value: "equal" }
+                          - { label: "Beside the previous block, narrower", value: "narrow" }
+                          - { label: "Beside the previous block, wider", value: "wide" }
                   - name: style
                     label: "Appearance"
                     widget: object
@@ -536,6 +591,17 @@ collections:
                     hint: "Size and placement — rarely needs changing."
                     fields:
                       - { name: flip, label: "Quote on left", widget: boolean, required: false, default: false }
+                      - name: beside
+                        label: "Placement"
+                        widget: select
+                        required: false
+                        default: "below"
+                        hint: "On wide screens the block shares a row with the block above it; on small screens they stack."
+                        options:
+                          - { label: "Below the previous block", value: "below" }
+                          - { label: "Beside the previous block, equal widths", value: "equal" }
+                          - { label: "Beside the previous block, narrower", value: "narrow" }
+                          - { label: "Beside the previous block, wider", value: "wide" }
                   - name: style
                     label: "Appearance"
                     widget: object
@@ -611,6 +677,17 @@ collections:
                           - { label: "Left", value: "left" }
                           - { label: "Right", value: "right" }
                           - { label: "Indented", value: "indent" }
+                      - name: beside
+                        label: "Placement"
+                        widget: select
+                        required: false
+                        default: "below"
+                        hint: "On wide screens the block shares a row with the block above it; on small screens they stack."
+                        options:
+                          - { label: "Below the previous block", value: "below" }
+                          - { label: "Beside the previous block, equal widths", value: "equal" }
+                          - { label: "Beside the previous block, narrower", value: "narrow" }
+                          - { label: "Beside the previous block, wider", value: "wide" }
                   - name: style
                     label: "Appearance"
                     widget: object
@@ -641,6 +718,17 @@ collections:
                     hint: "Size and placement — rarely needs changing."
                     fields:
                       - { name: sticky, label: "Stick to the top", widget: boolean, required: false, default: false, hint: "Keep the row at the top of the window while scrolling" }
+                      - name: beside
+                        label: "Placement"
+                        widget: select
+                        required: false
+                        default: "below"
+                        hint: "On wide screens the block shares a row with the block above it; on small screens they stack."
+                        options:
+                          - { label: "Below the previous block", value: "below" }
+                          - { label: "Beside the previous block, equal widths", value: "equal" }
+                          - { label: "Beside the previous block, narrower", value: "narrow" }
+                          - { label: "Beside the previous block, wider", value: "wide" }
                   - name: style
                     label: "Appearance"
                     widget: object
@@ -769,6 +857,17 @@ collections:
                     hint: "Size and placement — rarely needs changing."
                     fields:
                       - { name: numbered, label: "Numbered (01/02/03 instead of icons)", widget: boolean, required: false, default: false }
+                      - name: beside
+                        label: "Placement"
+                        widget: select
+                        required: false
+                        default: "below"
+                        hint: "On wide screens the block shares a row with the block above it; on small screens they stack."
+                        options:
+                          - { label: "Below the previous block", value: "below" }
+                          - { label: "Beside the previous block, equal widths", value: "equal" }
+                          - { label: "Beside the previous block, narrower", value: "narrow" }
+                          - { label: "Beside the previous block, wider", value: "wide" }
                   - name: style
                     label: "Appearance"
                     widget: object
@@ -814,6 +913,23 @@ collections:
                     fields:
                       - { name: title, label: "Title", widget: string }
                       - { name: body, label: "Text", widget: text }
+                  - name: layout
+                    label: "Layout"
+                    widget: object
+                    collapsed: true
+                    hint: "Size and placement — rarely needs changing."
+                    fields:
+                      - name: beside
+                        label: "Placement"
+                        widget: select
+                        required: false
+                        default: "below"
+                        hint: "On wide screens the block shares a row with the block above it; on small screens they stack."
+                        options:
+                          - { label: "Below the previous block", value: "below" }
+                          - { label: "Beside the previous block, equal widths", value: "equal" }
+                          - { label: "Beside the previous block, narrower", value: "narrow" }
+                          - { label: "Beside the previous block, wider", value: "wide" }
                   - name: style
                     label: "Appearance"
                     widget: object
@@ -888,6 +1004,23 @@ collections:
                                   - { label: "Contact (/contact)", value: "/contact" }
                               - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
                   - { name: footnote, label: "Footnote", widget: text, required: false, hint: "Small note under the cards — e.g. what every plan includes." }
+                  - name: layout
+                    label: "Layout"
+                    widget: object
+                    collapsed: true
+                    hint: "Size and placement — rarely needs changing."
+                    fields:
+                      - name: beside
+                        label: "Placement"
+                        widget: select
+                        required: false
+                        default: "below"
+                        hint: "On wide screens the block shares a row with the block above it; on small screens they stack."
+                        options:
+                          - { label: "Below the previous block", value: "below" }
+                          - { label: "Beside the previous block, equal widths", value: "equal" }
+                          - { label: "Beside the previous block, narrower", value: "narrow" }
+                          - { label: "Beside the previous block, wider", value: "wide" }
                   - name: style
                     label: "Appearance"
                     widget: object
@@ -923,6 +1056,23 @@ collections:
                     fields:
                       - { name: title, label: "Title", widget: string }
                       - { name: body, label: "Text", widget: text }
+                  - name: layout
+                    label: "Layout"
+                    widget: object
+                    collapsed: true
+                    hint: "Size and placement — rarely needs changing."
+                    fields:
+                      - name: beside
+                        label: "Placement"
+                        widget: select
+                        required: false
+                        default: "below"
+                        hint: "On wide screens the block shares a row with the block above it; on small screens they stack."
+                        options:
+                          - { label: "Below the previous block", value: "below" }
+                          - { label: "Beside the previous block, equal widths", value: "equal" }
+                          - { label: "Beside the previous block, narrower", value: "narrow" }
+                          - { label: "Beside the previous block, wider", value: "wide" }
                   - name: style
                     label: "Appearance"
                     widget: object
@@ -975,6 +1125,17 @@ collections:
                         options:
                           - { label: "Narrow (reading column)", value: "narrow" }
                           - { label: "Full width", value: "full" }
+                      - name: beside
+                        label: "Placement"
+                        widget: select
+                        required: false
+                        default: "below"
+                        hint: "On wide screens the block shares a row with the block above it; on small screens they stack."
+                        options:
+                          - { label: "Below the previous block", value: "below" }
+                          - { label: "Beside the previous block, equal widths", value: "equal" }
+                          - { label: "Beside the previous block, narrower", value: "narrow" }
+                          - { label: "Beside the previous block, wider", value: "wide" }
                   - name: style
                     label: "Appearance"
                     widget: object
@@ -1017,6 +1178,17 @@ collections:
                     hint: "Size and placement — rarely needs changing."
                     fields:
                       - { name: columns, label: "Columns", widget: number, required: false, default: 2, hint: "1 or 2." }
+                      - name: beside
+                        label: "Placement"
+                        widget: select
+                        required: false
+                        default: "below"
+                        hint: "On wide screens the block shares a row with the block above it; on small screens they stack."
+                        options:
+                          - { label: "Below the previous block", value: "below" }
+                          - { label: "Beside the previous block, equal widths", value: "equal" }
+                          - { label: "Beside the previous block, narrower", value: "narrow" }
+                          - { label: "Beside the previous block, wider", value: "wide" }
                   - name: style
                     label: "Appearance"
                     widget: object
@@ -1068,6 +1240,17 @@ collections:
                           - { label: "1", value: "1" }
                           - { label: "2", value: "2" }
                           - { label: "3", value: "3" }
+                      - name: beside
+                        label: "Placement"
+                        widget: select
+                        required: false
+                        default: "below"
+                        hint: "On wide screens the block shares a row with the block above it; on small screens they stack."
+                        options:
+                          - { label: "Below the previous block", value: "below" }
+                          - { label: "Beside the previous block, equal widths", value: "equal" }
+                          - { label: "Beside the previous block, narrower", value: "narrow" }
+                          - { label: "Beside the previous block, wider", value: "wide" }
                   - name: style
                     label: "Appearance"
                     widget: object
@@ -1121,6 +1304,17 @@ collections:
                     hint: "Size and placement — rarely needs changing."
                     fields:
                       - { name: columns, label: "Columns", widget: number, required: false, default: 3, hint: "2 or 3." }
+                      - name: beside
+                        label: "Placement"
+                        widget: select
+                        required: false
+                        default: "below"
+                        hint: "On wide screens the block shares a row with the block above it; on small screens they stack."
+                        options:
+                          - { label: "Below the previous block", value: "below" }
+                          - { label: "Beside the previous block, equal widths", value: "equal" }
+                          - { label: "Beside the previous block, narrower", value: "narrow" }
+                          - { label: "Beside the previous block, wider", value: "wide" }
                   - name: style
                     label: "Appearance"
                     widget: object
@@ -1155,6 +1349,23 @@ collections:
                       - { name: image, label: "Image", widget: image, required: false }
                       - { name: alt, label: "Alt text", widget: string, required: false, hint: "Describe the picture for screen readers and search engines." }
                   - { name: caption, label: "Caption", widget: string, required: false, hint: "One line under the collage." }
+                  - name: layout
+                    label: "Layout"
+                    widget: object
+                    collapsed: true
+                    hint: "Size and placement — rarely needs changing."
+                    fields:
+                      - name: beside
+                        label: "Placement"
+                        widget: select
+                        required: false
+                        default: "below"
+                        hint: "On wide screens the block shares a row with the block above it; on small screens they stack."
+                        options:
+                          - { label: "Below the previous block", value: "below" }
+                          - { label: "Beside the previous block, equal widths", value: "equal" }
+                          - { label: "Beside the previous block, narrower", value: "narrow" }
+                          - { label: "Beside the previous block, wider", value: "wide" }
                   - name: style
                     label: "Appearance"
                     widget: object
@@ -1190,6 +1401,23 @@ collections:
                       - { name: after, label: "After image", widget: image, required: false }
                   - { name: beforeAlt, label: "Before · alt text", widget: string, required: false, hint: "Describe the before image (accessibility). Falls back to a label." }
                   - { name: afterAlt, label: "After · alt text", widget: string, required: false, hint: "Describe the after image." }
+                  - name: layout
+                    label: "Layout"
+                    widget: object
+                    collapsed: true
+                    hint: "Size and placement — rarely needs changing."
+                    fields:
+                      - name: beside
+                        label: "Placement"
+                        widget: select
+                        required: false
+                        default: "below"
+                        hint: "On wide screens the block shares a row with the block above it; on small screens they stack."
+                        options:
+                          - { label: "Below the previous block", value: "below" }
+                          - { label: "Beside the previous block, equal widths", value: "equal" }
+                          - { label: "Beside the previous block, narrower", value: "narrow" }
+                          - { label: "Beside the previous block, wider", value: "wide" }
                   - name: style
                     label: "Appearance"
                     widget: object
@@ -1251,6 +1479,17 @@ collections:
                           - { label: "Left", value: "left" }
                           - { label: "Centered", value: "center" }
                           - { label: "Right", value: "right" }
+                      - name: beside
+                        label: "Placement"
+                        widget: select
+                        required: false
+                        default: "below"
+                        hint: "On wide screens the block shares a row with the block above it; on small screens they stack."
+                        options:
+                          - { label: "Below the previous block", value: "below" }
+                          - { label: "Beside the previous block, equal widths", value: "equal" }
+                          - { label: "Beside the previous block, narrower", value: "narrow" }
+                          - { label: "Beside the previous block, wider", value: "wide" }
                   - name: style
                     label: "Appearance"
                     widget: object
@@ -1301,6 +1540,17 @@ collections:
                           - { label: "Left", value: "left" }
                           - { label: "Centered", value: "center" }
                           - { label: "Right", value: "right" }
+                      - name: beside
+                        label: "Placement"
+                        widget: select
+                        required: false
+                        default: "below"
+                        hint: "On wide screens the block shares a row with the block above it; on small screens they stack."
+                        options:
+                          - { label: "Below the previous block", value: "below" }
+                          - { label: "Beside the previous block, equal widths", value: "equal" }
+                          - { label: "Beside the previous block, narrower", value: "narrow" }
+                          - { label: "Beside the previous block, wider", value: "wide" }
                   - name: style
                     label: "Appearance"
                     widget: object
@@ -1357,6 +1607,23 @@ collections:
                       - { name: label, label: "Label", widget: string, required: false }
                       - { name: value, label: "Value", widget: string }
                       - { name: note, label: "Note", widget: text, required: false }
+                  - name: layout
+                    label: "Layout"
+                    widget: object
+                    collapsed: true
+                    hint: "Size and placement — rarely needs changing."
+                    fields:
+                      - name: beside
+                        label: "Placement"
+                        widget: select
+                        required: false
+                        default: "below"
+                        hint: "On wide screens the block shares a row with the block above it; on small screens they stack."
+                        options:
+                          - { label: "Below the previous block", value: "below" }
+                          - { label: "Beside the previous block, equal widths", value: "equal" }
+                          - { label: "Beside the previous block, narrower", value: "narrow" }
+                          - { label: "Beside the previous block, wider", value: "wide" }
                   - name: style
                     label: "Appearance"
                     widget: object
@@ -1387,6 +1654,23 @@ collections:
                     fields:
                       - { name: label, label: "Label", widget: string }
                       - { name: value, label: "Value", widget: string }
+                  - name: layout
+                    label: "Layout"
+                    widget: object
+                    collapsed: true
+                    hint: "Size and placement — rarely needs changing."
+                    fields:
+                      - name: beside
+                        label: "Placement"
+                        widget: select
+                        required: false
+                        default: "below"
+                        hint: "On wide screens the block shares a row with the block above it; on small screens they stack."
+                        options:
+                          - { label: "Below the previous block", value: "below" }
+                          - { label: "Beside the previous block, equal widths", value: "equal" }
+                          - { label: "Beside the previous block, narrower", value: "narrow" }
+                          - { label: "Beside the previous block, wider", value: "wide" }
                   - name: style
                     label: "Appearance"
                     widget: object
@@ -1417,6 +1701,23 @@ collections:
                     label_singular: "Name"
                     collapsed: true
                     field: { name: name, label: "Name", widget: string }
+                  - name: layout
+                    label: "Layout"
+                    widget: object
+                    collapsed: true
+                    hint: "Size and placement — rarely needs changing."
+                    fields:
+                      - name: beside
+                        label: "Placement"
+                        widget: select
+                        required: false
+                        default: "below"
+                        hint: "On wide screens the block shares a row with the block above it; on small screens they stack."
+                        options:
+                          - { label: "Below the previous block", value: "below" }
+                          - { label: "Beside the previous block, equal widths", value: "equal" }
+                          - { label: "Beside the previous block, narrower", value: "narrow" }
+                          - { label: "Beside the previous block, wider", value: "wide" }
               - name: faq
                 label: "FAQ"
                 widget: object
@@ -1488,6 +1789,17 @@ collections:
                           - { label: "Accordion", value: "accordion" }
                           - { label: "Cards", value: "cards" }
                           - { label: "Split (index + reader)", value: "split" }
+                      - name: beside
+                        label: "Placement"
+                        widget: select
+                        required: false
+                        default: "below"
+                        hint: "On wide screens the block shares a row with the block above it; on small screens they stack."
+                        options:
+                          - { label: "Below the previous block", value: "below" }
+                          - { label: "Beside the previous block, equal widths", value: "equal" }
+                          - { label: "Beside the previous block, narrower", value: "narrow" }
+                          - { label: "Beside the previous block, wider", value: "wide" }
                   - name: style
                     label: "Appearance"
                     widget: object
@@ -1537,6 +1849,23 @@ collections:
                               - { label: "About (/about)", value: "/about" }
                               - { label: "Contact (/contact)", value: "/contact" }
                           - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
+                  - name: layout
+                    label: "Layout"
+                    widget: object
+                    collapsed: true
+                    hint: "Size and placement — rarely needs changing."
+                    fields:
+                      - name: beside
+                        label: "Placement"
+                        widget: select
+                        required: false
+                        default: "below"
+                        hint: "On wide screens the block shares a row with the block above it; on small screens they stack."
+                        options:
+                          - { label: "Below the previous block", value: "below" }
+                          - { label: "Beside the previous block, equal widths", value: "equal" }
+                          - { label: "Beside the previous block, narrower", value: "narrow" }
+                          - { label: "Beside the previous block, wider", value: "wide" }
               - name: ctaBox
                 label: "Call to action (box)"
                 widget: object
@@ -1619,6 +1948,17 @@ collections:
                           - { label: "Classic (centered panel)", value: "classic" }
                           - { label: "Split (copy + facts card)", value: "split" }
                           - { label: "Panel (dark, with readout)", value: "panel" }
+                      - name: beside
+                        label: "Placement"
+                        widget: select
+                        required: false
+                        default: "below"
+                        hint: "On wide screens the block shares a row with the block above it; on small screens they stack."
+                        options:
+                          - { label: "Below the previous block", value: "below" }
+                          - { label: "Beside the previous block, equal widths", value: "equal" }
+                          - { label: "Beside the previous block, narrower", value: "narrow" }
+                          - { label: "Beside the previous block, wider", value: "wide" }
                   - name: style
                     label: "Appearance"
                     widget: object
@@ -1663,6 +2003,24 @@ collections:
                   - { name: labelMessage, label: "Field label — message", widget: string, required: false, hint: "Blank uses the site wording (\"Describe your project\"). Word it for your business." }
                   - { name: submitLabel, label: "Submit button text", widget: string, required: false, hint: "The form's submit button. Blank uses the site wording (\"Send request\")." }
                   - { name: showDirectContact, label: "Show the direct-contact card", widget: boolean, required: false, default: true, hint: "Off → the form fills the width (no phone/email card)." }
+                  - { name: inbox, label: "Inbox key", widget: string, required: false, hint: "Where this form's messages are delivered: the key of an inbox set up for the site. Empty means the site's default inbox." }
+                  - name: layout
+                    label: "Layout"
+                    widget: object
+                    collapsed: true
+                    hint: "Size and placement — rarely needs changing."
+                    fields:
+                      - name: beside
+                        label: "Placement"
+                        widget: select
+                        required: false
+                        default: "below"
+                        hint: "On wide screens the block shares a row with the block above it; on small screens they stack."
+                        options:
+                          - { label: "Below the previous block", value: "below" }
+                          - { label: "Beside the previous block, equal widths", value: "equal" }
+                          - { label: "Beside the previous block, narrower", value: "narrow" }
+                          - { label: "Beside the previous block, wider", value: "wide" }
               - name: contactCard
                 label: "Contact card"
                 widget: object
@@ -1683,12 +2041,46 @@ collections:
                       - { label: "Social links", value: "socials" }
                   - { name: label, label: "Card heading", widget: string, required: false, hint: "Blank uses the site wording (\"Direct contact\")." }
                   - { name: tint, label: "Tinted background", widget: boolean, required: false, default: true }
+                  - name: layout
+                    label: "Layout"
+                    widget: object
+                    collapsed: true
+                    hint: "Size and placement — rarely needs changing."
+                    fields:
+                      - name: beside
+                        label: "Placement"
+                        widget: select
+                        required: false
+                        default: "below"
+                        hint: "On wide screens the block shares a row with the block above it; on small screens they stack."
+                        options:
+                          - { label: "Below the previous block", value: "below" }
+                          - { label: "Beside the previous block, equal widths", value: "equal" }
+                          - { label: "Beside the previous block, narrower", value: "narrow" }
+                          - { label: "Beside the previous block, wider", value: "wide" }
               - name: findUs
                 label: "Find us (map)"
                 widget: object
                 fields:
                   - { name: heading, label: "Heading", widget: string, required: false, hint: "Blank uses the site wording (\"Find us\")." }
                   - { name: showHours, label: "Show opening hours", widget: boolean, required: false, default: true }
+                  - name: layout
+                    label: "Layout"
+                    widget: object
+                    collapsed: true
+                    hint: "Size and placement — rarely needs changing."
+                    fields:
+                      - name: beside
+                        label: "Placement"
+                        widget: select
+                        required: false
+                        default: "below"
+                        hint: "On wide screens the block shares a row with the block above it; on small screens they stack."
+                        options:
+                          - { label: "Below the previous block", value: "below" }
+                          - { label: "Beside the previous block, equal widths", value: "equal" }
+                          - { label: "Beside the previous block, narrower", value: "narrow" }
+                          - { label: "Beside the previous block, wider", value: "wide" }
               - name: map
                 label: "Find your way (static map)"
                 widget: object
@@ -1714,6 +2106,23 @@ collections:
                     fields:
                       - { name: lat, label: "Latitude", widget: number, required: false }
                       - { name: lng, label: "Longitude", widget: number, required: false }
+                  - name: layout
+                    label: "Layout"
+                    widget: object
+                    collapsed: true
+                    hint: "Size and placement — rarely needs changing."
+                    fields:
+                      - name: beside
+                        label: "Placement"
+                        widget: select
+                        required: false
+                        default: "below"
+                        hint: "On wide screens the block shares a row with the block above it; on small screens they stack."
+                        options:
+                          - { label: "Below the previous block", value: "below" }
+                          - { label: "Beside the previous block, equal widths", value: "equal" }
+                          - { label: "Beside the previous block, narrower", value: "narrow" }
+                          - { label: "Beside the previous block, wider", value: "wide" }
                   - name: style
                     label: "Appearance"
                     widget: object
@@ -1947,6 +2356,17 @@ collections:
                     options:
                       - { label: "Full width", value: "full" }
                       - { label: "Narrow (reading column)", value: "narrow" }
+                  - name: beside
+                    label: "Placement"
+                    widget: select
+                    required: false
+                    default: "below"
+                    hint: "On wide screens the block shares a row with the block above it; on small screens they stack."
+                    options:
+                      - { label: "Below the previous block", value: "below" }
+                      - { label: "Beside the previous block, equal widths", value: "equal" }
+                      - { label: "Beside the previous block, narrower", value: "narrow" }
+                      - { label: "Beside the previous block, wider", value: "wide" }
               - name: style
                 label: "Appearance"
                 widget: object
@@ -2087,6 +2507,17 @@ collections:
                     options:
                       - { label: "Tall", value: "tall" }
                       - { label: "Medium", value: "medium" }
+                  - name: beside
+                    label: "Placement"
+                    widget: select
+                    required: false
+                    default: "below"
+                    hint: "On wide screens the block shares a row with the block above it; on small screens they stack."
+                    options:
+                      - { label: "Below the previous block", value: "below" }
+                      - { label: "Beside the previous block, equal widths", value: "equal" }
+                      - { label: "Beside the previous block, narrower", value: "narrow" }
+                      - { label: "Beside the previous block, wider", value: "wide" }
           - name: pageHeader
             label: "Page header"
             widget: object
@@ -2142,6 +2573,17 @@ collections:
                     options:
                       - { label: "Narrow (reading column)", value: "narrow" }
                       - { label: "Full width", value: "full" }
+                  - name: beside
+                    label: "Placement"
+                    widget: select
+                    required: false
+                    default: "below"
+                    hint: "On wide screens the block shares a row with the block above it; on small screens they stack."
+                    options:
+                      - { label: "Below the previous block", value: "below" }
+                      - { label: "Beside the previous block, equal widths", value: "equal" }
+                      - { label: "Beside the previous block, narrower", value: "narrow" }
+                      - { label: "Beside the previous block, wider", value: "wide" }
               - name: style
                 label: "Appearance"
                 widget: object
@@ -2184,6 +2626,17 @@ collections:
                     options:
                       - { label: "Narrow (reading column)", value: "narrow" }
                       - { label: "Full width", value: "full" }
+                  - name: beside
+                    label: "Placement"
+                    widget: select
+                    required: false
+                    default: "below"
+                    hint: "On wide screens the block shares a row with the block above it; on small screens they stack."
+                    options:
+                      - { label: "Below the previous block", value: "below" }
+                      - { label: "Beside the previous block, equal widths", value: "equal" }
+                      - { label: "Beside the previous block, narrower", value: "narrow" }
+                      - { label: "Beside the previous block, wider", value: "wide" }
               - name: style
                 label: "Appearance"
                 widget: object
@@ -2223,6 +2676,17 @@ collections:
                 hint: "Size and placement — rarely needs changing."
                 fields:
                   - { name: flip, label: "Image on left", widget: boolean, required: false, default: false }
+                  - name: beside
+                    label: "Placement"
+                    widget: select
+                    required: false
+                    default: "below"
+                    hint: "On wide screens the block shares a row with the block above it; on small screens they stack."
+                    options:
+                      - { label: "Below the previous block", value: "below" }
+                      - { label: "Beside the previous block, equal widths", value: "equal" }
+                      - { label: "Beside the previous block, narrower", value: "narrow" }
+                      - { label: "Beside the previous block, wider", value: "wide" }
               - name: style
                 label: "Appearance"
                 widget: object
@@ -2255,6 +2719,17 @@ collections:
                 hint: "Size and placement — rarely needs changing."
                 fields:
                   - { name: flip, label: "Quote on left", widget: boolean, required: false, default: false }
+                  - name: beside
+                    label: "Placement"
+                    widget: select
+                    required: false
+                    default: "below"
+                    hint: "On wide screens the block shares a row with the block above it; on small screens they stack."
+                    options:
+                      - { label: "Below the previous block", value: "below" }
+                      - { label: "Beside the previous block, equal widths", value: "equal" }
+                      - { label: "Beside the previous block, narrower", value: "narrow" }
+                      - { label: "Beside the previous block, wider", value: "wide" }
               - name: style
                 label: "Appearance"
                 widget: object
@@ -2330,6 +2805,17 @@ collections:
                       - { label: "Left", value: "left" }
                       - { label: "Right", value: "right" }
                       - { label: "Indented", value: "indent" }
+                  - name: beside
+                    label: "Placement"
+                    widget: select
+                    required: false
+                    default: "below"
+                    hint: "On wide screens the block shares a row with the block above it; on small screens they stack."
+                    options:
+                      - { label: "Below the previous block", value: "below" }
+                      - { label: "Beside the previous block, equal widths", value: "equal" }
+                      - { label: "Beside the previous block, narrower", value: "narrow" }
+                      - { label: "Beside the previous block, wider", value: "wide" }
               - name: style
                 label: "Appearance"
                 widget: object
@@ -2360,6 +2846,17 @@ collections:
                 hint: "Size and placement — rarely needs changing."
                 fields:
                   - { name: sticky, label: "Stick to the top", widget: boolean, required: false, default: false, hint: "Keep the row at the top of the window while scrolling" }
+                  - name: beside
+                    label: "Placement"
+                    widget: select
+                    required: false
+                    default: "below"
+                    hint: "On wide screens the block shares a row with the block above it; on small screens they stack."
+                    options:
+                      - { label: "Below the previous block", value: "below" }
+                      - { label: "Beside the previous block, equal widths", value: "equal" }
+                      - { label: "Beside the previous block, narrower", value: "narrow" }
+                      - { label: "Beside the previous block, wider", value: "wide" }
               - name: style
                 label: "Appearance"
                 widget: object
@@ -2488,6 +2985,17 @@ collections:
                 hint: "Size and placement — rarely needs changing."
                 fields:
                   - { name: numbered, label: "Numbered (01/02/03 instead of icons)", widget: boolean, required: false, default: false }
+                  - name: beside
+                    label: "Placement"
+                    widget: select
+                    required: false
+                    default: "below"
+                    hint: "On wide screens the block shares a row with the block above it; on small screens they stack."
+                    options:
+                      - { label: "Below the previous block", value: "below" }
+                      - { label: "Beside the previous block, equal widths", value: "equal" }
+                      - { label: "Beside the previous block, narrower", value: "narrow" }
+                      - { label: "Beside the previous block, wider", value: "wide" }
               - name: style
                 label: "Appearance"
                 widget: object
@@ -2533,6 +3041,23 @@ collections:
                 fields:
                   - { name: title, label: "Title", widget: string }
                   - { name: body, label: "Text", widget: text }
+              - name: layout
+                label: "Layout"
+                widget: object
+                collapsed: true
+                hint: "Size and placement — rarely needs changing."
+                fields:
+                  - name: beside
+                    label: "Placement"
+                    widget: select
+                    required: false
+                    default: "below"
+                    hint: "On wide screens the block shares a row with the block above it; on small screens they stack."
+                    options:
+                      - { label: "Below the previous block", value: "below" }
+                      - { label: "Beside the previous block, equal widths", value: "equal" }
+                      - { label: "Beside the previous block, narrower", value: "narrow" }
+                      - { label: "Beside the previous block, wider", value: "wide" }
               - name: style
                 label: "Appearance"
                 widget: object
@@ -2607,6 +3132,23 @@ collections:
                               - { label: "Contact (/contact)", value: "/contact" }
                           - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
               - { name: footnote, label: "Footnote", widget: text, required: false, hint: "Small note under the cards — e.g. what every plan includes." }
+              - name: layout
+                label: "Layout"
+                widget: object
+                collapsed: true
+                hint: "Size and placement — rarely needs changing."
+                fields:
+                  - name: beside
+                    label: "Placement"
+                    widget: select
+                    required: false
+                    default: "below"
+                    hint: "On wide screens the block shares a row with the block above it; on small screens they stack."
+                    options:
+                      - { label: "Below the previous block", value: "below" }
+                      - { label: "Beside the previous block, equal widths", value: "equal" }
+                      - { label: "Beside the previous block, narrower", value: "narrow" }
+                      - { label: "Beside the previous block, wider", value: "wide" }
               - name: style
                 label: "Appearance"
                 widget: object
@@ -2642,6 +3184,23 @@ collections:
                 fields:
                   - { name: title, label: "Title", widget: string }
                   - { name: body, label: "Text", widget: text }
+              - name: layout
+                label: "Layout"
+                widget: object
+                collapsed: true
+                hint: "Size and placement — rarely needs changing."
+                fields:
+                  - name: beside
+                    label: "Placement"
+                    widget: select
+                    required: false
+                    default: "below"
+                    hint: "On wide screens the block shares a row with the block above it; on small screens they stack."
+                    options:
+                      - { label: "Below the previous block", value: "below" }
+                      - { label: "Beside the previous block, equal widths", value: "equal" }
+                      - { label: "Beside the previous block, narrower", value: "narrow" }
+                      - { label: "Beside the previous block, wider", value: "wide" }
               - name: style
                 label: "Appearance"
                 widget: object
@@ -2694,6 +3253,17 @@ collections:
                     options:
                       - { label: "Narrow (reading column)", value: "narrow" }
                       - { label: "Full width", value: "full" }
+                  - name: beside
+                    label: "Placement"
+                    widget: select
+                    required: false
+                    default: "below"
+                    hint: "On wide screens the block shares a row with the block above it; on small screens they stack."
+                    options:
+                      - { label: "Below the previous block", value: "below" }
+                      - { label: "Beside the previous block, equal widths", value: "equal" }
+                      - { label: "Beside the previous block, narrower", value: "narrow" }
+                      - { label: "Beside the previous block, wider", value: "wide" }
               - name: style
                 label: "Appearance"
                 widget: object
@@ -2736,6 +3306,17 @@ collections:
                 hint: "Size and placement — rarely needs changing."
                 fields:
                   - { name: columns, label: "Columns", widget: number, required: false, default: 2, hint: "1 or 2." }
+                  - name: beside
+                    label: "Placement"
+                    widget: select
+                    required: false
+                    default: "below"
+                    hint: "On wide screens the block shares a row with the block above it; on small screens they stack."
+                    options:
+                      - { label: "Below the previous block", value: "below" }
+                      - { label: "Beside the previous block, equal widths", value: "equal" }
+                      - { label: "Beside the previous block, narrower", value: "narrow" }
+                      - { label: "Beside the previous block, wider", value: "wide" }
               - name: style
                 label: "Appearance"
                 widget: object
@@ -2787,6 +3368,17 @@ collections:
                       - { label: "1", value: "1" }
                       - { label: "2", value: "2" }
                       - { label: "3", value: "3" }
+                  - name: beside
+                    label: "Placement"
+                    widget: select
+                    required: false
+                    default: "below"
+                    hint: "On wide screens the block shares a row with the block above it; on small screens they stack."
+                    options:
+                      - { label: "Below the previous block", value: "below" }
+                      - { label: "Beside the previous block, equal widths", value: "equal" }
+                      - { label: "Beside the previous block, narrower", value: "narrow" }
+                      - { label: "Beside the previous block, wider", value: "wide" }
               - name: style
                 label: "Appearance"
                 widget: object
@@ -2840,6 +3432,17 @@ collections:
                 hint: "Size and placement — rarely needs changing."
                 fields:
                   - { name: columns, label: "Columns", widget: number, required: false, default: 3, hint: "2 or 3." }
+                  - name: beside
+                    label: "Placement"
+                    widget: select
+                    required: false
+                    default: "below"
+                    hint: "On wide screens the block shares a row with the block above it; on small screens they stack."
+                    options:
+                      - { label: "Below the previous block", value: "below" }
+                      - { label: "Beside the previous block, equal widths", value: "equal" }
+                      - { label: "Beside the previous block, narrower", value: "narrow" }
+                      - { label: "Beside the previous block, wider", value: "wide" }
               - name: style
                 label: "Appearance"
                 widget: object
@@ -2874,6 +3477,23 @@ collections:
                   - { name: image, label: "Image", widget: image, required: false }
                   - { name: alt, label: "Alt text", widget: string, required: false, hint: "Describe the picture for screen readers and search engines." }
               - { name: caption, label: "Caption", widget: string, required: false, hint: "One line under the collage." }
+              - name: layout
+                label: "Layout"
+                widget: object
+                collapsed: true
+                hint: "Size and placement — rarely needs changing."
+                fields:
+                  - name: beside
+                    label: "Placement"
+                    widget: select
+                    required: false
+                    default: "below"
+                    hint: "On wide screens the block shares a row with the block above it; on small screens they stack."
+                    options:
+                      - { label: "Below the previous block", value: "below" }
+                      - { label: "Beside the previous block, equal widths", value: "equal" }
+                      - { label: "Beside the previous block, narrower", value: "narrow" }
+                      - { label: "Beside the previous block, wider", value: "wide" }
               - name: style
                 label: "Appearance"
                 widget: object
@@ -2909,6 +3529,23 @@ collections:
                   - { name: after, label: "After image", widget: image, required: false }
               - { name: beforeAlt, label: "Before · alt text", widget: string, required: false, hint: "Describe the before image (accessibility). Falls back to a label." }
               - { name: afterAlt, label: "After · alt text", widget: string, required: false, hint: "Describe the after image." }
+              - name: layout
+                label: "Layout"
+                widget: object
+                collapsed: true
+                hint: "Size and placement — rarely needs changing."
+                fields:
+                  - name: beside
+                    label: "Placement"
+                    widget: select
+                    required: false
+                    default: "below"
+                    hint: "On wide screens the block shares a row with the block above it; on small screens they stack."
+                    options:
+                      - { label: "Below the previous block", value: "below" }
+                      - { label: "Beside the previous block, equal widths", value: "equal" }
+                      - { label: "Beside the previous block, narrower", value: "narrow" }
+                      - { label: "Beside the previous block, wider", value: "wide" }
               - name: style
                 label: "Appearance"
                 widget: object
@@ -2970,6 +3607,17 @@ collections:
                       - { label: "Left", value: "left" }
                       - { label: "Centered", value: "center" }
                       - { label: "Right", value: "right" }
+                  - name: beside
+                    label: "Placement"
+                    widget: select
+                    required: false
+                    default: "below"
+                    hint: "On wide screens the block shares a row with the block above it; on small screens they stack."
+                    options:
+                      - { label: "Below the previous block", value: "below" }
+                      - { label: "Beside the previous block, equal widths", value: "equal" }
+                      - { label: "Beside the previous block, narrower", value: "narrow" }
+                      - { label: "Beside the previous block, wider", value: "wide" }
               - name: style
                 label: "Appearance"
                 widget: object
@@ -3020,6 +3668,17 @@ collections:
                       - { label: "Left", value: "left" }
                       - { label: "Centered", value: "center" }
                       - { label: "Right", value: "right" }
+                  - name: beside
+                    label: "Placement"
+                    widget: select
+                    required: false
+                    default: "below"
+                    hint: "On wide screens the block shares a row with the block above it; on small screens they stack."
+                    options:
+                      - { label: "Below the previous block", value: "below" }
+                      - { label: "Beside the previous block, equal widths", value: "equal" }
+                      - { label: "Beside the previous block, narrower", value: "narrow" }
+                      - { label: "Beside the previous block, wider", value: "wide" }
               - name: style
                 label: "Appearance"
                 widget: object
@@ -3076,6 +3735,23 @@ collections:
                   - { name: label, label: "Label", widget: string, required: false }
                   - { name: value, label: "Value", widget: string }
                   - { name: note, label: "Note", widget: text, required: false }
+              - name: layout
+                label: "Layout"
+                widget: object
+                collapsed: true
+                hint: "Size and placement — rarely needs changing."
+                fields:
+                  - name: beside
+                    label: "Placement"
+                    widget: select
+                    required: false
+                    default: "below"
+                    hint: "On wide screens the block shares a row with the block above it; on small screens they stack."
+                    options:
+                      - { label: "Below the previous block", value: "below" }
+                      - { label: "Beside the previous block, equal widths", value: "equal" }
+                      - { label: "Beside the previous block, narrower", value: "narrow" }
+                      - { label: "Beside the previous block, wider", value: "wide" }
               - name: style
                 label: "Appearance"
                 widget: object
@@ -3106,6 +3782,23 @@ collections:
                 fields:
                   - { name: label, label: "Label", widget: string }
                   - { name: value, label: "Value", widget: string }
+              - name: layout
+                label: "Layout"
+                widget: object
+                collapsed: true
+                hint: "Size and placement — rarely needs changing."
+                fields:
+                  - name: beside
+                    label: "Placement"
+                    widget: select
+                    required: false
+                    default: "below"
+                    hint: "On wide screens the block shares a row with the block above it; on small screens they stack."
+                    options:
+                      - { label: "Below the previous block", value: "below" }
+                      - { label: "Beside the previous block, equal widths", value: "equal" }
+                      - { label: "Beside the previous block, narrower", value: "narrow" }
+                      - { label: "Beside the previous block, wider", value: "wide" }
               - name: style
                 label: "Appearance"
                 widget: object
@@ -3136,6 +3829,23 @@ collections:
                 label_singular: "Name"
                 collapsed: true
                 field: { name: name, label: "Name", widget: string }
+              - name: layout
+                label: "Layout"
+                widget: object
+                collapsed: true
+                hint: "Size and placement — rarely needs changing."
+                fields:
+                  - name: beside
+                    label: "Placement"
+                    widget: select
+                    required: false
+                    default: "below"
+                    hint: "On wide screens the block shares a row with the block above it; on small screens they stack."
+                    options:
+                      - { label: "Below the previous block", value: "below" }
+                      - { label: "Beside the previous block, equal widths", value: "equal" }
+                      - { label: "Beside the previous block, narrower", value: "narrow" }
+                      - { label: "Beside the previous block, wider", value: "wide" }
           - name: faq
             label: "FAQ"
             widget: object
@@ -3207,6 +3917,17 @@ collections:
                       - { label: "Accordion", value: "accordion" }
                       - { label: "Cards", value: "cards" }
                       - { label: "Split (index + reader)", value: "split" }
+                  - name: beside
+                    label: "Placement"
+                    widget: select
+                    required: false
+                    default: "below"
+                    hint: "On wide screens the block shares a row with the block above it; on small screens they stack."
+                    options:
+                      - { label: "Below the previous block", value: "below" }
+                      - { label: "Beside the previous block, equal widths", value: "equal" }
+                      - { label: "Beside the previous block, narrower", value: "narrow" }
+                      - { label: "Beside the previous block, wider", value: "wide" }
               - name: style
                 label: "Appearance"
                 widget: object
@@ -3256,6 +3977,23 @@ collections:
                           - { label: "About (/about)", value: "/about" }
                           - { label: "Contact (/contact)", value: "/contact" }
                       - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
+              - name: layout
+                label: "Layout"
+                widget: object
+                collapsed: true
+                hint: "Size and placement — rarely needs changing."
+                fields:
+                  - name: beside
+                    label: "Placement"
+                    widget: select
+                    required: false
+                    default: "below"
+                    hint: "On wide screens the block shares a row with the block above it; on small screens they stack."
+                    options:
+                      - { label: "Below the previous block", value: "below" }
+                      - { label: "Beside the previous block, equal widths", value: "equal" }
+                      - { label: "Beside the previous block, narrower", value: "narrow" }
+                      - { label: "Beside the previous block, wider", value: "wide" }
           - name: ctaBox
             label: "Call to action (box)"
             widget: object
@@ -3338,6 +4076,17 @@ collections:
                       - { label: "Classic (centered panel)", value: "classic" }
                       - { label: "Split (copy + facts card)", value: "split" }
                       - { label: "Panel (dark, with readout)", value: "panel" }
+                  - name: beside
+                    label: "Placement"
+                    widget: select
+                    required: false
+                    default: "below"
+                    hint: "On wide screens the block shares a row with the block above it; on small screens they stack."
+                    options:
+                      - { label: "Below the previous block", value: "below" }
+                      - { label: "Beside the previous block, equal widths", value: "equal" }
+                      - { label: "Beside the previous block, narrower", value: "narrow" }
+                      - { label: "Beside the previous block, wider", value: "wide" }
               - name: style
                 label: "Appearance"
                 widget: object
@@ -3382,6 +4131,24 @@ collections:
               - { name: labelMessage, label: "Field label — message", widget: string, required: false, hint: "Blank uses the site wording (\"Describe your project\"). Word it for your business." }
               - { name: submitLabel, label: "Submit button text", widget: string, required: false, hint: "The form's submit button. Blank uses the site wording (\"Send request\")." }
               - { name: showDirectContact, label: "Show the direct-contact card", widget: boolean, required: false, default: true, hint: "Off → the form fills the width (no phone/email card)." }
+              - { name: inbox, label: "Inbox key", widget: string, required: false, hint: "Where this form's messages are delivered: the key of an inbox set up for the site. Empty means the site's default inbox." }
+              - name: layout
+                label: "Layout"
+                widget: object
+                collapsed: true
+                hint: "Size and placement — rarely needs changing."
+                fields:
+                  - name: beside
+                    label: "Placement"
+                    widget: select
+                    required: false
+                    default: "below"
+                    hint: "On wide screens the block shares a row with the block above it; on small screens they stack."
+                    options:
+                      - { label: "Below the previous block", value: "below" }
+                      - { label: "Beside the previous block, equal widths", value: "equal" }
+                      - { label: "Beside the previous block, narrower", value: "narrow" }
+                      - { label: "Beside the previous block, wider", value: "wide" }
           - name: contactCard
             label: "Contact card"
             widget: object
@@ -3402,12 +4169,46 @@ collections:
                   - { label: "Social links", value: "socials" }
               - { name: label, label: "Card heading", widget: string, required: false, hint: "Blank uses the site wording (\"Direct contact\")." }
               - { name: tint, label: "Tinted background", widget: boolean, required: false, default: true }
+              - name: layout
+                label: "Layout"
+                widget: object
+                collapsed: true
+                hint: "Size and placement — rarely needs changing."
+                fields:
+                  - name: beside
+                    label: "Placement"
+                    widget: select
+                    required: false
+                    default: "below"
+                    hint: "On wide screens the block shares a row with the block above it; on small screens they stack."
+                    options:
+                      - { label: "Below the previous block", value: "below" }
+                      - { label: "Beside the previous block, equal widths", value: "equal" }
+                      - { label: "Beside the previous block, narrower", value: "narrow" }
+                      - { label: "Beside the previous block, wider", value: "wide" }
           - name: findUs
             label: "Find us (map)"
             widget: object
             fields:
               - { name: heading, label: "Heading", widget: string, required: false, hint: "Blank uses the site wording (\"Find us\")." }
               - { name: showHours, label: "Show opening hours", widget: boolean, required: false, default: true }
+              - name: layout
+                label: "Layout"
+                widget: object
+                collapsed: true
+                hint: "Size and placement — rarely needs changing."
+                fields:
+                  - name: beside
+                    label: "Placement"
+                    widget: select
+                    required: false
+                    default: "below"
+                    hint: "On wide screens the block shares a row with the block above it; on small screens they stack."
+                    options:
+                      - { label: "Below the previous block", value: "below" }
+                      - { label: "Beside the previous block, equal widths", value: "equal" }
+                      - { label: "Beside the previous block, narrower", value: "narrow" }
+                      - { label: "Beside the previous block, wider", value: "wide" }
           - name: map
             label: "Find your way (static map)"
             widget: object
@@ -3433,6 +4234,23 @@ collections:
                 fields:
                   - { name: lat, label: "Latitude", widget: number, required: false }
                   - { name: lng, label: "Longitude", widget: number, required: false }
+              - name: layout
+                label: "Layout"
+                widget: object
+                collapsed: true
+                hint: "Size and placement — rarely needs changing."
+                fields:
+                  - name: beside
+                    label: "Placement"
+                    widget: select
+                    required: false
+                    default: "below"
+                    hint: "On wide screens the block shares a row with the block above it; on small screens they stack."
+                    options:
+                      - { label: "Below the previous block", value: "below" }
+                      - { label: "Beside the previous block, equal widths", value: "equal" }
+                      - { label: "Beside the previous block, narrower", value: "narrow" }
+                      - { label: "Beside the previous block, wider", value: "wide" }
               - name: style
                 label: "Appearance"
                 widget: object

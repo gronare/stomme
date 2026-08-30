@@ -112,24 +112,37 @@ const withAnchors = rendered.map((block, i) => ({
     ? { sections: anchored.filter((a) => a.i > i).map(({ anchor, label }) => ({ anchor, label })) }
     : {}),
 }));
+
+const RATIOS = new Set(['equal', 'narrow', 'wide']);
+// A row is one block, or two when the second asked to sit beside it; a row that already holds a pair never takes a third, so three besides in a row make a pair and a single.
+const rows: { ratio: string | null; items: typeof withAnchors }[] = [];
+for (const block of withAnchors) {
+  const ratio = RATIOS.has(String((block as any).layout?.beside)) ? String((block as any).layout.beside) : null;
+  const open = rows[rows.length - 1];
+  if (ratio && open && open.items.length === 1) { open.ratio = ratio; open.items.push(block); }
+  else rows.push({ ratio: null, items: [block] });
+}
 ---
 {
-  withAnchors.map((block) => {
-    const Component = reg[block.type];
-    if (!Component) {
-      return (
-        <div class="section" style="color:#b00020">
-          ⚠ Unknown block: <code>{block.type}</code>
+  rows.map((row) => {
+    const painted = row.items.map((block) => {
+      const Component = reg[block.type];
+      if (!Component) {
+        return (
+          <div class="section" style="color:#b00020">
+            ⚠ Unknown block: <code>{block.type}</code>
+          </div>
+        );
+      }
+      const surf = block.style?.surface ? surfaceClass[block.style.surface] : undefined;
+      return surf ? (
+        <div class={surf}>
+          <Component {...block} site={site} pageHasH1={pageHasH1} localeLink={localeLink} />
         </div>
-      );
-    }
-    const surf = block.style?.surface ? surfaceClass[block.style.surface] : undefined;
-    return surf ? (
-      <div class={surf}>
+      ) : (
         <Component {...block} site={site} pageHasH1={pageHasH1} localeLink={localeLink} />
-      </div>
-    ) : (
-      <Component {...block} site={site} pageHasH1={pageHasH1} localeLink={localeLink} />
-    );
+      );
+    });
+    return row.ratio ? <div class={`block-pair block-pair--${row.ratio}`}>{painted}</div> : painted;
   })
 }

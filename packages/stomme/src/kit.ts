@@ -140,8 +140,24 @@ export const mediaGroup = (hint: string, fields: Field[], summary?: string): Fie
   ...(summary ? { summary } : {}),
 });
 
+// Appended to every layout group rather than declared per block, so a block can be paired the moment it has a Layout tab at all; BlockRenderer reads it off the SECOND block of the pair.
+export const besideField: Field = {
+  name: 'beside',
+  label: 'Placement',
+  widget: 'select',
+  required: false,
+  default: 'below',
+  options: [
+    { label: 'Below the previous block', value: 'below' },
+    { label: 'Beside the previous block, equal widths', value: 'equal' },
+    { label: 'Beside the previous block, narrower', value: 'narrow' },
+    { label: 'Beside the previous block, wider', value: 'wide' },
+  ],
+  hint: 'On wide screens the block shares a row with the block above it; on small screens they stack.',
+};
+
 export const layoutGroup = (fields: Field[]): Field =>
-  group('layout', 'Layout', 'Size and placement — rarely needs changing.', fields);
+  group('layout', 'Layout', 'Size and placement — rarely needs changing.', [...fields, besideField]);
 
 // ALWAYS the last field of a block; defaults to the surface + accent pair, and a block that renders only one passes the subset it uses.
 export const styleGroup = (fields?: Field[]): Field =>

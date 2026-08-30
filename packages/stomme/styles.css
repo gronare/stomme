@@ -50,6 +50,18 @@ body > main > * { background: var(--color-paper); }
 .section--read { max-width: 53rem; }
 .section-head { max-width: 52rem; }
 
+.block-pair { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.5rem; align-items: start; max-width: 72rem; margin-inline: auto; padding-inline: max(1.5rem, var(--safe-l)) max(1.5rem, var(--safe-r)); }
+@media (min-width: 900px) {
+  .block-pair--equal { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .block-pair--narrow { grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); }
+  .block-pair--wide { grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr); }
+}
+/* margin-inline:0 is load-bearing: an auto margin makes a grid item shrink-wrap instead of filling its column, so the half would centre itself at content width. */
+.block-pair > .section,
+.block-pair > :is(.surface-tint, .band, .surface-dark, .surface-gradient) > .section { max-width: none; margin-inline: 0; padding-inline: 0; }
+.block-pair > :is(.surface-tint, .band, .surface-dark, .surface-gradient) { padding-inline: 1.5rem; }
+.block-pair > .stat-panel > .stat-panel__inner { max-width: none; grid-template-columns: minmax(0, 1fr); padding: 2.75rem 1.75rem; }
+
 .display { font-family: var(--font-display); font-weight: 800; letter-spacing: -0.02em; color: var(--color-brand); font-size: clamp(1.6rem, 3vw, 2.25rem); line-height: 1.1; margin: 0; }
 /* `*words*` in heading fields → underlined emphasis (see src/Emph.astro), not italics. */
 .display em, .confirm-head em { font-style: normal; border-bottom: 2px solid currentColor; }
@@ -953,8 +965,10 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
   }
   .section-nav__link:hover { border-color: var(--color-brand); }
   .section-nav__link:focus-visible { outline: 2px solid var(--color-brand); outline-offset: 2px; }
-  /* Sites tune the offset: a sticky header of their own belongs in top, not here. */
-  .section-nav--sticky { position: sticky; top: 0; z-index: 4; background: var(--color-paper); }
+  /* Both variables are published by this nav's own script: --section-nav-top is a sticky header's height, so the bar stacks under it instead of behind it. */
+  .section-nav--sticky { position: sticky; top: var(--section-nav-top, 0px); z-index: 4; background: var(--color-paper); }
+  /* --section-nav-offset is the header plus this bar; unset, the jump keeps a harmless 1rem of air. */
+  main [id] { scroll-margin-top: calc(var(--section-nav-offset, 0px) + 1rem); }
   @media (max-width: 640px) {
     .section-nav__list { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
     .section-nav__list::-webkit-scrollbar { display: none; }
@@ -1112,6 +1126,8 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
   }
   .post-card__img { width: 100%; height: 180px; object-fit: cover; display: block; }
   .post-article__cover { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 1rem; border: 1px solid var(--color-line); margin-bottom: 1.75rem; }
+  .post-back { display: inline-block; margin-bottom: 0.9rem; font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--color-brand); text-decoration: none; }
+  .post-back:hover { text-decoration: underline; text-underline-offset: 5px; }
   .post-card__body { padding: 1.5rem; display: flex; flex-direction: column; flex: 1; }
   .post-title {
     margin: 0.5rem 0 0;

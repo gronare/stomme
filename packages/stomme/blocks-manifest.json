@@ -47,6 +47,23 @@
           "required": false
         },
         {
+          "name": "layout",
+          "widget": "object",
+          "fields": [
+            {
+              "name": "beside",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "below",
+                "equal",
+                "narrow",
+                "wide"
+              ]
+            }
+          ]
+        },
+        {
           "name": "style",
           "widget": "object",
           "fields": [
@@ -102,6 +119,17 @@
                 "left",
                 "center",
                 "right"
+              ]
+            },
+            {
+              "name": "beside",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "below",
+                "equal",
+                "narrow",
+                "wide"
               ]
             }
           ]
@@ -190,6 +218,17 @@
               "name": "columns",
               "widget": "number",
               "required": false
+            },
+            {
+              "name": "beside",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "below",
+                "equal",
+                "narrow",
+                "wide"
+              ]
             }
           ]
         },
@@ -257,6 +296,17 @@
               "name": "columns",
               "widget": "number",
               "required": false
+            },
+            {
+              "name": "beside",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "below",
+                "equal",
+                "narrow",
+                "wide"
+              ]
             }
           ]
         },
@@ -308,6 +358,23 @@
           "required": false
         },
         {
+          "name": "layout",
+          "widget": "object",
+          "fields": [
+            {
+              "name": "beside",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "below",
+                "equal",
+                "narrow",
+                "wide"
+              ]
+            }
+          ]
+        },
+        {
           "name": "style",
           "widget": "object",
           "fields": [
@@ -355,6 +422,23 @@
           "name": "tint",
           "widget": "boolean",
           "required": false
+        },
+        {
+          "name": "layout",
+          "widget": "object",
+          "fields": [
+            {
+              "name": "beside",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "below",
+                "equal",
+                "narrow",
+                "wide"
+              ]
+            }
+          ]
         }
       ]
     },
@@ -441,6 +525,28 @@
           "name": "showDirectContact",
           "widget": "boolean",
           "required": false
+        },
+        {
+          "name": "inbox",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "layout",
+          "widget": "object",
+          "fields": [
+            {
+              "name": "beside",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "below",
+                "equal",
+                "narrow",
+                "wide"
+              ]
+            }
+          ]
         }
       ]
     },
@@ -587,6 +693,17 @@
                 "tall",
                 "medium"
               ]
+            },
+            {
+              "name": "beside",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "below",
+                "equal",
+                "narrow",
+                "wide"
+              ]
             }
           ]
         }
@@ -695,6 +812,17 @@
                 "split",
                 "panel"
               ]
+            },
+            {
+              "name": "beside",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "below",
+                "equal",
+                "narrow",
+                "wide"
+              ]
             }
           ]
         },
@@ -765,6 +893,23 @@
               ]
             }
           ]
+        },
+        {
+          "name": "layout",
+          "widget": "object",
+          "fields": [
+            {
+              "name": "beside",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "below",
+                "equal",
+                "narrow",
+                "wide"
+              ]
+            }
+          ]
         }
       ]
     },
@@ -826,6 +971,17 @@
                 "center",
                 "right"
               ]
+            },
+            {
+              "name": "beside",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "below",
+                "equal",
+                "narrow",
+                "wide"
+              ]
             }
           ]
         },
@@ -884,6 +1040,17 @@
               "name": "grouped",
               "widget": "boolean",
               "required": false
+            },
+            {
+              "name": "beside",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "below",
+                "equal",
+                "narrow",
+                "wide"
+              ]
             }
           ]
         },
@@ -950,6 +1117,17 @@
               "name": "showPast",
               "widget": "boolean",
               "required": false
+            },
+            {
+              "name": "beside",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "below",
+                "equal",
+                "narrow",
+                "wide"
+              ]
             }
           ]
         },
@@ -1030,6 +1208,17 @@
                 "1",
                 "2",
                 "3"
+              ]
+            },
+            {
+              "name": "beside",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "below",
+                "equal",
+                "narrow",
+                "wide"
               ]
             }
           ]
@@ -1149,6 +1338,17 @@
                 "accordion",
                 "cards",
                 "split"
+              ]
+            },
+            {
+              "name": "beside",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "below",
+                "equal",
+                "narrow",
+                "wide"
               ]
             }
           ]
@@ -1311,6 +1511,17 @@
               "name": "numbered",
               "widget": "boolean",
               "required": false
+            },
+            {
+              "name": "beside",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "below",
+                "equal",
+                "narrow",
+                "wide"
+              ]
             }
           ]
         },
@@ -1358,6 +1569,23 @@
           "name": "showHours",
           "widget": "boolean",
           "required": false
+        },
+        {
+          "name": "layout",
+          "widget": "object",
+          "fields": [
+            {
+              "name": "beside",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "below",
+                "equal",
+                "narrow",
+                "wide"
+              ]
+            }
+          ]
         }
       ]
     },
@@ -1420,6 +1648,17 @@
                 "left",
                 "right",
                 "indent"
+              ]
+            },
+            {
+              "name": "beside",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "below",
+                "equal",
+                "narrow",
+                "wide"
               ]
             }
           ]
@@ -1494,6 +1733,17 @@
               "name": "columns",
               "widget": "number",
               "required": false
+            },
+            {
+              "name": "beside",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "below",
+                "equal",
+                "narrow",
+                "wide"
+              ]
             }
           ]
         },
@@ -1736,6 +1986,17 @@
                 "full",
                 "narrow"
               ]
+            },
+            {
+              "name": "beside",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "below",
+                "equal",
+                "narrow",
+                "wide"
+              ]
             }
           ]
         },
@@ -1791,6 +2052,23 @@
           "required": false
         },
         {
+          "name": "layout",
+          "widget": "object",
+          "fields": [
+            {
+              "name": "beside",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "below",
+                "equal",
+                "narrow",
+                "wide"
+              ]
+            }
+          ]
+        },
+        {
           "name": "style",
           "widget": "object",
           "fields": [
@@ -1828,6 +2106,23 @@
             "name": "name",
             "widget": "string"
           }
+        },
+        {
+          "name": "layout",
+          "widget": "object",
+          "fields": [
+            {
+              "name": "beside",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "below",
+                "equal",
+                "narrow",
+                "wide"
+              ]
+            }
+          ]
         }
       ]
     },
@@ -1889,6 +2184,23 @@
               "name": "lng",
               "widget": "number",
               "required": false
+            }
+          ]
+        },
+        {
+          "name": "layout",
+          "widget": "object",
+          "fields": [
+            {
+              "name": "beside",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "below",
+                "equal",
+                "narrow",
+                "wide"
+              ]
             }
           ]
         },
@@ -1980,6 +2292,17 @@
                 "narrow",
                 "full"
               ]
+            },
+            {
+              "name": "beside",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "below",
+                "equal",
+                "narrow",
+                "wide"
+              ]
             }
           ]
         },
@@ -2035,6 +2358,23 @@
             {
               "name": "body",
               "widget": "text"
+            }
+          ]
+        },
+        {
+          "name": "layout",
+          "widget": "object",
+          "fields": [
+            {
+              "name": "beside",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "below",
+                "equal",
+                "narrow",
+                "wide"
+              ]
             }
           ]
         },
@@ -2163,6 +2503,23 @@
           "required": false
         },
         {
+          "name": "layout",
+          "widget": "object",
+          "fields": [
+            {
+              "name": "beside",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "below",
+                "equal",
+                "narrow",
+                "wide"
+              ]
+            }
+          ]
+        },
+        {
           "name": "style",
           "widget": "object",
           "fields": [
@@ -2241,6 +2598,17 @@
               "name": "limit",
               "widget": "number",
               "required": false
+            },
+            {
+              "name": "beside",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "below",
+                "equal",
+                "narrow",
+                "wide"
+              ]
             }
           ]
         },
@@ -2306,6 +2674,17 @@
                 "narrow",
                 "full"
               ]
+            },
+            {
+              "name": "beside",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "below",
+                "equal",
+                "narrow",
+                "wide"
+              ]
             }
           ]
         },
@@ -2347,6 +2726,17 @@
               "name": "sticky",
               "widget": "boolean",
               "required": false
+            },
+            {
+              "name": "beside",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "below",
+                "equal",
+                "narrow",
+                "wide"
+              ]
             }
           ]
         },
@@ -2397,6 +2787,23 @@
           "required": false,
           "multiple": true,
           "options": "$services"
+        },
+        {
+          "name": "layout",
+          "widget": "object",
+          "fields": [
+            {
+              "name": "beside",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "below",
+                "equal",
+                "narrow",
+                "wide"
+              ]
+            }
+          ]
         },
         {
           "name": "style",
@@ -2450,6 +2857,23 @@
             {
               "name": "body",
               "widget": "text"
+            }
+          ]
+        },
+        {
+          "name": "layout",
+          "widget": "object",
+          "fields": [
+            {
+              "name": "beside",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "below",
+                "equal",
+                "narrow",
+                "wide"
+              ]
             }
           ]
         },
@@ -2534,6 +2958,23 @@
           ]
         },
         {
+          "name": "layout",
+          "widget": "object",
+          "fields": [
+            {
+              "name": "beside",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "below",
+                "equal",
+                "narrow",
+                "wide"
+              ]
+            }
+          ]
+        },
+        {
           "name": "style",
           "widget": "object",
           "fields": [
@@ -2568,6 +3009,23 @@
             {
               "name": "value",
               "widget": "string"
+            }
+          ]
+        },
+        {
+          "name": "layout",
+          "widget": "object",
+          "fields": [
+            {
+              "name": "beside",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "below",
+                "equal",
+                "narrow",
+                "wide"
+              ]
             }
           ]
         },
@@ -2648,6 +3106,17 @@
                 "narrow",
                 "full"
               ]
+            },
+            {
+              "name": "beside",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "below",
+                "equal",
+                "narrow",
+                "wide"
+              ]
             }
           ]
         },
@@ -2691,6 +3160,23 @@
           "name": "intro",
           "widget": "text",
           "required": false
+        },
+        {
+          "name": "layout",
+          "widget": "object",
+          "fields": [
+            {
+              "name": "beside",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "below",
+                "equal",
+                "narrow",
+                "wide"
+              ]
+            }
+          ]
         },
         {
           "name": "style",
@@ -2750,6 +3236,17 @@
               "name": "flip",
               "widget": "boolean",
               "required": false
+            },
+            {
+              "name": "beside",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "below",
+                "equal",
+                "narrow",
+                "wide"
+              ]
             }
           ]
         },
@@ -2799,6 +3296,17 @@
               "name": "flip",
               "widget": "boolean",
               "required": false
+            },
+            {
+              "name": "beside",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "below",
+                "equal",
+                "narrow",
+                "wide"
+              ]
             }
           ]
         },

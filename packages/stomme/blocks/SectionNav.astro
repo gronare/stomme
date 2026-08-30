@@ -18,5 +18,27 @@ const aria = label || site?.strings?.sectionNav?.label || 'On this page';
         <li><a class="section-nav__link" href={`#${s.anchor}`}>{s.label}</a></li>
       ))}
     </ul>
+    {sticky && (
+      <script is:inline>
+        (function () {
+          var nav = document.currentScript.closest('.section-nav');
+          if (!nav) return;
+          var header = document.querySelector('.site-header.is-sticky');
+          // getBoundingClientRect, never offsetHeight: the rounded integer leaves a sub-pixel seam between the header and this bar for the page to show through.
+          var publish = function () {
+            var above = header ? header.getBoundingClientRect().height : 0;
+            document.documentElement.style.setProperty('--section-nav-top', above + 'px');
+            document.documentElement.style.setProperty('--section-nav-offset', (above + nav.getBoundingClientRect().height) + 'px');
+          };
+          publish();
+          window.addEventListener('resize', publish, { passive: true });
+          if (window.ResizeObserver) {
+            var ro = new ResizeObserver(publish);
+            ro.observe(nav);
+            if (header) ro.observe(header);
+          }
+        })();
+      </script>
+    )}
   </nav>
 )}

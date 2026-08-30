@@ -33,6 +33,7 @@ export interface SiteConfig {
     footer?: { links?: string; areas?: string };
     documents?: { separator?: string; file?: string };
     sectionNav?: { label?: string };
+    post?: { back?: string };
     town?: {
       eyebrow?: string;
       heading?: string;
@@ -157,6 +158,7 @@ const STRINGS_EN = {
   footer: { links: 'Links', areas: 'Areas' },
   documents: { separator: '·', file: 'FILE' },
   sectionNav: { label: 'On this page' },
+  post: { back: 'All posts' },
   town: {
     eyebrow: 'Local service: {name}',
     heading: '{name}',
@@ -228,6 +230,7 @@ const STRINGS_SV: typeof STRINGS_EN = {
   footer: { links: 'Länkar', areas: 'Områden' },
   documents: { separator: '·', file: 'FIL' },
   sectionNav: { label: 'På den här sidan' },
+  post: { back: 'Alla inlägg' },
   town: {
     eyebrow: 'Lokal tjänst: {name}',
     heading: '{name}',
@@ -299,6 +302,7 @@ const STRINGS_NO: typeof STRINGS_EN = {
   footer: { links: 'Lenker', areas: 'Områder' },
   documents: { separator: '·', file: 'FIL' },
   sectionNav: { label: 'På denne siden' },
+  post: { back: 'Alle innlegg' },
   town: {
     eyebrow: 'Lokal tjeneste: {name}',
     heading: '{name}',
@@ -356,6 +360,7 @@ function baseStrings(locale?: string, cmsLocale?: string) {
     footer: { ...STRINGS_EN.footer, ...b.footer },
     documents: { ...STRINGS_EN.documents, ...b.documents },
     sectionNav: { ...STRINGS_EN.sectionNav, ...b.sectionNav },
+    post: { ...STRINGS_EN.post, ...b.post },
     town: { ...STRINGS_EN.town, ...b.town },
     service: { ...STRINGS_EN.service, ...b.service },
     listingStatus: { ...STRINGS_EN.listingStatus, ...b.listingStatus },
@@ -420,6 +425,7 @@ export function resolveSite(c?: SiteConfig, locale?: string) {
       footer: { ...base.footer, ...((s && (s as any).footer) || {}) },
       documents: { ...base.documents, ...((s && (s as any).documents) || {}) },
       sectionNav: { ...base.sectionNav, ...((s && (s as any).sectionNav) || {}) },
+      post: { ...base.post, ...((s && (s as any).post) || {}) },
       consent: { ...base.consent, ...((s && (s as any).consent) || {}) },
     },
     listings: resolveListings(c && c.listings),

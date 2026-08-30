@@ -6,10 +6,11 @@ import { resolveListings, listingSpecRows } from './src/config';
 interface Props {
   entry: any;
   config?: any;
+  listing?: any;
 }
 const { entry, config: site } = Astro.props;
 const d = entry.data;
-const listing = resolveListings(site?.listings).find((l) => l.id === entry.collection);
+const listing = Astro.props.listing ?? resolveListings(site?.listings).find((l) => l.id === entry.collection);
 const specRows = listingSpecRows(d, listing);
 const sl = { available: 'Available', reserved: 'Reserved', sold: 'Sold', ...(site?.strings?.listingStatus || {}) };
 const ST = { available: 'avail', reserved: 'res', sold: 'sold' };

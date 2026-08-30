@@ -4,6 +4,7 @@ import { Image } from 'astro:assets';
 import type { ImageMetadata } from 'astro';
 import { resolveLink } from '../src/href';
 import { resolveLocales, splitLocalePath, localeEntryId, localeLinker, localeSwitcher } from '../src/i18n';
+import { normalizeNavPath, currentNavPath } from '../src/nav-current';
 import { resolveSite } from '../src/config';
 import LangSwitcher from './LangSwitcher.astro';
 // @ts-expect-error — virtual alias, no static types.
@@ -68,14 +69,9 @@ const resolved = await Promise.all(
     children: (await childrenOf(i)).map((c) => ({ ...c, href: inLocale(c.href) })),
   })),
 );
-const path = Astro.url.pathname.replace(/\/+$/, '') || '/';
-// The locale root is a front page like `/` is, so it must not claim every page beneath it the way a section link does.
-const root = homeHref.replace(/\/+$/, '') || '/';
-const isActive = (href: string) => {
-  const h = (href || '').replace(/\/+$/, '') || '/';
-  if (!href) return false;
-  return h === path || (h !== '/' && h !== root && path.startsWith(h + '/'));
-};
+const navPath = (href: string) => normalizeNavPath(splitLocalePath(href, locales).path);
+const current = currentNavPath(here.path, [homeHref, ...resolved.flatMap((i) => [i.href, ...i.children.map((c) => c.href)])].filter(Boolean).map(navPath));
+const isActive = (href: string) => !!href && navPath(href) === current;
 ---
 <header class:list={['site-header', { 'is-sticky': nav.sticky }]}>
   <div class="inner">

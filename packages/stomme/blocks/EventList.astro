@@ -2,6 +2,7 @@
 import { getCollection } from 'astro:content';
 
 interface Props {
+  anchor?: string;
   eyebrow?: string;
   heading?: string;
   intro?: string;
@@ -13,7 +14,7 @@ interface Props {
   items?: { id: string; data: Record<string, any> }[];
   site?: any;
 }
-const { eyebrow, heading, intro, emptyText, feedLabel, source = 'posts', base, site } = Astro.props;
+const { eyebrow, heading, intro, emptyText, feedLabel, source = 'posts', base, site, anchor } = Astro.props;
 const limit = Astro.props.layout?.limit ?? 6;
 const showPast = Astro.props.layout?.showPast === true;
 const prefix = base ?? site?.routes?.blog ?? '/blog';

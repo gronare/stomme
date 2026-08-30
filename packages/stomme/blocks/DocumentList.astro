@@ -10,11 +10,12 @@ interface Props {
   heading?: string;
   intro?: string;
   group?: string;
+  anchor?: string;
   layout?: { grouped?: boolean };
   items?: { id: string; data: Record<string, any> }[];
   site?: any;
 }
-const { eyebrow, heading, intro, group: only, site } = Astro.props;
+const { eyebrow, heading, intro, group: only, anchor, site } = Astro.props;
 const grouped = Astro.props.layout?.grouped ?? false;
 const locale = site?.locale ?? 'en-US';
 const sep = site?.strings?.documents?.separator ?? '·';
@@ -75,7 +76,7 @@ const names = [...new Set(rows.map((r) => r.group))].sort((a, b) => (a === '' ? 
 const sections = grouped ? names.map((name) => ({ name, rows: rows.filter((r) => r.group === name) })) : [{ name: '', rows }];
 ---
 {rows.length > 0 && (
-  <section data-stomme-block="documentList" class="section">
+  <section data-stomme-block="documentList" id={anchor || undefined} class="section">
     {(eyebrow || heading || intro) && (
       <div class="section-head">
         {eyebrow && <span class="mono eyebrow">{eyebrow}</span>}

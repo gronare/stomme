@@ -204,10 +204,11 @@ const RAW_BLOCKS: BlockDef[] = [
     fields: [
       ...headingFields,
       { name: 'services', label: 'Services shown', widget: 'select', options: '$services', multiple: true, required: false, hint: 'Pick which services appear (in order). Leave empty to show all.' },
+      layoutGroup([]),
       styleGroup([surfaceField]),
     ],
   },
-  { type: 'pillars', label: 'Principles / values', group: 'Cards & lists', summary: 'Row of principle / value cards (icon, title, text).', shape: 'grid', fields: [...headingFields, cardListField, styleGroup([surfaceField])] },
+  { type: 'pillars', label: 'Principles / values', group: 'Cards & lists', summary: 'Row of principle / value cards (icon, title, text).', shape: 'grid', fields: [...headingFields, cardListField, layoutGroup([]), styleGroup([surfaceField])] },
   {
     type: 'plans',
     label: 'Pricing / plans',
@@ -237,10 +238,11 @@ const RAW_BLOCKS: BlockDef[] = [
         ],
       },
       { name: 'footnote', label: 'Footnote', widget: 'text', required: false, hint: 'Small note under the cards — e.g. what every plan includes.' },
+      layoutGroup([]),
       styleGroup([surfaceField]),
     ],
   },
-  { type: 'specialistGrid', label: 'Specialist grid', group: 'Cards & lists', summary: 'Grid of specialist / team profile cards.', shape: 'grid', fields: [...headingFields, cardListField, styleGroup([surfaceField])] },
+  { type: 'specialistGrid', label: 'Specialist grid', group: 'Cards & lists', summary: 'Grid of specialist / team profile cards.', shape: 'grid', fields: [...headingFields, cardListField, layoutGroup([]), styleGroup([surfaceField])] },
   {
     type: 'steps', label: 'Process / steps', group: 'Cards & lists', summary: 'Numbered process — a sequence of steps.', shape: 'steps',
     fields: [
@@ -331,6 +333,7 @@ const RAW_BLOCKS: BlockDef[] = [
         ],
       },
       { name: 'caption', label: 'Caption', widget: 'string', required: false, hint: 'One line under the collage.' },
+      layoutGroup([]),
       styleGroup([surfaceField]),
     ],
   },
@@ -345,6 +348,7 @@ const RAW_BLOCKS: BlockDef[] = [
       mediaGroup('The two photos being compared.', [imageField('before', 'Before image'), imageField('after', 'After image')]),
       { name: 'beforeAlt', label: 'Before · alt text', widget: 'string', required: false, hint: 'Describe the before image (accessibility). Falls back to a label.' },
       { name: 'afterAlt', label: 'After · alt text', widget: 'string', required: false, hint: 'Describe the after image.' },
+      layoutGroup([]),
       styleGroup([surfaceField]),
     ],
   },
@@ -511,6 +515,7 @@ const RAW_BLOCKS: BlockDef[] = [
           { name: 'note', label: 'Note', widget: 'text', required: false },
         ],
       },
+      layoutGroup([]),
       styleGroup([accentField]),
     ],
   },
@@ -521,7 +526,7 @@ const RAW_BLOCKS: BlockDef[] = [
     summary: 'Customer testimonials from your Testimonials collection.',
     shape: 'quote',
     collection: 'testimonials',
-    fields: [...headingFieldsSuggesting('Happy customers', 'References'), styleGroup([surfaceField])],
+    fields: [...headingFieldsSuggesting('Happy customers', 'References'), layoutGroup([]), styleGroup([surfaceField])],
   },
   {
     type: 'documentList',
@@ -546,7 +551,7 @@ const RAW_BLOCKS: BlockDef[] = [
     summary: 'Chip links from your Areas collection (e.g. towns you serve).',
     shape: 'chips',
     collection: 'towns',
-    fields: [...headingFieldsSuggesting('Service areas', 'Where we work'), styleGroup([surfaceField])],
+    fields: [...headingFieldsSuggesting('Service areas', 'Where we work'), layoutGroup([]), styleGroup([surfaceField])],
   },
   {
     type: 'postList',
@@ -614,7 +619,7 @@ const RAW_BLOCKS: BlockDef[] = [
     group: 'Calls to action',
     summary: 'Full-width call-to-action band with a button.',
     shape: 'band',
-    fields: [...headingFields, buttonField('cta', 'Button')],
+    fields: [...headingFields, buttonField('cta', 'Button'), layoutGroup([])],
   },
   {
     type: 'ctaBox',
@@ -663,6 +668,7 @@ const RAW_BLOCKS: BlockDef[] = [
     shape: 'stats',
     fields: [
       { name: 'items', label: 'Facts (label + value)', widget: 'list', required: false, collapsed: true, label_singular: 'Fact', summary: '{{fields.label}} {{fields.value}}', fields: [{ name: 'label', label: 'Label', widget: 'string' }, { name: 'value', label: 'Value', widget: 'string' }] },
+      layoutGroup([]),
       styleGroup([surfaceField]),
     ],
   },
@@ -672,6 +678,7 @@ const RAW_BLOCKS: BlockDef[] = [
     fields: [
       { name: 'lead', label: 'Lead-in', widget: 'string', required: false, hint: 'e.g. “Trusted by” or “Built on”.' },
       { name: 'logos', label: 'Names', widget: 'list', required: false, collapsed: true, label_singular: 'Name', field: { name: 'name', label: 'Name', widget: 'string' } },
+      layoutGroup([]),
     ],
   },
   {
@@ -693,6 +700,8 @@ const RAW_BLOCKS: BlockDef[] = [
       { name: 'labelMessage', label: 'Field label — message', widget: 'string', required: false, hint: 'Blank uses the site wording ("Describe your project"). Word it for your business.' },
       { name: 'submitLabel', label: 'Submit button text', widget: 'string', required: false, hint: 'The form\'s submit button. Blank uses the site wording ("Send request").' },
       { name: 'showDirectContact', label: 'Show the direct-contact card', widget: 'boolean', required: false, default: true, hint: 'Off → the form fills the width (no phone/email card).' },
+      { name: 'inbox', label: 'Inbox key', widget: 'string', required: false, hint: "Where this form's messages are delivered: the key of an inbox set up for the site. Empty means the site's default inbox." },
+      layoutGroup([]),
     ],
   },
   {
@@ -712,6 +721,7 @@ const RAW_BLOCKS: BlockDef[] = [
         ] },
       { name: 'label', label: 'Card heading', widget: 'string', required: false, hint: 'Blank uses the site wording ("Direct contact").' },
       { name: 'tint', label: 'Tinted background', widget: 'boolean', required: false, default: true },
+      layoutGroup([]),
     ],
   },
   {
@@ -720,6 +730,7 @@ const RAW_BLOCKS: BlockDef[] = [
     fields: [
       { name: 'heading', label: 'Heading', widget: 'string', required: false, hint: 'Blank uses the site wording ("Find us").' },
       { name: 'showHours', label: 'Show opening hours', widget: 'boolean', required: false, default: true },
+      layoutGroup([]),
     ],
   },
   {
@@ -739,6 +750,7 @@ const RAW_BLOCKS: BlockDef[] = [
         { name: 'lat', label: 'Latitude', widget: 'number', required: false },
         { name: 'lng', label: 'Longitude', widget: 'number', required: false },
       ]),
+      layoutGroup([]),
       styleGroup([surfaceField]),
     ],
   },

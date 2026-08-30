@@ -12,6 +12,16 @@ A page that carries a `sectionNav` block also gets an `id` on every block that h
 heading — slugged from the heading, de-duplicated with `-2`, `-3` — so the chips can
 link to them. A page without that block renders exactly as before, with no ids.
 
+### Placing two blocks side by side
+
+Every block with a Layout group carries `layout.beside`. Left at `below` (the default)
+the block sits under the one before it, as always. Set to `equal`, `narrow` or `wide`
+and the renderer wraps the two blocks in one `.block-pair` row: `equal` splits it down
+the middle, `narrow` makes the second block the smaller half, `wide` makes it the larger
+one. Below 900px the pair stacks in source order. Only the block that asks is affected,
+and a row never takes a third block, so three `beside` blocks in a row make one pair and
+one full-width block.
+
 ## Content & layout
 
 | Type | What it renders | Key fields |

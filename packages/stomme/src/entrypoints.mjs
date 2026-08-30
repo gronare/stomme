@@ -329,9 +329,11 @@ export async function getStaticPaths() {
   return items.map((e) => ({ params: { slug: e.id }, props: { entry: e } }));
 }
 const { entry } = Astro.props;
+// Baked in rather than looked up in the site config: a listing the blog feature injects exists only in the integration, so the detail page would find nothing to go back to.
+const listing = ${JSON.stringify({ id: l.id, route: l.route, label: l.label, preset: l.preset, specs: l.specs ?? [] })};
 ---
 <Base title={entry.data.title} description={entry.data.excerpt ?? entry.data.title} image={entry.data.seo?.image ?? entry.data.image ?? entry.data.cover}>
-  <Detail ${prop}={entry} config={{ ...site, listings }} />
+  <Detail ${prop}={entry} listing={listing} config={{ ...site, listings }} />
 </Base>
 `;
 }

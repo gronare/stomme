@@ -33,6 +33,7 @@ export const POST: APIRoute = async ({ request, locals, redirect }) => {
   const phone = cap(form.get('phone'), 60);
   const category = cap(form.get('category'), 120);
   const unit = cap(form.get('unit'), 120);
+  const inbox = cap(form.get('inbox'), 120);
   const message = cap(form.get('message'), 5000);
 
   const apiKey = env(locals, 'RESEND_API_KEY');
@@ -46,7 +47,7 @@ export const POST: APIRoute = async ({ request, locals, redirect }) => {
   }
 
   const subject = `New enquiry from ${name || email || 'website'}`;
-  const text = [`Name:  ${name}`, `Email: ${email}`, `Phone: ${phone}`, ...(category ? [`Category: ${category}`] : []), ...(unit ? [`Unit: ${unit}`] : []), '', message].join('\n');
+  const text = [`Name:  ${name}`, `Email: ${email}`, `Phone: ${phone}`, ...(category ? [`Category: ${category}`] : []), ...(unit ? [`Unit: ${unit}`] : []), ...(inbox ? [`Inbox: ${inbox}`] : []), '', message].join('\n');
   // Sanitised to Resend's allowed tag characters.
   const siteTag = new URL(request.url).hostname.replace(/[^a-zA-Z0-9_-]/g, '-');
 

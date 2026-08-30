@@ -6,10 +6,12 @@ import { resolveSite, type SiteConfig } from './src/config';
 interface Props {
   post: any;
   config?: SiteConfig;
+  listing?: { route?: string };
 }
 const { post, config } = Astro.props;
 const site = resolveSite(config);
 const html = await renderMarkdown(post.body ?? '');
+const listing = Astro.props.listing ?? site.listings.find((l) => l.id === post.collection);
 const fmt = (d: string) => new Date(d).toLocaleDateString(site.locale, { year: 'numeric', month: 'long', day: 'numeric' });
 const date = post.data.date ? fmt(post.data.date) : '';
 const eventLine = post.data.eventDate ? [fmt(post.data.eventDate), post.data.eventTime].filter(Boolean).join(' · ') : '';
@@ -18,6 +20,7 @@ const eventLine = post.data.eventDate ? [fmt(post.data.eventDate), post.data.eve
   {post.data.showCover && (
     <Cover src={post.data.cover} alt={post.data.title} placeholder="/images/placeholders/service.svg" width={1100} height={620} loading="eager" class="post-article__cover" />
   )}
+  {listing?.route && <a class="post-back" href={listing.route}>← {site.strings.post.back}</a>}
   {date && <p class="mono">{date}</p>}
   <h1 class="display display--hero" style="margin-top:0.5rem">{post.data.title}</h1>
   {(eventLine || post.data.category) && (
