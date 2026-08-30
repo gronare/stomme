@@ -7,8 +7,9 @@ interface Props {
   media?: { image?: string; imageAlt?: string; credit?: string; pinX?: number; pinY?: number };
   coords?: { lat?: number; lng?: number };
   site?: any;
+  anchor?: string;
 }
-const { address, note, site } = Astro.props;
+const { address, note, site, anchor } = Astro.props;
 const media = Astro.props.media ?? {};
 const coords = Astro.props.coords ?? {};
 const copy = site?.strings?.map ?? {};
@@ -22,7 +23,7 @@ const apple = `https://maps.apple.com/?daddr=${dest}`;
 ---
 
 {(address || media.image) && (
-  <section data-stomme-block="map" class="section">
+  <section data-stomme-block="map" id={anchor || undefined} class="section">
     <div class="mapblock">
       <MapPanel lat={coords.lat} lng={coords.lng} address={address} site={site} still={media} />
       <div class="mapblock__row">

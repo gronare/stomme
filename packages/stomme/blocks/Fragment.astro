@@ -10,14 +10,15 @@ interface Props {
   linkLabel?: string;
   link?: unknown;
   layout?: { placement?: 'left' | 'right' | 'indent' };
+  anchor?: string;
 }
-const { eyebrow, statement, body, cta, linkLabel, link } = Astro.props;
+const { eyebrow, statement, body, cta, linkLabel, link, anchor } = Astro.props;
 const placement = Astro.props.layout?.placement ?? 'left';
 const btn = resolveButton(cta, linkLabel, link);
 ---
 
 {(statement || body) && (
-  <section data-stomme-block="fragment" class="section">
+  <section data-stomme-block="fragment" id={anchor || undefined} class="section">
     <div class:list={['fragment', `fragment--${placement}`]}>
       {eyebrow && <span class="mono eyebrow fragment__eyebrow">{eyebrow}</span>}
       {statement && <p class="display fragment__statement"><Emph text={statement} /></p>}

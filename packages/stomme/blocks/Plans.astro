@@ -21,13 +21,14 @@ interface Props {
   intro?: string;
   plans?: Plan[];
   footnote?: string;
+  anchor?: string;
 }
-const { eyebrow, heading, intro, plans = [], footnote } = Astro.props;
+const { eyebrow, heading, intro, plans = [], footnote, anchor } = Astro.props;
 const anyPrefix = plans.some((p) => p.pricePrefix);
 ---
 
 {(heading || plans.length > 0) && (
-  <section data-stomme-block="plans" class="section">
+  <section data-stomme-block="plans" id={anchor || undefined} class="section">
     {(eyebrow || heading || intro) && (
       <div class="section-head">
         {eyebrow && <span class="mono eyebrow">{eyebrow}</span>}

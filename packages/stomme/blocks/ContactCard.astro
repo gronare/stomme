@@ -4,11 +4,12 @@ interface Props {
   label?: string;
   tint?: boolean;
   show?: string[];
+  anchor?: string;
 }
-const { label, tint, show = [] } = Astro.props;
+const { label, tint, show = [], anchor } = Astro.props;
 const on = (k: string) => show.includes(k);
 ---
-<section data-stomme-block="contactCard" class="section">
+<section data-stomme-block="contactCard" id={anchor || undefined} class="section">
   <div class="contact-card-block">
     <DirectContact
       label={label}

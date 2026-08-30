@@ -1,10 +1,10 @@
 ---
-interface Props { items?: { label: string; value: string }[] }
-const { items } = Astro.props;
+interface Props { items?: { label: string; value: string }[]; anchor?: string }
+const { items, anchor } = Astro.props;
 const facts = Array.isArray(items) ? items : [];
 ---
 {facts.length > 0 && (
-  <section data-stomme-block="statsBar" class="section">
+  <section data-stomme-block="statsBar" id={anchor || undefined} class="section">
     <dl class="facts-grid">
       {facts.map((f) => (
         <div class="fact">

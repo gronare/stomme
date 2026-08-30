@@ -8,11 +8,12 @@ interface Props {
   cta?: { label?: string; link?: unknown };
   label?: string;
   href?: unknown;
+  anchor?: string;
 }
-const { eyebrow, heading, intro, cta, label, href } = Astro.props;
+const { eyebrow, heading, intro, cta, label, href, anchor } = Astro.props;
 const btn = resolveButton(cta, label, href);
 ---
-<section data-stomme-block="ctaPanel" class="section">
+<section data-stomme-block="ctaPanel" id={anchor || undefined} class="section">
   <div class="band cta-panel">
     {eyebrow && <span class="mono">{eyebrow}</span>}
     {heading && <h2 class="display" style="margin-top:0.5rem">{heading}</h2>}

@@ -12,8 +12,9 @@ interface Props {
   base?: string;
   items?: { id: string; data: Record<string, any> }[];
   site?: any;
+  anchor?: string;
 }
-const { eyebrow, heading, intro, source = 'posts', base, site } = Astro.props;
+const { eyebrow, heading, intro, source = 'posts', base, site, anchor } = Astro.props;
 const showImages = Astro.props.media?.showImages ?? false;
 const featured = Astro.props.layout?.featured ?? false;
 const columns = Astro.props.layout?.columns ?? 3;
@@ -31,7 +32,7 @@ const leadHasImg = !!(lead && showImages && lead.data.showCover);
 const hasImg = (p: any) => !!(showImages && p.data.showCover);
 ---
 {all.length > 0 && (
-  <section data-stomme-block="postList" class="section">
+  <section data-stomme-block="postList" id={anchor || undefined} class="section">
     {(eyebrow || heading || intro) && (
       <div class="section-head post-head">
         {eyebrow && <span class="mono eyebrow">{eyebrow}</span>}

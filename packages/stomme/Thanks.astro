@@ -4,6 +4,8 @@ import Emph from './src/Emph.astro';
 interface Recap {
   emailLabel?: string; email?: string;
   phoneLabel?: string; phone?: string;
+  categoryLabel?: string; category?: string;
+  unitLabel?: string; unit?: string;
   messageLabel?: string; message?: string;
 }
 interface Props {
@@ -32,7 +34,7 @@ const {
   showContact, talkLabel = 'Prefer to talk?', who, town, toLabel = 'to', fromLabel = 'from',
 } = Astro.props;
 
-const hasRecap = !!recap && !!(recap.email || recap.phone || recap.message);
+const hasRecap = !!recap && !!(recap.email || recap.phone || recap.category || recap.unit || recap.message);
 const hasDirect = showContact === true;
 const twoCol = hasRecap && hasDirect;
 
@@ -50,6 +52,8 @@ const year = new Date().getFullYear();
           {toLine && <p class="mono">{toLabel}: {toLine}</p>}
           <p class="mono" data-letter-from data-prefix={fromLabel} hidden={!recap?.email}>{fromLabel}: {recap?.email ?? ''}</p>
           <p class="mono" data-letter-phone hidden={!recap?.phone}>{recap?.phone ?? ''}</p>
+          <p class="mono" data-letter-category hidden={!recap?.category}>{recap?.category ?? ''}</p>
+          <p class="mono" data-letter-unit hidden={!recap?.unit}>{recap?.unit ?? ''}</p>
         </div>
         <p class="letter-body letter-ink" data-letter-message hidden={!recap?.message}>{recap?.message ?? ''}</p>
         <div class="letter-rules letter-ink" aria-hidden="true"><i></i><i></i><i></i></div>
@@ -103,6 +107,8 @@ const year = new Date().getFullYear();
         <dl class="confirm-recap-dl">
           {recap!.email && (<><dt>{recap!.emailLabel ?? 'Email'}</dt><dd>{recap!.email}</dd></>)}
           {recap!.phone && (<><dt>{recap!.phoneLabel ?? 'Phone'}</dt><dd>{recap!.phone}</dd></>)}
+          {recap!.category && (<><dt>{recap!.categoryLabel ?? 'Category'}</dt><dd>{recap!.category}</dd></>)}
+          {recap!.unit && (<><dt>{recap!.unitLabel ?? 'Unit'}</dt><dd>{recap!.unit}</dd></>)}
           {recap!.message && (
             <div class="confirm-msg">
               <dt>{recap!.messageLabel ?? 'Message'}</dt>
@@ -125,10 +131,12 @@ const year = new Date().getFullYear();
       if (!raw) return;
       var d; try { d = JSON.parse(raw); } catch (e) { return; }
       try { sessionStorage.removeItem('stomme:recap'); } catch (e) {}
-      if (!d || !(d.email || d.phone || d.message)) return;
+      if (!d || !(d.email || d.phone || d.category || d.unit || d.message)) return;
       var el = function (s) { return document.querySelector(s); };
       if (d.email && el('[data-letter-from]')) { el('[data-letter-from]').textContent = (el('[data-letter-from]').getAttribute('data-prefix') || 'from') + ': ' + d.email; el('[data-letter-from]').hidden = false; }
       if (d.phone && el('[data-letter-phone]')) { el('[data-letter-phone]').textContent = d.phone; el('[data-letter-phone]').hidden = false; }
+      if (d.category && el('[data-letter-category]')) { el('[data-letter-category]').textContent = d.category; el('[data-letter-category]').hidden = false; }
+      if (d.unit && el('[data-letter-unit]')) { el('[data-letter-unit]').textContent = d.unit; el('[data-letter-unit]').hidden = false; }
       if (d.message && el('[data-letter-message]')) { el('[data-letter-message]').textContent = d.message; el('[data-letter-message]').hidden = false; }
     })();
   </script>
@@ -139,7 +147,7 @@ const year = new Date().getFullYear();
       if (!raw) return;
       var d; try { d = JSON.parse(raw); } catch (e) { return; }
       try { sessionStorage.removeItem('stomme:recap'); } catch (e) {}
-      if (!d || !(d.email || d.phone || d.message)) return;
+      if (!d || !(d.email || d.phone || d.category || d.unit || d.message)) return;
 
       var confirmEl = document.querySelector('.thanks-confirm');
       if (!confirmEl) return;
@@ -156,6 +164,8 @@ const year = new Date().getFullYear();
       var rows = '';
       if (d.email) rows += '<dt>' + esc(L.email || 'Email') + '</dt><dd>' + esc(d.email) + '</dd>';
       if (d.phone) rows += '<dt>' + esc(L.phone || 'Phone') + '</dt><dd>' + esc(d.phone) + '</dd>';
+      if (d.category) rows += '<dt>' + esc(L.category || 'Category') + '</dt><dd>' + esc(d.category) + '</dd>';
+      if (d.unit) rows += '<dt>' + esc(L.unit || 'Unit') + '</dt><dd>' + esc(d.unit) + '</dd>';
       if (d.message) rows += '<div class="confirm-msg"><dt>' + esc(L.message || 'Message') + '</dt><dd>' + esc(d.message) + '</dd></div>';
 
       var card = document.createElement('section');

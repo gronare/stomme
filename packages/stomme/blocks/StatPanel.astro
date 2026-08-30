@@ -11,12 +11,13 @@ interface Props {
   statLabel?: string;
   stats?: Stat[];
   style?: { accent?: 'brand' | 'secondary' | 'highlight' };
+  anchor?: string;
 }
-const { eyebrow, heading, body, badges = [], statValue, statLabel, stats = [] } = Astro.props;
+const { eyebrow, heading, body, badges = [], statValue, statLabel, stats = [], anchor } = Astro.props;
 const accent = Astro.props.style?.accent ?? 'brand';
 const accentVar = accent === 'secondary' ? 'var(--color-secondary)' : accent === 'highlight' ? 'var(--color-highlight)' : 'var(--color-brand)';
 ---
-<section data-stomme-block="statPanel" class="stat-panel" style={`--block-accent:${accentVar}`}>
+<section data-stomme-block="statPanel" id={anchor || undefined} class="stat-panel" style={`--block-accent:${accentVar}`}>
   <div class="stat-panel__inner">
     <div class="stat-panel__main">
       {eyebrow && <span class="mono eyebrow">{eyebrow}</span>}

@@ -207,6 +207,7 @@ The form POSTs `multipart/form-data` with these fields:
 | Field | |
 |---|---|
 | `name`, `email`, `phone`, `message` | the visitor's input; `phone` only when the block enables it |
+| `category`, `unit` | optional; present only when the block enables them (`showCategory` + a category list, `showUnit`) |
 | `bot-field` | honeypot — if it is non-empty, respond 200 and discard silently, do not tell the bot |
 | `_success` | the path to redirect a no-JavaScript submit to, taken from `routes.formSuccess` |
 

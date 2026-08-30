@@ -34,10 +34,12 @@ import ContactForm from '../blocks/ContactForm.astro';
 import ContactCard from '../blocks/ContactCard.astro';
 import FindUs from '../blocks/FindUs.astro';
 import MapBlock from '../blocks/Map.astro';
+import SectionNav from '../blocks/SectionNav.astro';
 import { getCollection } from 'astro:content';
 import { blocks as addonBlocks } from '@stomme/addon-blocks';
 import { resolveSite, resolveFeatures, type SiteConfig, type StommeFeatures } from './config';
 import { resolveLocales, splitLocalePath, localeLinker, localizeLinks } from './i18n';
+import { blockAnchors } from './anchors';
 
 const defaults: Record<string, any> = {
   hero: Hero,
@@ -75,6 +77,7 @@ const defaults: Record<string, any> = {
   contactCard: ContactCard,
   findUs: FindUs,
   map: MapBlock,
+  sectionNav: SectionNav,
 };
 
 interface Props {
@@ -96,9 +99,20 @@ const rendered = locales.enabled ? localizeLinks(shown, localeLink) : shown;
 const surfaceClass: Record<string, string> = { tint: 'surface-tint', band: 'band', dark: 'surface-dark', gradient: 'surface-gradient' };
 const H1_BLOCKS = new Set(['hero', 'cover', 'pageHeader']);
 const pageHasH1 = rendered.some((b) => H1_BLOCKS.has(b.type));
+// No sectionNav on the page means no anchors at all: an id nobody links to would still change every existing site's HTML.
+const anchors = rendered.some((b) => b.type === 'sectionNav') ? blockAnchors(rendered) : [];
+const anchored = anchors.map((anchor, i) => ({ anchor, label: String(rendered[i].heading ?? ''), i })).filter((a) => a.anchor);
+const withAnchors = rendered.map((block, i) => ({
+  ...block,
+  ...(anchors[i] ? { anchor: anchors[i] } : {}),
+  // A caller-supplied list survives, so the lookbook can render the block alone with nothing below it to read.
+  ...(block.type === 'sectionNav' && !block.sections
+    ? { sections: anchored.filter((a) => a.i > i).map(({ anchor, label }) => ({ anchor, label })) }
+    : {}),
+}));
 ---
 {
-  rendered.map((block) => {
+  withAnchors.map((block) => {
     const Component = reg[block.type];
     if (!Component) {
       return (

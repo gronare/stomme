@@ -3,8 +3,8 @@ import { getEntry } from 'astro:content';
 import ContactLink from '../src/ContactLink.astro';
 import MapPanel from '../src/MapPanel.astro';
 import { mapEmbeddable } from '../src/map-point.ts';
-interface Props { heading?: string; showHours?: boolean; data?: any; site?: any }
-const { heading, showHours, data, site } = Astro.props;
+interface Props { heading?: string; showHours?: boolean; data?: any; site?: any; anchor?: string }
+const { heading, showHours, data, site, anchor } = Astro.props;
 const copy = site?.strings?.contact ?? {};
 const title = heading || copy.findUs || 'Find us';
 const c = (data ?? (await getEntry('contact', 'contact').catch(() => null))?.data ?? {}) as any;
@@ -18,7 +18,7 @@ const hours = (c.hours ?? []) as { days: string; hours: string }[];
 const hoursNote = c.hoursNote ?? '';
 const showHrs = showHours === true;
 ---
-<section data-stomme-block="findUs" class="findus-block">
+<section data-stomme-block="findUs" id={anchor || undefined} class="findus-block">
   <div class="findus">
     {hasMap && (
       <div class="findus__map">

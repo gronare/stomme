@@ -9,12 +9,13 @@ interface Props {
   statLabel?: string;
   layout?: { width?: 'narrow' | 'full' };
   localeLink?: (href: string) => string;
+  anchor?: string;
 }
-const { eyebrow, heading, body = '', statValue, statLabel, localeLink } = Astro.props;
+const { eyebrow, heading, body = '', statValue, statLabel, localeLink, anchor } = Astro.props;
 const width = Astro.props.layout?.width ?? 'narrow';
 const html = await renderMarkdown(body, localeLink);
 ---
-<section data-stomme-block="prose" class:list={['section', { 'section--read': width !== 'full' }]}>
+<section data-stomme-block="prose" id={anchor || undefined} class:list={['section', { 'section--read': width !== 'full' }]}>
   {eyebrow && <span class="mono eyebrow">{eyebrow}</span>}
   {heading && <h2 class="display" style={eyebrow ? 'margin-top:0.75rem' : ''}>{heading}</h2>}
   <div class="prose" style={heading ? 'margin-top:1.5rem' : ''} set:html={html} />

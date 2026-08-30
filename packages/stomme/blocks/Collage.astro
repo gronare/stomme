@@ -6,8 +6,9 @@ interface Props {
   images?: CollageImage[];
   caption?: string;
   site?: any;
+  anchor?: string;
 }
-const { caption, site } = Astro.props;
+const { caption, site, anchor } = Astro.props;
 const images = (Astro.props.images ?? []).filter((img) => img && (img.image || img.alt));
 const copy = site?.strings?.collage ?? {};
 const fill = (s: string, vals: Record<string, string>) => s.replace(/\{(\w+)\}/g, (_m, k) => vals[k] ?? _m);
@@ -19,7 +20,7 @@ const rest = images.length - tiles.length;
 ---
 
 {images.length > 0 && (
-  <section data-stomme-block="collage" class="section">
+  <section data-stomme-block="collage" id={anchor || undefined} class="section">
     <figure class="collage">
       <div class="collage__grid" data-tiles={tiles.length}>
         {tiles.map((img, i) => (

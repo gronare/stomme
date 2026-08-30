@@ -8,14 +8,15 @@ interface Props {
   wordClass?: string;
   senses?: Sense[];
   layout?: { width?: 'xnarrow' | 'narrow' | 'full'; align?: 'left' | 'center' | 'right' };
+  anchor?: string;
 }
-const { eyebrow, term, wordClass, senses = [] } = Astro.props;
+const { eyebrow, term, wordClass, senses = [], anchor } = Astro.props;
 const width = Astro.props.layout?.width ?? 'xnarrow';
 const align = Astro.props.layout?.align ?? 'left';
 ---
 
 {term && (
-  <section data-stomme-block="definition" class:list={['section', { 'section--read': width === 'narrow' }]}>
+  <section data-stomme-block="definition" id={anchor || undefined} class:list={['section', { 'section--read': width === 'narrow' }]}>
     <div class:list={['definition', `definition--${width}`, `definition--${align}`]}>
       {eyebrow && <span class="mono eyebrow definition__eyebrow">{eyebrow}</span>}
       <div class="definition__entry">

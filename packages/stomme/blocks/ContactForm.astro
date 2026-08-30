@@ -6,9 +6,12 @@ interface Props {
   site?: any; eyebrow?: string; heading?: string; intro?: string;
   labelName?: string; labelEmail?: string; labelMessage?: string;
   submitLabel?: string; showPhone?: boolean; showDirectContact?: boolean;
+  showCategory?: boolean; labelCategory?: string; categories?: string[];
+  showUnit?: boolean; labelUnit?: string; placeholderUnit?: string;
   pageHasH1?: boolean;
+  anchor?: string;
 }
-const { site, eyebrow, heading, intro, labelName, labelEmail, labelMessage, submitLabel, showPhone, showDirectContact, pageHasH1 } = Astro.props;
+const { site, eyebrow, heading, intro, labelName, labelEmail, labelMessage, submitLabel, showPhone, showDirectContact, showCategory, labelCategory, categories = [], showUnit, labelUnit, placeholderUnit, pageHasH1, anchor } = Astro.props;
 // A form-only contact page has no other heading to be the page's h1, so the block takes the rank the page leaves open.
 const Heading = pageHasH1 ? 'h2' : 'h1';
 const c = site?.strings?.contact ?? {};
@@ -16,6 +19,9 @@ const L = {
   name: labelName || (c.name ?? 'Name'),
   email: labelEmail || (c.email ?? 'Email'),
   phone: c.phone ?? 'Phone',
+  category: labelCategory || (c.category ?? 'Category'),
+  categoryPlaceholder: c.categoryPlaceholder ?? 'Choose…',
+  unit: labelUnit || (c.unit ?? 'Unit'),
   message: labelMessage || (c.message ?? 'Describe your project'),
   submit: submitLabel || (c.submit ?? 'Send request'),
   direct: c.direct ?? 'Direct contact',
@@ -24,6 +30,9 @@ const L = {
 };
 const showPhoneField = showPhone === true;
 const showAside = showDirectContact === true;
+const options = (Array.isArray(categories) ? categories : []).filter(Boolean);
+const showCategoryField = showCategory === true && options.length > 0;
+const showUnitField = showUnit === true;
 
 const settings = (await getEntry('settings', 'site'))!.data;
 const contact = ((await getEntry('contact', 'contact').catch(() => null))?.data ?? {}) as any;
@@ -36,9 +45,9 @@ const contactAction = site?.contact?.endpoint
   : site?.cms?.baseUrl ? `${site.cms.baseUrl}/contact` : '/api/contact';
 const successPath = site?.routes?.formSuccess ?? '/thanks';
 
-const recapLabels = JSON.stringify({ email: L.email, phone: L.phone, message: L.message });
+const recapLabels = JSON.stringify({ email: L.email, phone: L.phone, category: L.category, unit: L.unit, message: L.message });
 ---
-<section data-stomme-block="contactForm" class="section">
+<section data-stomme-block="contactForm" id={anchor || undefined} class="section">
   {(heading || intro) && (
     <div class="contact-head">
       {eyebrow && <span class="mono eyebrow">{eyebrow}</span>}
@@ -63,6 +72,21 @@ const recapLabels = JSON.stringify({ email: L.email, phone: L.phone, message: L.
         <div class="field">
           <label for="phone" class="mono">{L.phone}</label>
           <input id="phone" name="phone" type="tel" />
+        </div>
+      )}
+      {showCategoryField && (
+        <div class="field">
+          <label for="category" class="mono">{L.category}</label>
+          <select id="category" name="category" required>
+            <option value="" disabled selected>{L.categoryPlaceholder}</option>
+            {options.map((o) => <option value={o}>{o}</option>)}
+          </select>
+        </div>
+      )}
+      {showUnitField && (
+        <div class="field">
+          <label for="unit" class="mono">{L.unit}</label>
+          <input id="unit" name="unit" placeholder={placeholderUnit} />
         </div>
       )}
       <div class="field">
@@ -91,7 +115,7 @@ const recapLabels = JSON.stringify({ email: L.email, phone: L.phone, message: L.
           try {
             var labels = null; try { labels = JSON.parse(form.dataset.recapLabels || 'null'); } catch (e) {}
             sessionStorage.setItem('stomme:recap', JSON.stringify({
-              email: fd.get('email') || '', phone: fd.get('phone') || '', message: fd.get('message') || '', labels: labels,
+              email: fd.get('email') || '', phone: fd.get('phone') || '', category: fd.get('category') || '', unit: fd.get('unit') || '', message: fd.get('message') || '', labels: labels,
             }));
           } catch (e) {}
           window.location.assign(form.dataset.success || '/thanks');

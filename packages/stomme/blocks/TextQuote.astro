@@ -8,15 +8,16 @@ interface Props {
   layout?: { flip?: boolean };
   style?: { surface?: string; accent?: 'brand' | 'secondary' | 'highlight' };
   localeLink?: (href: string) => string;
+  anchor?: string;
 }
-const { body = '', quote, attribution, localeLink } = Astro.props;
+const { body = '', quote, attribution, localeLink, anchor } = Astro.props;
 const flip = Astro.props.layout?.flip ?? false;
 const accent = Astro.props.style?.accent ?? 'brand';
 const accentVar = accent === 'secondary' ? 'var(--color-secondary)' : accent === 'highlight' ? 'var(--color-highlight)' : 'var(--color-brand)';
 const html = await renderMarkdown(body, localeLink);
 ---
 
-<section data-stomme-block="textQuote" class="section">
+<section data-stomme-block="textQuote" id={anchor || undefined} class="section">
   <div class:list={['tq-grid', { 'tq-flip': flip }]}>
     <div class:list={['prose', 'tq-body', { 'tq-second': flip }]} set:html={html} />
     {quote && (

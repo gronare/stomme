@@ -7,12 +7,13 @@ interface Props {
   intro?: string;
   items?: { id: string; data: { name: string } }[];
   site?: any;
+  anchor?: string;
 }
-const { eyebrow, heading, intro, site } = Astro.props;
+const { eyebrow, heading, intro, site, anchor } = Astro.props;
 const prefix = site?.routes?.towns ?? '/areas';
 const towns = Astro.props.items ?? (await getCollection('towns')).sort((a, b) => a.data.order - b.data.order);
 ---
-<section data-stomme-block="linkChips" class="section">
+<section data-stomme-block="linkChips" id={anchor || undefined} class="section">
   {(eyebrow || heading || intro) && (
     <div class="section-head">
       {eyebrow && <span class="mono eyebrow">{eyebrow}</span>}

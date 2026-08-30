@@ -394,6 +394,40 @@
           "required": false
         },
         {
+          "name": "showCategory",
+          "widget": "boolean",
+          "required": false
+        },
+        {
+          "name": "labelCategory",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "categories",
+          "widget": "list",
+          "required": false,
+          "field": {
+            "name": "category",
+            "widget": "string"
+          }
+        },
+        {
+          "name": "showUnit",
+          "widget": "boolean",
+          "required": false
+        },
+        {
+          "name": "labelUnit",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "placeholderUnit",
+          "widget": "string",
+          "required": false
+        },
+        {
           "name": "labelMessage",
           "widget": "string",
           "required": false
@@ -2191,6 +2225,47 @@
                 "narrow",
                 "full"
               ]
+            }
+          ]
+        },
+        {
+          "name": "style",
+          "widget": "object",
+          "fields": [
+            {
+              "name": "surface",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "standard",
+                "tint",
+                "band",
+                "dark",
+                "gradient"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "sectionNav": {
+      "label": "Section links",
+      "group": "Text",
+      "shape": "chips",
+      "fields": [
+        {
+          "name": "label",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "layout",
+          "widget": "object",
+          "fields": [
+            {
+              "name": "sticky",
+              "widget": "boolean",
+              "required": false
             }
           ]
         },

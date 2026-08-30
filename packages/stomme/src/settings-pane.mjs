@@ -317,6 +317,9 @@ ${emitNavLinks(10, on('nav'))}
           - { name: showLogo, label: "Show logo mark", widget: boolean, required: false, default: true, hint: "Show the logo image (set under Identity) in the footer."${inline('footer', 'duplicate')} }
           - { name: showWordmark, label: "Show wordmark text", widget: boolean, required: false, default: true, hint: "Show the wordmark text (set under Identity) in the footer."${inline('footer', 'duplicate')} }
           - { name: tagline, label: "Tagline", widget: string, required: false, hint: "A line under the logo."${inline('footer', 'true')} }
+          - { name: showAddress, label: "Show the address", widget: boolean, required: false, default: false, hint: "Street and postcode from Site & contact, under the tagline. On, the tagline drops the town it repeats."${inline('footer', 'duplicate')} }
+          - { name: showHours, label: "Show opening hours", widget: boolean, required: false, default: false, hint: "The opening hours from Site & contact, on one line."${inline('footer', 'duplicate')} }
+          - { name: showSocials, label: "Show social links", widget: boolean, required: false, default: false, hint: "The social links from Site & contact."${inline('footer', 'duplicate')} }
           - { name: showLinks, label: "Show quick links", widget: boolean, required: false, default: true${inline('footer', 'duplicate')} }
 ${emitFooterLinks(10, on('footer'))}
           - { name: showTowns, label: "Show service areas", widget: boolean, required: false, default: false, hint: "Adds a column linking every entry in the Areas collection."${inline('footer', 'duplicate')} }

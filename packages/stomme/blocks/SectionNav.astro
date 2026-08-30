@@ -1,0 +1,22 @@
+---
+interface Props {
+  sections?: { anchor: string; label: string }[];
+  label?: string;
+  anchor?: string;
+  layout?: { sticky?: boolean };
+  site?: any;
+}
+const { sections = [], label, anchor, site } = Astro.props;
+const sticky = Astro.props.layout?.sticky === true;
+const aria = label || site?.strings?.sectionNav?.label || 'On this page';
+---
+
+{sections.length > 0 && (
+  <nav data-stomme-block="sectionNav" id={anchor || undefined} class:list={['section', 'section-nav', { 'section-nav--sticky': sticky }]} aria-label={aria}>
+    <ul class="section-nav__list">
+      {sections.map((s) => (
+        <li><a class="section-nav__link" href={`#${s.anchor}`}>{s.label}</a></li>
+      ))}
+    </ul>
+  </nav>
+)}

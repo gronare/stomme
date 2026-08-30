@@ -20,8 +20,9 @@ interface Props {
   asideHref?: unknown;
   asideCtaHref?: unknown;
   items?: { id: string; data: { question: string; answer: string } }[];
+  anchor?: string;
 }
-const { eyebrow, heading, intro, entries, tag, asideHeading, asideBody, asideCta, asideCtaLabel, asideHref, asideCtaHref } = Astro.props;
+const { eyebrow, heading, intro, entries, tag, asideHeading, asideBody, asideCta, asideCtaLabel, asideHref, asideCtaHref, anchor } = Astro.props;
 const variant = Astro.props.layout?.variant ?? 'list';
 const fixture = Astro.props.items;
 const all = fixture ?? (await getCollection('faq'));
@@ -43,7 +44,7 @@ const protectAside = !!contact.protectContact && !!contact.email && aHref === em
 const hasAside = !!(asideHeading || asideBody || aLabel);
 const n = (i: number) => String(i + 1).padStart(2, '0');
 ---
-<section data-stomme-block="faq" class="section">
+<section data-stomme-block="faq" id={anchor || undefined} class="section">
   {(eyebrow || heading || intro) && (
     <div class="section-head">
       {eyebrow && <span class="mono eyebrow">{eyebrow}</span>}

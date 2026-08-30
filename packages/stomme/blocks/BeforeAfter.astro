@@ -11,8 +11,9 @@ interface Props {
   beforeAlt?: string;
   afterAlt?: string;
   site?: any;
+  anchor?: string;
 }
-const { eyebrow, heading, intro, site } = Astro.props;
+const { eyebrow, heading, intro, site, anchor } = Astro.props;
 const before = Astro.props.media?.before;
 const after = Astro.props.media?.after;
 const ba = site?.strings?.beforeAfter ?? {};
@@ -22,7 +23,7 @@ const beforeAlt = Astro.props.beforeAlt ?? tagBefore;
 const afterAlt = Astro.props.afterAlt ?? tagAfter;
 ---
 
-<section data-stomme-block="beforeAfter" class="section">
+<section data-stomme-block="beforeAfter" id={anchor || undefined} class="section">
   {(eyebrow || heading || intro) && (
     <div class="section-head">
       {eyebrow && <span class="mono eyebrow">{eyebrow}</span>}

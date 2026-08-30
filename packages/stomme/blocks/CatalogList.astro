@@ -13,8 +13,9 @@ interface Props {
   layout?: { filters?: boolean; columns?: number };
   items?: { id: string; data: Record<string, any> }[];
   site?: any;
+  anchor?: string;
 }
-const { eyebrow, heading, intro, source = '', base, site } = Astro.props;
+const { eyebrow, heading, intro, source = '', base, site, anchor } = Astro.props;
 const showImages = Astro.props.media?.showImages ?? false;
 const filters = Astro.props.layout?.filters ?? false;
 const columns = Astro.props.layout?.columns ?? 3;
@@ -32,7 +33,7 @@ const cats = [...new Set(items.map((i) => i.data.category).filter(Boolean))];
 const PLACE = '/images/placeholders/service.svg';
 ---
 {items.length > 0 && (
-  <section data-stomme-block="catalogList" class="section">
+  <section data-stomme-block="catalogList" id={anchor || undefined} class="section">
     {(eyebrow || heading || intro) && (
       <div class="section-head post-head">
         {eyebrow && <span class="mono eyebrow">{eyebrow}</span>}

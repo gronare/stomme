@@ -15,8 +15,9 @@ interface Props {
   href2?: unknown;
   facts?: Fact[];
   layout?: { variant?: 'classic' | 'split' | 'panel' };
+  anchor?: string;
 }
-const { eyebrow, heading, intro, cta, cta2, label, href, label2, href2, facts = [] } = Astro.props;
+const { eyebrow, heading, intro, cta, cta2, label, href, label2, href2, facts = [], anchor } = Astro.props;
 const variant = Astro.props.layout?.variant ?? 'classic';
 const btn = resolveButton(cta, label, href);
 const btn2 = resolveButton(cta2, label2, href2);
@@ -24,7 +25,7 @@ const shownFacts = (facts ?? []).filter((f) => f && (f.label || f.value));
 const hasFacts = variant !== 'classic' && shownFacts.length > 0;
 ---
 
-<section data-stomme-block="ctaBox" class="section">
+<section data-stomme-block="ctaBox" id={anchor || undefined} class="section">
   <div class:list={['ctabox', `ctabox--${variant}`]}>
     <div class="ctabox-copy">
       {eyebrow && <span class="mono ctabox-eyebrow">{eyebrow}</span>}

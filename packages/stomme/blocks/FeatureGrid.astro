@@ -11,14 +11,15 @@ interface Props {
   layout?: { numbered?: boolean };
   style?: { surface?: string; accent?: 'brand' | 'secondary' | 'highlight' };
   site?: any;
+  anchor?: string;
 }
-const { eyebrow, heading, intro, items = [], site } = Astro.props;
+const { eyebrow, heading, intro, items = [], site, anchor } = Astro.props;
 const numbered = Astro.props.layout?.numbered ?? false;
 const accent = Astro.props.style?.accent ?? 'brand';
 const readMore = site?.strings?.readMore ?? 'Read more';
 const accentVar = accent === 'secondary' ? 'var(--color-secondary)' : accent === 'highlight' ? 'var(--color-highlight)' : 'var(--color-brand)';
 ---
-<section data-stomme-block="featureGrid" class="section" style={`--block-accent:${accentVar}`}>
+<section data-stomme-block="featureGrid" id={anchor || undefined} class="section" style={`--block-accent:${accentVar}`}>
   {(eyebrow || heading || intro) && (
     <div class="section-head">
       {eyebrow && <span class="mono eyebrow">{eyebrow}</span>}

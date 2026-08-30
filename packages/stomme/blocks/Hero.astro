@@ -21,8 +21,9 @@ interface Props {
   media?: { kind?: 'none' | 'image' | 'highlights' | 'motif'; image?: string; imageAlt?: string; highlights?: Highlight[] };
   layout?: { height?: 'normal' | 'tall'; align?: 'top' | 'center' | 'bottom'; width?: 'narrow' | 'full' };
   style?: { surface?: string; accent?: 'brand' | 'secondary' | 'highlight' };
+  anchor?: string;
 }
-const { eyebrow, heading, intro, cta, cta2, ctaLabel, ctaHref, cta2Label, cta2Href, ticks = [] } = Astro.props;
+const { eyebrow, heading, intro, cta, cta2, ctaLabel, ctaHref, cta2Label, cta2Href, ticks = [], anchor } = Astro.props;
 const kind = Astro.props.media?.kind ?? 'none';
 const image = Astro.props.media?.image;
 const imageAlt = Astro.props.media?.imageAlt;
@@ -40,7 +41,7 @@ const showHighlights = kind === 'highlights' && highlights.length > 0;
 const showMotif = kind === 'motif';
 const hasMedia = showImage || showHighlights || showMotif;
 ---
-<section data-stomme-block="hero" class:list={['section', { 'section--hero-tall': height === 'tall', 'section--read': width === 'narrow' }, height === 'tall' && `section--hero-${align}`]} style={`--block-accent:${accentVar}`}>
+<section data-stomme-block="hero" id={anchor || undefined} class:list={['section', { 'section--hero-tall': height === 'tall', 'section--read': width === 'narrow' }, height === 'tall' && `section--hero-${align}`]} style={`--block-accent:${accentVar}`}>
   <div class:list={['hero-grid', { 'has-media': hasMedia }]}>
     <div>
       {eyebrow && <span class="mono eyebrow">{eyebrow}</span>}

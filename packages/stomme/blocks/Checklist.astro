@@ -5,14 +5,15 @@ interface Props {
   intro?: string;
   items?: { text: string; note?: string }[];
   layout?: { columns?: number };
+  anchor?: string;
 }
-const { eyebrow, heading, intro, items = [] } = Astro.props;
+const { eyebrow, heading, intro, items = [], anchor } = Astro.props;
 const columns = Astro.props.layout?.columns ?? 2;
 const single = columns === 1;
 ---
 
 {(heading || items.length > 0) && (
-  <section data-stomme-block="checklist" class="section">
+  <section data-stomme-block="checklist" id={anchor || undefined} class="section">
     {(eyebrow || heading || intro) && (
       <div class="section-head">
         {eyebrow && <span class="mono eyebrow">{eyebrow}</span>}

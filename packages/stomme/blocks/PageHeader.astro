@@ -12,8 +12,9 @@ interface Props {
   ctaLabel?: string;
   ctaHref?: unknown;
   layout?: { variant?: 'light' | 'dark'; width?: 'narrow' | 'full' };
+  anchor?: string;
 }
-const { eyebrow, heading, intro, cta, ctaLabel, ctaHref } = Astro.props;
+const { eyebrow, heading, intro, cta, ctaLabel, ctaHref, anchor } = Astro.props;
 const variant = Astro.props.layout?.variant ?? 'light';
 const width = Astro.props.layout?.width ?? 'narrow';
 const read = width !== 'full';
@@ -22,7 +23,7 @@ const contact = ((await getEntry('contact', 'contact').catch(() => null))?.data 
 ---
 
 {variant === 'dark' ? (
-  <section data-stomme-block="pageHeader" class="band page-header page-header--dark">
+  <section data-stomme-block="pageHeader" id={anchor || undefined} class="band page-header page-header--dark">
     <div class="page-header__glow" aria-hidden="true"></div>
     <div class:list={['section', 'page-header__inner', { 'section--read': read }]}>
       {eyebrow && <span class="mono eyebrow">{eyebrow}</span>}
@@ -37,7 +38,7 @@ const contact = ((await getEntry('contact', 'contact').catch(() => null))?.data 
     </div>
   </section>
 ) : (
-  <section data-stomme-block="pageHeader" class:list={['section', 'page-header', 'page-header--light', { 'section--read': read }]}>
+  <section data-stomme-block="pageHeader" id={anchor || undefined} class:list={['section', 'page-header', 'page-header--light', { 'section--read': read }]}>
     {eyebrow && <span class="mono eyebrow">{eyebrow}</span>}
     <h1 class="display display--hero page-header__heading"><Emph text={heading} /></h1>
     {intro && <p class="intro page-header__intro">{intro}</p>}

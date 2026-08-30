@@ -22,7 +22,7 @@ export interface SiteConfig {
     readMore?: string;
     latest?: string;
     changeLanguage?: string;
-    contact?: { name?: string; email?: string; phone?: string; message?: string; submit?: string; direct?: string; honeypot?: string; hours?: string; visit?: string; findUs?: string; follow?: string; map?: string; reveal?: string; error?: string };
+    contact?: { name?: string; email?: string; phone?: string; category?: string; categoryPlaceholder?: string; unit?: string; message?: string; submit?: string; direct?: string; honeypot?: string; hours?: string; visit?: string; findUs?: string; follow?: string; map?: string; reveal?: string; error?: string };
     beforeAfter?: { before?: string; after?: string; compare?: string };
     collage?: { more?: string; more1?: string; open?: string; viewer?: string; prev?: string; next?: string; close?: string; counter?: string };
     map?: {
@@ -32,6 +32,7 @@ export interface SiteConfig {
     };
     footer?: { links?: string; areas?: string };
     documents?: { separator?: string; file?: string };
+    sectionNav?: { label?: string };
     town?: {
       eyebrow?: string;
       heading?: string;
@@ -133,7 +134,7 @@ const STRINGS_EN = {
   latest: 'Latest',
   changeLanguage: 'Change language',
   contact: {
-    name: 'Name', email: 'Email', phone: 'Phone', message: 'Describe your project', submit: 'Send request',
+    name: 'Name', email: 'Email', phone: 'Phone', category: 'Category', categoryPlaceholder: 'Choose…', unit: 'Unit', message: 'Describe your project', submit: 'Send request',
     direct: 'Direct contact', honeypot: 'Leave this field empty', hours: 'Opening hours', visit: 'Visit',
     findUs: 'Find us', follow: 'Follow', map: 'Map',
     reveal: 'Contact details — enable JavaScript to reveal',
@@ -155,6 +156,7 @@ const STRINGS_EN = {
   },
   footer: { links: 'Links', areas: 'Areas' },
   documents: { separator: '·', file: 'FILE' },
+  sectionNav: { label: 'On this page' },
   town: {
     eyebrow: 'Local service: {name}',
     heading: '{name}',
@@ -203,7 +205,7 @@ const STRINGS_SV: typeof STRINGS_EN = {
   latest: 'Senaste',
   changeLanguage: 'Byt språk',
   contact: {
-    name: 'Namn', email: 'E-post', phone: 'Telefon', message: 'Beskriv ditt projekt', submit: 'Skicka förfrågan',
+    name: 'Namn', email: 'E-post', phone: 'Telefon', category: 'Kategori', categoryPlaceholder: 'Välj…', unit: 'Lägenhet', message: 'Beskriv ditt projekt', submit: 'Skicka förfrågan',
     direct: 'Direktkontakt', honeypot: 'Lämna fältet tomt', hours: 'Öppettider', visit: 'Hitta hit',
     findUs: 'Hitta hit', follow: 'Följ oss', map: 'Karta',
     reveal: 'Kontaktuppgifter, aktivera JavaScript för att visa dem',
@@ -225,6 +227,7 @@ const STRINGS_SV: typeof STRINGS_EN = {
   },
   footer: { links: 'Länkar', areas: 'Områden' },
   documents: { separator: '·', file: 'FIL' },
+  sectionNav: { label: 'På den här sidan' },
   town: {
     eyebrow: 'Lokal tjänst: {name}',
     heading: '{name}',
@@ -273,7 +276,7 @@ const STRINGS_NO: typeof STRINGS_EN = {
   latest: 'Siste',
   changeLanguage: 'Bytt språk',
   contact: {
-    name: 'Navn', email: 'E-post', phone: 'Telefon', message: 'Beskriv prosjektet ditt', submit: 'Send forespørsel',
+    name: 'Navn', email: 'E-post', phone: 'Telefon', category: 'Kategori', categoryPlaceholder: 'Velg…', unit: 'Leilighet', message: 'Beskriv prosjektet ditt', submit: 'Send forespørsel',
     direct: 'Direktekontakt', honeypot: 'La feltet stå tomt', hours: 'Åpningstider', visit: 'Finn fram',
     findUs: 'Finn fram', follow: 'Følg oss', map: 'Kart',
     reveal: 'Kontaktopplysninger, slå på JavaScript for å vise dem',
@@ -295,6 +298,7 @@ const STRINGS_NO: typeof STRINGS_EN = {
   },
   footer: { links: 'Lenker', areas: 'Områder' },
   documents: { separator: '·', file: 'FIL' },
+  sectionNav: { label: 'På denne siden' },
   town: {
     eyebrow: 'Lokal tjeneste: {name}',
     heading: '{name}',
@@ -351,6 +355,7 @@ function baseStrings(locale?: string, cmsLocale?: string) {
     map: { ...STRINGS_EN.map, ...b.map },
     footer: { ...STRINGS_EN.footer, ...b.footer },
     documents: { ...STRINGS_EN.documents, ...b.documents },
+    sectionNav: { ...STRINGS_EN.sectionNav, ...b.sectionNav },
     town: { ...STRINGS_EN.town, ...b.town },
     service: { ...STRINGS_EN.service, ...b.service },
     listingStatus: { ...STRINGS_EN.listingStatus, ...b.listingStatus },
@@ -414,6 +419,7 @@ export function resolveSite(c?: SiteConfig, locale?: string) {
       map: { ...base.map, ...((s && (s as any).map) || {}) },
       footer: { ...base.footer, ...((s && (s as any).footer) || {}) },
       documents: { ...base.documents, ...((s && (s as any).documents) || {}) },
+      sectionNav: { ...base.sectionNav, ...((s && (s as any).sectionNav) || {}) },
       consent: { ...base.consent, ...((s && (s as any).consent) || {}) },
     },
     listings: resolveListings(c && c.listings),

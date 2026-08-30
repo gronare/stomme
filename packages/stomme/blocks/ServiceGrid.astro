@@ -9,8 +9,9 @@ interface Props {
   services?: string[];
   items?: { id: string; data: Record<string, any> }[];
   site?: any;
+  anchor?: string;
 }
-const { eyebrow, heading, intro, services: picked, site } = Astro.props;
+const { eyebrow, heading, intro, services: picked, site, anchor } = Astro.props;
 const prefix = site?.routes?.services ?? '/services';
 const readMore = site?.strings?.readMore ?? 'Read more';
 const all = Astro.props.items ?? (await getCollection('services'));
@@ -20,7 +21,7 @@ const services = (
     : [...all].sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0))
 ) as typeof all;
 ---
-<section data-stomme-block="serviceGrid" class="section">
+<section data-stomme-block="serviceGrid" id={anchor || undefined} class="section">
   {(eyebrow || heading || intro) && (
     <div class="section-head">
       {eyebrow && <span class="mono eyebrow">{eyebrow}</span>}

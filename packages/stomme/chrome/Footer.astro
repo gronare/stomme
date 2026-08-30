@@ -11,9 +11,9 @@ import ContactLink from '../src/ContactLink.astro';
 import SlotFooterEnd from '@stomme/slot-footer-end';
 import Metrics from './Metrics.astro';
 
-interface FooterData { dark?: boolean; tagline?: string; showLinks?: boolean; linksHeading?: string; links?: { label: string; link?: unknown }[]; links2Heading?: string; links2?: { label: string; link?: unknown }[]; showTowns?: boolean; townsHeading?: string; legal?: { label: string; link?: unknown }[]; note?: string; showLogo?: boolean; showWordmark?: boolean }
+interface FooterData { dark?: boolean; tagline?: string; showAddress?: boolean; showHours?: boolean; showSocials?: boolean; showLinks?: boolean; linksHeading?: string; links?: { label: string; link?: unknown }[]; links2Heading?: string; links2?: { label: string; link?: unknown }[]; showTowns?: boolean; townsHeading?: string; legal?: { label: string; link?: unknown }[]; note?: string; showLogo?: boolean; showWordmark?: boolean }
 interface SettingsData { name?: string; logo?: { textPre?: string; textAccent?: string; image?: string; alt?: string } }
-interface ContactData { email?: string; phone?: string; phoneE164?: string; protectContact?: boolean; address?: { city?: string }; orgNr?: string; founded?: string }
+interface ContactData { email?: string; phone?: string; phoneE164?: string; protectContact?: boolean; address?: { street?: string; postcode?: string; city?: string }; hours?: { days?: string; hours?: string }[]; hoursNote?: string; socials?: { platform?: string; url?: string }[]; orgNr?: string; founded?: string }
 interface Props { footer?: FooterData; settings?: SettingsData; contact?: ContactData; towns?: { id: string; name: string }[]; townsHref?: string }
 
 let { footer, settings, contact, towns, townsHref } = Astro.props;
@@ -35,7 +35,13 @@ const logoOptimized = logoKey && logoUploads[logoKey] ? logoUploads[logoKey] : n
 const links = footer.links ?? [];
 const links2 = footer.links2 ?? [];
 const legal = footer.legal ?? [];
-const tagline = [footer.tagline, contact.address?.city].filter(Boolean).join(' · ');
+const showAddress = footer.showAddress === true;
+const tagline = showAddress ? footer.tagline : [footer.tagline, contact.address?.city].filter(Boolean).join(' · ');
+const address = [contact.address?.street, [contact.address?.postcode, contact.address?.city].filter(Boolean).join(' ')].filter(Boolean).join(', ');
+const hours = footer.showHours === true
+  ? [...(contact.hours ?? []).map((h) => [h.days, h.hours].filter(Boolean).join(' ')), contact.hoursNote].filter(Boolean).join(' · ')
+  : '';
+const socials = footer.showSocials === true ? (contact.socials ?? []).filter((s) => s && s.url) : [];
 const orgLine = [contact.orgNr && `Org.nr ${contact.orgNr}`, contact.founded && `Est. ${contact.founded}`].filter(Boolean).join(' · ');
 const year = new Date().getFullYear();
 ---
@@ -50,6 +56,13 @@ const year = new Date().getFullYear();
           {showWord && <span class="logo-word">{logo.textPre}<span class="accent">{logo.textAccent}</span></span>}
         </div>
         {tagline && <p style="margin:0.5rem 0 0;max-width:36rem">{tagline}</p>}
+        {showAddress && address && <p class="footer-address">{address}</p>}
+        {hours && <p class="footer-hours">{hours}</p>}
+        {socials.length > 0 && (
+          <ul class="footer-socials">
+            {socials.map((s) => <li><a href={s.url} class="footer-link" target="_blank" rel="noopener">{s.platform}</a></li>)}
+          </ul>
+        )}
         {(contact.phone || contact.email) && (
           <p style="margin:0.75rem 0 0">
             {contact.phone && <ContactLink kind="tel" class="footer-link" target={contact.phoneE164 || contact.phone} display={contact.phone} protect={!!contact.protectContact} />}

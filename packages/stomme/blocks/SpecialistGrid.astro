@@ -4,11 +4,12 @@ interface Props {
   heading?: string;
   intro?: string;
   items?: { title: string; body?: string }[];
+  anchor?: string;
 }
-const { eyebrow, heading, intro, items = [] } = Astro.props;
+const { eyebrow, heading, intro, items = [], anchor } = Astro.props;
 ---
 {(heading || items.length > 0) && (
-  <section data-stomme-block="specialistGrid" class="section">
+  <section data-stomme-block="specialistGrid" id={anchor || undefined} class="section">
     {(eyebrow || heading || intro) && (
       <div class="section-head">
         {eyebrow && <span class="mono eyebrow">{eyebrow}</span>}

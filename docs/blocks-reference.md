@@ -8,6 +8,10 @@ follows `theme.eyebrowColor`). Both are set under the block's `style` group —
 `style.surface`, `style.accent` — and the tables below name them bare. Add your own
 blocks alongside these (see [customizing](customizing.md)).
 
+A page that carries a `sectionNav` block also gets an `id` on every block that has a
+heading — slugged from the heading, de-duplicated with `-2`, `-3` — so the chips can
+link to them. A page without that block renders exactly as before, with no ids.
+
 ## Content & layout
 
 | Type | What it renders | Key fields |
@@ -25,6 +29,7 @@ blocks alongside these (see [customizing](customizing.md)).
 | `gallery` | Responsive image grid with captions | `eyebrow`/`heading`/`intro`, `images[]` (`image`, `alt`, `caption`), `columns` |
 | `beforeAfter` | Draggable before/after image slider | `eyebrow`/`heading`/`intro`, `before`, `after` |
 | `definition` | A dictionary-style entry (term, word class, senses) | `eyebrow`, `term`, `wordClass`, `senses[]` (`text`, `note`), `width` |
+| `sectionNav` | A row of chip links that jump to the headings below it on the same page | `label` (accessible name), `sticky`; the chips are read from the blocks below, nothing to fill in |
 | `fragment` | A placed editorial fragment — big lead line, short body, optional link; consecutive fragments drift across the page | `eyebrow`, `statement`, `body`, `cta` |
 | `plans` | A row of pricing plan cards | `eyebrow`/`heading`/`intro`, `plans[]` (`name`, `pricePrefix`, `price`, `period`, `description`, `features[]`, `badge`, `highlight`), `footnote` |
 | `textImage` | Text column beside an image (flippable) | `heading`, `body` (markdown), `image`, `imageAlt`, `flip` |
@@ -68,7 +73,7 @@ Each carries its own data, so different pages can show different numbers.
 
 | Type | What it renders | Key fields |
 |---|---|---|
-| `contactForm` | Form + direct-contact aside; posts to the engine's contact route and redirects to `routes.formSuccess` | `eyebrow`/`heading`/`intro`, `labelName`, `labelEmail`, `labelMessage`, `submitLabel`, `showPhone`, `showDirectContact` |
+| `contactForm` | Form + direct-contact aside; posts to the engine's contact route and redirects to `routes.formSuccess` | `eyebrow`/`heading`/`intro`, `labelName`, `labelEmail`, `labelMessage`, `submitLabel`, `showPhone`, `showDirectContact`, `showCategory` + `categories[]`/`labelCategory`, `showUnit`/`labelUnit`/`placeholderUnit` |
 | `contactCard` | The direct-contact card on its own | `show` (which parts), `tint` |
 | `findUs` | Map + address block | reads the `contact` settings |
 
@@ -93,6 +98,11 @@ Six pairs are easy to mix up. Each row says what makes the block different, not 
 `@gronare/stomme/Header.astro` and `@gronare/stomme/Footer.astro` render the site header/footer
 from the `navigation`/`footer`/`settings` collections; use them in your `Base`
 layout. They accept optional draft props so the CMS chrome previews can render them.
+
+The footer's first column can also carry the address, the opening hours and the social
+links from the `contact` settings — `showAddress`, `showHours`, `showSocials`, each off
+until it is turned on. With `showAddress` on, the tagline drops the town it would
+otherwise repeat.
 
 ## Page templates (not blocks)
 

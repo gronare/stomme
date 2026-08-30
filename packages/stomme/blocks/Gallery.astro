@@ -8,14 +8,15 @@ interface Props {
   intro?: string;
   images?: GalleryImage[];
   layout?: { columns?: number };
+  anchor?: string;
 }
-const { eyebrow, heading, intro, images = [] } = Astro.props;
+const { eyebrow, heading, intro, images = [], anchor } = Astro.props;
 const columns = Astro.props.layout?.columns ?? 3;
 const cols = columns === 2 ? 2 : 3;
 ---
 
 {(heading || images.length > 0) && (
-  <section data-stomme-block="gallery" class="section">
+  <section data-stomme-block="gallery" id={anchor || undefined} class="section">
     {(eyebrow || heading || intro) && (
       <div class="section-head">
         {eyebrow && <span class="mono eyebrow">{eyebrow}</span>}

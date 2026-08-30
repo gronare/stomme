@@ -438,6 +438,20 @@ const RAW_BLOCKS: BlockDef[] = [
     ],
   },
   {
+    type: 'sectionNav',
+    label: 'Section links',
+    group: 'Text',
+    summary: 'A row of links that jump to the headings further down this page. Nothing to fill in: it reads the sections below it.',
+    shape: 'chips',
+    fields: [
+      { name: 'label', label: 'Accessible label', widget: 'string', required: false, hint: 'Read by screen readers; the visible chips come from the section headings below.' },
+      layoutGroup([
+        { name: 'sticky', label: 'Stick to the top', widget: 'boolean', required: false, default: false, hint: 'Keep the row at the top of the window while scrolling' },
+      ]),
+      styleGroup([surfaceField]),
+    ],
+  },
+  {
     type: 'callout',
     label: 'Highlighted quote',
     group: 'Quote & highlight',
@@ -650,6 +664,12 @@ const RAW_BLOCKS: BlockDef[] = [
       { name: 'labelName', label: 'Field label — name', widget: 'string', required: false, hint: 'Blank uses the site wording ("Name").' },
       { name: 'labelEmail', label: 'Field label — email', widget: 'string', required: false, hint: 'Blank uses the site wording ("Email").' },
       { name: 'showPhone', label: 'Show the phone field', widget: 'boolean', required: false, default: true },
+      { name: 'showCategory', label: 'Show the category dropdown', widget: 'boolean', required: false, default: false, hint: 'A dropdown the visitor picks their errand from. Needs at least one choice below.' },
+      { name: 'labelCategory', label: 'Field label — category', widget: 'string', required: false, hint: 'Blank uses the site wording ("Category").' },
+      { name: 'categories', label: 'Categories', widget: 'list', required: false, collapsed: true, label_singular: 'Category', hint: 'The choices in the dropdown, in order.', field: { name: 'category', label: 'Category', widget: 'string' } },
+      { name: 'showUnit', label: 'Show the unit field', widget: 'boolean', required: false, default: false, hint: 'A short free-text field for which unit the visitor is writing about.' },
+      { name: 'labelUnit', label: 'Field label — unit', widget: 'string', required: false, hint: 'Blank uses the site wording ("Unit").' },
+      { name: 'placeholderUnit', label: 'Unit placeholder', widget: 'string', required: false, hint: 'Faint example text inside the empty field.' },
       { name: 'labelMessage', label: 'Field label — message', widget: 'string', required: false, hint: 'Blank uses the site wording ("Describe your project"). Word it for your business.' },
       { name: 'submitLabel', label: 'Submit button text', widget: 'string', required: false, hint: 'The form\'s submit button. Blank uses the site wording ("Send request").' },
       { name: 'showDirectContact', label: 'Show the direct-contact card', widget: 'boolean', required: false, default: true, hint: 'Off → the form fills the width (no phone/email card).' },
@@ -826,9 +846,13 @@ const SAMPLES: Record<string, ({ _label?: string } & Record<string, unknown>)[]>
     { _label: 'cards', layout: { variant: 'cards' }, heading: 'Questions (cards)', items: FAQ_FIX },
     { _label: 'split', layout: { variant: 'split' }, heading: 'Questions (split)', items: FAQ_FIX },
   ],
+  sectionNav: [{ sections: [{ anchor: 'first', label: 'The first section' }, { anchor: 'second', label: 'A second, longer heading' }, { anchor: 'third', label: 'The third' }] }],
   statsBar: [{ items: [{ label: 'Projects', value: '142+' }, { label: 'Uptime', value: '100%' }, { label: 'Rating', value: '5.0' }] }],
   logoStrip: [{ lead: 'Trusted by', logos: ['Alpha', 'Beta', 'Gamma', 'Delta'] }],
-  contactForm: [{ eyebrow: 'Contact', heading: 'Get in touch', intro: 'The real form, themed.', showPhone: true, showDirectContact: true }],
+  contactForm: [
+    { _label: 'name · email · phone', eyebrow: 'Contact', heading: 'Get in touch', intro: 'The real form, themed.', showPhone: true, showDirectContact: true },
+    { _label: 'category + unit', eyebrow: 'Contact', heading: 'Form with a dropdown', showPhone: true, showCategory: true, categories: ['First category', 'Second category'], showUnit: true, placeholderUnit: 'e.g. 12B' },
+  ],
   contactCard: [{ show: ['phone', 'email', 'hours'], label: 'Direct contact', tint: true }],
   findUs: [{ heading: 'Find us', showHours: true }],
   map: [
