@@ -577,6 +577,18 @@ const RAW_BLOCKS: BlockDef[] = [
       { name: 'base', label: 'base', widget: 'hidden', required: false },
       mediaGroup('Cover images on the cards.', [
         { name: 'showImages', label: 'Image previews', widget: 'boolean', required: false, default: true, hint: 'Show cover images on the cards.' },
+        {
+          name: 'style',
+          label: 'Image placement',
+          widget: 'select',
+          required: false,
+          default: 'top',
+          hint: 'How a card carries its image.',
+          options: [
+            { label: 'Across the top', value: 'top' },
+            { label: 'A corner thumbnail', value: 'corner' },
+          ],
+        },
       ]),
       layoutGroup([
         { name: 'featured', label: 'Featured first post', widget: 'boolean', required: false, default: true, hint: 'Show the newest post as a large lead card.' },

@@ -8,7 +8,7 @@ interface Props {
   heading?: string;
   intro?: string;
   text?: string;
-  media?: { showImages?: boolean };
+  media?: { showImages?: boolean; style?: string };
   layout?: { featured?: boolean; columns?: number; limit?: number };
   source?: string;
   base?: string;
@@ -18,6 +18,7 @@ interface Props {
 }
 const { eyebrow, heading, intro, source = 'posts', base, site, anchor } = Astro.props;
 const showImages = Astro.props.media?.showImages ?? false;
+const corner = Astro.props.media?.style === 'corner';
 const featured = Astro.props.layout?.featured ?? false;
 const columns = Astro.props.layout?.columns ?? 3;
 const limit = Number(Astro.props.layout?.limit) || 0;
@@ -72,7 +73,7 @@ const hasImg = (p: any) => !!(showImages && p.data.showCover);
     {rest.length > 0 && (
       <div class="post-grid" style={`--post-cols:${columns}`}>
         {rest.map((p) => (
-          <a href={`${prefix}/${p.id}`} class="post-card">
+          <a href={`${prefix}/${p.id}`} class:list={['post-card', corner && 'post-card--corner']}>
             {hasImg(p) && (
               <Cover src={p.data.cover} alt={p.data.title} placeholder={PLACE} width={800} height={480} class="post-card__img" />
             )}

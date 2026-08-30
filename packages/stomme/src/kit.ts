@@ -92,6 +92,7 @@ export const surfaceField: Field = {
   options: [
     { label: 'Standard (white)', value: 'standard' },
     { label: 'Tinted', value: 'tint' },
+    { label: 'Panel (rounded plate)', value: 'panel' },
     { label: 'Accent band', value: 'band' },
     { label: 'Dark', value: 'dark' },
     { label: 'Gradient', value: 'gradient' },

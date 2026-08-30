@@ -74,6 +74,7 @@
               "options": [
                 "standard",
                 "tint",
+                "panel",
                 "band",
                 "dark",
                 "gradient"
@@ -145,6 +146,7 @@
               "options": [
                 "standard",
                 "tint",
+                "panel",
                 "band",
                 "dark",
                 "gradient"
@@ -243,6 +245,7 @@
               "options": [
                 "standard",
                 "tint",
+                "panel",
                 "band",
                 "dark",
                 "gradient"
@@ -321,6 +324,7 @@
               "options": [
                 "standard",
                 "tint",
+                "panel",
                 "band",
                 "dark",
                 "gradient"
@@ -385,6 +389,7 @@
               "options": [
                 "standard",
                 "tint",
+                "panel",
                 "band",
                 "dark",
                 "gradient"
@@ -837,6 +842,7 @@
               "options": [
                 "standard",
                 "tint",
+                "panel",
                 "band",
                 "dark",
                 "gradient"
@@ -996,6 +1002,7 @@
               "options": [
                 "standard",
                 "tint",
+                "panel",
                 "band",
                 "dark",
                 "gradient"
@@ -1065,6 +1072,7 @@
               "options": [
                 "standard",
                 "tint",
+                "panel",
                 "band",
                 "dark",
                 "gradient"
@@ -1152,6 +1160,7 @@
               "options": [
                 "standard",
                 "tint",
+                "panel",
                 "band",
                 "dark",
                 "gradient"
@@ -1234,6 +1243,7 @@
               "options": [
                 "standard",
                 "tint",
+                "panel",
                 "band",
                 "dark",
                 "gradient"
@@ -1364,6 +1374,7 @@
               "options": [
                 "standard",
                 "tint",
+                "panel",
                 "band",
                 "dark",
                 "gradient"
@@ -1536,6 +1547,7 @@
               "options": [
                 "standard",
                 "tint",
+                "panel",
                 "band",
                 "dark",
                 "gradient"
@@ -1674,6 +1686,7 @@
               "options": [
                 "standard",
                 "tint",
+                "panel",
                 "band",
                 "dark",
                 "gradient"
@@ -1758,6 +1771,7 @@
               "options": [
                 "standard",
                 "tint",
+                "panel",
                 "band",
                 "dark",
                 "gradient"
@@ -2011,6 +2025,7 @@
               "options": [
                 "standard",
                 "tint",
+                "panel",
                 "band",
                 "dark",
                 "gradient"
@@ -2079,6 +2094,7 @@
               "options": [
                 "standard",
                 "tint",
+                "panel",
                 "band",
                 "dark",
                 "gradient"
@@ -2215,6 +2231,7 @@
               "options": [
                 "standard",
                 "tint",
+                "panel",
                 "band",
                 "dark",
                 "gradient"
@@ -2317,6 +2334,7 @@
               "options": [
                 "standard",
                 "tint",
+                "panel",
                 "band",
                 "dark",
                 "gradient"
@@ -2389,6 +2407,7 @@
               "options": [
                 "standard",
                 "tint",
+                "panel",
                 "band",
                 "dark",
                 "gradient"
@@ -2530,6 +2549,7 @@
               "options": [
                 "standard",
                 "tint",
+                "panel",
                 "band",
                 "dark",
                 "gradient"
@@ -2586,6 +2606,15 @@
               "name": "showImages",
               "widget": "boolean",
               "required": false
+            },
+            {
+              "name": "style",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "top",
+                "corner"
+              ]
             }
           ]
         },
@@ -2632,6 +2661,7 @@
               "options": [
                 "standard",
                 "tint",
+                "panel",
                 "band",
                 "dark",
                 "gradient"
@@ -2708,6 +2738,7 @@
               "options": [
                 "standard",
                 "tint",
+                "panel",
                 "band",
                 "dark",
                 "gradient"
@@ -2760,6 +2791,7 @@
               "options": [
                 "standard",
                 "tint",
+                "panel",
                 "band",
                 "dark",
                 "gradient"
@@ -2825,6 +2857,7 @@
               "options": [
                 "standard",
                 "tint",
+                "panel",
                 "band",
                 "dark",
                 "gradient"
@@ -2897,6 +2930,7 @@
               "options": [
                 "standard",
                 "tint",
+                "panel",
                 "band",
                 "dark",
                 "gradient"
@@ -3049,6 +3083,7 @@
               "options": [
                 "standard",
                 "tint",
+                "panel",
                 "band",
                 "dark",
                 "gradient"
@@ -3140,6 +3175,7 @@
               "options": [
                 "standard",
                 "tint",
+                "panel",
                 "band",
                 "dark",
                 "gradient"
@@ -3198,6 +3234,7 @@
               "options": [
                 "standard",
                 "tint",
+                "panel",
                 "band",
                 "dark",
                 "gradient"
@@ -3270,6 +3307,7 @@
               "options": [
                 "standard",
                 "tint",
+                "panel",
                 "band",
                 "dark",
                 "gradient"
@@ -3330,6 +3368,7 @@
               "options": [
                 "standard",
                 "tint",
+                "panel",
                 "band",
                 "dark",
                 "gradient"

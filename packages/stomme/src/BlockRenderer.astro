@@ -98,7 +98,7 @@ const localeLink = localeLinker(config, splitLocalePath(Astro.url.pathname, loca
 const shown = feats.contactForm === false ? blocks.filter((b) => b.type !== 'contactForm') : blocks;
 const rendered = locales.enabled ? localizeLinks(shown, localeLink) : shown;
 
-const surfaceClass: Record<string, string> = { tint: 'surface-tint', band: 'band', dark: 'surface-dark', gradient: 'surface-gradient' };
+const surfaceClass: Record<string, string> = { tint: 'surface-tint', panel: 'surface-panel', band: 'band', dark: 'surface-dark', gradient: 'surface-gradient' };
 const H1_BLOCKS = new Set(['hero', 'cover', 'pageHeader']);
 const pageHasH1 = rendered.some((b) => H1_BLOCKS.has(b.type));
 // No sectionNav on the page means no anchors at all: an id nobody links to would still change every existing site's HTML.
