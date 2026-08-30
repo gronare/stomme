@@ -42,7 +42,7 @@ const accentVar = accent === 'secondary' ? 'var(--color-secondary)' : accent ===
           )}
           <h3>{it.title}</h3>
           {it.body && <p>{it.body}</p>}
-          {href && <span class="mono" style="display:inline-block;margin-top:1rem;color:var(--color-brand)">{label} →</span>}
+          {href && <span class="mono card-more">{label} →</span>}
           {it.tag && <span class="mono card-tag">{it.tag}</span>}
         </Tag>
       );
