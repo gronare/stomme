@@ -1,6 +1,7 @@
 ---
 import { getEntry } from 'astro:content';
 import DirectContact from '../src/DirectContact.astro';
+import { slugifyHeading } from '../src/anchors';
 
 interface Props {
   site?: any; eyebrow?: string; heading?: string; intro?: string;
@@ -14,6 +15,9 @@ interface Props {
 const { site, eyebrow, heading, intro, labelName, labelEmail, labelMessage, submitLabel, showPhone, showDirectContact, showCategory, labelCategory, categories = [], showUnit, labelUnit, placeholderUnit, pageHasH1, anchor } = Astro.props;
 // A form-only contact page has no other heading to be the page's h1, so the block takes the rank the page leaves open.
 const Heading = pageHasH1 ? 'h2' : 'h1';
+// Two forms on one page would otherwise share every field id, and a label click would land in the other form.
+const fid = anchor || slugifyHeading(heading) || 'contact';
+const fieldId = (name: string) => `${fid}-${name}`;
 const c = site?.strings?.contact ?? {};
 const L = {
   name: labelName || (c.name ?? 'Name'),
@@ -61,23 +65,23 @@ const recapLabels = JSON.stringify({ email: L.email, phone: L.phone, category: L
       <p class="hp" aria-hidden="true" style="display:none"><label>{L.honeypot} <input name="bot-field" tabindex="-1" autocomplete="off" /></label></p>
       <input type="hidden" name="_success" value={successPath} />
       <div class="field">
-        <label for="name" class="mono">{L.name}</label>
-        <input id="name" name="name" required />
+        <label for={fieldId('name')} class="mono">{L.name}</label>
+        <input id={fieldId('name')} name="name" required />
       </div>
       <div class="field">
-        <label for="email" class="mono">{L.email}</label>
-        <input id="email" name="email" type="email" required />
+        <label for={fieldId('email')} class="mono">{L.email}</label>
+        <input id={fieldId('email')} name="email" type="email" required />
       </div>
       {showPhoneField && (
         <div class="field">
-          <label for="phone" class="mono">{L.phone}</label>
-          <input id="phone" name="phone" type="tel" />
+          <label for={fieldId('phone')} class="mono">{L.phone}</label>
+          <input id={fieldId('phone')} name="phone" type="tel" />
         </div>
       )}
       {showCategoryField && (
         <div class="field">
-          <label for="category" class="mono">{L.category}</label>
-          <select id="category" name="category" required>
+          <label for={fieldId('category')} class="mono">{L.category}</label>
+          <select id={fieldId('category')} name="category" required>
             <option value="" disabled selected>{L.categoryPlaceholder}</option>
             {options.map((o) => <option value={o}>{o}</option>)}
           </select>
@@ -85,13 +89,13 @@ const recapLabels = JSON.stringify({ email: L.email, phone: L.phone, category: L
       )}
       {showUnitField && (
         <div class="field">
-          <label for="unit" class="mono">{L.unit}</label>
-          <input id="unit" name="unit" placeholder={placeholderUnit} />
+          <label for={fieldId('unit')} class="mono">{L.unit}</label>
+          <input id={fieldId('unit')} name="unit" placeholder={placeholderUnit} />
         </div>
       )}
       <div class="field">
-        <label for="message" class="mono">{L.message}</label>
-        <textarea id="message" name="message" rows="5" required></textarea>
+        <label for={fieldId('message')} class="mono">{L.message}</label>
+        <textarea id={fieldId('message')} name="message" rows="5" required></textarea>
       </div>
       <button type="submit" class="btn">{L.submit}</button>
     </form>
