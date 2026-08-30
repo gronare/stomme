@@ -21,6 +21,10 @@ export const WEBFONTS: Record<string, Webfont> = {
     family: 'Inter Tight Variable', fallbackFamily: 'Inter Tight Fallback',
     fallback: '@font-face{font-family:"Inter Tight Fallback";src:local("Arial"),local("ArialMT");ascent-override:100.5078%;descent-override:25.0256%;line-gap-override:0%;size-adjust:96.3855%;}',
   },
+  jost: {
+    family: 'Jost Variable', fallbackFamily: 'Jost Fallback',
+    fallback: '@font-face{font-family:"Jost Fallback";src:local("Arial"),local("ArialMT");ascent-override:113.1250%;descent-override:40.1752%;line-gap-override:0%;size-adjust:94.5858%;}',
+  },
 };
 
 const formatOf = (path: string) =>
@@ -48,8 +52,9 @@ export function curatedWebfontUrls(): Record<string, string> {
 
 export function resolveFonts(
   theme: { fontDisplay?: string; fontBody?: string; fontCustomFile?: string; fontCustomBodyFile?: string } = {},
-  webfontUrls: Record<string, string> = {},
+  maybeWebfontUrls?: Record<string, string> | string | null,
 ): { vars: string[]; fontFace: string | null; preloads: { href: string; type: string }[] } {
+  const webfontUrls = maybeWebfontUrls && typeof maybeWebfontUrls === 'object' ? maybeWebfontUrls : curatedWebfontUrls();
   const customDisplayUrl = uploadFontUrl(theme.fontCustomFile);
   const customBodyUrl = uploadFontUrl(theme.fontCustomBodyFile);
   const stack = (key: string | undefined, customFamily: string | null): string | null => {

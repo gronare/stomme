@@ -2560,6 +2560,15 @@
           "required": false
         },
         {
+          "name": "text",
+          "widget": "select",
+          "required": false,
+          "options": [
+            "excerpt",
+            "full"
+          ]
+        },
+        {
           "name": "source",
           "widget": "hidden",
           "required": false

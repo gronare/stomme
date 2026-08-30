@@ -265,13 +265,14 @@ ${emitShareCards(6)}
             label: "Heading font"
             widget: select
             required: false
-            hint: "Font for headings. Empty = system default. Inter and Inter Tight are served from your own site: upload the file to /media/fonts/<name>.woff2 or they fall back to the system stack."
+            hint: "Font for headings. Empty = system default. Inter, Inter Tight and Jost are served from your own site: upload the file to /media/fonts/<name>.woff2 or they fall back to the system stack."
             options:
               - { label: "System (default)", value: "system" }
               - { label: "Serif (elegant headlines)", value: "serif" }
               - { label: "Grotesk (clean sans)", value: "grotesk" }
               - { label: "Inter", value: "inter" }
               - { label: "Inter Tight", value: "inter-tight" }
+              - { label: "Jost", value: "jost" }
               - { label: "Geometric (Futura-style)", value: "geometric" }
               - { label: "Rounded", value: "rounded" }
               - { label: "Slab serif", value: "slab" }
@@ -284,13 +285,14 @@ ${emitShareCards(6)}
             label: "Body font"
             widget: select
             required: false
-            hint: "Font for body text. Empty = system default. Inter and Inter Tight are served from your own site: upload the file to /media/fonts/<name>.woff2 or they fall back to the system stack."
+            hint: "Font for body text. Empty = system default. Inter, Inter Tight and Jost are served from your own site: upload the file to /media/fonts/<name>.woff2 or they fall back to the system stack."
             options:
               - { label: "System (default)", value: "system" }
               - { label: "Serif (elegant headlines)", value: "serif" }
               - { label: "Grotesk (clean sans)", value: "grotesk" }
               - { label: "Inter", value: "inter" }
               - { label: "Inter Tight", value: "inter-tight" }
+              - { label: "Jost", value: "jost" }
               - { label: "Geometric (Futura-style)", value: "geometric" }
               - { label: "Rounded", value: "rounded" }
               - { label: "Slab serif", value: "slab" }

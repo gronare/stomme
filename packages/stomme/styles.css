@@ -1143,6 +1143,8 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
     color: var(--color-muted);
     flex: 1;
   }
+  .post-body p { margin: 0 0 0.5em; }
+  .post-body p:last-child { margin-bottom: 0; }
   .post-more {
     margin-top: 1.25rem;
     display: inline-block;

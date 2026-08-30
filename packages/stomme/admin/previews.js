@@ -36,6 +36,7 @@
     mono: MONO,
     inter: '"Inter Variable",' + SANS,
     'inter-tight': '"Inter Tight Variable",' + SANS,
+    jost: '"Jost Variable",' + SANS,
   };
   var fontFor = function (key) { return key && FONT_STACKS[key] ? FONT_STACKS[key] : SANS; };
   var cBrand = 'var(--color-brand,' + BRAND + ')', cInk = 'var(--color-ink,' + INK + ')',

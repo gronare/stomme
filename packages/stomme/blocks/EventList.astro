@@ -33,7 +33,7 @@ const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0'
 const feedHref = `${prefix}/calendar.ics`;
 const line = (d: Record<string, any>) => [d.eventTime, d.excerpt].filter(Boolean).join(' · ');
 ---
-{events.length > 0 && (
+{(events.length > 0 || emptyText) && (
   <section data-stomme-block="eventList" id={anchor || undefined} class="section" data-limit={String(limit)} data-show-past={showPast ? '1' : '0'}>
     {(eyebrow || heading || intro) && (
       <div class="section-head post-head">

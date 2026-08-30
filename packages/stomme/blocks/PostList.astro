@@ -1,11 +1,13 @@
 ---
 import { getCollection } from 'astro:content';
 import Cover from '../src/Cover.astro';
+import { renderMarkdown } from '../src/markdown';
 
 interface Props {
   eyebrow?: string;
   heading?: string;
   intro?: string;
+  text?: string;
   media?: { showImages?: boolean };
   layout?: { featured?: boolean; columns?: number; limit?: number };
   source?: string;
@@ -27,7 +29,10 @@ const latest = site?.strings?.latest ?? 'Latest';
 const sorted = Astro.props.items ?? (await getCollection(source)).sort((a, b) => (a.data.date < b.data.date ? 1 : -1));
 const all = limit > 0 ? sorted.slice(0, limit) : sorted;
 const fmt = (d: string) => new Date(d).toLocaleDateString(locale, { year: 'numeric', month: 'long', day: 'numeric' });
-const dateLine = (d: Record<string, any>) => (d.eventDate ? [fmt(d.eventDate), d.eventTime].filter(Boolean).join(' · ') : fmt(d.date));
+const dateLine = (d: Record<string, any>) => fmt(d.date);
+const fullText = Astro.props.text === 'full';
+const bodyHtml = new Map<string, string>();
+if (fullText) for (const p of all) if ((p as any).body) bodyHtml.set(p.id, await renderMarkdown((p as any).body));
 const lead = featured && all.length > 1 ? all[0] : null;
 const rest = lead ? all.slice(1) : all;
 const PLACE = '/images/placeholders/service.svg';
@@ -50,12 +55,16 @@ const hasImg = (p: any) => !!(showImages && p.data.showCover);
           <Cover src={lead.data.cover} alt={lead.data.title} placeholder={PLACE} width={1000} height={640} class="post-feature__img" />
         )}
         <div class="post-feature__body">
-          <p class:list={['mono', { 'post-date--event': !!lead.data.eventDate }]}>
+          <p class="mono">
             {dateLine(lead.data)}
             {lead.data.category && <span class="post-cat">{lead.data.category}</span>}
           </p>
           <ItemHeading class="post-feature__title">{lead.data.title}</ItemHeading>
-          {lead.data.excerpt && <p class="post-excerpt">{lead.data.excerpt}</p>}
+          {bodyHtml.get(lead.id) ? (
+            <div class="post-excerpt post-body" set:html={bodyHtml.get(lead.id)} />
+          ) : (
+            lead.data.excerpt && <p class="post-excerpt">{lead.data.excerpt}</p>
+          )}
           <span class="mono post-more">{readMore} →</span>
         </div>
       </a>
@@ -68,12 +77,16 @@ const hasImg = (p: any) => !!(showImages && p.data.showCover);
               <Cover src={p.data.cover} alt={p.data.title} placeholder={PLACE} width={800} height={480} class="post-card__img" />
             )}
             <div class="post-card__body">
-              <p class:list={['mono', { 'post-date--event': !!p.data.eventDate }]}>
+              <p class="mono">
                 {dateLine(p.data)}
                 {p.data.category && <span class="post-cat">{p.data.category}</span>}
               </p>
               <ItemHeading class="post-title">{p.data.title}</ItemHeading>
-              {p.data.excerpt && <p class="post-excerpt">{p.data.excerpt}</p>}
+              {bodyHtml.get(p.id) ? (
+                <div class="post-excerpt post-body" set:html={bodyHtml.get(p.id)} />
+              ) : (
+                p.data.excerpt && <p class="post-excerpt">{p.data.excerpt}</p>
+              )}
               <span class="mono post-more">{readMore} →</span>
             </div>
           </a>

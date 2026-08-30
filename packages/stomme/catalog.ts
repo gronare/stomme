@@ -561,6 +561,18 @@ const RAW_BLOCKS: BlockDef[] = [
     shape: 'list',
     fields: [
       ...headingFields,
+      {
+        name: 'text',
+        label: 'Card text',
+        widget: 'select',
+        required: false,
+        default: 'excerpt',
+        hint: 'What each card shows below its title.',
+        options: [
+          { label: 'The excerpt', value: 'excerpt' },
+          { label: 'The whole post, notice-board style', value: 'full' },
+        ],
+      },
       { name: 'source', label: 'source', widget: 'hidden', required: false },
       { name: 'base', label: 'base', widget: 'hidden', required: false },
       mediaGroup('Cover images on the cards.', [
