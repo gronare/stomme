@@ -29,6 +29,5 @@ const eventLine = post.data.eventDate ? [fmt(post.data.eventDate), post.data.eve
       {post.data.category && <span class="post-cat">{post.data.category}</span>}
     </p>
   )}
-  {post.data.excerpt && <p class="intro">{post.data.excerpt}</p>}
   <div class="prose" style="margin-top:1.5rem" set:html={html} />
 </article>
