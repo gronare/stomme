@@ -741,9 +741,10 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
   .ctabox-eyebrow { color: color-mix(in srgb, var(--color-on-dark) 85%, transparent); }
   .ctabox-heading { margin-top: 0.75rem; color: var(--color-on-dark); }
   .ctabox-intro { margin: 1rem 0 0; max-width: 34rem; color: color-mix(in srgb, var(--color-on-dark) 75%, transparent); }
+  .ctabox-actions { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 0.9rem 1.5rem; margin-top: 1.75rem; }
+  .ctabox--split .ctabox-actions { justify-content: flex-start; }
   .ctabox-btn {
     display: inline-block;
-    margin-top: 1.75rem;
     background: var(--color-on-dark);
     color: var(--color-brand);
     font-weight: 600;
@@ -752,7 +753,7 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
     text-decoration: none;
   }
   .ctabox-btn:hover { background: color-mix(in srgb, var(--color-on-dark) 88%, var(--color-brand)); }
-  .ctabox-link2 { display: inline-block; margin: 1.75rem 0 0 1.5rem; }
+  .ctabox-link2 { display: inline-block; }
   .ctabox .btn-ghost, .ctabox .btn-ghost:hover { color: var(--color-on-dark); }
 
   .ctabox--split {

@@ -31,8 +31,12 @@ const hasFacts = variant !== 'classic' && shownFacts.length > 0;
       {eyebrow && <span class="mono ctabox-eyebrow">{eyebrow}</span>}
       <h2 class="display ctabox-heading"><Emph text={heading} /></h2>
       {intro && <p class="ctabox-intro">{intro}</p>}
-      {btn && <a href={btn.href} class="ctabox-btn">{btn.label}</a>}
-      {btn2 && <a href={btn2.href} class="btn-ghost ctabox-link2">{btn2.label} →</a>}
+      {(btn || btn2) && (
+        <div class="ctabox-actions">
+          {btn && <a href={btn.href} class="ctabox-btn">{btn.label}</a>}
+          {btn2 && <a href={btn2.href} class="btn-ghost ctabox-link2">{btn2.label} →</a>}
+        </div>
+      )}
     </div>
 
     {hasFacts && variant === 'split' && (
