@@ -1,3 +1,113 @@
 {
-  "blocks": {}
+  "blocks": {
+    "bookableObject": {
+      "label": "Bokningsobjekt",
+      "group": "Bokning",
+      "collection": "bookables",
+      "fields": [
+        {
+          "name": "object",
+          "widget": "relation"
+        },
+        {
+          "name": "heading",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "body",
+          "widget": "text",
+          "required": false
+        },
+        {
+          "name": "ctaLabel",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "layout",
+          "widget": "select",
+          "required": false,
+          "options": [
+            "card",
+            "wide"
+          ]
+        },
+        {
+          "name": "blocks",
+          "widget": "blocks",
+          "required": false
+        }
+      ]
+    },
+    "bookablePlans": {
+      "label": "Priskort",
+      "group": "Bokning",
+      "collection": "bookables",
+      "fields": [
+        {
+          "name": "eyebrow",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "heading",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "intro",
+          "widget": "text",
+          "required": false
+        },
+        {
+          "name": "objects",
+          "widget": "list",
+          "required": false,
+          "fields": [
+            {
+              "name": "object",
+              "widget": "relation"
+            },
+            {
+              "name": "description",
+              "widget": "text",
+              "required": false
+            },
+            {
+              "name": "ctaLabel",
+              "widget": "string",
+              "required": false
+            }
+          ]
+        },
+        {
+          "name": "footnote",
+          "widget": "string",
+          "required": false
+        }
+      ]
+    },
+    "bookingWidget": {
+      "label": "Bokningsruta",
+      "group": "Bokning",
+      "collection": "bookables",
+      "fields": [
+        {
+          "name": "object",
+          "widget": "relation"
+        },
+        {
+          "name": "heading",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "body",
+          "widget": "text",
+          "required": false
+        }
+      ]
+    }
+  }
 }

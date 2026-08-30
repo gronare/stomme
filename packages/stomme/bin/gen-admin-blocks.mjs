@@ -104,6 +104,7 @@ if (STYLE_DIR) {
 
 let LOCALIZED_BY_PATH = null;
 let LOCALIZED_BY_TEXT = null;
+let EN_BY_PATH = null;
 const REVERSE_ALL = {};
 try {
   const adminDir = new URL('../admin/', import.meta.url);
@@ -112,16 +113,23 @@ try {
     if (!mm) continue;
     const byPath = {};
     const byText = {};
+    const enByPath = {};
     for (const [path, entry] of Object.entries((await import(new URL(f, adminDir))).default)) {
       const [en, loc] = Array.isArray(entry) ? entry : [null, entry];
       byPath[path] = loc;
-      if (en !== null) { byText[en] = loc; REVERSE_ALL[loc] = en; }
+      if (en !== null) { enByPath[path] = en; byText[en] = loc; REVERSE_ALL[loc] = en; }
     }
-    if (mm[1] === CMS_LOCALE) { LOCALIZED_BY_PATH = byPath; LOCALIZED_BY_TEXT = byText; }
+    if (mm[1] === CMS_LOCALE) { LOCALIZED_BY_PATH = byPath; LOCALIZED_BY_TEXT = byText; EN_BY_PATH = enByPath; }
   }
 } catch {
 }
-const localized = (path, en) => (LOCALIZED_BY_PATH ? LOCALIZED_BY_PATH[path] ?? LOCALIZED_BY_TEXT[en] ?? en : en);
+// A by-path translation answers the stock English only: a label the site renamed (a listing called what it is) must survive, so the path hit is skipped when the English no longer matches.
+const localized = (path, en) => {
+  if (!LOCALIZED_BY_PATH) return en;
+  const pathHit = LOCALIZED_BY_PATH[path];
+  if (pathHit !== undefined && (!(path in (EN_BY_PATH ?? {})) || EN_BY_PATH[path] === en)) return pathHit;
+  return LOCALIZED_BY_TEXT[en] ?? en;
+};
 
 const MARKER_START = /# >>> (\w+):generated/;
 const q = (s) => `"${String(s).replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`;
