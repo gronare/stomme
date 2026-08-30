@@ -1,0 +1,106 @@
+---
+import { getCollection } from 'astro:content';
+
+// Sizes are a build-time read; the module must still evaluate where there is no filesystem, or the SSR preview route dies with it.
+const fs = await import('node:fs').then((m) => m, () => null);
+const cwd = typeof process !== 'undefined' && typeof process.cwd === 'function' ? process.cwd() : '';
+
+interface Props {
+  eyebrow?: string;
+  heading?: string;
+  intro?: string;
+  group?: string;
+  layout?: { grouped?: boolean };
+  items?: { id: string; data: Record<string, any> }[];
+  site?: any;
+}
+const { eyebrow, heading, intro, group: only, site } = Astro.props;
+const grouped = Astro.props.layout?.grouped ?? false;
+const locale = site?.locale ?? 'en-US';
+const sep = site?.strings?.documents?.separator ?? '·';
+const fileWord = site?.strings?.documents?.file ?? 'FILE';
+
+const POINTER = 'version stomme/media/1';
+// A pointer stub stands in for a file this build never pulled, so reporting its own few bytes would put a wrong size on the row.
+function byteSize(path: string): number | null {
+  if (!fs || !cwd || !path.startsWith('/media/')) return null;
+  const rel = path.slice('/media/'.length);
+  for (const full of [`${cwd}/public/media/${rel}`, `${cwd}/src/assets/media/${rel}`]) {
+    try {
+      const stat = fs.statSync(full);
+      if (!stat.isFile()) continue;
+      if (stat.size < 4096 && fs.readFileSync(full, 'latin1').startsWith(POINTER)) return null;
+      return stat.size;
+    } catch {
+      continue;
+    }
+  }
+  return null;
+}
+
+const decimals = (n: number, digits: number) =>
+  new Intl.NumberFormat(locale, { minimumFractionDigits: digits, maximumFractionDigits: digits }).format(n);
+const humanSize = (bytes: number) =>
+  bytes >= 1048576 ? `${decimals(bytes / 1048576, 1)} MB` : `${decimals(Math.max(1, Math.round(bytes / 1024)), 0)} KB`;
+const extOf = (path: string) => (path.match(/\.([A-Za-z0-9]{1,8})(?:[?#].*)?$/)?.[1] ?? '').toUpperCase() || fileWord;
+const fmtDate = (raw: string) => {
+  const d = new Date(raw);
+  return Number.isNaN(d.getTime()) ? '' : d.toLocaleDateString(locale, { year: 'numeric', month: 'long', day: 'numeric' });
+};
+const join = (parts: string[]) => parts.filter(Boolean).join(` ${sep} `);
+
+const all = Astro.props.items ?? (await getCollection('documents'));
+const listed = all
+  .filter((d) => !only || String(d.data.group ?? '') === only)
+  .sort((a, b) =>
+    (a.data.order ?? 0) - (b.data.order ?? 0)
+    || String(b.data.date ?? '').localeCompare(String(a.data.date ?? ''))
+    || String(a.data.title ?? '').localeCompare(String(b.data.title ?? ''), locale));
+
+const rows = listed.map((d) => {
+  const file = String(d.data.file ?? '');
+  const size = byteSize(file);
+  return {
+    group: String(d.data.group ?? ''),
+    file,
+    title: String(d.data.title ?? ''),
+    ext: extOf(file),
+    note: join([String(d.data.note ?? ''), d.data.date ? fmtDate(String(d.data.date)) : '']),
+    meta: join([extOf(file), size === null ? '' : humanSize(size)]),
+  };
+});
+
+// An unnamed group sorts last so the documents nobody filed sit under the ones that are.
+const names = [...new Set(rows.map((r) => r.group))].sort((a, b) => (a === '' ? 1 : b === '' ? -1 : 0));
+const sections = grouped ? names.map((name) => ({ name, rows: rows.filter((r) => r.group === name) })) : [{ name: '', rows }];
+---
+{rows.length > 0 && (
+  <section data-stomme-block="documentList" class="section">
+    {(eyebrow || heading || intro) && (
+      <div class="section-head">
+        {eyebrow && <span class="mono eyebrow">{eyebrow}</span>}
+        {heading && <h2 class="display" style="margin-top:0.75rem">{heading}</h2>}
+        {intro && <p class="intro">{intro}</p>}
+      </div>
+    )}
+    {sections.map((s) => (
+      <div class="doc-group">
+        {grouped && s.name && <h3 class="mono eyebrow">{s.name}</h3>}
+        <ul class="doc-list">
+          {s.rows.map((d) => (
+            <li>
+              <a class="doc-row" href={d.file} target="_blank" rel="noopener">
+                <span class="doc-icon">{d.ext}</span>
+                <span class="doc-body">
+                  <b class="doc-title">{d.title}</b>
+                  {d.note && <small class="doc-note">{d.note}</small>}
+                </span>
+                <span class="doc-meta mono">{d.meta}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    ))}
+  </section>
+)}

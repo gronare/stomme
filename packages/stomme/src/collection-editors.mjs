@@ -75,6 +75,21 @@ ${emitWidget(4, on('pages'))}`,
     - { name: role, label: "Role / company", widget: string, required: false }
     - { name: quote, label: "Quote", widget: text }
     - { name: order, widget: hidden, required: false, default: 0 }`,
+  documents: `- name: documents
+  label: "Documents"
+  label_singular: "Document"
+  folder: "src/content/documents"
+  create: true
+  reorder: true
+  summary: "{{fields.title}}"
+  slug: "{{slug}}"${line('documents', 2, 'i18n: true')}
+  fields:
+    - { name: title, label: "Title", widget: string${inline('documents', 'true')} }
+    - { name: file, label: "File", widget: file, hint: "The file visitors download, usually a PDF."${inline('documents', 'true')} }
+    - { name: group, label: "Group", widget: string, required: false, hint: "Heading the document is listed under, e.g. Bylaws, Annual reports, Forms."${inline('documents', 'true')} }
+    - { name: date, label: "Date", widget: datetime, date_format: "YYYY-MM-DD", time_format: false, required: false${inline('documents', 'duplicate')} }
+    - { name: note, label: "Note", widget: string, required: false, hint: "One line shown under the title."${inline('documents', 'true')} }
+    - { name: order, widget: hidden, required: false, default: 0${inline('documents', 'duplicate')} }`,
   towns: `- name: towns
   label: "Service areas"
   label_singular: "Area"

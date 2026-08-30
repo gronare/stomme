@@ -14,7 +14,7 @@ export type Field = {
   label_singular?: string;
   collapsed?: boolean;
   multiple?: boolean;
-  options?: '$pages' | '$services' | '$faq' | '$faqTags' | { label: string; value: string }[];
+  options?: '$pages' | '$services' | '$faq' | '$faqTags' | '$documentGroups' | { label: string; value: string }[];
   media_folder?: string;
   public_folder?: string;
 };

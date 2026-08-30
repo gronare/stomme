@@ -69,7 +69,7 @@ try {
   if (mod.site && mod.site.cms) CMS = mod.site.cms;
   if (mod.site && mod.site.style) STYLE = mod.site.style;
   if (mod.site && mod.site.media) MEDIA = resolveMediaConfig(mod.site.media);
-  if (mod.features) FEATURES = { blog: false, areas: false, services: false, testimonials: false, faq: false, tracking: false, ...mod.features };
+  if (mod.features) FEATURES = { blog: false, areas: false, services: false, testimonials: false, faq: false, documents: false, tracking: false, ...mod.features };
   if (Array.isArray(mod.listings))
     LISTINGS = mod.listings
       .filter((x) => x && x.id && x.route && (x.preset === 'article' || x.preset === 'catalog'))
@@ -188,7 +188,7 @@ const mSlug = (dir) => ({ m: `/public/media/${dir}/{{slug}}`, p: `/media/${dir}/
 const mFlat = (dir) => ({ m: `/public/media/${dir}`, p: `/media/${dir}` });
 const COLLECTION_MEDIA = {
   home: mFlat('home'), pages: mSlug('pages'), towns: mSlug('towns'), services: mSlug('services'),
-  faq: mFlat('faq'), testimonials: mFlat('testimonials'), settings: mFlat('settings'),
+  faq: mFlat('faq'), testimonials: mFlat('testimonials'), documents: mFlat('documents'), settings: mFlat('settings'),
 };
 for (const l of LISTINGS) COLLECTION_MEDIA[l.id] = l.preset === 'catalog' ? mSlug(l.id) : mFlat(l.id);
 {

@@ -815,6 +815,64 @@
         }
       ]
     },
+    "documentList": {
+      "label": "Documents",
+      "group": "From collections",
+      "shape": "list",
+      "collection": "documents",
+      "fields": [
+        {
+          "name": "eyebrow",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "heading",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "intro",
+          "widget": "text",
+          "required": false
+        },
+        {
+          "name": "group",
+          "widget": "select",
+          "required": false,
+          "options": "$documentGroups"
+        },
+        {
+          "name": "layout",
+          "widget": "object",
+          "fields": [
+            {
+              "name": "grouped",
+              "widget": "boolean",
+              "required": false
+            }
+          ]
+        },
+        {
+          "name": "style",
+          "widget": "object",
+          "fields": [
+            {
+              "name": "surface",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "standard",
+                "tint",
+                "band",
+                "dark",
+                "gradient"
+              ]
+            }
+          ]
+        }
+      ]
+    },
     "factList": {
       "label": "Fact list (label + value)",
       "group": "Cards & lists",

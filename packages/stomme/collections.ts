@@ -169,6 +169,18 @@ export function stommeCollections(listings?: Listing[]) {
 
     testimonials: defineCollection({ loader: md('testimonials'), schema: z.object({ name: z.string(), role: z.string().default(''), quote: z.string(), order: z.number().default(0) }) }),
 
+    documents: defineCollection({
+      loader: md('documents'),
+      schema: z.object({
+        title: z.string(),
+        file: z.string(),
+        group: z.string().default(''),
+        date: dateField.optional(),
+        note: z.string().default(''),
+        order: z.number().default(0),
+      }),
+    }),
+
     towns: defineCollection({
       loader: md('towns'),
       schema: z.object({

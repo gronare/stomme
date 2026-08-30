@@ -20,7 +20,7 @@ const BLOCKS = [
   { type: 'postList', label: 'Post list', group: 'From collections', fields: [], sample: {} },
   { type: 'sampleless', label: 'Sampleless', group: 'Automatic', fields: [] },
 ];
-const ALL_ON = { pages: true, faq: true, testimonials: true, areas: true, blog: true, services: true, booking: true };
+const ALL_ON = { pages: true, faq: true, testimonials: true, documents: true, areas: true, blog: true, services: true, booking: true };
 
 let root;
 const warnings = [];

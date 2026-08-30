@@ -67,6 +67,9 @@
     '.bk-stats .l{font-family:' + fMono + ';font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:' + cMuted + ';margin-top:4px}',
     '.bk-note{margin-top:26px;font-size:.72rem;color:#9aa0ab;font-style:italic}',
     '.bk-post-date{font-family:' + fMono + ';font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;color:' + cMuted + '}',
+    '.bk-doc{display:flex;align-items:center;gap:14px;border:1px solid ' + cLine + ';border-radius:12px;padding:14px 16px;max-width:520px;margin-top:10px;background:' + cPaper + '}',
+    '.bk-doc-icon{font-family:' + fMono + ';font-size:.62rem;font-weight:700;letter-spacing:.08em;color:' + cBrand + ';border:1px solid ' + cLine + ';border-radius:7px;padding:6px 9px;min-width:52px;text-align:center}',
+    '.bk-doc-note{display:block;color:' + cMuted + ';font-size:.85rem;margin-top:2px}',
     '.bk-bullets{margin:18px 0 0;padding:0;list-style:none;max-width:60ch}',
     '.bk-bullets li{position:relative;padding-left:22px;margin-top:8px;color:' + cInk + '}',
     '.bk-bullets li:before{content:"✓";position:absolute;left:0;color:' + cBrand + ';font-weight:700}',
@@ -119,6 +122,20 @@
       h('div', { className: 'bk-q' }, v(e, 'question')),
       h('div', { className: 'bk-a' }, v(e, 'answer')),
       note('A question shown in the FAQ block.'));
+  };
+
+  var DocumentPreview = function (props) {
+    var e = props.entry;
+    var ext = String(v(e, 'file') || '').match(/\.([A-Za-z0-9]{1,8})$/);
+    var meta = [v(e, 'note'), v(e, 'date')].filter(Boolean).join(' \u00b7 ');
+    return h('div', { className: 'bk' },
+      v(e, 'group') ? h('div', { className: 'bk-section-label', style: { marginTop: 0 } }, v(e, 'group')) : null,
+      h('div', { className: 'bk-doc' },
+        h('span', { className: 'bk-doc-icon' }, ext ? ext[1].toUpperCase() : 'FILE'),
+        h('span', {},
+          h('b', {}, v(e, 'title')),
+          meta ? h('small', { className: 'bk-doc-note' }, meta) : null)),
+      note('A download row shown in the Documents block.'));
   };
 
   var PostPreview = function (props) {
@@ -274,6 +291,7 @@
   window.CMS.registerPreviewTemplate('pages', PagePreview);
   window.CMS.registerPreviewTemplate('faq', FaqPreview);
   window.CMS.registerPreviewTemplate('testimonials', TestimonialPreview);
+  window.CMS.registerPreviewTemplate('documents', DocumentPreview);
   window.CMS.registerPreviewTemplate('towns', TownPreview);
   window.CMS.registerPreviewTemplate('services', ServicePreview);
   window.CMS.registerPreviewTemplate('posts', PostPreview);

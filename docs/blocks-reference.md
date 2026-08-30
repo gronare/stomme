@@ -48,6 +48,7 @@ when it's absent). Chrome fields (`eyebrow`/`heading`/`intro`) are optional.
 |---|---|---|---|
 | `faq` | `faq` (`question`, `answer`, `order`) | — | Q&A + editable contact aside (`asideHeading`/`asideBody`/`asideCtaLabel`/`asideHref`). `variant`: `list` (default) / `accordion` (native `<details>`) / `cards` / `split` (index + reader, JS-enhanced) |
 | `testimonials` | `testimonials` (`name`, `role`, `quote`, `order`) | — | Quote cards |
+| `documentList` | `documents` (`title`, `file`, `group`, `date`, `note`, `order`) | — | Download rows grouped under their `group` heading (`grouped`); an icon with the file extension, the title, `note` + date, and file type + size read off the built file. `group` filters to one group |
 | `linkChips` | `towns` (`name`, `order`) | `routes.towns` | Chip links to each entry's page |
 | `serviceGrid` | `services` (`navLabel`, `summary`, `order`, `image?`) | `routes.services` | Service cards (image, placeholder fallback) → detail page; `services[]` picks/orders a subset |
 | `postList` | `posts` / any `article` listing (`title`, `date`, `excerpt`, `cover`, `showCover`) | listing `route` | Featured lead (a "Latest" tag, `strings.latest`) + card grid; per-post `showCover` shows the image or a brand-tinted default; `featured`/`showImages`/`columns` |
@@ -107,4 +108,4 @@ For collection **detail** pages, the package ships two layouts you drop into a r
 Use them in `src/pages/<route>/[slug].astro`: `getStaticPaths` over the collection,
 then `<Base ...><TownPage town={entry} config={kit} /></Base>`. `linkChips`/`serviceGrid`
 link into these routes. `cms:gen` auto-creates the CMS editor for any collection it
-finds (faq / testimonials / towns / posts / services) — no hand-authored admin sections.
+finds (faq / testimonials / documents / towns / posts / services) — no hand-authored admin sections.

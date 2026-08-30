@@ -6,6 +6,7 @@ export const features: StommeFeatures = {
   areas: false,
   services: false,
   testimonials: false,
+  documents: false,
 };
 
 export const site: SiteConfig = {

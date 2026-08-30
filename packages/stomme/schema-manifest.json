@@ -32,6 +32,17 @@
         ]
       }
     },
+    "documents": {
+      "fields": [
+        "title",
+        "file",
+        "group",
+        "date",
+        "note",
+        "order"
+      ],
+      "passthrough": false
+    },
     "faq": {
       "fields": [
         "question",

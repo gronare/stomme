@@ -159,7 +159,7 @@ along with the class's ratio, and the box measures 0 high until the file arrives
 
 `stomme-gen` copies the engine's `stomme-previews.js` into `public/admin/` —
 a live page preview (real components via `/preview`) plus rich mockups for
-testimonials/faq/posts/theme/nav/footer/settings. Add or override per-site previews
+testimonials/faq/documents/posts/theme/nav/footer/settings. Add or override per-site previews
 in `public/admin/previews.js` (loaded after the engine's): re-register a name to
 override, or add bespoke previews for your own collections (e.g. a `towns` mockup).
 

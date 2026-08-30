@@ -31,6 +31,7 @@ export interface SiteConfig {
       embedOsm?: string; embedNoteOsm?: string; embedLoadingOsm?: string; embedTitleOsm?: string;
     };
     footer?: { links?: string; areas?: string };
+    documents?: { separator?: string; file?: string };
     town?: {
       eyebrow?: string;
       heading?: string;
@@ -78,6 +79,7 @@ export interface StommeFeatures {
   services?: boolean;
   testimonials?: boolean;
   faq?: boolean;
+  documents?: boolean;
   tracking?: boolean;
   contactForm?: boolean;
   pages?: boolean;
@@ -89,6 +91,7 @@ export const FEATURE_DEFAULTS: Required<StommeFeatures> = {
   services: false,
   testimonials: false,
   faq: false,
+  documents: false,
   tracking: false,
   contactForm: true,
   pages: true,
@@ -151,6 +154,7 @@ const STRINGS_EN = {
     embedTitleOsm: 'OpenStreetMap map of {address}',
   },
   footer: { links: 'Links', areas: 'Areas' },
+  documents: { separator: '·', file: 'FILE' },
   town: {
     eyebrow: 'Local service: {name}',
     heading: '{name}',
@@ -220,6 +224,7 @@ const STRINGS_SV: typeof STRINGS_EN = {
     embedTitleOsm: 'OpenStreetMap-karta över {address}',
   },
   footer: { links: 'Länkar', areas: 'Områden' },
+  documents: { separator: '·', file: 'FIL' },
   town: {
     eyebrow: 'Lokal tjänst: {name}',
     heading: '{name}',
@@ -289,6 +294,7 @@ const STRINGS_NO: typeof STRINGS_EN = {
     embedTitleOsm: 'OpenStreetMap-kart over {address}',
   },
   footer: { links: 'Lenker', areas: 'Områder' },
+  documents: { separator: '·', file: 'FIL' },
   town: {
     eyebrow: 'Lokal tjeneste: {name}',
     heading: '{name}',
@@ -344,6 +350,7 @@ function baseStrings(locale?: string, cmsLocale?: string) {
     collage: { ...STRINGS_EN.collage, ...b.collage },
     map: { ...STRINGS_EN.map, ...b.map },
     footer: { ...STRINGS_EN.footer, ...b.footer },
+    documents: { ...STRINGS_EN.documents, ...b.documents },
     town: { ...STRINGS_EN.town, ...b.town },
     service: { ...STRINGS_EN.service, ...b.service },
     listingStatus: { ...STRINGS_EN.listingStatus, ...b.listingStatus },
@@ -406,6 +413,7 @@ export function resolveSite(c?: SiteConfig, locale?: string) {
       collage: { ...base.collage, ...((s && (s as any).collage) || {}) },
       map: { ...base.map, ...((s && (s as any).map) || {}) },
       footer: { ...base.footer, ...((s && (s as any).footer) || {}) },
+      documents: { ...base.documents, ...((s && (s as any).documents) || {}) },
       consent: { ...base.consent, ...((s && (s as any).consent) || {}) },
     },
     listings: resolveListings(c && c.listings),

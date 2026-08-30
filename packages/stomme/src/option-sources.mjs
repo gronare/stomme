@@ -86,7 +86,17 @@ export function buildOptionSources({ root, ROUTES, FEATURES, LISTINGS, BLOCKS })
   }
   const FAQ_TAG_OPTIONS = faqTagOptions();
 
-  const OPTION_SOURCES = { '$pages': PAGE_OPTIONS, '$services': SERVICE_OPTIONS, '$faq': FAQ_OPTIONS, '$faqTags': FAQ_TAG_OPTIONS };
+  function documentGroupOptions() {
+    const groups = new Set();
+    for (const f of contentFiles('src/content/documents')) {
+      const g = labelFromFrontmatter(resolve(root, 'src/content/documents', f), 'group');
+      if (g) groups.add(g);
+    }
+    return [...groups].sort().map((g) => ({ label: g, value: g }));
+  }
+  const DOCUMENT_GROUP_OPTIONS = documentGroupOptions();
+
+  const OPTION_SOURCES = { '$pages': PAGE_OPTIONS, '$services': SERVICE_OPTIONS, '$faq': FAQ_OPTIONS, '$faqTags': FAQ_TAG_OPTIONS, '$documentGroups': DOCUMENT_GROUP_OPTIONS };
 
   function collectionExists(name) {
     try {
@@ -96,7 +106,7 @@ export function buildOptionSources({ root, ROUTES, FEATURES, LISTINGS, BLOCKS })
       return false;
     }
   }
-  const FEATURE_OF = { faq: 'faq', testimonials: 'testimonials', towns: 'areas', posts: 'blog', services: 'services' };
+  const FEATURE_OF = { faq: 'faq', testimonials: 'testimonials', documents: 'documents', towns: 'areas', posts: 'blog', services: 'services' };
   function collectionEnabled(name) {
     if (name === 'home') return true;
     // Pages are enabled unless EXPLICITLY disabled — a deliberate exception to "absent = off", since the collection predates feature flags and absent-means-off would orphan every existing site's page content.
@@ -125,5 +135,5 @@ export function buildOptionSources({ root, ROUTES, FEATURES, LISTINGS, BLOCKS })
   const GROUP_ORDER = ['Hero & headers', 'Text', 'Cards & lists', 'Media', 'Quote & highlight', 'Numbers', 'From collections', 'Calls to action', 'Automatic'];
   const groupRank = (b) => { const i = GROUP_ORDER.indexOf(b.group); return i === -1 ? GROUP_ORDER.length : i; };
   AVAILABLE_BLOCKS.sort((a, b) => groupRank(a) - groupRank(b));
-  return { PAGE_OPTIONS, FAQ_TAG_OPTIONS, OPTION_SOURCES, collectionEnabled, AVAILABLE_BLOCKS, SKIPPED_BLOCKS, GROUP_ORDER };
+  return { PAGE_OPTIONS, FAQ_TAG_OPTIONS, DOCUMENT_GROUP_OPTIONS, OPTION_SOURCES, collectionEnabled, AVAILABLE_BLOCKS, SKIPPED_BLOCKS, GROUP_ORDER };
 }

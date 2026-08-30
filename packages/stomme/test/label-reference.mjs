@@ -12,8 +12,8 @@ import { scanLabels, listingAliases } from '../src/label-paths.mjs';
 
 const PKG = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const ROUTES = { services: '/services', towns: '/areas', blog: '/blog' };
-const ALL_ON = { blog: true, areas: true, services: true, testimonials: true, faq: true, tracking: true, pages: true };
-const ALL_OFF = { blog: false, areas: false, services: false, testimonials: false, faq: false, tracking: false, pages: true };
+const ALL_ON = { blog: true, areas: true, services: true, testimonials: true, faq: true, documents: true, tracking: true, pages: true };
+const ALL_OFF = { blog: false, areas: false, services: false, testimonials: false, faq: false, documents: false, tracking: false, pages: true };
 const LISTINGS = [
   { id: 'posts', route: '/blog', label: 'Blog', preset: 'article' },
   { id: 'catalog', route: '/catalog', label: 'Catalog', preset: 'catalog', specs: [{ key: 'spec', label: 'Spec' }] },

@@ -510,6 +510,22 @@ const RAW_BLOCKS: BlockDef[] = [
     fields: [...headingFieldsSuggesting('Happy customers', 'References'), styleGroup([surfaceField])],
   },
   {
+    type: 'documentList',
+    label: 'Documents',
+    group: 'From collections',
+    summary: 'Downloadable files from your Documents collection, grouped rows with file type and size.',
+    shape: 'list',
+    collection: 'documents',
+    fields: [
+      ...headingFieldsSuggesting('Documents', 'Read for yourself'),
+      { name: 'group', label: 'Group filter', widget: 'select', options: '$documentGroups', required: false, hint: 'Show only this group. Empty shows every group under its own heading.' },
+      layoutGroup([
+        { name: 'grouped', label: 'Group headings', widget: 'boolean', required: false, default: true, hint: 'Group headings on/off.' },
+      ]),
+      styleGroup([surfaceField]),
+    ],
+  },
+  {
     type: 'linkChips',
     label: 'Link chips',
     group: 'From collections',
@@ -781,6 +797,12 @@ const SAMPLES: Record<string, ({ _label?: string } & Record<string, unknown>)[]>
   ] }],
   linkChips: [{ _label: 'fixture entries', eyebrow: 'Areas', heading: 'Where we work', items: [
     { id: 'north', data: { name: 'Northtown' } }, { id: 'south', data: { name: 'Southville' } }, { id: 'east', data: { name: 'East End' } },
+  ] }],
+  documentList: [{ _label: 'fixture entries · grouped', eyebrow: 'Documents', heading: 'Read for yourself', layout: { grouped: true }, items: [
+    { id: 'rules', data: { title: 'House rules', file: '/media/documents/house-rules.pdf', group: 'Rules', date: '2026-01-15', note: 'Adopted at the annual meeting', order: 0 } },
+    { id: 'report-2025', data: { title: 'Annual report 2025', file: '/media/documents/annual-report-2025.pdf', group: 'Annual reports', date: '2026-03-20', note: '', order: 0 } },
+    { id: 'report-2024', data: { title: 'Annual report 2024', file: '/media/documents/annual-report-2024.pdf', group: 'Annual reports', date: '2025-03-18', note: '', order: 0 } },
+    { id: 'form', data: { title: 'Application form', file: '/media/documents/application.docx', group: '', date: '', note: 'Fill it in and hand it to the office', order: 0 } },
   ] }],
   postList: [{ _label: 'fixture entries · featured + images', eyebrow: 'Blog', heading: 'Latest posts', layout: { featured: true }, media: { showImages: true }, items: [
     { id: 'first', data: { title: 'The featured lead post', date: '2026-05-01', excerpt: LOREM, showCover: true } },

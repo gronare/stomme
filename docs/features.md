@@ -15,6 +15,7 @@ export const features: StommeFeatures = {
   services: false,     // services collection + /<routes.services>/[slug] + serviceGrid + ServicePage
   testimonials: true,  // testimonials collection + testimonials block (no route)
   faq: true,           // faq collection + faq block (no route)
+  documents: true,     // documents collection + documentList block (no route)
 };
 ```
 
@@ -25,6 +26,7 @@ export const features: StommeFeatures = {
 | `services` | `services` | `serviceGrid` | `/<routes.services>/[slug]` |
 | `testimonials` | `testimonials` | `testimonials` | — |
 | `faq` | `faq` | `faq` | — |
+| `documents` | `documents` | `documentList` | — |
 
 How it works (set up once by the scaffold; you only edit the flags afterwards):
 
