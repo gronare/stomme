@@ -1023,7 +1023,7 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
 
 .page-header__heading { margin-top: 1rem; font-size: clamp(2.5rem, 6vw, 4rem); }
   .page-header__intro { max-width: 42rem; }
-  .page-header--light { padding-top: clamp(3rem, 6vw, 4.5rem); padding-bottom: clamp(2rem, 3vw, 3rem); }
+  .section.page-header--light { padding-bottom: clamp(1rem, 1.5vw, 1.5rem); }
 
   .page-header--dark { position: relative; overflow: hidden; }
   .page-header__glow {
@@ -1417,8 +1417,10 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
     border: 1px solid var(--color-line);
     background: var(--color-line);
   }
+  .facts-grid > .fact:nth-child(odd):last-child { grid-column: 1 / -1; }
   @media (min-width: 640px) {
     .facts-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .facts-grid > .fact:nth-child(odd):last-child { grid-column: auto; }
   }
   .fact {
     background: var(--color-paper);
