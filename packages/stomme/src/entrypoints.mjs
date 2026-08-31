@@ -149,24 +149,24 @@ if (shareDraft && scOg.enabled) {
 {/* Static/prerendered output emits no response header, so carry the CSP in a leading <meta> that Astro relocates into the document <head>; redundant but harmless under SSR. */}
 <meta http-equiv="Content-Security-Policy" content={csp} />
 {kind === 'header' ? (
-  <Base title="Preview" chrome={false}><div id="preview-root"><Header nav={navDraft} /></div></Base>
+  <Base title="Preview" chrome={false}><Header nav={navDraft} /></Base>
 ) : kind === 'footer' ? (
-  <Base title="Preview" chrome={false}><div id="preview-root"><Footer footer={footerDraft} towns={towns} townsHref={site.routes?.towns ?? '/areas'} /></div></Base>
+  <Base title="Preview" chrome={false}><Footer footer={footerDraft} towns={towns} townsHref={site.routes?.towns ?? '/areas'} /></Base>
 ) : kind === 'thanks' ? (
-  <Base title="Preview"><div id="preview-root"><Thanks {...thanks} /></div></Base>
+  <Base title="Preview"><Thanks {...thanks} /></Base>
 ) : kind === 'contact' ? (
-  <Base title="Preview"><div id="preview-root">
+  <Base title="Preview">
     <div style="display:flex;flex-direction:column;gap:2.25rem;padding:2.25rem 1.5rem">
       <div class="contact-card-block"><DirectContact data={contactDraft} tint={true} show={{ phone: true, email: true, hours: true, address: true, socials: true, map: true }} /></div>
       <FindUs data={contactDraft} showHours={true} site={resolveSite(site)} />
     </div>
-  </div></Base>
+  </Base>
 ) : kind === 'service' ? (
-  <Base title="Preview"><div id="preview-root"><ServicePage data={serviceDraft ?? {}} bodyHtml={serviceHtml} config={site} /></div></Base>
+  <Base title="Preview"><ServicePage data={serviceDraft ?? {}} bodyHtml={serviceHtml} config={site} /></Base>
 ) : kind === 'town' ? (
-  <Base title="Preview"><div id="preview-root"><TownPage town={{ id: 'preview', data: townDraft ?? {} }} config={site} /></div></Base>
+  <Base title="Preview"><TownPage town={{ id: 'preview', data: townDraft ?? {} }} config={site} /></Base>
 ) : kind === 'identity' ? (
-  <Base title="Preview" chrome={false}><div id="preview-root">
+  <Base title="Preview" chrome={false}>
     <div style="padding:1.5rem;color:var(--color-ink,#1f2937);font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;line-height:1.5">
       <p style={idLabel}>Logo</p>
       <div class="logo" style="display:flex;align-items:center;gap:0.75rem">
@@ -205,9 +205,9 @@ if (shareDraft && scOg.enabled) {
 
       <p style="margin-top:26px;color:#6b7280;font-size:.9rem">Business name: <span style="color:var(--color-ink,#1f2937);font-weight:600">{idName}</span></p>
     </div>
-  </div></Base>
+  </Base>
 ) : kind === 'sharecards' ? (
-  <Base title="Preview" chrome={false}><div id="preview-root">
+  <Base title="Preview" chrome={false}>
     <div style="padding:1.5rem;color:var(--color-ink,#1f2937);font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;line-height:1.5">
       <p style={idLabel}>Site default share image</p>
       {scDefaultImg ? (
@@ -242,16 +242,16 @@ if (shareDraft && scOg.enabled) {
         <p style="color:#6b7280;font-size:.9rem;margin:0">Cards are off — pages share the site default image above.</p>
       )}
     </div>
-  </div></Base>
+  </Base>
 ) : kind ? (
-  <Base title="Preview"><div id="preview-root">
+  <Base title="Preview">
     <AddonPreview kind={kind} draft={draft} config={site} />
-  </div></Base>
+  </Base>
 ) : (
-  <Base title="Preview"><div id="preview-root"><BlockRenderer blocks={blocks} config={site} features={features} /></div></Base>
+  <Base title="Preview"><BlockRenderer blocks={blocks} config={site} features={features} /></Base>
 )}
 <script is:inline nonce={nonce}>
-  // The CMS keeps this iframe mounted and posts each draft; re-fetching and MORPHING into #preview-root patches only what changed, so there is no reload, no white flash, scroll and focus survive, and one-shot animations do not replay. Single-flight with a trailing run always converges on the latest data.
+  // The CMS keeps this iframe mounted and posts each draft; re-fetching and MORPHING the layout's own <main> patches only what changed, so there is no reload, no white flash, scroll and focus survive, and one-shot animations do not replay. Single-flight with a trailing run always converges on the latest data.
   (function () {
     // Aligns children by index and patches text/attributes in place: a text edit touches only text nodes, a structural change patches more, neither reloads.
     function morph(from, to) {
@@ -293,8 +293,8 @@ if (shareDraft && scOg.enabled) {
       fetch(u.toString(), { headers: { 'X-Preview-Swap': '1' } })
         .then(function (r) { return r.text(); })
         .then(function (html) {
-          var cur = document.getElementById('preview-root');
-          var fresh = new DOMParser().parseFromString(html, 'text/html').getElementById('preview-root');
+          var cur = document.querySelector('main');
+          var fresh = new DOMParser().parseFromString(html, 'text/html').querySelector('main');
           if (cur && fresh) {
             morphChildren(cur, fresh);
             // A morph never re-runs a page's island, so anything that painted itself on load would sit at its empty first state for every edit after the first — the page listens for this and paints again.

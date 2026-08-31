@@ -91,7 +91,7 @@
     for (var i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
     return btoa(bin);
   }
-  // The iframe stays MOUNTED across edits: returning its src UNCHANGED is what stops the CMS's React from reloading (and flickering) it — new drafts ride in on postMessage and /preview swaps #preview-root in place.
+  // The iframe stays MOUNTED across edits: returning its src UNCHANGED is what stops the CMS's React from reloading (and flickering) it — new drafts ride in on postMessage and /preview morphs its own <main> in place.
   var FRAME_STYLE = { width: '100%', height: '100vh', border: '0', display: 'block', background: '#fff' };
   var FRAMES = {};
   function liveFrame(id, baseSrc, data, style) {

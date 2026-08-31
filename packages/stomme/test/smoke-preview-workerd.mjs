@@ -65,8 +65,8 @@ async function portBusy() {
   try { await fetch(base + '/'); return true; } catch { return false; }
 }
 
-function previewRootInner(html) {
-  const m = html.match(/id="preview-root"[^>]*>([\s\S]*)/);
+function mainInner(html) {
+  const m = html.match(/<main[^>]*>([\s\S]*)<\/main>/);
   return m ? m[1] : null;
 }
 
@@ -107,15 +107,24 @@ async function main() {
   const html = await res.text();
   if (res.status !== 200) ok = fail(`/preview returned HTTP ${res.status} (expected 200)`);
 
-  const inner = previewRootInner(html);
+  const inner = mainInner(html);
   if (inner === null) {
-    ok = fail('no #preview-root in the response');
-  } else if (/^\s*<\/div>/.test(inner)) {
-    ok = fail('#preview-root is EMPTY — decode/render failed on workerd (the Buffer-on-workerd signature)');
+    ok = fail('no <main> in the response');
+  } else if (!inner.trim()) {
+    ok = fail('<main> is EMPTY — decode/render failed on workerd (the Buffer-on-workerd signature)');
   } else if (!inner.includes(MARKER)) {
-    ok = fail(`#preview-root is non-empty but does not contain the encoded heading ("${MARKER}") — decode drift`);
+    ok = fail(`<main> is non-empty but does not contain the encoded heading ("${MARKER}") — decode drift`);
   } else {
-    log('OK  /preview 200, #preview-root non-empty and contains the encoded heading (UTF-8 round-trip)');
+    log('OK  /preview 200, <main> non-empty and contains the encoded heading (UTF-8 round-trip)');
+  }
+
+  // A wrapper around the blocks makes the preview DOM main > div > section where a real page is main > section, so every structural selector a site writes (main > .section[data-stomme-block], :first-child) misses in the editor only.
+  if (inner !== null && inner.trim()) {
+    if (!/^\s*<section[\s>]/.test(inner)) {
+      ok = fail(`the first block is NOT a direct child of <main> — something wraps it: "${inner.trim().slice(0, 80)}…"`);
+    } else {
+      log('OK  the first block\'s <section> is a direct child of <main> (structural parity with a real page)');
+    }
   }
 
   const logText = workerLog.join('');
