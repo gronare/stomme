@@ -1162,6 +1162,48 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
   }
   .post-date--event { color: var(--color-brand); font-weight: 700; }
 
+  .post-archfoot {
+    display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0.75rem;
+    margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--color-line);
+  }
+  .post-archfoot__note { margin: 0; font-size: 0.85rem; color: var(--color-muted); }
+  .post-archfoot__link { color: var(--color-brand); text-decoration: none; }
+  .post-archfoot__link:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+  .archive-year + .archive-year { margin-top: 2.25rem; }
+  .archive-head {
+    display: flex; align-items: baseline; justify-content: space-between; gap: 1rem;
+    padding-bottom: 0.5rem; border-bottom: 2px solid var(--color-brand);
+  }
+  .archive-head h3 { margin: 0; color: var(--color-ink); font-variant-numeric: tabular-nums; }
+  .archive-count { color: var(--color-muted); white-space: nowrap; }
+  .archive-list { list-style: none; margin: 0; padding: 0; }
+  .archive-list li { border-bottom: 1px solid var(--color-line); }
+  .archive-row {
+    display: grid;
+    grid-template-columns: 8.5rem minmax(0, 1fr) auto;
+    align-items: baseline;
+    gap: 1rem;
+    padding: 0.72rem 0;
+    text-decoration: none;
+    color: inherit;
+  }
+  .archive-row:focus-visible { outline: 2px solid var(--color-brand); outline-offset: 2px; }
+  .archive-date { color: var(--color-muted); font-variant-numeric: tabular-nums; }
+  .archive-title { font-weight: 700; color: var(--color-ink); transition: color 0.18s; }
+  .archive-row:hover .archive-title { color: var(--color-brand); text-decoration: underline; text-underline-offset: 3px; }
+  .archive-cat {
+    justify-self: end; padding: 0.28rem 0.55rem; border-radius: 7px; white-space: nowrap;
+    background: color-mix(in srgb, var(--color-brand) 12%, var(--color-paper));
+    color: var(--color-brand);
+  }
+  @media (max-width: 560px) {
+    .archive-row { grid-template-columns: minmax(0, 1fr) auto; }
+    .archive-title { grid-column: 1; grid-row: 1; }
+    .archive-date { grid-column: 1; grid-row: 2; }
+    .archive-cat { grid-column: 2; grid-row: 1 / span 2; align-self: center; }
+  }
+
   .post-card--corner { position: relative; }
   .post-card--corner .post-card__img { position: absolute; top: 1rem; right: 1rem; width: 7.5rem; height: 5rem; object-fit: cover; border-radius: 8px; border: 1px solid var(--color-line); }
   .post-card--corner:has(.post-card__img) .post-card__body { padding-right: 9.5rem; }

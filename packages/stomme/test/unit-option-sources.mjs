@@ -18,6 +18,7 @@ const BLOCKS = [
   { type: 'bookingForm', label: 'Booking', group: 'Calls to action', feature: 'booking', fields: [], samples: [{}] },
   { type: 'catalogList', label: 'Catalog list', group: 'From collections', fields: [], sample: {} },
   { type: 'postList', label: 'Post list', group: 'From collections', fields: [], sample: {} },
+  { type: 'postArchive', label: 'Post archive', group: 'From collections', fields: [], sample: {} },
   { type: 'sampleless', label: 'Sampleless', group: 'Automatic', fields: [] },
 ];
 const ALL_ON = { pages: true, faq: true, testimonials: true, documents: true, areas: true, blog: true, services: true, booking: true };
@@ -163,6 +164,10 @@ try {
   check(typesOf(build({ FEATURES: { ...ALL_ON, blog: false }, LISTINGS: withArticle })).includes('postList'),
     'postList also appears for an article listing without the blog feature');
   check(!typesOf(build({ FEATURES: { ...ALL_ON, blog: false } })).includes('postList'), 'postList is dropped with neither a blog nor an article listing');
+  check(typesOf(build({ FEATURES: { ...ALL_ON, blog: false }, LISTINGS: withArticle })).includes('postArchive'),
+    'postArchive follows the same article gate as postList');
+  check(!typesOf(build({ FEATURES: { ...ALL_ON, blog: false } })).includes('postArchive'),
+    'postArchive is dropped without one too — it reads the same collection, so offering it would build a page against nothing');
   const r = build({ FEATURES: { ...ALL_ON, faq: false } });
   check(r.AVAILABLE_BLOCKS.length + r.SKIPPED_BLOCKS.length === BLOCKS.length
     && !r.SKIPPED_BLOCKS.some((b) => typesOf(r).includes(b.type)),

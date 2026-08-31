@@ -9,7 +9,7 @@ interface Props {
   intro?: string;
   text?: string;
   media?: { showImages?: boolean; style?: string };
-  layout?: { featured?: boolean; columns?: number; limit?: number };
+  layout?: { featured?: boolean; columns?: number; limit?: number; archive?: string };
   source?: string;
   base?: string;
   items?: { id: string; data: Record<string, any> }[];
@@ -22,13 +22,17 @@ const corner = Astro.props.media?.style === 'corner';
 const featured = Astro.props.layout?.featured ?? false;
 const columns = Astro.props.layout?.columns ?? 3;
 const limit = Number(Astro.props.layout?.limit) || 0;
+const archivePath = String(Astro.props.layout?.archive ?? '').trim();
 const ItemHeading = heading ? 'h3' : 'h2';
 const prefix = base ?? site?.routes?.blog ?? '/blog';
 const locale = site?.locale ?? 'en-US';
 const readMore = site?.strings?.readMore ?? 'Read more';
 const latest = site?.strings?.latest ?? 'Latest';
+const showingLatest = site?.strings?.post?.showingLatest ?? 'Showing the {n} latest posts';
+const archiveLabel = site?.strings?.post?.archive ?? 'All posts in the archive';
 const sorted = Astro.props.items ?? (await getCollection(source)).sort((a, b) => (a.data.date < b.data.date ? 1 : -1));
 const all = limit > 0 ? sorted.slice(0, limit) : sorted;
+const archived = archivePath !== '' && sorted.length > all.length;
 const fmt = (d: string) => new Date(d).toLocaleDateString(locale, { year: 'numeric', month: 'long', day: 'numeric' });
 const dateLine = (d: Record<string, any>) => fmt(d.date);
 const fullText = Astro.props.text === 'full';
@@ -92,6 +96,12 @@ const hasImg = (p: any) => !!(showImages && p.data.showCover);
             </div>
           </a>
         ))}
+      </div>
+    )}
+    {archived && (
+      <div class="post-archfoot">
+        <p class="post-archfoot__note">{showingLatest.replace('{n}', String(all.length))}</p>
+        <a class="mono post-archfoot__link" href={archivePath}>{archiveLabel} →</a>
       </div>
     )}
   </section>

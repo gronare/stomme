@@ -594,7 +594,22 @@ const RAW_BLOCKS: BlockDef[] = [
         { name: 'featured', label: 'Featured first post', widget: 'boolean', required: false, default: true, hint: 'Show the newest post as a large lead card.' },
         { name: 'columns', label: 'Columns', widget: 'number', required: false, default: 3, hint: '2 or 3.' },
         { name: 'limit', label: 'Show at most', widget: 'number', required: false, hint: 'Newest first. Empty shows every post.' },
+        { name: 'archive', label: 'Archive page', widget: 'string', required: false, hint: 'Path to the archive page, e.g. /archive. When the limit cuts the list, a link to it is shown.' },
       ]),
+      styleGroup([surfaceField]),
+    ],
+  },
+  {
+    type: 'postArchive',
+    label: 'Post archive',
+    group: 'From collections',
+    summary: 'The complete register of every post, grouped by year, newest first — title and date rows linking to each post. Pair it with a post list that has a limit.',
+    shape: 'list',
+    fields: [
+      ...headingFieldsSuggesting('Archive', 'Every post'),
+      { name: 'source', label: 'source', widget: 'hidden', required: false },
+      { name: 'base', label: 'base', widget: 'hidden', required: false },
+      layoutGroup([]),
       styleGroup([surfaceField]),
     ],
   },
@@ -884,6 +899,13 @@ const SAMPLES: Record<string, ({ _label?: string } & Record<string, unknown>)[]>
     { id: 'first', data: { title: 'The featured lead post', date: '2026-05-01', excerpt: LOREM, showCover: true } },
     { id: 'second', data: { title: 'A text-only card', date: '2026-04-01', excerpt: 'A shorter excerpt.' } },
     { id: 'third', data: { title: 'A card with the placeholder cover', date: '2026-03-01', excerpt: LOREM, showCover: true } },
+  ] }],
+  postArchive: [{ _label: 'fixture entries · two years', eyebrow: 'Archive', heading: 'Every post', items: [
+    { id: 'may', data: { title: 'The newest entry of the year', date: '2026-05-01', category: 'Notice' } },
+    { id: 'march', data: { title: 'A row with no category', date: '2026-03-14' } },
+    { id: 'february', data: { title: 'An entry with a longer title, long enough to wrap on a narrow screen', date: '2026-02-02', category: 'Maintenance' } },
+    { id: 'november', data: { title: 'The last entry of the year before', date: '2025-11-20', category: 'Meeting' } },
+    { id: 'january', data: { title: 'And the first one', date: '2025-01-08' } },
   ] }],
   eventList: [
     { _label: 'fixture entries · upcoming + feed link', eyebrow: 'Calendar', heading: 'Upcoming', feedLabel: 'Add to your calendar', emptyText: 'Nothing is planned right now.', items: [

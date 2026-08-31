@@ -116,7 +116,7 @@ export function buildOptionSources({ root, ROUTES, FEATURES, LISTINGS, BLOCKS })
   }
   const hasCatalog = LISTINGS.some((l) => l.preset === 'catalog');
   const hasArticle = !!(FEATURES && FEATURES.blog) || LISTINGS.some((l) => l.preset === 'article');
-  const ARTICLE_BLOCKS = new Set(['postList', 'eventList']);
+  const ARTICLE_BLOCKS = new Set(['postList', 'postArchive', 'eventList']);
   const presetOk = (b) => (b.type !== 'catalogList' || hasCatalog) && (!ARTICLE_BLOCKS.has(b.type) || hasArticle);
   const featureOn = (name) => !!(FEATURES && FEATURES[name]);
   const blockOk = (b) => (!b.collection || collectionEnabled(b.collection)) && (!b.feature || featureOn(b.feature)) && presetOk(b);

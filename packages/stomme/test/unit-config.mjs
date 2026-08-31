@@ -154,6 +154,19 @@ eq(resolveSite({ strings: { readMore: 'More →' } }).strings.readMore, 'More �
 eq(resolveSite({ locale: 'sv', strings: { listingCta: 'Boka' } }).strings.listingCta, 'Boka', 'listingCta is overridable');
 eq(resolveSite({ locale: 'sv', strings: { listingCta: '' } }).strings.listingCta, 'Kontakta oss', 'an empty listingCta falls back rather than rendering a blank button');
 
+// ── post strings ────────────────────────────────────────────────────────────
+const COUNTED = ['yearCount', 'showingLatest', 'archive'];
+for (const set of [EN, sv, no])
+  check(COUNTED.every((k) => typeof set.post[k] === 'string' && set.post[k] !== ''),
+    `the archive strings (${COUNTED.join(', ')}) exist in the ${set.readMore} set`,
+    COUNTED.filter((k) => !set.post[k]).join(', '));
+for (const set of [EN, sv, no])
+  check(set.post.yearCount.includes('{n}') && set.post.showingLatest.includes('{n}'),
+    `the counted archive strings carry the {n} placeholder the blocks fill in (${set.readMore})`,
+    `${set.post.yearCount} · ${set.post.showingLatest}`);
+check(!EN.post.archive.includes('{n}') && !sv.post.archive.includes('{n}'),
+  'the archive link is a plain label — it counts nothing, so it carries no placeholder to leave unfilled');
+
 // ── map providers ───────────────────────────────────────────────────────────
 eq(EN.map.embed, 'Show interactive map', 'the chip promises the interactive map, not a provider');
 eq(EN.map.embedOsm, 'Show interactive map', 'the openstreetmap chip carries the very same label');

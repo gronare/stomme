@@ -2559,6 +2559,74 @@
         }
       ]
     },
+    "postArchive": {
+      "label": "Post archive",
+      "group": "From collections",
+      "shape": "list",
+      "fields": [
+        {
+          "name": "eyebrow",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "heading",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "intro",
+          "widget": "text",
+          "required": false
+        },
+        {
+          "name": "source",
+          "widget": "hidden",
+          "required": false
+        },
+        {
+          "name": "base",
+          "widget": "hidden",
+          "required": false
+        },
+        {
+          "name": "layout",
+          "widget": "object",
+          "fields": [
+            {
+              "name": "beside",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "below",
+                "equal",
+                "narrow",
+                "wide"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "style",
+          "widget": "object",
+          "fields": [
+            {
+              "name": "surface",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "standard",
+                "tint",
+                "panel",
+                "band",
+                "dark",
+                "gradient"
+              ]
+            }
+          ]
+        }
+      ]
+    },
     "postList": {
       "label": "Posts (blog / news)",
       "group": "From collections",
@@ -2635,6 +2703,11 @@
             {
               "name": "limit",
               "widget": "number",
+              "required": false
+            },
+            {
+              "name": "archive",
+              "widget": "string",
               "required": false
             },
             {

@@ -1,0 +1,55 @@
+---
+import { getCollection } from 'astro:content';
+
+interface Props {
+  eyebrow?: string;
+  heading?: string;
+  intro?: string;
+  source?: string;
+  base?: string;
+  items?: { id: string; data: Record<string, any> }[];
+  site?: any;
+  anchor?: string;
+}
+const { eyebrow, heading, intro, source = 'posts', base, site, anchor } = Astro.props;
+const prefix = base ?? site?.routes?.blog ?? '/blog';
+const locale = site?.locale ?? 'en-US';
+const countLabel = site?.strings?.post?.yearCount ?? '{n} posts';
+const entries = Astro.props.items ?? (await getCollection(source));
+const all = [...entries].sort((a, b) => (a.data.date < b.data.date ? 1 : -1));
+const yearOf = (p: { data: Record<string, any> }) => String(p.data.date ?? '').slice(0, 4);
+const years = [...new Set(all.map(yearOf))];
+const groups = years.map((year) => ({ year, rows: all.filter((p) => yearOf(p) === year) }));
+const fmt = (d: string) => new Date(`${String(d).slice(0, 10)}T12:00:00`).toLocaleDateString(locale, { day: 'numeric', month: 'long' });
+const counted = (n: number) => countLabel.replace('{n}', String(n));
+---
+{all.length > 0 && (
+  <section data-stomme-block="postArchive" id={anchor || undefined} class="section">
+    {(eyebrow || heading || intro) && (
+      <div class="section-head">
+        {eyebrow && <span class="mono eyebrow">{eyebrow}</span>}
+        {heading && <h2 class="display" style="margin-top:0.75rem">{heading}</h2>}
+        {intro && <p class="intro">{intro}</p>}
+      </div>
+    )}
+    {groups.map((g) => (
+      <div class="archive-year">
+        <div class="archive-head">
+          <h3 class="mono eyebrow">{g.year}</h3>
+          <span class="mono archive-count">{counted(g.rows.length)}</span>
+        </div>
+        <ul class="archive-list">
+          {g.rows.map((p) => (
+            <li>
+              <a class="archive-row" href={`${prefix}/${p.id}`}>
+                <span class="mono archive-date">{fmt(p.data.date)}</span>
+                <b class="archive-title">{p.data.title}</b>
+                {p.data.category && <span class="mono archive-cat">{p.data.category}</span>}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    ))}
+  </section>
+)}

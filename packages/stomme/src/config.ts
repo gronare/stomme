@@ -158,7 +158,12 @@ const STRINGS_EN = {
   footer: { links: 'Links', areas: 'Areas' },
   documents: { separator: '·', file: 'FILE' },
   sectionNav: { label: 'On this page' },
-  post: { back: 'All posts' },
+  post: {
+    back: 'All posts',
+    yearCount: '{n} posts',
+    showingLatest: 'Showing the {n} latest posts',
+    archive: 'All posts in the archive',
+  },
   town: {
     eyebrow: 'Local service: {name}',
     heading: '{name}',
@@ -230,7 +235,12 @@ const STRINGS_SV: typeof STRINGS_EN = {
   footer: { links: 'Länkar', areas: 'Områden' },
   documents: { separator: '·', file: 'FIL' },
   sectionNav: { label: 'På den här sidan' },
-  post: { back: 'Alla inlägg' },
+  post: {
+    back: 'Alla inlägg',
+    yearCount: '{n} inlägg',
+    showingLatest: 'Visar de {n} senaste inläggen',
+    archive: 'Alla inlägg i arkivet',
+  },
   town: {
     eyebrow: 'Lokal tjänst: {name}',
     heading: '{name}',
@@ -302,7 +312,12 @@ const STRINGS_NO: typeof STRINGS_EN = {
   footer: { links: 'Lenker', areas: 'Områder' },
   documents: { separator: '·', file: 'FIL' },
   sectionNav: { label: 'På denne siden' },
-  post: { back: 'Alle innlegg' },
+  post: {
+    back: 'Alle innlegg',
+    yearCount: '{n} innlegg',
+    showingLatest: 'Viser de {n} siste innleggene',
+    archive: 'Alle innlegg i arkivet',
+  },
   town: {
     eyebrow: 'Lokal tjeneste: {name}',
     heading: '{name}',
