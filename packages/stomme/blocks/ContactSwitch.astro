@@ -1,0 +1,110 @@
+---
+import ContactForm from './ContactForm.astro';
+import { switchPanes, switchVariant, type SwitchItem } from '../src/contact-switch';
+
+interface Props {
+  site?: any;
+  eyebrow?: string;
+  heading?: string;
+  intro?: string;
+  anchor?: string;
+  pageHasH1?: boolean;
+  layout?: { variant?: 'segmented' | 'cards' | 'tabs' };
+  style?: { surface?: string };
+  items?: SwitchItem[];
+}
+const { site, eyebrow, heading, intro, anchor, pageHasH1, items } = Astro.props;
+const variant = switchVariant(Astro.props.layout?.variant);
+const panes = switchPanes(items, anchor, heading);
+const Heading = pageHasH1 ? 'h2' : 'h1';
+const switched = panes.length > 1;
+---
+
+{panes.length > 0 && (
+  <section data-stomme-block="contactSwitch" id={anchor || undefined} class:list={['section', 'contact-switch', `contact-switch--${variant}`]}>
+    {(eyebrow || heading || intro) && (
+      <div class="section-head contact-switch__head">
+        {eyebrow && <span class="mono eyebrow">{eyebrow}</span>}
+        {heading && <Heading class="display contact-switch__heading">{heading}</Heading>}
+        {intro && <p class="intro">{intro}</p>}
+      </div>
+    )}
+    {switched && (
+      <div class="contact-switch__controls" role="tablist" aria-label={heading || undefined}>
+        {panes.map((p, i) => (
+          <button type="button" role="tab" id={p.tabId} class="contact-switch__btn" aria-selected={i === 0 ? 'true' : 'false'} aria-controls={p.panelId}>
+            {variant === 'cards' ? (
+              <>
+                <span class="contact-switch__dot" aria-hidden="true" />
+                <span class="contact-switch__text">
+                  <span class="contact-switch__label">{p.item.label}</span>
+                  {p.item.description && <span class="contact-switch__desc">{p.item.description}</span>}
+                </span>
+              </>
+            ) : p.item.label}
+          </button>
+        ))}
+      </div>
+    )}
+    {panes.map((p) => (
+      <div
+        class="contact-switch__pane"
+        id={switched ? p.panelId : undefined}
+        role={switched ? 'tabpanel' : undefined}
+        aria-labelledby={switched ? p.tabId : undefined}
+        hidden={p.hidden}
+      >
+        <ContactForm
+          site={site}
+          embedded
+          anchor={p.anchor}
+          intro={p.item.intro}
+          labelName={p.item.labelName}
+          labelEmail={p.item.labelEmail}
+          labelMessage={p.item.labelMessage}
+          submitLabel={p.item.submitLabel}
+          showPhone={p.item.showPhone}
+          showCategory={p.item.showCategory}
+          labelCategory={p.item.labelCategory}
+          categories={p.item.categories}
+          showUnit={p.item.showUnit}
+          labelUnit={p.item.labelUnit}
+          placeholderUnit={p.item.placeholderUnit}
+          showDirectContact={p.item.showDirectContact}
+          inbox={p.item.inbox}
+        />
+      </div>
+    ))}
+    {switched && (
+      <noscript>
+        <style is:inline>[data-stomme-block="contactSwitch"] .contact-switch__pane[hidden] { display: block; } [data-stomme-block="contactSwitch"] .contact-switch__controls { display: none; }</style>
+      </noscript>
+    )}
+    {switched && (
+      <script is:inline>
+        (function () {
+          var box = document.currentScript.closest('[data-stomme-block="contactSwitch"]');
+          if (!box) return;
+          var tabs = [].slice.call(box.querySelectorAll(':scope > .contact-switch__controls > [role=tab]'));
+          var panes = [].slice.call(box.querySelectorAll(':scope > .contact-switch__pane'));
+          if (tabs.length !== panes.length) return;
+          var select = function (i) {
+            tabs.forEach(function (t, n) { t.setAttribute('aria-selected', n === i ? 'true' : 'false'); });
+            panes.forEach(function (p, n) { p.hidden = n !== i; });
+          };
+          tabs.forEach(function (tab, i) {
+            tab.addEventListener('click', function () { select(i); });
+            tab.addEventListener('keydown', function (e) {
+              var step = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+              if (!step) return;
+              e.preventDefault();
+              var next = (i + step + tabs.length) % tabs.length;
+              select(next);
+              tabs[next].focus();
+            });
+          });
+        })();
+      </script>
+    )}
+  </section>
+)}

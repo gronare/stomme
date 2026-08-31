@@ -555,6 +555,164 @@
         }
       ]
     },
+    "contactSwitch": {
+      "label": "Contact form switcher",
+      "group": "Calls to action",
+      "shape": "band",
+      "fields": [
+        {
+          "name": "eyebrow",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "heading",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "intro",
+          "widget": "text",
+          "required": false
+        },
+        {
+          "name": "items",
+          "widget": "list",
+          "required": false,
+          "fields": [
+            {
+              "name": "label",
+              "widget": "string"
+            },
+            {
+              "name": "description",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "intro",
+              "widget": "text",
+              "required": false
+            },
+            {
+              "name": "labelName",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "labelEmail",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "showPhone",
+              "widget": "boolean",
+              "required": false
+            },
+            {
+              "name": "showCategory",
+              "widget": "boolean",
+              "required": false
+            },
+            {
+              "name": "labelCategory",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "categories",
+              "widget": "list",
+              "required": false,
+              "field": {
+                "name": "category",
+                "widget": "string"
+              }
+            },
+            {
+              "name": "showUnit",
+              "widget": "boolean",
+              "required": false
+            },
+            {
+              "name": "labelUnit",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "placeholderUnit",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "labelMessage",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "submitLabel",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "showDirectContact",
+              "widget": "boolean",
+              "required": false
+            },
+            {
+              "name": "inbox",
+              "widget": "string",
+              "required": false
+            }
+          ]
+        },
+        {
+          "name": "layout",
+          "widget": "object",
+          "fields": [
+            {
+              "name": "variant",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "segmented",
+                "cards",
+                "tabs"
+              ]
+            },
+            {
+              "name": "beside",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "below",
+                "equal",
+                "narrow",
+                "wide"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "style",
+          "widget": "object",
+          "fields": [
+            {
+              "name": "surface",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "standard",
+                "tint",
+                "panel",
+                "band",
+                "dark",
+                "gradient"
+              ]
+            }
+          ]
+        }
+      ]
+    },
     "cover": {
       "label": "Cover (full-bleed)",
       "group": "Hero & headers",

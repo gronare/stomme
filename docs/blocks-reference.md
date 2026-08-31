@@ -85,6 +85,7 @@ Each carries its own data, so different pages can show different numbers.
 | Type | What it renders | Key fields |
 |---|---|---|
 | `contactForm` | Form + direct-contact aside; posts to the engine's contact route and redirects to `routes.formSuccess` | `eyebrow`/`heading`/`intro`, `labelName`, `labelEmail`, `labelMessage`, `submitLabel`, `showPhone`, `showDirectContact`, `showCategory` + `categories[]`/`labelCategory`, `showUnit`/`labelUnit`/`placeholderUnit` |
+| `contactSwitch` | Two or more contact forms on one surface, one at a time, switched without a page load | `eyebrow`/`heading`/`intro`, `items[]` (`label`, `description` + every `contactForm` field), `layout.variant` (segmented/cards/tabs) |
 | `contactCard` | The direct-contact card on its own | `show` (which parts), `tint` |
 | `findUs` | Map + address block | reads the `contact` settings |
 
@@ -103,6 +104,7 @@ Six pairs are easy to mix up. Each row says what makes the block different, not 
 | `prose` | its pull-stat (`statValue` + `statLabel`) is for the one headline figure a text section earns — `statsBar` is the row for several |
 | `definition` | a dictionary entry (term, word class, numbered senses); `width` and `align` behave as they do in `callout` |
 | `factList` | one row per fact, label beside value — `statsBar` is the row of big headline numbers, `definition` is a single word being defined |
+| `contactSwitch` | one surface, one form at a time — two `contactForm` blocks under each other is the alternative, and it asks the visitor to read both |
 
 ## Chrome (not blocks)
 

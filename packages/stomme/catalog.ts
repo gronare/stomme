@@ -772,6 +772,47 @@ const RAW_BLOCKS: BlockDef[] = [
     ],
   },
   {
+    type: 'contactSwitch', label: 'Contact form switcher', group: 'Calls to action',
+    summary: 'Two or more contact forms sharing one surface, one at a time. The visitor picks the errand and that form appears, without a page load.', shape: 'band',
+    fields: [
+      { name: 'eyebrow', label: 'Eyebrow', widget: 'string', required: false, hint: 'Small uppercase label above the heading.' },
+      { name: 'heading', label: 'Heading', widget: 'string', required: false, hint: 'Blank uses the page title.' },
+      { name: 'intro', label: 'Intro / description', widget: 'text', required: false, hint: 'Optional line under the heading. Blank = hidden.' },
+      {
+        name: 'items',
+        label: 'Forms',
+        widget: 'list',
+        required: false,
+        collapsed: true,
+        label_singular: 'Form',
+        summary: '{{fields.label}}',
+        hint: 'One entry per errand, in the order they are offered. The first one is the form the page opens on.',
+        fields: [
+          { name: 'label', label: 'Switch button text', widget: 'string', hint: 'What the visitor picks, e.g. "Report a fault".' },
+          { name: 'description', label: 'Switch description', widget: 'string', required: false, hint: 'Where the errand goes, in one line. Shown by the choice-cards layout only.' },
+          { name: 'intro', label: 'Intro / description', widget: 'text', required: false, hint: 'Optional line above this form. Blank = hidden.' },
+          { name: 'labelName', label: 'Field label — name', widget: 'string', required: false, hint: 'Blank uses the site wording ("Name").' },
+          { name: 'labelEmail', label: 'Field label — email', widget: 'string', required: false, hint: 'Blank uses the site wording ("Email").' },
+          { name: 'showPhone', label: 'Show the phone field', widget: 'boolean', required: false, default: true },
+          { name: 'showCategory', label: 'Show the category dropdown', widget: 'boolean', required: false, default: false, hint: 'A dropdown the visitor picks their errand from. Needs at least one choice below.' },
+          { name: 'labelCategory', label: 'Field label — category', widget: 'string', required: false, hint: 'Blank uses the site wording ("Category").' },
+          { name: 'categories', label: 'Categories', widget: 'list', required: false, collapsed: true, label_singular: 'Category', hint: 'The choices in the dropdown, in order.', field: { name: 'category', label: 'Category', widget: 'string' } },
+          { name: 'showUnit', label: 'Show the unit field', widget: 'boolean', required: false, default: false, hint: 'A short free-text field for which unit the visitor is writing about.' },
+          { name: 'labelUnit', label: 'Field label — unit', widget: 'string', required: false, hint: 'Blank uses the site wording ("Unit").' },
+          { name: 'placeholderUnit', label: 'Unit placeholder', widget: 'string', required: false, hint: 'Faint example text inside the empty field.' },
+          { name: 'labelMessage', label: 'Field label — message', widget: 'string', required: false, hint: 'Blank uses the site wording ("Describe your project"). Word it for your business.' },
+          { name: 'submitLabel', label: 'Submit button text', widget: 'string', required: false, hint: 'The form\'s submit button. Blank uses the site wording ("Send request").' },
+          { name: 'showDirectContact', label: 'Show the direct-contact card', widget: 'boolean', required: false, default: true, hint: 'Off → the form fills the width (no phone/email card).' },
+          { name: 'inbox', label: 'Inbox key', widget: 'string', required: false, hint: "Where this form's messages are delivered: the key of an inbox set up for the site. Empty means the site's default inbox." },
+        ],
+      },
+      layoutGroup([
+        { name: 'variant', label: 'Layout', widget: 'select', required: false, default: 'segmented', hint: 'How the visitor switches between the forms.', options: [{ label: 'Segmented button', value: 'segmented' }, { label: 'Choice cards (with descriptions)', value: 'cards' }, { label: 'Tabs on the card', value: 'tabs' }] },
+      ]),
+      styleGroup([surfaceField]),
+    ],
+  },
+  {
     type: 'contactCard', label: 'Contact card', group: 'Calls to action', shape: 'box',
     summary: 'A contact card placed anywhere, auto-filled from Contact settings. Tick what it shows.',
     fields: [
@@ -828,6 +869,10 @@ const FAQ_FIX = [
   { id: 'q1', data: { question: 'A first sample question?', answer: LOREM, order: 1 } },
   { id: 'q2', data: { question: 'A second, longer sample question to wrap the row?', answer: 'A short answer.', order: 2 } },
   { id: 'q3', data: { question: 'A third?', answer: LOREM, order: 3 } },
+];
+const CONTACT_SWITCH_FIX = [
+  { label: 'Report a fault', description: 'Goes to the caretaker. Urgent? Call the service line.', intro: 'Goes to the caretaker, who answers on weekdays.', showPhone: true, showCategory: true, categories: ['First category', 'Second category'], showUnit: true, placeholderUnit: 'e.g. 12B', labelMessage: 'Describe the fault', submitLabel: 'Send the report' },
+  { label: 'Write to the board', description: 'Answered after the monthly board meeting.', intro: 'Answered after the monthly board meeting.', labelMessage: 'Your errand', submitLabel: 'Send to the board' },
 ];
 const SAMPLES: Record<string, ({ _label?: string } & Record<string, unknown>)[]> = {
   hero: [
@@ -976,6 +1021,11 @@ const SAMPLES: Record<string, ({ _label?: string } & Record<string, unknown>)[]>
   contactForm: [
     { _label: 'name · email · phone', eyebrow: 'Contact', heading: 'Get in touch', intro: 'The real form, themed.', showPhone: true, showDirectContact: true },
     { _label: 'category + unit', eyebrow: 'Contact', heading: 'Form with a dropdown', showPhone: true, showCategory: true, categories: ['First category', 'Second category'], showUnit: true, placeholderUnit: 'e.g. 12B' },
+  ],
+  contactSwitch: [
+    { _label: 'segmented', style: { surface: 'tint' }, eyebrow: 'Contact', heading: 'Write to us', items: CONTACT_SWITCH_FIX },
+    { _label: 'choice cards', layout: { variant: 'cards' }, style: { surface: 'tint' }, heading: 'Two errands, one surface', items: CONTACT_SWITCH_FIX },
+    { _label: 'tabs', layout: { variant: 'tabs' }, style: { surface: 'tint' }, heading: 'Tabs on the card', items: CONTACT_SWITCH_FIX },
   ],
   contactCard: [{ show: ['phone', 'email', 'hours'], label: 'Direct contact', tint: true }],
   findUs: [{ heading: 'Find us', showHours: true }],

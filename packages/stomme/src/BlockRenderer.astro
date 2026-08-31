@@ -34,6 +34,7 @@ import StatsBar from '../blocks/StatsBar.astro';
 import Timeline from '../blocks/Timeline.astro';
 import LogoStrip from '../blocks/LogoStrip.astro';
 import ContactForm from '../blocks/ContactForm.astro';
+import ContactSwitch from '../blocks/ContactSwitch.astro';
 import ContactCard from '../blocks/ContactCard.astro';
 import FindUs from '../blocks/FindUs.astro';
 import MapBlock from '../blocks/Map.astro';
@@ -80,6 +81,7 @@ const defaults: Record<string, any> = {
   timeline: Timeline,
   logoStrip: LogoStrip,
   contactForm: ContactForm,
+  contactSwitch: ContactSwitch,
   contactCard: ContactCard,
   findUs: FindUs,
   map: MapBlock,
@@ -99,7 +101,8 @@ const feats = resolveFeatures(features);
 // The links follow the URL's language, not the rendered entry's: an untranslated page under /en/ still leads on to the English pages that do exist. resolveSite drops `locales`, so the raw config is what carries them.
 const locales = resolveLocales(config);
 const localeLink = localeLinker(config, splitLocalePath(Astro.url.pathname, locales).locale, locales.enabled ? await getCollection('pages') : []);
-const shown = feats.contactForm === false ? blocks.filter((b) => b.type !== 'contactForm') : blocks;
+const CONTACT_FORM_BLOCKS = new Set(['contactForm', 'contactSwitch']);
+const shown = feats.contactForm === false ? blocks.filter((b) => !CONTACT_FORM_BLOCKS.has(b.type)) : blocks;
 const rendered = locales.enabled ? localizeLinks(shown, localeLink) : shown;
 
 const surfaceClass: Record<string, string> = { tint: 'surface-tint', panel: 'surface-panel', band: 'band', dark: 'surface-dark', gradient: 'surface-gradient' };
