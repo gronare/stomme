@@ -6,7 +6,7 @@ import { defaultLocaleEntries } from '@gronare/stomme/i18n';
 import { site, features } from '../site.config';
 
 export async function getStaticPaths() {
-  const pages = defaultLocaleEntries(await getCollection('pages'), site).filter((p) => p.data.published !== false);
+  const pages = defaultLocaleEntries(await getCollection('pages'), site).filter((p) => p.data.published);
   return pages.map((p) => ({ params: { slug: p.id }, props: { page: p } }));
 }
 const { page } = Astro.props;
