@@ -29,7 +29,7 @@ const linked = (s = '') => esc(s).replace(/\[([^\]]+)\]\(([^()\s]+)\)/g, (_m, te
         {intro && <p class="intro">{intro}</p>}
       </div>
     )}
-    <dl class="fact-list" style={`--fact-cols:${columns}`}>
+    <dl class="fact-list" data-cols={columns} style={`--fact-cols:${columns}`}>
       {rows.map((it) => (
         <div class="fact-list__row">
           <dt class="fact-list__label">{it.label}</dt>
