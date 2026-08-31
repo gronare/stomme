@@ -3460,6 +3460,89 @@
           ]
         }
       ]
+    },
+    "timeline": {
+      "label": "Timeline",
+      "group": "Numbers",
+      "shape": "pairs",
+      "fields": [
+        {
+          "name": "eyebrow",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "heading",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "intro",
+          "widget": "text",
+          "required": false
+        },
+        {
+          "name": "items",
+          "widget": "list",
+          "required": false,
+          "fields": [
+            {
+              "name": "year",
+              "widget": "string"
+            },
+            {
+              "name": "title",
+              "widget": "string"
+            },
+            {
+              "name": "detail",
+              "widget": "string",
+              "required": false
+            }
+          ]
+        },
+        {
+          "name": "planned",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "layout",
+          "widget": "object",
+          "fields": [
+            {
+              "name": "beside",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "below",
+                "equal",
+                "narrow",
+                "wide"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "style",
+          "widget": "object",
+          "fields": [
+            {
+              "name": "surface",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "standard",
+                "tint",
+                "panel",
+                "band",
+                "dark",
+                "gradient"
+              ]
+            }
+          ]
+        }
+      ]
     }
   }
 }

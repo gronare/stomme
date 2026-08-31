@@ -13,5 +13,62 @@ const facts = Array.isArray(items) ? items : [];
         </div>
       ))}
     </dl>
+    <script is:inline>
+      (function () {
+        var bar = document.currentScript.closest('[data-stomme-block="statsBar"]');
+        if (!bar || !window.IntersectionObserver || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        var counters = [];
+        var values = bar.querySelectorAll('.fact-value');
+        for (var i = 0; i < values.length; i++) {
+          var text = values[i].textContent;
+          var m = /\d+(?:[\u00A0 ]\d{3})*/.exec(text);
+          if (!m) continue;
+          var before = text.slice(0, m.index);
+          var after = text.slice(m.index + m[0].length);
+          if (/\d[.,]$/.test(before) || /^[.,]\d/.test(after)) continue;
+          var target = parseInt(m[0].replace(/[\u00A0 ]/g, ''), 10);
+          counters.push({
+            el: values[i],
+            text: text,
+            before: before,
+            after: after,
+            sep: (m[0].match(/[\u00A0 ]/) || [''])[0],
+            target: target,
+            from: target >= 1500 && target <= 2100 ? Math.floor(target / 100) * 100 : 0,
+          });
+        }
+        if (!counters.length) return;
+        var grouped = function (n, sep) {
+          var s = String(n);
+          return sep ? s.replace(/\B(?=(\d{3})+(?!\d))/g, sep) : s;
+        };
+        var run = function () {
+          var t0 = performance.now();
+          var tick = function (now) {
+            var running = false;
+            for (var i = 0; i < counters.length; i++) {
+              var c = counters[i];
+              var p = (now - t0 - i * 90) / 950;
+              if (p <= 0) { running = true; continue; }
+              if (p >= 1) { if (c.el.textContent !== c.text) c.el.textContent = c.text; continue; }
+              var eased = 1 - Math.pow(1 - p, 3);
+              c.el.textContent = c.before + grouped(Math.round(c.from + (c.target - c.from) * eased), c.sep) + c.after;
+              running = true;
+            }
+            if (running) requestAnimationFrame(tick);
+          };
+          requestAnimationFrame(tick);
+        };
+        var io = new IntersectionObserver(function (entries) {
+          for (var i = 0; i < entries.length; i++) {
+            if (!entries[i].isIntersecting) continue;
+            io.disconnect();
+            run();
+            return;
+          }
+        }, { threshold: 0.4 });
+        io.observe(bar);
+      })();
+    </script>
   </section>
 )}

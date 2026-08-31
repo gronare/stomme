@@ -1,0 +1,64 @@
+---
+import { timelinePositions } from '../src/timeline';
+interface Props {
+  eyebrow?: string;
+  heading?: string;
+  intro?: string;
+  anchor?: string;
+  items?: { year?: string; title?: string; detail?: string }[];
+  planned?: string;
+  style?: { surface?: string };
+}
+const { eyebrow, heading, intro, anchor, items = [], planned } = Astro.props;
+const rows = items.filter((it) => it && (it.year || it.title));
+
+const spread = timelinePositions(rows.map((it) => it.year), !!planned);
+const delay = (i: number) => Math.round(i * 12) / 100;
+---
+
+{rows.length > 0 && (
+  <section data-stomme-block="timeline" id={anchor || undefined} class="section timeline">
+    {(eyebrow || heading || intro) && (
+      <div class="section-head">
+        {eyebrow && <span class="mono eyebrow">{eyebrow}</span>}
+        {heading && <h2 class="display timeline__heading">{heading}</h2>}
+        {intro && <p class="intro">{intro}</p>}
+      </div>
+    )}
+    <div class="timeline__track">
+      <span class="timeline__spine" aria-hidden="true" />
+      <ol class="timeline__items">
+        {rows.map((it, i) => (
+          <li
+            class:list={['timeline__item', i % 2 === 1 && 'timeline__item--under', i === rows.length - 1 && 'timeline__item--now']}
+            style={`--timeline-x:${spread[i]}%;--timeline-delay:${delay(i)}s`}
+          >
+            <span class="timeline__dot" aria-hidden="true" />
+            <span class="timeline__label">
+              <span class="timeline__year">{it.year}</span>
+              <span class="timeline__title">{it.title}</span>
+              {it.detail && <span class="timeline__detail">{it.detail}</span>}
+            </span>
+          </li>
+        ))}
+      </ol>
+      {planned && <p class="timeline__planned" style={`--timeline-delay:${delay(rows.length)}s`}>{planned}</p>}
+    </div>
+    <script is:inline>
+      (function () {
+        var line = document.currentScript.closest('[data-stomme-block="timeline"]');
+        if (!line || !window.IntersectionObserver || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        line.classList.add('timeline--motion');
+        var io = new IntersectionObserver(function (entries) {
+          for (var i = 0; i < entries.length; i++) {
+            if (!entries[i].isIntersecting) continue;
+            io.disconnect();
+            line.classList.add('is-playing');
+            return;
+          }
+        }, { threshold: 0.2 });
+        io.observe(line);
+      })();
+    </script>
+  </section>
+)}

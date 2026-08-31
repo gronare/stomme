@@ -712,6 +712,34 @@ const RAW_BLOCKS: BlockDef[] = [
     ],
   },
   {
+    type: 'timeline',
+    label: 'Timeline',
+    group: 'Numbers',
+    summary: 'A line of years with one dot per milestone, the last one highlighted, and an optional note about what is planned.',
+    shape: 'pairs',
+    fields: [
+      ...headingFields,
+      {
+        name: 'items',
+        label: 'Milestones (year + title)',
+        widget: 'list',
+        required: false,
+        collapsed: true,
+        label_singular: 'Milestone',
+        summary: '{{fields.year}} {{fields.title}}',
+        hint: 'Oldest first. The last one is drawn as the most recent.',
+        fields: [
+          { name: 'year', label: 'Year', widget: 'string', hint: 'A year such as 2019, or wording such as "00s".' },
+          { name: 'title', label: 'Title', widget: 'string', hint: 'One or two words for what was done.' },
+          { name: 'detail', label: 'Detail', widget: 'string', required: false, hint: 'A short line under the title, shown on narrow screens.' },
+        ],
+      },
+      { name: 'planned', label: 'Planned (trailing note)', widget: 'string', required: false, hint: 'A dashed note at the end of the line, for what has not happened yet.' },
+      layoutGroup([]),
+      styleGroup([surfaceField]),
+    ],
+  },
+  {
     type: 'logoStrip', label: 'Logo strip', group: 'Numbers', shape: 'chips',
     summary: 'A centered row of partner / client names with an optional lead-in.',
     fields: [
@@ -937,6 +965,13 @@ const SAMPLES: Record<string, ({ _label?: string } & Record<string, unknown>)[]>
   ],
   sectionNav: [{ sections: [{ anchor: 'first', label: 'The first section' }, { anchor: 'second', label: 'A second, longer heading' }, { anchor: 'third', label: 'The third' }] }],
   statsBar: [{ items: [{ label: 'Projects', value: '142+' }, { label: 'Uptime', value: '100%' }, { label: 'Rating', value: '5.0' }] }],
+  timeline: [{ style: { surface: 'tint' }, eyebrow: 'The property', heading: 'Maintenance over the years', intro: 'The full list with details sits below.', planned: 'Planned: Garage doors · Facade', items: [
+    { year: '00s', title: 'Security doors', detail: 'and a new outdoor space' },
+    { year: '2011', title: 'Roof', detail: 'relaid' },
+    { year: '2012', title: 'Windows', detail: 'replaced' },
+    { year: '2019', title: 'Radiators', detail: 'valves and thermostats' },
+    { year: '2025', title: 'Ventilation', detail: 'inspection and planting' },
+  ] }],
   logoStrip: [{ lead: 'Trusted by', logos: ['Alpha', 'Beta', 'Gamma', 'Delta'] }],
   contactForm: [
     { _label: 'name · email · phone', eyebrow: 'Contact', heading: 'Get in touch', intro: 'The real form, themed.', showPhone: true, showDirectContact: true },
