@@ -8,6 +8,8 @@ import { site, features, listings } from '@stomme/config';
 import { getCollection, getEntry } from 'astro:content';
 import { resolveSite } from '@gronare/stomme/config';
 import { resolveLink } from '@gronare/stomme/href';
+import { defaultLocaleEntries } from '@gronare/stomme/i18n';
+import { contactFormSamples, formSampleChrome } from '@gronare/stomme/form-samples';
 import BlockRenderer from '@gronare/stomme/BlockRenderer.astro';
 import Header from '@gronare/stomme/Header.astro';
 import Footer from '@gronare/stomme/Footer.astro';
@@ -41,6 +43,9 @@ const towns = kind === 'footer'
   : [];
 
 let thanks = null;
+let formSamples = [];
+let formPick = 0;
+let formChrome = { picker: '', note: '' };
 if (kind === 'thanks') {
   const rs = resolveSite(site);
   const t = rs.strings.thanks;
@@ -48,6 +53,16 @@ if (kind === 'thanks') {
   const td = draft && typeof draft === 'object' ? draft : {};
   const settings = (await getEntry('settings', 'site'))?.data ?? {};
   const ct = (await getEntry('contact', 'contact'))?.data ?? {};
+  let homeBlocks = null;
+  try { homeBlocks = (await getEntry('home', 'home'))?.data?.blocks; } catch (e) { homeBlocks = null; }
+  const pages = defaultLocaleEntries(await getCollection('pages'), site).filter((p) => p.data.published);
+  formSamples = contactFormSamples(
+    [{ title: settings.name, blocks: homeBlocks }, ...pages.map((p) => ({ title: p.data.title, blocks: p.data.blocks }))],
+    c,
+    rs.locale,
+  );
+  formChrome = formSampleChrome(rs.cmsLocale || rs.locale);
+  formPick = Math.min(Math.max(0, Math.trunc(Number(Astro.url.searchParams.get('form')) || 0)), Math.max(0, formSamples.length - 1));
   thanks = {
     variant: td.variant,
     town: (ct.address && ct.address.city) || undefined,
@@ -61,7 +76,7 @@ if (kind === 'thanks') {
     secondaryLabel: (td.button2 && td.button2.label) || '',
     secondaryHref: resolveLink(td.button2 && td.button2.link, '/'),
     recapLabel: t.recapLabel,
-    recap: {
+    recap: formSamples.length ? formSamples[formPick].recap : {
       emailLabel: c.email, email: ct.email || 'name@example.com',
       phoneLabel: c.phone, phone: ct.phone || '070 123 45 67',
       messageLabel: c.message, message: 'Hi! I would like to book a meeting next week if that works for you.',
@@ -92,6 +107,7 @@ const idFav = idAsset(identityDraft && identityDraft.favicon) || '/favicon.svg';
 const idApple = idAsset(identityDraft && identityDraft.appleIcon);
 const idOg = idAsset(identityDraft && identityDraft.ogImage);
 const idLabel = 'font-family:ui-monospace,Menlo,monospace;font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;color:#6b7280;margin:0 0 10px';
+const pickStyle = (on) => 'appearance:none;cursor:pointer;font-family:ui-monospace,Menlo,monospace;font-size:.68rem;letter-spacing:.06em;text-transform:uppercase;padding:7px 13px;border-radius:999px;border:1px solid ' + (on ? 'transparent' : 'var(--color-line,#e5e7eb)') + ';background:' + (on ? 'var(--color-ink,#1f2937)' : 'var(--color-paper,#fff)') + ';color:' + (on ? '#fff' : '#6b7280');
 
 const shareDraft = kind === 'sharecards' && draft && typeof draft === 'object' ? draft : null;
 const scName = (shareDraft && shareDraft.name) || 'Your business';
@@ -153,7 +169,20 @@ if (shareDraft && scOg.enabled) {
 ) : kind === 'footer' ? (
   <Base title="Preview" chrome={false}><Footer footer={footerDraft} towns={towns} townsHref={site.routes?.towns ?? '/areas'} /></Base>
 ) : kind === 'thanks' ? (
-  <Base title="Preview"><Thanks {...thanks} /></Base>
+  <Base title="Preview">
+    {formSamples.length > 1 && (
+      <div data-form-picker style="width:min(1080px, 100% - 3rem);margin:0 auto;padding-top:1.5rem;font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif">
+        <p style={idLabel}>{formChrome.picker}</p>
+        <div style="display:flex;flex-wrap:wrap;gap:8px">
+          {formSamples.map((f, i) => (
+            <button type="button" data-form-pick={i} aria-pressed={i === formPick ? 'true' : 'false'} style={pickStyle(i === formPick)}>{f.name}</button>
+          ))}
+        </div>
+        <p style="margin:10px 0 0;color:#6b7280;font-size:.8rem;line-height:1.45">{formChrome.note}</p>
+      </div>
+    )}
+    <Thanks {...thanks} />
+  </Base>
 ) : kind === 'contact' ? (
   <Base title="Preview">
     <div style="display:flex;flex-direction:column;gap:2.25rem;padding:2.25rem 1.5rem">
@@ -309,6 +338,18 @@ if (shareDraft && scOg.enabled) {
     }
     window.addEventListener('message', function (e) {
       if (e.data && e.data.type === 'stomme:preview' && typeof e.data.data === 'string') update(e.data.data);
+    });
+
+    // The picked form lives in the URL, never in a variable: the morph re-fetch already carries the whole query string, so the server stays the only thing deciding which sample is on screen.
+    document.addEventListener('click', function (e) {
+      var b = e.target && e.target.closest ? e.target.closest('[data-form-pick]') : null;
+      if (!b) return;
+      var u = new URL(location.href);
+      u.searchParams.set('form', b.getAttribute('data-form-pick'));
+      history.replaceState(null, '', u);
+      var d = applied !== null ? applied : (u.searchParams.get('data') || '');
+      applied = null;
+      update(d);
     });
 
     if (window.top !== window) (function () {

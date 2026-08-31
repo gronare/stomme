@@ -127,6 +127,24 @@ async function main() {
     }
   }
 
+  const THANKS_HEADING = 'WORKERD-SMOKE thanks Åäö';
+  const THANKS = b64({ heading: THANKS_HEADING, message: 'The confirmation lead line.', button: { label: 'Home', link: { page: '/' } } });
+  const thanksRes = await fetch(`${base}/preview?kind=thanks&data=${THANKS}`);
+  const thanksInner = mainInner(await thanksRes.text());
+  if (thanksRes.status !== 200 || !thanksInner) {
+    ok = fail(`/preview?kind=thanks returned HTTP ${thanksRes.status} with ${thanksInner ? 'a' : 'no'} <main>`);
+  } else if (!thanksInner.includes(THANKS_HEADING)) {
+    ok = fail('the thanks preview does not carry the posted draft heading — the pane\'s own copy stopped flowing through');
+  } else if (!thanksInner.includes('anna@example.com')) {
+    ok = fail('the thanks recap carries no sample sender — the site\'s contactForm blocks were not read (getCollection on workerd)');
+  } else if (thanksInner.includes('hello@example.com') || thanksInner.includes('+1 555 0100')) {
+    ok = fail('the thanks recap shows the SITE\'s own contact details as if a visitor had typed them');
+  } else if (thanksInner.includes('data-form-picker')) {
+    ok = fail('a site with one contact form must get no form picker');
+  } else {
+    log('OK  /preview?kind=thanks renders the draft copy with a sample receipt built from the site\'s own form');
+  }
+
   const logText = workerLog.join('');
   const badLog = logText.match(/Buffer is not defined|ReferenceError|is not defined/);
   if (badLog) ok = fail(`worker log carries a runtime error: "${badLog[0]}"`);

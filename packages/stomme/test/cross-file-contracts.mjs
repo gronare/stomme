@@ -46,6 +46,19 @@ check(encodesReversed && decodesReversed,
   'src/protect.ts encodes reversed+base64 and src/entrypoints.mjs decodes the same way',
   `encode=${encodesReversed} decode=${decodesReversed}`);
 
+const contactForm = read('blocks/ContactForm.astro');
+const formSamples = read('src/form-samples.ts');
+const recapFields = [...(contactForm.match(/const recapLabels = JSON\.stringify\(\{([^}]*)\}/)?.[1] ?? '').matchAll(/(\w+):/g)].map((m) => m[1]);
+const unmirrored = recapFields.filter((f) => !new RegExp(`${f}Label`).test(formSamples));
+check(recapFields.length > 0 && unmirrored.length === 0,
+  `the thanks preview samples every field the form captures at submit (${recapFields.join(', ')})`,
+  `missing from src/form-samples.ts: ${unmirrored.join(', ')}`);
+const overrides = [...contactForm.matchAll(/^\s+(\w+): (label\w+) \|\| \(c\.(\w+)/gm)].map((m) => [m[2], m[3]]).filter(([, str]) => recapFields.includes(str));
+const driftedOverrides = overrides.filter(([prop, str]) => !new RegExp(`b\\.${prop} \\|\\| \\(c\\.${str}`).test(formSamples));
+check(overrides.length >= 3 && driftedOverrides.length === 0,
+  'the preview resolves each overridable label exactly as the form does (block override, else the site string)',
+  `drifted: ${driftedOverrides.map(([p]) => p).join(', ')}`);
+
 const footer = read('chrome/Footer.astro');
 const styles = read('styles.css');
 const legalList = footer.match(/<ul class="footer-legal">[\s\S]*?<\/ul>/)?.[0] ?? '';
