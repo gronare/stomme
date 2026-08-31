@@ -699,7 +699,7 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
 
 .contact-embed__intro { margin: 0 0 1.1rem; color: var(--color-muted); font-size: 0.95rem; max-width: 52ch; }
   .contact-switch__heading { margin-top: 0.75rem; }
-  .contact-switch__head { margin-bottom: 2rem; }
+  .contact-switch__head { margin-bottom: 2rem; max-width: 46rem; margin-inline: auto; }
   .contact-switch__controls, .contact-switch__pane { max-width: 46rem; margin-inline: auto; }
   .contact-switch__controls { margin-bottom: 1.1rem; }
   .contact-switch__btn { font-family: var(--font-display); font-weight: 700; color: var(--color-muted); cursor: pointer; min-width: 0; }
