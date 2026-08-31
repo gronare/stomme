@@ -93,9 +93,9 @@ jobs:
       - name: slot mounting + gating
         run: pnpm --filter @gronare/stomme test:slots
 
-  # Engine behaviour no build failure would surface: generated share cards, the unlisted-path rules behind noindex, the middleware that makes /admin a working dev address, and the metrics beacon staying absent until a site names an endpoint.
+  # Engine behaviour no build failure would surface: generated share cards, the unlisted-path rules behind noindex, the middleware that makes /admin a working dev address, the metrics beacon staying absent until a site names an endpoint, and the contact form's challenge widget staying absent until a site is built with a site key.
   engine-smokes:
-    name: engine smokes (og + noindex + public index + metrics + maps)
+    name: engine smokes (og + noindex + public index + metrics + turnstile + maps)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -113,6 +113,8 @@ jobs:
         run: pnpm --filter @gronare/stomme test:public-index
       - name: metrics beacon
         run: pnpm --filter @gronare/stomme test:metrics
+      - name: contact form turnstile gate
+        run: pnpm --filter @gronare/stomme test:turnstile
       - name: two-click google map
         run: pnpm --filter @gronare/stomme test:maps
       - name: per-language page addresses + the header switcher

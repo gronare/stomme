@@ -60,6 +60,7 @@
     "test:slots": "node test/smoke-slots.mjs",
     "test:metrics": "node test/smoke-metrics.mjs",
     "test:maps": "node test/smoke-maps.mjs",
+    "test:turnstile": "node test/smoke-turnstile.mjs",
     "test:locale-urls": "node test/smoke-locale-urls.mjs",
     "test:map-proxy": "node test/smoke-map-proxy.mjs",
     "lint:comments": "node bin/lint-comments.mjs .",

@@ -49,6 +49,7 @@ const contactAction = site?.contact?.endpoint
   ? `${site.contact.endpoint}/contact`
   : site?.cms?.baseUrl ? `${site.cms.baseUrl}/contact` : '/api/contact';
 const successPath = site?.routes?.formSuccess ?? '/thanks';
+const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || '';
 
 const recapLabels = JSON.stringify({ email: L.email, phone: L.phone, category: L.category, unit: L.unit, message: L.message });
 ---
@@ -99,6 +100,8 @@ const recapLabels = JSON.stringify({ email: L.email, phone: L.phone, category: L
         <label for={fieldId('message')} class="mono">{L.message}</label>
         <textarea id={fieldId('message')} name="message" rows="5" required></textarea>
       </div>
+      {/* Out of the form's flex flow: an invisible widget paints nothing, but an in-flow mount would still claim a gap row. */}
+      {turnstileSiteKey && <div class="contact-turnstile" data-sitekey={turnstileSiteKey} style="position:absolute"></div>}
       <button type="submit" class="btn">{L.submit}</button>
     </form>
 
@@ -110,11 +113,39 @@ const recapLabels = JSON.stringify({ email: L.email, phone: L.phone, category: L
     (function () {
       var form = document.currentScript.closest('section').querySelector('.contact-form');
       if (!form) return;
+      var mount = form.querySelector('.contact-turnstile');
+      var token = null;
+      var widgetId = null;
+      if (mount) {
+        var src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
+        if (!document.querySelector('script[src="' + src + '"]')) {
+          var loader = document.createElement('script');
+          loader.src = src;
+          loader.async = true;
+          loader.defer = true;
+          document.head.appendChild(loader);
+        }
+        var waited = 0;
+        var poll = setInterval(function () {
+          if (window.turnstile) {
+            clearInterval(poll);
+            widgetId = window.turnstile.render(mount, {
+              sitekey: mount.dataset.sitekey,
+              // Off, or Turnstile adds its OWN cf-turnstile-response input to the enclosing form and the submit sends the field twice.
+              'response-field': false,
+              callback: function (t) { token = t; },
+              'expired-callback': function () { token = null; },
+              'error-callback': function () { token = null; },
+            });
+          } else if ((waited += 100) >= 10000) clearInterval(poll);
+        }, 100);
+      }
       form.addEventListener('submit', async function (e) {
         e.preventDefault();
         var btn = form.querySelector('button[type=submit]');
         if (btn) btn.disabled = true;
         var fd = new FormData(form);
+        if (token) fd.append('cf-turnstile-response', token);
         try {
           var res = await fetch(form.action, { method: 'POST', body: fd, headers: { Accept: 'application/json', 'X-Requested-With': 'fetch' } });
           if (!res.ok) throw new Error('send failed');
@@ -127,6 +158,7 @@ const recapLabels = JSON.stringify({ email: L.email, phone: L.phone, category: L
           window.location.assign(form.dataset.success || '/thanks');
         } catch (err) {
           if (btn) btn.disabled = false;
+          if (widgetId && window.turnstile) { window.turnstile.reset(widgetId); token = null; }
           var msg = form.querySelector('.contact-error');
           if (!msg) { msg = document.createElement('p'); msg.className = 'contact-error'; form.appendChild(msg); }
           msg.textContent = form.dataset.error;
