@@ -41,6 +41,7 @@ const alternates = hreflangLinks(Astro.url.pathname, site, Astro.site, locales.e
 const bounceHost = canonicalBounceHost(Astro.site);
 ---
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="format-detection" content="telephone=no" />
 {bounceHost && <script is:inline define:vars={{ bounceHost }}>
   var host = location.hostname;
   if (host !== bounceHost && (host.endsWith('.pages.dev') || host.endsWith('.workers.dev'))) location.replace('https://' + bounceHost + location.pathname + location.search + location.hash);
