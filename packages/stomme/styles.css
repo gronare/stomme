@@ -825,7 +825,8 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
     font-variant-numeric: tabular-nums;
   }
 
-.gallery-grid { display: grid; gap: 1.25rem; grid-template-columns: 1fr; margin-top: 2.5rem; }
+.gallery-grid { display: grid; gap: 1.25rem; grid-template-columns: 1fr; }
+.section-head + .gallery-grid { margin-top: 2.5rem; }
   @media (min-width: 640px) {
     .gallery-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   }
