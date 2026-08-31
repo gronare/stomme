@@ -32,7 +32,7 @@ const showingLatest = site?.strings?.post?.showingLatest ?? 'Showing the {n} lat
 const archiveLabel = site?.strings?.post?.archive ?? 'All posts in the archive';
 const sorted = Astro.props.items ?? (await getCollection(source)).sort((a, b) => (a.data.date < b.data.date ? 1 : -1));
 const all = limit > 0 ? sorted.slice(0, limit) : sorted;
-const archived = archivePath !== '' && sorted.length > all.length;
+const truncated = sorted.length > all.length;
 const fmt = (d: string) => new Date(d).toLocaleDateString(locale, { year: 'numeric', month: 'long', day: 'numeric' });
 const dateLine = (d: Record<string, any>) => fmt(d.date);
 const fullText = Astro.props.text === 'full';
@@ -98,9 +98,9 @@ const hasImg = (p: any) => !!(showImages && p.data.showCover);
         ))}
       </div>
     )}
-    {archived && (
+    {archivePath !== '' && (
       <div class="post-archfoot">
-        <p class="post-archfoot__note">{showingLatest.replace('{n}', String(all.length))}</p>
+        {truncated && <p class="post-archfoot__note">{showingLatest.replace('{n}', String(all.length))}</p>}
         <a class="mono post-archfoot__link" href={archivePath}>{archiveLabel} →</a>
       </div>
     )}
