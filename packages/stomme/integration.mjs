@@ -169,7 +169,7 @@ export default function stomme(options = {}) {
         }
         const siteRenderer = resolve(root, 'src/blocks/BlockRenderer.astro');
 
-        const SLOT_NAMES = ['footer-end', 'header-start', 'header-nav-end', 'header-end'];
+        const SLOT_NAMES = ['footer-end', 'footer-legal-end', 'header-start', 'header-nav-end', 'header-end'];
         const slotsDir = process.env.STOMME_SLOTS_DIR;
         const slotNoop = resolve(pkgDir, 'src/SlotNoop.astro');
         const slotAlias = {};

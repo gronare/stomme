@@ -46,6 +46,21 @@ check(encodesReversed && decodesReversed,
   'src/protect.ts encodes reversed+base64 and src/entrypoints.mjs decodes the same way',
   `encode=${encodesReversed} decode=${decodesReversed}`);
 
+const footer = read('chrome/Footer.astro');
+const styles = read('styles.css');
+const legalList = footer.match(/<ul class="footer-legal">[\s\S]*?<\/ul>/)?.[0] ?? '';
+check(/<SlotFooterLegalEnd \/>/.test(legalList), 'the footer-legal-end slot is mounted inside the legal list, not merely aliased');
+check(/'footer-legal-end'/.test(read('integration.mjs')), 'the integration declares the slot the footer mounts');
+check(!/legal\.length > 0 && \(\s*<ul class="footer-legal">/.test(footer),
+  'the legal list renders whether or not the site supplies legal links — only the slot knows whether it filled it');
+const legalHover = styles.match(/^\.footer-legal \.footer-link:hover \{([^}]*)\}/m)?.[1] ?? '';
+const hoverToken = legalHover.match(/var\((--[\w-]+)/)?.[1];
+check(!!hoverToken && hoverToken !== '--color-brand',
+  'the legal-row hover reads a token, not a brand colour a dark footer may share with its own ground', legalHover.trim());
+check(!!hoverToken && new RegExp(`\\n\\s*${hoverToken}:`).test(styles.match(/^\.site-footer--dark \{[\s\S]*?\n\}/m)?.[0] ?? ''),
+  `.site-footer--dark remaps ${hoverToken}, so the hover stays legible on the dark ground`);
+check(!/:visited/.test(styles), 'no :visited rule anywhere — a link keeps one colour in every state but hover');
+
 const throwsOnMiss = /const substitute = \(src, re, replacement, what\) => \{/.test(gen) && /throw new AnchorMissing\(`stomme-gen: \$\{what\}/.test(gen);
 const escapesCatch = (gen.match(/if \(e instanceof AnchorMissing\) throw e;/g) || []).length >= 2;
 check(throwsOnMiss, 'a generator substitution that matches nothing throws');

@@ -9,6 +9,7 @@ import { resolveSite } from '../src/config';
 import ContactLink from '../src/ContactLink.astro';
 // Rendered flush after .inner's close tag — on its own line the newline would collapse to a space on every page of every site.
 import SlotFooterEnd from '@stomme/slot-footer-end';
+import SlotFooterLegalEnd from '@stomme/slot-footer-legal-end';
 import Metrics from './Metrics.astro';
 
 interface FooterData { dark?: boolean; tagline?: string; showAddress?: boolean; showHours?: boolean; showSocials?: boolean; showLinks?: boolean; linksHeading?: string; links?: { label: string; link?: unknown }[]; links2Heading?: string; links2?: { label: string; link?: unknown }[]; showTowns?: boolean; townsHeading?: string; legal?: { label: string; link?: unknown }[]; note?: string; showLogo?: boolean; showWordmark?: boolean }
@@ -103,11 +104,11 @@ const year = new Date().getFullYear();
     </div>
     <div class="footer-bar">
       <p class="mono" style="margin:0">© {contact.founded ? `${contact.founded}–` : ''}{year} {settings.name}{footer.note ? ` · ${footer.note}` : ''}</p>
-      {legal.length > 0 && (
-        <ul class="footer-legal">
-          {legal.map((l) => <li><a href={inLocale(resolveLink(l.link, '/'))} class="footer-link">{l.label}</a></li>)}
-        </ul>
-      )}
+      {/* Rendered whether or not the site has legal links: only the slot knows whether it filled the list, and the stylesheet takes an empty one out of flow. */}
+      <ul class="footer-legal">
+        {legal.map((l) => <li><a href={inLocale(resolveLink(l.link, '/'))} class="footer-link">{l.label}</a></li>)}
+        <SlotFooterLegalEnd />
+      </ul>
     </div>
   </div><SlotFooterEnd /><Metrics />
 </footer>
