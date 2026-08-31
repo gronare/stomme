@@ -18,7 +18,7 @@ interface NavItem extends NavLink { menu?: string; children?: NavLink[] }
 interface NavData {
   items?: NavItem[];
   cta?: { label: string; link?: unknown };
-  sticky?: boolean;
+  sticky?: boolean | 'true' | 'false' | 'phone';
   showLogo?: boolean;
   showWordmark?: boolean;
 }
@@ -69,11 +69,13 @@ const resolved = await Promise.all(
     children: (await childrenOf(i)).map((c) => ({ ...c, href: inLocale(c.href) })),
   })),
 );
+// The CMS select writes its values as strings, older content carries the plain boolean, and both mean the same three states.
+const sticky = nav.sticky === 'phone' ? 'phone' : nav.sticky === true || nav.sticky === 'true';
 const navPath = (href: string) => normalizeNavPath(splitLocalePath(href, locales).path);
 const current = currentNavPath(here.path, [homeHref, ...resolved.flatMap((i) => [i.href, ...i.children.map((c) => c.href)])].filter(Boolean).map(navPath));
 const isActive = (href: string) => !!href && navPath(href) === current;
 ---
-<header class:list={['site-header', { 'is-sticky': nav.sticky }]}>
+<header class:list={['site-header', { 'is-sticky': !!sticky, 'is-sticky--phone': sticky === 'phone' }]}>
   <div class="inner">
     <a class="logo" href={homeHref} aria-label={settings.name}>
       {showMark && (logoOptimized
@@ -234,7 +236,9 @@ const isActive = (href: string) => !!href && navPath(href) === current;
         var top = text.getBoundingClientRect().top + window.scrollY + parseFloat(getComputedStyle(text).paddingTop);
         trigger = Math.max(0, top - headerH);
       };
-      var onScroll = function () { header.classList.toggle('solid', window.scrollY > trigger); };
+      // A phone-only sticky header scrolls away like any other on a wide screen, so the stuck paint has to stay behind its breakpoint too.
+      var stuckable = function () { return !header.classList.contains('is-sticky--phone') || mobile.matches; };
+      var onScroll = function () { header.classList.toggle('solid', stuckable() && window.scrollY > trigger); };
       measure(); onScroll();
       window.addEventListener('scroll', onScroll, { passive: true });
       window.addEventListener('resize', function () { measure(); onScroll(); }, { passive: true });

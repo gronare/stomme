@@ -307,7 +307,16 @@ ${emitShareCards(6)}
         label: "Header"
         file: "${filePath('nav', 'src/content/navigation/nav.md')}"${line('nav', 8, 'i18n: true')}
         fields:
-          - { name: sticky, label: "Sticky header", widget: boolean, required: false, default: false, hint: "Header stays fixed at the top while scrolling. Default: it scrolls away with the page."${inline('nav', 'duplicate')} }
+          - name: sticky
+            label: "Sticky header"
+            widget: select
+            required: false
+            default: "false"
+            hint: "Whether the header stays at the top of the window while the page scrolls."${line('nav', 12, 'i18n: duplicate')}
+            options:
+              - { label: "Off, it scrolls away with the page", value: "false" }
+              - { label: "On every screen", value: "true" }
+              - { label: "On phone screens only", value: "phone" }
           - { name: showLogo, label: "Show logo mark", widget: boolean, required: false, default: true, hint: "Show the logo image (set under Identity) in the header."${inline('nav', 'duplicate')} }
           - { name: showWordmark, label: "Show wordmark text", widget: boolean, required: false, default: true, hint: "Show the wordmark text (set under Identity) in the header."${inline('nav', 'duplicate')} }
 ${emitNavLinks(10, on('nav'))}

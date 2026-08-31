@@ -18,15 +18,32 @@ const aria = label || site?.strings?.sectionNav?.label || 'On this page';
         <li><a class="section-nav__link" href={`#${s.anchor}`}>{s.label}</a></li>
       ))}
     </ul>
+    <script is:inline>
+      (function () {
+        var nav = document.currentScript.closest('.section-nav');
+        var list = nav && nav.querySelector('.section-nav__list');
+        if (!list) return;
+        var edges = function () {
+          nav.classList.toggle('has-scroll-start', list.scrollLeft > 1);
+          nav.classList.toggle('has-scroll-end', list.scrollLeft + list.clientWidth < list.scrollWidth - 1);
+        };
+        edges();
+        list.addEventListener('scroll', edges, { passive: true });
+        window.addEventListener('resize', edges, { passive: true });
+        if (window.ResizeObserver) new ResizeObserver(edges).observe(list);
+      })();
+    </script>
     {sticky && (
       <script is:inline>
         (function () {
           var nav = document.currentScript.closest('.section-nav');
           if (!nav) return;
-          var header = document.querySelector('.site-header.is-sticky');
+          // The header only stands above this bar while it is actually stuck, and a phone-only sticky header is not on a wide screen, so the reading is its position at the width in front of us.
+          var header = document.querySelector('.site-header');
+          var stuck = function () { return !!header && /^(fixed|sticky)$/.test(getComputedStyle(header).position); };
           // getBoundingClientRect, never offsetHeight: the rounded integer leaves a sub-pixel seam between the header and this bar for the page to show through.
           var publish = function () {
-            var above = header ? header.getBoundingClientRect().height : 0;
+            var above = stuck() ? header.getBoundingClientRect().height : 0;
             document.documentElement.style.setProperty('--section-nav-top', above + 'px');
             document.documentElement.style.setProperty('--section-nav-offset', (above + nav.getBoundingClientRect().height) + 'px');
           };

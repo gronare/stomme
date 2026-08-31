@@ -1,5 +1,6 @@
 ---
 import Emph from '../src/Emph.astro';
+import { renderMarkdown } from '../src/markdown';
 
 interface Stat { label?: string; value?: string; note?: string }
 interface Props {
@@ -12,8 +13,10 @@ interface Props {
   stats?: Stat[];
   style?: { accent?: 'brand' | 'secondary' | 'highlight' };
   anchor?: string;
+  localeLink?: (href: string) => string;
 }
-const { eyebrow, heading, body, badges = [], statValue, statLabel, stats = [], anchor } = Astro.props;
+const { eyebrow, heading, body, badges = [], statValue, statLabel, stats = [], anchor, localeLink } = Astro.props;
+const bodyHtml = body ? await renderMarkdown(body, localeLink) : '';
 const accent = Astro.props.style?.accent ?? 'brand';
 const accentVar = accent === 'secondary' ? 'var(--color-secondary)' : accent === 'highlight' ? 'var(--color-highlight)' : 'var(--color-brand)';
 ---
@@ -22,7 +25,7 @@ const accentVar = accent === 'secondary' ? 'var(--color-secondary)' : accent ===
     <div class="stat-panel__main">
       {eyebrow && <span class="mono eyebrow">{eyebrow}</span>}
       {heading && <h2 class="display stat-panel__h"><Emph text={heading} /></h2>}
-      {body && <p class="stat-panel__body">{body}</p>}
+      {bodyHtml && <div class="stat-panel__body" set:html={bodyHtml} />}
       {badges.length > 0 && (
         <div class="stat-panel__badges">
           {badges.map((b) => <span class="stat-panel__pill">{b}</span>)}

@@ -14,10 +14,12 @@ const rows = items.filter((it) => it && (it.year || it.title));
 
 const spread = timelinePositions(rows.map((it) => it.year), !!planned);
 const delay = (i: number) => Math.round(i * 12) / 100;
+const detailed = rows.some((it) => !!it.detail);
+const span = spread.length > 2 ? Math.min(...spread.slice(2).map((x, i) => x - spread[i])) : 100;
 ---
 
 {rows.length > 0 && (
-  <section data-stomme-block="timeline" id={anchor || undefined} class="section timeline">
+  <section data-stomme-block="timeline" id={anchor || undefined} class:list={['section', 'timeline', detailed && 'timeline--detailed']}>
     {(eyebrow || heading || intro) && (
       <div class="section-head">
         {eyebrow && <span class="mono eyebrow">{eyebrow}</span>}
@@ -25,7 +27,7 @@ const delay = (i: number) => Math.round(i * 12) / 100;
         {intro && <p class="intro">{intro}</p>}
       </div>
     )}
-    <div class="timeline__track">
+    <div class="timeline__track" style={`--timeline-span:${span}`}>
       <span class="timeline__spine" aria-hidden="true" />
       <ol class="timeline__items">
         {rows.map((it, i) => (

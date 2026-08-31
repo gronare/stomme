@@ -138,7 +138,7 @@ export function stommeCollections(listings?: Listing[]) {
           children: z.array(z.object({ label: z.string(), link })).default([]),
         })).default([]),
         cta: z.object({ label: z.string(), link }).optional(),
-        sticky: z.boolean().default(false),
+        sticky: z.union([z.boolean(), z.enum(['true', 'false', 'phone'])]).default(false),
         showLogo: z.boolean().default(false),
         showWordmark: z.boolean().default(false),
       }),

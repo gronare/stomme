@@ -496,7 +496,7 @@ const RAW_BLOCKS: BlockDef[] = [
     fields: [
       { name: 'eyebrow', label: 'Eyebrow', widget: 'string', required: false, hint: 'Small uppercase label above the heading.' },
       { name: 'heading', label: 'Heading', widget: 'string', required: false, hint: 'Wrap words in *asterisks* to underline them.' },
-      { name: 'body', label: 'Body', widget: 'text', required: false },
+      { name: 'body', label: 'Body', widget: 'text', required: false, hint: 'Leave a blank line between two pieces of text to start a new paragraph.' },
       { name: 'badges', label: 'Badges', widget: 'list', required: false, collapsed: true, label_singular: 'Badge', field: { name: 'badge', label: 'Badge', widget: 'string' } },
       { name: 'statValue', label: 'Big number', widget: 'string', required: false },
       { name: 'statLabel', label: 'Number label', widget: 'string', required: false },
