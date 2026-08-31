@@ -14,9 +14,18 @@ const refused = (status: number, body: string) =>
     headers: { 'Content-Type': 'text/plain; charset=utf-8', 'Cache-Control': 'no-store' },
   });
 
+const DEV_TILE = `<svg xmlns="http://www.w3.org/2000/svg" width="640" height="320" viewBox="0 0 640 320"><rect width="640" height="320" fill="#e8ebe6"/><path d="M0 80h640M0 160h640M0 240h640M160 0v320M320 0v320M480 0v320" stroke="#d5dad2" stroke-width="1"/><circle cx="320" cy="150" r="10" fill="#5c6f62"/><path d="M320 160c-6 8-10 14-10 20a10 10 0 0 0 20 0c0-6-4-12-10-20z" fill="#5c6f62"/></svg>`;
+
 export const GET: APIRoute = async ({ params, request }) => {
   const point = parseMapPoint(params.point);
   if (!point) return refused(404, 'no such map point');
+
+  // Node's fetch strips the Referer header, so the referrer-locked key can never pass in dev; the tile stands in.
+  if (import.meta.env.DEV) {
+    return new Response(DEV_TILE, {
+      headers: { 'Content-Type': 'image/svg+xml', 'Cache-Control': 'no-store' },
+    });
+  }
 
   const key = typeof site?.maps?.key === 'string' ? site.maps.key.trim() : '';
   if (!key) return refused(502, 'map image unavailable');
