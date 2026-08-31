@@ -76,7 +76,7 @@ body > main > * { background: var(--color-paper); }
 [data-eyebrow="bold"] .eyebrow::before { display: none; }
 [data-eyebrow="bold"] .eyebrow { font-weight: 700; letter-spacing: 0.16em; }
 
-.btn { display: inline-block; background: var(--color-brand); color: var(--color-on-dark); font-weight: 600; padding: 0.6rem 1.3rem; border-radius: 0.7rem; text-decoration: none; white-space: nowrap; }
+.btn { display: inline-block; background: var(--color-brand); color: var(--color-on-dark); font-weight: 600; font-size: 1em; line-height: inherit; padding: 0.6rem 1.3rem; border-radius: 0.7rem; text-decoration: none; white-space: nowrap; }
 /* Auto hyphenation fills lines rather than rescuing words, so it is on only at the widths a zoomed phone has, where a Swedish compound otherwise breaks mid-syllable; chrome and button labels never hyphenate, and a button wraps its label only there. */
 @media (max-width: 330px) { body { -webkit-hyphens: auto; hyphens: auto; } }
 .site-header, .btn, .ctabox-btn { -webkit-hyphens: manual; hyphens: manual; }
