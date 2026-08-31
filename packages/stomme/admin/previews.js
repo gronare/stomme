@@ -94,8 +94,9 @@
   // The iframe stays MOUNTED across edits: returning its src UNCHANGED is what stops the CMS's React from reloading (and flickering) it — new drafts ride in on postMessage and /preview morphs its own <main> in place.
   var FRAME_STYLE = { width: '100%', height: '100vh', border: '0', display: 'block', background: '#fff' };
   var FRAMES = {};
-  function liveFrame(id, baseSrc, data, style) {
+  function liveFrame(id, baseSrc, data, style, opts) {
     var rec = FRAMES[id] || (FRAMES[id] = {});
+    rec.blockOffset = (opts && opts.blockOffset) || 0;
     if (!rec.ref) rec.ref = function (el) { rec.el = el; if (!el) rec.src = null; };
     if (!rec.src) {
       var sep = baseSrc.indexOf('?') >= 0 ? '&' : '?';
@@ -105,6 +106,151 @@
     }
     return h('iframe', { src: rec.src, style: style || FRAME_STYLE, ref: rec.ref });
   }
+
+  try {
+    var PANE_IDS = ['first-pane-body', 'second-pane-body'];
+    var BLOCK_ITEMS = 'section.field[data-key-path="blocks"] > .field-wrapper > .sui.group > .inner > .item-list > .item-wrapper > .item';
+    var clamp = function (n, lo, hi) { return n < lo ? lo : n > hi ? hi : n; };
+
+    var syncOn = true, syncChecked = 0;
+    function syncEnabled() {
+      var now = Date.now();
+      if (now - syncChecked < 2000) return syncOn;
+      syncChecked = now;
+      try {
+        if (!indexedDB.databases) return syncOn;
+        indexedDB.databases().then(function (dbs) {
+          var name = (dbs || []).map(function (d) { return d && d.name; }).filter(function (n) { return /^(github|gitlab|gitea):/.test(n || ''); })[0];
+          if (!name) { syncOn = true; return; }
+          var req = indexedDB.open(name);
+          req.onerror = function () { syncOn = true; };
+          req.onsuccess = function () {
+            var db = req.result;
+            try {
+              if (!db.objectStoreNames.contains('ui-settings')) { syncOn = true; db.close(); return; }
+              var get = db.transaction('ui-settings', 'readonly').objectStore('ui-settings').get('entry-view');
+              get.onsuccess = function () { syncOn = !(get.result && get.result.syncScrolling === false); db.close(); };
+              get.onerror = function () { syncOn = true; db.close(); };
+            } catch (e) { syncOn = true; try { db.close(); } catch (e2) {} }
+          };
+        }, function () { syncOn = true; });
+      } catch (e) { syncOn = true; }
+      return syncOn;
+    }
+
+    function liveRec() {
+      for (var k in FRAMES) {
+        var r = FRAMES[k];
+        if (r && r.el && r.el.isConnected && r.el.contentWindow) return r;
+      }
+      return null;
+    }
+    function recFor(source) {
+      for (var k in FRAMES) {
+        var r = FRAMES[k];
+        if (r && r.el && r.el.isConnected && r.el.contentWindow === source) return r;
+      }
+      return null;
+    }
+    function paneContent(pane) {
+      var c = pane && pane.querySelector(':scope > .content');
+      return c && c.querySelector('section.field') ? c : null;
+    }
+    function editContent() {
+      for (var i = 0; i < PANE_IDS.length; i++) {
+        var c = paneContent(document.getElementById(PANE_IDS[i]));
+        if (c) return c;
+      }
+      return null;
+    }
+    function blockItems(content) { return content.querySelectorAll(BLOCK_ITEMS); }
+
+    function previewTarget(rec, content) {
+      var g = rec.geom, max = Math.max(0, g.scrollHeight - g.viewport);
+      var items = blockItems(content);
+      if (!items.length || !g.sections.length) {
+        var range = content.scrollHeight - content.clientHeight;
+        return max * (range > 0 ? clamp(content.scrollTop / range, 0, 1) : 0);
+      }
+      var sampleY = content.getBoundingClientRect().top, n = -1, f = 0, r, i;
+      for (i = 0; i < items.length; i++) {
+        r = items[i].getBoundingClientRect();
+        if (r.top <= sampleY) { n = i; f = r.height > 0 ? (sampleY - r.top) / r.height : 0; }
+      }
+      if (n < 0) return 0;
+      if (n === items.length - 1 && sampleY >= items[n].getBoundingClientRect().bottom) return max;
+      var sec = g.sections[clamp(n + (rec.blockOffset || 0), 0, g.sections.length - 1)];
+      return clamp(sec.top + clamp(f, 0, 1) * sec.height, 0, max);
+    }
+
+    var pushRaf = 0;
+    function pushToPreview() {
+      if (pushRaf) return;
+      pushRaf = requestAnimationFrame(function () {
+        pushRaf = 0;
+        try {
+          var rec = liveRec();
+          var content = editContent();
+          if (!rec || !rec.geom || !content) return;
+          rec.el.contentWindow.postMessage({ type: 'stomme:preview-scrollto', top: previewTarget(rec, content) }, '*');
+        } catch (e) {}
+      });
+    }
+
+    function onEditorScroll(e) {
+      try {
+        var rec = liveRec();
+        if (!rec) return;
+        var t = e.target;
+        var pane = t && t.closest ? t.closest('#first-pane-body, #second-pane-body') : null;
+        if (!pane || !paneContent(pane)) return;
+        if (!syncEnabled() || !rec.geom) return;
+        pushToPreview();
+      } catch (e2) {}
+    }
+
+    function previewScrolled(rec, top) {
+      try {
+        if (!syncEnabled() || !rec.geom) return;
+        var g = rec.geom, content = editContent();
+        if (!content) return;
+        var items = blockItems(content);
+        if (!items.length || !g.sections.length) {
+          var max = Math.max(0, g.scrollHeight - g.viewport);
+          content.scrollTop = (content.scrollHeight - content.clientHeight) * (max > 0 ? clamp(top / max, 0, 1) : 0);
+          return;
+        }
+        var idx = 0, f = 0, i;
+        for (i = 0; i < g.sections.length; i++) {
+          if (g.sections[i].top <= top) { idx = i; f = g.sections[i].height > 0 ? (top - g.sections[i].top) / g.sections[i].height : 0; }
+        }
+        var n = idx - (rec.blockOffset || 0);
+        if (n < 0) { content.scrollTop = 0; return; }
+        if (n > items.length - 1) { n = items.length - 1; f = 1; }
+        var r = items[n].getBoundingClientRect();
+        content.scrollTop += (r.top - content.getBoundingClientRect().top) + clamp(f, 0, 1) * r.height;
+      } catch (e) {}
+    }
+
+    window.addEventListener('message', function (e) {
+      try {
+        var d = e.data;
+        if (!d || typeof d !== 'object') return;
+        if (d.type !== 'stomme:preview-geometry' && d.type !== 'stomme:preview-scrolled') return;
+        var rec = recFor(e.source);
+        if (!rec) return;
+        if (d.type === 'stomme:preview-geometry') {
+          if (!Array.isArray(d.sections)) return;
+          rec.geom = { sections: d.sections, scrollHeight: Number(d.scrollHeight) || 0, viewport: Number(d.viewport) || 0 };
+          return;
+        }
+        previewScrolled(rec, Number(d.top) || 0);
+      } catch (e2) {}
+    });
+    window.addEventListener('wheel', onEditorScroll, { capture: true, passive: true });
+    window.addEventListener('touchmove', onEditorScroll, { capture: true, passive: true });
+  } catch (e) { console.warn('[stomme] scroll sync unavailable:', e); }
+
   var PagePreview = function (props) {
     return liveFrame('stomme-preview', '/preview', b64(jsBlocks(props.entry)));
   };
@@ -325,7 +471,8 @@
       var e = props.entry;
       var head = { type: 'pageHeader', heading: v(e, headingField || 'heading'), intro: v(e, introField || 'message') };
       var blocks = jsBlocks(e);
-      return liveFrame('stomme-preview', '/preview', b64(head.heading || head.intro ? [head].concat(blocks) : blocks));
+      var headed = !!(head.heading || head.intro);
+      return liveFrame('stomme-preview', '/preview', b64(headed ? [head].concat(blocks) : blocks), null, { blockOffset: headed ? 1 : 0 });
     });
   };
 

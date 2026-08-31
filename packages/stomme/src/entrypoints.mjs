@@ -310,6 +310,43 @@ if (shareDraft && scOg.enabled) {
     window.addEventListener('message', function (e) {
       if (e.data && e.data.type === 'stomme:preview' && typeof e.data.data === 'string') update(e.data.data);
     });
+
+    if (window.top !== window) (function () {
+      var syncTop = window.top, applyingUntil = 0, geomRaf = 0, scrollRaf = 0;
+      function postGeometry() {
+        geomRaf = 0;
+        var main = document.querySelector('main'), sections = [], i, r;
+        if (main) for (i = 0; i < main.children.length; i++) {
+          r = main.children[i].getBoundingClientRect();
+          sections.push({ top: r.top + window.scrollY, height: r.height });
+        }
+        try { syncTop.postMessage({ type: 'stomme:preview-geometry', sections: sections, scrollHeight: document.documentElement.scrollHeight, viewport: window.innerHeight }, '*'); } catch (e) {}
+      }
+      function reportGeometry() { if (!geomRaf) geomRaf = requestAnimationFrame(postGeometry); }
+      window.addEventListener('message', function (e) {
+        if (!e.data || e.data.type !== 'stomme:preview-scrollto' || typeof e.data.top !== 'number') return;
+        applyingUntil = Date.now() + 250;
+        window.scrollTo(0, e.data.top);
+      });
+      window.addEventListener('scroll', function () {
+        if (scrollRaf || Date.now() < applyingUntil) return;
+        scrollRaf = requestAnimationFrame(function () {
+          scrollRaf = 0;
+          if (Date.now() < applyingUntil) return;
+          try { syncTop.postMessage({ type: 'stomme:preview-scrolled', top: window.scrollY }, '*'); } catch (e) {}
+        });
+      }, { passive: true });
+      document.addEventListener('stomme:preview-morph', reportGeometry);
+      window.addEventListener('load', reportGeometry);
+      window.addEventListener('resize', reportGeometry);
+      if (window.ResizeObserver) {
+        var ro = new ResizeObserver(reportGeometry);
+        ro.observe(document.body);
+        var m = document.querySelector('main');
+        if (m) ro.observe(m);
+      }
+      reportGeometry();
+    })();
   })();
 </script>
 `;

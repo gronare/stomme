@@ -218,6 +218,58 @@ try {
     return true;
   });
 
+  await check('edit pane scroll container (#first|#second-pane-body > .content holding section.field)', () => page.evaluate(() => {
+    const panes = ['first-pane-body', 'second-pane-body'].map((id) => document.getElementById(id)).filter(Boolean);
+    if (!panes.length) return 'neither #first-pane-body nor #second-pane-body exists — the scroll sync cannot find the editor pane';
+    const content = panes.map((p) => p.querySelector(':scope > .content')).filter((c) => c && c.querySelector('section.field'))[0];
+    if (!content) return 'no pane has a > .content holding section.field — previews.js editContent() finds no editor to scroll';
+    const oy = getComputedStyle(content).overflowY;
+    return oy === 'auto' || oy === 'scroll' ? true : `the edit pane's > .content is overflow-y:${oy} — it is no longer the scroll container the sync reads and drives`;
+  }));
+
+  await check('blocks rows reachable by the scoped item path (.item-list > .item-wrapper > .item)', () => page.evaluate(() => {
+    const PATH = 'section.field[data-key-path="blocks"] > .field-wrapper > .sui.group > .inner > .item-list > .item-wrapper > .item';
+    const field = document.querySelector('section.field[data-key-path="blocks"]');
+    if (!field) return 'no section.field[data-key-path="blocks"] — the sync has no block list to sample the editor against';
+    const own = [...field.querySelectorAll('.item')].filter((i) => i.closest('section.field[data-key-path]') === field);
+    if (!own.length) return 'the blocks field holds no .item — nothing to map onto a preview section';
+    const scoped = [...document.querySelectorAll(PATH)];
+    if (!scoped.length) return `the path yields no .item though the blocks field owns ${own.length} — previews.js BLOCK_ITEMS matches nothing and the sync falls back to proportional scrolling`;
+    return scoped.length === own.length ? true : `the path yields ${scoped.length} .item(s) but the blocks field owns ${own.length} — editor rows map onto the wrong preview sections`;
+  }));
+
+  await check('preview nesting (iframe.preview > our iframe[src^="/preview"])', () => page.evaluate(() => {
+    const sandbox = document.querySelector('iframe.preview');
+    if (!sandbox) return 'no iframe.preview — Sveltia no longer mounts the sandbox our preview template renders into';
+    let doc = null;
+    try { doc = sandbox.contentDocument; } catch (e) { return `iframe.preview is not readable (${e.message}) — the sync cannot reach our /preview frame`; }
+    if (!doc) return 'iframe.preview has no same-origin contentDocument — allow-same-origin is gone and FRAMES.el can never be matched against e.source';
+    return doc.querySelector('iframe[src^="/preview"]') ? true : 'the sandbox holds no iframe[src^="/preview"] — liveFrame() no longer mounts our frame inside it';
+  }));
+
+  await check('editor wheel → stomme:preview-scrollto reaches our /preview frame', async () => {
+    const frame = page.frames().find((f) => /\/preview(\?|$)/.test(f.url()));
+    if (!frame) return 'no /preview frame under the preview sandbox — the sync has nothing to post to';
+    await frame.evaluate(() => {
+      window.__stommeScrollTo = [];
+      window.addEventListener('message', (e) => { if (e.data && e.data.type === 'stomme:preview-scrollto') window.__stommeScrollTo.push(e.data); });
+      window.top.postMessage({ type: 'stomme:preview-geometry', sections: [{ top: 0, height: 400 }, { top: 400, height: 500 }, { top: 900, height: 300 }], scrollHeight: 1200, viewport: 600 }, '*');
+    });
+    await page.waitForTimeout(200);
+    const wheeled = await page.evaluate(() => {
+      const content = ['first-pane-body', 'second-pane-body'].map((id) => document.getElementById(id)).filter(Boolean)
+        .map((p) => p.querySelector(':scope > .content')).filter((c) => c && c.querySelector('section.field'))[0];
+      if (!content) return false;
+      (content.querySelector('section.field') || content).dispatchEvent(new WheelEvent('wheel', { bubbles: true, deltaY: 120 }));
+      return true;
+    });
+    if (!wheeled) return 'no edit pane to wheel over';
+    await page.waitForTimeout(400);
+    const got = await frame.evaluate(() => window.__stommeScrollTo || []);
+    if (!got.length) return 'the wheel produced no stomme:preview-scrollto — previews.js never matched the geometry message to the mounted frame, or the pane/toggle guard now bails';
+    return typeof got[0].top === 'number' ? true : `the scrollto carries top=${JSON.stringify(got[0].top)}, not a number`;
+  });
+
   await page.evaluate(() => { location.hash = '#/collections/settings/entries/thanks'; });
   await page.waitForSelector('section.field[data-field-type=boolean]', { timeout: 30000 });
   await page.waitForTimeout(500);
