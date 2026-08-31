@@ -748,7 +748,8 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
   }
   .ctabox-eyebrow { color: color-mix(in srgb, var(--color-on-dark) 85%, transparent); }
   .ctabox .ctabox-heading { margin-top: 0.75rem; color: var(--color-on-dark); }
-  .ctabox-intro { margin: 1rem 0 0; max-width: 34rem; color: color-mix(in srgb, var(--color-on-dark) 75%, transparent); }
+  .ctabox-intro { margin: 1rem auto 0; max-width: 34rem; color: color-mix(in srgb, var(--color-on-dark) 75%, transparent); }
+  .ctabox--split .ctabox-intro { margin-inline: 0; }
   .ctabox-actions { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 0.9rem 1.5rem; margin-top: 1.75rem; }
   .ctabox--split .ctabox-actions { justify-content: flex-start; }
   .ctabox-btn {
@@ -1173,7 +1174,7 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
     margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--color-line);
   }
   .post-archfoot__note { margin: 0; font-size: 0.85rem; color: var(--color-muted); }
-  .post-archfoot__link { color: var(--color-brand); text-decoration: none; }
+  .post-archfoot__link { margin-left: auto; color: var(--color-brand); text-decoration: none; }
   .post-archfoot__link:hover { text-decoration: underline; text-underline-offset: 3px; }
 
   .archive-year + .archive-year { margin-top: 2.25rem; }
