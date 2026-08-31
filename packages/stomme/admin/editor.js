@@ -1,5 +1,17 @@
 (function () {
   'use strict';
+  var nativeAnimate = Element.prototype.animate;
+  Element.prototype.animate = function (keyframes, options) {
+    var still = false;
+    try { still = !!(this.classList && this.classList.contains('item-wrapper')); } catch (e) {}
+    if (!still) return nativeAnimate.apply(this, arguments);
+    var zero = { duration: 0, delay: 0, endDelay: 0, fill: 'none' };
+    var opts = options && typeof options === 'object' ? Object.assign({}, options, zero) : zero;
+    var anim = nativeAnimate.call(this, keyframes, opts);
+    try { anim.finish(); } catch (e) {}
+    return anim;
+  };
+
   // The expand/collapse disclosure — first header group's button; NOT the aria-expanded ⋮ menu button.
   function toggleButton(item) { return item.querySelector(':scope > .header > div:first-child > button[aria-expanded]'); }
   function isCollapsed(item) { var b = toggleButton(item); return !!b && b.getAttribute('aria-expanded') === 'false'; }
