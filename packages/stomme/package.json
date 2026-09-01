@@ -55,6 +55,7 @@
     "test:addon-cms": "node test/smoke-addon-cms.mjs",
     "test:admin-contract": "node test/admin-contract.mjs",
     "test:noindex": "node test/smoke-noindex.mjs",
+    "test:seo": "node test/smoke-seo.mjs",
     "test:addon-blocks": "node test/smoke-addon-blocks.mjs",
     "test:addon-lookbook": "node test/smoke-addon-lookbook.mjs",
     "test:public-index": "node test/smoke-public-index.mjs",
@@ -83,7 +84,8 @@
     "test:timeline": "node test/unit-timeline.mjs",
     "test:form-samples": "node test/unit-form-samples.mjs",
     "test:contact-switch": "node test/unit-contact-switch.mjs",
-    "test:units": "pnpm -s run test:contracts && pnpm -s run test:emit-fields && pnpm -s run test:collection-editors && pnpm -s run test:option-sources && pnpm -s run test:admin-theme && pnpm -s run test:markdown && pnpm -s run test:href && pnpm -s run test:config && pnpm -s run test:i18n && pnpm -s run test:kit && pnpm -s run test:icons && pnpm -s run test:protect && pnpm -s run test:og-pages && pnpm -s run test:media-config && pnpm -s run test:anchors && pnpm -s run test:timeline && pnpm -s run test:form-samples && pnpm -s run test:contact-switch && pnpm -s run test:nav-current",
+    "test:local-business": "node test/unit-local-business.mjs",
+    "test:units": "pnpm -s run test:contracts && pnpm -s run test:emit-fields && pnpm -s run test:collection-editors && pnpm -s run test:option-sources && pnpm -s run test:admin-theme && pnpm -s run test:markdown && pnpm -s run test:href && pnpm -s run test:config && pnpm -s run test:i18n && pnpm -s run test:kit && pnpm -s run test:icons && pnpm -s run test:protect && pnpm -s run test:og-pages && pnpm -s run test:media-config && pnpm -s run test:anchors && pnpm -s run test:timeline && pnpm -s run test:form-samples && pnpm -s run test:contact-switch && pnpm -s run test:local-business && pnpm -s run test:nav-current",
     "test:nav-current": "node test/unit-nav-current.mjs"
   },
   "bin": {

@@ -4,7 +4,8 @@ import { getEntry, getCollection } from 'astro:content';
 import { site, features, listings } from '@stomme/config';
 import { resolveShareImage } from './src/og-pages.ts';
 import { canonicalBounceHost, demoHost, isUnlisted } from './src/config.ts';
-import { hreflangLinks, resolveLocales, splitLocalePath } from './src/i18n.ts';
+import { localBusinessJsonLd } from './src/local-business.ts';
+import { hreflangLinks, normalizeLocalePath, resolveLocales, splitLocalePath } from './src/i18n.ts';
 
 interface Props {
   title?: string;
@@ -36,9 +37,22 @@ const ogUrl = Astro.site ? new URL(Astro.url.pathname, Astro.site).href : undefi
 const locales = resolveLocales(site);
 // The noindex list is written in site paths, so a locale copy of an unlisted page has to be measured against the same path or it would be the one that gets indexed.
 const listPath = splitLocalePath(Astro.url.pathname, locales).path;
-const noindex = isUnlisted(listPath, site?.noindex) || (Astro.site ? demoHost(new URL(Astro.site).hostname) : false);
+const noindex = isUnlisted(listPath, site?.noindex, site?.routes?.formSuccess) || (Astro.site ? demoHost(new URL(Astro.site).hostname) : false);
 const alternates = hreflangLinks(Astro.url.pathname, site, Astro.site, locales.enabled ? await getCollection('pages') : []);
 const bounceHost = canonicalBounceHost(Astro.site);
+
+const isHome = normalizeLocalePath(Astro.url.pathname) === '/';
+const contact = isHome ? ((await getEntry('contact', 'contact')?.catch(() => null))?.data as any) ?? {} : {};
+const towns = isHome && features?.areas ? await getCollection('towns').catch(() => []) : [];
+const localBusiness = isHome
+  ? localBusinessJsonLd({
+      name: settings.name,
+      url: Astro.site ? new URL(Astro.site).origin : undefined,
+      image: settings.ogImage ? (Astro.site ? new URL(settings.ogImage, Astro.site).href : settings.ogImage) : undefined,
+      contact,
+      towns: towns.map((t: any) => t.data?.name),
+    })
+  : null;
 ---
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="format-detection" content="telephone=no" />
@@ -59,6 +73,7 @@ const bounceHost = canonicalBounceHost(Astro.site);
 {ogImage && <meta property="og:image" content={ogImage} />}
 <meta name="twitter:card" content={ogImage ? 'summary_large_image' : 'summary'} />
 {ogImage && <meta name="twitter:image" content={ogImage} />}
+{localBusiness && <script type="application/ld+json" set:html={JSON.stringify(localBusiness)} />}
 <link rel="icon" href={favicon} type={faviconType} />
 <link rel="icon" href="/favicon.ico" sizes="32x32" />
 {settings.appleIcon && <link rel="apple-touch-icon" href={settings.appleIcon} />}

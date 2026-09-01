@@ -290,6 +290,16 @@ export default function stomme(options = {}) {
           enabled.push('/404');
         }
 
+        const siteRobots = ['robots.txt.ts', 'robots.txt.js', 'robots.txt.mjs']
+          .some((f) => existsSync(resolve(root, 'src/pages', f)))
+          || existsSync(resolve(fileURLToPath(config.publicDir), 'robots.txt'));
+        if (siteRobots) {
+          logger.info("using the site's own /robots.txt (skipped the generated one)");
+        } else {
+          injectRoute({ pattern: '/robots.txt', entrypoint: '@gronare/stomme/routes/robots.ts' });
+          enabled.push('/robots.txt');
+        }
+
         // The OG renderer must NOT go through the site bundle — its deps are native (satori/resvg/sharp) — so the endpoint runtime-imports it from its real package location via this define.
         updateConfig({ vite: { define: { __STOMME_OG_RENDERER__: JSON.stringify(pathToFileURL(resolve(pkgDir, 'src/og.mjs')).href) } } });
         injectRoute({ pattern: '/og/[...slug]', entrypoint: '@gronare/stomme/routes/og.ts' });

@@ -392,8 +392,10 @@ export const SITE_DEFAULTS = {
   strings: STRINGS_EN,
 };
 
-export function isUnlisted(pathname: string, noindex?: string[]): boolean {
+export function isUnlisted(pathname: string, noindex?: string[], formSuccess?: string): boolean {
   const path = String(pathname || '');
+  const success = String(formSuccess || SITE_DEFAULTS.routes.formSuccess).trim().replace(/\/+$/, '');
+  if (success !== '' && path.replace(/\/+$/, '') === success) return true;
   return (noindex ?? []).some((raw) => {
     const prefix = String(raw || '').trim().replace(/\/+$/, '');
     return prefix !== '' && (path === prefix || path.startsWith(`${prefix}/`));

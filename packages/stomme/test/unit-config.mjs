@@ -100,6 +100,9 @@ check(!isUnlisted('/bookings', ['/booking']), 'a sibling that merely starts with
 check(!isUnlisted('/anything', ['']), 'an empty noindex entry never matches — it would otherwise hide the whole site');
 check(!isUnlisted('/anything', ['   ']), 'a whitespace-only noindex entry never matches');
 check(!isUnlisted('/anything', undefined), 'no noindex list leaves every page listed');
+check(isUnlisted('/thanks', undefined), 'the form-success route is unlisted without a site having to list it');
+check(isUnlisted('/tack/', undefined, '/tack'), "the site's own form-success route is unlisted, trailing slash or not");
+check(!isUnlisted('/thanks', undefined, '/tack'), 'moving the route leaves the default path indexable');
 
 // ── locale strings ──────────────────────────────────────────────────────────
 const EN = SITE_DEFAULTS.strings;

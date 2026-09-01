@@ -12,7 +12,7 @@ Not published to a registry yet — clone the repository and scaffold from it. S
 
 | Import | What |
 |---|---|
-| `@gronare/stomme/integration` | The Astro integration. Wires the CMS generator, virtual aliases, `/preview`, `/404`, `/api/contact`, `/og`, theme splicing and the addon seams. |
+| `@gronare/stomme/integration` | The Astro integration. Wires the CMS generator, virtual aliases, `/preview`, `/404`, `/robots.txt`, `/api/contact`, `/og`, theme splicing and the addon seams. |
 | `@gronare/stomme/BlockRenderer.astro` | Renders a `blocks` array. Built-in registry plus optional `registry` (your blocks) and `config` (routes/locale/strings) props. |
 | `@gronare/stomme/catalog` | `defaultBlocks` — the built-in block field definitions. |
 | `@gronare/stomme/collections` | `stommeCollections()` — the content-collection schemas. |
