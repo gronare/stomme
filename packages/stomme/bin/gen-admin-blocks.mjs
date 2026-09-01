@@ -20,6 +20,9 @@ const here = dirname(fileURLToPath(import.meta.url));
 // Pinned CMS bundle, swapped into each site's public/admin/index.html on build: bump deliberately — Sveltia is pre-1.0 and the editor is coupled to its DOM. STOMME_SVELTIA_SRC points at a local/vendored copy instead.
 const SVELTIA_CMS_SRC = process.env.STOMME_SVELTIA_SRC || 'https://unpkg.com/@sveltia/cms@0.203.2/dist/sveltia-cms.js';
 
+// Every id admin/previews.js registers, plus the built-ins the editor still needs; Sveltia's own default is `[...builtins, ...registered]` WITHOUT dedupe, so an id that appears in both (image, linked-image, code-block) makes the rich-text Insert menu throw each_key_duplicate and never mount at all.
+const EDITOR_COMPONENTS = ['code-block', 'image', 'stomme-section'];
+
 // Loaded through jiti rather than a bare dynamic import: Node's own type-stripping refuses any .ts file under node_modules, so importing schema.ts / site.config.ts breaks the moment its import graph reaches the installed package's .ts ('@gronare/stomme/kit', './catalog') — which is exactly what a registry install is. jiti transpiles .ts everywhere and resolves each module's bare specifiers from its own location.
 const jiti = createJiti(import.meta.url);
 const schemaPath = resolve(root, process.env.STOMME_SCHEMA || 'src/blocks/schema.ts');
@@ -245,6 +248,12 @@ yaml = withMaxFileSize(yaml, MEDIA);
 if (!/^output:/m.test(yaml)) {
   yaml = `output:\n  omit_empty_optional_fields: true\n${yaml}`;
 }
+{
+  // Rewritten on every run, never only seeded: a config generated before a component existed would keep a stale list and drop that component from the Insert menu without a word.
+  const line = `    editor_components: [${EDITOR_COMPONENTS.join(', ')}]`;
+  if (/^ {4}editor_components: \[[^\]]*\]$/m.test(yaml)) yaml = yaml.replace(/^ {4}editor_components: \[[^\]]*\]$/m, line);
+  else if (!/^field_defaults:/m.test(yaml)) yaml = `field_defaults:\n  richtext:\n${line}\n${yaml}`;
+}
 yaml = translateLabels(yaml);
 
 // Sveltia's local mode requires the picked directory to BE the repository root (it checks for `.git`) and resolves every path from there, so a site living in a subdirectory needs its paths written from the repo root — that is `cms.repoPath`. Only filesystem paths move: `public_folder` is a URL on the built site, and every image 404s if it gains the prefix.
@@ -287,6 +296,16 @@ try {
   const LOGIN_LABELS = { en: 'Log in', sv: 'Logga in', da: 'Log ind', nb_no: 'Logg inn', nb: 'Logg inn', nn: 'Logg inn', de: 'Anmelden', fr: 'Se connecter', es: 'Iniciar sesión', it: 'Accedi', nl: 'Inloggen', pt: 'Entrar', fi: 'Kirjaudu sisään' };
   const loginLabel = LOGIN_LABELS[CMS_LOCALE] || LOGIN_LABELS[String(CMS_LOCALE).split(/[-_]/)[0]] || 'Log in';
   previewsSrc = substitute(previewsSrc, /var LOGIN_LABEL = '[^']*';/, `var LOGIN_LABEL = ${JSON.stringify(loginLabel)};`, 'the admin login label');
+  const COMPONENT_LABELS = {
+    en: { image: 'Image', caption: 'Caption', captionHint: 'Shown as the caption (and alt text).', section: 'Section (##)', heading: 'Heading' },
+    sv: { image: 'Bild', caption: 'Bildtext', captionHint: 'Visas som bildtext (och alt-text).', section: 'Avsnitt (##)', heading: 'Rubrik' },
+    da: { image: 'Billede', caption: 'Billedtekst', captionHint: 'Vises som billedtekst (og alt-tekst).', section: 'Afsnit (##)', heading: 'Overskrift' },
+    nb: { image: 'Bilde', caption: 'Bildetekst', captionHint: 'Vises som bildetekst (og alt-tekst).', section: 'Avsnitt (##)', heading: 'Overskrift' },
+  };
+  COMPONENT_LABELS.nb_no = COMPONENT_LABELS.nb;
+  COMPONENT_LABELS.nn = COMPONENT_LABELS.nb;
+  const componentLabels = COMPONENT_LABELS[CMS_LOCALE] || COMPONENT_LABELS[String(CMS_LOCALE).split(/[-_]/)[0]] || COMPONENT_LABELS.en;
+  previewsSrc = substitute(previewsSrc, /var COMPONENT_LABELS = \{[^}]*\};/, `var COMPONENT_LABELS = ${JSON.stringify(componentLabels)};`, 'the rich-text component labels');
   if (LISTINGS.length) {
     const regs = LISTINGS.map((l) => {
       const specs = (Array.isArray(l.specs) ? l.specs : []).map((s, i) =>

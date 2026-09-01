@@ -484,16 +484,21 @@
     window.CMS.registerPreviewTemplate(id, tmpl);
   };
 
+  // Rewritten per site locale by stomme-gen — keep the shape, the keys and the single-line form.
+  var COMPONENT_LABELS = { image: 'Image', caption: 'Caption', captionHint: 'Shown as the caption (and alt text).', section: 'Section (##)', heading: 'Heading' };
+
   // Replaces the default image button; placement/size are stored as keywords in the markdown title (`![alt](src "right small")`), which renderMarkdown parses back out.
   var ALIGN = ['center', 'left', 'right', 'wide'];
   var SIZE = ['small', 'large'];
   var IMAGE_COMPONENT = {
     id: 'image',
-    label: 'Image',
+    label: COMPONENT_LABELS.image,
+    icon: 'image',
+    trigger: 'button',
     fields: [
       // No field-level media_folder — the CMS resolves it relative to the entry, so a post would upload to .../posts/src/assets/uploads and show an empty picker; config.yml's global root-relative one works.
-      { name: 'image', label: 'Image', widget: 'image' },
-      { name: 'alt', label: 'Caption', widget: 'string', required: false, hint: 'Shown as the caption (and alt text).' },
+      { name: 'image', label: COMPONENT_LABELS.image, widget: 'image' },
+      { name: 'alt', label: COMPONENT_LABELS.caption, widget: 'string', required: false, hint: COMPONENT_LABELS.captionHint },
       { name: 'align', label: 'Placement', widget: 'select', default: 'center', options: [
         { label: 'Centered', value: 'center' }, { label: 'Left — text wraps', value: 'left' },
         { label: 'Right — text wraps', value: 'right' }, { label: 'Wide', value: 'wide' }] },
@@ -521,4 +526,16 @@
   window.CMS.registerEditorComponent(IMAGE_COMPONENT);
   // Sveltia's rich-text image button resolves the component named `linked-image` when `linked_images` is on (its default), so the same definition is registered under that id or the built-in src/alt/title dialog wins.
   try { window.CMS.registerEditorComponent(Object.assign({}, IMAGE_COMPONENT, { id: 'linked-image' })); } catch (e) {}
+
+  // A `##` heading is an invisible construct — a fold on the bookable object page, a section break anywhere else — so the Insert menu writes one. The pattern is a NUL byte no markdown file can hold: matching real `##` lines would turn every level-2 heading in every body into a component card on the next load.
+  window.CMS.registerEditorComponent({
+    id: 'stomme-section',
+    label: COMPONENT_LABELS.section,
+    icon: 'format_h2',
+    fields: [{ name: 'heading', label: COMPONENT_LABELS.heading, widget: 'string' }],
+    pattern: /^\0stomme-section$/m,
+    fromBlock: function () { return {}; },
+    toBlock: function (d) { return '## ' + ((d && d.heading) || ''); },
+    toPreview: function (d) { return '<h2>' + ((d && d.heading) || '') + '</h2>'; },
+  });
 })();

@@ -51,6 +51,9 @@ try {
   browser = await chromium.launch({ channel: 'chrome', headless: true });
   // Tall viewport: Sveltia lazy-mounts offscreen fields as placeholders, and the checks need them mounted.
   const page = await browser.newPage({ viewport: { width: 1280, height: 2600 } });
+  // A Svelte render error inside a menu kills only that subtree — the button still flips aria-expanded, so the failure is invisible unless the throw is caught here.
+  const pageErrors = [];
+  page.on('pageerror', (e) => pageErrors.push(String((e && e.message) || e)));
 
   await page.goto(`http://localhost:${PORT}/admin/index.html`, { waitUntil: 'domcontentloaded' });
   await page.waitForFunction(() => [...document.querySelectorAll('button')].some((b) => /test repository/i.test(b.textContent || '')), null, { timeout: 30000 });
@@ -269,6 +272,52 @@ try {
     if (!got.length) return 'the wheel produced no stomme:preview-scrollto — previews.js never matched the geometry message to the mounted frame, or the pane/toggle guard now bails';
     return typeof got[0].top === 'number' ? true : `the scrollto carries top=${JSON.stringify(got[0].top)}, not a number`;
   });
+
+  await check('rich-text field mounts a toolbar (markdown widget)', async () => {
+    if (await has(page, 'section.field[data-field-type=markdown] [role=toolbar]')) return true;
+    const opened = await page.evaluate(() => {
+      const list = document.querySelector('section.field[data-key-path="blocks"]');
+      const add = [...(list?.querySelectorAll(':scope > .field-wrapper button[aria-haspopup=menu]') || [])].find((b) => !b.closest('.item'));
+      if (!add) return false;
+      add.click();
+      return true;
+    });
+    if (!opened) return 'no Add button on the blocks list to add a rich-text section with';
+    await page.waitForFunction(() => document.querySelector('[role=menu] button[role=menuitem]'), null, { timeout: 10000 });
+    const picked = await page.evaluate(() => {
+      const items = [...document.querySelectorAll('[role=menu] button[role=menuitem]')];
+      const it = items.find((b) => /rich text/i.test(b.textContent || ''));
+      if (!it) return false;
+      it.click();
+      return true;
+    });
+    if (!picked) return 'the block picker offers no "Rich text" type';
+    await page.waitForSelector('section.field[data-field-type=markdown] [role=toolbar]', { timeout: 15000 });
+    return true;
+  });
+  await check('rich-text Insert menu mounts its registered components', async () => {
+    const opened = await page.evaluate(() => {
+      const tb = document.querySelector('section.field[data-field-type=markdown] [role=toolbar]');
+      const b = [...(tb?.querySelectorAll('button[aria-haspopup=menu]') || [])].find((x) => /insert/i.test(x.getAttribute('aria-label') || x.textContent || ''));
+      if (!b) return false;
+      b.click();
+      return true;
+    });
+    if (!opened) return 'the markdown toolbar carries no Insert menu button — no registered editor component reaches the toolbar';
+    try {
+      await page.waitForFunction(() => [...document.querySelectorAll('[role=menu] [role^=menuitem]')].some((i) => /section/i.test(i.textContent || '')), null, { timeout: 8000 });
+    } catch {
+      const dup = pageErrors.find((m) => /each_key_duplicate/.test(m));
+      return dup ? 'the Insert menu threw each_key_duplicate — an editor_components id is listed twice' : 'the Insert menu opened but mounted no items';
+    }
+    return true;
+  });
+
+  await check('rich-text Image button (the custom image component, trigger: button)', () => page.evaluate(() => {
+    const tb = document.querySelector('section.field[data-field-type=markdown] [role=toolbar]');
+    const b = [...(tb?.querySelectorAll('button') || [])].find((x) => /^image$/i.test((x.getAttribute('aria-label') || '').trim()));
+    return b ? true : 'no Image button in the markdown toolbar — the placement/size component no longer renders as its own trigger';
+  }));
 
   await page.evaluate(() => { location.hash = '#/collections/settings/entries/thanks'; });
   await page.waitForSelector('section.field[data-field-type=boolean]', { timeout: 30000 });

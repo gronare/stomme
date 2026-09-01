@@ -37,6 +37,18 @@ const drift = previewStacks.filter(([, k, v]) => families(stacks[k]) !== familie
 check(previewStacks.length > 0 && drift.length === 0,
   `the CMS preview lists the same families as src/fonts.ts for ${previewStacks.length} stacks`, `drifted: ${drift.join(', ')}`);
 
+const IMAGE_ALIAS = { 'linked-image': 'image' };
+const registeredComponents = [...new Set([...previews.slice(previews.indexOf('var IMAGE_COMPONENT')).matchAll(/\bid: '([^']+)'/g)].map((m) => m[1]))];
+const listedComponents = (gen.match(/const EDITOR_COMPONENTS = \[([^\]]*)\]/)?.[1] ?? '').split(',').map((s) => s.trim().replace(/^'|'$/g, '')).filter(Boolean);
+const unreachable = registeredComponents.filter((id) => !listedComponents.includes(id) && !listedComponents.includes(IMAGE_ALIAS[id]));
+check(registeredComponents.length >= 3 && listedComponents.length >= 3 && unreachable.length === 0,
+  `every rich-text component admin/previews.js registers is named in the generator's editor_components list (${listedComponents.join(', ')})`,
+  `unreachable: ${unreachable.join(', ')}`);
+check(new Set(listedComponents).size === listedComponents.length,
+  'the generated editor_components list names each id once', `duplicated: ${listedComponents.join(', ')}`);
+check(/editor_components: \[\$\{EDITOR_COMPONENTS\.join\(', '\)\}\]/.test(gen),
+  'the generator writes field_defaults.richtext.editor_components from EDITOR_COMPONENTS rather than leaving Sveltia to build the default');
+
 const typeFields = [...ogPages.slice(ogPages.indexOf('TYPE_FIELDS')).matchAll(/'([a-z][A-Za-z]*)'/g)].map((m) => m[1]);
 check(typeFields.length > 0, `the OG renderer resolves ${new Set(typeFields).size} distinct card fields`);
 
