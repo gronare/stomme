@@ -122,6 +122,7 @@ const isActive = (href: string) => !!href && navPath(href) === current;
   (function () {
     var header = document.querySelector('.site-header');
     if (!header) return;
+    requestAnimationFrame(function () { requestAnimationFrame(function () { header.classList.add('is-anim'); }); });
     var toggle = header.querySelector('.nav-toggle');
     var mobile = window.matchMedia('(max-width: 820px)');
 

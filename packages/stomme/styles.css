@@ -408,8 +408,8 @@ main .cover:first-child .cover__inner { --cover-clear: calc(var(--header-bottom)
 body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header {
   position: absolute; top: 0; left: 0; right: 0; z-index: 50;
   background: transparent; border-bottom-width: 0; color: #fff;
-  transition: background 0.3s, box-shadow 0.3s, border-color 0.3s, color 0.3s;
 }
+.site-header.is-anim { transition: background 0.3s, box-shadow 0.3s, border-color 0.3s, color 0.3s; }
 body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header.is-sticky:not(.is-sticky--phone) { position: fixed; }
 body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header .logo,
 body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header .site-nav > a,
