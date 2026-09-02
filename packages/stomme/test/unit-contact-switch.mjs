@@ -68,7 +68,7 @@ check(/CONTACT_FORM_BLOCKS = new Set\(\['contactForm', 'contactSwitch'\]\)/.test
   'a site with the contact-form feature off gets neither contact block');
 const itemFields = manifest.blocks.contactSwitch.fields.find((f) => f.name === 'items')?.fields ?? [];
 const formFields = manifest.blocks.contactForm.fields.map((f) => f.name);
-const missing = formFields.filter((n) => !['eyebrow', 'heading', 'layout'].includes(n) && !itemFields.some((f) => f.name === n));
+const missing = formFields.filter((n) => !['eyebrow', 'heading', 'layout', 'style'].includes(n) && !itemFields.some((f) => f.name === n));
 check(missing.length === 0, 'every per-form field the contact form takes is editable on a switch item', `missing: ${missing.join(', ')}`);
 
 const failed = results.filter((ok) => !ok).length;

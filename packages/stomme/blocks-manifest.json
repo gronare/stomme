@@ -455,6 +455,25 @@
               ]
             }
           ]
+        },
+        {
+          "name": "style",
+          "widget": "object",
+          "fields": [
+            {
+              "name": "surface",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "standard",
+                "tint",
+                "panel",
+                "band",
+                "dark",
+                "gradient"
+              ]
+            }
+          ]
         }
       ]
     },
@@ -568,6 +587,25 @@
               ]
             }
           ]
+        },
+        {
+          "name": "style",
+          "widget": "object",
+          "fields": [
+            {
+              "name": "surface",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "standard",
+                "tint",
+                "panel",
+                "band",
+                "dark",
+                "gradient"
+              ]
+            }
+          ]
         }
       ]
     },
@@ -622,6 +660,11 @@
             },
             {
               "name": "showPhone",
+              "widget": "boolean",
+              "required": false
+            },
+            {
+              "name": "requirePhone",
               "widget": "boolean",
               "required": false
             },
@@ -1783,6 +1826,25 @@
               ]
             }
           ]
+        },
+        {
+          "name": "style",
+          "widget": "object",
+          "fields": [
+            {
+              "name": "surface",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "standard",
+                "tint",
+                "panel",
+                "band",
+                "dark",
+                "gradient"
+              ]
+            }
+          ]
         }
       ]
     },
@@ -2321,6 +2383,25 @@
                 "equal",
                 "narrow",
                 "wide"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "style",
+          "widget": "object",
+          "fields": [
+            {
+              "name": "surface",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "standard",
+                "tint",
+                "panel",
+                "band",
+                "dark",
+                "gradient"
               ]
             }
           ]

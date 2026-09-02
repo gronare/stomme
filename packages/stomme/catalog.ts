@@ -294,7 +294,7 @@ const RAW_BLOCKS: BlockDef[] = [
           { name: 'kicker', label: 'Tag after the number', widget: 'string', required: false, hint: 'Short word shown with the number, e.g. "talk". Rows layout only.' },
           { name: 'body', label: 'Text', widget: 'text' },
           { name: 'icon', label: 'Icon', widget: 'string', required: false, hint: 'An icon name, shown in the icon-flow layouts.' },
-          { name: 'image', label: 'Icon image', widget: 'image', required: false, media_folder: '/public/media/steps', public_folder: '/media/steps', hint: 'A custom icon image for the icon-flow layouts — tinted to the brand colour. Takes priority over the icon name.' },
+          { name: 'image', label: 'Icon image', widget: 'image', required: false, hint: 'A custom icon image for the icon-flow layouts — tinted to the brand colour. Takes priority over the icon name.' },
         ],
       },
       { name: 'anchor', label: 'Anchor id', widget: 'string', required: false, hint: 'Lets links jump here — anchor "process" makes "#process" scroll to this section.' },
@@ -804,6 +804,7 @@ const RAW_BLOCKS: BlockDef[] = [
       { name: 'lead', label: 'Lead-in', widget: 'string', required: false, hint: 'e.g. “Trusted by” or “Built on”.' },
       { name: 'logos', label: 'Names', widget: 'list', required: false, collapsed: true, label_singular: 'Name', field: { name: 'name', label: 'Name', widget: 'string' } },
       layoutGroup([]),
+      styleGroup([surfaceField]),
     ],
   },
   {
@@ -828,6 +829,7 @@ const RAW_BLOCKS: BlockDef[] = [
       { name: 'showDirectContact', label: 'Show the direct-contact card', widget: 'boolean', required: false, default: true, hint: 'Off → the form fills the width (no phone/email card).' },
       { name: 'inbox', label: 'Inbox key', widget: 'string', required: false, hint: "Where this form's messages are delivered: the key of an inbox set up for the site. Empty means the site's default inbox." },
       layoutGroup([]),
+      styleGroup([surfaceField]),
     ],
   },
   {
@@ -853,6 +855,7 @@ const RAW_BLOCKS: BlockDef[] = [
           { name: 'labelName', label: 'Field label — name', widget: 'string', required: false, hint: 'Blank uses the site wording ("Name").' },
           { name: 'labelEmail', label: 'Field label — email', widget: 'string', required: false, hint: 'Blank uses the site wording ("Email").' },
           { name: 'showPhone', label: 'Show the phone field', widget: 'boolean', required: false, default: true },
+          { name: 'requirePhone', label: 'Make the phone field required', widget: 'boolean', required: false, default: false, hint: 'Only applies when the phone field is shown.' },
           { name: 'showCategory', label: 'Show the category dropdown', widget: 'boolean', required: false, default: false, hint: 'A dropdown the visitor picks their errand from. Needs at least one choice below.' },
           { name: 'labelCategory', label: 'Field label — category', widget: 'string', required: false, hint: 'Blank uses the site wording ("Category").' },
           { name: 'categories', label: 'Categories', widget: 'list', required: false, collapsed: true, label_singular: 'Category', hint: 'The choices in the dropdown, in order.', field: { name: 'category', label: 'Category', widget: 'string' } },
@@ -889,6 +892,7 @@ const RAW_BLOCKS: BlockDef[] = [
       { name: 'label', label: 'Card heading', widget: 'string', required: false, hint: 'Blank uses the site wording ("Direct contact").' },
       { name: 'tint', label: 'Tinted background', widget: 'boolean', required: false, default: true },
       layoutGroup([]),
+      styleGroup([surfaceField]),
     ],
   },
   {
@@ -898,6 +902,7 @@ const RAW_BLOCKS: BlockDef[] = [
       { name: 'heading', label: 'Heading', widget: 'string', required: false, hint: 'Blank uses the site wording ("Find us").' },
       { name: 'showHours', label: 'Show opening hours', widget: 'boolean', required: false, default: true },
       layoutGroup([]),
+      styleGroup([surfaceField]),
     ],
   },
   {

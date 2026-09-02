@@ -8,6 +8,15 @@ follows `theme.eyebrowColor`). Both are set under the block's `style` group —
 `style.surface`, `style.accent` — and the tables below name them bare. Add your own
 blocks alongside these (see [customizing](customizing.md)).
 
+**Buttons.** A block's call-to-action is a `cta` group — `cta.label` plus `cta.link`,
+where the link is `{ page: '/…' }` for an internal page or `{ url: '…' }` for an
+external one. A block with a second button uses `cta2`; the faq aside uses `asideCta`;
+a card inside a grid (`featureGrid`) carries its own `cta`. Write the group, not the
+flat pair: the legacy `ctaLabel`/`ctaHref`, `label`/`href` and `link`/`linkLabel` still
+render through a back-compat shim, but `block-migrations.json` lists each rename and the
+control plane's drift check reports the flat form as field drift. The tables below show
+the current group.
+
 A page that carries a `sectionNav` block also gets an `id` on every block that has a
 heading — slugged from the heading, de-duplicated with `-2`, `-3` — so the chips can
 link to them. A page without that block renders exactly as before, with no ids.
@@ -26,11 +35,11 @@ one full-width block.
 
 | Type | What it renders | Key fields |
 |---|---|---|
-| `hero` | Headline + intro + CTA, with a swappable right-side media slot | `eyebrow`, `heading`, `intro`, `ctaLabel`, `ctaHref`, `media` (`none`/`image`/`highlights`/`motif`), `image`/`imageAlt`, `highlights[]` (`icon`,`title`,`body`), `height` (`normal`/`tall`), `align` (`top`/`center`/`bottom`) |
-| `cover` | Full-bleed banner with overlaid text + up to two CTAs | `eyebrow`, `heading`, `intro`, `ctaLabel`/`ctaHref`, `cta2Label`/`cta2Href`, `media` (`image`/`video`/`gradient`/`animated`), `image` (also the video poster), `imageAlt`, `video`/`videoUrl`, `overlay` (`light`/`medium`/`strong`), `align` (`start`/`center`), `height` (`tall`/`medium`) |
-| `pageHeader` | Inner-page title header (light band or grey "Band") | `variant` (`light`/`dark`), `width` (`narrow`/`full`), `eyebrow`, `heading`, `intro`, `ctaLabel`, `ctaHref` |
+| `hero` | Headline + intro + CTA, with a swappable right-side media slot | `eyebrow`, `heading`, `intro`, `cta` (`label`, `link`), `media` (`none`/`image`/`highlights`/`motif`), `image`/`imageAlt`, `highlights[]` (`icon`,`title`,`body`), `height` (`normal`/`tall`), `align` (`top`/`center`/`bottom`) |
+| `cover` | Full-bleed banner with overlaid text + up to two CTAs | `eyebrow`, `heading`, `intro`, `cta`, `cta2` (each `label`, `link`), `media` (`image`/`video`/`gradient`/`animated`), `image` (also the video poster), `imageAlt`, `video`/`videoUrl`, `overlay` (`light`/`medium`/`strong`), `align` (`start`/`center`), `vAlign` (`end`/`center`/`start` — moves the text block up or down independently of `align`), `height` (`tall`/`medium`) |
+| `pageHeader` | Inner-page title header (light band or grey "Band") | `variant` (`light`/`dark`), `width` (`narrow`/`full`), `eyebrow`, `heading`, `intro`, `cta` (`label`, `link`) |
 | `prose` | Rich text from markdown (inline images optimized + placed) | `heading`, `body` (markdown), `width` (`narrow`/`full`) |
-| `featureGrid` | Grid of icon + title + text cards (cards can link) | `eyebrow`/`heading`/`intro`, `items[]` (`icon`, `title`, `body`, `link`, `linkLabel`), `numbered`, `accent` |
+| `featureGrid` | Grid of icon + title + text cards (cards can link) | `eyebrow`/`heading`/`intro`, `items[]` (`icon`, `title`, `body`, `cta` (`label`, `link`)), `numbered`, `columns`, `accent` |
 | `pillars` | Columns of title + text (principles / values) | `eyebrow`/`heading`/`intro`, `items[]` (`title`, `body`) |
 | `specialistGrid` | Compact title + text grid with a brand top-rule | `eyebrow`/`heading`/`intro`, `items[]` (`title`, `body`) |
 | `team` | Grid of people cards — photo, role, contact details | `eyebrow`/`heading`/`intro`, `items[]` (`image`, `name`, `role`, `email`, `phone`, `linkUrl`, `linkLabel`, `bio`) |
@@ -52,8 +61,8 @@ one full-width block.
 
 | Type | What it renders | Key fields |
 |---|---|---|
-| `ctaPanel` | Full-width accent band with a CTA | `eyebrow`/`heading`/`intro`, `label`, `href` |
-| `ctaBox` | Compact brand-colored CTA box | `eyebrow`, `heading`, `label`, `href` |
+| `ctaPanel` | Full-width accent band with a CTA | `eyebrow`/`heading`/`intro`, `cta` (`label`, `link`) |
+| `ctaBox` | Compact brand-colored CTA box | `eyebrow`, `heading`, `intro`, `cta`, `cta2` (each `label`, `link`), `facts[]`, `layout` (`classic`/`split`/`panel`) |
 
 ## Collection-backed
 
@@ -62,7 +71,7 @@ when it's absent). Chrome fields (`eyebrow`/`heading`/`intro`) are optional.
 
 | Type | Collection | Detail route | Notes |
 |---|---|---|---|
-| `faq` | `faq` (`question`, `answer`, `order`) | — | Q&A + editable contact aside (`asideHeading`/`asideBody`/`asideCtaLabel`/`asideHref`). `variant`: `list` (default) / `accordion` (native `<details>`) / `cards` / `split` (index + reader, JS-enhanced) |
+| `faq` | `faq` (`question`, `answer`, `order`) | — | Q&A + editable contact aside (`asideHeading`/`asideBody`/`asideCta` (`label`, `link`)). `variant`: `list` (default) / `accordion` (native `<details>`) / `cards` / `split` (index + reader, JS-enhanced) |
 | `testimonials` | `testimonials` (`name`, `role`, `quote`, `order`) | — | Quote cards |
 | `documentList` | `documents` (`title`, `file`, `group`, `date`, `note`, `order`) | — | Download rows grouped under their `group` heading (`grouped`); an icon with the file extension, the title, `note` + date, and file type + size read off the built file. `group` filters to one group |
 | `linkChips` | `towns` (`name`, `order`) | `routes.towns` | Chip links to each entry's page |
@@ -91,7 +100,9 @@ Each carries its own data, so different pages can show different numbers.
 | `findUs` | Map + address block | reads the `contact` settings |
 
 The contact blocks read the `contact` settings for the actual phone/email/address; their
-fields control wording and which parts appear.
+fields control wording and which parts appear. `contactForm`, `contactCard` and `findUs`
+(and `logoStrip`) take `style.surface` like the section blocks above, so a form can sit on
+a `tint` or `band` ground.
 
 ## Choosing between similar blocks
 
