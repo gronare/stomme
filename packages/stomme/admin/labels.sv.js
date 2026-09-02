@@ -1196,6 +1196,8 @@ export default {
   "block.contactForm.labelEmail.label": ["Field label — email", "Fältetikett — e-post"],
   "block.contactForm.labelEmail.hint": ["Blank uses the site wording (\"Email\").", "Tomt ger sajtens standardtext (”E-post”)."],
   "block.contactForm.showPhone.label": ["Show the phone field", "Visa telefonfältet"],
+  "block.contactForm.requirePhone.label": ["Make the phone field required", "Gör telefonfältet obligatoriskt"],
+  "block.contactForm.requirePhone.hint": ["Only applies when the phone field is shown.", "Gäller bara när telefonfältet visas."],
   "block.contactForm.showCategory.label": ["Show the category dropdown", "Visa kategorimenyn"],
   "block.contactForm.showCategory.hint": ["A dropdown the visitor picks their errand from. Needs at least one choice below.", "En meny där besökaren väljer sitt ärende. Kräver minst ett val nedan."],
   "block.contactForm.labelCategory.label": ["Field label — category", "Fältetikett — kategori"],

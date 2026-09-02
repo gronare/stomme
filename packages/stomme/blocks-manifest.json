@@ -494,6 +494,11 @@
           "required": false
         },
         {
+          "name": "requirePhone",
+          "widget": "boolean",
+          "required": false
+        },
+        {
           "name": "showCategory",
           "widget": "boolean",
           "required": false

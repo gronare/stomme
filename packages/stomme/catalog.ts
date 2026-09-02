@@ -803,6 +803,7 @@ const RAW_BLOCKS: BlockDef[] = [
       { name: 'labelName', label: 'Field label — name', widget: 'string', required: false, hint: 'Blank uses the site wording ("Name").' },
       { name: 'labelEmail', label: 'Field label — email', widget: 'string', required: false, hint: 'Blank uses the site wording ("Email").' },
       { name: 'showPhone', label: 'Show the phone field', widget: 'boolean', required: false, default: true },
+      { name: 'requirePhone', label: 'Make the phone field required', widget: 'boolean', required: false, default: false, hint: 'Only applies when the phone field is shown.' },
       { name: 'showCategory', label: 'Show the category dropdown', widget: 'boolean', required: false, default: false, hint: 'A dropdown the visitor picks their errand from. Needs at least one choice below.' },
       { name: 'labelCategory', label: 'Field label — category', widget: 'string', required: false, hint: 'Blank uses the site wording ("Category").' },
       { name: 'categories', label: 'Categories', widget: 'list', required: false, collapsed: true, label_singular: 'Category', hint: 'The choices in the dropdown, in order.', field: { name: 'category', label: 'Category', widget: 'string' } },

@@ -6,7 +6,7 @@ import { slugifyHeading } from '../src/anchors';
 interface Props {
   site?: any; eyebrow?: string; heading?: string; intro?: string;
   labelName?: string; labelEmail?: string; labelMessage?: string;
-  submitLabel?: string; showPhone?: boolean; showDirectContact?: boolean;
+  submitLabel?: string; showPhone?: boolean; requirePhone?: boolean; showDirectContact?: boolean;
   showCategory?: boolean; labelCategory?: string; categories?: string[];
   showUnit?: boolean; labelUnit?: string; placeholderUnit?: string;
   inbox?: string;
@@ -14,7 +14,7 @@ interface Props {
   anchor?: string;
   embedded?: boolean;
 }
-const { site, eyebrow, heading, intro, labelName, labelEmail, labelMessage, submitLabel, showPhone, showDirectContact, showCategory, labelCategory, categories = [], showUnit, labelUnit, placeholderUnit, inbox, pageHasH1, anchor, embedded } = Astro.props;
+const { site, eyebrow, heading, intro, labelName, labelEmail, labelMessage, submitLabel, showPhone, requirePhone, showDirectContact, showCategory, labelCategory, categories = [], showUnit, labelUnit, placeholderUnit, inbox, pageHasH1, anchor, embedded } = Astro.props;
 // A form-only contact page has no other heading to be the page's h1, so the block takes the rank the page leaves open.
 const Heading = pageHasH1 ? 'h2' : 'h1';
 // Two forms on one page would otherwise share every field id, and a label click would land in the other form.
@@ -80,7 +80,7 @@ const recapLabels = JSON.stringify({ email: L.email, phone: L.phone, category: L
       {showPhoneField && (
         <div class="field">
           <label for={fieldId('phone')} class="mono">{L.phone}</label>
-          <input id={fieldId('phone')} name="phone" type="tel" />
+          <input id={fieldId('phone')} name="phone" type="tel" required={requirePhone === true} />
         </div>
       )}
       {showCategoryField && (
