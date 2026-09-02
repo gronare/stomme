@@ -157,6 +157,7 @@ function emitSettings() {
             hint: "Shown in the header and footer (each chooses what to display)."
             fields:
               - { name: image, label: "Logo mark (shown beside the text)", widget: image, required: false, media_folder: "/public/media/identity", public_folder: "/media/identity", hint: "An icon/mark. The wordmark is the text below, set in your display font." }
+              - { name: imageDark, label: "Logo for dark backgrounds", widget: image, required: false, media_folder: "/public/media/identity", public_folder: "/media/identity", hint: "Shown instead of the logo mark where the page is dark behind it — the see-through header over a photo, or a dark footer. Usually the same mark in white." }
               - { name: alt, label: "Logo alt text", widget: string, required: false }
               - { name: textPre, label: "Wordmark text", widget: string, required: false }
               - { name: textAccent, label: "Wordmark accent (in brand colour)", widget: string, required: false }

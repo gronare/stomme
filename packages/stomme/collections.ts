@@ -51,7 +51,7 @@ export function stommeCollections(listings?: Listing[]) {
       loader: md('settings'),
       schema: z.object({
         name: z.string(),
-        logo: z.object({ image: z.string().optional(), alt: z.string().optional(), textPre: z.string().default(''), textAccent: z.string().default('') }).default({}),
+        logo: z.object({ image: z.string().optional(), imageDark: z.string().optional(), alt: z.string().optional(), textPre: z.string().default(''), textAccent: z.string().default('') }).default({}),
         favicon: z.string().optional(),
         appleIcon: z.string().optional(),
         languageSwitcher: z.enum(['globe', 'flags']).default('globe'),

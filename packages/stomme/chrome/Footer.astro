@@ -33,6 +33,8 @@ const showWord = footer.showWordmark === true && !!logo.textPre;
 const logoUploads = import.meta.glob<{ default: ImageMetadata }>('/src/assets/media/**/*.{jpg,jpeg,png,webp,avif}');
 const logoKey = logo.image && logo.image.startsWith('/media/') ? `/src/assets/media/${logo.image.slice('/media/'.length)}` : null;
 const logoOptimized = logoKey && logoUploads[logoKey] ? logoUploads[logoKey] : null;
+const logoDarkKey = logo.imageDark && logo.imageDark.startsWith('/media/') ? `/src/assets/media/${logo.imageDark.slice('/media/'.length)}` : null;
+const logoDarkOptimized = logoDarkKey && logoUploads[logoDarkKey] ? logoUploads[logoDarkKey] : null;
 const links = footer.links ?? [];
 const links2 = footer.links2 ?? [];
 const legal = footer.legal ?? [];
@@ -54,6 +56,9 @@ const year = new Date().getFullYear();
           {showMark && (logoOptimized
             ? <Image class="logo-mark" src={logoOptimized()} alt={logo.alt ?? ''} />
             : <img class="logo-mark" src={logo.image} alt={logo.alt ?? ''} />)}
+          {showMark && logo.imageDark && (logoDarkOptimized
+            ? <Image class="logo-mark logo-mark--ondark" src={logoDarkOptimized()} alt={logo.alt ?? ''} />
+            : <img class="logo-mark logo-mark--ondark" src={logo.imageDark} alt={logo.alt ?? ''} />)}
           {showWord && <span class="logo-word">{logo.textPre}<span class="accent">{logo.textAccent}</span></span>}
         </div>
         {tagline && <p style="margin:0.5rem 0 0;max-width:36rem">{tagline}</p>}

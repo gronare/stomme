@@ -22,7 +22,7 @@ interface NavData {
   showLogo?: boolean;
   showWordmark?: boolean;
 }
-interface SiteData { name?: string; languageSwitcher?: 'globe' | 'flags'; logo?: { textPre?: string; textAccent?: string; image?: string; alt?: string } }
+interface SiteData { name?: string; languageSwitcher?: 'globe' | 'flags'; logo?: { textPre?: string; textAccent?: string; image?: string; imageDark?: string; alt?: string } }
 interface Props { nav?: NavData; settings?: SiteData }
 
 let { nav, settings } = Astro.props;
@@ -42,6 +42,8 @@ const showWord = nav.showWordmark === true && !!logo.textPre;
 const logoUploads = import.meta.glob<{ default: ImageMetadata }>('/src/assets/media/**/*.{jpg,jpeg,png,webp,avif}');
 const logoKey = logo.image && logo.image.startsWith('/media/') ? `/src/assets/media/${logo.image.slice('/media/'.length)}` : null;
 const logoOptimized = logoKey && logoUploads[logoKey] ? logoUploads[logoKey] : null;
+const logoDarkKey = logo.imageDark && logo.imageDark.startsWith('/media/') ? `/src/assets/media/${logo.imageDark.slice('/media/'.length)}` : null;
+const logoDarkOptimized = logoDarkKey && logoUploads[logoDarkKey] ? logoUploads[logoDarkKey] : null;
 const items = nav.items ?? [];
 const inLocale = localeLinker(site, here.locale, locales.enabled ? await getCollection('pages') : []);
 const homeHref = inLocale('/');
@@ -81,6 +83,9 @@ const isActive = (href: string) => !!href && navPath(href) === current;
       {showMark && (logoOptimized
         ? <Image class="logo-mark" src={logoOptimized()} alt={logo.alt ?? ''} />
         : <img class="logo-mark" src={logo.image} alt={logo.alt ?? ''} />)}
+      {showMark && logo.imageDark && (logoDarkOptimized
+        ? <Image class="logo-mark logo-mark--ondark" src={logoDarkOptimized()} alt={logo.alt ?? ''} />
+        : <img class="logo-mark logo-mark--ondark" src={logo.imageDark} alt={logo.alt ?? ''} />)}
       {showWord && <span class="logo-word">{logo.textPre}<span class="accent">{logo.textAccent}</span></span>}
     </a>
     <SlotHeaderStart />

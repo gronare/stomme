@@ -244,6 +244,32 @@ const RAW_BLOCKS: BlockDef[] = [
   },
   { type: 'specialistGrid', label: 'Specialist grid', group: 'Cards & lists', summary: 'Grid of specialist / team profile cards.', shape: 'grid', fields: [...headingFields, cardListField, layoutGroup([]), styleGroup([surfaceField])] },
   {
+    type: 'team',
+    label: 'Team',
+    group: 'Cards & lists',
+    summary: 'Grid of people cards — photo, role, contact details.',
+    shape: 'grid',
+    fields: [
+      ...headingFields,
+      {
+        name: 'items', label: 'People', widget: 'list', required: false,
+        collapsed: true, label_singular: 'Person', summary: '{{fields.name}}',
+        fields: [
+          imageField('image', 'Photo', 'Square works best. Left empty, a neutral silhouette is drawn instead.'),
+          { name: 'name', label: 'Name', widget: 'string' },
+          { name: 'role', label: 'Role', widget: 'string', required: false, hint: 'Job title or responsibility.' },
+          { name: 'email', label: 'Email', widget: 'string', required: false, hint: 'Shown as a clickable address.' },
+          { name: 'phone', label: 'Phone', widget: 'string', required: false, hint: 'Written as you want it read; the call link strips the spacing.' },
+          { name: 'linkUrl', label: 'Profile link', widget: 'string', required: false, hint: 'Full URL to a LinkedIn profile or a personal page.' },
+          { name: 'linkLabel', label: 'Profile link text', widget: 'string', required: false, hint: 'The words on the link. Blank shows the address itself.' },
+          { name: 'bio', label: 'Short text', widget: 'text', required: false, hint: 'A few lines about the person.' },
+        ],
+      },
+      layoutGroup([]),
+      styleGroup([surfaceField]),
+    ],
+  },
+  {
     type: 'steps', label: 'Process / steps', group: 'Cards & lists', summary: 'Numbered process — a sequence of steps.', shape: 'steps',
     fields: [
       ...headingFields,
@@ -642,6 +668,16 @@ const RAW_BLOCKS: BlockDef[] = [
       ...headingFields,
       { name: 'source', label: 'source', widget: 'hidden', required: false },
       { name: 'base', label: 'base', widget: 'hidden', required: false },
+      {
+        name: 'status', label: 'Show only', widget: 'select', required: false,
+        hint: 'Limit the grid to one status; entries carrying any other status are left out.',
+        options: [
+          { label: 'All statuses', value: '' },
+          { label: 'Available', value: 'available' },
+          { label: 'Reserved', value: 'reserved' },
+          { label: 'Sold', value: 'sold' },
+        ],
+      },
       mediaGroup('Cover images on the cards.', [
         { name: 'showImages', label: 'Image previews', widget: 'boolean', required: false, default: true, hint: 'Show cover images on the cards.' },
       ]),
@@ -913,6 +949,11 @@ const SAMPLES: Record<string, ({ _label?: string } & Record<string, unknown>)[]>
   ], footnote: 'Every plan includes a shared line like this one — the footnote field.' }],
   specialistGrid: [{ eyebrow: 'Team', heading: 'Specialists', items: [
     { title: 'Role one', body: LOREM }, { title: 'Role two', body: 'Short line.' },
+  ] }],
+  team: [{ eyebrow: 'The people', heading: 'Who you meet', items: [
+    { name: 'Anna Andersson', role: 'Head of something', email: 'anna@example.com', phone: '010-123 45 67', bio: LOREM },
+    { name: 'Bo Bergström', role: 'A longer role that wraps on a narrow card', linkUrl: 'https://www.linkedin.com/in/example', linkLabel: 'On LinkedIn', bio: 'A shorter line.' },
+    { name: 'Cecilia Carlsson', email: 'cecilia@example.com' },
   ] }],
   steps: [{ eyebrow: 'Process', heading: 'How it works', items: [
     { kicker: 'talk', title: 'We talk', body: LOREM },

@@ -219,8 +219,8 @@ main .cover:first-child .cover__inner { --cover-clear: calc(var(--header-bottom)
 .cover--center .cover__h1 { max-width: 22ch; }
 .cover__intro { margin: 1.1rem 0 0; font-size: 1.12rem; color: rgba(255,255,255,.86); max-width: 48ch; }
 .cover__cta { margin-top: 1.75rem; display: flex; flex-wrap: wrap; gap: 0.875rem; align-items: center; }
-.cover__btn-ghost { background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.3); color: #fff; }
-.cover__btn-ghost:hover { background: rgba(255,255,255,.2); }
+.cover__cta .btn.cover__btn-ghost { background: rgba(255,255,255,.16); border: 1px solid rgba(255,255,255,.6); color: #fff; -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+.cover__cta .btn.cover__btn-ghost:hover { background: rgba(255,255,255,.3); border-color: #fff; }
 
 .feature-grid { display: grid; gap: 1.25rem; grid-template-columns: 1fr; margin-top: 2.5rem; }
 @media (min-width: 700px) { .feature-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
@@ -414,6 +414,11 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
 body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header .nav-top,
 body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header .nav-toggle { color: #fff; }
 body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header .logo .accent { color: var(--color-brand); }
+.logo-mark--ondark { display: none; }
+body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header:not(.solid):not(.nav-open) .logo:has(.logo-mark--ondark) .logo-mark:not(.logo-mark--ondark) { display: none; }
+body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header:not(.solid):not(.nav-open) .logo .logo-mark--ondark { display: inline-block; }
+.site-footer--dark .logo:has(.logo-mark--ondark) .logo-mark:not(.logo-mark--ondark) { display: none; }
+.site-footer--dark .logo .logo-mark--ondark { display: inline-block; }
 body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header.solid,
 body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header.nav-open {
   background: color-mix(in srgb, var(--color-paper) 96%, transparent);
@@ -698,6 +703,9 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
   /* Offset = label line (0.74rem x 1.6) + the input's margin-top, so the card's border lines up with the first INPUT's rather than with its label. */
   @media (min-width: 1024px) { .contact-grid .direct-card { align-self: start; margin-top: calc(0.74rem * 1.6 + 0.375rem); } }
   .contact-grid--solo { grid-template-columns: 1fr; max-width: 580px; margin-inline: auto; }
+  [data-stomme-block="contactForm"]:has(.contact-grid--solo) .contact-head { max-width: 580px; margin-inline: auto; text-align: center; }
+  [data-stomme-block="contactForm"]:has(.contact-grid--solo) .contact-head .contact-h1,
+  [data-stomme-block="contactForm"]:has(.contact-grid--solo) .contact-head .contact-intro { max-width: none; margin-inline: auto; }
 
 .contact-embed__intro { margin: 0 0 1.1rem; color: var(--color-muted); font-size: 0.95rem; max-width: 52ch; }
   .contact-switch__heading { margin-top: 0.75rem; }
@@ -1191,7 +1199,7 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
     box-shadow: 0 18px 36px -28px color-mix(in srgb, var(--color-brand) 60%, transparent);
   }
   .post-card__img { width: 100%; height: 180px; object-fit: cover; display: block; }
-  .post-article__cover { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 1rem; border: 1px solid var(--color-line); margin-bottom: 1.75rem; }
+  .post-article__cover { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 1rem; border: 1px solid var(--color-line); margin-bottom: 1.75rem; }
   .post-back { display: inline-block; margin-bottom: 0.9rem; font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--color-brand); text-decoration: none; }
   .post-back:hover { text-decoration: underline; text-underline-offset: 5px; }
   .post-card__body { padding: 1.5rem; display: flex; flex-direction: column; flex: 1; }
@@ -1351,7 +1359,7 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
   }
   .listing-card:hover { border-color: var(--color-brand); transform: translateY(-3px); box-shadow: 0 18px 36px -28px color-mix(in srgb, var(--color-brand) 60%, transparent); }
   .listing-photo { position: relative; }
-  .listing-img { width: 100%; aspect-ratio: 16 / 10; object-fit: cover; display: block; }
+  .listing-img { width: 100%; height: auto; aspect-ratio: 16 / 10; object-fit: cover; display: block; }
   .listing-badge {
     position: absolute; top: 0.7rem; left: 0.7rem;
     font-family: var(--font-mono); font-size: 0.64rem; font-weight: 700;
@@ -1373,9 +1381,9 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
 
   .catalog-detail { display: grid; gap: 2rem; align-items: start; }
   @media (min-width: 860px) { .catalog-detail { grid-template-columns: 1.15fr 0.85fr; } }
-  .catalog-gallery__main { width: 100%; aspect-ratio: 16 / 10; object-fit: cover; border-radius: 14px; display: block; }
+  .catalog-gallery__main { width: 100%; height: auto; aspect-ratio: 16 / 10; object-fit: cover; border-radius: 14px; display: block; }
   .catalog-thumbs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.6rem; margin-top: 0.6rem; }
-  .catalog-thumb { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 8px; display: block; }
+  .catalog-thumb { width: 100%; height: auto; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 8px; display: block; }
   .catalog-info { display: flex; flex-direction: column; align-items: flex-start; }
   .catalog-info .listing-badge { position: static; margin-bottom: 0.75rem; }
   .catalog-h1 { margin: 0.5rem 0 0; }
@@ -1405,6 +1413,18 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
   .specialist { border-top: 2px solid var(--color-brand); padding-top: 1rem; }
   .specialist__title { margin: 0; font-weight: 700; color: var(--color-ink); }
   .specialist__body { margin: 0.5rem 0 0; font-size: 0.9rem; color: var(--color-muted); }
+
+.team-grid { margin-top: 2.5rem; display: grid; gap: 1.5rem; grid-template-columns: 1fr; }
+  @media (min-width: 640px) { .team-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (min-width: 1024px) { .team-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+  .person__img { aspect-ratio: 1 / 1; width: 100%; height: auto; object-fit: cover; display: block; }
+  .person__body { padding: 1.4rem; }
+  .person__name { margin: 0; font-size: 1.1rem; font-weight: 700; color: var(--color-ink); }
+  .person__role { margin: 0.35rem 0 0; }
+  .person__contact { margin: 0.9rem 0 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 0.35rem; font-size: 0.92rem; }
+  .person__contact a { color: var(--color-brand); text-decoration: none; overflow-wrap: anywhere; }
+  .person__contact a:hover { text-decoration: underline; }
+  .person__bio { margin: 0.9rem 0 0; font-size: 0.9rem; color: var(--color-muted); white-space: pre-line; }
 
 /* Ground and foreground go through --stat-panel-bg / --stat-panel-fg, defaulting to the historic ink/on-dark, so a theme recolours every label, pill and rule below with one `.stat-panel { … }` rule. */
 .stat-panel { --stat-panel-bg: var(--color-ink); --stat-panel-fg: var(--color-on-dark); background: var(--stat-panel-bg); color: var(--stat-panel-fg); }

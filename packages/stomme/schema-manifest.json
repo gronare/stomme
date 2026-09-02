@@ -187,6 +187,7 @@
       "nested": {
         "logo": [
           "image",
+          "imageDark",
           "alt",
           "textPre",
           "textAccent"

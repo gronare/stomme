@@ -33,6 +33,7 @@ one full-width block.
 | `featureGrid` | Grid of icon + title + text cards (cards can link) | `eyebrow`/`heading`/`intro`, `items[]` (`icon`, `title`, `body`, `link`, `linkLabel`), `numbered`, `accent` |
 | `pillars` | Columns of title + text (principles / values) | `eyebrow`/`heading`/`intro`, `items[]` (`title`, `body`) |
 | `specialistGrid` | Compact title + text grid with a brand top-rule | `eyebrow`/`heading`/`intro`, `items[]` (`title`, `body`) |
+| `team` | Grid of people cards — photo, role, contact details | `eyebrow`/`heading`/`intro`, `items[]` (`image`, `name`, `role`, `email`, `phone`, `linkUrl`, `linkLabel`, `bio`) |
 | `steps` | A numbered process (bordered rows + badges) | `eyebrow`/`heading`/`intro`, `items[]` (`title`, `body`), `width` (`narrow`/`full`) |
 | `checklist` | Ticked list, 1–2 columns | `eyebrow`/`heading`/`intro`, `items[]` (`text`, `note`), `columns` |
 | `factList` | Rows of label + value (specs, what is included, opening hours) | `eyebrow`/`heading`/`intro`, `items[]` (`label`, `value`), `columns` (1/2/3), `accent` |
@@ -68,7 +69,7 @@ when it's absent). Chrome fields (`eyebrow`/`heading`/`intro`) are optional.
 | `serviceGrid` | `services` (`navLabel`, `summary`, `order`, `image?`) | `routes.services` | Service cards (image, placeholder fallback) → detail page; `services[]` picks/orders a subset |
 | `postList` | `posts` / any `article` listing (`title`, `date`, `excerpt`, `category`, `eventDate`, `eventTime`, `cover`, `showCover`) | listing `route` | Featured lead (a "Latest" tag, `strings.latest`) + card grid; `category` renders as a chip beside the date, an `eventDate` (plus `eventTime`) replaces the publish date; per-post `showCover` shows the image or a brand-tinted default; `featured`/`showImages`/`columns`/`limit` |
 | `eventList` | `posts` / any `article` listing, entries with an `eventDate` (`title`, `eventDate`, `eventTime`, `excerpt`) | listing `route` | Day/month tile + title and time, sorted ascending. The page ships every dated entry; the reader's browser hides what has passed (unless `showPast`, which dims them instead) so a static page stays current. `limit` counts upcoming events only, never the shown past ones. `emptyText` shows when nothing is upcoming, `feedLabel` links the listing's calendar feed at `<route>/calendar.ics` |
-| `catalogList` | any `catalog` listing (`title`, `price`, `status`, `category`, `cover`, `gallery[]`, keyed `specs`) | listing `route` | Filterable cards with cover, status badge (themed), price + the listing's config-defined specs; `filters`/`showImages`/`columns` |
+| `catalogList` | any `catalog` listing (`title`, `price`, `status`, `category`, `cover`, `gallery[]`, keyed `specs`) | listing `route` | Filterable cards with cover, status badge (themed), price + the listing's config-defined specs; `filters`/`showImages`/`columns`. `status` (`available`/`reserved`/`sold`) narrows the grid to one status before it renders; empty shows every entry |
 
 ## Numbers & proof
 
@@ -100,6 +101,7 @@ Six pairs are easy to mix up. Each row says what makes the block different, not 
 |---|---|
 | `pillars` | airy columns with a large brand numeral and a top rule — unlike `featureGrid` (boxed, small numeral) or `specialistGrid` (border-top, denser) |
 | `specialistGrid` | denser than `pillars` (no large numeral), flatter than `featureGrid` (no box or icon) — a longer list of capabilities under one service |
+| `team` | named people with a photo and their own phone, email and profile link — `specialistGrid` lists roles and capabilities, with no photo and nobody to contact |
 | `ctaBox` | three layouts (classic / split / panel); `facts` feeds the split card's chips and the panel's readout and is ignored by classic. `ctaPanel` is the one that sits on a surface band |
 | `prose` | its pull-stat (`statValue` + `statLabel`) is for the one headline figure a text section earns — `statsBar` is the row for several |
 | `definition` | a dictionary entry (term, word class, numbered senses); `width` and `align` behave as they do in `callout` |
