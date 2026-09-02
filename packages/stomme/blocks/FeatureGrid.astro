@@ -8,13 +8,14 @@ interface Props {
   heading?: string;
   intro?: string;
   items?: { icon?: string; title: string; body?: string; tag?: string; cta?: { label?: string; link?: unknown }; link?: unknown; linkLabel?: string }[];
-  layout?: { numbered?: boolean };
+  layout?: { numbered?: boolean; columns?: number };
   style?: { surface?: string; accent?: 'brand' | 'secondary' | 'highlight' };
   site?: any;
   anchor?: string;
 }
 const { eyebrow, heading, intro, items = [], site, anchor } = Astro.props;
 const numbered = Astro.props.layout?.numbered ?? false;
+const columns = Astro.props.layout?.columns;
 const accent = Astro.props.style?.accent ?? 'brand';
 const readMore = site?.strings?.readMore ?? 'Read more';
 const accentVar = accent === 'secondary' ? 'var(--color-secondary)' : accent === 'highlight' ? 'var(--color-highlight)' : 'var(--color-brand)';
@@ -27,7 +28,7 @@ const accentVar = accent === 'secondary' ? 'var(--color-secondary)' : accent ===
       {intro && <p class="intro">{intro}</p>}
     </div>
   )}
-  <div class="feature-grid">
+  <div class="feature-grid" style={columns ? `--fg-cols:${columns}` : undefined}>
     {items.map((it, i) => {
       const target = it.cta?.link ?? it.link;
       const href = target ? resolveLink(target, '') : '';

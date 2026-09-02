@@ -20,9 +20,12 @@ const contactHref = site?.routes?.contact ?? '/contact';
 const gallery = d.gallery?.length ? d.gallery : d.cover ? [{ image: d.cover, alt: d.title }] : [];
 const { Content } = await render(entry);
 const PLACE = '/images/placeholders/service.svg';
+const backLabel = site?.strings?.listingBack ?? listing?.label;
 ---
 <section data-stomme-page="listing" data-stomme-entry={entry.id} class="section">
-  <div class="catalog-detail">
+  {listing?.route && backLabel && <a href={listing.route} class="mono catalog-back">← {backLabel}</a>}
+  <div class:list={['catalog-detail', { 'catalog-detail--solo': gallery.length === 0 }]}>
+    {gallery.length > 0 && (
     <div class="catalog-gallery">
       <Cover src={gallery[0]?.image} alt={gallery[0]?.alt || d.title} placeholder={PLACE} width={1100} height={700} class="catalog-gallery__main" />
       {gallery.length > 1 && (
@@ -33,6 +36,7 @@ const PLACE = '/images/placeholders/service.svg';
         </div>
       )}
     </div>
+    )}
     <div class="catalog-info">
       <span class={`listing-badge b-${ST[d.status] || 'avail'}`}>{sl[d.status] || d.status}</span>
       <h1 class="display catalog-h1">{d.title}</h1>
