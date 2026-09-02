@@ -865,6 +865,17 @@
               ]
             },
             {
+              "name": "vAlign",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "",
+                "end",
+                "center",
+                "start"
+              ]
+            },
+            {
               "name": "height",
               "widget": "select",
               "required": false,

@@ -131,6 +131,19 @@ const RAW_BLOCKS: BlockDef[] = [
           ],
         },
         {
+          name: 'vAlign',
+          label: 'Vertical placement',
+          widget: 'select',
+          required: false,
+          hint: 'Moves the text block up or down, keeping its side alignment. Blank keeps the default for the chosen text position.',
+          options: [
+            { label: 'Default', value: '' },
+            { label: 'Bottom', value: 'end' },
+            { label: 'Middle', value: 'center' },
+            { label: 'Top', value: 'start' },
+          ],
+        },
+        {
           name: 'height',
           label: 'Height',
           widget: 'select',

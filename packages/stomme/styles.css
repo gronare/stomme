@@ -212,6 +212,9 @@ main .cover:first-child .cover__inner { --cover-clear: calc(var(--header-bottom)
 @media (min-width: 768px) { .cover__inner { padding-bottom: 5rem; } .cover--center .cover__inner { padding-bottom: max(5rem, var(--cover-clear, 0px)); } }
 .cover--center { text-align: center; }
 .cover--center .cover__inner { align-self: center; }
+.cover--v-end .cover__inner { align-self: flex-end; }
+.cover--v-center .cover__inner { align-self: center; }
+.cover--v-start .cover__inner { align-self: flex-start; padding-top: calc(var(--cover-clear, 0px) + 2rem); }
 .cover--center .cover__h1, .cover--center .cover__intro { margin-inline: auto; }
 .cover--center .cover__cta { justify-content: center; }
 .cover__eyebrow { font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.16em; font-size: 0.74rem; font-weight: 700; color: color-mix(in srgb, var(--color-brand) 45%, #fff); }

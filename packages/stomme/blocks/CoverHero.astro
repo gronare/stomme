@@ -22,7 +22,7 @@ interface Props {
     videoUrl?: string;
     overlay?: 'light' | 'medium' | 'strong';
   };
-  layout?: { align?: 'start' | 'center'; height?: 'tall' | 'medium' };
+  layout?: { align?: 'start' | 'center'; vAlign?: 'end' | 'center' | 'start'; height?: 'tall' | 'medium' };
   anchor?: string;
 }
 const { eyebrow, heading, intro, cta, cta2, ctaLabel, ctaHref, cta2Label, cta2Href, anchor } = Astro.props;
@@ -33,6 +33,7 @@ const video = Astro.props.media?.video;
 const videoUrl = Astro.props.media?.videoUrl;
 const overlay = Astro.props.media?.overlay ?? 'medium';
 const align = Astro.props.layout?.align ?? 'start';
+const vAlign = Astro.props.layout?.vAlign;
 const height = Astro.props.layout?.height ?? 'tall';
 
 const btn = resolveButton(cta, ctaLabel, ctaHref);
@@ -47,7 +48,7 @@ const videoSrc =
     ? (videoUrl || (videoKey && (videoFiles as Record<string, string>)[videoKey]) || video || undefined)
     : undefined;
 ---
-<section data-stomme-block="cover" id={anchor || undefined} class:list={['cover', `cover--${align}`, `cover--h-${height}`, `cover--ov-${overlay}`]}>
+<section data-stomme-block="cover" id={anchor || undefined} class:list={['cover', `cover--${align}`, vAlign && `cover--v-${vAlign}`, `cover--h-${height}`, `cover--ov-${overlay}`]}>
   <div class:list={['cover__media', { 'cover__media--gradient': media === 'gradient' || media === 'animated' }]}>
     {media !== 'gradient' && media !== 'animated' && (
       <Cover
