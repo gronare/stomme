@@ -1,18 +1,30 @@
 ---
+import Icon from '../src/Icon.astro';
+import type { ImageMetadata } from 'astro';
+
 interface Props {
   eyebrow?: string;
   heading?: string;
   intro?: string;
-  items?: { title: string; body: string; kicker?: string }[];
-  layout?: { width?: 'narrow' | 'full' };
+  items?: { title: string; body: string; kicker?: string; icon?: string; image?: string }[];
+  layout?: { width?: 'narrow' | 'full'; variant?: 'rows' | 'flow-soft' | 'flow-filled' };
   anchor?: string;
 }
 const { eyebrow, heading, intro, items = [], anchor } = Astro.props;
 const width = Astro.props.layout?.width ?? 'narrow';
+const variant = Astro.props.layout?.variant ?? 'rows';
+const flow = variant === 'flow-soft' || variant === 'flow-filled';
+
+const iconUrls = import.meta.glob<string>('/src/assets/media/**/*.{png,svg,webp,jpg,jpeg,avif}', { query: '?url', import: 'default', eager: true });
+const maskUrl = (src?: string) => {
+  if (!src || !src.startsWith('/media/')) return undefined;
+  const hit = iconUrls[`/src/assets/media/${src.slice('/media/'.length)}`];
+  return hit as string | undefined;
+};
 ---
 
 {(heading || items.length > 0) && (
-  <section data-stomme-block="steps" id={anchor || undefined} class:list={['section', { 'section--read': width !== 'full' }]}>
+  <section data-stomme-block="steps" id={anchor || undefined} class:list={['section', { 'section--read': width !== 'full' && !flow }]}>
     {(eyebrow || heading || intro) && (
       <div class="section-head">
         {eyebrow && <span class="mono eyebrow">{eyebrow}</span>}
@@ -20,17 +32,40 @@ const width = Astro.props.layout?.width ?? 'narrow';
         {intro && <p class="intro">{intro}</p>}
       </div>
     )}
-    <ol class="steps-track">
-      {items.map((s, i) => (
-        <li class="step">
-          <span class="step__n">{String(i + 1).padStart(2, '0')}</span>
-          <div>
-            {s.kicker && <span class="mono step__kicker">{s.kicker}</span>}
-            <h3 class="step__title">{s.title}</h3>
-            <p class="step__body">{s.body}</p>
-          </div>
-        </li>
-      ))}
-    </ol>
+    {flow ? (
+      <ol class:list={['steps-flow', variant === 'flow-filled' ? 'steps-flow--filled' : 'steps-flow--soft']} style={`--flow-cols:${items.length}`}>
+        {items.map((s, i) => {
+          const mask = maskUrl(s.image);
+          return (
+            <li class="stepflow">
+              <div class="stepflow__mark">
+                {mask
+                  ? <span class="stepflow__icon" style={`--icon:url("${mask}")`} role="img" aria-label={s.title}></span>
+                  : s.icon
+                    ? <span class="stepflow__glyph"><Icon name={s.icon} /></span>
+                    : <span class="stepflow__glyph">{String(i + 1)}</span>}
+                <span class="stepflow__num">{i + 1}</span>
+              </div>
+              <span class="mono stepflow__step">{`0${i + 1}`}</span>
+              <h3 class="stepflow__title">{s.title}</h3>
+              {s.body && <p class="stepflow__body">{s.body}</p>}
+            </li>
+          );
+        })}
+      </ol>
+    ) : (
+      <ol class="steps-track">
+        {items.map((s, i) => (
+          <li class="step">
+            <span class="step__n">{String(i + 1).padStart(2, '0')}</span>
+            <div>
+              {s.kicker && <span class="mono step__kicker">{s.kicker}</span>}
+              <h3 class="step__title">{s.title}</h3>
+              <p class="step__body">{s.body}</p>
+            </div>
+          </li>
+        ))}
+      </ol>
+    )}
   </section>
 )}

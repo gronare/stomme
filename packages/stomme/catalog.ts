@@ -278,12 +278,21 @@ const RAW_BLOCKS: BlockDef[] = [
         collapsed: true, label_singular: 'Step', summary: '{{fields.title}}',
         fields: [
           { name: 'title', label: 'Title', widget: 'string' },
-          { name: 'kicker', label: 'Tag after the number', widget: 'string', required: false, hint: 'Short word shown with the number, e.g. "talk".' },
+          { name: 'kicker', label: 'Tag after the number', widget: 'string', required: false, hint: 'Short word shown with the number, e.g. "talk". Rows layout only.' },
           { name: 'body', label: 'Text', widget: 'text' },
+          { name: 'icon', label: 'Icon', widget: 'string', required: false, hint: 'An icon name, shown in the icon-flow layouts.' },
+          { name: 'image', label: 'Icon image', widget: 'image', required: false, media_folder: '/public/media/steps', public_folder: '/media/steps', hint: 'A custom icon image for the icon-flow layouts — tinted to the brand colour. Takes priority over the icon name.' },
         ],
       },
       { name: 'anchor', label: 'Anchor id', widget: 'string', required: false, hint: 'Lets links jump here — anchor "process" makes "#process" scroll to this section.' },
-      layoutGroup([widthField]),
+      layoutGroup([
+        widthField,
+        { name: 'variant', label: 'Layout', widget: 'select', required: false, default: 'rows', options: [
+          { label: 'Numbered rows', value: 'rows' },
+          { label: 'Icon flow — soft', value: 'flow-soft' },
+          { label: 'Icon flow — filled', value: 'flow-filled' },
+        ], hint: 'Rows is the bordered numbered list. The icon-flow layouts place the steps in one connected row, each with its icon.' },
+      ]),
       styleGroup([surfaceField]),
     ],
   },

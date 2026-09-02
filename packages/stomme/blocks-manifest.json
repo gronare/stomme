@@ -3372,6 +3372,16 @@
             {
               "name": "body",
               "widget": "text"
+            },
+            {
+              "name": "icon",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "image",
+              "widget": "image",
+              "required": false
             }
           ]
         },
@@ -3391,6 +3401,16 @@
               "options": [
                 "narrow",
                 "full"
+              ]
+            },
+            {
+              "name": "variant",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "rows",
+                "flow-soft",
+                "flow-filled"
               ]
             },
             {

@@ -34,7 +34,7 @@ one full-width block.
 | `pillars` | Columns of title + text (principles / values) | `eyebrow`/`heading`/`intro`, `items[]` (`title`, `body`) |
 | `specialistGrid` | Compact title + text grid with a brand top-rule | `eyebrow`/`heading`/`intro`, `items[]` (`title`, `body`) |
 | `team` | Grid of people cards — photo, role, contact details | `eyebrow`/`heading`/`intro`, `items[]` (`image`, `name`, `role`, `email`, `phone`, `linkUrl`, `linkLabel`, `bio`) |
-| `steps` | A numbered process (bordered rows + badges) | `eyebrow`/`heading`/`intro`, `items[]` (`title`, `body`), `width` (`narrow`/`full`) |
+| `steps` | A numbered process — bordered rows, or a connected icon flow | `eyebrow`/`heading`/`intro`, `items[]` (`title`, `body`, `icon`, `image`), `width` (`narrow`/`full`), `variant` (`rows` / `flow-soft` / `flow-filled` — the flow layouts run the steps across one row, each with its `image` icon tinted to the brand colour, or a named `icon`) |
 | `checklist` | Ticked list, 1–2 columns | `eyebrow`/`heading`/`intro`, `items[]` (`text`, `note`), `columns` |
 | `factList` | Rows of label + value (specs, what is included, opening hours) | `eyebrow`/`heading`/`intro`, `items[]` (`label`, `value`), `columns` (1/2/3), `accent` |
 | `gallery` | Responsive image grid with captions | `eyebrow`/`heading`/`intro`, `images[]` (`image`, `alt`, `caption`), `columns` |

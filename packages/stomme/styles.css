@@ -1555,6 +1555,32 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
   .step__title { margin: 0.15rem 0 0; font-size: 1.1rem; font-weight: 700; color: var(--color-ink); }
   .step__body { margin: 0.35rem 0 0; color: var(--color-muted); }
 
+  .steps-flow { list-style: none; margin: 2.75rem 0 0; padding: 0; display: grid; grid-template-columns: 1fr; gap: 2.25rem; position: relative; }
+  .stepflow { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; text-align: center; }
+  .stepflow__mark { position: relative; display: grid; place-items: center; margin-bottom: 1.1rem; }
+  .stepflow__icon { display: block; background: var(--color-brand); -webkit-mask: var(--icon) center / contain no-repeat; mask: var(--icon) center / contain no-repeat; }
+  .stepflow__glyph { display: grid; place-items: center; color: var(--color-brand); font-family: var(--font-display); font-weight: 700; }
+  .stepflow__glyph :global(svg) { width: 60%; height: 60%; }
+  .stepflow__step { color: var(--color-brand); font-size: 0.7rem; letter-spacing: 0.14em; margin-bottom: 0.4rem; }
+  .stepflow__title { margin: 0 0 0.4rem; font-family: var(--font-display); font-weight: 700; font-size: 1.02rem; line-height: 1.25; color: var(--color-ink); text-wrap: balance; }
+  .stepflow__body { margin: 0; font-size: 0.9rem; color: var(--color-muted); max-width: 26ch; }
+
+  .steps-flow--soft .stepflow__mark { width: 78px; height: 78px; border-radius: 50%; background: var(--color-paper); border: 2px solid color-mix(in srgb, var(--color-brand) 34%, var(--color-paper)); }
+  .steps-flow--soft .stepflow__icon { width: 42px; height: 42px; }
+  .steps-flow--soft .stepflow__glyph { width: 42px; height: 42px; font-size: 1.3rem; }
+  .steps-flow--soft .stepflow__num { display: none; }
+
+  .steps-flow--filled .stepflow__step { display: none; }
+  .steps-flow--filled .stepflow__mark { width: 92px; height: 92px; border-radius: 50%; background: var(--color-brand); }
+  .steps-flow--filled .stepflow__icon { width: 50px; height: 50px; background: var(--color-on-dark); }
+  .steps-flow--filled .stepflow__glyph { width: 50px; height: 50px; font-size: 1.5rem; color: var(--color-on-dark); }
+  .steps-flow--filled .stepflow__num { position: absolute; top: -4px; right: -4px; width: 27px; height: 27px; border-radius: 50%; background: var(--color-ink); color: var(--color-on-dark); font-family: var(--font-mono); font-weight: 700; font-size: 0.82rem; display: grid; place-items: center; border: 2px solid var(--color-paper); }
+
+  @media (min-width: 720px) {
+    .steps-flow { grid-template-columns: repeat(var(--flow-cols, 3), minmax(0, 1fr)); gap: 1.25rem; }
+    .steps-flow--soft::before { content: ""; position: absolute; top: 39px; left: 12%; right: 12%; height: 2px; background: color-mix(in srgb, var(--color-brand) 28%, var(--color-paper)); z-index: 0; }
+  }
+
 .testimonials-grid {
     margin-top: 2.5rem;
     display: grid;
