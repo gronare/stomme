@@ -187,8 +187,9 @@ const isActive = (href: string) => !!href && navPath(href) === current;
     // Measured at zoom 1, where every length is in plain px: the row scales linearly with --header-zoom, so the factor that fits is room over use; the open menu is absolute and full-width, so it is not a row child.
     var fit = function () {
       setZoom(1);
-      var cs = getComputedStyle(inner);
-      var room = inner.getBoundingClientRect().width - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+      var box = getComputedStyle(inner).display === 'contents' ? header : inner;
+      var cs = getComputedStyle(box);
+      var room = box.getBoundingClientRect().width - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
       var gap = parseFloat(cs.columnGap) || 0, used = -gap;
       [].forEach.call(inner.children, function (el) {
         var k = getComputedStyle(el);
@@ -251,7 +252,7 @@ const isActive = (href: string) => !!href && navPath(href) === current;
       var measure = function () {
         var headerH = header.offsetHeight || 64;
         var top = text.getBoundingClientRect().top + window.scrollY + parseFloat(getComputedStyle(text).paddingTop);
-        trigger = Math.max(0, top - headerH);
+        trigger = mobile.matches ? 16 : Math.max(0, top - headerH);
       };
       // A phone-only sticky header scrolls away like any other on a wide screen, so the stuck paint has to stay behind its breakpoint too.
       var stuckable = function () { return !header.classList.contains('is-sticky--phone') || mobile.matches; };
