@@ -88,6 +88,7 @@ const current = currentNavPath(here.path, [homeHref, ...resolved.flatMap((i) => 
 const isActive = (href: string) => !!href && navPath(href) === current;
 ---
 <header class:list={['site-header', { 'is-sticky': !!sticky, 'is-sticky--phone': sticky === 'phone' }]}>
+  <div class="site-header__glass" aria-hidden="true"></div>
   <div class="inner">
     <a class:list={['logo', { 'logo--plate': logo.plate === true }]} href={homeHref} aria-label={settings.name}>
       {showMark && (logoOptimized
