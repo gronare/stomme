@@ -192,6 +192,7 @@
         "logo": [
           "image",
           "imageDark",
+          "plate",
           "alt",
           "textPre",
           "textAccent"

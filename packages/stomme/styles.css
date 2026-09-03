@@ -421,10 +421,12 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
 body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header .logo .accent { color: var(--color-brand); }
 body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header:not(.solid):not(.nav-open) :is(.site-cta, .nav-cta) { color: #fff; border-color: rgba(255,255,255,.6); background: rgba(255,255,255,.16); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
 .logo-mark--ondark { display: none; }
-body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header:not(.solid):not(.nav-open) .logo:has(.logo-mark--ondark) .logo-mark:not(.logo-mark--ondark) { display: none; }
-body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header:not(.solid):not(.nav-open) .logo .logo-mark--ondark { display: inline-block; }
-.site-footer--dark .logo:has(.logo-mark--ondark) .logo-mark:not(.logo-mark--ondark) { display: none; }
-.site-footer--dark .logo .logo-mark--ondark { display: inline-block; }
+body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header:not(.solid):not(.nav-open) .logo:not(.logo--plate):has(.logo-mark--ondark) .logo-mark:not(.logo-mark--ondark) { display: none; }
+body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header:not(.solid):not(.nav-open) .logo:not(.logo--plate) .logo-mark--ondark { display: inline-block; }
+.site-footer--dark .logo:not(.logo--plate):has(.logo-mark--ondark) .logo-mark:not(.logo-mark--ondark) { display: none; }
+.site-footer--dark .logo:not(.logo--plate) .logo-mark--ondark { display: inline-block; }
+.logo--plate { background: var(--color-paper); border-radius: 999px; padding: 0.35em 0.7em; }
+body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header .logo.logo--plate, .site-footer--dark .logo.logo--plate { color: var(--color-ink); }
 body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header.solid,
 body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header.nav-open {
   background: color-mix(in srgb, var(--color-paper) 96%, transparent);

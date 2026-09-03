@@ -1603,6 +1603,8 @@ export default {
   "settings.site.logo.image.label": ["Logo mark (shown beside the text)", "Logotypmärke (visas bredvid texten)"],
   "settings.site.logo.imageDark.label": ["Logo for dark backgrounds", "Logotyp för mörka bakgrunder"],
   "settings.site.logo.imageDark.hint": ["Shown instead of the logo mark where the page is dark behind it — the see-through header over a photo, or a dark footer. Usually the same mark in white.", "Visas i stället för logotypmärket där sidan är mörk bakom — det genomskinliga sidhuvudet över ett foto, eller en mörk sidfot. Oftast samma märke i vitt."],
+  "settings.site.logo.plate.label": ["White plate behind the logo", "Vit platta bakom logotypen"],
+  "settings.site.logo.plate.hint": ["Keeps the logo in its own colours everywhere: a white rounded plate sits behind it on a see-through header or a dark footer, instead of switching to the logo for dark backgrounds.", "Logotypen behåller sina egna färger överallt: en vit rundad platta ligger bakom den på ett genomskinligt sidhuvud eller en mörk sidfot, i stället för att byta till logotypen för mörka bakgrunder."],
   "settings.site.logo.alt.label": ["Logo alt text", "Alt-text för logotyp"],
   "settings.site.logo.textPre.label": ["Wordmark text", "Ordmärkestext"],
   "settings.site.logo.textAccent.label": ["Wordmark accent (in brand colour)", "Ordmärkets accent (i varumärkesfärgen)"],

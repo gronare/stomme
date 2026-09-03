@@ -52,7 +52,7 @@ const year = new Date().getFullYear();
   <div class="inner">
     <div class="footer-grid">
       <div>
-        <div class="logo" style="margin:0">
+        <div class:list={['logo', { 'logo--plate': logo.plate === true }]} style="margin:0">
           {showMark && (logoOptimized
             ? <Image class="logo-mark" src={logoOptimized()} alt={logo.alt ?? ''} />
             : <img class="logo-mark" src={logo.image} alt={logo.alt ?? ''} />)}

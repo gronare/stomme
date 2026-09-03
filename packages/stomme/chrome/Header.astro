@@ -23,7 +23,7 @@ interface NavData {
   showLogo?: boolean;
   showWordmark?: boolean;
 }
-interface SiteData { name?: string; languageSwitcher?: 'globe' | 'flags'; logo?: { textPre?: string; textAccent?: string; image?: string; imageDark?: string; alt?: string } }
+interface SiteData { name?: string; languageSwitcher?: 'globe' | 'flags'; logo?: { textPre?: string; textAccent?: string; image?: string; imageDark?: string; plate?: boolean; alt?: string } }
 interface Props { nav?: NavData; settings?: SiteData }
 
 let { nav, settings } = Astro.props;
@@ -89,7 +89,7 @@ const isActive = (href: string) => !!href && navPath(href) === current;
 ---
 <header class:list={['site-header', { 'is-sticky': !!sticky, 'is-sticky--phone': sticky === 'phone' }]}>
   <div class="inner">
-    <a class="logo" href={homeHref} aria-label={settings.name}>
+    <a class:list={['logo', { 'logo--plate': logo.plate === true }]} href={homeHref} aria-label={settings.name}>
       {showMark && (logoOptimized
         ? <Image class="logo-mark" src={logoOptimized()} alt={logo.alt ?? ''} />
         : <img class="logo-mark" src={logo.image} alt={logo.alt ?? ''} />)}
