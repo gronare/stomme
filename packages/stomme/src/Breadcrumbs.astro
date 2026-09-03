@@ -1,0 +1,42 @@
+---
+export interface Crumb {
+  label: string;
+  href?: string;
+}
+interface Props {
+  crumbs: Crumb[];
+  label: string;
+  siteUrl?: string;
+}
+const { crumbs, label, siteUrl } = Astro.props;
+
+const absolute = (href?: string) => {
+  if (!href || !siteUrl) return null;
+  try { return new URL(href, siteUrl).href; } catch { return null; }
+};
+const listed = crumbs.map((c, i) => ({ ...c, position: i + 1, url: absolute(c.href) }));
+const jsonLd = siteUrl
+  ? {
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: listed.map((c) => ({
+        '@type': 'ListItem',
+        position: c.position,
+        name: c.label,
+        ...(c.url ? { item: c.url } : {}),
+      })),
+    }
+  : null;
+---
+<nav class="breadcrumbs" aria-label={label}>
+  <ol class="breadcrumbs__list">
+    {crumbs.map((c, i) => (
+      <li class="breadcrumbs__item">
+        {c.href
+          ? <a class="breadcrumbs__link" href={c.href}>{c.label}</a>
+          : <span aria-current={i === crumbs.length - 1 ? 'page' : undefined}>{c.label}</span>}
+      </li>
+    ))}
+  </ol>
+</nav>
+{jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}

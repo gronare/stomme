@@ -24,7 +24,7 @@ export function localePages(root = process.cwd()) {
     let src = '';
     try { src = readFileSync(resolve(dir, f), 'utf8'); } catch { return null; }
     const id = f.replace(/\.md$/, '').split('/').map((s) => s.toLowerCase()).join('/');
-    return { id, data: { published: field(src, 'published') === 'true', url: field(src, 'url') } };
+    return { id, data: { published: field(src, 'published') === 'true', url: field(src, 'url'), parent: field(src, 'parent') } };
   }).filter(Boolean);
 }
 

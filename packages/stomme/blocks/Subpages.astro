@@ -1,0 +1,155 @@
+---
+import { getCollection } from 'astro:content';
+import Cover from '../src/Cover.astro';
+import { pagePaths, pageByPath, pageChildren, pageTitle, writtenPages, normalizePagePath } from '../src/pages';
+
+interface PageLike {
+  id: string;
+  data?: Record<string, any>;
+}
+
+interface Props {
+  eyebrow?: string;
+  heading?: string;
+  intro?: string;
+  pages?: string[];
+  layout?: { variant?: string; columns?: number | string };
+  media?: { showImages?: boolean };
+  items?: PageLike[];
+  site?: any;
+  anchor?: string;
+  currentPath?: string;
+  localeLink?: (href: string) => string;
+}
+
+const VARIANTS = new Set(['cards', 'tiles', 'rows', 'chips', 'siblings']);
+
+const { eyebrow, heading, intro, site, anchor } = Astro.props;
+const supplied = Array.isArray(Astro.props.items) ? (Astro.props.items as PageLike[]) : null;
+const variant = VARIANTS.has(String(Astro.props.layout?.variant)) ? String(Astro.props.layout!.variant) : 'cards';
+const columns = Number(Astro.props.layout?.columns) || 2;
+const showImages = Astro.props.media?.showImages ?? false;
+const picked = Array.isArray(Astro.props.pages) ? Astro.props.pages.filter((p) => typeof p === 'string' && p) : [];
+const link = typeof Astro.props.localeLink === 'function' ? Astro.props.localeLink : (href: string) => href;
+const readMore = site?.strings?.readMore ?? 'Read more';
+const inSection = site?.strings?.subpages?.inSection ?? 'In this section';
+const moreInSection = site?.strings?.subpages?.moreInSection ?? 'More in this section';
+
+const all = (supplied ?? writtenPages(await getCollection('pages'))) as PageLike[];
+const paths = pagePaths(all);
+const here = normalizePagePath(Astro.props.currentPath ?? '/');
+const parentPath = here.lastIndexOf('/') > 0 ? here.slice(0, here.lastIndexOf('/')) : '';
+const parentPage = parentPath && !supplied ? pageByPath(parentPath, all) : undefined;
+
+const published = (p: PageLike) => !!p.data?.published;
+const byPick = picked.map((path) => pageByPath(path, all)).filter((p): p is PageLike => !!p && published(p));
+const siblings = parentPage ? pageChildren(parentPath, all).filter((p) => paths.get(p.id) !== here) : [];
+const auto = supplied ? supplied.filter(published) : variant === 'siblings' ? siblings : pageChildren(here, all);
+const listed = byPick.length ? byPick : auto;
+
+const summaryOf = (p: PageLike) => String(p.data?.summary || p.data?.seo?.description || '');
+const items = listed.map((p) => ({
+  title: pageTitle(p),
+  href: link(paths.get(p.id) ?? `/${p.id}`),
+  summary: summaryOf(p),
+  cover: typeof p.data?.cover === 'string' ? p.data.cover : '',
+}));
+
+const bandEyebrow = eyebrow || (parentPage ? pageTitle(parentPage) : '');
+const bandHeading = heading || moreInSection;
+const parentHref = parentPage ? link(parentPath) : '';
+const hasHead = !!(eyebrow || heading || intro);
+const show = variant === 'siblings' ? !!parentPage && items.length > 0 : items.length > 0;
+---
+{show && (
+  <section data-stomme-block="subpages" id={anchor || undefined} class={`section subpages subpages--${variant}`}>
+    {variant !== 'siblings' && hasHead && (
+      <div class="section-head">
+        {eyebrow && <span class="mono eyebrow">{eyebrow}</span>}
+        {heading && <h2 class="display" style="margin-top:0.75rem">{heading}</h2>}
+        {intro && <p class="intro">{intro}</p>}
+      </div>
+    )}
+
+    {variant === 'cards' && (
+      <div class="subpage-cards" style={`--sub-cols:${columns}`}>
+        {items.map((it) => (
+          <a href={it.href} class="card subpage-card">
+            {showImages && it.cover && (
+              <Cover src={it.cover} alt={it.title} placeholder="" width={800} height={450} class="subpage-card__img" />
+            )}
+            <div class="subpage-card__body">
+              <h3>{it.title}</h3>
+              {it.summary && <p>{it.summary}</p>}
+              <span class="mono subpage-card__more">{readMore} →</span>
+            </div>
+          </a>
+        ))}
+      </div>
+    )}
+
+    {variant === 'tiles' && (
+      <div class="subpage-tiles" style={`--sub-cols:${columns}`}>
+        {items.map((it) => (
+          <a href={it.href} class="subpage-tile">
+            <h3 class="subpage-tile__title">{it.title}</h3>
+            {it.summary && <p>{it.summary}</p>}
+            <span class="mono subpage-tile__more">{readMore} →</span>
+          </a>
+        ))}
+      </div>
+    )}
+
+    {variant === 'rows' && (
+      <ul class="subpage-rows">
+        {items.map((it) => (
+          <li>
+            <a href={it.href} class="subpage-row">
+              <span class="subpage-row__text">
+                <span class="subpage-row__title">{it.title}</span>
+                {it.summary && <span class="subpage-row__summary">{it.summary}</span>}
+              </span>
+              <span class="subpage-row__arrow" aria-hidden="true">→</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    )}
+
+    {variant === 'chips' && (
+      <div class="subpage-chiprow">
+        <span class="mono subpage-chiprow__label">{inSection}</span>
+        {items.map((it) => <a href={it.href} class="subpage-chip">{it.title}</a>)}
+      </div>
+    )}
+
+    {variant === 'siblings' && (
+      <div class="subpage-siblings">
+        <div class="subpage-siblings__head">
+          {bandEyebrow && <span class="mono eyebrow">{bandEyebrow}</span>}
+          <h2 class="display subpage-siblings__heading">{bandHeading}</h2>
+          {intro && <p class="intro">{intro}</p>}
+        </div>
+        <ul class="subpage-siblings__list">
+          {items.map((it) => (
+            <li>
+              <a href={it.href} class="subpage-row">
+                <span class="subpage-row__text">
+                  <span class="subpage-row__title">{it.title}</span>
+                </span>
+                <span class="subpage-row__arrow" aria-hidden="true">→</span>
+              </a>
+            </li>
+          ))}
+          <li class="subpage-siblings__up">
+            <a href={parentHref} class="subpage-row subpage-row--up">
+              <span class="subpage-row__text">
+                <span class="subpage-row__title">↑ {parentPage ? pageTitle(parentPage) : ''}</span>
+              </span>
+            </a>
+          </li>
+        </ul>
+      </div>
+    )}
+  </section>
+)}

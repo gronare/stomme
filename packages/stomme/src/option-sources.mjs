@@ -1,5 +1,6 @@
 import { resolve } from 'node:path';
 import { readdirSync, readFileSync } from 'node:fs';
+import { pagePathMap } from './page-paths.mjs';
 
 export function buildOptionSources({ root, ROUTES, FEATURES, LISTINGS, BLOCKS }) {
   // A translation is the same page in another language, never a second link target — and it is one whether or not the site has switched its languages on, or a site with the files in place but the setting still off offers /info.en in every picker. Both halves are load-bearing: a language subtag in the stem AND the untranslated sibling beside it, so a page genuinely called `plan.b` stays a page.
@@ -39,13 +40,15 @@ export function buildOptionSources({ root, ROUTES, FEATURES, LISTINGS, BLOCKS })
   }
 
   function pageRouteOptions() {
-    const opts = [{ label: 'Home (/)', value: '/' }];
-    for (const f of contentFiles('src/content/pages')) {
-      const slug = f.replace(/\.md$/, '');
-      const label = labelFromFrontmatter(resolve(root, 'src/content/pages', f), 'title') || slug;
-      opts.push({ label: `${label} (/${slug})`, value: `/${slug}` });
-    }
-    return opts;
+    const pages = contentFiles('src/content/pages').map((f) => {
+      const id = f.replace(/\.md$/, '');
+      const file = resolve(root, 'src/content/pages', f);
+      return { id, parent: labelFromFrontmatter(file, 'parent'), label: labelFromFrontmatter(file, 'title') || id };
+    });
+    const paths = pagePathMap(pages);
+    const opts = pages.map((p) => ({ label: `${p.label} (${paths.get(p.id)})`, value: paths.get(p.id) }));
+    opts.sort((a, b) => a.value.localeCompare(b.value));
+    return [{ label: 'Home (/)', value: '/' }, ...opts];
   }
 
   const PAGE_OPTIONS = [

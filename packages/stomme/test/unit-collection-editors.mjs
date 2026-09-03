@@ -70,6 +70,32 @@ for (const dir of readDirs) {
     `the folder option-sources scans for '${dir}' is the folder its pane writes to`);
 }
 
+console.log('\n· subpages');
+const P = COLLECTION_EDITORS.pages;
+check(/^ {2}view_groups:\n {4}groups:\n {6}- \{ name: parent, label: "Parent page", field: parent \}$/m.test(P),
+  'the pages list can be grouped by parent page, and opens ungrouped', block(P, /^ {2}view_groups:$/));
+check(/^ {4}- name: parent\n {6}label: "Parent page"\n {6}widget: select\n {6}required: false\n {6}hint: "[^"]+"\n {6}options:$/m.test(P),
+  'the parent is picked from the site\'s own pages, and is optional', block(P, /^ {4}- name: parent$/));
+check(P.includes('- { label: "Home (/)", value: "/" }'), 'the parent picker is filled from the $pages option source');
+check(/- \{ name: summary, label: "Short text", widget: text, required: false, hint: "[^"]+" \}/.test(P), 'a page carries a short text for cards and lists');
+check(/- \{ name: cover, label: "Card image", widget: image, required: false \}/.test(P), 'and a card image');
+check(/- \{ name: order, label: "Order", widget: number, required: false, default: 0, hint: "[^"]+" \}/.test(P), 'and an order among its siblings');
+const pageFields = fieldNames(P.slice(P.indexOf('\n  fields:')));
+check(pageFields.indexOf('parent') > pageFields.indexOf('title') && pageFields.indexOf('order') < pageFields.indexOf('seo'),
+  'the new fields sit after the title and before SEO', pageFields.join(', '));
+const localizedPages = makeCollectionEditors({ q, emitField: E.emitField, emitWidget: E.emitWidget, buttonField: E.buttonField, localized: (n) => n === 'pages' }).COLLECTION_EDITORS.pages;
+check(/name: parent[\s\S]*?\n {6}i18n: duplicate\n/.test(localizedPages) && /name: cover[^}]*i18n: duplicate/.test(localizedPages) && /name: order[^}]*i18n: duplicate/.test(localizedPages),
+  'the parent, the card image and the order are one setting for every language',
+  block(localizedPages, /^ {4}- name: parent$/));
+check(/name: summary[^}]*i18n: true/.test(localizedPages), 'the short text is written per language');
+
+console.log('\n· a menu item can list a page\'s subpages');
+const navYaml = E.emitNavLinks(4);
+check(/- \{ name: autoChildren, label: "List the page's subpages", widget: boolean, required: false, default: false, hint: "[^"]+" \}/.test(navYaml),
+  'the nav editor offers the switch that fills a dropdown from the page tree', navYaml);
+check(navYaml.indexOf('autoChildren') > navYaml.indexOf('name: children'),
+  'it sits after the manual sub-links it gives way to');
+
 console.log('\n· section builders');
 const withBlocks = entries.filter(([, yaml]) => /^ *- name: blocks$/m.test(yaml)).map(([k]) => k);
 check(JSON.stringify(withBlocks) === '["home","pages","services"]', 'exactly the page-like panes get a section builder', withBlocks.join(', '));

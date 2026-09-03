@@ -1,4 +1,5 @@
 import { SITE_DEFAULTS, type SiteConfig } from './config.ts';
+import { pagePaths, normalizeParentPath } from './pages.ts';
 
 export interface ResolvedLocales {
   enabled: boolean;
@@ -176,14 +177,23 @@ export function localeRoutes(site: SiteConfig | undefined, pages: readonly Local
   served.add('/');
   const own: LocaleEntry[] = [];
   const byId = new Map<string, LocaleEntry>();
+  const written: LocaleEntry[] = [];
   for (const p of pages) {
     if (!p) continue;
     byId.set(p.id, p);
-    if (!p.data || !p.data.published) continue;
     if (stripLocaleSuffix(p.id, locales.locales).locale !== null) continue;
-    served.add(normalizeLocalePath(`/${p.id}`));
+    written.push(p);
+  }
+  const paths = pagePaths(written);
+  const pathOf = (id: string) => normalizeLocalePath(paths.get(id) ?? `/${id}`);
+  for (const p of written) {
+    if (!p.data || !p.data.published) continue;
+    served.add(pathOf(p.id));
     own.push(p);
   }
+  const slashes = (s: string) => s.split('/').length;
+  const depth = (p: LocaleEntry) => slashes(pathOf(p.id)) - slashes(p.id) + 1;
+  own.sort((a, b) => depth(a) - depth(b));
   // The default language's address is the filename: nav items, block links and every hand-written href name it, so a `url` beside it would break them rather than move the page.
   for (const p of own) {
     if (typeof p.data!.url !== 'string' || !p.data!.url.trim() || warnedDefaultUrl.has(p.id)) continue;
@@ -195,9 +205,10 @@ export function localeRoutes(site: SiteConfig | undefined, pages: readonly Local
     const back = new Map<string, string>([['/', '/']]);
     const claimed = new Map<string, string>();
     for (const p of own) {
-      const from = normalizeLocalePath(`/${p.id}`);
+      const from = pathOf(p.id);
       const slug = loc === locales.default ? '' : customUrl(byId.get(localeEntryId(p.id, loc, locales.default)), p.id, loc);
-      const to = slug ? `/${slug}` : from;
+      const under = normalizeParentPath(p.data!.parent);
+      const to = `${under ? forward.get(under) ?? under : ''}/${slug || p.id}`;
       if (slug) custom = true;
       const file = pageFile(p.id, slug ? loc : null);
       const taken = claimed.get(to);
@@ -328,7 +339,9 @@ export function localeSwitcher(pathname: string, site: SiteConfig | undefined, e
   const routes = localeRoutes(site, entries);
   const here = splitLocalePath(pathname, l);
   const path = basePagePath(here.path, here.locale, routes);
-  const id = path === '/' ? 'home' : path.slice(1);
+  const idAt = new Map<string, string>();
+  for (const [pid, at] of pagePaths(entries.filter((e) => stripLocaleSuffix(e.id, l.locales).locale === null))) idAt.set(at, pid);
+  const id = idAt.get(path) ?? (path === '/' ? 'home' : path.slice(1));
   const ids = entries.map((e) => e.id);
   // An addon route is served in every language, so its own path is the target everywhere — it has no page entry to look a translation up by.
   const everywhere = underRouteBase(path, routes);

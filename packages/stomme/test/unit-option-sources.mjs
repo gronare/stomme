@@ -46,6 +46,9 @@ try {
   put('src/content/pages', 'about.md', '---\ntitle: "About us"\n---\n');
   put('src/content/pages', 'contact.md', '---\npublished: true\n---\n');
   put('src/content/pages', 'notes.txt', 'ignored');
+  put('src/content/pages', 'salja-foretag.md', '---\ntitle: "Sälja företag"\n---\n');
+  put('src/content/pages', 'generationsskifte.md', '---\ntitle: "Generationsskifte"\nparent: /salja-foretag\n---\n');
+  put('src/content/pages', 'checklista.md', '---\ntitle: "Checklista"\nparent: "/salja-foretag/generationsskifte"\n---\n');
   put('src/content/services', 'tak.md', '---\ntitle: "Takläggning i hela stan"\nnavLabel: Tak\n---\n');
   put('src/content/services', 'vvs.md', '---\ntitle: "VVS"\n---\n');
   put('src/content/towns', 'lund.md', '---\nname: Lund\n---\n');
@@ -68,6 +71,17 @@ try {
     labelOf(PAGE_OPTIONS, '/tjanster/tak'));
   check(labelOf(PAGE_OPTIONS, '/tjanster/vvs') === 'vvs (/tjanster/vvs)', 'a service with no navLabel falls back to its slug — never to its SEO title');
   check(labelOf(PAGE_OPTIONS, '/orter/lund') === 'Lund (/orter/lund)', 'a town is labelled from `name` under the configured towns route');
+
+  console.log('\n· subpages are offered on the address they answer on');
+  check(labelOf(PAGE_OPTIONS, '/salja-foretag/generationsskifte') === 'Generationsskifte (/salja-foretag/generationsskifte)',
+    'a subpage is offered under its parent, labelled with its own title',
+    JSON.stringify(values(PAGE_OPTIONS)));
+  check(labelOf(PAGE_OPTIONS, '/salja-foretag/generationsskifte/checklista') === 'Checklista (/salja-foretag/generationsskifte/checklista)',
+    'and a page two levels down carries the whole trail in its address');
+  check(!values(PAGE_OPTIONS).includes('/generationsskifte'),
+    'the flat address a subpage would have had is not offered beside it — one page, one address');
+  check(values(PAGE_OPTIONS).indexOf('/salja-foretag') < values(PAGE_OPTIONS).indexOf('/salja-foretag/generationsskifte'),
+    'a parent is listed before the pages that sit under it');
 
   console.log('\n· collection option sources');
   check(JSON.stringify(values(OPTION_SOURCES['$services'])) === '["tak","vvs"]', 'a $services option is the bare slug, not a route',

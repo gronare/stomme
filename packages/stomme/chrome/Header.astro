@@ -3,7 +3,8 @@ import { getEntry, getCollection } from 'astro:content';
 import { Image } from 'astro:assets';
 import type { ImageMetadata } from 'astro';
 import { resolveLink } from '../src/href';
-import { resolveLocales, splitLocalePath, localeEntryId, localeLinker, localeSwitcher } from '../src/i18n';
+import { resolveLocales, splitLocalePath, localeEntryId, localeLinker, localeSwitcher, defaultLocaleEntries } from '../src/i18n';
+import { pageChildren, pagePaths, pageTitle } from '../src/pages';
 import { normalizeNavPath, currentNavPath } from '../src/nav-current';
 import { resolveSite } from '../src/config';
 import LangSwitcher from './LangSwitcher.astro';
@@ -14,7 +15,7 @@ import SlotHeaderNavEnd from '@stomme/slot-header-nav-end';
 import SlotHeaderEnd from '@stomme/slot-header-end';
 
 interface NavLink { label: string; link?: unknown }
-interface NavItem extends NavLink { menu?: string; children?: NavLink[] }
+interface NavItem extends NavLink { menu?: string; autoChildren?: boolean; children?: NavLink[] }
 interface NavData {
   items?: NavItem[];
   cta?: { label: string; link?: unknown };
@@ -31,8 +32,11 @@ const here = splitLocalePath(Astro.url.pathname, locales);
 const navId = localeEntryId('nav', here.locale, locales.default);
 if (!nav) nav = ((navId !== 'nav' && (await getEntry('navigation', navId))) || (await getEntry('navigation', 'nav'))!).data as NavData;
 if (!settings) settings = (await getEntry('settings', 'site'))!.data as SiteData;
+const items = nav.items ?? [];
+const autoNav = items.some((i) => i.autoChildren === true);
+const pageEntries = locales.enabled || autoNav ? await getCollection('pages') : [];
 const langs = locales.enabled
-  ? localeSwitcher(Astro.url.pathname, site, [...(await getCollection('pages')), ...(await getCollection('home'))])
+  ? localeSwitcher(Astro.url.pathname, site, [...pageEntries, ...(await getCollection('home'))])
   : [];
 const langLabel = resolveSite(site, here.locale).strings.changeLanguage;
 
@@ -44,9 +48,10 @@ const logoKey = logo.image && logo.image.startsWith('/media/') ? `/src/assets/me
 const logoOptimized = logoKey && logoUploads[logoKey] ? logoUploads[logoKey] : null;
 const logoDarkKey = logo.imageDark && logo.imageDark.startsWith('/media/') ? `/src/assets/media/${logo.imageDark.slice('/media/'.length)}` : null;
 const logoDarkOptimized = logoDarkKey && logoUploads[logoDarkKey] ? logoUploads[logoDarkKey] : null;
-const items = nav.items ?? [];
-const inLocale = localeLinker(site, here.locale, locales.enabled ? await getCollection('pages') : []);
+const inLocale = localeLinker(site, here.locale, locales.enabled ? pageEntries : []);
 const homeHref = inLocale('/');
+const ownPages = autoNav ? defaultLocaleEntries(pageEntries, site) : [];
+const ownPagePaths = autoNav ? pagePaths(ownPages) : new Map<string, string>();
 
 async function childrenOf(item: NavItem): Promise<{ label: string; href: string }[]> {
   if (item.menu) {
@@ -61,7 +66,12 @@ async function childrenOf(item: NavItem): Promise<{ label: string; href: string 
       return entries.map((e: any) => ({ label: e.data.navLabel ?? e.data.title ?? e.id, href: `${base}/${e.id}` }));
     } catch { return []; }
   }
-  if (Array.isArray(item.children)) return item.children.map((c) => ({ label: c.label, href: resolveLink(c.link, homeHref) }));
+  if (Array.isArray(item.children) && item.children.length) return item.children.map((c) => ({ label: c.label, href: resolveLink(c.link, homeHref) }));
+  if (item.autoChildren === true) {
+    const under = normalizeNavPath(resolveLink(item.link, ''));
+    if (under === '/') return [];
+    return pageChildren(under, ownPages).map((c) => ({ label: pageTitle(c), href: ownPagePaths.get(c.id) as string }));
+  }
   return [];
 }
 const resolved = await Promise.all(

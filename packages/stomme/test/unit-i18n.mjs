@@ -318,6 +318,55 @@ throws(() => localeRoutes(SITE, [
   { id: 'omradet.en', data: { published: true, url: 'kontakt' } },
   { id: 'kontakt', data: { published: true } },
 ]), /omradet\.en\.md and src\/content\/pages\/kontakt\.md/, 'two pages on one address in one language fail the build and name both');
+throws(() => localeRoutes(SITE, [{ id: 'barn', data: { published: true, parent: '/borta' } }]),
+  /barn\.md/, 'a parent no page answers on fails the build and names the file that points at it');
+throws(() => localeRoutes(SITE, [
+  { id: 'salja', data: { published: true } },
+  { id: 'ett', data: { published: true, parent: '/salja' } },
+  { id: 'ett.en', data: { published: true, parent: '/salja', url: 'two' } },
+  { id: 'tva', data: { published: true, parent: '/salja' } },
+  { id: 'tva.en', data: { published: true, parent: '/salja', url: 'two' } },
+]), /ett\.en\.md and src\/content\/pages\/tva\.en\.md/,
+  'two subpages of one parent on one address in one language fail the build and name both');
+
+console.log('\n· a subpage composes its address out of its parent, one language at a time');
+const NESTED_PAGES = [
+  { id: 'salja-foretag', data: { published: true } },
+  { id: 'salja-foretag.en', data: { published: true, url: 'sell-a-company' } },
+  { id: 'generationsskifte', data: { published: true, parent: '/salja-foretag' } },
+  { id: 'generationsskifte.en', data: { published: true, parent: '/salja-foretag', url: 'succession' } },
+  { id: 'vardering', data: { published: true, parent: '/salja-foretag' } },
+  { id: 'kontakt', data: { published: true } },
+];
+const NR = localeRoutes(SITE, NESTED_PAGES);
+eq([...NR.served].sort(), ['/', '/kontakt', '/salja-foretag', '/salja-foretag/generationsskifte', '/salja-foretag/vardering'],
+  'the served set carries the nested address the default language writes');
+eq(localeHref('/salja-foretag/generationsskifte', 'en', NR), '/en/sell-a-company/succession',
+  'both halves of a nested address are the ones that language names');
+eq(localeHref('/salja-foretag/vardering', 'en', NR), '/en/sell-a-company/vardering',
+  'a child nobody translated keeps its own segment, under the translated parent');
+eq(localeHref('/salja-foretag/generationsskifte', 'no', NR), '/no/salja-foretag/generationsskifte',
+  'a language that translated neither half falls back to the whole base address');
+eq(localeHref('/salja-foretag/generationsskifte', 'sv', NR), '/salja-foretag/generationsskifte',
+  'the default language is the file names, unprefixed');
+eq(localeHref('/salja-foretag', 'en', NR), '/en/sell-a-company', 'the parent itself is unaffected by having children');
+eq(localeHref('/kontakt', 'en', NR), '/en/kontakt', 'and a page beside the tree is untouched');
+eq(localePagePath('/salja-foretag/generationsskifte', 'en', NR), '/sell-a-company/succession',
+  'the slug the /en/ catch-all builds its static path from');
+eq(basePagePath('/sell-a-company/succession', 'en', NR), '/salja-foretag/generationsskifte',
+  'and the entry that path resolves back to');
+eq(localeSwitcher('/salja-foretag/generationsskifte', SITE, NESTED_PAGES).map((l) => l.href),
+  ['/salja-foretag/generationsskifte', '/en/sell-a-company/succession', '/no/'],
+  'the switcher finds the nested page by its address, so a translated subpage is offered rather than the front page');
+eq(hreflangLinks('/en/sell-a-company/succession', SITE, null, NESTED_PAGES).map((a) => a.href),
+  ['/salja-foretag/generationsskifte', '/en/sell-a-company/succession', '/no/salja-foretag/generationsskifte', '/salja-foretag/generationsskifte'],
+  'the head names the nested URL each language answers on');
+const HIDDEN_PARENT = localeRoutes(SITE, [
+  { id: 'foralder', data: { published: false } },
+  { id: 'barn', data: { published: true, parent: '/foralder' } },
+]);
+eq([...HIDDEN_PARENT.served].sort(), ['/', '/foralder/barn'],
+  'an unpublished parent still gives its published child the nested address — it is the address, not a page that must be built');
 
 console.log('\n· an address on the default-language file is ignored, loudly');
 const warnings = [];

@@ -450,16 +450,19 @@ import BlockRenderer from '@gronare/stomme/BlockRenderer.astro';
 import { getCollection } from 'astro:content';
 import { site, features } from '@stomme/config';
 import { resolveLocales, defaultLocaleEntries, pickLocaleEntry, localeConfig, localeRoutes, localePagePath, htmlLang } from '@gronare/stomme/i18n';
+import { pagePaths } from '@gronare/stomme/pages';
 
 export async function getStaticPaths() {
   const all = await getCollection('pages');
   const locales = resolveLocales(site);
   const routes = localeRoutes(site, all);
-  return defaultLocaleEntries(all, site)
+  const written = defaultLocaleEntries(all, site);
+  const paths = pagePaths(written);
+  return written
     .filter((p) => p.data.published)
     .map((p) => {
       const { entry, locale } = pickLocaleEntry(all, p.id, ${JSON.stringify(locale)}, locales);
-      return { params: { slug: localePagePath(\`/\${p.id}\`, ${JSON.stringify(locale)}, routes).slice(1) }, props: { page: entry, locale } };
+      return { params: { slug: localePagePath(paths.get(p.id), ${JSON.stringify(locale)}, routes).slice(1) }, props: { page: entry, locale } };
     });
 }
 const { page, locale } = Astro.props;

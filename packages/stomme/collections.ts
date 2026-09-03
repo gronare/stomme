@@ -45,7 +45,7 @@ export function stommeCollections(listings?: Listing[]) {
   const base: Record<string, ReturnType<typeof defineCollection>> = {
     home: defineCollection({ loader: md('home'), schema: z.object({ seo, blocks }) }),
     // The slug rule lives in src/i18n.ts and fails the build there; a second rule here would drift.
-    pages: defineCollection({ loader: md('pages'), schema: z.object({ title: z.string(), url: z.string().optional(), seo, blocks, published: z.boolean().default(false) }) }),
+    pages: defineCollection({ loader: md('pages'), schema: z.object({ title: z.string(), url: z.string().optional(), parent: z.string().optional(), summary: z.string().optional(), cover: z.string().optional(), order: z.number().optional(), seo, blocks, published: z.boolean().default(false) }) }),
 
     settings: defineCollection({
       loader: md('settings'),
@@ -135,6 +135,7 @@ export function stommeCollections(listings?: Listing[]) {
           label: z.string(),
           link,
           menu: z.string().optional(),
+          autoChildren: z.boolean().default(false),
           children: z.array(z.object({ label: z.string(), link })).default([]),
         })).default([]),
         cta: z.object({ label: z.string(), link }).optional(),

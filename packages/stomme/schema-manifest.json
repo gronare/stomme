@@ -109,6 +109,10 @@
       "fields": [
         "title",
         "url",
+        "parent",
+        "summary",
+        "cover",
+        "order",
         "seo",
         "blocks",
         "published"

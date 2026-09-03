@@ -86,6 +86,27 @@ for (const f of [kit.surfaceField, kit.accentField, kit.widthField]) {
   check(f.required === false, `${f.name} is optional — a block that never sets it still renders`);
 }
 
+// ── subpages ────────────────────────────────────────────────────────────────
+const subpages = defaultBlocks.find((b) => b.type === 'subpages');
+const subField = (name) => walk(subpages.fields).find((f) => f.name === name);
+check(!!subpages, 'the catalog ships a subpages block');
+eq([subpages.group, subpages.collection], ['From collections', 'pages'],
+  'subpages sits with the other from-collections blocks and is gated on the pages collection');
+eq(subpages.fields.map((f) => f.name), ['eyebrow', 'heading', 'intro', 'pages', 'layout', 'media', 'style'],
+  'subpages declares the heading fields, a page picker, layout, media and the style group');
+eq([subField('pages').options, subField('pages').multiple, subField('pages').required], ['$pages', true, false],
+  'the page picker is a multiple $pages select nobody has to fill in');
+eq(subField('variant').options.map((o) => o.value), ['cards', 'tiles', 'rows', 'chips', 'siblings'],
+  'the five variants the block renders are the five the editor can pick');
+eq(subField('variant').default, 'cards', 'a block nobody configured renders the photo cards');
+eq(subField('columns').options.map((o) => o.value), ['2', '3', '4'], 'the column picker offers 2, 3 and 4');
+eq(subField('columns').default, '2', 'and starts at two');
+check(subField('variant').options.every((o) => o.label && o.label !== o.value),
+  'every variant is named in words, not by its stored value');
+eq(subField('showImages').default, true, 'the cover images are on for a block the editor adds today');
+check(subpages.samples.length >= 2 && subpages.samples.every((x) => Array.isArray(x.items) && x.items.length),
+  'the lookbook has sample pages to draw, since the block cannot read a page there');
+
 // ── the Field/BlockDef shape, across the whole catalog ───────────────────────
 const WIDGETS = new Set([...kitSource.slice(kitSource.indexOf('widget:'), kitSource.indexOf(';', kitSource.indexOf('widget:'))).matchAll(/'([a-z]+)'/g)].map((m) => m[1]));
 check(WIDGETS.size >= 10, `the Field type declares ${WIDGETS.size} widgets`, [...WIDGETS].join(', '));

@@ -711,6 +711,40 @@ const RAW_BLOCKS: BlockDef[] = [
     ],
   },
   {
+    type: 'subpages',
+    label: 'Subpages',
+    group: 'From collections',
+    summary: 'The pages that sit under this one — photo cards, tiles, a list, a chapter row, or a band of sibling pages on a subpage.',
+    shape: 'grid',
+    collection: 'pages',
+    fields: [
+      ...headingFields,
+      { name: 'pages', label: 'Pages shown', widget: 'select', options: '$pages', multiple: true, required: false, hint: 'Pick which pages appear, in order. Leave empty to show the subpages of the page this block sits on.' },
+      layoutGroup([
+        {
+          name: 'variant', label: 'Layout', widget: 'select', required: false, default: 'cards',
+          hint: 'How the pages are presented.',
+          options: [
+            { label: 'Cards with photo', value: 'cards' },
+            { label: 'Tiles', value: 'tiles' },
+            { label: 'List', value: 'rows' },
+            { label: 'Chapter row', value: 'chips' },
+            { label: 'Siblings, for a subpage', value: 'siblings' },
+          ],
+        },
+        {
+          name: 'columns', label: 'Columns', widget: 'select', required: false, default: '2',
+          hint: 'Cards and tiles only.',
+          options: [{ label: '2', value: '2' }, { label: '3', value: '3' }, { label: '4', value: '4' }],
+        },
+      ]),
+      mediaGroup('Cover images on the cards.', [
+        { name: 'showImages', label: 'Image previews', widget: 'boolean', required: false, default: true, hint: 'Show each page\'s cover image. Cards layout only; a page with no cover keeps a card without one.' },
+      ]),
+      styleGroup([surfaceField]),
+    ],
+  },
+  {
     type: 'ctaPanel',
     label: 'Call to action (band)',
     group: 'Calls to action',
@@ -934,6 +968,11 @@ const FAQ_FIX = [
   { id: 'q2', data: { question: 'A second, longer sample question to wrap the row?', answer: 'A short answer.', order: 2 } },
   { id: 'q3', data: { question: 'A third?', answer: LOREM, order: 3 } },
 ];
+const SUBPAGE_FIX = [
+  { id: 'first-subpage', data: { title: 'The first subpage', summary: LOREM, cover: '/images/placeholders/service.svg', published: true, order: 1 } },
+  { id: 'second-subpage', data: { title: 'A second subpage, with a longer title that wraps', summary: 'A shorter summary line.', published: true, order: 2 } },
+  { id: 'third-subpage', data: { title: 'The third', summary: LOREM, published: true, order: 3 } },
+];
 const CONTACT_SWITCH_FIX = [
   { label: 'Report a fault', description: 'Goes to the caretaker. Urgent? Call the service line.', intro: 'Goes to the caretaker, who answers on weekdays.', showPhone: true, showCategory: true, categories: ['First category', 'Second category'], showUnit: true, placeholderUnit: 'e.g. 12B', labelMessage: 'Describe the fault', submitLabel: 'Send the report' },
   { label: 'Write to the board', description: 'Answered after the monthly board meeting.', intro: 'Answered after the monthly board meeting.', labelMessage: 'Your errand', submitLabel: 'Send to the board' },
@@ -1065,6 +1104,12 @@ const SAMPLES: Record<string, ({ _label?: string } & Record<string, unknown>)[]>
     { id: 'two', data: { title: 'Second item', price: '8 900 kr', status: 'reserved', category: 'Beta', date: '2026-04-01' } },
     { id: 'three', data: { title: 'Third item', price: '4 200 kr', status: 'sold', category: 'Alpha', date: '2026-03-01' } },
   ] }],
+  subpages: [
+    { _label: 'cards · fixture pages', eyebrow: 'In this section', heading: 'Subpage cards', media: { showImages: true }, layout: { variant: 'cards', columns: '2' }, items: SUBPAGE_FIX },
+    { _label: 'tiles · three columns', heading: 'Subpage tiles', layout: { variant: 'tiles', columns: '3' }, items: SUBPAGE_FIX },
+    { _label: 'list', heading: 'Subpages as a list', layout: { variant: 'rows' }, items: SUBPAGE_FIX },
+    { _label: 'chapter row', layout: { variant: 'chips' }, items: SUBPAGE_FIX },
+  ],
   ctaPanel: [{ eyebrow: 'Eyebrow', heading: 'A call-to-action band', intro: LOREM, label: 'Do the thing', href: { url: '#' } }],
   ctaBox: [
     { _label: 'classic', style: { surface: 'dark' }, eyebrow: 'Next step', heading: 'A boxed call to action.', intro: 'A short supporting line under the heading.', cta: { label: 'Primary', link: { url: '#' } }, cta2: { label: 'quiet second link', link: { url: '#' } } },

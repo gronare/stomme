@@ -12,6 +12,10 @@ const filePath = (name, path) => (on(name) ? localeFilePath(path) : path);
 const pageUrlField = () => (on('pages')
   ? '\n    - { name: url, label: "Address in this language", widget: string, required: false, pattern: ["^[a-z0-9]+(?:-[a-z0-9]+)*$", "Lowercase a-z, digits and hyphens only"], hint: "Empty = the same address as the default language. Applies to the translations; the address in the site\'s own language is the page name.", i18n: true }'
   : '');
+const pageParentField = () => emitField({
+  name: 'parent', label: 'Parent page', widget: 'select', options: '$pages', required: false,
+  hint: 'The address nests under the page you pick. A page under /services answers on /services/its-own-name. Empty means a top-level page.',
+}, 4, on('pages'));
 // No field-level media_folder in any editor below: the CMS resolves it relative to the entry, which breaks uploads from subfolder entries — the global media_folder in config.yml is the one that works.
 const COLLECTION_EDITORS = {
   home: `- name: home
@@ -35,9 +39,16 @@ ${emitWidget(8, on('home'))}`,
   folder: "src/content/pages"
   create: true
   slug: "{{slug}}"${line('pages', 2, 'i18n: true')}
+  view_groups:
+    groups:
+      - { name: parent, label: "Parent page", field: parent }
   fields:
     - { name: title, label: "Title", widget: string${inline('pages', 'true')} }${pageUrlField()}
     - { name: published, label: "Published", widget: boolean, default: true, required: false, hint: "Uncheck to hide the page — unpublished pages aren't built."${inline('pages', 'duplicate')} }
+${pageParentField()}
+    - { name: summary, label: "Short text", widget: text, required: false, hint: "Short text used on cards, in lists and in menus that show this page."${inline('pages', 'true')} }
+    - { name: cover, label: "Card image", widget: image, required: false${inline('pages', 'duplicate')} }
+    - { name: order, label: "Order", widget: number, required: false, default: 0, hint: "Sorts this page among the pages that share the same parent. Lowest number first."${inline('pages', 'duplicate')} }
     - name: seo
       label: "SEO"
       widget: object

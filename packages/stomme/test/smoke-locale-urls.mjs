@@ -17,17 +17,35 @@ const OWNED = ['src/site.config.ts', 'src/content/settings/site.md', 'public/adm
 const saved = new Map(OWNED.map((f) => [f, readFileSync(resolve(STARTER, f), 'utf8')]));
 const added = [];
 
-const page = (title, url) => `---
+const page = (title, url, parent, extra = {}) => `---
 title: ${JSON.stringify(title)}
-${url ? `url: ${url}\n` : ''}published: true
+${url ? `url: ${url}\n` : ''}${parent ? `parent: ${parent}\n` : ''}${extra.order ? `order: ${extra.order}\n` : ''}${extra.cover ? `cover: ${extra.cover}\n` : ''}${extra.summary ? `summary: ${JSON.stringify(extra.summary)}\n` : ''}published: true
 seo:
   title: ${JSON.stringify(title)}
   description: ${JSON.stringify(`${title} — locale route fixture.`)}
 blocks:
   - type: prose
     body: ${JSON.stringify(title)}
----
+${extra.blocks ?? ''}---
 `;
+
+const CHIPS = `  - type: subpages
+    layout:
+      variant: chips
+`;
+const CARDS = `  - type: subpages
+    heading: "Vidare härifrån"
+    media:
+      showImages: true
+    layout:
+      variant: cards
+      columns: "2"
+`;
+const SIBLINGS = `  - type: subpages
+    layout:
+      variant: siblings
+`;
+const COVER = '/images/placeholders/service.svg';
 
 const EN_QUESTION = 'This question is written in English.';
 const EN_TAGLINE = 'The footer, written in English.';
@@ -74,9 +92,12 @@ try {
   writeFileSync(resolve(STARTER, 'src/site.config.ts'),
     saved.get('src/site.config.ts')
       .replace("  locale: 'en-US',\n  cmsLocale: 'en',", "  locale: 'sv-SE',\n  cmsLocale: 'sv',\n  locales: ['sv', 'en', 'no'],"));
-  write('src/content/pages/omradet.md', page('Området'));
-  write('src/content/pages/omradet.en.md', page('The area', 'the-area'));
+  write('src/content/pages/omradet.md', page('Området', '', '', { blocks: CHIPS + CARDS + SIBLINGS }));
+  write('src/content/pages/omradet.en.md', page('The area', 'the-area', '', { blocks: CHIPS + CARDS + SIBLINGS }));
   write('src/content/pages/omradet.no.md', page('Området', 'omraadet'));
+  write('src/content/pages/guiden.md', page('Guiden', '', '/omradet', { order: 1, cover: COVER, summary: 'Guiden i korthet.', blocks: SIBLINGS }));
+  write('src/content/pages/guiden.en.md', page('The guide', 'the-guide', '/omradet', { order: 1, cover: COVER, summary: 'The guide in short.', blocks: SIBLINGS }));
+  write('src/content/pages/kartan.md', page('Kartan', '', '/omradet', { order: 2, summary: 'Kartan i korthet.' }));
   write('src/content/faq/what-is-this.en.md', faqEntry(EN_QUESTION, 'This answer is written in English.'));
   write('src/content/footer/footer.en.md', footerEntry(EN_TAGLINE, EN_LINK));
 
@@ -92,6 +113,69 @@ try {
   check(!emitted('en/omradet'), 'the filename is not also served under /en/ — one page, one address per language');
   check(emitted('about') && emitted('en/about') && emitted('no/about'),
     'a page no translation renamed still answers on the filename in every language');
+
+  check(emitted('omradet/guiden'), 'a subpage answers under its parent — /omradet/guiden');
+  check(emitted('en/the-area/the-guide'), 'and on the address both halves have in that language — /en/the-area/the-guide');
+  check(emitted('no/omraadet/guiden'), 'a language that translated only the parent keeps the child segment — /no/omraadet/guiden');
+  check(!emitted('guiden') && !emitted('en/the-guide'), 'the flat address a subpage would have had is not built beside it');
+
+  const child = html('omradet/guiden');
+  check(/<nav class="breadcrumbs" aria-label="Brödsmulor">/.test(child), 'the subpage carries a breadcrumb trail, named in the language of the page');
+  check(/<a class="breadcrumbs__link" href="\/">Hem<\/a>/.test(child), 'the trail starts at the front page');
+  check(/<a class="breadcrumbs__link" href="\/omradet">Området<\/a>/.test(child), 'names the parent by its title, linked');
+  check(/aria-current="page">Guiden</.test(child), 'and ends on the page itself as plain text');
+  check(child.includes('"@type":"BreadcrumbList"') && child.includes('https://example.com/omradet'),
+    'and says the same thing to a crawler, in absolute URLs');
+  check(!/breadcrumbs/.test(html('omradet')) && !/breadcrumbs/.test(html('about')),
+    'a page with no parent carries no breadcrumb at all');
+
+  console.log('· the subpages block…');
+  const parent = html('omradet');
+  check(/<section data-stomme-block="subpages" class="section subpages subpages--chips">/.test(parent),
+    'the chapter row is one subpages section, told apart by its variant class');
+  check(/<span class="mono subpage-chiprow__label">I det här avsnittet<\/span>/.test(parent),
+    'and is introduced in the language of the page');
+  check(/<a href="\/omradet\/guiden" class="subpage-chip">Guiden<\/a>/.test(parent)
+    && /<a href="\/omradet\/kartan" class="subpage-chip">Kartan<\/a>/.test(parent),
+    'each subpage is a chip, named by its title and linked on its nested address');
+
+  const cards = Object.fromEntries([...parent.matchAll(/<a href="([^"]+)" class="card subpage-card">([\s\S]*?)<\/a>/g)].map((m) => [m[1], m[2]]));
+  check(Object.keys(cards).length === 2, 'the card grid draws one card per subpage', Object.keys(cards).join(', '));
+  check(/<img src="\/images\/placeholders\/service\.svg"[^>]*class="subpage-card__img"/.test(cards['/omradet/guiden'] ?? ''),
+    'a page with a cover carries it across the top of its card');
+  check(!/<img|subpage-card__img/.test(cards['/omradet/kartan'] ?? ''),
+    'a page with no cover renders a card with no image area at all — never a placeholder');
+  check(/<h3>Guiden<\/h3><p>Guiden i korthet\.<\/p><span class="mono subpage-card__more">/.test(cards['/omradet/guiden'] ?? ''),
+    'the card reads the title, then the summary, then the read-more line the site words itself', cards['/omradet/guiden']);
+  check(!/subpages--siblings/.test(parent),
+    'the siblings band placed on a page with no parent renders nothing, rather than a band pointing at the site root');
+
+  const band = html('omradet/guiden');
+  check(/<section data-stomme-block="subpages" class="section subpages subpages--siblings">/.test(band),
+    'the same block on a subpage renders the siblings band');
+  check(/<span class="mono eyebrow">Området<\/span>/.test(band) && /Fler sidor i avsnittet<\/h2>/.test(band),
+    'the band is labelled with the parent title and the wording of the page\'s language');
+  check(/<a href="\/omradet\/kartan" class="subpage-row">/.test(band), 'it lists the pages beside this one');
+  check(!/<a href="\/omradet\/guiden" class="subpage-row/.test(band), 'and never the page you are reading');
+  check(/<a href="\/omradet" class="subpage-row subpage-row--up">[\s\S]*?↑ Området/.test(band),
+    'and ends on a link up to the parent');
+
+  const parentEn = html('en/the-area');
+  check(/<span class="mono subpage-chiprow__label">In this section<\/span>/.test(parentEn),
+    'the English twin introduces its chapter row in English');
+  check(/<a href="\/en\/the-area\/the-guide" class="subpage-chip">/.test(parentEn),
+    'and the chips lead to the English addresses');
+  check(/<a href="\/en\/the-area\/kartan" class="subpage-chip">/.test(parentEn),
+    'a subpage no language renamed keeps its segment under the translated parent');
+  check(/<a href="\/en\/the-area\/the-guide" class="card subpage-card">/.test(parentEn),
+    'the cards on the twin lead there too');
+  check(/<a href="\/en\/the-area" class="subpage-row subpage-row--up">/.test(html('en/the-area/the-guide')),
+    'and the band on the English subpage climbs to the English parent');
+
+  const childEn = html('en/the-area/the-guide');
+  check(/<a class="breadcrumbs__link" href="\/en\/">Home<\/a>/.test(childEn), 'the English trail is worded in English');
+  check(/<a class="breadcrumbs__link" href="\/en\/the-area">The area<\/a>/.test(childEn),
+    'and names the parent by its translated title, on its translated address');
 
   const bounce = html('omradet');
   check(bounce.includes('location.replace') && bounce.includes('example.com') && bounce.includes(".endsWith('.pages.dev')"),

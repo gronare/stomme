@@ -22,6 +22,8 @@ export interface SiteConfig {
     readMore?: string;
     latest?: string;
     changeLanguage?: string;
+    breadcrumbHome?: string;
+    breadcrumbLabel?: string;
     contact?: { name?: string; email?: string; phone?: string; category?: string; categoryPlaceholder?: string; unit?: string; message?: string; submit?: string; direct?: string; honeypot?: string; hours?: string; visit?: string; findUs?: string; follow?: string; map?: string; reveal?: string; error?: string };
     beforeAfter?: { before?: string; after?: string; compare?: string };
     collage?: { more?: string; more1?: string; open?: string; viewer?: string; prev?: string; next?: string; close?: string; counter?: string };
@@ -33,6 +35,7 @@ export interface SiteConfig {
     footer?: { links?: string; areas?: string };
     documents?: { separator?: string; file?: string };
     sectionNav?: { label?: string };
+    subpages?: { inSection?: string; moreInSection?: string };
     post?: { back?: string };
     town?: {
       eyebrow?: string;
@@ -134,6 +137,8 @@ const STRINGS_EN = {
   readMore: 'Read more',
   latest: 'Latest',
   changeLanguage: 'Change language',
+  breadcrumbHome: 'Home',
+  breadcrumbLabel: 'Breadcrumb',
   contact: {
     name: 'Name', email: 'Email', phone: 'Phone', category: 'Category', categoryPlaceholder: 'Choose…', unit: 'Unit', message: 'Describe your project', submit: 'Send request',
     direct: 'Direct contact', honeypot: 'Leave this field empty', hours: 'Opening hours', visit: 'Visit',
@@ -158,6 +163,7 @@ const STRINGS_EN = {
   footer: { links: 'Links', areas: 'Areas' },
   documents: { separator: '·', file: 'FILE' },
   sectionNav: { label: 'On this page' },
+  subpages: { inSection: 'In this section', moreInSection: 'More in this section' },
   post: {
     back: 'All posts',
     yearCount: '{n} posts',
@@ -211,6 +217,8 @@ const STRINGS_SV: typeof STRINGS_EN = {
   readMore: 'Läs mer',
   latest: 'Senaste',
   changeLanguage: 'Byt språk',
+  breadcrumbHome: 'Hem',
+  breadcrumbLabel: 'Brödsmulor',
   contact: {
     name: 'Namn', email: 'E-post', phone: 'Telefon', category: 'Kategori', categoryPlaceholder: 'Välj…', unit: 'Lägenhet', message: 'Beskriv ditt projekt', submit: 'Skicka förfrågan',
     direct: 'Direktkontakt', honeypot: 'Lämna fältet tomt', hours: 'Öppettider', visit: 'Hitta hit',
@@ -235,6 +243,7 @@ const STRINGS_SV: typeof STRINGS_EN = {
   footer: { links: 'Länkar', areas: 'Områden' },
   documents: { separator: '·', file: 'FIL' },
   sectionNav: { label: 'På den här sidan' },
+  subpages: { inSection: 'I det här avsnittet', moreInSection: 'Fler sidor i avsnittet' },
   post: {
     back: 'Alla inlägg',
     yearCount: '{n} inlägg',
@@ -288,6 +297,8 @@ const STRINGS_NO: typeof STRINGS_EN = {
   readMore: 'Les mer',
   latest: 'Siste',
   changeLanguage: 'Bytt språk',
+  breadcrumbHome: 'Hjem',
+  breadcrumbLabel: 'Brødsmuler',
   contact: {
     name: 'Navn', email: 'E-post', phone: 'Telefon', category: 'Kategori', categoryPlaceholder: 'Velg…', unit: 'Leilighet', message: 'Beskriv prosjektet ditt', submit: 'Send forespørsel',
     direct: 'Direktekontakt', honeypot: 'La feltet stå tomt', hours: 'Åpningstider', visit: 'Finn fram',
@@ -312,6 +323,7 @@ const STRINGS_NO: typeof STRINGS_EN = {
   footer: { links: 'Lenker', areas: 'Områder' },
   documents: { separator: '·', file: 'FIL' },
   sectionNav: { label: 'På denne siden' },
+  subpages: { inSection: 'I denne delen', moreInSection: 'Flere sider i denne delen' },
   post: {
     back: 'Alle innlegg',
     yearCount: '{n} innlegg',
@@ -375,6 +387,7 @@ function baseStrings(locale?: string, cmsLocale?: string) {
     footer: { ...STRINGS_EN.footer, ...b.footer },
     documents: { ...STRINGS_EN.documents, ...b.documents },
     sectionNav: { ...STRINGS_EN.sectionNav, ...b.sectionNav },
+    subpages: { ...STRINGS_EN.subpages, ...b.subpages },
     post: { ...STRINGS_EN.post, ...b.post },
     town: { ...STRINGS_EN.town, ...b.town },
     service: { ...STRINGS_EN.service, ...b.service },
@@ -454,6 +467,7 @@ export function resolveSite(c?: SiteConfig, locale?: string) {
       footer: { ...base.footer, ...((s && (s as any).footer) || {}) },
       documents: { ...base.documents, ...((s && (s as any).documents) || {}) },
       sectionNav: { ...base.sectionNav, ...((s && (s as any).sectionNav) || {}) },
+      subpages: { ...base.subpages, ...((s && (s as any).subpages) || {}) },
       post: { ...base.post, ...((s && (s as any).post) || {}) },
       consent: { ...base.consent, ...((s && (s as any).consent) || {}) },
     },

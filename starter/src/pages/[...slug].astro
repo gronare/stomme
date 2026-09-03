@@ -3,11 +3,13 @@ import Base from '../layouts/Base.astro';
 import BlockRenderer from '@gronare/stomme/BlockRenderer.astro';
 import { getCollection } from 'astro:content';
 import { defaultLocaleEntries } from '@gronare/stomme/i18n';
+import { pagePaths } from '@gronare/stomme/pages';
 import { site, features } from '../site.config';
 
 export async function getStaticPaths() {
-  const pages = defaultLocaleEntries(await getCollection('pages'), site).filter((p) => p.data.published);
-  return pages.map((p) => ({ params: { slug: p.id }, props: { page: p } }));
+  const written = defaultLocaleEntries(await getCollection('pages'), site);
+  const paths = pagePaths(written);
+  return written.filter((p) => p.data.published).map((p) => ({ params: { slug: paths.get(p.id).slice(1) }, props: { page: p } }));
 }
 const { page } = Astro.props;
 ---

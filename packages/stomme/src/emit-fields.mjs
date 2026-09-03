@@ -191,6 +191,7 @@ export function makeEmitters({ q, pad, AVAILABLE_BLOCKS, OPTION_SOURCES }) {
         navLinkField(),
         { name: 'menu', label: 'Dropdown from collection', widget: 'select', options: '$menus', required: false, hint: 'Optional. Fill a dropdown with every entry of a collection (e.g. all services). Overrides manual sub-links below.' },
         { name: 'children', label: '…or manual sub-links', widget: 'list', required: false, collapsed: true, label_singular: 'Sub-link', summary: '{{fields.label}}', fields: [{ name: 'label', label: 'Label', widget: 'string' }, navLinkField()] },
+        { name: 'autoChildren', label: "List the page's subpages", widget: 'boolean', required: false, default: false, hint: 'Fills the dropdown with the pages that sit under the page above. A collection dropdown or manual sub-links win over it.' },
       ],
     };
     const cta = {
