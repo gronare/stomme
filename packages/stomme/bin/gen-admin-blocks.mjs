@@ -73,7 +73,7 @@ try {
   if (mod.site && mod.site.cms) CMS = mod.site.cms;
   if (mod.site && mod.site.style) STYLE = mod.site.style;
   if (mod.site && mod.site.media) MEDIA = resolveMediaConfig(mod.site.media);
-  if (mod.site && mod.site.strings && mod.site.strings.listingStatus) LISTING_STATUS = mod.site.strings.listingStatus;
+  if (mod.site && mod.site.strings && mod.site.strings.listingStatus) LISTING_STATUS = (await jiti.import(resolve(here, '../src/config.ts'))).resolveSite(mod.site).strings.listingStatus;
   if (mod.features) FEATURES = { blog: false, areas: false, services: false, testimonials: false, faq: false, documents: false, tracking: false, ...mod.features };
   if (Array.isArray(mod.listings))
     LISTINGS = mod.listings
@@ -129,7 +129,10 @@ try {
 } catch {
 }
 // A by-path translation answers the stock English only: a label the site renamed (a listing called what it is) must survive, so the path hit is skipped when the English no longer matches.
+const STATUS_OPTION_LABEL = /^block\.catalogList\.status\.options\[(available|reserved|sold)\]\.label$/;
 const localized = (path, en) => {
+  const status = path.match(STATUS_OPTION_LABEL);
+  if (status && LISTING_STATUS[status[1]]) return LISTING_STATUS[status[1]];
   if (!LOCALIZED_BY_PATH) return en;
   const pathHit = LOCALIZED_BY_PATH[path];
   if (pathHit !== undefined && (!(path in (EN_BY_PATH ?? {})) || EN_BY_PATH[path] === en)) return pathHit;

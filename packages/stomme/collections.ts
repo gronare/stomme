@@ -32,7 +32,7 @@ export const PRESET_SCHEMAS = {
   catalog: z.object({
     title: z.string(),
     price: z.string().default(''),
-    status: z.enum(['available', 'reserved', 'sold']).default('available'),
+    status: z.string().default('available'),
     category: z.string().default(''),
     cover: z.string().optional(),
     gallery: z.array(z.object({ image: z.string(), alt: z.string().default('') })).default([]),

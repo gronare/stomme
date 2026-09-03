@@ -2,6 +2,9 @@ import { localeFilePath } from './cms-i18n.mjs';
 
 export function makeCollectionEditors({ q, emitField, emitWidget, buttonField, localized = () => false, listingStatus = {} }) {
 const statusLabel = (value, en) => q(listingStatus[value] || en);
+const statusValue = (value) => (listingStatus[value] ? q(listingStatus[value]) : value);
+const statusPattern = (value) => q(`^${(listingStatus[value] || value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`);
+const statusSortDirection = () => ((listingStatus.available || 'available').localeCompare(listingStatus.sold || 'sold') <= 0 ? 'ascending' : 'descending');
 const on = (name) => !!localized(name);
 const line = (name, indent, text) => (on(name) ? `\n${' '.repeat(indent)}${text}` : '');
 const inline = (name, value) => (on(name) ? `, i18n: ${value}` : '');
@@ -224,11 +227,11 @@ ${specs.map((s) => `        - { name: ${s.key}, label: ${q(s.label)}, widget: st
     - name: status
       label: "Status"
       widget: select
-      default: available
+      default: ${statusValue('available')}
       options:
-        - { label: ${statusLabel('available', 'Available')}, value: available }
-        - { label: ${statusLabel('reserved', 'Reserved')}, value: reserved }
-        - { label: ${statusLabel('sold', 'Sold')}, value: sold }
+        - { label: ${statusLabel('available', 'Available')}, value: ${statusValue('available')} }
+        - { label: ${statusLabel('reserved', 'Reserved')}, value: ${statusValue('reserved')} }
+        - { label: ${statusLabel('sold', 'Sold')}, value: ${statusValue('sold')} }
     - { name: category, label: "Category", widget: string, required: false }
     - { name: cover, label: "Cover image", widget: image, required: false }
     - name: gallery
@@ -243,15 +246,18 @@ ${specs.map((s) => `        - { name: ${s.key}, label: ${q(s.label)}, widget: st
     - { name: date, label: "Date added", widget: datetime, date_format: "YYYY-MM-DD", time_format: false, required: false }
     - { name: body, label: "Description", widget: markdown, required: false }`;
   const catalogViews = `
+  sortable_fields:
+    fields: [title, status, date]
+    default: { field: status, direction: ${statusSortDirection()} }
   view_groups:
     groups:
       - { name: status, label: "Status", field: status }
     default: status
   view_filters:
     filters:
-      - { name: available, label: ${statusLabel('available', 'Available')}, field: status, pattern: available }
-      - { name: reserved, label: ${statusLabel('reserved', 'Reserved')}, field: status, pattern: reserved }
-      - { name: sold, label: ${statusLabel('sold', 'Sold')}, field: status, pattern: sold }`;
+      - { name: available, label: ${statusLabel('available', 'Available')}, field: status, pattern: ${statusPattern('available')} }
+      - { name: reserved, label: ${statusLabel('reserved', 'Reserved')}, field: status, pattern: ${statusPattern('reserved')} }
+      - { name: sold, label: ${statusLabel('sold', 'Sold')}, field: status, pattern: ${statusPattern('sold')} }`;
   return `- name: ${l.id}
   label: ${q(l.label || l.id)}
   folder: "src/content/${l.id}"

@@ -416,6 +416,18 @@ export function canonicalBounceHost(siteUrl?: string | URL): string {
   return !host || demoHost(host) ? '' : host;
 }
 
+export const LISTING_STATUS_KEYS = ['available', 'reserved', 'sold'] as const;
+export type ListingStatusKey = (typeof LISTING_STATUS_KEYS)[number];
+
+export function listingStatusKey(strings: { listingStatus?: Record<string, string | undefined> } | undefined, value: unknown): ListingStatusKey {
+  const v = String(value ?? '').trim();
+  const words = (strings && strings.listingStatus) || {};
+  const hit = LISTING_STATUS_KEYS.find((k) => k === v || words[k] === v);
+  if (hit) return hit;
+  const allowed = LISTING_STATUS_KEYS.flatMap((k) => (words[k] && words[k] !== k ? [k, String(words[k])] : [k]));
+  throw new Error(`Unknown listing status "${v}" — use one of: ${allowed.join(', ')}`);
+}
+
 // `locale` renders the chrome in another language than the site's own: the site's `strings` overrides are written in the default language, so they are dropped whenever the requested language is not that one.
 export function resolveSite(c?: SiteConfig, locale?: string) {
   const lang = (t?: string) => String(t || '').split(/[-_]/)[0].toLowerCase();

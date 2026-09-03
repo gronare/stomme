@@ -1,7 +1,7 @@
 ---
 import Cover from './src/Cover.astro';
 import { render } from 'astro:content';
-import { resolveListings, resolveSpecs, listingSpecRows } from './src/config';
+import { resolveListings, resolveSpecs, listingSpecRows, listingStatusKey } from './src/config';
 
 interface Props {
   entry: any;
@@ -15,6 +15,7 @@ const listing = baked ? { ...baked, specs: resolveSpecs(baked.specs) } : resolve
 const specRows = listingSpecRows(d, listing);
 const sl = { available: 'Available', reserved: 'Reserved', sold: 'Sold', ...(site?.strings?.listingStatus || {}) };
 const ST = { available: 'avail', reserved: 'res', sold: 'sold' };
+const statusKey = listingStatusKey(site?.strings, d.status);
 const cta = site?.strings?.listingCta ?? 'Contact us';
 const contactHref = site?.routes?.contact ?? '/contact';
 const gallery = d.gallery?.length ? d.gallery : d.cover ? [{ image: d.cover, alt: d.title }] : [];
@@ -38,7 +39,7 @@ const backLabel = site?.strings?.listingBack ?? listing?.label;
     </div>
     )}
     <div class="catalog-info">
-      <span class={`listing-badge b-${ST[d.status] || 'avail'}`}>{sl[d.status] || d.status}</span>
+      <span class={`listing-badge b-${ST[statusKey]}`}>{sl[statusKey]}</span>
       <h1 class="display catalog-h1">{d.title}</h1>
       {d.price && <p class="catalog-price">{d.price}</p>}
       {specRows.length > 0 && (

@@ -1,7 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import Cover from '../src/Cover.astro';
-import { resolveListings, listingSpecRows } from '../src/config';
+import { resolveListings, listingSpecRows, listingStatusKey } from '../src/config';
 
 interface Props {
   eyebrow?: string;
@@ -25,11 +25,13 @@ const prefix = base ?? (source ? `/${source}` : '');
 const readMore = site?.strings?.readMore ?? 'Read more';
 const sl = { available: 'Available', reserved: 'Reserved', sold: 'Sold', all: 'All', ...(site?.strings?.listingStatus || {}) };
 const ST = { available: 'avail', reserved: 'res', sold: 'sold' };
+const key = (v: unknown) => listingStatusKey(site?.strings, v);
+const only = status ? key(status) : '';
 const all = Astro.props.items
   ?? (source
     ? (await getCollection(source)).sort((a, b) => ((a.data.date ?? '') < (b.data.date ?? '') ? 1 : -1))
     : []);
-const items = status ? all.filter((i) => i.data.status === status) : all;
+const items = only ? all.filter((i) => key(i.data.status) === only) : all;
 const listing = resolveListings(site?.listings).find((l) => l.id === source);
 const cats = [...new Set(items.map((i) => i.data.category).filter(Boolean))];
 const PLACE = '/images/placeholders/service.svg';
@@ -53,11 +55,11 @@ const PLACE = '/images/placeholders/service.svg';
     )}
     <div class="catalog-grid" style={`--cat-cols:${columns}`}>
       {items.map((it) => (
-        <a href={`${prefix}/${it.id}`} class={`listing-card is-${ST[it.data.status] || 'avail'}`} data-cat={it.data.category || ''}>
+        <a href={`${prefix}/${it.id}`} class={`listing-card is-${ST[key(it.data.status)]}`} data-cat={it.data.category || ''}>
           {showImages && (
             <div class="listing-photo">
               <Cover src={it.data.cover} alt={it.data.title} placeholder={PLACE} width={640} height={400} class="listing-img" />
-              <span class={`listing-badge b-${ST[it.data.status] || 'avail'}`}>{sl[it.data.status] || it.data.status}</span>
+              <span class={`listing-badge b-${ST[key(it.data.status)]}`}>{sl[key(it.data.status)]}</span>
             </div>
           )}
           <div class="listing-body">

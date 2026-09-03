@@ -8,7 +8,7 @@ const PKG = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const jiti = createJiti(import.meta.url);
 const {
   FEATURE_DEFAULTS, SITE_DEFAULTS, resolveFeatures, resolveSpecs, listingSpecRows,
-  resolveListings, isUnlisted, resolveSite,
+  resolveListings, isUnlisted, resolveSite, listingStatusKey, LISTING_STATUS_KEYS,
 } = await jiti.import(resolve(PKG, 'src/config.ts'));
 const source = readFileSync(resolve(PKG, 'src/config.ts'), 'utf8');
 
@@ -201,6 +201,17 @@ eq(resolveSite().maps, undefined, 'no maps config resolves to nothing for the bl
 eq(resolveSite({ routes: { blog: '/news' } }).routes, { ...SITE_DEFAULTS.routes, blog: '/news' },
   'overriding one route keeps the other defaults');
 eq(resolveSite().routes, SITE_DEFAULTS.routes, 'no config resolves the default routes');
+
+// ── listing status ──────────────────────────────────────────────────────────
+const svStrings = resolveSite({ locale: 'sv-SE', strings: { listingStatus: { available: 'Till salu', sold: 'Genomförd' } } }).strings;
+eq(LISTING_STATUS_KEYS, ['available', 'reserved', 'sold'], 'the three listing states are fixed');
+eq(LISTING_STATUS_KEYS.map((k) => listingStatusKey(svStrings, k)), ['available', 'reserved', 'sold'], 'a canonical key resolves to itself on any site');
+eq(['Till salu', 'Reserverad', 'Genomförd'].map((v) => listingStatusKey(svStrings, v)), ['available', 'reserved', 'sold'],
+  "the site's own words resolve to the keys — the named ones and the locale default for the one it left alone");
+eq(listingStatusKey(undefined, 'sold'), 'sold', 'no strings at all still resolves the canonical keys');
+const unknown = (() => { try { listingStatusKey(svStrings, 'Såld'); return null; } catch (e) { return String(e.message); } })();
+check(unknown && /"Såld"/.test(unknown) && /Genomförd/.test(unknown) && /available/.test(unknown),
+  'an unknown stored status fails loudly and names the accepted words instead of rendering as available', unknown);
 
 const failed = results.filter((ok) => !ok).length;
 console.log(`\n${results.length - failed}/${results.length} config checks passed`);

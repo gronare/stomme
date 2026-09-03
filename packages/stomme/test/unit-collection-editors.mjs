@@ -130,16 +130,21 @@ const groups = block(catalog, /^ {2}view_groups:$/);
 check(/^ {6}- \{ name: status, label: "Status", field: status \}$/m.test(groups) && /^ {4}default: status$/m.test(groups),
   'a catalog collection opens grouped by status', groups);
 const filters = block(catalog, /^ {2}view_filters:$/);
-check(['available', 'reserved', 'sold'].every((v) => new RegExp(`name: ${v}, label: "[^"]+", field: status, pattern: ${v} }`).test(filters)),
+check(['available', 'reserved', 'sold'].every((v) => new RegExp(`name: ${v}, label: "[^"]+", field: status, pattern: "\\^${v}\\$" }`).test(filters)),
   'a catalog collection offers one filter per status', filters);
 check(!/view_groups|view_filters/.test(article), 'an article collection has no status views');
 
-const worded = makeCollectionEditors({ q, emitField: E.emitField, emitWidget: E.emitWidget, buttonField: E.buttonField, listingStatus: { available: 'Till salu', sold: 'Genomförd' } })
+check(/^ {6}default: available$/m.test(catalog) && /pattern: "\^available\$" }/.test(filters), 'without site words the stored value stays the canonical key and the filter matches exactly that');
+
+const worded = makeCollectionEditors({ q, emitField: E.emitField, emitWidget: E.emitWidget, buttonField: E.buttonField, listingStatus: { available: 'Till salu', reserved: 'Reserverad', sold: 'Genomförd (ja)' } })
   .listingEditor({ id: 'stock', preset: 'catalog' });
-check(/label: "Till salu", value: available/.test(worded) && /label: "Genomförd", value: sold/.test(worded) && /label: "Reserved", value: reserved/.test(worded),
-  "the status options speak the site's own words where it names them and the engine's elsewhere");
-check(/name: available, label: "Till salu", field: status/.test(worded) && /name: sold, label: "Genomförd", field: status/.test(worded),
-  'the status filters carry the same words as the options');
+check(/label: "Till salu", value: "Till salu" }/.test(worded) && /label: "Reserverad", value: "Reserverad" }/.test(worded) && /label: "Genomförd \(ja\)", value: "Genomförd \(ja\)" }/.test(worded),
+  "with site words the status options store the site's own word as the value");
+check(/^ {4}default: \{ field: status, direction: ascending \}$/m.test(catalog) && /^ {4}default: \{ field: status, direction: descending \}$/m.test(worded),
+  'the list sorts on status in whichever direction puts the available word first, so Sveltia lists that group at the top');
+check(/^ {6}default: "Till salu"$/m.test(worded), 'a new entry starts on the site word for available, so the stored value is never a key the options lack');
+check(worded.includes('- { name: available, label: "Till salu", field: status, pattern: "^Till salu$" }') && worded.includes('- { name: sold, label: "Genomförd (ja)", field: status, pattern: "^Genomförd \\\\(ja\\\\)$" }'),
+  'the status filters match the stored word exactly, with regex characters in a word escaped', worded.split('\n').filter((l) => l.includes('pattern:')).join('\n'));
 
 const failed = results.filter(([ok]) => !ok);
 console.log(`\n${results.length - failed.length}/${results.length} checks passed`);
