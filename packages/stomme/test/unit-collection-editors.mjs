@@ -126,6 +126,21 @@ check(/name: colour, label: "Colour"/.test(specsBlock), 'a spec with an explicit
 check(/name: spec_2, label: "Depth"/.test(specsBlock), 'a spec object without a key falls back to its position — never to a duplicate key');
 check(!/- name: specs$/m.test(listingEditor({ id: 'news', preset: 'article', specs: ['Weight'] })), 'the article preset ignores specs');
 
+const groups = block(catalog, /^ {2}view_groups:$/);
+check(/^ {6}- \{ name: status, label: "Status", field: status \}$/m.test(groups) && /^ {4}default: status$/m.test(groups),
+  'a catalog collection opens grouped by status', groups);
+const filters = block(catalog, /^ {2}view_filters:$/);
+check(['available', 'reserved', 'sold'].every((v) => new RegExp(`name: ${v}, label: "[^"]+", field: status, pattern: ${v} }`).test(filters)),
+  'a catalog collection offers one filter per status', filters);
+check(!/view_groups|view_filters/.test(article), 'an article collection has no status views');
+
+const worded = makeCollectionEditors({ q, emitField: E.emitField, emitWidget: E.emitWidget, buttonField: E.buttonField, listingStatus: { available: 'Till salu', sold: 'Genomförd' } })
+  .listingEditor({ id: 'stock', preset: 'catalog' });
+check(/label: "Till salu", value: available/.test(worded) && /label: "Genomförd", value: sold/.test(worded) && /label: "Reserved", value: reserved/.test(worded),
+  "the status options speak the site's own words where it names them and the engine's elsewhere");
+check(/name: available, label: "Till salu", field: status/.test(worded) && /name: sold, label: "Genomförd", field: status/.test(worded),
+  'the status filters carry the same words as the options');
+
 const failed = results.filter(([ok]) => !ok);
 console.log(`\n${results.length - failed.length}/${results.length} checks passed`);
 if (failed.length) {

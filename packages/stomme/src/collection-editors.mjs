@@ -1,6 +1,7 @@
 import { localeFilePath } from './cms-i18n.mjs';
 
-export function makeCollectionEditors({ q, emitField, emitWidget, buttonField, localized = () => false }) {
+export function makeCollectionEditors({ q, emitField, emitWidget, buttonField, localized = () => false, listingStatus = {} }) {
+const statusLabel = (value, en) => q(listingStatus[value] || en);
 const on = (name) => !!localized(name);
 const line = (name, indent, text) => (on(name) ? `\n${' '.repeat(indent)}${text}` : '');
 const inline = (name, value) => (on(name) ? `, i18n: ${value}` : '');
@@ -225,9 +226,9 @@ ${specs.map((s) => `        - { name: ${s.key}, label: ${q(s.label)}, widget: st
       widget: select
       default: available
       options:
-        - { label: "Available", value: available }
-        - { label: "Reserved", value: reserved }
-        - { label: "Sold", value: sold }
+        - { label: ${statusLabel('available', 'Available')}, value: available }
+        - { label: ${statusLabel('reserved', 'Reserved')}, value: reserved }
+        - { label: ${statusLabel('sold', 'Sold')}, value: sold }
     - { name: category, label: "Category", widget: string, required: false }
     - { name: cover, label: "Cover image", widget: image, required: false }
     - name: gallery
@@ -241,11 +242,21 @@ ${specs.map((s) => `        - { name: ${s.key}, label: ${q(s.label)}, widget: st
         - { name: alt, label: "Alt text", widget: string, required: false }${specsField}
     - { name: date, label: "Date added", widget: datetime, date_format: "YYYY-MM-DD", time_format: false, required: false }
     - { name: body, label: "Description", widget: markdown, required: false }`;
+  const catalogViews = `
+  view_groups:
+    groups:
+      - { name: status, label: "Status", field: status }
+    default: status
+  view_filters:
+    filters:
+      - { name: available, label: ${statusLabel('available', 'Available')}, field: status, pattern: available }
+      - { name: reserved, label: ${statusLabel('reserved', 'Reserved')}, field: status, pattern: reserved }
+      - { name: sold, label: ${statusLabel('sold', 'Sold')}, field: status, pattern: sold }`;
   return `- name: ${l.id}
   label: ${q(l.label || l.id)}
   folder: "src/content/${l.id}"
   create: true
-  slug: "{{slug}}"
+  slug: "{{slug}}"${l.preset === 'catalog' ? catalogViews : ''}
   fields:
 ${l.preset === 'catalog' ? catalogFields : articleFields}`;
 }

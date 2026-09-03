@@ -64,6 +64,7 @@ let LISTINGS = [];
 let STYLE = process.env.STOMME_STYLE || null;
 let MEDIA = resolveMediaConfig(null);
 let LOCALES = [];
+let LISTING_STATUS = {};
 try {
   const mod = await jiti.import(resolve(root, 'src/site.config.ts'));
   if (mod.site && mod.site.routes) ROUTES = { ...ROUTES, ...mod.site.routes };
@@ -72,6 +73,7 @@ try {
   if (mod.site && mod.site.cms) CMS = mod.site.cms;
   if (mod.site && mod.site.style) STYLE = mod.site.style;
   if (mod.site && mod.site.media) MEDIA = resolveMediaConfig(mod.site.media);
+  if (mod.site && mod.site.strings && mod.site.strings.listingStatus) LISTING_STATUS = mod.site.strings.listingStatus;
   if (mod.features) FEATURES = { blog: false, areas: false, services: false, testimonials: false, faq: false, documents: false, tracking: false, ...mod.features };
   if (Array.isArray(mod.listings))
     LISTINGS = mod.listings
@@ -143,7 +145,7 @@ const { PAGE_OPTIONS, FAQ_TAG_OPTIONS, OPTION_SOURCES, collectionEnabled, AVAILA
 const { listSummary, emitField, emitFlow, emitWidget, navLinkField, emitFooterLinks, emitNavLinks, buttonField, emitThanksButtons } = makeEmitters({ q, pad, AVAILABLE_BLOCKS, OPTION_SOURCES });
 
 const isLocalized = (name) => LOCALES.length > 1 && LOCALIZED_EDITORS.includes(name);
-const { COLLECTION_EDITORS, listingEditor } = makeCollectionEditors({ q, emitField, emitWidget, buttonField, localized: isLocalized });
+const { COLLECTION_EDITORS, listingEditor } = makeCollectionEditors({ q, emitField, emitWidget, buttonField, localized: isLocalized, listingStatus: LISTING_STATUS });
 
 const { ADDON_PANES, ADDON_PANEL_FILES } = await loadAddonCms({ slotsDir: process.env.STOMME_SLOTS_DIR, ROUTES, FEATURES, emitWidget, emitField, buttonField, navLinkField });
 
