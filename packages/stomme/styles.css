@@ -311,6 +311,7 @@ main .cover:first-child .cover__inner { --cover-clear: calc(var(--header-bottom)
 .site-header .inner { position: relative; display: flex; flex-wrap: nowrap; align-items: center; justify-content: flex-start; gap: var(--header-rem); }
 .site-header .inner > * { flex: 0 0 auto; }
 .site-header .btn { padding: calc(0.6 * var(--header-rem)) calc(1.3 * var(--header-rem)); border-radius: calc(0.7 * var(--header-rem)); }
+.site-header :is(.site-cta, .nav-cta) { transform: translateZ(0); will-change: transform; }
 .site-nav { display: flex; gap: calc(1.25 * var(--header-rem)); align-items: center; flex-wrap: wrap; margin-left: auto; }
 .site-nav a { text-decoration: none; color: var(--color-ink); }
 .site-nav a:hover { color: var(--color-brand); }
