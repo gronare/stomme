@@ -426,7 +426,9 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
 body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header:not(.solid):not(.nav-open) .logo:not(.logo--plate) .logo-mark--ondark { display: inline-block; }
 .site-footer--dark .logo:not(.logo--plate):has(.logo-mark--ondark) .logo-mark:not(.logo-mark--ondark) { display: none; }
 .site-footer--dark .logo:not(.logo--plate) .logo-mark--ondark { display: inline-block; }
-.logo--plate { background: var(--color-paper); border-radius: 999px; padding: 0.35em 0.7em; }
+.logo--plate { position: relative; z-index: 0; }
+.logo--plate::before { content: ""; position: absolute; inset: -7px -12px; z-index: -1; display: none; background: color-mix(in srgb, var(--color-paper) 84%, transparent); border: 1px solid color-mix(in srgb, var(--color-paper) 75%, transparent); border-radius: 10px; }
+body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header:not(.solid):not(.nav-open) .logo--plate::before, .site-footer--dark .logo--plate::before { display: block; }
 body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header .logo.logo--plate, .site-footer--dark .logo.logo--plate { color: var(--color-ink); }
 body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header.solid,
 body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header.nav-open {
