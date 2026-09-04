@@ -3590,13 +3590,8 @@
             },
             {
               "name": "columns",
-              "widget": "select",
-              "required": false,
-              "options": [
-                "2",
-                "3",
-                "4"
-              ]
+              "widget": "number",
+              "required": false
             },
             {
               "name": "beside",

@@ -10,5 +10,8 @@
     "@astrojs/check": "^0.9.9",
     "typescript": "^6.0.3"
   },
-  "license": "AGPL-3.0-only"
+  "license": "AGPL-3.0-only",
+  "scripts": {
+    "postinstall": "git config core.hooksPath .githooks || true"
+  }
 }

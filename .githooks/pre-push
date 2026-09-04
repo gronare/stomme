@@ -1,0 +1,13 @@
+#!/bin/sh
+set -e
+cd "$(git rev-parse --show-toplevel)"
+pnpm --filter @gronare/stomme gen:schema-manifest >/dev/null
+pnpm --filter @gronare/stomme gen:blocks-manifest >/dev/null
+git diff --exit-code -- packages/stomme/schema-manifest.json packages/stomme/blocks-manifest.json || { echo "pre-push: a manifest lags its generator; commit the regenerated file"; exit 1; }
+pnpm --filter @gronare/stomme typecheck
+node --check packages/stomme/bin/gen-admin-blocks.mjs
+node --check packages/stomme/bin/new-block.mjs
+node --check packages/stomme/integration.mjs
+node --check packages/stomme/admin/previews.js
+node --check packages/stomme/test/smoke-preview-workerd.mjs
+node --check packages/stomme/test/smoke-metrics.mjs
