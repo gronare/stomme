@@ -5142,6 +5142,7 @@ collections:
             fields:
               - { name: image, label: "Logo mark (shown beside the text)", widget: image, required: false, media_folder: "/public/media/identity", public_folder: "/media/identity", hint: "An icon/mark. The wordmark is the text below, set in your display font." }
               - { name: imageDark, label: "Logo for dark backgrounds", widget: image, required: false, media_folder: "/public/media/identity", public_folder: "/media/identity", hint: "Shown instead of the logo mark where the page is dark behind it — the see-through header over a photo, or a dark footer. Usually the same mark in white." }
+              - { name: plate, label: "White plate behind the logo", widget: boolean, required: false, default: false, hint: "Keeps the logo in its own colours everywhere: a white rounded plate sits behind it on a see-through header or a dark footer, instead of switching to the logo for dark backgrounds." }
               - { name: alt, label: "Logo alt text", widget: string, required: false }
               - { name: textPre, label: "Wordmark text", widget: string, required: false }
               - { name: textAccent, label: "Wordmark accent (in brand colour)", widget: string, required: false }
