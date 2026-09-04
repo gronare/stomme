@@ -330,15 +330,17 @@ main .cover:first-child .cover__inner { --cover-clear: calc(var(--header-bottom)
 .lang-flag__code { font-size: 0.78em; font-weight: 600; letter-spacing: 0.06em; }
 .nav-item--menu { position: relative; display: inline-flex; align-items: center; }
 .nav-top { display: inline-flex; align-items: center; gap: 6px; text-decoration: none; color: var(--color-ink); cursor: pointer; }
-.nav-top:hover { color: var(--color-brand); }
+.nav-item--menu:is(:hover, .is-open) :is(.nav-top, .nav-caret-btn) { color: var(--color-brand); }
 .nav-caret-btn { display: inline-flex; align-items: center; justify-content: center; background: none; border: 0; padding: 0; margin-left: 4px; cursor: pointer; color: inherit; }
-.nav-caret { width: 7px; height: 7px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(45deg) translateY(-2px); opacity: 0.55; }
+.nav-caret { width: 7px; height: 7px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(45deg) translateY(-2px); opacity: 0.55; transition: transform 0.2s; }
+.nav-item--menu:is(:hover, .is-open) .nav-caret { opacity: 1; }
+.nav-item--menu.is-open .nav-caret { transform: rotate(-135deg) translateY(2px); }
 .nav-submenu { position: absolute; top: calc(100% + 10px); left: 0; min-width: 224px; margin: 0; padding: 8px; list-style: none;
   background: var(--color-paper); border: 1px solid var(--color-line); border-radius: 12px; box-shadow: 0 24px 48px -24px rgba(0,0,0,0.35);
   opacity: 0; visibility: hidden; transform: translateY(-6px); transition: opacity 0.15s, transform 0.15s, visibility 0.15s; z-index: 50; }
 /* Transparent bridge over the 10px gap — without it, moving the pointer from header to menu drops :hover and closes it. */
 .nav-submenu::before { content: ""; position: absolute; top: -10px; left: 0; right: 0; height: 10px; }
-.nav-item--menu:hover .nav-submenu, .nav-item--menu:focus-within .nav-submenu { opacity: 1; visibility: visible; transform: translateY(0); }
+.nav-item--menu:is(:hover, :focus-within, .is-open) .nav-submenu { opacity: 1; visibility: visible; transform: translateY(0); }
 .nav-submenu a { display: block; padding: 9px 12px; border-radius: 8px; text-decoration: none; color: var(--color-ink); }
 .nav-submenu a:hover { background: color-mix(in srgb, var(--color-surface) 30%, var(--color-paper)); color: var(--color-brand); }
 
@@ -377,8 +379,6 @@ main .cover:first-child .cover__inner { --cover-clear: calc(var(--header-bottom)
     border: 0; border-left: 2px solid var(--color-line); border-radius: 0; min-width: 0; margin: 0 0 calc(0.75 * var(--header-rem)) calc(0.25 * var(--header-rem)); padding: 0; }
   .nav-submenu::before { display: none; }
   .nav-item--menu.is-open .nav-submenu { display: block; }
-  .nav-caret { transition: transform 0.2s; }
-  .nav-item--menu.is-open .nav-caret { transform: rotate(-135deg) translateY(2px); }
 }
 
 .logo { display: inline-flex; align-items: center; gap: 0.5rem; font-family: var(--font-display); font-weight: 600; font-size: 1.9rem; color: var(--color-ink); text-decoration: none; line-height: 1; }
@@ -400,8 +400,8 @@ main .cover:first-child .cover__inner { --cover-clear: calc(var(--header-bottom)
 body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header { position: absolute; top: 0; left: 0; right: 0; z-index: 50; color: var(--color-on-dark); }
 body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header.is-sticky:not(.is-sticky--phone) { position: fixed; }
 body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header :is(.logo, .site-nav > a, .nav-top, .nav-toggle) { color: inherit; }
-body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header:not(.solid, .nav-open) :is(.site-nav > a:not(.btn), .nav-top):hover { color: var(--color-highlight); }
-body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header:is(.solid, .nav-open) :is(.site-nav > a:not(.btn), .nav-top):hover, body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header:is(.solid, .nav-open) .site-nav a[aria-current='page'], body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header:is(.solid, .nav-open) .nav-top.is-active { color: var(--color-brand); }
+body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header:not(.solid, .nav-open) :is(.site-nav > a:not(.btn):hover, .nav-item--menu:is(:hover, .is-open) :is(.nav-top, .nav-caret-btn)) { color: var(--color-highlight); }
+body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header:is(.solid, .nav-open) :is(.site-nav > a:not(.btn):hover, .nav-item--menu:is(:hover, .is-open) :is(.nav-top, .nav-caret-btn)), body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header:is(.solid, .nav-open) .site-nav a[aria-current='page'], body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header:is(.solid, .nav-open) .nav-top.is-active { color: var(--color-brand); }
 body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header .logo .accent { color: var(--color-brand); }
 body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header .logo.logo--plate { color: var(--color-ink); }
 body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header .logo--plate::before { display: block; }
