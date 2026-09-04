@@ -175,6 +175,8 @@ const isActive = (href: string) => !!href && navPath(href) === current;
       });
     }
 
+    var arm = function () { requestAnimationFrame(function () { requestAnimationFrame(function () { header.classList.add('is-anim'); }); }); };
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', arm); else arm();
     var inner = header;
     var cta = header.querySelector('.site-cta');
     var round = function (v) { return String(Math.round(v * 1000) / 1000); };
