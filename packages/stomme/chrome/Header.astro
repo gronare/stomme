@@ -89,7 +89,6 @@ const isActive = (href: string) => !!href && navPath(href) === current;
 ---
 <header class:list={['site-header', { 'is-sticky': !!sticky, 'is-sticky--phone': sticky === 'phone' }]}>
   <div class="site-header__glass" aria-hidden="true"></div>
-  <div class="inner">
     <a class:list={['logo', { 'logo--plate': logo.plate === true }]} href={homeHref} aria-label={settings.name}>
       {showMark && (logoOptimized
         ? <Image class="logo-mark" src={logoOptimized()} alt={logo.alt ?? ''} />
@@ -127,13 +126,12 @@ const isActive = (href: string) => !!href && navPath(href) === current;
     <button class="nav-toggle" type="button" aria-label="Menu" aria-expanded="false" aria-controls="site-nav">
       <span class="nav-toggle__bars" aria-hidden="true"></span>
     </button>
-  </div>
 </header>
+<div class="site-tint" aria-hidden="true"></div>
 <script is:inline>
   (function () {
     var header = document.querySelector('.site-header');
     if (!header) return;
-    requestAnimationFrame(function () { requestAnimationFrame(function () { header.classList.add('is-anim'); }); });
     var toggle = header.querySelector('.nav-toggle');
     var mobile = window.matchMedia('(max-width: 820px)');
 
@@ -177,12 +175,16 @@ const isActive = (href: string) => !!href && navPath(href) === current;
       });
     }
 
-    var inner = header.querySelector('.inner');
+    var inner = header;
     var cta = header.querySelector('.site-cta');
     var round = function (v) { return String(Math.round(v * 1000) / 1000); };
+    var publishedZoom = '';
     var setZoom = function (z) {
-      header.style.setProperty('--header-zoom', round(z));
-      document.documentElement.style.setProperty('--header-zoom', round(z));
+      var value = round(z);
+      if (value === publishedZoom) return;
+      publishedZoom = value;
+      header.style.setProperty('--header-zoom', value);
+      document.documentElement.style.setProperty('--header-zoom', value);
     };
     // Measured at zoom 1, where every length is in plain px: the row scales linearly with --header-zoom, so the factor that fits is room over use; the open menu is absolute and full-width, so it is not a row child.
     var fit = function () {
@@ -232,8 +234,12 @@ const isActive = (href: string) => !!href && navPath(href) === current;
     }
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { fitRow(true); });
 
+    var publishedBottom = '';
     var publishBottom = function () {
-      document.documentElement.style.setProperty('--header-bottom', (header.offsetTop + header.offsetHeight) + 'px');
+      var bottom = (header.offsetTop + header.offsetHeight) + 'px';
+      if (bottom === publishedBottom) return;
+      publishedBottom = bottom;
+      document.documentElement.style.setProperty('--header-bottom', bottom);
     };
     publishBottom();
     window.addEventListener('resize', publishBottom, { passive: true });
@@ -246,13 +252,10 @@ const isActive = (href: string) => !!href && navPath(href) === current;
       var darkHero = document.querySelector('main .surface-dark:first-child .hero-grid, main .surface-gradient:first-child .hero-grid');
       var hero = cover || (darkHero && darkHero.closest('.surface-dark, .surface-gradient'));
       if (!hero) return;
-      var text = hero.querySelector('.cover__inner, .hero-grid > *') || hero;
+      var text = hero.querySelector('.cover__inner > :first-child, .hero-grid > :first-child') || hero;
       var trigger = 0;
-      // The cover pads its text box down by --cover-clear to clear the header, so the text starts at the content top, not at the border box.
       var measure = function () {
-        var headerH = header.offsetHeight || 64;
-        var top = text.getBoundingClientRect().top + window.scrollY + parseFloat(getComputedStyle(text).paddingTop);
-        trigger = mobile.matches ? 16 : Math.max(0, top - headerH);
+        trigger = Math.max(0, text.getBoundingClientRect().top + window.scrollY - (header.offsetHeight || 64));
       };
       // A phone-only sticky header scrolls away like any other on a wide screen, so the stuck paint has to stay behind its breakpoint too.
       var stuckable = function () { return !header.classList.contains('is-sticky--phone') || mobile.matches; };
