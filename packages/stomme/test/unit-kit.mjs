@@ -99,8 +99,8 @@ eq([subField('pages').options, subField('pages').multiple, subField('pages').req
 eq(subField('variant').options.map((o) => o.value), ['cards', 'tiles', 'rows', 'chips', 'siblings'],
   'the five variants the block renders are the five the editor can pick');
 eq(subField('variant').default, 'cards', 'a block nobody configured renders the photo cards');
-eq(subField('columns').options.map((o) => o.value), ['2', '3', '4'], 'the column picker offers 2, 3 and 4');
-eq(subField('columns').default, '2', 'and starts at two');
+eq(subField('columns').widget, 'number', 'columns is a number field like every other block, so a stored 2 is never drift against a list of strings');
+eq(subField('columns').default, 2, 'the column count defaults to two');
 check(subField('variant').options.every((o) => o.label && o.label !== o.value),
   'every variant is named in words, not by its stored value');
 eq(subField('showImages').default, true, 'the cover images are on for a block the editor adds today');

@@ -733,9 +733,7 @@ const RAW_BLOCKS: BlockDef[] = [
           ],
         },
         {
-          name: 'columns', label: 'Columns', widget: 'select', required: false, default: '2',
-          hint: 'Cards and tiles only.',
-          options: [{ label: '2', value: '2' }, { label: '3', value: '3' }, { label: '4', value: '4' }],
+          name: 'columns', label: 'Columns', widget: 'number', required: false, default: 2, hint: '2, 3 or 4.',
         },
       ]),
       mediaGroup('Cover images on the cards.', [
@@ -1105,8 +1103,8 @@ const SAMPLES: Record<string, ({ _label?: string } & Record<string, unknown>)[]>
     { id: 'three', data: { title: 'Third item', price: '4 200 kr', status: 'sold', category: 'Alpha', date: '2026-03-01' } },
   ] }],
   subpages: [
-    { _label: 'cards · fixture pages', eyebrow: 'In this section', heading: 'Subpage cards', media: { showImages: true }, layout: { variant: 'cards', columns: '2' }, items: SUBPAGE_FIX },
-    { _label: 'tiles · three columns', heading: 'Subpage tiles', layout: { variant: 'tiles', columns: '3' }, items: SUBPAGE_FIX },
+    { _label: 'cards · fixture pages', eyebrow: 'In this section', heading: 'Subpage cards', media: { showImages: true }, layout: { variant: 'cards', columns: 2 }, items: SUBPAGE_FIX },
+    { _label: 'tiles · three columns', heading: 'Subpage tiles', layout: { variant: 'tiles', columns: 3 }, items: SUBPAGE_FIX },
     { _label: 'list', heading: 'Subpages as a list', layout: { variant: 'rows' }, items: SUBPAGE_FIX },
     { _label: 'chapter row', layout: { variant: 'chips' }, items: SUBPAGE_FIX },
   ],
