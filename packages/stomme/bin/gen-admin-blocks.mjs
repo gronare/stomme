@@ -18,7 +18,7 @@ const root = process.cwd();
 const here = dirname(fileURLToPath(import.meta.url));
 
 // Pinned CMS bundle, swapped into each site's public/admin/index.html on build: bump deliberately — Sveltia is pre-1.0 and the editor is coupled to its DOM. STOMME_SVELTIA_SRC points at a local/vendored copy instead.
-const SVELTIA_CMS_SRC = process.env.STOMME_SVELTIA_SRC || 'https://unpkg.com/@sveltia/cms@0.205.3/dist/sveltia-cms.js';
+const SVELTIA_CMS_SRC = process.env.STOMME_SVELTIA_SRC || 'https://unpkg.com/@sveltia/cms@0.205.4/dist/sveltia-cms.js';
 
 // Every id admin/previews.js registers, plus the built-ins the editor still needs; Sveltia's own default is `[...builtins, ...registered]` WITHOUT dedupe, so an id that appears in both (image, linked-image, code-block) makes the rich-text Insert menu throw each_key_duplicate and never mount at all.
 const EDITOR_COMPONENTS = ['code-block', 'image', 'stomme-section'];

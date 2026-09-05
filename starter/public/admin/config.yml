@@ -1933,16 +1933,7 @@ collections:
                           - { label: "List", value: "rows" }
                           - { label: "Chapter row", value: "chips" }
                           - { label: "Siblings, for a subpage", value: "siblings" }
-                      - name: columns
-                        label: "Columns"
-                        widget: select
-                        required: false
-                        default: "2"
-                        hint: "Cards and tiles only."
-                        options:
-                          - { label: "2", value: "2" }
-                          - { label: "3", value: "3" }
-                          - { label: "4", value: "4" }
+                      - { name: columns, label: "Columns", widget: number, required: false, default: 2, hint: "2, 3 or 4." }
                       - name: beside
                         label: "Placement"
                         widget: select
@@ -4483,16 +4474,7 @@ collections:
                       - { label: "List", value: "rows" }
                       - { label: "Chapter row", value: "chips" }
                       - { label: "Siblings, for a subpage", value: "siblings" }
-                  - name: columns
-                    label: "Columns"
-                    widget: select
-                    required: false
-                    default: "2"
-                    hint: "Cards and tiles only."
-                    options:
-                      - { label: "2", value: "2" }
-                      - { label: "3", value: "3" }
-                      - { label: "4", value: "4" }
+                  - { name: columns, label: "Columns", widget: number, required: false, default: 2, hint: "2, 3 or 4." }
                   - name: beside
                     label: "Placement"
                     widget: select
