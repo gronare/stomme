@@ -3,7 +3,7 @@ import Cover from './src/Cover.astro';
 // @stomme/renderer resolves to the site's own BlockRenderer when it has one, so a service's blocks get the site's custom blocks — importing the engine renderer directly loses them.
 import BlockRenderer from '@stomme/renderer';
 import { render } from 'astro:content';
-import { resolveLink, resolveButton } from './src/href';
+import { resolveLink, resolveButton, withTrailingSlash } from './src/href';
 import { resolveSite, type SiteConfig } from './src/config';
 
 interface Props {
@@ -16,7 +16,7 @@ const { service, data: draftData, bodyHtml, config } = Astro.props;
 const data = service ? service.data : (draftData ?? {});
 const site = resolveSite(config);
 const t = site.strings.service;
-const contact = site.routes.contact ?? '/contact';
+const contact = withTrailingSlash(site.routes.contact ?? '/contact');
 const Content = service ? (await render(service)).Content : null;
 const hasBlocks = Array.isArray(data.blocks) && data.blocks.length > 0;
 const hero = hasBlocks && data.hero && typeof data.hero === 'object' ? data.hero : null;

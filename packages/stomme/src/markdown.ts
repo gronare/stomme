@@ -1,6 +1,7 @@
 import { marked } from 'marked';
 import { getImage } from 'astro:assets';
 import type { ImageMetadata } from 'astro';
+import { withTrailingSlash } from './href.ts';
 
 const uploads = import.meta.glob<{ default: ImageMetadata }>(
   '/src/assets/media/**/*.{jpg,jpeg,png,webp,avif}',
@@ -15,7 +16,8 @@ const attr = (tag: string, name: string) => (tag.match(new RegExp(`\\b${name}="(
 // `link` rewrites the href of every inline link — the locale mapper, so a body's own [text](/page) lands in the language the page is read in.
 export async function renderMarkdown(md = '', link?: (href: string) => string): Promise<string> {
   let html = await marked.parse(md ?? '');
-  if (link) html = html.replace(/(<a\b[^>]*\bhref=")([^"]*)(")/g, (_m, pre, href, post) => pre + link(href) + post);
+  const target = (href: string) => withTrailingSlash(link ? link(href) : href);
+  html = html.replace(/(<a\b[^>]*\bhref=")([^"]*)(")/g, (_m, pre, href, post) => pre + target(href) + post);
 
   for (const tag of new Set([...html.matchAll(/<img\b[^>]*>/g)].map((m) => m[0]))) {
     const src = attr(tag, 'src');

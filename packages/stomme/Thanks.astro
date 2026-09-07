@@ -1,6 +1,7 @@
 ---
 import DirectContact from './src/DirectContact.astro';
 import Emph from './src/Emph.astro';
+import { withTrailingSlash } from './src/href';
 interface Recap {
   emailLabel?: string; email?: string;
   phoneLabel?: string; phone?: string;
@@ -29,11 +30,13 @@ interface Props {
 const {
   variant = 'classic',
   eyebrow = 'Message sent', heading, message,
-  primaryLabel, primaryHref = '/', secondaryLabel, secondaryHref = '/',
+  primaryLabel, primaryHref: primaryTo = '/', secondaryLabel, secondaryHref: secondaryTo = '/',
   recapLabel = 'What you sent', recap = null,
   showContact, talkLabel = 'Prefer to talk?', who, town, toLabel = 'to', fromLabel = 'from',
 } = Astro.props;
 
+const primaryHref = withTrailingSlash(primaryTo);
+const secondaryHref = withTrailingSlash(secondaryTo);
 const hasRecap = !!recap && !!(recap.email || recap.phone || recap.category || recap.unit || recap.message);
 const hasDirect = showContact === true;
 const twoCol = hasRecap && hasDirect;

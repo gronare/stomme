@@ -1,4 +1,5 @@
 ---
+import { withTrailingSlash } from './href';
 export interface Crumb {
   label: string;
   href?: string;
@@ -8,7 +9,8 @@ interface Props {
   label: string;
   siteUrl?: string;
 }
-const { crumbs, label, siteUrl } = Astro.props;
+const { label, siteUrl } = Astro.props;
+const crumbs = Astro.props.crumbs.map((c) => (c.href ? { ...c, href: withTrailingSlash(c.href) } : c));
 
 const absolute = (href?: string) => {
   if (!href || !siteUrl) return null;

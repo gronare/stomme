@@ -121,14 +121,14 @@ try {
     "a dynamic addon route's static paths are built under the prefix too — /en/bokning/stugan");
   check(emitted('min-bokning') && emitted('en/min-bokning'), 'a guest page on its own top-level path gets its twins as well');
 
-  check(/<a class="btn nav-cta" href="\/bokning">/.test(html('')), 'the booking CTA in the default language is the bare path');
-  check(/<a class="btn nav-cta" href="\/en\/bokning">/.test(html('en')), 'and on an /en/ page it sends the guest to /en/bokning');
-  check(/<a class="btn nav-cta" href="\/no\/bokning">/.test(html('no/about')),
+  check(/<a class="btn nav-cta" href="\/bokning\/">/.test(html('')), 'the booking CTA in the default language carries no locale prefix');
+  check(/<a class="btn nav-cta" href="\/en\/bokning\/">/.test(html('en')), 'and on an /en/ page it sends the guest to /en/bokning/');
+  check(/<a class="btn nav-cta" href="\/no\/bokning\/">/.test(html('no/about')),
     'a page deep inside a locale links into the addon under that locale, not back to the default language');
 
   const twin = html('en/bokning');
   const row = (href) => new RegExp(`<a class="lang-switch__row[^"]*"[^>]*href="${href}"`).test(twin);
-  check(row('/bokning') && row('/en/bokning') && row('/no/bokning'),
+  check(row('/bokning/') && row('/en/bokning/') && row('/no/bokning/'),
     'the switcher on the twin offers the same addon path in each language');
   check(!/<a class="lang-switch__row[^"]*"[^>]*href="\/(en|no)\/"/.test(twin),
     'no row falls back to a locale front page — every language really serves this path');

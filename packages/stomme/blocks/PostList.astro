@@ -2,6 +2,7 @@
 import { getCollection } from 'astro:content';
 import Cover from '../src/Cover.astro';
 import { renderMarkdown } from '../src/markdown';
+import { withTrailingSlash } from '../src/href';
 
 interface Props {
   eyebrow?: string;
@@ -54,7 +55,7 @@ const hasImg = (p: any) => !!(showImages && p.data.showCover);
       </div>
     )}
     {lead && (
-      <a href={`${prefix}/${lead.id}`} class:list={['post-feature', { 'post-feature--text': !leadHasImg }]}>
+      <a href={withTrailingSlash(`${prefix}/${lead.id}`)} class:list={['post-feature', { 'post-feature--text': !leadHasImg }]}>
         <span class="post-latest">{latest}</span>
         {leadHasImg && (
           <Cover src={lead.data.cover} alt={lead.data.title} placeholder={PLACE} width={1000} height={640} class="post-feature__img" />
@@ -77,7 +78,7 @@ const hasImg = (p: any) => !!(showImages && p.data.showCover);
     {rest.length > 0 && (
       <div class="post-grid" style={`--post-cols:${columns}`}>
         {rest.map((p) => (
-          <a href={`${prefix}/${p.id}`} class:list={['post-card', corner && 'post-card--corner']}>
+          <a href={withTrailingSlash(`${prefix}/${p.id}`)} class:list={['post-card', corner && 'post-card--corner']}>
             {hasImg(p) && (
               <Cover src={p.data.cover} alt={p.data.title} placeholder={PLACE} width={800} height={480} class="post-card__img" />
             )}
@@ -101,7 +102,7 @@ const hasImg = (p: any) => !!(showImages && p.data.showCover);
     {archivePath !== '' && (
       <div class="post-archfoot">
         {truncated && <p class="post-archfoot__note">{showingLatest.replace('{n}', String(all.length))}</p>}
-        <a class="mono post-archfoot__link" href={archivePath}>{archiveLabel} →</a>
+        <a class="mono post-archfoot__link" href={withTrailingSlash(archivePath)}>{archiveLabel} →</a>
       </div>
     )}
   </section>

@@ -65,6 +65,7 @@
     "test:maps": "node test/smoke-maps.mjs",
     "test:turnstile": "node test/smoke-turnstile.mjs",
     "test:locale-urls": "node test/smoke-locale-urls.mjs",
+    "test:trailing-slash": "node test/smoke-trailing-slash.mjs",
     "test:map-proxy": "node test/smoke-map-proxy.mjs",
     "lint:comments": "node bin/lint-comments.mjs .",
     "test:contracts": "node test/cross-file-contracts.mjs",

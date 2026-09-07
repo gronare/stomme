@@ -1,6 +1,7 @@
 import type { APIRoute } from 'astro';
 import { getCollection } from 'astro:content';
 import { site } from '@stomme/config';
+import { withTrailingSlash } from './href.ts';
 
 const escape = (s: string) =>
   String(s ?? '')
@@ -46,7 +47,7 @@ export function calendarFeed(collection: string, prefix: string): APIRoute {
       lines.push(`DTSTART;VALUE=DATE:${p.date.replace(/-/g, '')}`);
       lines.push(`SUMMARY:${escape(p.data.title)}`);
       if (p.data.excerpt) lines.push(`DESCRIPTION:${escape(p.data.excerpt)}`);
-      lines.push(`URL:${origin}${prefix}/${p.id}`);
+      lines.push(`URL:${origin}${withTrailingSlash(`${prefix}/${p.id}`)}`);
       lines.push('END:VEVENT');
     }
     lines.push('END:VCALENDAR');

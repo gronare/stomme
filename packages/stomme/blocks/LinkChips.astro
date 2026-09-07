@@ -1,5 +1,6 @@
 ---
 import { getCollection } from 'astro:content';
+import { withTrailingSlash } from '../src/href';
 
 interface Props {
   eyebrow?: string;
@@ -22,6 +23,6 @@ const towns = Astro.props.items ?? (await getCollection('towns')).sort((a, b) =>
     </div>
   )}
   <div class="link-chip-row">
-    {towns.map((t) => <a href={`${prefix}/${t.id}`} class="link-chip">{t.data.name}</a>)}
+    {towns.map((t) => <a href={withTrailingSlash(`${prefix}/${t.id}`)} class="link-chip">{t.data.name}</a>)}
   </div>
 </section>

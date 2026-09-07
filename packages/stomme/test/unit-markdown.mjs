@@ -40,6 +40,7 @@ const dir = mkdtempSync(join(HERE, '.tmp-markdown-'));
 try {
   const file = join(dir, 'markdown.ts');
   writeFileSync(file, src);
+  writeFileSync(join(dir, 'href.ts'), readFileSync(resolve(PKG, 'src/href.ts'), 'utf8'));
   const { renderMarkdown } = await createJiti(import.meta.url).import(file);
   const cls = (html) => (html.match(/<figure class="([^"]*)"/) ?? [])[1];
 
@@ -108,16 +109,23 @@ try {
   console.log('\n· a body\'s own links follow the page\'s language');
   const enLink = (h) => (h === '/kontakt' ? '/en/kontakt' : h);
   eq(await renderMarkdown('Reach us via the [contact form](/kontakt).', enLink),
-    '<p>Reach us via the <a href="/en/kontakt">contact form</a>.</p>\n',
+    '<p>Reach us via the <a href="/en/kontakt/">contact form</a>.</p>\n',
     'an internal link in a markdown body is rewritten by the mapper');
   eq(await renderMarkdown('See [booking](/bokning/stugan).', enLink),
-    '<p>See <a href="/bokning/stugan">booking</a>.</p>\n',
-    'a link the mapper leaves alone is written out unchanged');
+    '<p>See <a href="/bokning/stugan/">booking</a>.</p>\n',
+    'a link the mapper leaves alone still takes the trailing slash the page is served on');
   eq(await renderMarkdown('[Us](https://x.se) and [mail](mailto:a@b.se)', enLink),
     '<p><a href="https://x.se">Us</a> and <a href="mailto:a@b.se">mail</a></p>\n',
     'external and mailto links pass through the mapper untouched');
-  check(!(await renderMarkdown('Reach us via the [contact form](/kontakt).')).includes('/en/'),
-    'without a mapper the body renders exactly as before');
+  eq(await renderMarkdown('The [handbook](/media/handbook.pdf).', enLink),
+    '<p>The <a href="/media/handbook.pdf">handbook</a>.</p>\n',
+    'a body linking a file names the address it is served on');
+  eq(await renderMarkdown('Jump to [pricing](#pricing).', enLink),
+    '<p>Jump to <a href="#pricing">pricing</a>.</p>\n',
+    'an anchor on the same page is left as it is');
+  eq(await renderMarkdown('Reach us via the [contact form](/kontakt).'),
+    '<p>Reach us via the <a href="/kontakt/">contact form</a>.</p>\n',
+    'a body with no mapper is still written out on the slashed address');
   check((await renderMarkdown('`<a href="/kontakt">`', enLink)).includes('/kontakt') === true
     && !(await renderMarkdown('`<a href="/kontakt">`', enLink)).includes('/en/kontakt'),
     'markup inside a code span is escaped text, not a link — the rewrite cannot reach it');

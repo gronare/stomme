@@ -2,6 +2,7 @@
 import Cover from './src/Cover.astro';
 import CtaBox from './blocks/CtaBox.astro';
 import { getEntry } from 'astro:content';
+import { withTrailingSlash } from './src/href';
 import { resolveSite, type SiteConfig } from './src/config';
 
 interface Props {
@@ -12,7 +13,7 @@ const { town, config } = Astro.props;
 const { data } = town;
 const site = resolveSite(config);
 const t = site.strings.town;
-const contact = site.routes.contact ?? '/contact';
+const contact = withTrailingSlash(site.routes.contact ?? '/contact');
 const fill = (s?: string) => (s ?? '').replace(/\{name\}/g, data.name);
 
 const whyParagraphs = (data.why ?? '').split(/\n\n+/).map((p: string) => p.trim()).filter(Boolean);

@@ -1,6 +1,7 @@
 ---
 import Cover from '../src/Cover.astro';
 import { getCollection } from 'astro:content';
+import { withTrailingSlash } from '../src/href';
 
 interface Props {
   eyebrow?: string;
@@ -31,7 +32,7 @@ const services = (
   )}
   <div class="service-grid">
     {services.map((s) => (
-      <a href={`${prefix}/${s.id}`} class="card service-card">
+      <a href={withTrailingSlash(`${prefix}/${s.id}`)} class="card service-card">
         <Cover
           src={s.data.media?.image}
           alt={s.data.media?.imageAlt ?? s.data.navLabel}

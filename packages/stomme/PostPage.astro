@@ -1,6 +1,7 @@
 ---
 import Cover from './src/Cover.astro';
 import { renderMarkdown } from './src/markdown';
+import { withTrailingSlash } from './src/href';
 import { resolveSite, type SiteConfig } from './src/config';
 
 interface Props {
@@ -20,7 +21,7 @@ const eventLine = post.data.eventDate ? [fmt(post.data.eventDate), post.data.eve
   {post.data.showCover && (
     <Cover src={post.data.cover} alt={post.data.title} placeholder="/images/placeholders/service.svg" width={1100} height={620} loading="eager" class="post-article__cover" />
   )}
-  {listing?.route && <a class="post-back" href={listing.route}>← {site.strings.post.back}</a>}
+  {listing?.route && <a class="post-back" href={withTrailingSlash(listing.route)}>← {site.strings.post.back}</a>}
   {date && <p class="mono">{date}</p>}
   <h1 class="display display--hero" style="margin-top:0.5rem">{post.data.title}</h1>
   {(eventLine || post.data.category) && (

@@ -1,5 +1,6 @@
 ---
 import { getCollection } from 'astro:content';
+import { withTrailingSlash } from '../src/href';
 
 interface Props {
   eyebrow?: string;
@@ -41,7 +42,7 @@ const counted = (n: number) => countLabel.replace('{n}', String(n));
         <ul class="archive-list">
           {g.rows.map((p) => (
             <li>
-              <a class="archive-row" href={`${prefix}/${p.id}`}>
+              <a class="archive-row" href={withTrailingSlash(`${prefix}/${p.id}`)}>
                 <span class="mono archive-date">{fmt(p.data.date)}</span>
                 <b class="archive-title">{p.data.title}</b>
                 {p.data.category && <span class="mono archive-cat">{p.data.category}</span>}

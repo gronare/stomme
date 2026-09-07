@@ -1,6 +1,7 @@
 import type { APIRoute } from 'astro';
 import { getEntry } from 'astro:content';
 import { site } from '@stomme/config';
+import { withTrailingSlash } from './href.ts';
 
 export const prerender = false;
 
@@ -13,7 +14,7 @@ export const POST: APIRoute = async ({ request, locals, redirect }) => {
   const wantsJson =
     (request.headers.get('accept') || '').includes('application/json') ||
     request.headers.get('x-requested-with') === 'fetch';
-  const ok = (body: any) => (wantsJson ? new Response(JSON.stringify(body), { status: 200, headers: { 'Content-Type': 'application/json' } }) : redirect(site?.routes?.formSuccess ?? '/thanks', 303));
+  const ok = (body: any) => (wantsJson ? new Response(JSON.stringify(body), { status: 200, headers: { 'Content-Type': 'application/json' } }) : redirect(withTrailingSlash(site?.routes?.formSuccess ?? '/thanks'), 303));
   const fail = (msg: string, status: number) => (wantsJson ? new Response(JSON.stringify({ ok: false, error: msg }), { status, headers: { 'Content-Type': 'application/json' } }) : new Response(msg, { status }));
 
   if (form.get('bot-field')) return ok({ ok: true }); // honeypot → silently "succeed"

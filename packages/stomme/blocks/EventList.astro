@@ -1,5 +1,6 @@
 ---
 import { getCollection } from 'astro:content';
+import { withTrailingSlash } from '../src/href';
 
 interface Props {
   anchor?: string;
@@ -45,7 +46,7 @@ const line = (d: Record<string, any>) => [d.eventTime, d.excerpt].filter(Boolean
     <ol class="event-list">
       {events.map((e) => (
         <li class="event-row" data-date={e.date} data-past={e.date < today ? '' : undefined}>
-          <a href={`${prefix}/${e.id}`}>
+          <a href={withTrailingSlash(`${prefix}/${e.id}`)}>
             <span class="event-day"><b>{day(e.date)}</b><small>{month(e.date)}</small></span>
             <span class="event-body">
               <b class="event-title">{e.data.title}</b>
@@ -56,7 +57,7 @@ const line = (d: Record<string, any>) => [d.eventTime, d.excerpt].filter(Boolean
       ))}
     </ol>
     <p class="event-empty" hidden>{emptyText}</p>
-    {feedLabel && <p class="event-feed"><a href={feedHref}>{feedLabel}</a></p>}
+    {feedLabel && <p class="event-feed"><a href={withTrailingSlash(feedHref)}>{feedLabel}</a></p>}
     <script is:inline>
       (function () {
         var root = document.currentScript.closest('[data-stomme-block="eventList"]');

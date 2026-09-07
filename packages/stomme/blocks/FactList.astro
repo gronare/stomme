@@ -1,4 +1,5 @@
 ---
+import { withTrailingSlash } from '../src/href';
 interface Props {
   eyebrow?: string;
   heading?: string;
@@ -17,7 +18,7 @@ const rows = items.filter((it) => it && (it.label || it.value));
 
 const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 // renderMarkdown wraps its output in <p>, which a <dd> row cannot carry, so the value escapes first and then takes links only.
-const linked = (s = '') => esc(s).replace(/\[([^\]]+)\]\(([^()\s]+)\)/g, (_m, text, href) => `<a href="${localeLink ? localeLink(href) : href}">${text}</a>`);
+const linked = (s = '') => esc(s).replace(/\[([^\]]+)\]\(([^()\s]+)\)/g, (_m, text, href) => `<a href="${withTrailingSlash(localeLink ? localeLink(href) : href)}">${text}</a>`);
 ---
 
 {rows.length > 0 && (

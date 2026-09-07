@@ -122,7 +122,7 @@ try {
   const child = html('omradet/guiden');
   check(/<nav class="breadcrumbs" aria-label="Brödsmulor">/.test(child), 'the subpage carries a breadcrumb trail, named in the language of the page');
   check(/<a class="breadcrumbs__link" href="\/">Hem<\/a>/.test(child), 'the trail starts at the front page');
-  check(/<a class="breadcrumbs__link" href="\/omradet">Området<\/a>/.test(child), 'names the parent by its title, linked');
+  check(/<a class="breadcrumbs__link" href="\/omradet\/">Området<\/a>/.test(child), 'names the parent by its title, linked');
   check(/aria-current="page">Guiden</.test(child), 'and ends on the page itself as plain text');
   check(child.includes('"@type":"BreadcrumbList"') && child.includes('https://example.com/omradet'),
     'and says the same thing to a crawler, in absolute URLs');
@@ -135,18 +135,18 @@ try {
     'the chapter row is one subpages section, told apart by its variant class');
   check(/<span class="mono subpage-chiprow__label">I det här avsnittet<\/span>/.test(parent),
     'and is introduced in the language of the page');
-  check(/<a href="\/omradet\/guiden" class="subpage-chip">Guiden<\/a>/.test(parent)
-    && /<a href="\/omradet\/kartan" class="subpage-chip">Kartan<\/a>/.test(parent),
+  check(/<a href="\/omradet\/guiden\/" class="subpage-chip">Guiden<\/a>/.test(parent)
+    && /<a href="\/omradet\/kartan\/" class="subpage-chip">Kartan<\/a>/.test(parent),
     'each subpage is a chip, named by its title and linked on its nested address');
 
   const cards = Object.fromEntries([...parent.matchAll(/<a href="([^"]+)" class="card subpage-card">([\s\S]*?)<\/a>/g)].map((m) => [m[1], m[2]]));
   check(Object.keys(cards).length === 2, 'the card grid draws one card per subpage', Object.keys(cards).join(', '));
-  check(/<img src="\/images\/placeholders\/service\.svg"[^>]*class="subpage-card__img"/.test(cards['/omradet/guiden'] ?? ''),
+  check(/<img src="\/images\/placeholders\/service\.svg"[^>]*class="subpage-card__img"/.test(cards['/omradet/guiden/'] ?? ''),
     'a page with a cover carries it across the top of its card');
-  check(!/<img|subpage-card__img/.test(cards['/omradet/kartan'] ?? ''),
+  check(!/<img|subpage-card__img/.test(cards['/omradet/kartan/'] ?? ''),
     'a page with no cover renders a card with no image area at all — never a placeholder');
-  check(/<h3>Guiden<\/h3><p>Guiden i korthet\.<\/p><span class="mono subpage-card__more">/.test(cards['/omradet/guiden'] ?? ''),
-    'the card reads the title, then the summary, then the read-more line the site words itself', cards['/omradet/guiden']);
+  check(/<h3>Guiden<\/h3><p>Guiden i korthet\.<\/p><span class="mono subpage-card__more">/.test(cards['/omradet/guiden/'] ?? ''),
+    'the card reads the title, then the summary, then the read-more line the site words itself', cards['/omradet/guiden/']);
   check(!/subpages--siblings/.test(parent),
     'the siblings band placed on a page with no parent renders nothing, rather than a band pointing at the site root');
 
@@ -155,26 +155,26 @@ try {
     'the same block on a subpage renders the siblings band');
   check(/<span class="mono eyebrow">Området<\/span>/.test(band) && /Fler sidor i avsnittet<\/h2>/.test(band),
     'the band is labelled with the parent title and the wording of the page\'s language');
-  check(/<a href="\/omradet\/kartan" class="subpage-row">/.test(band), 'it lists the pages beside this one');
-  check(!/<a href="\/omradet\/guiden" class="subpage-row/.test(band), 'and never the page you are reading');
-  check(/<a href="\/omradet" class="subpage-row subpage-row--up">[\s\S]*?↑ Området/.test(band),
+  check(/<a href="\/omradet\/kartan\/" class="subpage-row">/.test(band), 'it lists the pages beside this one');
+  check(!/<a href="\/omradet\/guiden\/" class="subpage-row/.test(band), 'and never the page you are reading');
+  check(/<a href="\/omradet\/" class="subpage-row subpage-row--up">[\s\S]*?↑ Området/.test(band),
     'and ends on a link up to the parent');
 
   const parentEn = html('en/the-area');
   check(/<span class="mono subpage-chiprow__label">In this section<\/span>/.test(parentEn),
     'the English twin introduces its chapter row in English');
-  check(/<a href="\/en\/the-area\/the-guide" class="subpage-chip">/.test(parentEn),
+  check(/<a href="\/en\/the-area\/the-guide\/" class="subpage-chip">/.test(parentEn),
     'and the chips lead to the English addresses');
-  check(/<a href="\/en\/the-area\/kartan" class="subpage-chip">/.test(parentEn),
+  check(/<a href="\/en\/the-area\/kartan\/" class="subpage-chip">/.test(parentEn),
     'a subpage no language renamed keeps its segment under the translated parent');
-  check(/<a href="\/en\/the-area\/the-guide" class="card subpage-card">/.test(parentEn),
+  check(/<a href="\/en\/the-area\/the-guide\/" class="card subpage-card">/.test(parentEn),
     'the cards on the twin lead there too');
-  check(/<a href="\/en\/the-area" class="subpage-row subpage-row--up">/.test(html('en/the-area/the-guide')),
+  check(/<a href="\/en\/the-area\/" class="subpage-row subpage-row--up">/.test(html('en/the-area/the-guide')),
     'and the band on the English subpage climbs to the English parent');
 
   const childEn = html('en/the-area/the-guide');
   check(/<a class="breadcrumbs__link" href="\/en\/">Home<\/a>/.test(childEn), 'the English trail is worded in English');
-  check(/<a class="breadcrumbs__link" href="\/en\/the-area">The area<\/a>/.test(childEn),
+  check(/<a class="breadcrumbs__link" href="\/en\/the-area\/">The area<\/a>/.test(childEn),
     'and names the parent by its translated title, on its translated address');
 
   const bounce = html('omradet');
@@ -195,7 +195,7 @@ try {
   check(/<details class="lang-switch"/.test(nav), 'the header carries the globe switcher by default');
   check(nav.includes('>Svenska<') && nav.includes('>English<') && nav.includes('>Norsk<'),
     'each language is offered in its own words');
-  check(/<a class="lang-switch__row"[^>]*href="\/en\/the-area"/.test(nav),
+  check(/<a class="lang-switch__row"[^>]*href="\/en\/the-area\/"/.test(nav),
     "the switcher's own targets are the translated addresses");
   check(/aria-label="Byt språk"/.test(nav), 'the control says what it does, in the language of the page');
 
@@ -213,7 +213,7 @@ try {
   check(home.no.includes('A block-built starter'), 'an untranslated footer falls back to the one the site started with');
   check(/<p class="mono eyebrow">Links<\/p>/.test(home.en) && /<p class="mono eyebrow">Explore<\/p>/.test(home.sv),
     "a heading the translation leaves empty falls back to the chrome's own word for it, in the page's language");
-  check(new RegExp(`href="/en/about" class="footer-link">${EN_LINK}<`).test(home.en),
+  check(new RegExp(`href="/en/about/" class="footer-link">${EN_LINK}<`).test(home.en),
     'a translated footer link keeps its page — and lands on the address that page has in this language');
 
   console.log('· the same site with the switcher set to flags…');
@@ -229,7 +229,7 @@ try {
   check((flagged.match(/class="lang-flag[ "]/g) || []).length === 3, 'one flag per language');
   check(/<a class="lang-flag is-current"[^>]*aria-label="Svenska"/.test(flagged),
     'the language being read is the lit one, and every flag says which language it is');
-  check(/<a class="lang-flag"[^>]*href="\/en\/the-area"/.test(flagged), 'the flags point at the same addresses the globe did');
+  check(/<a class="lang-flag"[^>]*href="\/en\/the-area\/"/.test(flagged), 'the flags point at the same addresses the globe did');
 
   console.log('· a page whose address is not an address…');
   writeFileSync(resolve(PAGES, 'omradet.en.md'), page('The area', 'The Area'));

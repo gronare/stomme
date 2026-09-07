@@ -1,12 +1,13 @@
 ---
 import { getEntry } from 'astro:content';
+import { withTrailingSlash } from '../src/href';
 import { resolveSite, resolveFeatures } from '../src/config';
 import { site as siteConfig, features } from '@stomme/config';
 
 const t: any = (await getEntry('tracking', 'tracking')?.catch(() => null))?.data ?? {};
 const on = resolveFeatures(features).tracking && !!(t.gtmId || t.ga4Id || t.metaPixelId);
 const c = resolveSite(siteConfig).strings.consent;
-const privacyUrl = t.privacyUrl || '';
+const privacyUrl = withTrailingSlash(t.privacyUrl || '');
 ---
 {on && (
   <Fragment>

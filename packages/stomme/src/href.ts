@@ -1,4 +1,20 @@
+const FILE_SEGMENT = /\/[^/]*\.[^/.]+$/;
+
+export function withTrailingSlash(href: unknown): string {
+  const value = typeof href === 'string' ? href : '';
+  if (!value.startsWith('/') || value.startsWith('//')) return value;
+  const cut = value.search(/[?#]/);
+  const path = cut === -1 ? value : value.slice(0, cut);
+  const rest = cut === -1 ? '' : value.slice(cut);
+  if (path.endsWith('/') || FILE_SEGMENT.test(path)) return value;
+  return `${path}/${rest}`;
+}
+
 export function resolveLink(value: unknown, fallback = '/'): string {
+  return withTrailingSlash(readLink(value, fallback));
+}
+
+function readLink(value: unknown, fallback: string): string {
   if (!value) return fallback;
   if (typeof value === 'string') return value;
   if (typeof value === 'object') {

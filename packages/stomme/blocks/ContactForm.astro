@@ -1,5 +1,6 @@
 ---
 import { getEntry } from 'astro:content';
+import { withTrailingSlash } from '../src/href';
 import DirectContact from '../src/DirectContact.astro';
 import { slugifyHeading } from '../src/anchors';
 
@@ -49,7 +50,7 @@ const contactLine = [settings.name, contact.address?.city, contact.orgNr && `Org
 const contactAction = site?.contact?.endpoint
   ? `${site.contact.endpoint}/contact`
   : site?.cms?.baseUrl ? `${site.cms.baseUrl}/contact` : '/api/contact';
-const successPath = site?.routes?.formSuccess ?? '/thanks';
+const successPath = withTrailingSlash(site?.routes?.formSuccess ?? '/thanks');
 const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || '';
 
 const recapLabels = JSON.stringify({ email: L.email, phone: L.phone, category: L.category, unit: L.unit, message: L.message });

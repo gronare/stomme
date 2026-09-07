@@ -1,5 +1,6 @@
 import { SITE_DEFAULTS, type SiteConfig } from './config.ts';
 import { pagePaths, normalizeParentPath } from './pages.ts';
+import { withTrailingSlash } from './href.ts';
 
 export interface ResolvedLocales {
   enabled: boolean;
@@ -254,7 +255,7 @@ export function localeHref(href: string, locale: string, routes: LocaleRoutes): 
 
 export function localeLinker(site: SiteConfig | undefined, locale: string, pages: readonly LocaleEntry[] = []): (href: string) => string {
   const routes = localeRoutes(site, pages);
-  return (href: string) => localeHref(href, locale, routes);
+  return (href: string) => withTrailingSlash(localeHref(href, locale, routes));
 }
 
 // Block link fields as src/href.ts reads them: a `link` holding either a { page, url } object or a plain string, plus the legacy `ctaHref`/`href2`/… strings. Rewritten once here, so no block component has to know the page is being rendered in a language.
@@ -350,9 +351,9 @@ export function localeSwitcher(pathname: string, site: SiteConfig | undefined, e
     locale: loc,
     code: loc.toUpperCase(),
     label: localeEndonym(loc),
-    href: loc === here.locale || everywhere || hasTranslation(ids, id, loc, l)
+    href: withTrailingSlash(loc === here.locale || everywhere || hasTranslation(ids, id, loc, l)
       ? localePathFor(localePagePath(path, loc, routes), loc, l)
-      : localePathFor('/', loc, l),
+      : localePathFor('/', loc, l)),
     current: loc === here.locale,
   }));
 }

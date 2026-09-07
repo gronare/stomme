@@ -126,15 +126,18 @@ eq(localeHref('/blogg/nyhet', 'en', BR), '/blogg/nyhet', 'and so is a listing ro
 eq(localeHref('/bokningar', 'en', BR), '/bokningar', 'a path that merely starts with the same letters is not under the base');
 eq(localeHref('/boka', 'en', BR), '/boka', 'a bare route segment names a child, not a path — it is no base of its own');
 eq(localeHref('/nagot-okant', 'en', BR), '/nagot-okant', 'an unknown path is still left alone');
-eq(localeLinker(BOOKING_SITE, 'en', PAGES)('/bokning/stugan'), '/en/bokning/stugan', 'the mapper the components use follows the same rule');
+eq(localeLinker(BOOKING_SITE, 'en', PAGES)('/bokning/stugan'), '/en/bokning/stugan/', 'the mapper the components use follows the same rule, and hands back the address the page is served on');
 eq(localeHref('/bokning', 'en', localeRoutes({ ...PLAIN, routes: BOOKING_SITE.routes }, PAGES)), '/bokning',
   'a single-language site serves no twins — every addon path stays bare');
 
 console.log('\n· the linker the components use');
 const link = localeLinker(SITE, 'en', PAGES);
-eq([link('/kontakt'), link('/bokning/stugan'), link('/')], ['/en/kontakt', '/bokning/stugan', '/en/'],
+eq([link('/kontakt'), link('/bokning/stugan'), link('/')], ['/en/kontakt/', '/bokning/stugan/', '/en/'],
   'one mapper per rendered page, so no component needs the route table');
-eq(localeLinker(PLAIN, 'en', PAGES)('/kontakt'), '/kontakt', 'without locales the mapper is the identity');
+eq(localeLinker(PLAIN, 'en', PAGES)('/kontakt'), '/kontakt/',
+  'a site with no locales gets no prefix, and still gets the trailing slash every internal link is rendered with');
+eq(localeLinker(PLAIN, 'en', PAGES)('/files/terms.pdf'), '/files/terms.pdf',
+  'a linked file keeps the address it is served on');
 
 console.log('\n· block link fields follow the page they are rendered on');
 const BLOCKS_IN = [
@@ -144,12 +147,12 @@ const BLOCKS_IN = [
   { type: 'ctaBox', href2: '/omradet', heading: 'Läs mer', media: { image: '/media/kontakt.jpg' } },
 ];
 const OUT = localizeLinks(BLOCKS_IN, link);
-eq(OUT[0].cta.link.page, '/bokning/stugan', 'a CTA to a route without a locale keeps its bare path');
-eq(OUT[0].cta2.link.page, '/en/omradet', 'a CTA to a localized page is rewritten');
-eq(OUT[1].items[0].link, '/en/kontakt', 'a plain-string link field is rewritten as well');
+eq(OUT[0].cta.link.page, '/bokning/stugan/', 'a CTA to a route without a locale keeps its unprefixed path');
+eq(OUT[0].cta2.link.page, '/en/omradet/', 'a CTA to a localized page is rewritten');
+eq(OUT[1].items[0].link, '/en/kontakt/', 'a plain-string link field is rewritten as well');
 eq(OUT[1].items[1].link, 'https://x.se', 'an external item link is left alone');
-eq([OUT[2].asideCtaHref, OUT[2].asideHref], ['/en/kontakt', '/tack'], 'the legacy *Href fields go through the same rule');
-eq(OUT[3].href2, '/en/omradet', 'a numbered legacy href is a link field too');
+eq([OUT[2].asideCtaHref, OUT[2].asideHref], ['/en/kontakt/', '/tack/'], 'the legacy *Href fields go through the same rule');
+eq(OUT[3].href2, '/en/omradet/', 'a numbered legacy href is a link field too');
 eq(OUT[3].media.image, '/media/kontakt.jpg', 'a media path is not a link — it is left untouched');
 eq(OUT[0].cta.label, 'Boka', 'labels and every other field are carried through unchanged');
 check(localizeLinks(BLOCKS_IN, (h) => h) === BLOCKS_IN, 'a pass that changes nothing returns the very same blocks');
@@ -235,24 +238,24 @@ const TRANSLATED = [
 const sw = localeSwitcher('/kontakt', SITE, TRANSLATED);
 eq(sw.map((l) => l.code), ['SV', 'EN', 'NO'], 'each row carries the locale code, in configured order');
 eq(sw.map((l) => l.label), ['Svenska', 'English', 'Norsk'], 'the label is what the language calls itself');
-eq(sw.map((l) => l.href), ['/kontakt', '/en/kontakt', '/no/'],
+eq(sw.map((l) => l.href), ['/kontakt/', '/en/kontakt/', '/no/'],
   'a locale with a translation links to the page; one without links to its front page');
 eq(sw.map((l) => l.current), [true, false, false], 'the locale being read is marked current');
-eq(localeSwitcher('/en/kontakt', SITE, TRANSLATED).map((l) => l.href), ['/kontakt', '/en/kontakt', '/no/'],
+eq(localeSwitcher('/en/kontakt', SITE, TRANSLATED).map((l) => l.href), ['/kontakt/', '/en/kontakt/', '/no/'],
   'the same three targets from inside a locale');
-eq(localeSwitcher('/no/kontakt', SITE, TRANSLATED).map((l) => l.href), ['/kontakt', '/en/kontakt', '/no/kontakt'],
+eq(localeSwitcher('/no/kontakt', SITE, TRANSLATED).map((l) => l.href), ['/kontakt/', '/en/kontakt/', '/no/kontakt/'],
   'the language you are already reading links to the page you are on, translated or not');
 eq(localeSwitcher('/', SITE, TRANSLATED).map((l) => l.href), ['/', '/en/', '/no/'],
   'on the front page the switcher is the three front pages');
-eq(localeSwitcher('/areas/oslo', SITE, TRANSLATED).map((l) => l.href), ['/areas/oslo', '/en/', '/no/'],
+eq(localeSwitcher('/areas/oslo', SITE, TRANSLATED).map((l) => l.href), ['/areas/oslo/', '/en/', '/no/'],
   'a route with no page entry sends the other locales to their front page');
-eq(localeSwitcher('/en/bokning', BOOKING_SITE, TRANSLATED).map((l) => l.href), ['/bokning', '/en/bokning', '/no/bokning'],
+eq(localeSwitcher('/en/bokning', BOOKING_SITE, TRANSLATED).map((l) => l.href), ['/bokning/', '/en/bokning/', '/no/bokning/'],
   'an addon page is served in every language, so the switcher offers the page itself rather than the front page');
 eq(localeSwitcher('/en/bokning', BOOKING_SITE, TRANSLATED).map((l) => l.current), [false, true, false],
   'and the language the addon page is being read in is the current one');
 eq(localeSwitcher('/en/bokning/stugan', BOOKING_SITE, TRANSLATED).map((l) => l.href),
-  ['/bokning/stugan', '/en/bokning/stugan', '/no/bokning/stugan'], 'a dynamic addon page keeps its own path across the languages');
-eq(localeSwitcher('/bokning', BOOKING_SITE, TRANSLATED).map((l) => l.href), ['/bokning', '/en/bokning', '/no/bokning'],
+  ['/bokning/stugan/', '/en/bokning/stugan/', '/no/bokning/stugan/'], 'a dynamic addon page keeps its own path across the languages');
+eq(localeSwitcher('/bokning', BOOKING_SITE, TRANSLATED).map((l) => l.href), ['/bokning/', '/en/bokning/', '/no/bokning/'],
   'the same three targets seen from the default language');
 eq(hreflangLinks('/en/bokning', BOOKING_SITE, 'https://ex.se', TRANSLATED).map((a) => a.hreflang), ['sv-SE', 'en', 'no', 'x-default'],
   'the head of an addon page names every language and closes with x-default');
@@ -291,7 +294,7 @@ eq(localeHref('/omradet', 'sv', UR), '/omradet', 'the default language is the fi
 eq(localeHref('/kontakt', 'en', UR), '/en/kontakt', 'a translation that names no address keeps the filename');
 eq(localeHref('/omradet#karta', 'en', UR), '/en/the-area#karta', 'a fragment rides along to the translated address');
 eq(localeHref('/omradet/', 'en', UR), '/en/the-area/', 'a trailing slash survives the rename');
-eq(localeLinker(SITE, 'en', URL_PAGES)('/omradet'), '/en/the-area', 'the mapper the components use maps the same way');
+eq(localeLinker(SITE, 'en', URL_PAGES)('/omradet'), '/en/the-area/', 'the mapper the components use maps the same way');
 eq(localePagePath('/omradet', 'en', UR), '/the-area', 'the slug the /en/ catch-all builds its static path from');
 eq(basePagePath('/the-area', 'en', UR), '/omradet', 'and the entry that path resolves back to');
 eq(basePagePath('/kontakt', 'en', UR), '/kontakt', 'an untranslated address resolves back to itself');
@@ -356,7 +359,7 @@ eq(localePagePath('/salja-foretag/generationsskifte', 'en', NR), '/sell-a-compan
 eq(basePagePath('/sell-a-company/succession', 'en', NR), '/salja-foretag/generationsskifte',
   'and the entry that path resolves back to');
 eq(localeSwitcher('/salja-foretag/generationsskifte', SITE, NESTED_PAGES).map((l) => l.href),
-  ['/salja-foretag/generationsskifte', '/en/sell-a-company/succession', '/no/'],
+  ['/salja-foretag/generationsskifte/', '/en/sell-a-company/succession/', '/no/'],
   'the switcher finds the nested page by its address, so a translated subpage is offered rather than the front page');
 eq(hreflangLinks('/en/sell-a-company/succession', SITE, null, NESTED_PAGES).map((a) => a.href),
   ['/salja-foretag/generationsskifte', '/en/sell-a-company/succession', '/no/salja-foretag/generationsskifte', '/salja-foretag/generationsskifte'],
@@ -380,13 +383,13 @@ check(warnings.some((w) => w.includes('src/content/pages/omradet.md')),
 check(DR.custom === false, 'an ignored address is not an address — the sitemap alternates stay');
 
 console.log('\n· the switcher and the head follow the same addresses');
-eq(localeSwitcher('/omradet', SITE, URL_PAGES).map((l) => l.href), ['/omradet', '/en/the-area', '/no/omraadet'],
+eq(localeSwitcher('/omradet', SITE, URL_PAGES).map((l) => l.href), ['/omradet/', '/en/the-area/', '/no/omraadet/'],
   'each language points at its own address for the page being read');
-eq(localeSwitcher('/en/the-area', SITE, URL_PAGES).map((l) => l.href), ['/omradet', '/en/the-area', '/no/omraadet'],
+eq(localeSwitcher('/en/the-area', SITE, URL_PAGES).map((l) => l.href), ['/omradet/', '/en/the-area/', '/no/omraadet/'],
   'the same three targets seen from a translated address');
 eq(localeSwitcher('/en/the-area', SITE, URL_PAGES).map((l) => l.current), [false, true, false],
   'the language whose address you are on is the current one');
-eq(localeSwitcher('/en/kontakt', SITE, URL_PAGES).map((l) => l.href), ['/kontakt', '/en/kontakt', '/no/'],
+eq(localeSwitcher('/en/kontakt', SITE, URL_PAGES).map((l) => l.href), ['/kontakt/', '/en/kontakt/', '/no/'],
   'an untranslated language still gets its front page, addresses or not');
 eq(hreflangLinks('/omradet', SITE, 'https://ex.se', URL_PAGES).map((a) => a.href),
   ['https://ex.se/omradet', 'https://ex.se/en/the-area', 'https://ex.se/no/omraadet', 'https://ex.se/omradet'],

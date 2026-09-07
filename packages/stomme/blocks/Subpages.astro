@@ -1,5 +1,6 @@
 ---
 import { getCollection } from 'astro:content';
+import { withTrailingSlash } from '../src/href';
 import Cover from '../src/Cover.astro';
 import { pagePaths, pageByPath, pageChildren, pageTitle, writtenPages, normalizePagePath } from '../src/pages';
 
@@ -30,7 +31,8 @@ const variant = VARIANTS.has(String(Astro.props.layout?.variant)) ? String(Astro
 const columns = Number(Astro.props.layout?.columns) || 2;
 const showImages = Astro.props.media?.showImages ?? false;
 const picked = Array.isArray(Astro.props.pages) ? Astro.props.pages.filter((p) => typeof p === 'string' && p) : [];
-const link = typeof Astro.props.localeLink === 'function' ? Astro.props.localeLink : (href: string) => href;
+const localeLink = typeof Astro.props.localeLink === 'function' ? Astro.props.localeLink : (href: string) => href;
+const link = (href: string) => withTrailingSlash(localeLink(href));
 const readMore = site?.strings?.readMore ?? 'Read more';
 const inSection = site?.strings?.subpages?.inSection ?? 'In this section';
 const moreInSection = site?.strings?.subpages?.moreInSection ?? 'More in this section';

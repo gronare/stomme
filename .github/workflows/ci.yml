@@ -121,6 +121,8 @@ jobs:
         run: pnpm --filter @gronare/stomme test:maps
       - name: per-language page addresses + the header switcher
         run: pnpm --filter @gronare/stomme test:locale-urls
+      - name: internal links carry the trailing slash the site is served on
+        run: pnpm --filter @gronare/stomme test:trailing-slash
 
   # The Sveltia DOM contract test is deliberately not per-PR: between version bumps the pinned DOM does not change, so it runs when the pin is bumped instead.
 
