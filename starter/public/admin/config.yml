@@ -5323,12 +5323,6 @@ collections:
                       - { label: "About (/about)", value: "/about" }
                       - { label: "Contact (/contact)", value: "/contact" }
                   - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto: — overrides the page above." }
-              - name: menu
-                label: "Dropdown from collection"
-                widget: select
-                required: false
-                hint: "Optional. Fill a dropdown with every entry of a collection (e.g. all services). Overrides manual sub-links below."
-                options: []
               - name: children
                 label: "…or manual sub-links"
                 widget: list

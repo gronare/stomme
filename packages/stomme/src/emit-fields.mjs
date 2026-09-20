@@ -47,10 +47,9 @@ export function makeEmitters({ q, pad, AVAILABLE_BLOCKS, OPTION_SOURCES }) {
       for (const b of types) {
         lines.push(`${p}    - name: ${b.type}`, `${p}      label: ${q(b.label)}`, `${p}      widget: object`);
         if (flag) lines.push(`${p}      i18n: true`);
+        const sub = b.fields.map((sf) => emitField(sf, indent + 8, i18n)).filter(Boolean);
         lines.push(`${p}      fields:`);
-        lines.push(...(b.fields.length
-          ? b.fields.map((sf) => emitField(sf, indent + 8, i18n))
-          : [`${p}        - { name: _auto, label: "Auto", widget: hidden${flag ? ', i18n: duplicate' : ''} }`]));
+        lines.push(...(sub.length ? sub : [`${p}        - { name: _auto, label: "Auto", widget: hidden${flag ? ', i18n: duplicate' : ''} }`]));
       }
       return lines.join('\n');
     }
@@ -63,7 +62,7 @@ export function makeEmitters({ q, pad, AVAILABLE_BLOCKS, OPTION_SOURCES }) {
         ...mediaProps(),
         ...i18nLine,
         ...(sum ? [`${p}  summary: ${q(sum)}`] : []),
-        `${p}  fields:`, ...f.fields.map((sf) => emitField(sf, indent + 4, i18n))].join('\n');
+        `${p}  fields:`, ...f.fields.map((sf) => emitField(sf, indent + 4, i18n)).filter(Boolean)].join('\n');
     }
     if (f.widget === 'list' && f.field) {
       return [`${p}- name: ${f.name}`, `${p}  label: ${q(f.label)}`, `${p}  widget: list`,
@@ -86,7 +85,7 @@ export function makeEmitters({ q, pad, AVAILABLE_BLOCKS, OPTION_SOURCES }) {
       head.push(...mediaProps());
       head.push(...i18nLine);
       head.push(`${p}  fields:`);
-      return [...head, ...f.fields.map((sf) => emitField(sf, indent + 4, i18n))].join('\n');
+      return [...head, ...f.fields.map((sf) => emitField(sf, indent + 4, i18n)).filter(Boolean)].join('\n');
     }
     if (f.widget === 'relation') {
       const list = (v) => `[${(Array.isArray(v) ? v : [v]).map(q).join(', ')}]`;
@@ -102,18 +101,16 @@ export function makeEmitters({ q, pad, AVAILABLE_BLOCKS, OPTION_SOURCES }) {
     }
     if (f.widget === 'select') {
       const opts = typeof f.options === 'string' ? OPTION_SOURCES[f.options] ?? [] : Array.isArray(f.options) ? f.options : [];
+      // A select whose source resolved empty is omitted: Sveltia rejects `options: []` as a fatal config error, and with nothing to choose no stored value could be valid anyway.
+      if (opts.length === 0) return '';
       const out = [`${p}- name: ${f.name}`, `${p}  label: ${q(f.label)}`, `${p}  widget: select`];
       if (f.multiple) out.push(`${p}  multiple: true`);
       if (f.required === false) out.push(`${p}  required: false`);
       if (f.default !== undefined) out.push(`${p}  default: ${Array.isArray(f.default) ? `[${f.default.map(q).join(', ')}]` : q(f.default)}`);
       if (f.hint) out.push(`${p}  hint: ${q(f.hint)}`);
       out.push(...i18nLine);
-      if (opts.length === 0) {
-        out.push(`${p}  options: []`);
-      } else {
-        out.push(`${p}  options:`);
-        for (const o of opts) out.push(`${p}    - { label: ${q(o.label)}, value: ${q(o.value)} }`);
-      }
+      out.push(`${p}  options:`);
+      for (const o of opts) out.push(`${p}    - { label: ${q(o.label)}, value: ${q(o.value)} }`);
       return out.join('\n');
     }
     return `${p}- { ${parts.join(', ')} }`;
@@ -143,11 +140,8 @@ export function makeEmitters({ q, pad, AVAILABLE_BLOCKS, OPTION_SOURCES }) {
     for (const b of AVAILABLE_BLOCKS) {
       lines.push(`${p}    - name: ${b.type}`, `${p}      label: ${q(b.label)}`, `${p}      widget: object`);
       if (i18n) lines.push(`${p}      i18n: true`);
-      if (b.fields.length === 0) {
-        lines.push(`${p}      fields:`, `${p}        - { name: _auto, label: "Auto", widget: hidden${i18n ? ', i18n: duplicate' : ''} }`);
-      } else {
-        lines.push(`${p}      fields:`, ...b.fields.map((f) => emitField(f, indent + 8, i18n)));
-      }
+      const sub = b.fields.map((f) => emitField(f, indent + 8, i18n)).filter(Boolean);
+      lines.push(`${p}      fields:`, ...(sub.length ? sub : [`${p}        - { name: _auto, label: "Auto", widget: hidden${i18n ? ', i18n: duplicate' : ''} }`]));
     }
     return lines.join('\n');
   }
@@ -182,7 +176,7 @@ export function makeEmitters({ q, pad, AVAILABLE_BLOCKS, OPTION_SOURCES }) {
       linkList('links2', 'Second link group'),
       linkList('legal', 'Legal links (bottom bar)'),
     ];
-    return fields.map((f) => emitField(f, indent, i18n)).join('\n');
+    return fields.map((f) => emitField(f, indent, i18n)).filter(Boolean).join('\n');
   }
   function emitNavLinks(indent, i18n = false) {
     const items = {
@@ -200,7 +194,7 @@ export function makeEmitters({ q, pad, AVAILABLE_BLOCKS, OPTION_SOURCES }) {
         navLinkField(),
       ],
     };
-    return [emitField(items, indent, i18n), emitField(cta, indent, i18n)].join('\n');
+    return [emitField(items, indent, i18n), emitField(cta, indent, i18n)].filter(Boolean).join('\n');
   }
 
   function buttonField(name, label, labelHint) {

@@ -101,8 +101,8 @@ console.log('\n· select and relation');
 const sel = emitField({ name: 'page', label: 'Page', widget: 'select', options: '$pages' }, 0);
 check(has(sel, /^ {4}- \{ label: "Home \(\/\)", value: "\/" \}$/m) && has(sel, /^ {4}- \{ label: "About \(\/about\)", value: "\/about" \}$/m),
   'a $-named select resolves its options from OPTION_SOURCES');
-check(has(emitField({ name: 'x', label: 'X', widget: 'select', options: '$nope' }, 0), /^ {2}options: \[\]$/m),
-  'an unresolvable option source emits an explicit empty list, never a missing options key');
+check(emitField({ name: 'x', label: 'X', widget: 'select', options: '$nope' }, 0) === '',
+  'an unresolvable option source emits no field at all, never an empty options list Sveltia refuses to load');
 const selMulti = emitField({ name: 'x', label: 'X', widget: 'select', multiple: true, default: ['a', 'b'], options: [{ label: 'A', value: 'a' }] }, 0);
 check(has(selMulti, /^ {2}multiple: true$/m) && has(selMulti, /^ {2}default: \["a", "b"\]$/m), 'a multiple select emits an array default in flow style');
 const rel = emitField({ name: 'svc', label: 'Service', widget: 'relation', collection: 'services', search_fields: ['title'] }, 0);

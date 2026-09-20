@@ -58,7 +58,7 @@ try {
   await page.goto(`http://localhost:${PORT}/admin/index.html`, { waitUntil: 'domcontentloaded' });
   await page.waitForFunction(() => [...document.querySelectorAll('button')].some((b) => /test repository/i.test(b.textContent || '')), null, { timeout: 30000 });
   await page.evaluate(() => { [...document.querySelectorAll('button')].find((b) => /test repository/i.test(b.textContent || '')).click(); });
-  await page.waitForSelector('[role=listbox]', { timeout: 30000 });
+  await page.waitForSelector('[role=tree], [role=listbox]', { timeout: 30000 });
 
   // A 404 here silently disables the theme + enhancements and would make every later check lie about the cause.
   await check('stomme-editor.js + stomme-theme.css load (no 404)', () => page.evaluate(() => {
