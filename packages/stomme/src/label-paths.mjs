@@ -1,3 +1,5 @@
+import { categoriesOf } from './term-collections.mjs';
+
 const TRANSLATABLE = /\b(label|label_singular|hint): "((?:[^"\\]|\\.)*)"/g;
 
 const unquote = (s) => s.replace(/\\"/g, '"').replace(/\\\\/g, '\\');
@@ -79,4 +81,4 @@ export function rewriteLabels(yaml, pick, options) {
 }
 
 export const listingAliases = (listings) =>
-  Object.fromEntries((listings || []).map((l) => [l.id, `listing:${l.preset}`]));
+  Object.fromEntries((listings || []).flatMap((l) => [[l.id, `listing:${l.preset}`], [categoriesOf(l.id), `listing:${l.preset}-categories`]]));

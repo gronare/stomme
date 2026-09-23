@@ -32,10 +32,10 @@ function emit(defaultBlocks, FEATURES, listings, LOCALES = []) {
     const { emitField, emitWidget, emitNavLinks, emitFooterLinks, buttonField, emitThanksButtons } =
       makeEmitters({ q, pad, AVAILABLE_BLOCKS, OPTION_SOURCES });
     const localized = (n) => LOCALES.length > 1 && LOCALIZED_EDITORS.includes(n);
-    const { COLLECTION_EDITORS, listingEditor } = makeCollectionEditors({ q, emitField, emitWidget, buttonField, localized });
+    const { COLLECTION_EDITORS, listingEditor, termEditor } = makeCollectionEditors({ q, emitField, emitWidget, buttonField, localized });
     const { emitCollections, emitSettings } = makeSettingsPane({
       q, pad, emitWidget, emitNavLinks, emitFooterLinks, emitThanksButtons,
-      COLLECTION_EDITORS, listingEditor, collectionEnabled, FEATURES, LISTINGS: listings, CMS: null, LOCALES,
+      COLLECTION_EDITORS, listingEditor, termEditor, collectionEnabled, FEATURES, LISTINGS: listings, CMS: null, LOCALES,
       ADDON_PANES: [], ADDON_PANEL_FILES: [], getStaticCollections: () => new Set(),
     });
     return { yaml: `collections:\n${emitCollections(2)}\n${emitSettings()}`, blocks: AVAILABLE_BLOCKS, groups: GROUP_ORDER };

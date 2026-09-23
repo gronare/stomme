@@ -1,14 +1,15 @@
 import { localeFilePath } from './cms-i18n.mjs';
+import { FAQ_TAGS, DOCUMENT_GROUPS, categoriesOf } from './term-collections.mjs';
 
-export function makeCollectionEditors({ q, emitField, emitWidget, buttonField, localized = () => false, listingStatus = {} }) {
+export function makeCollectionEditors({ q, emitField, emitWidget, buttonField, localized = () => false, listingStatus = {}, word = (en) => en }) {
 const statusLabel = (value, en) => q(listingStatus[value] || en);
 const statusValue = (value) => (listingStatus[value] ? q(listingStatus[value]) : value);
 const statusPattern = (value) => q(`^${(listingStatus[value] || value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`);
-const statusSortDirection = () => ((listingStatus.available || 'available').localeCompare(listingStatus.sold || 'sold') <= 0 ? 'ascending' : 'descending');
 const on = (name) => !!localized(name);
 const line = (name, indent, text) => (on(name) ? `\n${' '.repeat(indent)}${text}` : '');
 const inline = (name, value) => (on(name) ? `, i18n: ${value}` : '');
 const filePath = (name, path) => (on(name) ? localeFilePath(path) : path);
+const relation = (collection, multiple = false) => `widget: relation, collection: ${collection}, ${multiple ? 'multiple: true, ' : ''}value_field: "{{title}}", display_fields: ["{{title}}"], search_fields: [title], required: false`;
 const pageUrlField = () => (on('pages')
   ? '\n    - { name: url, label: "Address in this language", widget: string, required: false, pattern: ["^[a-z0-9]+(?:-[a-z0-9]+)*$", "Lowercase a-z, digits and hyphens only"], hint: "Empty = the same address as the default language. Applies to the translations; the address in the site\'s own language is the page name.", i18n: true }'
   : '');
@@ -69,14 +70,7 @@ ${emitWidget(4, on('pages'))}`,
     - { name: question, label: "Question", widget: string${inline('faq', 'true')} }
     - { name: answer, label: "Answer", widget: text${inline('faq', 'true')} }
     - { name: order, widget: hidden, required: false, default: 0${inline('faq', 'duplicate')} }
-    - name: tags
-      label: "Tags"
-      widget: list
-      required: false
-      collapsed: true
-      summary: "{{fields.tag}}"
-      hint: "Scope the question to pages: an FAQ block filtered on a tag (e.g. a service or town) shows every question carrying it. Click a suggested tag to add it, or type a new one."${line('faq', 6, 'i18n: duplicate')}
-      field: { name: tag, label: "Tag", widget: string${inline('faq', 'duplicate')} }`,
+    - { name: tags, label: "Tags", ${relation(FAQ_TAGS, true)}, hint: "Scope the question to pages: an FAQ block filtered on a tag (e.g. a service or town) shows every question carrying it. Pick a tag; a new tag is created under FAQ tags."${inline('faq', 'duplicate')} }`,
   testimonials: `- name: testimonials
   label: "Testimonials"
   label_singular: "Testimonial"
@@ -101,7 +95,7 @@ ${emitWidget(4, on('pages'))}`,
   fields:
     - { name: title, label: "Title", widget: string${inline('documents', 'true')} }
     - { name: file, label: "File", widget: file, hint: "The file visitors download, usually a PDF."${inline('documents', 'true')} }
-    - { name: group, label: "Group", widget: string, required: false, hint: "Heading the document is listed under, e.g. Bylaws, Annual reports, Forms."${inline('documents', 'true')} }
+    - { name: group, label: "Group", ${relation(DOCUMENT_GROUPS)}, hint: "Heading the document is listed under, e.g. Bylaws, Annual reports, Forms."${inline('documents', 'duplicate')} }
     - { name: date, label: "Date", widget: datetime, date_format: "YYYY-MM-DD", time_format: false, required: false${inline('documents', 'duplicate')} }
     - { name: note, label: "Note", widget: string, required: false, hint: "One line shown under the title."${inline('documents', 'true')} }
     - { name: order, widget: hidden, required: false, default: 0${inline('documents', 'duplicate')} }`,
@@ -217,7 +211,7 @@ function listingEditor(l) {
   const articleFields = `    - { name: title, label: "Title", widget: string }
     - { name: date, label: "Date", widget: datetime, date_format: "YYYY-MM-DD", time_format: false }
     - { name: excerpt, label: "Excerpt", widget: text, required: false }
-    - { name: category, label: "Category", widget: string, required: false, hint: "Short label shown as a chip, e.g. Notice, Maintenance, Meeting" }
+    - { name: category, label: "Category", ${relation(categoriesOf(l.id))}, hint: "Short label shown as a chip, e.g. Notice, Maintenance, Meeting" }
     - { name: eventDate, label: "Event date", widget: datetime, date_format: "YYYY-MM-DD", time_format: false, required: false, hint: "Set when the post is about something happening on a date. It then also appears in the upcoming-events block and the calendar feed" }
     - { name: eventTime, label: "Event time", widget: string, required: false, hint: "Free text, e.g. 10.00–12.00" }
     - { name: cover, label: "Cover image", widget: image, required: false }
@@ -243,7 +237,7 @@ ${specs.map((s) => `        - { name: ${s.key}, label: ${q(s.label)}, widget: st
         - { label: ${statusLabel('available', 'Available')}, value: ${statusValue('available')} }
         - { label: ${statusLabel('reserved', 'Reserved')}, value: ${statusValue('reserved')} }
         - { label: ${statusLabel('sold', 'Sold')}, value: ${statusValue('sold')} }
-    - { name: category, label: "Category", widget: string, required: false }
+    - { name: category, label: "Category", ${relation(categoriesOf(l.id))} }
     - { name: cover, label: "Cover image", widget: image, required: false }
     - name: gallery
       label: "Gallery"
@@ -259,7 +253,7 @@ ${specs.map((s) => `        - { name: ${s.key}, label: ${q(s.label)}, widget: st
   const catalogViews = `
   sortable_fields:
     fields: [title, status, date]
-    default: { field: status, direction: ${statusSortDirection()} }
+    default: { field: date, direction: descending }
   view_groups:
     groups:
       - { name: status, label: "Status", field: status }
@@ -277,5 +271,22 @@ ${specs.map((s) => `        - { name: ${s.key}, label: ${q(s.label)}, widget: st
   fields:
 ${l.preset === 'catalog' ? catalogFields : articleFields}`;
 }
-  return { COLLECTION_EDITORS, listingEditor };
+const TERM_LABELS = {
+  [FAQ_TAGS]: { label: 'FAQ tags', singular: 'Tag' },
+  [DOCUMENT_GROUPS]: { label: 'Document groups', singular: 'Group' },
+};
+function termEditor(term) {
+  const own = TERM_LABELS[term.name];
+  const label = own ? own.label : `${word(term.listing.label || term.listing.id)} · ${word('Categories')}`;
+  const singular = own ? own.singular : 'Category';
+  return `- name: ${term.name}
+  label: ${q(label)}
+  label_singular: ${q(singular)}
+  folder: "src/content/${term.name}"
+  create: true
+  slug: "{{slug}}"
+  fields:
+    - { name: title, label: ${q(singular)}, widget: string }`;
+}
+  return { COLLECTION_EDITORS, listingEditor, termEditor };
 }

@@ -16,7 +16,6 @@
   function toggleButton(item) { return item.querySelector(':scope > .header > div:first-child > button[aria-expanded]'); }
   function isCollapsed(item) { var b = toggleButton(item); return !!b && b.getAttribute('aria-expanded') === 'false'; }
   function isListItem(item) { return !!item.closest('section.field[data-field-type="list"]') && !!toggleButton(item); }
-  function delay(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
 
   function inControl(t) { return !!(t.closest && t.closest('button, a, input, textarea, select, [contenteditable], [role="menu"], [role="listbox"]')); }
 
@@ -105,75 +104,11 @@
     });
   }
 
-  var FAQ_TAGS = ["basics","editing"];
-  function tagInputs(section) {
-    return section.querySelectorAll(':scope input[type="text"]');
-  }
-  function usedTags(section) {
-    var vals = [];
-    section.querySelectorAll(':scope input[type="text"]').forEach(function (i) { vals.push(i.value.trim()); });
-    section.querySelectorAll(':scope .item .summary').forEach(function (s) { vals.push((s.textContent || '').trim()); });
-    return vals;
-  }
-  function tagAddButton(section) {
-    var btns = section.querySelectorAll(':scope > .field-wrapper button');
-    for (var i = btns.length - 1; i >= 0; i--) if (!btns[i].closest('.item')) return btns[i];
-    return null;
-  }
-  async function addTag(section, tag) {
-    var before = tagInputs(section).length;
-    var add = tagAddButton(section);
-    if (!add) return;
-    add.click();
-    for (var t = 0; t < 20; t++) {
-      await delay(50);
-      var inputs = tagInputs(section);
-      if (inputs.length > before) {
-        var input = inputs[inputs.length - 1];
-        input.value = tag;
-        input.dispatchEvent(new Event('input', { bubbles: true }));
-        return;
-      }
-    }
-  }
-  function renderTagChips(section) {
-    if (!section.__stommeTagHook) {
-      section.__stommeTagHook = true;
-      section.addEventListener('input', function () { setTimeout(function () { renderTagChips(section); }, 0); });
-    }
-    var used = usedTags(section);
-    var free = FAQ_TAGS.filter(function (t) { return used.indexOf(t) === -1; });
-    var row = section.querySelector(':scope > .stomme-tag-chips');
-    var sig = free.join(' ');
-    if (!free.length) { if (row) row.remove(); return; }
-    if (row && row.__stommeSig === sig) return;
-    if (!row) {
-      row = document.createElement('div');
-      row.className = 'stomme-tag-chips';
-      section.appendChild(row);
-    }
-    row.__stommeSig = sig;
-    row.textContent = '';
-    free.forEach(function (t) {
-      var chip = document.createElement('button');
-      chip.type = 'button';
-      chip.className = 'stomme-tag-chip';
-      chip.textContent = '+ ' + t;
-      chip.addEventListener('click', function () { addTag(section, t); });
-      row.appendChild(chip);
-    });
-  }
-  function enhanceFaqTags() {
-    if (!FAQ_TAGS.length || location.hash.indexOf('#/collections/faq/') !== 0) return;
-    document.querySelectorAll('section.field[data-field-type="list"][data-key-path="tags"]').forEach(renderTagChips);
-  }
-
   function scan() {
     document.querySelectorAll('.item').forEach(enhance);
     document.querySelectorAll('section.field[data-field-type="object"]').forEach(function (o) {
       enhanceObject(o); gateObject(o); enhanceGated(o);
     });
-    enhanceFaqTags();
   }
   var raf = 0, timer = 0;
   function run() { cancelAnimationFrame(raf); clearTimeout(timer); raf = timer = 0; scan(); }

@@ -535,8 +535,8 @@ check(onEditors.COLLECTION_EDITORS.faq.includes('name: question, label: "Questio
   'the question and its answer are what a translator writes');
 check(onEditors.COLLECTION_EDITORS.faq.includes('name: order, widget: hidden, required: false, default: 0, i18n: duplicate'),
   'the sort order is one decision for every language — a translation must not reorder the list');
-check(/\n      i18n: duplicate\n      field: \{ name: tag, label: "Tag", widget: string, i18n: duplicate \}/.test(onEditors.COLLECTION_EDITORS.faq),
-  'the tags are duplicated down to the tag itself — a translated tag would scope the question to nothing');
+check(/- \{ name: tags, label: "Tags", widget: relation, [^\n]*, i18n: duplicate \}/.test(onEditors.COLLECTION_EDITORS.faq),
+  'the tags are one picked set for every language — a translated tag would scope the question to nothing');
 
 const settingsYaml = (LOCALES) => makeSettingsPane({
   q, pad, emitWidget: E.emitWidget, emitNavLinks: E.emitNavLinks, emitFooterLinks: E.emitFooterLinks, emitThanksButtons: E.emitThanksButtons,

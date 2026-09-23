@@ -13,6 +13,7 @@ import { renderGallery } from '../admin/blocks-gallery.mjs';
 import { rewriteLabels, listingAliases } from '../src/label-paths.mjs';
 import { r2LibraryYaml, resolveMediaConfig, withMaxFileSize } from '../src/media-config.mjs';
 import { resolveCmsLocales, LOCALIZED_EDITORS } from '../src/cms-i18n.mjs';
+import { termCollections, seedTerms } from '../src/term-collections.mjs';
 
 const root = process.cwd();
 const here = dirname(fileURLToPath(import.meta.url));
@@ -143,16 +144,17 @@ const MARKER_START = /# >>> (\w+):generated/;
 const q = (s) => `"${String(s).replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`;
 const pad = (n) => ' '.repeat(n);
 
-const { PAGE_OPTIONS, FAQ_TAG_OPTIONS, OPTION_SOURCES, collectionEnabled, AVAILABLE_BLOCKS, SKIPPED_BLOCKS, GROUP_ORDER } = buildOptionSources({ root, ROUTES, FEATURES, LISTINGS, BLOCKS });
+const { PAGE_OPTIONS, OPTION_SOURCES, collectionEnabled, AVAILABLE_BLOCKS, SKIPPED_BLOCKS, GROUP_ORDER } = buildOptionSources({ root, ROUTES, FEATURES, LISTINGS, BLOCKS });
 
 const { listSummary, emitField, emitFlow, emitWidget, navLinkField, emitFooterLinks, emitNavLinks, buttonField, emitThanksButtons } = makeEmitters({ q, pad, AVAILABLE_BLOCKS, OPTION_SOURCES });
 
 const isLocalized = (name) => LOCALES.length > 1 && LOCALIZED_EDITORS.includes(name);
-const { COLLECTION_EDITORS, listingEditor } = makeCollectionEditors({ q, emitField, emitWidget, buttonField, localized: isLocalized, listingStatus: LISTING_STATUS });
+const word = (en) => (LOCALIZED_BY_TEXT && LOCALIZED_BY_TEXT[en]) ?? en;
+const { COLLECTION_EDITORS, listingEditor, termEditor } = makeCollectionEditors({ q, emitField, emitWidget, buttonField, localized: isLocalized, listingStatus: LISTING_STATUS, word });
 
 const { ADDON_PANES, ADDON_PANEL_FILES } = await loadAddonCms({ slotsDir: process.env.STOMME_SLOTS_DIR, ROUTES, FEATURES, emitWidget, emitField, buttonField, navLinkField });
 
-const { generatedEditors, emitCollections, emitCms, emitSettings, emitTrackingPane } = makeSettingsPane({ q, pad, emitWidget, emitNavLinks, emitFooterLinks, emitThanksButtons, COLLECTION_EDITORS, listingEditor, collectionEnabled, FEATURES, LISTINGS, CMS, LOCALES, ADDON_PANES, ADDON_PANEL_FILES, getStaticCollections: () => STATIC_COLLECTIONS });
+const { generatedEditors, emitCollections, emitCms, emitSettings, emitTrackingPane } = makeSettingsPane({ q, pad, emitWidget, emitNavLinks, emitFooterLinks, emitThanksButtons, COLLECTION_EDITORS, listingEditor, termEditor, collectionEnabled, FEATURES, LISTINGS, CMS, LOCALES, ADDON_PANES, ADDON_PANEL_FILES, getStaticCollections: () => STATIC_COLLECTIONS });
 
 const EMITTERS = { blocks: emitWidget, collections: emitCollections, navlinks: emitNavLinks, thanksbuttons: emitThanksButtons, footerlinks: emitFooterLinks, settings: emitSettings, cms: emitCms, tracking: emitTrackingPane };
 
@@ -328,10 +330,7 @@ try {
 try {
   const editorDest = resolve(root, 'public/admin/stomme-editor.js');
   mkdirSync(dirname(editorDest), { recursive: true });
-  let editorSrc = readFileSync(resolve(here, '../admin/editor.js'), 'utf8');
-  editorSrc = substitute(editorSrc, /var FAQ_TAGS = \[[^\]]*\];/,
-    `var FAQ_TAGS = ${JSON.stringify(FAQ_TAG_OPTIONS.map((o) => o.value))};`, 'the FAQ tag list');
-  writeFileSync(editorDest, editorSrc);
+  writeFileSync(editorDest, readFileSync(resolve(here, '../admin/editor.js'), 'utf8'));
 } catch (e) {
   if (e instanceof AnchorMissing) throw e;
   console.warn('  (stomme-editor.js copy skipped:', e.message + ')');
@@ -401,6 +400,12 @@ for (const l of LISTINGS) {
   } catch (e) {
     console.warn(`  (listing index seed skipped for ${l.id}:`, e.message + ')');
   }
+}
+
+try {
+  seedTerms(root, termCollections(LISTINGS, collectionEnabled));
+} catch (e) {
+  console.warn('  (term seed skipped:', e.message + ')');
 }
 
 // Derived from the ENGINE's own schema, not the site's, so it is only regenerated when running against the engine SOURCE — a monorepo build with the engine linked. In a real node_modules install the shipped manifest is authoritative and read-only. gen-schema-manifest writes relative to its own dir, always the engine package.

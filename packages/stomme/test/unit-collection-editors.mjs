@@ -166,11 +166,54 @@ const worded = makeCollectionEditors({ q, emitField: E.emitField, emitWidget: E.
   .listingEditor({ id: 'stock', preset: 'catalog' });
 check(/label: "Till salu", value: "Till salu" }/.test(worded) && /label: "Reserverad", value: "Reserverad" }/.test(worded) && /label: "Genomförd \(ja\)", value: "Genomförd \(ja\)" }/.test(worded),
   "with site words the status options store the site's own word as the value");
-check(/^ {4}default: \{ field: status, direction: ascending \}$/m.test(catalog) && /^ {4}default: \{ field: status, direction: descending \}$/m.test(worded),
-  'the list sorts on status in whichever direction puts the available word first, so Sveltia lists that group at the top');
+check(/^ {4}default: \{ field: date, direction: descending \}$/m.test(catalog) && /^ {4}default: \{ field: date, direction: descending \}$/m.test(worded),
+  'the catalog list opens newest first, whatever the site calls its statuses', block(catalog, /^ {2}sortable_fields:$/));
+check(!/name: date[^}]*default:/.test(catalog), 'the date added carries no default — a declared default is written into existing items on save');
 check(/^ {6}default: "Till salu"$/m.test(worded), 'a new entry starts on the site word for available, so the stored value is never a key the options lack');
 check(worded.includes('- { name: available, label: "Till salu", field: status, pattern: "^Till salu$" }') && worded.includes('- { name: sold, label: "Genomförd (ja)", field: status, pattern: "^Genomförd \\\\(ja\\\\)$" }'),
   'the status filters match the stored word exactly, with regex characters in a word escaped', worded.split('\n').filter((l) => l.includes('pattern:')).join('\n'));
+
+console.log('\n· taggings pick from earlier values');
+const relationOf = (yaml, name) => (yaml.match(new RegExp(`^ *- \\{ name: ${name}, [^\\n]*\\}$`, 'm')) || [''])[0];
+const picks = (line, collection) => line.includes('widget: relation') && line.includes(`collection: ${collection},`)
+  && line.includes('value_field: "{{title}}"') && line.includes('display_fields: ["{{title}}"]') && line.includes('search_fields: [title]') && line.includes('required: false');
+check(picks(relationOf(article, 'category'), 'news-categories'), "an article's category is picked from the listing's own categories", relationOf(article, 'category'));
+check(picks(relationOf(catalog, 'category'), 'stock-categories'), "a catalog item's category is picked from the listing's own categories", relationOf(catalog, 'category'));
+const faqTags = relationOf(COLLECTION_EDITORS.faq, 'tags');
+check(picks(faqTags, 'faq-tags') && faqTags.includes('multiple: true'), 'a question carries any number of tags picked from the FAQ tags', faqTags);
+check(/hint: "[^"]*FAQ block filtered on a tag[^"]*shows every question carrying it/.test(faqTags), 'the tags hint still says what a tag does');
+check(!/name: tag,/.test(COLLECTION_EDITORS.faq), 'the tags are one field, not a list of free-text tags');
+const docGroup = relationOf(COLLECTION_EDITORS.documents, 'group');
+check(picks(docGroup, 'document-groups') && !docGroup.includes('multiple'), 'a document sits in one group picked from the document groups', docGroup);
+check(!/default:/.test([relationOf(article, 'category'), relationOf(catalog, 'category'), faqTags, docGroup].join('\n')), 'no tagging declares a default');
+
+const { termEditor } = makeCollectionEditors({ q, emitField: E.emitField, emitWidget: E.emitWidget, buttonField: E.buttonField, word: (en) => ({ Categories: 'Kategorier' })[en] ?? en });
+const tagTerms = termEditor({ name: 'faq-tags', owner: 'faq' });
+check(/^- name: faq-tags\n {2}label: "FAQ tags"\n {2}label_singular: "Tag"\n {2}folder: "src\/content\/faq-tags"\n {2}create: true\n/.test(tagTerms)
+  && /^ {4}- \{ name: title, label: "Tag", widget: string \}$/m.test(tagTerms) && fieldNames(tagTerms.slice(tagTerms.indexOf('\n  fields:'))).join() === 'title',
+  'the FAQ tags are a creatable folder collection holding one title per tag', tagTerms);
+const groupTerms = termEditor({ name: 'document-groups', owner: 'documents' });
+check(/label: "Document groups"/.test(groupTerms) && /folder: "src\/content\/document-groups"/.test(groupTerms), 'the document groups are their own collection', groupTerms);
+const catTerms = termEditor({ name: 'stock-categories', owner: 'stock', listing: { id: 'stock', label: 'Lager', preset: 'catalog' } });
+check(/^ {2}label: "Lager · Kategorier"$/m.test(catTerms) && /^ {2}label_singular: "Category"$/m.test(catTerms) && /folder: "src\/content\/stock-categories"/.test(catTerms),
+  "a listing's categories are labelled with the listing's own name and the translated word", catTerms);
+
+const { makeSettingsPane } = await import('../src/settings-pane.mjs');
+const { termCollections } = await import('../src/term-collections.mjs');
+const regionOf = (features, statics = []) => makeSettingsPane({
+  q, pad, emitWidget: E.emitWidget, emitNavLinks: E.emitNavLinks, emitFooterLinks: E.emitFooterLinks, emitThanksButtons: E.emitThanksButtons,
+  COLLECTION_EDITORS, listingEditor, termEditor, collectionEnabled: (n) => n === 'home' || !!features[n], FEATURES: features,
+  LISTINGS: [{ id: 'news', route: '/news', label: 'News', preset: 'article' }], CMS: null, LOCALES: [], ADDON_PANES: [], ADDON_PANEL_FILES: [],
+  getStaticCollections: () => new Set(statics),
+}).emitCollections(2);
+const region = regionOf({ faq: true, documents: true });
+const names = [...region.matchAll(/^ {2}- name: (\S+)$/gm)].map((m) => m[1]);
+check(JSON.stringify(names) === '["home","faq","faq-tags","documents","document-groups","news","news-categories"]',
+  'each term collection is emitted right after the collection that uses it', names.join(', '));
+const bare = regionOf({});
+check(!/faq-tags|document-groups/.test(bare) && /- name: news-categories$/m.test(bare), 'a term collection is emitted only with its owner', [...bare.matchAll(/^ {2}- name: (\S+)$/gm)].map((m) => m[1]).join(', '));
+check(!/- name: faq-tags$/m.test(regionOf({ faq: true }, ['faq'])), 'a hand-authored FAQ pane gets no generated FAQ tags beside it');
+check(JSON.stringify(termCollections([{ id: 'news' }], () => true).map((t) => t.name)) === '["faq-tags","document-groups","news-categories"]', 'termCollections names one collection per term kind');
 
 const failed = results.filter(([ok]) => !ok);
 console.log(`\n${results.length - failed.length}/${results.length} checks passed`);

@@ -2,33 +2,46 @@ import { resolve } from 'node:path';
 import { readdirSync, readFileSync } from 'node:fs';
 import { pagePathMap } from './page-paths.mjs';
 
+// A translation is the same page in another language, never a second link target — and it is one whether or not the site has switched its languages on, or a site with the files in place but the setting still off offers /info.en in every picker. Both halves are load-bearing: a language subtag in the stem AND the untranslated sibling beside it, so a page genuinely called `plan.b` stays a page.
+const LOCALE_TAIL = /\.([a-z]{2,3}(?:-[a-z0-9]{2,8})?)\.md$/i;
+const isLocaleFile = (f, siblings) => {
+  const m = f.match(LOCALE_TAIL);
+  return !!m && siblings.has(`${f.slice(0, -m[0].length)}.md`);
+};
+
+export function contentFilesIn(root, dir) {
+  let files = [];
+  try {
+    files = readdirSync(resolve(root, dir)).filter((f) => f.endsWith('.md'));
+  } catch {
+    return [];
+  }
+  const siblings = new Set(files);
+  return files.filter((f) => !isLocaleFile(f, siblings)).sort();
+}
+
+export function labelFromFrontmatter(file, key) {
+  try {
+    const m = readFileSync(file, 'utf8').match(new RegExp(`^${key}:[ \\t]*(.+?)[ \\t]*$`, 'm'));
+    return m ? m[1].replace(/^["']|["']$/g, '').trim() : null;
+  } catch {
+    return null;
+  }
+}
+
+export function listFromFrontmatter(file, key) {
+  let src = '';
+  try { src = readFileSync(file, 'utf8'); } catch { return []; }
+  const out = [];
+  const block = src.match(new RegExp(`^${key}:\\s*\\n((?:[ \\t]+-[ \\t]+.*\\n)+)`, 'm'));
+  if (block) for (const m of block[1].matchAll(/-[ \t]+["']?([^"'\n]+?)["']?\s*$/gm)) out.push(m[1].trim());
+  const inline = src.match(new RegExp(`^${key}:\\s*\\[([^\\]]*)\\]`, 'm'));
+  if (inline) for (const t of inline[1].split(',')) { const v = t.trim().replace(/^["']|["']$/g, ''); if (v) out.push(v); }
+  return out;
+}
+
 export function buildOptionSources({ root, ROUTES, FEATURES, LISTINGS, BLOCKS }) {
-  // A translation is the same page in another language, never a second link target — and it is one whether or not the site has switched its languages on, or a site with the files in place but the setting still off offers /info.en in every picker. Both halves are load-bearing: a language subtag in the stem AND the untranslated sibling beside it, so a page genuinely called `plan.b` stays a page.
-  const LOCALE_TAIL = /\.([a-z]{2,3}(?:-[a-z0-9]{2,8})?)\.md$/i;
-  const isLocaleFile = (f, siblings) => {
-    const m = f.match(LOCALE_TAIL);
-    return !!m && siblings.has(`${f.slice(0, -m[0].length)}.md`);
-  };
-
-  function contentFiles(dir) {
-    let files = [];
-    try {
-      files = readdirSync(resolve(root, dir)).filter((f) => f.endsWith('.md'));
-    } catch {
-      return [];
-    }
-    const siblings = new Set(files);
-    return files.filter((f) => !isLocaleFile(f, siblings)).sort();
-  }
-
-  function labelFromFrontmatter(file, key) {
-    try {
-      const m = readFileSync(file, 'utf8').match(new RegExp(`^${key}:\\s*(.+?)\\s*$`, 'm'));
-      return m ? m[1].replace(/^["']|["']$/g, '').trim() : null;
-    } catch {
-      return null;
-    }
-  }
+  const contentFiles = (dir) => contentFilesIn(root, dir);
 
   function collectionOptions(dir, routePrefix, labelKey) {
     return contentFiles(dir).map((f) => {
@@ -75,16 +88,8 @@ export function buildOptionSources({ root, ROUTES, FEATURES, LISTINGS, BLOCKS })
   const FAQ_OPTIONS = faqOptions();
 
   function faqTagOptions() {
-    const files = contentFiles('src/content/faq');
     const tags = new Set();
-    for (const f of files) {
-      let src = '';
-      try { src = readFileSync(resolve(root, 'src/content/faq', f), 'utf8'); } catch { continue; }
-      const block = src.match(/^tags:\s*\n((?:[ \t]+-[ \t]+.*\n)+)/m);
-      if (block) for (const m of block[1].matchAll(/-[ \t]+["']?([^"'\n]+?)["']?\s*$/gm)) tags.add(m[1].trim());
-      const inline = src.match(/^tags:\s*\[([^\]]*)\]/m);
-      if (inline) for (const t of inline[1].split(',')) { const v = t.trim().replace(/^["']|["']$/g, ''); if (v) tags.add(v); }
-    }
+    for (const f of contentFiles('src/content/faq')) for (const t of listFromFrontmatter(resolve(root, 'src/content/faq', f), 'tags')) tags.add(t);
     return [...tags].sort().map((t) => ({ label: t, value: t }));
   }
   const FAQ_TAG_OPTIONS = faqTagOptions();

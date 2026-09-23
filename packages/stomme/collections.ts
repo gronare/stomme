@@ -3,6 +3,7 @@ import { defineCollection, z } from 'astro:content';
 import { glob } from 'astro/loaders';
 import { readdirSync } from 'node:fs';
 import { resolveListings, type Listing } from './src/config.ts';
+import { termCollectionNames } from './src/term-collections.mjs';
 
 const seo = z.object({ title: z.string(), description: z.string(), image: z.string().optional(), ogRaw: z.boolean().optional() });
 const blocks = z.array(z.object({ type: z.string() }).passthrough()).default([]);
@@ -40,6 +41,8 @@ export const PRESET_SCHEMAS = {
     date: dateField.optional(),
   }),
 } as const;
+
+const TERM_SCHEMA = z.object({ title: z.string() });
 
 export function stommeCollections(listings?: Listing[]) {
   const base: Record<string, ReturnType<typeof defineCollection>> = {
@@ -235,8 +238,12 @@ export function stommeCollections(listings?: Listing[]) {
     }),
   };
 
-  for (const l of resolveListings(listings)) {
+  const resolved = resolveListings(listings);
+  for (const l of resolved) {
     if (!(l.id in base)) base[l.id] = defineCollection({ loader: md(l.id), schema: PRESET_SCHEMAS[l.preset] });
+  }
+  for (const name of termCollectionNames(resolved)) {
+    if (!(name in base)) base[name] = defineCollection({ loader: md(name), schema: TERM_SCHEMA });
   }
   return base;
 }

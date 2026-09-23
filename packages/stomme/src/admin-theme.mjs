@@ -181,8 +181,4 @@ export const THEME_CSS = `:root{
     section.field[data-key-path="og.enabled"]{display:grid!important;grid-template-columns:auto minmax(0,1fr)!important;column-gap:14px!important;align-items:center!important;border:1px solid hsl(var(--sui-border-color-2-hsl))!important;border-radius:10px!important;background:hsl(var(--sui-background-color-1-hsl))!important;box-shadow:0 1px 3px hsl(var(--sui-base-hue) 8% 50% / 8%)!important;padding:14px 16px!important;margin:14px 0!important;}
     section.field[data-key-path="og.enabled"] > header{grid-column:2!important;grid-row:1!important;margin:0!important;padding:0!important;height:auto!important;min-height:0!important;}
     section.field[data-key-path="og.enabled"] > .field-wrapper{grid-column:1!important;grid-row:1 / span 2!important;}
-    section.field[data-key-path="og.enabled"] > .footer{grid-column:2!important;grid-row:2!important;margin:0!important;padding:0!important;}
-    /* FAQ tag suggestions (stomme-editor.js): existing tags as click-to-add chips. */
-    .stomme-tag-chips{display:flex;flex-wrap:wrap;gap:8px;width:100%;justify-content:flex-start;padding:10px 0 4px;}
-    .stomme-tag-chip{appearance:none;border:1px dashed hsl(var(--sui-border-color-1-hsl));border-radius:999px;background:hsl(var(--sui-background-color-2-hsl));color:var(--sui-secondary-foreground-color);font:inherit;font-size:12px;line-height:1;padding:7px 12px;cursor:pointer;transition:background 120ms,color 120ms,border-color 120ms;}
-    .stomme-tag-chip:hover{background:var(--sui-primary-accent-color-translucent);border-color:var(--sui-primary-accent-color);color:var(--sui-primary-accent-color-text);border-style:solid;}`;
+    section.field[data-key-path="og.enabled"] > .footer{grid-column:2!important;grid-row:2!important;margin:0!important;padding:0!important;}`;

@@ -32,6 +32,12 @@
         ]
       }
     },
+    "document-groups": {
+      "fields": [
+        "title"
+      ],
+      "passthrough": false
+    },
     "documents": {
       "fields": [
         "title",
@@ -49,6 +55,12 @@
         "answer",
         "order",
         "tags"
+      ],
+      "passthrough": false
+    },
+    "faq-tags": {
+      "fields": [
+        "title"
       ],
       "passthrough": false
     },
@@ -137,6 +149,12 @@
         "eventTime",
         "cover",
         "showCover"
+      ],
+      "passthrough": false
+    },
+    "posts-categories": {
+      "fields": [
+        "title"
       ],
       "passthrough": false
     },

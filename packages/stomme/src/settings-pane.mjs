@@ -1,6 +1,7 @@
 import { i18nConfigBlock, localeFilePath, LOCALIZED_EDITORS } from './cms-i18n.mjs';
+import { termCollections } from './term-collections.mjs';
 
-export function makeSettingsPane({ q, pad, emitWidget, emitNavLinks, emitFooterLinks, emitThanksButtons, COLLECTION_EDITORS, listingEditor, collectionEnabled, FEATURES, LISTINGS, CMS, LOCALES = [], ADDON_PANES, ADDON_PANEL_FILES, getStaticCollections }) {
+export function makeSettingsPane({ q, pad, emitWidget, emitNavLinks, emitFooterLinks, emitThanksButtons, COLLECTION_EDITORS, listingEditor, termEditor = null, collectionEnabled, FEATURES, LISTINGS, CMS, LOCALES = [], ADDON_PANES, ADDON_PANEL_FILES, getStaticCollections }) {
 const multiLocale = LOCALES.length > 1;
 const on = (name) => multiLocale && LOCALIZED_EDITORS.includes(name);
 const anyLocalized = ['nav', 'footer'].some(on);
@@ -11,8 +12,11 @@ const generatedEditors = () => Object.keys(COLLECTION_EDITORS).filter(collection
 function emitCollections(indent) {
   const p = pad(indent);
   const ind = (s) => s.split('\n').map((l) => (l ? p + l : l)).join('\n');
-  const fixed = generatedEditors().map((name) => ind(COLLECTION_EDITORS[name]));
-  const listing = LISTINGS.map((l) => ind(listingEditor(l)));
+  const generated = generatedEditors();
+  const terms = termEditor ? termCollections(LISTINGS, (n) => generated.includes(n)).filter((t) => !getStaticCollections().has(t.name)) : [];
+  const termsOf = (owner) => terms.filter((t) => t.owner === owner).map((t) => ind(termEditor(t)));
+  const fixed = generated.flatMap((name) => [ind(COLLECTION_EDITORS[name]), ...termsOf(name)]);
+  const listing = LISTINGS.flatMap((l) => [ind(listingEditor(l)), ...termsOf(l.id)]);
   // Addon panes last, so an out-of-tree extension can never displace a site's own editors.
   const addon = ADDON_PANES.map((e) => ind(e.yaml.replace(/\n+$/, '')));
   return [...fixed, ...listing, ...addon].join('\n');

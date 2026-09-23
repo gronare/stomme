@@ -5096,14 +5096,15 @@ collections:
       - { name: question, label: "Question", widget: string }
       - { name: answer, label: "Answer", widget: text }
       - { name: order, widget: hidden, required: false, default: 0 }
-      - name: tags
-        label: "Tags"
-        widget: list
-        required: false
-        collapsed: true
-        summary: "{{fields.tag}}"
-        hint: "Scope the question to pages: an FAQ block filtered on a tag (e.g. a service or town) shows every question carrying it. Click a suggested tag to add it, or type a new one."
-        field: { name: tag, label: "Tag", widget: string }
+      - { name: tags, label: "Tags", widget: relation, collection: faq-tags, multiple: true, value_field: "{{title}}", display_fields: ["{{title}}"], search_fields: [title], required: false, hint: "Scope the question to pages: an FAQ block filtered on a tag (e.g. a service or town) shows every question carrying it. Pick a tag; a new tag is created under FAQ tags." }
+  - name: faq-tags
+    label: "FAQ tags"
+    label_singular: "Tag"
+    folder: "src/content/faq-tags"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { name: title, label: "Tag", widget: string }
   # <<< collections:generated
   # >>> settings:generated (run: pnpm cms:gen — do not edit between markers)
   - name: settings
