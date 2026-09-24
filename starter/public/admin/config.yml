@@ -5096,7 +5096,7 @@ collections:
       - { name: question, label: "Question", widget: string }
       - { name: answer, label: "Answer", widget: text }
       - { name: order, widget: hidden, required: false, default: 0 }
-      - { name: tags, label: "Tags", widget: relation, collection: faq-tags, multiple: true, value_field: "{{title}}", display_fields: ["{{title}}"], search_fields: [title], required: false, hint: "Scope the question to pages: an FAQ block filtered on a tag (e.g. a service or town) shows every question carrying it. Pick a tag; a new tag is created under FAQ tags." }
+      - { name: tags, label: "Tags", widget: relation, collection: faq-tags, multiple: true, value_field: "{{title}}", display_fields: ["{{title}}"], search_fields: [title], required: false, hint: "Scope the question to pages: an FAQ block filtered on a tag (e.g. a service or town) shows every question carrying it. Pick a tag or add a new one right in the field." }
   - name: faq-tags
     label: "FAQ tags"
     label_singular: "Tag"

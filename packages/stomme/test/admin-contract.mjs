@@ -46,6 +46,7 @@ const check = async (name, fn) => {
 };
 const has = (page, sel) => page.evaluate((s) => !!document.querySelector(s), sel);
 let optKeys = [];
+class LoginBlocked extends Error {}
 
 try {
   browser = await chromium.launch({ channel: 'chrome', headless: true });
@@ -56,7 +57,11 @@ try {
   page.on('pageerror', (e) => pageErrors.push(String((e && e.message) || e)));
 
   await page.goto(`http://localhost:${PORT}/admin/index.html`, { waitUntil: 'domcontentloaded' });
-  await page.waitForFunction(() => [...document.querySelectorAll('button')].some((b) => /test repository/i.test(b.textContent || '')), null, { timeout: 30000 });
+  const loginAlert = await page.waitForFunction(() => [...document.querySelectorAll('button')].some((b) => /test repository/i.test(b.textContent || '')), null, { timeout: 30000 })
+    .then(() => null)
+    .catch(() => page.evaluate(() => (document.querySelector('[role=alert]')?.innerText || 'the test-repository button never appeared and no [role=alert] explains why').replace(/[\u2068\u2069]/g, '').replace(/\s+/g, ' ').trim()));
+  await check('login screen offers the test-repository sign-in (no config error alert)', () => loginAlert === null || `login blocked: ${loginAlert}`);
+  if (loginAlert !== null) throw new LoginBlocked();
   await page.evaluate(() => { [...document.querySelectorAll('button')].find((b) => /test repository/i.test(b.textContent || '')).click(); });
   await page.waitForSelector('[role=tree], [role=listbox]', { timeout: 30000 });
 
@@ -449,6 +454,61 @@ try {
     const h = await cardHeight(i);
     return h === collapsedH[i] ? true : `collapsed again but the card is ${h}px, not the ${collapsedH[i]}px it started at`;
   }));
+
+  const TERM = 'Old Town';
+  await page.evaluate(() => {
+    window.__stommeSaved = [];
+    window.CMS.registerEventListener({ name: 'preSave', handler: ({ entry }) => {
+      const data = entry && typeof entry.get === 'function' ? entry.get('data') : entry?.data;
+      window.__stommeSaved.push(data && typeof data.toJS === 'function' ? data.toJS() : data);
+    } });
+  });
+  await page.evaluate(() => { location.hash = '#/collections/faq-tags/new'; });
+  await page.waitForSelector('section.field[data-key-path="title"]', { timeout: 30000 });
+  await check('term collection: a new FAQ tag saves its title', async () => {
+    await page.locator('section.field[data-key-path="title"]').getByRole('textbox').fill(TERM);
+    await page.getByRole('button', { name: /^save$/i }).first().click();
+    try { await page.waitForFunction((t) => window.__stommeSaved.some((d) => d && d.title === t), TERM, { timeout: 10000 }); }
+    catch { return `no preSave carried title "${TERM}" — the term entry did not save through the test repository`; }
+    try { await page.waitForFunction(() => !/\/new$/.test(location.hash), null, { timeout: 10000 }); }
+    catch { return 'the editor stayed on the new term after saving'; }
+    return true;
+  });
+
+  await page.evaluate(() => { location.hash = '#/collections/faq/new'; });
+  await page.waitForSelector('section.field[data-key-path="tags"]', { timeout: 30000 });
+  const tags = page.locator('section.field[data-field-type=relation][data-key-path="tags"]');
+  await check('FAQ tags relation offers the inline Add control (button[aria-haspopup=dialog] "Add …")', async () => {
+    const add = tags.getByRole('button', { name: /^add\b/i });
+    if (!(await add.count())) return 'no "Add …" button in the tags relation field — Sveltia no longer offers creating a term in place';
+    if ((await add.first().getAttribute('aria-haspopup')) !== 'dialog') return `the Add button carries aria-haspopup="${await add.first().getAttribute('aria-haspopup')}", not a dialog`;
+    await add.first().click();
+    try { await page.waitForFunction(() => [...document.querySelectorAll('[role=dialog], dialog[open]')].some((d) => d.querySelector('section.field[data-key-path="title"]')), null, { timeout: 5000 }); }
+    catch { return 'the Add button opened no dialog holding the term collection\'s title field'; }
+    await page.keyboard.press('Escape');
+    try { await page.waitForFunction(() => ![...document.querySelectorAll('[role=dialog], dialog[open]')].some((d) => d.querySelector('section.field[data-key-path="title"]')), null, { timeout: 5000 }); }
+    catch { return 'Escape did not close the Add dialog'; }
+    return true;
+  });
+  await check('FAQ tags relation: choosing an existing term stores its title string', async () => {
+    const opt = tags.getByRole('checkbox', { name: TERM }).or(tags.getByRole('option', { name: TERM }));
+    try { await opt.first().waitFor({ timeout: 10000 }); }
+    catch { return `the saved term "${TERM}" is not offered in the tags relation field`; }
+    await opt.first().click();
+    await page.locator('section.field[data-key-path="question"]').getByRole('textbox').fill('Where is the office?');
+    await page.locator('section.field[data-key-path="answer"]').getByRole('textbox').fill('In the old town.');
+    await page.getByRole('button', { name: /^save$/i }).first().click();
+    try { await page.waitForFunction(() => window.__stommeSaved.some((d) => d && Array.isArray(d.tags)), null, { timeout: 10000 }); }
+    catch { return 'the FAQ entry saved no tags array'; }
+    const stored = await page.evaluate(() => window.__stommeSaved.find((d) => d && Array.isArray(d.tags)).tags);
+    return JSON.stringify(stored) === JSON.stringify([TERM]) ? true : `tags stored as ${JSON.stringify(stored)}, not ["${TERM}"]`;
+  });
+} catch (e) {
+  if (!(e instanceof LoginBlocked)) {
+    const why = String(e.message).split('\n')[0];
+    results.push([false, 'contract run aborted', why]);
+    console.log(`✗ contract run aborted — ${why}`);
+  }
 } finally {
   if (browser) await browser.close();
   srv.close();

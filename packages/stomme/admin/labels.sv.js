@@ -1466,7 +1466,7 @@ export default {
   "faq.question.label": ["Question", "Fråga"],
   "faq.answer.label": ["Answer", "Svar"],
   "faq.tags.label": ["Tags", "Taggar"],
-  "faq.tags.hint": ["Scope the question to pages: an FAQ block filtered on a tag (e.g. a service or town) shows every question carrying it. Pick a tag; a new tag is created under FAQ tags.", "Koppla frågan till sidor: ett FAQ-block med ett taggfilter (t.ex. en tjänst eller ort) visar alla frågor med taggen. Välj en tagg; en ny tagg skapas under FAQ-taggar."],
+  "faq.tags.hint": ["Scope the question to pages: an FAQ block filtered on a tag (e.g. a service or town) shows every question carrying it. Pick a tag or add a new one right in the field.", "Koppla frågan till sidor: ett FAQ-block med ett taggfilter (t.ex. en tjänst eller ort) visar alla frågor med taggen. Välj en tagg eller lägg till en ny direkt i fältet."],
   "faq-tags.label": ["FAQ tags", "FAQ-taggar"],
   "faq-tags.label_singular": ["Tag", "Tagg"],
   "faq-tags.title.label": ["Tag", "Tagg"],

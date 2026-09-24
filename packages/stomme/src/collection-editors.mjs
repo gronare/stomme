@@ -70,7 +70,7 @@ ${emitWidget(4, on('pages'))}`,
     - { name: question, label: "Question", widget: string${inline('faq', 'true')} }
     - { name: answer, label: "Answer", widget: text${inline('faq', 'true')} }
     - { name: order, widget: hidden, required: false, default: 0${inline('faq', 'duplicate')} }
-    - { name: tags, label: "Tags", ${relation(FAQ_TAGS, true)}, hint: "Scope the question to pages: an FAQ block filtered on a tag (e.g. a service or town) shows every question carrying it. Pick a tag; a new tag is created under FAQ tags."${inline('faq', 'duplicate')} }`,
+    - { name: tags, label: "Tags", ${relation(FAQ_TAGS, true)}, hint: "Scope the question to pages: an FAQ block filtered on a tag (e.g. a service or town) shows every question carrying it. Pick a tag or add a new one right in the field."${inline('faq', 'duplicate')} }`,
   testimonials: `- name: testimonials
   label: "Testimonials"
   label_singular: "Testimonial"
