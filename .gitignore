@@ -15,5 +15,8 @@ blocks.html
 # create-stomme bundles the starter here at publish time (prepack), removed after (postpack)
 packages/create-stomme/template/
 
-# Local AI-tooling workspace — never part of the engine
-.claude/
+# Local AI-tooling workspace, except the shared block-field-convention skill
+.claude/*
+!.claude/skills/
+.claude/skills/*
+!.claude/skills/block-field-convention/
