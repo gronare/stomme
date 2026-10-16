@@ -44,10 +44,19 @@ const logo = settings.logo ?? {};
 const showMark = nav.showLogo === true && !!logo.image;
 const showWord = nav.showWordmark === true && !!logo.textPre;
 const logoUploads = import.meta.glob<{ default: ImageMetadata }>('/src/assets/media/**/*.{jpg,jpeg,png,webp,avif}');
+const logoVectors = import.meta.glob<string>('/src/assets/media/**/*.svg', { query: '?raw', import: 'default' });
+const inlineSvg = (raw: string, cls: string, prefix: string) => raw
+  .replace(/<\?xml[^>]*>\s*/, '')
+  .replace(/\bid="([^"]+)"/g, `id="${prefix}-$1"`)
+  .replace(/url\(#([^)]+)\)/g, `url(#${prefix}-$1)`)
+  .replace(/href="#([^"]+)"/g, `href="#${prefix}-$1"`)
+  .replace(/<svg\b([^>]*)>/, (_m, attrs: string) => `<svg class="${cls}" aria-hidden="true" focusable="false"${attrs.replace(/\s(class|aria-hidden|role|aria-label)="[^"]*"/g, '')}>`);
 const logoKey = logo.image && logo.image.startsWith('/media/') ? `/src/assets/media/${logo.image.slice('/media/'.length)}` : null;
 const logoOptimized = logoKey && logoUploads[logoKey] ? logoUploads[logoKey] : null;
 const logoDarkKey = logo.imageDark && logo.imageDark.startsWith('/media/') ? `/src/assets/media/${logo.imageDark.slice('/media/'.length)}` : null;
 const logoDarkOptimized = logoDarkKey && logoUploads[logoDarkKey] ? logoUploads[logoDarkKey] : null;
+const logoVector = logoKey && logoVectors[logoKey] ? inlineSvg(await logoVectors[logoKey](), 'logo-mark', 'logo') : null;
+const logoDarkVector = logoDarkKey && logoVectors[logoDarkKey] ? inlineSvg(await logoVectors[logoDarkKey](), 'logo-mark logo-mark--ondark', 'logo-dark') : null;
 const inLocale = localeLinker(site, here.locale, locales.enabled ? pageEntries : []);
 const homeHref = inLocale('/');
 const ownPages = autoNav ? defaultLocaleEntries(pageEntries, site) : [];
@@ -90,10 +99,14 @@ const isActive = (href: string) => !!href && navPath(href) === current;
 <header class:list={['site-header', { 'is-sticky': !!sticky, 'is-sticky--phone': sticky === 'phone' }]}>
   <div class="site-header__glass" aria-hidden="true"></div>
     <a class:list={['logo', { 'logo--plate': logo.plate === true }]} href={homeHref} aria-label={settings.name}>
-      {showMark && (logoOptimized
-        ? <Image class="logo-mark" src={logoOptimized()} alt={logo.alt ?? ''} />
+      {showMark && (logoVector
+        ? <Fragment set:html={logoVector} />
+        : logoOptimized
+        ? <Image class="logo-mark" src={logoOptimized()} alt={logo.alt ?? ''} loading="eager" />
         : <img class="logo-mark" src={logo.image} alt={logo.alt ?? ''} />)}
-      {showMark && logo.imageDark && (logoDarkOptimized
+      {showMark && logo.imageDark && (logoDarkVector
+        ? <Fragment set:html={logoDarkVector} />
+        : logoDarkOptimized
         ? <Image class="logo-mark logo-mark--ondark" src={logoDarkOptimized()} alt={logo.alt ?? ''} />
         : <img class="logo-mark logo-mark--ondark" src={logo.imageDark} alt={logo.alt ?? ''} />)}
       {showWord && <span class="logo-word">{logo.textPre}<span class="accent">{logo.textAccent}</span></span>}
