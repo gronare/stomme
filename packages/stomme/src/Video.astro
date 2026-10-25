@@ -1,0 +1,63 @@
+---
+import { getImage } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+
+interface Props {
+  video?: string;
+  videoWebm?: string;
+  videoUrl?: string;
+  poster?: string;
+  alt?: string;
+  width?: number;
+  class?: string;
+  pauseLabel?: string;
+  playLabel?: string;
+}
+const { video, videoWebm, videoUrl, poster, alt = '', width = 1600, class: cls, pauseLabel = 'Pause video', playLabel = 'Play video' } = Astro.props;
+
+const videoFiles = import.meta.glob('/src/assets/media/**/*.{mp4,webm}', { query: '?url', import: 'default', eager: true }) as Record<string, string>;
+const uploads = import.meta.glob<{ default: ImageMetadata }>('/src/assets/media/**/*.{jpg,jpeg,png,webp,avif}');
+const mediaKey = (p?: string) => (p && p.startsWith('/media/') ? `/src/assets/media/${p.slice('/media/'.length)}` : null);
+const fileUrl = (p?: string) => { const k = mediaKey(p); return (k && videoFiles[k]) || p || undefined; };
+const typeOf = (p: string) => (/\.webm(\?|#|$)/i.test(p) ? 'video/webm' : 'video/mp4');
+
+const sources = videoUrl ? [videoUrl] : [fileUrl(videoWebm), fileUrl(video)].filter((s): s is string => !!s);
+const posterKey = mediaKey(poster);
+const posterMod = posterKey && uploads[posterKey] ? (await uploads[posterKey]()).default : null;
+const posterImg = posterMod ? await getImage({ src: posterMod, width: Math.min(width, posterMod.width) }) : null;
+const posterSrc = posterImg?.src ?? poster;
+const dims = posterImg ? { width: posterImg.attributes.width, height: posterImg.attributes.height } : {};
+---
+{sources.length > 0 && (
+  <div class:list={['media-video', cls]}>
+    <video class="media-video__el" autoplay muted loop playsinline preload="metadata" poster={posterSrc} aria-label={alt || undefined} {...dims}>
+      {sources.map((src) => <source src={src} type={typeOf(src)} />)}
+    </video>
+    <button type="button" class="media-video__toggle" aria-label={pauseLabel} data-pause-label={pauseLabel} data-play-label={playLabel}></button>
+  </div>
+)}
+<script>
+  const still = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const videos = () => Array.from(document.querySelectorAll<HTMLVideoElement>('.media-video__el'));
+  const label = (v: HTMLVideoElement) => {
+    const b = v.parentElement?.querySelector<HTMLButtonElement>('.media-video__toggle');
+    if (!b) return;
+    b.setAttribute('aria-label', (v.paused ? b.dataset.playLabel : b.dataset.pauseLabel) || '');
+    v.parentElement?.classList.toggle('is-paused', v.paused);
+  };
+  const settle = () => videos().forEach((v) => {
+    if (still.matches) { v.removeAttribute('autoplay'); v.pause(); v.load(); }
+    else if (v.paused && !v.parentElement?.classList.contains('is-held')) v.play().catch(() => {});
+    label(v);
+  });
+  videos().forEach((v) => { v.addEventListener('play', () => label(v)); v.addEventListener('pause', () => label(v)); });
+  document.addEventListener('click', (event) => {
+    const b = (event.target as Element | null)?.closest?.('.media-video__toggle');
+    const v = b?.parentElement?.querySelector<HTMLVideoElement>('.media-video__el');
+    if (!b || !v) return;
+    if (v.paused) { b.parentElement?.classList.remove('is-held'); v.play().catch(() => {}); }
+    else { b.parentElement?.classList.add('is-held'); v.pause(); }
+  });
+  still.addEventListener('change', settle);
+  settle();
+</script>

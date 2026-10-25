@@ -25,7 +25,7 @@ Not published to a registry yet — clone the repository and scaffold from it. S
 | `@gronare/stomme/Head.astro` | Title, description, Open Graph, Twitter card, favicon, canonical and noindex. |
 | `@gronare/stomme/Cover.astro`, `Icon.astro` | Optimized image + the icon set. |
 | `@gronare/stomme/Thanks.astro`, `TownPage.astro`, `ServicePage.astro`, `PostPage.astro`, `CatalogPage.astro` | Page templates. |
-| `@gronare/stomme/markdown`, `href`, `fonts`, `contact` | `renderMarkdown`, `resolveLink`, `resolveFonts`, the contact-form handler. |
+| `@gronare/stomme/markdown`, `href`, `fonts`, `theme`, `contact` | `renderMarkdown`, `resolveLink`, `resolveFonts`, `themeStyle`/`nightStyle` (the theme's day and night colours), the contact-form handler. |
 | `@gronare/stomme/blocks/*`, `routes/*` | Individual block components and the injectable routes. |
 
 ## Bin scripts

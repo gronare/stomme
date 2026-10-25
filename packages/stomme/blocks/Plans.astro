@@ -11,6 +11,7 @@ interface Plan {
   features?: { text?: string }[];
   badge?: string;
   highlight?: boolean;
+  note?: { label?: string; text?: string };
   cta?: { label?: string; link?: unknown };
   ctaLabel?: string;
   ctaHref?: unknown;
@@ -53,6 +54,12 @@ const anyPrefix = plans.some((p) => p.pricePrefix);
             <ul class="plan__features">
               {p.features.filter((f) => f && f.text).map((f) => <li><Emph text={f.text} /></li>)}
             </ul>
+          )}
+          {(p.note?.label || p.note?.text) && (
+            <div class="plan__note">
+              {p.note?.label && <span class="mono plan__note-label">{p.note.label}</span>}
+              {p.note?.text && <p class="plan__note-text"><Emph text={p.note.text} /></p>}
+            </div>
           )}
           {(() => { const btn = resolveButton(p.cta, p.ctaLabel, p.ctaHref); return btn && (
             <a href={btn.href} class="btn plan__cta">{btn.label}</a>

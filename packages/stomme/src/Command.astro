@@ -1,0 +1,40 @@
+---
+interface Props { text: string; copy?: string; copied?: string; copyLabel?: string; class?: string }
+const { text, copy = 'Copy', copied = 'Copied', copyLabel = 'Copy command', class: cls } = Astro.props;
+---
+<div class:list={['command', cls]} data-copied-text={copied}>
+  <code class="command__line"><span class="command__prompt" aria-hidden="true">$ </span><span class="command__text">{text}</span></code>
+  <button type="button" class="command__copy" aria-label={copyLabel} data-copy-text={copy}>{copy}</button>
+  <span class="command__status" role="status"></span>
+</div>
+<script>
+  const selectText = (node: Element) => {
+    const sel = window.getSelection();
+    if (!sel) return;
+    const range = document.createRange();
+    range.selectNodeContents(node);
+    sel.removeAllRanges();
+    sel.addRange(range);
+  };
+  document.addEventListener('click', (event) => {
+    const button = (event.target as Element | null)?.closest?.('.command__copy') as HTMLButtonElement | null;
+    if (!button) return;
+    const box = button.closest('.command') as HTMLElement | null;
+    const textNode = box?.querySelector('.command__text');
+    if (!box || !textNode) return;
+    const status = box.querySelector('.command__status');
+    const done = () => {
+      button.textContent = box.dataset.copiedText || 'Copied';
+      if (status) status.textContent = box.dataset.copiedText || 'Copied';
+      box.classList.add('is-copied');
+      window.setTimeout(() => {
+        button.textContent = button.dataset.copyText || 'Copy';
+        if (status) status.textContent = '';
+        box.classList.remove('is-copied');
+      }, 2000);
+    };
+    const value = textNode.textContent ?? '';
+    if (navigator.clipboard?.writeText) navigator.clipboard.writeText(value).then(done, () => selectText(textNode));
+    else selectText(textNode);
+  });
+</script>

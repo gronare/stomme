@@ -25,6 +25,32 @@ Two ways to set the palette:
 - **Editor-managed** — the `theme` content collection. `Base.astro` reads it and
   injects the tokens onto `<html>` at runtime, so a client can recolor from `/admin`.
 
+### Dark mode
+
+A site is light unless its theme says otherwise. Set `scheme: auto` in `theme.md` and
+the night colours take over while the visitor's system is in dark mode:
+
+```yaml
+# src/content/theme/theme.md
+scheme: auto
+nightBrand: "#f0a070"
+nightInk: "#ecebe5"
+nightPaper: "#141417"
+nightSurface: "#1d1d22"
+nightLine: "#3a3a44"
+```
+
+Every colour has a `night…` twin (`nightMuted`, `nightOnDark`, `nightHighlight`,
+`nightSecondary`, `nightDark`, `nightDarkInk`, `nightDarkLine`); one left empty keeps its
+day value. `Base.astro` writes them with `themeStyle()` and `nightStyle()` from
+`@gronare/stomme/theme`, the same helpers the starter layout uses.
+
+### Fonts
+
+`fontDisplay` and `fontBody` pick the heading and body fonts, and `fontMono` the code
+font used for commands and labels. Each can be `custom` with an uploaded file:
+`fontCustomFile`, `fontCustomBodyFile` and `fontCustomMonoFile`, under `/media/fonts/`.
+
 To restyle a component, just write your own rule after the import — the library
 classes are plain and overridable (no `!important`, no scoped-style fights).
 

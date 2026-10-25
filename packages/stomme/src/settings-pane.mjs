@@ -267,6 +267,27 @@ ${emitShareCards(6)}
           - { name: dark, label: "Dark section background", widget: color, required: false, hint: "Background for blocks set to the Dark surface. Empty = derived from Primary." }
           - { name: darkInk, label: "Dark section text", widget: color, required: false, hint: "Text colour on dark sections. Empty = a light off-white." }
           - { name: darkLine, label: "Dark section borders", widget: color, required: false, hint: "Card borders / dividers on dark sections. Empty = a faint light rule." }
+          - name: scheme
+            label: "Dark mode"
+            widget: select
+            required: false
+            default: light
+            hint: "'Follow the visitor's system' switches to the night colours below while their device is in dark mode."
+            options:
+              - { label: "Off (always light)", value: light }
+              - { label: "Follow the visitor's system", value: auto }
+          - { name: nightBrand, label: "Night · Primary", widget: color, required: false, hint: "Used when Dark mode follows the system. Empty keeps the day colour." }
+          - { name: nightInk, label: "Night · Text", widget: color, required: false, hint: "Used when Dark mode follows the system. Empty keeps the day colour." }
+          - { name: nightMuted, label: "Night · Secondary text", widget: color, required: false, hint: "Used when Dark mode follows the system. Empty keeps the day colour." }
+          - { name: nightOnDark, label: "Night · Text on primary", widget: color, required: false, hint: "Used when Dark mode follows the system. Empty keeps the day colour." }
+          - { name: nightSurface, label: "Night · Tinted surface", widget: color, required: false, hint: "Used when Dark mode follows the system. Empty keeps the day colour." }
+          - { name: nightPaper, label: "Night · Page background", widget: color, required: false, hint: "Used when Dark mode follows the system. Empty keeps the day colour." }
+          - { name: nightLine, label: "Night · Borders & lines", widget: color, required: false, hint: "Used when Dark mode follows the system. Empty keeps the day colour." }
+          - { name: nightHighlight, label: "Night · Highlight", widget: color, required: false, hint: "Used when Dark mode follows the system. Empty keeps the day colour." }
+          - { name: nightSecondary, label: "Night · Secondary", widget: color, required: false, hint: "Used when Dark mode follows the system. Empty keeps the day colour." }
+          - { name: nightDark, label: "Night · Dark section background", widget: color, required: false, hint: "Used when Dark mode follows the system. Empty keeps the day colour." }
+          - { name: nightDarkInk, label: "Night · Dark section text", widget: color, required: false, hint: "Used when Dark mode follows the system. Empty keeps the day colour." }
+          - { name: nightDarkLine, label: "Night · Dark section borders", widget: color, required: false, hint: "Used when Dark mode follows the system. Empty keeps the day colour." }
           - name: fontDisplay
             label: "Heading font"
             widget: select
@@ -309,6 +330,15 @@ ${emitShareCards(6)}
               - { label: "Custom (uploaded below)", value: "custom" }
           - { name: fontCustomFile, label: "Custom heading font file", widget: file, required: false, media_folder: "/public/media/fonts", public_folder: "/media/fonts", hint: "Used when Heading font = Custom. A .woff2 / .woff / .ttf / .otf file (a font file, not an SVG)." }
           - { name: fontCustomBodyFile, label: "Custom body font file", widget: file, required: false, media_folder: "/public/media/fonts", public_folder: "/media/fonts", hint: "Used when Body font = Custom. Leave empty to reuse the heading font for body." }
+          - name: fontMono
+            label: "Code font"
+            widget: select
+            required: false
+            hint: "Font for commands, labels and other monospace text. Empty = the system monospace."
+            options:
+              - { label: "System monospace (default)", value: "mono" }
+              - { label: "Custom (uploaded below)", value: "custom" }
+          - { name: fontCustomMonoFile, label: "Custom code font file", widget: file, required: false, media_folder: "/public/media/fonts", public_folder: "/media/fonts", hint: "Used when Code font = Custom. A .woff2 / .woff / .ttf / .otf file." }
       - name: nav
         label: "Header"
         file: "${filePath('nav', 'src/content/navigation/nav.md')}"${line('nav', 8, 'i18n: true')}

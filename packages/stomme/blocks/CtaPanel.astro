@@ -1,23 +1,36 @@
 ---
 import { resolveButton } from '../src/href';
+import Command from '../src/Command.astro';
 
 interface Props {
   eyebrow?: string;
   heading?: string;
   intro?: string;
+  command?: string;
   cta?: { label?: string; link?: unknown };
+  cta2?: { label?: string; link?: unknown };
   label?: string;
   href?: unknown;
   anchor?: string;
+  site?: { strings?: { controls?: { copy?: string; copied?: string; copyCommand?: string } } };
 }
-const { eyebrow, heading, intro, cta, label, href, anchor } = Astro.props;
+const { eyebrow, heading, intro, command, cta, cta2, label, href, anchor, site } = Astro.props;
 const btn = resolveButton(cta, label, href);
+const btn2 = resolveButton(cta2);
+const controls = site?.strings?.controls ?? {};
 ---
 <section data-stomme-block="ctaPanel" id={anchor || undefined} class="section">
   <div class="band cta-panel">
     {eyebrow && <span class="mono">{eyebrow}</span>}
     {heading && <h2 class="display" style="margin-top:0.5rem">{heading}</h2>}
     {intro && <p class="lead">{intro}</p>}
-    {btn && <p style="margin-top:1.75rem;margin-bottom:0"><a href={btn.href} class="btn">{btn.label}</a></p>}
+    {command && <Command text={command} class="cta-panel__command" copy={controls.copy} copied={controls.copied} copyLabel={controls.copyCommand} />}
+    {btn && !btn2 && <p style="margin-top:1.75rem;margin-bottom:0"><a href={btn.href} class="btn">{btn.label}</a></p>}
+    {btn2 && (
+      <p class="btn-row cta-panel__buttons">
+        {btn && <a href={btn.href} class="btn">{btn.label}</a>}
+        <a href={btn2.href} class="btn btn-outline">{btn2.label}</a>
+      </p>
+    )}
   </div>
 </section>

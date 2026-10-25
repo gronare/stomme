@@ -51,12 +51,13 @@ export function curatedWebfontUrls(): Record<string, string> {
 }
 
 export function resolveFonts(
-  theme: { fontDisplay?: string; fontBody?: string; fontCustomFile?: string; fontCustomBodyFile?: string } = {},
+  theme: { fontDisplay?: string; fontBody?: string; fontMono?: string; fontCustomFile?: string; fontCustomBodyFile?: string; fontCustomMonoFile?: string } = {},
   maybeWebfontUrls?: Record<string, string> | string | null,
 ): { vars: string[]; fontFace: string | null; preloads: { href: string; type: string }[] } {
   const webfontUrls = maybeWebfontUrls && typeof maybeWebfontUrls === 'object' ? maybeWebfontUrls : curatedWebfontUrls();
   const customDisplayUrl = uploadFontUrl(theme.fontCustomFile);
   const customBodyUrl = uploadFontUrl(theme.fontCustomBodyFile);
+  const customMonoUrl = uploadFontUrl(theme.fontCustomMonoFile);
   const stack = (key: string | undefined, customFamily: string | null): string | null => {
     if (key === 'custom') return customFamily ? `${customFamily}, ${FONT_STACKS.system}` : null;
     if (key && WEBFONTS[key]) {
@@ -72,11 +73,16 @@ export function resolveFonts(
   if (d) vars.push(`--font-display:${d}`);
   const b = stack(theme.fontBody, bodyFamily);
   if (b) vars.push(`--font-sans:${b}`);
+  const m = theme.fontMono === 'custom'
+    ? (customMonoUrl ? `"StommeFontMono", ${FONT_STACKS.mono}` : null)
+    : theme.fontMono ? stack(theme.fontMono, null) : null;
+  if (m) vars.push(`--font-mono:${m}`);
   const faces: string[] = [];
   const preloads: { href: string; type: string }[] = [];
   if (customDisplayUrl) { faces.push(fontFace('StommeFontDisplay', customDisplayUrl)); preloads.push({ href: customDisplayUrl, type: mimeOf(customDisplayUrl) }); }
   if (customBodyUrl) { faces.push(fontFace('StommeFontBody', customBodyUrl)); preloads.push({ href: customBodyUrl, type: mimeOf(customBodyUrl) }); }
-  const webfontKeys = [...new Set([theme.fontDisplay, theme.fontBody])].filter(
+  if (customMonoUrl && theme.fontMono === 'custom') { faces.push(fontFace('StommeFontMono', customMonoUrl)); preloads.push({ href: customMonoUrl, type: mimeOf(customMonoUrl) }); }
+  const webfontKeys = [...new Set([theme.fontDisplay, theme.fontBody, theme.fontMono])].filter(
     (k): k is string => !!k && !!WEBFONTS[k] && !!webfontUrls[k],
   );
   for (const key of webfontKeys) {

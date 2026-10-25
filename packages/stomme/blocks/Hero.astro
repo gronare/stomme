@@ -5,6 +5,8 @@ import Cover from '../src/Cover.astro';
 import Icon from '../src/Icon.astro';
 import Emph from '../src/Emph.astro';
 import ContactLink from '../src/ContactLink.astro';
+import Command from '../src/Command.astro';
+import Video from '../src/Video.astro';
 
 interface Highlight { icon?: string; title: string; body?: string }
 interface Props {
@@ -18,12 +20,15 @@ interface Props {
   ctaHref?: unknown;
   cta2Label?: string;
   cta2Href?: unknown;
-  media?: { kind?: 'none' | 'image' | 'highlights' | 'motif'; image?: string; imageAlt?: string; highlights?: Highlight[] };
-  layout?: { height?: 'normal' | 'tall'; align?: 'top' | 'center' | 'bottom'; width?: 'narrow' | 'full' };
+  command?: string;
+  media?: { kind?: 'none' | 'image' | 'video' | 'highlights' | 'motif'; image?: string; imageAlt?: string; video?: string; videoWebm?: string; videoUrl?: string; ratio?: 'standard' | 'wide' | 'square'; highlights?: Highlight[] };
+  layout?: { height?: 'normal' | 'tall'; align?: 'top' | 'center' | 'bottom'; width?: 'narrow' | 'full'; mediaPosition?: 'beside' | 'below' };
   style?: { surface?: string; accent?: 'brand' | 'secondary' | 'highlight' };
   anchor?: string;
+  site?: { strings?: { controls?: { copy?: string; copied?: string; copyCommand?: string; pauseVideo?: string; playVideo?: string } } };
 }
-const { eyebrow, heading, intro, cta, cta2, ctaLabel, ctaHref, cta2Label, cta2Href, ticks = [], anchor } = Astro.props;
+const { eyebrow, heading, intro, cta, cta2, ctaLabel, ctaHref, cta2Label, cta2Href, ticks = [], anchor, command, site } = Astro.props;
+const controls = site?.strings?.controls ?? {};
 const kind = Astro.props.media?.kind ?? 'none';
 const image = Astro.props.media?.image;
 const imageAlt = Astro.props.media?.imageAlt;
@@ -39,10 +44,16 @@ const contact = ((await getEntry('contact', 'contact').catch(() => null))?.data 
 const showImage = kind === 'image' && !!image;
 const showHighlights = kind === 'highlights' && highlights.length > 0;
 const showMotif = kind === 'motif';
-const hasMedia = showImage || showHighlights || showMotif;
+const media = Astro.props.media ?? {};
+const showVideo = kind === 'video' && !!(media.video || media.videoWebm || media.videoUrl);
+const hasMedia = showImage || showVideo || showHighlights || showMotif;
+const below = Astro.props.layout?.mediaPosition === 'below' && (showImage || showVideo);
+const RATIOS: Record<string, string> = { wide: '16 / 9', square: '1 / 1' };
+const ratio = media.ratio ? RATIOS[media.ratio] : undefined;
+const mediaWidth = below ? 2000 : 1000;
 ---
 <section data-stomme-block="hero" id={anchor || undefined} class:list={['section', { 'section--hero-tall': height === 'tall', 'section--read': width === 'narrow' }, height === 'tall' && `section--hero-${align}`]} style={`--block-accent:${accentVar}`}>
-  <div class:list={['hero-grid', { 'has-media': hasMedia }]}>
+  <div class:list={['hero-grid', { 'has-media': hasMedia && !below, 'hero-grid--below': below }]}>
     <div>
       {eyebrow && <span class="mono eyebrow">{eyebrow}</span>}
       <h1 class="display display--hero" style="margin-top:1rem"><Emph text={heading} /></h1>
@@ -61,11 +72,18 @@ const hasMedia = showImage || showHighlights || showMotif;
           {!btn2 && contact.phone && <ContactLink kind="tel" class="btn-ghost" target={contact.phoneE164 || contact.phone} display={contact.phone} suffix=" →" protect={!!contact.protectContact} />}
         </div>
       )}
+      {command && <Command text={command} class="hero-command" copy={controls.copy} copied={controls.copied} copyLabel={controls.copyCommand} />}
     </div>
 
     {showImage && (
-      <div class="hero-media">
-        <Cover src={image} alt={imageAlt ?? heading} placeholder="/images/placeholder.svg" width={1000} height={750} loading="eager" class="hero-img" />
+      <div class="hero-media" style={ratio ? `--hero-ratio:${ratio}` : undefined}>
+        <Cover src={image} alt={imageAlt ?? heading} placeholder="/images/placeholder.svg" width={mediaWidth} height={Math.round(mediaWidth * 0.75)} loading="eager" class="hero-img" />
+      </div>
+    )}
+
+    {showVideo && (
+      <div class:list={['hero-media', { 'hero-media--shaped': ratio }]} style={ratio ? `--hero-ratio:${ratio}` : undefined}>
+        <Video video={media.video} videoWebm={media.videoWebm} videoUrl={media.videoUrl} poster={image} alt={imageAlt} width={mediaWidth} class="hero-video" pauseLabel={controls.pauseVideo} playLabel={controls.playVideo} />
       </div>
     )}
 

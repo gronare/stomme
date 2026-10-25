@@ -2,6 +2,7 @@
 import '../styles/global.css';
 import { getEntry, getCollection } from 'astro:content';
 import { resolveFonts, curatedWebfontUrls } from '@gronare/stomme/fonts';
+import { themeStyle, nightStyle } from '@gronare/stomme/theme';
 import Header from '@gronare/stomme/Header.astro';
 import Footer from '@gronare/stomme/Footer.astro';
 import Tracking from '@gronare/stomme/Tracking.astro';
@@ -23,24 +24,8 @@ const towns = footerCfg.showTowns === true
       .map((t) => ({ id: t.id, name: t.data.name }))
   : [];
 const fonts = resolveFonts(theme, curatedWebfontUrls());
-const eyebrowAccent = theme.eyebrowColor === 'highlight' || theme.eyebrowColor === 'secondary' ? theme.eyebrowColor : 'brand';
-
-const themeVars = [
-  `--color-brand:${theme.brand}`,
-  `--color-ink:${theme.ink}`,
-  ...(theme.muted ? [`--color-muted:${theme.muted}`] : []),
-  `--color-on-dark:${theme.onDark}`,
-  `--color-surface:${theme.surface}`,
-  `--color-paper:${theme.paper}`,
-  `--color-line:${theme.line}`,
-  `--color-highlight:${theme.highlight}`,
-  ...(theme.secondary ? [`--color-secondary:${theme.secondary}`] : []),
-  `--eyebrow-accent:var(--color-${eyebrowAccent})`,
-  ...(theme.dark ? [`--color-dark:${theme.dark}`] : []),
-  ...(theme.darkInk ? [`--color-dark-ink:${theme.darkInk}`] : []),
-  ...(theme.darkLine ? [`--color-dark-line:${theme.darkLine}`] : []),
-  ...fonts.vars,
-].join(';');
+const themeVars = themeStyle(theme, fonts.vars);
+const night = nightStyle(theme);
 ---
 <!doctype html>
 <html lang={pageLang(Astro.url.pathname, site, lang)} style={themeVars} data-eyebrow={theme.eyebrow}>
@@ -50,6 +35,7 @@ const themeVars = [
     <StommeHead title={title} description={description} image={image} />
     {fonts.preloads.map((p) => <link rel="preload" as="font" type={p.type} href={p.href} crossorigin />)}
     {fonts.fontFace && <style is:inline set:html={fonts.fontFace}></style>}
+    {night && <style is:inline set:html={night}></style>}
     {chrome && <Tracking />}
   </head>
   <body>

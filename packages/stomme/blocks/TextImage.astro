@@ -1,30 +1,42 @@
 ---
 import { renderMarkdown } from '../src/markdown';
 import Cover from '../src/Cover.astro';
+import Video from '../src/Video.astro';
 
 interface Props {
+  eyebrow?: string;
   heading?: string;
   body?: string;
-  media?: { image?: string; imageAlt?: string };
+  media?: { kind?: 'image' | 'video'; fit?: 'frame' | 'cutout'; image?: string; imageAlt?: string; video?: string; videoWebm?: string; videoUrl?: string };
   layout?: { flip?: boolean };
   localeLink?: (href: string) => string;
   anchor?: string;
+  site?: { strings?: { controls?: { pauseVideo?: string; playVideo?: string } } };
 }
-const { heading, body = '', localeLink, anchor } = Astro.props;
-const image = Astro.props.media?.image;
-const imageAlt = Astro.props.media?.imageAlt;
+const { eyebrow, heading, body = '', localeLink, anchor, site } = Astro.props;
+const media = Astro.props.media ?? {};
+const image = media.image;
+const imageAlt = media.imageAlt;
 const flip = Astro.props.layout?.flip ?? false;
+const showVideo = media.kind === 'video' && !!(media.video || media.videoWebm || media.videoUrl);
+const hasText = !!(eyebrow || heading || body.trim());
 const html = await renderMarkdown(body, localeLink);
+const controls = site?.strings?.controls ?? {};
 ---
 
 <section data-stomme-block="textImage" id={anchor || undefined} class="section">
-  <div class="ti-grid">
-    <div class={flip ? 'ti-text ti-second' : 'ti-text'}>
-      {heading && <h2 class="display">{heading}</h2>}
-      <div class:list={['prose', { 'ti-body': heading }]} set:html={html} />
-    </div>
-    <div class={flip ? 'ti-first' : ''}>
-      <Cover src={image} alt={imageAlt ?? ''} placeholder="/images/placeholder.svg" width={960} height={720} class="ti-img" />
+  <div class:list={['ti-grid', { 'ti-grid--media-only': !hasText }]}>
+    {hasText && (
+      <div class={flip ? 'ti-text ti-second' : 'ti-text'}>
+        {eyebrow && <span class="mono eyebrow">{eyebrow}</span>}
+        {heading && <h2 class:list={['display', { 'ti-heading': eyebrow }]}>{heading}</h2>}
+        <div class:list={['prose', { 'ti-body': heading || eyebrow }]} set:html={html} />
+      </div>
+    )}
+    <div class={flip && hasText ? 'ti-first' : ''}>
+      {showVideo
+        ? <Video video={media.video} videoWebm={media.videoWebm} videoUrl={media.videoUrl} poster={image} alt={imageAlt} width={hasText ? 1200 : 2000} class="ti-video" pauseLabel={controls.pauseVideo} playLabel={controls.playVideo} />
+        : <Cover src={image} alt={imageAlt ?? ''} placeholder="/images/placeholder.svg" width={hasText ? 960 : 2000} height={hasText ? 720 : 1500} class={media.fit === 'cutout' ? 'ti-img ti-img--cutout' : 'ti-img'} />}
     </div>
   </div>
 </section>

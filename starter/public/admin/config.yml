@@ -106,6 +106,7 @@ collections:
                               - { label: "About (/about)", value: "/about" }
                               - { label: "Contact (/contact)", value: "/contact" }
                           - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
+                  - { name: command, label: "Command", widget: string, required: false, hint: "A one-line shell command shown in monospace with a copy button, e.g. an install command." }
                   - name: media
                     label: "Media"
                     widget: object
@@ -118,14 +119,28 @@ collections:
                         widget: select
                         required: false
                         default: "none"
-                        hint: "What shows beside the heading: none, image, highlights or motif."
+                        hint: "What shows beside the heading: none, image, video, highlights or motif."
                         options:
                           - { label: "None (text only)", value: "none" }
                           - { label: "Image", value: "image" }
+                          - { label: "Video (looping, muted)", value: "video" }
                           - { label: "Highlights (icon + title + line)", value: "highlights" }
                           - { label: "Motif (animated, no image)", value: "motif" }
-                      - { name: image, label: "Image", widget: image, required: false, hint: "Used when Show = Image." }
+                      - { name: image, label: "Image", widget: image, required: false, hint: "Used when Show = Image, and as the poster when Show = Video." }
                       - { name: imageAlt, label: "Image alt text", widget: string, required: false, hint: "Describe the image for screen readers and search engines." }
+                      - { name: video, label: "Video file (MP4)", widget: file, required: false, hint: "Used when Show = Video. Plays muted and looping; the image above is the poster, and the only thing shown to visitors who ask for reduced motion." }
+                      - { name: videoWebm, label: "Video file (WebM)", widget: file, required: false, hint: "Optional second encoding of the same video. Browsers that play WebM pick it first." }
+                      - { name: videoUrl, label: "…or video URL", widget: string, required: false, hint: "External MP4/WebM URL. Used instead of an uploaded file if filled." }
+                      - name: ratio
+                        label: "Shape"
+                        widget: select
+                        required: false
+                        default: "standard"
+                        hint: "The shape the image or video is shown in. Wide suits screenshots."
+                        options:
+                          - { label: "Standard (4:3)", value: "standard" }
+                          - { label: "Wide (16:9)", value: "wide" }
+                          - { label: "Square", value: "square" }
                       - name: highlights
                         label: "Highlights"
                         widget: list
@@ -231,6 +246,15 @@ collections:
                         options:
                           - { label: "Full width", value: "full" }
                           - { label: "Narrow (reading column)", value: "narrow" }
+                      - name: mediaPosition
+                        label: "Media position"
+                        widget: select
+                        required: false
+                        default: "beside"
+                        hint: "Below puts the image or video under the text at the full width of the section."
+                        options:
+                          - { label: "Beside the text", value: "beside" }
+                          - { label: "Below the text", value: "below" }
                       - name: beside
                         label: "Placement"
                         widget: select
@@ -547,16 +571,37 @@ collections:
                 label: "Text + image"
                 widget: object
                 fields:
+                  - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
                   - { name: heading, label: "Heading", widget: string, required: false }
-                  - { name: body, label: "Text", widget: markdown }
+                  - { name: body, label: "Text", widget: markdown, required: false, hint: "Leave the heading and text empty and the image or video takes the whole row." }
                   - name: media
                     label: "Media"
                     widget: object
                     collapsed: true
-                    hint: "The picture beside the text."
+                    hint: "The picture or video beside the text."
                     fields:
-                      - { name: image, label: "Image", widget: image, required: false }
+                      - name: kind
+                        label: "Show"
+                        widget: select
+                        required: false
+                        default: "image"
+                        options:
+                          - { label: "Image", value: "image" }
+                          - { label: "Video (looping, muted)", value: "video" }
+                      - { name: image, label: "Image", widget: image, required: false, hint: "The picture, and the poster when Show = Video." }
                       - { name: imageAlt, label: "Alt text", widget: string, required: false }
+                      - name: fit
+                        label: "Image style"
+                        widget: select
+                        required: false
+                        default: "frame"
+                        hint: "Cut-out suits a picture with a see-through background, such as a phone or a product."
+                        options:
+                          - { label: "Framed, filling the column", value: "frame" }
+                          - { label: "Cut-out, no frame, at most 20rem wide", value: "cutout" }
+                      - { name: video, label: "Video file (MP4)", widget: file, required: false, hint: "Used when Show = Video. Plays muted and looping; the image above is the poster, and the only thing shown to visitors who ask for reduced motion." }
+                      - { name: videoWebm, label: "Video file (WebM)", widget: file, required: false, hint: "Optional second encoding of the same video. Browsers that play WebM pick it first." }
+                      - { name: videoUrl, label: "…or video URL", widget: string, required: false, hint: "External MP4/WebM URL. Used instead of an uploaded file if filled." }
                   - name: layout
                     label: "Layout"
                     widget: object
@@ -1001,6 +1046,16 @@ collections:
                           - { name: text, label: "Feature", widget: string }
                       - { name: badge, label: "Badge", widget: string, required: false, hint: "Small label, e.g. \"popular\"." }
                       - { name: highlight, label: "Highlight this plan", widget: boolean, required: false, default: false }
+                      - name: note
+                        label: "Note"
+                        widget: object
+                        required: false
+                        collapsed: true
+                        summary: "{{fields.label}}"
+                        hint: "A short note set apart under the features, e.g. what is coming to this plan."
+                        fields:
+                          - { name: label, label: "Label", widget: string, required: false, hint: "Small uppercase label, e.g. \"Coming soon\"." }
+                          - { name: text, label: "Text", widget: text, required: false }
                       - name: cta
                         label: "Button"
                         widget: object
@@ -1026,6 +1081,7 @@ collections:
                                   - { label: "Contact (/contact)", value: "/contact" }
                               - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
                   - { name: footnote, label: "Footnote", widget: text, required: false, hint: "Small note under the cards — e.g. what every plan includes." }
+                  - { name: anchor, label: "Anchor id", widget: string, required: false, hint: "Lets links jump here — anchor \"process\" makes \"#process\" scroll to this section." }
                   - name: layout
                     label: "Layout"
                     widget: object
@@ -2079,6 +2135,7 @@ collections:
                   - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
                   - { name: heading, label: "Heading", widget: string, required: false }
                   - { name: intro, label: "Intro", widget: text, required: false }
+                  - { name: command, label: "Command", widget: string, required: false, hint: "A one-line shell command shown in monospace with a copy button, e.g. an install command." }
                   - name: cta
                     label: "Button"
                     widget: object
@@ -2103,6 +2160,32 @@ collections:
                               - { label: "About (/about)", value: "/about" }
                               - { label: "Contact (/contact)", value: "/contact" }
                           - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
+                  - name: cta2
+                    label: "Second button"
+                    widget: object
+                    required: false
+                    collapsed: true
+                    summary: "{{fields.label}}"
+                    hint: "A quieter outlined button beside the first."
+                    fields:
+                      - { name: label, label: "Label", widget: string }
+                      - name: link
+                        label: "Link"
+                        widget: object
+                        collapsed: false
+                        fields:
+                          - name: page
+                            label: "Page"
+                            widget: select
+                            required: false
+                            hint: "Pick a page on the site."
+                            options:
+                              - { label: "— No page —", value: "" }
+                              - { label: "Home (/)", value: "/" }
+                              - { label: "About (/about)", value: "/about" }
+                              - { label: "Contact (/contact)", value: "/contact" }
+                          - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
+                  - { name: anchor, label: "Anchor id", widget: string, required: false, hint: "Lets links jump here — anchor \"process\" makes \"#process\" scroll to this section." }
                   - name: layout
                     label: "Layout"
                     widget: object
@@ -2307,7 +2390,7 @@ collections:
                     label: "Forms"
                     widget: list
                     required: false
-                    label_singular: "Form"
+                    label_singular: "Shape"
                     collapsed: true
                     hint: "One entry per errand, in the order they are offered. The first one is the form the page opens on."
                     summary: "{{fields.label}}"
@@ -2647,6 +2730,7 @@ collections:
                           - { label: "About (/about)", value: "/about" }
                           - { label: "Contact (/contact)", value: "/contact" }
                       - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
+              - { name: command, label: "Command", widget: string, required: false, hint: "A one-line shell command shown in monospace with a copy button, e.g. an install command." }
               - name: media
                 label: "Media"
                 widget: object
@@ -2659,14 +2743,28 @@ collections:
                     widget: select
                     required: false
                     default: "none"
-                    hint: "What shows beside the heading: none, image, highlights or motif."
+                    hint: "What shows beside the heading: none, image, video, highlights or motif."
                     options:
                       - { label: "None (text only)", value: "none" }
                       - { label: "Image", value: "image" }
+                      - { label: "Video (looping, muted)", value: "video" }
                       - { label: "Highlights (icon + title + line)", value: "highlights" }
                       - { label: "Motif (animated, no image)", value: "motif" }
-                  - { name: image, label: "Image", widget: image, required: false, hint: "Used when Show = Image." }
+                  - { name: image, label: "Image", widget: image, required: false, hint: "Used when Show = Image, and as the poster when Show = Video." }
                   - { name: imageAlt, label: "Image alt text", widget: string, required: false, hint: "Describe the image for screen readers and search engines." }
+                  - { name: video, label: "Video file (MP4)", widget: file, required: false, hint: "Used when Show = Video. Plays muted and looping; the image above is the poster, and the only thing shown to visitors who ask for reduced motion." }
+                  - { name: videoWebm, label: "Video file (WebM)", widget: file, required: false, hint: "Optional second encoding of the same video. Browsers that play WebM pick it first." }
+                  - { name: videoUrl, label: "…or video URL", widget: string, required: false, hint: "External MP4/WebM URL. Used instead of an uploaded file if filled." }
+                  - name: ratio
+                    label: "Shape"
+                    widget: select
+                    required: false
+                    default: "standard"
+                    hint: "The shape the image or video is shown in. Wide suits screenshots."
+                    options:
+                      - { label: "Standard (4:3)", value: "standard" }
+                      - { label: "Wide (16:9)", value: "wide" }
+                      - { label: "Square", value: "square" }
                   - name: highlights
                     label: "Highlights"
                     widget: list
@@ -2772,6 +2870,15 @@ collections:
                     options:
                       - { label: "Full width", value: "full" }
                       - { label: "Narrow (reading column)", value: "narrow" }
+                  - name: mediaPosition
+                    label: "Media position"
+                    widget: select
+                    required: false
+                    default: "beside"
+                    hint: "Below puts the image or video under the text at the full width of the section."
+                    options:
+                      - { label: "Beside the text", value: "beside" }
+                      - { label: "Below the text", value: "below" }
                   - name: beside
                     label: "Placement"
                     widget: select
@@ -3088,16 +3195,37 @@ collections:
             label: "Text + image"
             widget: object
             fields:
+              - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
               - { name: heading, label: "Heading", widget: string, required: false }
-              - { name: body, label: "Text", widget: markdown }
+              - { name: body, label: "Text", widget: markdown, required: false, hint: "Leave the heading and text empty and the image or video takes the whole row." }
               - name: media
                 label: "Media"
                 widget: object
                 collapsed: true
-                hint: "The picture beside the text."
+                hint: "The picture or video beside the text."
                 fields:
-                  - { name: image, label: "Image", widget: image, required: false }
+                  - name: kind
+                    label: "Show"
+                    widget: select
+                    required: false
+                    default: "image"
+                    options:
+                      - { label: "Image", value: "image" }
+                      - { label: "Video (looping, muted)", value: "video" }
+                  - { name: image, label: "Image", widget: image, required: false, hint: "The picture, and the poster when Show = Video." }
                   - { name: imageAlt, label: "Alt text", widget: string, required: false }
+                  - name: fit
+                    label: "Image style"
+                    widget: select
+                    required: false
+                    default: "frame"
+                    hint: "Cut-out suits a picture with a see-through background, such as a phone or a product."
+                    options:
+                      - { label: "Framed, filling the column", value: "frame" }
+                      - { label: "Cut-out, no frame, at most 20rem wide", value: "cutout" }
+                  - { name: video, label: "Video file (MP4)", widget: file, required: false, hint: "Used when Show = Video. Plays muted and looping; the image above is the poster, and the only thing shown to visitors who ask for reduced motion." }
+                  - { name: videoWebm, label: "Video file (WebM)", widget: file, required: false, hint: "Optional second encoding of the same video. Browsers that play WebM pick it first." }
+                  - { name: videoUrl, label: "…or video URL", widget: string, required: false, hint: "External MP4/WebM URL. Used instead of an uploaded file if filled." }
               - name: layout
                 label: "Layout"
                 widget: object
@@ -3542,6 +3670,16 @@ collections:
                       - { name: text, label: "Feature", widget: string }
                   - { name: badge, label: "Badge", widget: string, required: false, hint: "Small label, e.g. \"popular\"." }
                   - { name: highlight, label: "Highlight this plan", widget: boolean, required: false, default: false }
+                  - name: note
+                    label: "Note"
+                    widget: object
+                    required: false
+                    collapsed: true
+                    summary: "{{fields.label}}"
+                    hint: "A short note set apart under the features, e.g. what is coming to this plan."
+                    fields:
+                      - { name: label, label: "Label", widget: string, required: false, hint: "Small uppercase label, e.g. \"Coming soon\"." }
+                      - { name: text, label: "Text", widget: text, required: false }
                   - name: cta
                     label: "Button"
                     widget: object
@@ -3567,6 +3705,7 @@ collections:
                               - { label: "Contact (/contact)", value: "/contact" }
                           - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
               - { name: footnote, label: "Footnote", widget: text, required: false, hint: "Small note under the cards — e.g. what every plan includes." }
+              - { name: anchor, label: "Anchor id", widget: string, required: false, hint: "Lets links jump here — anchor \"process\" makes \"#process\" scroll to this section." }
               - name: layout
                 label: "Layout"
                 widget: object
@@ -4620,6 +4759,7 @@ collections:
               - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
               - { name: heading, label: "Heading", widget: string, required: false }
               - { name: intro, label: "Intro", widget: text, required: false }
+              - { name: command, label: "Command", widget: string, required: false, hint: "A one-line shell command shown in monospace with a copy button, e.g. an install command." }
               - name: cta
                 label: "Button"
                 widget: object
@@ -4644,6 +4784,32 @@ collections:
                           - { label: "About (/about)", value: "/about" }
                           - { label: "Contact (/contact)", value: "/contact" }
                       - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
+              - name: cta2
+                label: "Second button"
+                widget: object
+                required: false
+                collapsed: true
+                summary: "{{fields.label}}"
+                hint: "A quieter outlined button beside the first."
+                fields:
+                  - { name: label, label: "Label", widget: string }
+                  - name: link
+                    label: "Link"
+                    widget: object
+                    collapsed: false
+                    fields:
+                      - name: page
+                        label: "Page"
+                        widget: select
+                        required: false
+                        hint: "Pick a page on the site."
+                        options:
+                          - { label: "— No page —", value: "" }
+                          - { label: "Home (/)", value: "/" }
+                          - { label: "About (/about)", value: "/about" }
+                          - { label: "Contact (/contact)", value: "/contact" }
+                      - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto:. Used if filled." }
+              - { name: anchor, label: "Anchor id", widget: string, required: false, hint: "Lets links jump here — anchor \"process\" makes \"#process\" scroll to this section." }
               - name: layout
                 label: "Layout"
                 widget: object
@@ -4848,7 +5014,7 @@ collections:
                 label: "Forms"
                 widget: list
                 required: false
-                label_singular: "Form"
+                label_singular: "Shape"
                 collapsed: true
                 hint: "One entry per errand, in the order they are offered. The first one is the form the page opens on."
                 summary: "{{fields.label}}"
@@ -5241,6 +5407,27 @@ collections:
           - { name: dark, label: "Dark section background", widget: color, required: false, hint: "Background for blocks set to the Dark surface. Empty = derived from Primary." }
           - { name: darkInk, label: "Dark section text", widget: color, required: false, hint: "Text colour on dark sections. Empty = a light off-white." }
           - { name: darkLine, label: "Dark section borders", widget: color, required: false, hint: "Card borders / dividers on dark sections. Empty = a faint light rule." }
+          - name: scheme
+            label: "Dark mode"
+            widget: select
+            required: false
+            default: light
+            hint: "'Follow the visitor's system' switches to the night colours below while their device is in dark mode."
+            options:
+              - { label: "Off (always light)", value: light }
+              - { label: "Follow the visitor's system", value: auto }
+          - { name: nightBrand, label: "Night · Primary", widget: color, required: false, hint: "Used when Dark mode follows the system. Empty keeps the day colour." }
+          - { name: nightInk, label: "Night · Text", widget: color, required: false, hint: "Used when Dark mode follows the system. Empty keeps the day colour." }
+          - { name: nightMuted, label: "Night · Secondary text", widget: color, required: false, hint: "Used when Dark mode follows the system. Empty keeps the day colour." }
+          - { name: nightOnDark, label: "Night · Text on primary", widget: color, required: false, hint: "Used when Dark mode follows the system. Empty keeps the day colour." }
+          - { name: nightSurface, label: "Night · Tinted surface", widget: color, required: false, hint: "Used when Dark mode follows the system. Empty keeps the day colour." }
+          - { name: nightPaper, label: "Night · Page background", widget: color, required: false, hint: "Used when Dark mode follows the system. Empty keeps the day colour." }
+          - { name: nightLine, label: "Night · Borders & lines", widget: color, required: false, hint: "Used when Dark mode follows the system. Empty keeps the day colour." }
+          - { name: nightHighlight, label: "Night · Highlight", widget: color, required: false, hint: "Used when Dark mode follows the system. Empty keeps the day colour." }
+          - { name: nightSecondary, label: "Night · Secondary", widget: color, required: false, hint: "Used when Dark mode follows the system. Empty keeps the day colour." }
+          - { name: nightDark, label: "Night · Dark section background", widget: color, required: false, hint: "Used when Dark mode follows the system. Empty keeps the day colour." }
+          - { name: nightDarkInk, label: "Night · Dark section text", widget: color, required: false, hint: "Used when Dark mode follows the system. Empty keeps the day colour." }
+          - { name: nightDarkLine, label: "Night · Dark section borders", widget: color, required: false, hint: "Used when Dark mode follows the system. Empty keeps the day colour." }
           - name: fontDisplay
             label: "Heading font"
             widget: select
@@ -5283,6 +5470,15 @@ collections:
               - { label: "Custom (uploaded below)", value: "custom" }
           - { name: fontCustomFile, label: "Custom heading font file", widget: file, required: false, media_folder: "/public/media/fonts", public_folder: "/media/fonts", hint: "Used when Heading font = Custom. A .woff2 / .woff / .ttf / .otf file (a font file, not an SVG)." }
           - { name: fontCustomBodyFile, label: "Custom body font file", widget: file, required: false, media_folder: "/public/media/fonts", public_folder: "/media/fonts", hint: "Used when Body font = Custom. Leave empty to reuse the heading font for body." }
+          - name: fontMono
+            label: "Code font"
+            widget: select
+            required: false
+            hint: "Font for commands, labels and other monospace text. Empty = the system monospace."
+            options:
+              - { label: "System monospace (default)", value: "mono" }
+              - { label: "Custom (uploaded below)", value: "custom" }
+          - { name: fontCustomMonoFile, label: "Custom code font file", widget: file, required: false, media_folder: "/public/media/fonts", public_folder: "/media/fonts", hint: "Used when Code font = Custom. A .woff2 / .woff / .ttf / .otf file." }
       - name: nav
         label: "Header"
         file: "src/content/navigation/nav.md"

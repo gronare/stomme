@@ -39,7 +39,7 @@ const height = Astro.props.layout?.height ?? 'tall';
 const btn = resolveButton(cta, ctaLabel, ctaHref);
 const btn2 = resolveButton(cta2, cta2Label, cta2Href);
 
-const videoFiles = import.meta.glob('/src/assets/media/**/*.{mp4,webm,mov}', {
+const videoFiles = import.meta.glob('/src/assets/media/**/*.{mp4,webm}', {
   query: '?url', import: 'default', eager: true,
 });
 const videoKey = video && video.startsWith('/media/') ? `/src/assets/media/${video.slice('/media/'.length)}` : null;

@@ -17,6 +17,16 @@ render through a back-compat shim, but `block-migrations.json` lists each rename
 control plane's drift check reports the flat form as field drift. The tables below show
 the current group.
 
+**Commands.** `hero` and `ctaPanel` take a `command`: one line of shell shown in the
+code font with a copy button. The line scrolls sideways inside its own box, so a long
+command never widens the page. The button copies to the clipboard and, where the
+clipboard is unavailable, selects the text instead.
+
+**Video.** `hero` and `textImage` show a looping video when `media.kind` is `video`. It
+plays muted and inline, `image` is its poster, and `videoWebm` is offered before the MP4
+when both are set. A visitor who asks for reduced motion sees the poster, and a button
+on the video pauses and resumes it.
+
 A page that carries a `sectionNav` block also gets an `id` on every block that has a
 heading — slugged from the heading, de-duplicated with `-2`, `-3` — so the chips can
 link to them. A page without that block renders exactly as before, with no ids.
@@ -35,7 +45,7 @@ one full-width block.
 
 | Type | What it renders | Key fields |
 |---|---|---|
-| `hero` | Headline + intro + CTA, with a swappable right-side media slot | `eyebrow`, `heading`, `intro`, `cta` (`label`, `link`), `media` (`none`/`image`/`highlights`/`motif`), `image`/`imageAlt`, `highlights[]` (`icon`,`title`,`body`), `height` (`normal`/`tall`), `align` (`top`/`center`/`bottom`) |
+| `hero` | Headline + intro + CTA, with a swappable media slot beside or below the text | `eyebrow`, `heading`, `intro`, `cta` (`label`, `link`), `command`, `media` (`none`/`image`/`video`/`highlights`/`motif`), `image`/`imageAlt` (the image is the video's poster), `video`/`videoWebm`/`videoUrl`, `ratio` (`standard` 4:3 / `wide` 16:9 / `square`), `highlights[]` (`icon`,`title`,`body`), `height` (`normal`/`tall`), `align` (`top`/`center`/`bottom`), `mediaPosition` (`beside`/`below`) |
 | `cover` | Full-bleed banner with overlaid text + up to two CTAs | `eyebrow`, `heading`, `intro`, `cta`, `cta2` (each `label`, `link`), `media` (`image`/`video`/`gradient`/`animated`), `image` (also the video poster), `imageAlt`, `video`/`videoUrl`, `overlay` (`light`/`medium`/`strong`), `align` (`start`/`center`), `vAlign` (`end`/`center`/`start` — moves the text block up or down independently of `align`), `height` (`tall`/`medium`) |
 | `pageHeader` | Inner-page title header (light band or grey "Band") | `variant` (`light`/`dark`), `width` (`narrow`/`full`), `eyebrow`, `heading`, `intro`, `cta` (`label`, `link`) |
 | `prose` | Rich text from markdown (inline images optimized + placed) | `heading`, `body` (markdown), `width` (`narrow`/`full`) |
@@ -51,8 +61,8 @@ one full-width block.
 | `definition` | A dictionary-style entry (term, word class, senses) | `eyebrow`, `term`, `wordClass`, `senses[]` (`text`, `note`), `width` |
 | `sectionNav` | A row of chip links that jump to the headings below it on the same page | `label` (accessible name), `sticky`; the chips are read from the blocks below, nothing to fill in |
 | `fragment` | A placed editorial fragment — big lead line, short body, optional link; consecutive fragments drift across the page | `eyebrow`, `statement`, `body`, `cta` |
-| `plans` | A row of pricing plan cards | `eyebrow`/`heading`/`intro`, `plans[]` (`name`, `pricePrefix`, `price`, `period`, `description`, `features[]`, `badge`, `highlight`), `footnote` |
-| `textImage` | Text column beside an image (flippable) | `heading`, `body` (markdown), `image`, `imageAlt`, `flip` |
+| `plans` | A row of pricing plan cards | `eyebrow`/`heading`/`intro`, `plans[]` (`name`, `pricePrefix`, `price`, `period`, `description`, `features[]`, `badge`, `highlight`, `note` (`label`, `text`), `cta`), `footnote`, `anchor` |
+| `textImage` | Text column beside an image or a looping video (flippable); with no text the media takes the whole row | `eyebrow`, `heading`, `body` (markdown), `media` (`kind` `image`/`video`, `image` (also the poster), `imageAlt`, `video`/`videoWebm`/`videoUrl`), `flip` |
 | `textQuote` | Body text beside a pull quote (flippable) | `body` (markdown), `quote`, `attribution`, `flip`, `accent` |
 | `callout` | Single highlighted statement / quote | `eyebrow`, `quote`, `accent` |
 | `statPanel` | Dark statement panel beside a giant stat number | `eyebrow`, `heading`, `body`, `badges[]`, `statValue`, `statLabel`, `accent` |
@@ -61,7 +71,7 @@ one full-width block.
 
 | Type | What it renders | Key fields |
 |---|---|---|
-| `ctaPanel` | Full-width accent band with a CTA | `eyebrow`/`heading`/`intro`, `cta` (`label`, `link`) |
+| `ctaPanel` | Full-width accent band with a CTA | `eyebrow`/`heading`/`intro`, `command`, `cta`, `cta2` (each `label`, `link`), `anchor` |
 | `ctaBox` | Compact brand-colored CTA box | `eyebrow`, `heading`, `intro`, `cta`, `cta2` (each `label`, `link`), `facts[]`, `layout` (`classic`/`split`/`panel`) |
 
 ## Collection-backed

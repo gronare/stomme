@@ -1,4 +1,4 @@
-import { headingFields, headingFieldsSuggesting, buttonField, imageField, iconField, surfaceField, accentField, widthField, cardListField, linkedCardListField, group, mediaGroup, layoutGroup, styleGroup, type BlockDef } from './src/kit.ts';
+import { headingFields, headingFieldsSuggesting, buttonField, imageField, iconField, surfaceField, accentField, widthField, cardListField, linkedCardListField, group, mediaGroup, layoutGroup, styleGroup, anchorField, commandField, videoFields, type BlockDef } from './src/kit.ts';
 
 const RAW_BLOCKS: BlockDef[] = [
   {
@@ -23,6 +23,7 @@ const RAW_BLOCKS: BlockDef[] = [
       },
       buttonField('cta', 'Button'),
       buttonField('cta2', 'Second button', { hint: 'Shown as a quiet text link beside the button.' }),
+      commandField,
       mediaGroup('What shows beside the text. Default: none.', [
         {
           name: 'kind',
@@ -33,13 +34,20 @@ const RAW_BLOCKS: BlockDef[] = [
           options: [
             { label: 'None (text only)', value: 'none' },
             { label: 'Image', value: 'image' },
+            { label: 'Video (looping, muted)', value: 'video' },
             { label: 'Highlights (icon + title + line)', value: 'highlights' },
             { label: 'Motif (animated, no image)', value: 'motif' },
           ],
-          hint: 'What shows beside the heading: none, image, highlights or motif.',
+          hint: 'What shows beside the heading: none, image, video, highlights or motif.',
         },
-        imageField('image', 'Image', 'Used when Show = Image.'),
+        imageField('image', 'Image', 'Used when Show = Image, and as the poster when Show = Video.'),
         { name: 'imageAlt', label: 'Image alt text', widget: 'string', required: false, hint: 'Describe the image for screen readers and search engines.' },
+        ...videoFields,
+        {
+          name: 'ratio', label: 'Shape', widget: 'select', required: false, default: 'standard',
+          hint: 'The shape the image or video is shown in. Wide suits screenshots.',
+          options: [{ label: 'Standard (4:3)', value: 'standard' }, { label: 'Wide (16:9)', value: 'wide' }, { label: 'Square', value: 'square' }],
+        },
         {
           name: 'highlights',
           label: 'Highlights',
@@ -67,6 +75,11 @@ const RAW_BLOCKS: BlockDef[] = [
           name: 'width', label: 'Width', widget: 'select', required: false, default: 'full',
           hint: 'Narrow centers the hero in a reading column — best without side media.',
           options: [{ label: 'Full width', value: 'full' }, { label: 'Narrow (reading column)', value: 'narrow' }],
+        },
+        {
+          name: 'mediaPosition', label: 'Media position', widget: 'select', required: false, default: 'beside',
+          hint: 'Below puts the image or video under the text at the full width of the section.',
+          options: [{ label: 'Beside the text', value: 'beside' }, { label: 'Below the text', value: 'below' }],
         },
       ]),
       styleGroup(),
@@ -247,10 +260,19 @@ const RAW_BLOCKS: BlockDef[] = [
           { name: 'features', label: 'Features', widget: 'list', required: false, collapsed: true, label_singular: 'Feature', summary: '{{fields.text}}', fields: [{ name: 'text', label: 'Feature', widget: 'string' }] },
           { name: 'badge', label: 'Badge', widget: 'string', required: false, hint: 'Small label, e.g. "popular".' },
           { name: 'highlight', label: 'Highlight this plan', widget: 'boolean', required: false, default: false },
+          {
+            name: 'note', label: 'Note', widget: 'object', required: false, collapsed: true, summary: '{{fields.label}}',
+            hint: 'A short note set apart under the features, e.g. what is coming to this plan.',
+            fields: [
+              { name: 'label', label: 'Label', widget: 'string', required: false, hint: 'Small uppercase label, e.g. "Coming soon".' },
+              { name: 'text', label: 'Text', widget: 'text', required: false },
+            ],
+          },
           buttonField('cta', 'Button'),
         ],
       },
       { name: 'footnote', label: 'Footnote', widget: 'text', required: false, hint: 'Small note under the cards — e.g. what every plan includes.' },
+      anchorField,
       layoutGroup([]),
       styleGroup([surfaceField]),
     ],
@@ -297,7 +319,7 @@ const RAW_BLOCKS: BlockDef[] = [
           { name: 'image', label: 'Icon image', widget: 'image', required: false, hint: 'A custom icon image for the icon-flow layouts — tinted to the brand colour. Takes priority over the icon name.' },
         ],
       },
-      { name: 'anchor', label: 'Anchor id', widget: 'string', required: false, hint: 'Lets links jump here — anchor "process" makes "#process" scroll to this section.' },
+      anchorField,
       layoutGroup([
         widthField,
         { name: 'variant', label: 'Layout', widget: 'select', required: false, default: 'rows', options: [
@@ -404,14 +426,25 @@ const RAW_BLOCKS: BlockDef[] = [
     type: 'textImage',
     label: 'Text + image',
     group: 'Text',
-    summary: 'Text beside an image (image on the left or right).',
+    summary: 'Text beside an image or a looping video (media on the left or right).',
     shape: 'split',
     fields: [
+      { name: 'eyebrow', label: 'Eyebrow', widget: 'string', required: false, hint: 'Small uppercase label above the heading.' },
       { name: 'heading', label: 'Heading', widget: 'string', required: false },
-      { name: 'body', label: 'Text', widget: 'markdown' },
-      mediaGroup('The picture beside the text.', [
-        imageField('image', 'Image'),
+      { name: 'body', label: 'Text', widget: 'markdown', required: false, hint: 'Leave the heading and text empty and the image or video takes the whole row.' },
+      mediaGroup('The picture or video beside the text.', [
+        {
+          name: 'kind', label: 'Show', widget: 'select', required: false, default: 'image',
+          options: [{ label: 'Image', value: 'image' }, { label: 'Video (looping, muted)', value: 'video' }],
+        },
+        imageField('image', 'Image', 'The picture, and the poster when Show = Video.'),
         { name: 'imageAlt', label: 'Alt text', widget: 'string', required: false },
+        {
+          name: 'fit', label: 'Image style', widget: 'select', required: false, default: 'frame',
+          hint: 'Cut-out suits a picture with a see-through background, such as a phone or a product.',
+          options: [{ label: 'Framed, filling the column', value: 'frame' }, { label: 'Cut-out, no frame, at most 20rem wide', value: 'cutout' }],
+        },
+        ...videoFields,
       ]),
       layoutGroup([
         { name: 'flip', label: 'Image on left', widget: 'boolean', required: false, default: false },
@@ -748,7 +781,7 @@ const RAW_BLOCKS: BlockDef[] = [
     group: 'Calls to action',
     summary: 'Full-width call-to-action band with a button.',
     shape: 'band',
-    fields: [...headingFields, buttonField('cta', 'Button'), layoutGroup([])],
+    fields: [...headingFields, commandField, buttonField('cta', 'Button'), buttonField('cta2', 'Second button', { hint: 'A quieter outlined button beside the first.' }), anchorField, layoutGroup([])],
   },
   {
     type: 'ctaBox',
@@ -980,6 +1013,7 @@ const SAMPLES: Record<string, ({ _label?: string } & Record<string, unknown>)[]>
     { _label: 'narrow · two buttons · ticks', eyebrow: 'Eyebrow label', heading: 'A heading that states the offer.', intro: 'One supporting sentence that earns the click below.', ticks: ['A first checkmark reassurance.', 'A second, slightly longer one to wrap.'], cta: { label: 'Primary action', link: { url: '#' } }, cta2: { label: 'Quiet link', link: { url: '#' } }, media: { kind: 'none' }, layout: { width: 'narrow' } },
     { _label: 'highlights media', eyebrow: 'Eyebrow', heading: 'Hero beside highlights.', intro: LOREM, cta: { label: 'Action', link: { url: '#' } }, media: { kind: 'highlights', highlights: [{ icon: 'bolt', title: 'Fast', body: 'Loads instantly.' }, { icon: 'shield', title: 'Safe', body: 'Nothing to hack.' }] } },
     { _label: 'motif · tall dark', heading: 'Tall hero on the dark surface.', intro: LOREM, cta: { label: 'Action', link: { url: '#' } }, media: { kind: 'motif' }, layout: { height: 'tall' }, style: { surface: 'dark' } },
+    { _label: 'command · wide image below', eyebrow: 'Eyebrow', heading: 'A hero with a command to copy.', intro: LOREM, cta: { label: 'Action', link: { url: '#' } }, command: 'npm install --save-dev a-package-with-a-rather-long-name && npx a-package-with-a-rather-long-name init', media: { kind: 'image', ratio: 'wide' }, layout: { mediaPosition: 'below' } },
   ],
   cover: [
     { _label: 'gradient', eyebrow: 'Eyebrow', heading: 'Full-bleed cover heading', intro: LOREM, cta: { label: 'Primary', link: { url: '#' } }, cta2: { label: 'Secondary', link: { url: '#' } }, media: { kind: 'gradient' } },
@@ -1011,7 +1045,11 @@ const SAMPLES: Record<string, ({ _label?: string } & Record<string, unknown>)[]>
     { name: 'Basic', price: '6 900 kr', period: 'one-off', description: LOREM },
     { name: 'Standard', price: '12 900 kr', period: 'one-off', badge: 'Popular', highlight: true, description: 'The default pick.', features: [{ text: 'Everything in Basic' }, { text: 'One more thing' }] },
     { name: 'Plus', pricePrefix: 'from', price: '19 900 kr', period: 'one-off', description: 'For the works.', cta: { label: 'Choose', link: { url: '#' } } },
-  ], footnote: 'Every plan includes a shared line like this one — the footnote field.' }],
+  ], footnote: 'Every plan includes a shared line like this one — the footnote field.' },
+  { _label: 'free tiers · a note', eyebrow: 'Pricing', heading: 'Free plans with a note', plans: [
+    { name: 'Open', price: 'Free', period: 'MIT', features: [{ text: 'Every feature' }], cta: { label: 'Install', link: { url: '#' } } },
+    { name: 'Hosted', price: 'Free', period: 'to read', highlight: true, features: [{ text: 'A first feature' }, { text: 'A second feature' }], note: { label: 'Coming soon', text: 'A sentence about what is coming to this plan.' }, cta: { label: 'Connect', link: { url: '#' } } },
+  ] }],
   specialistGrid: [{ eyebrow: 'Team', heading: 'Specialists', items: [
     { title: 'Role one', body: LOREM }, { title: 'Role two', body: 'Short line.' },
   ] }],
@@ -1043,7 +1081,10 @@ const SAMPLES: Record<string, ({ _label?: string } & Record<string, unknown>)[]>
     { _label: 'five tiles · +N opens the viewer', images: [{ alt: 'The leading picture' }, { alt: 'A second' }, { alt: 'A third' }, { alt: 'A fourth' }, { alt: 'A fifth' }, { alt: 'Only in the viewer' }, { alt: 'Also only in the viewer' }] },
   ],
   beforeAfter: [{ eyebrow: 'Before & after', heading: 'Drag the divider' }],
-  textImage: [{ heading: 'Text beside an image', body: `${LOREM}\n\nSecond paragraph.`, layout: { flip: false } }],
+  textImage: [
+    { heading: 'Text beside an image', body: `${LOREM}\n\nSecond paragraph.`, layout: { flip: false } },
+    { _label: 'eyebrow · flipped', eyebrow: 'Eyebrow', heading: 'Text with an eyebrow', body: `${LOREM}\n\n- A first point\n- A second point`, layout: { flip: true } },
+  ],
   textQuote: [{ body: `${LOREM} ${LOREM}`, quote: 'A pulled-out line that carries the point.', attribution: 'Someone, Somewhere' }],
   callout: [
     { _label: 'narrow (reading column)', eyebrow: 'Eyebrow', quote: 'A highlighted statement at reading width, with an *emphasised* clause.' },
@@ -1108,7 +1149,10 @@ const SAMPLES: Record<string, ({ _label?: string } & Record<string, unknown>)[]>
     { _label: 'list', heading: 'Subpages as a list', layout: { variant: 'rows' }, items: SUBPAGE_FIX },
     { _label: 'chapter row', layout: { variant: 'chips' }, items: SUBPAGE_FIX },
   ],
-  ctaPanel: [{ eyebrow: 'Eyebrow', heading: 'A call-to-action band', intro: LOREM, label: 'Do the thing', href: { url: '#' } }],
+  ctaPanel: [
+    { eyebrow: 'Eyebrow', heading: 'A call-to-action band', intro: LOREM, label: 'Do the thing', href: { url: '#' } },
+    { _label: 'command · two buttons', heading: 'Install it and start.', intro: LOREM, command: 'curl -fsSL https://example.com/install.sh | sh', cta: { label: 'Get started', link: { url: '#' } }, cta2: { label: 'Read the docs', link: { url: '#' } } },
+  ],
   ctaBox: [
     { _label: 'classic', style: { surface: 'dark' }, eyebrow: 'Next step', heading: 'A boxed call to action.', intro: 'A short supporting line under the heading.', cta: { label: 'Primary', link: { url: '#' } }, cta2: { label: 'quiet second link', link: { url: '#' } } },
     { _label: 'split · facts card', layout: { variant: 'split' }, eyebrow: 'Next step', heading: 'Split call to action.', intro: 'Copy on the left, a dark facts card on the right.', label: 'Primary', href: { url: '#' }, facts: [{ label: 'Analysis', value: 'Free' }, { label: 'Reply', value: '< 24 h' }] },

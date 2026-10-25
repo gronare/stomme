@@ -7,6 +7,18 @@ frontmatter means disabled/not shown (see `src/kit.ts`).
 
 ## Unreleased
 
+- `hero` and `ctaPanel` take a `command`, a copyable one-line shell command. `ctaPanel`
+  also takes `cta2` and `anchor`; `plans` takes `anchor` and a per-plan `note`.
+- `hero` and `textImage` play a looping video (`media.kind: video`, `video`,
+  `videoWebm`, `videoUrl`, with `image` as the poster). The hero takes `media.ratio`
+  and `layout.mediaPosition: below`; `textImage` takes an `eyebrow`, and with no text
+  its media fills the row.
+- `theme.md` takes `scheme: auto` with `night…` colours for dark mode, and `fontMono`
+  / `fontCustomMonoFile` for the code font. Write the theme with `themeStyle()` and
+  `nightStyle()` from `@gronare/stomme/theme` in `Base.astro`; the starter does. The
+  settings pane only reaches existing sites when their `config.yml` is regenerated.
+- New strings under `strings.controls` (copy, copied, pause and play labels).
+
 - Listing `category`, FAQ `tags` and document `group` are Sveltia relation
   fields over new term collections (`<listing>-categories`, `faq-tags`,
   `document-groups`, one `title` per file). Stored values stay plain strings.

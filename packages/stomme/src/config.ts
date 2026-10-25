@@ -26,6 +26,7 @@ export interface SiteConfig {
     breadcrumbLabel?: string;
     contact?: { name?: string; email?: string; phone?: string; category?: string; categoryPlaceholder?: string; unit?: string; message?: string; submit?: string; direct?: string; honeypot?: string; hours?: string; visit?: string; findUs?: string; follow?: string; map?: string; reveal?: string; error?: string };
     beforeAfter?: { before?: string; after?: string; compare?: string };
+    controls?: { copy?: string; copied?: string; copyCommand?: string; pauseVideo?: string; playVideo?: string };
     collage?: { more?: string; more1?: string; open?: string; viewer?: string; prev?: string; next?: string; close?: string; counter?: string };
     map?: {
       google?: string; apple?: string;
@@ -147,6 +148,7 @@ const STRINGS_EN = {
     error: 'Sorry — could not send. Please try again or email us directly.',
   },
   beforeAfter: { before: 'Before', after: 'After', compare: 'Drag to compare before and after' },
+  controls: { copy: 'Copy', copied: 'Copied', copyCommand: 'Copy command', pauseVideo: 'Pause video', playVideo: 'Play video' },
   collage: {
     more: '+{n} images', more1: '+1 image', open: 'Open the image viewer', viewer: 'Image viewer',
     prev: 'Previous image', next: 'Next image', close: 'Close', counter: '{i} of {n}',
@@ -227,6 +229,7 @@ const STRINGS_SV: typeof STRINGS_EN = {
     error: 'Det gick inte att skicka. Försök igen eller mejla oss direkt.',
   },
   beforeAfter: { before: 'Före', after: 'Efter', compare: 'Dra för att jämföra före och efter' },
+  controls: { copy: 'Kopiera', copied: 'Kopierat', copyCommand: 'Kopiera kommandot', pauseVideo: 'Pausa videon', playVideo: 'Spela videon' },
   collage: {
     more: '+{n} bilder', more1: '+1 bild', open: 'Öppna bildvisaren', viewer: 'Bildvisare',
     prev: 'Föregående bild', next: 'Nästa bild', close: 'Stäng', counter: '{i} av {n}',
@@ -307,6 +310,7 @@ const STRINGS_NO: typeof STRINGS_EN = {
     error: 'Det gikk ikke å sende. Prøv igjen, eller send oss en e-post direkte.',
   },
   beforeAfter: { before: 'Før', after: 'Etter', compare: 'Dra for å sammenligne før og etter' },
+  controls: { copy: 'Kopier', copied: 'Kopiert', copyCommand: 'Kopier kommandoen', pauseVideo: 'Sett videoen på pause', playVideo: 'Spill av videoen' },
   collage: {
     more: '+{n} bilder', more1: '+1 bilde', open: 'Åpne bildeviseren', viewer: 'Bildeviser',
     prev: 'Forrige bilde', next: 'Neste bilde', close: 'Lukk', counter: '{i} av {n}',
@@ -382,6 +386,7 @@ function baseStrings(locale?: string, cmsLocale?: string) {
     ...STRINGS_EN, ...b,
     contact: { ...STRINGS_EN.contact, ...b.contact },
     beforeAfter: { ...STRINGS_EN.beforeAfter, ...b.beforeAfter },
+    controls: { ...STRINGS_EN.controls, ...b.controls },
     collage: { ...STRINGS_EN.collage, ...b.collage },
     map: { ...STRINGS_EN.map, ...b.map },
     footer: { ...STRINGS_EN.footer, ...b.footer },
@@ -462,6 +467,7 @@ export function resolveSite(c?: SiteConfig, locale?: string) {
       thanks: { ...base.thanks, ...((s && (s as any).thanks) || {}) },
       notFound: { ...base.notFound, ...((s && (s as any).notFound) || {}) },
       beforeAfter: { ...base.beforeAfter, ...((s && (s as any).beforeAfter) || {}) },
+      controls: { ...base.controls, ...((s && (s as any).controls) || {}) },
       collage: { ...base.collage, ...((s && (s as any).collage) || {}) },
       map: { ...base.map, ...((s && (s as any).map) || {}) },
       footer: { ...base.footer, ...((s && (s as any).footer) || {}) },

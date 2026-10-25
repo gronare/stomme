@@ -157,6 +157,16 @@ export const besideField: Field = {
   hint: 'On wide screens the block shares a row with the block above it; on small screens they stack.',
 };
 
+export const anchorField: Field = { name: 'anchor', label: 'Anchor id', widget: 'string', required: false, hint: 'Lets links jump here — anchor "process" makes "#process" scroll to this section.' };
+
+export const commandField: Field = { name: 'command', label: 'Command', widget: 'string', required: false, hint: 'A one-line shell command shown in monospace with a copy button, e.g. an install command.' };
+
+export const videoFields: Field[] = [
+  { name: 'video', label: 'Video file (MP4)', widget: 'file', required: false, hint: 'Used when Show = Video. Plays muted and looping; the image above is the poster, and the only thing shown to visitors who ask for reduced motion.' },
+  { name: 'videoWebm', label: 'Video file (WebM)', widget: 'file', required: false, hint: 'Optional second encoding of the same video. Browsers that play WebM pick it first.' },
+  { name: 'videoUrl', label: '…or video URL', widget: 'string', required: false, hint: 'External MP4/WebM URL. Used instead of an uploaded file if filled.' },
+];
+
 export const layoutGroup = (fields: Field[]): Field =>
   group('layout', 'Layout', 'Size and placement — rarely needs changing.', [...fields, besideField]);
 

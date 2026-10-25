@@ -1101,6 +1101,11 @@
           "required": false
         },
         {
+          "name": "command",
+          "widget": "string",
+          "required": false
+        },
+        {
           "name": "cta",
           "widget": "object",
           "required": false,
@@ -1127,6 +1132,39 @@
               ]
             }
           ]
+        },
+        {
+          "name": "cta2",
+          "widget": "object",
+          "required": false,
+          "fields": [
+            {
+              "name": "label",
+              "widget": "string"
+            },
+            {
+              "name": "link",
+              "widget": "object",
+              "fields": [
+                {
+                  "name": "page",
+                  "widget": "select",
+                  "required": false,
+                  "options": "$pages"
+                },
+                {
+                  "name": "url",
+                  "widget": "string",
+                  "required": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "anchor",
+          "widget": "string",
+          "required": false
         },
         {
           "name": "layout",
@@ -2113,6 +2151,11 @@
           ]
         },
         {
+          "name": "command",
+          "widget": "string",
+          "required": false
+        },
+        {
           "name": "media",
           "widget": "object",
           "fields": [
@@ -2123,6 +2166,7 @@
               "options": [
                 "none",
                 "image",
+                "video",
                 "highlights",
                 "motif"
               ]
@@ -2136,6 +2180,31 @@
               "name": "imageAlt",
               "widget": "string",
               "required": false
+            },
+            {
+              "name": "video",
+              "widget": "file",
+              "required": false
+            },
+            {
+              "name": "videoWebm",
+              "widget": "file",
+              "required": false
+            },
+            {
+              "name": "videoUrl",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "ratio",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "standard",
+                "wide",
+                "square"
+              ]
             },
             {
               "name": "highlights",
@@ -2246,6 +2315,15 @@
               "options": [
                 "full",
                 "narrow"
+              ]
+            },
+            {
+              "name": "mediaPosition",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "beside",
+                "below"
               ]
             },
             {
@@ -2753,6 +2831,23 @@
               "required": false
             },
             {
+              "name": "note",
+              "widget": "object",
+              "required": false,
+              "fields": [
+                {
+                  "name": "label",
+                  "widget": "string",
+                  "required": false
+                },
+                {
+                  "name": "text",
+                  "widget": "text",
+                  "required": false
+                }
+              ]
+            },
+            {
               "name": "cta",
               "widget": "object",
               "required": false,
@@ -2785,6 +2880,11 @@
         {
           "name": "footnote",
           "widget": "text",
+          "required": false
+        },
+        {
+          "name": "anchor",
+          "widget": "string",
           "required": false
         },
         {
@@ -3807,18 +3907,33 @@
       "shape": "split",
       "fields": [
         {
+          "name": "eyebrow",
+          "widget": "string",
+          "required": false
+        },
+        {
           "name": "heading",
           "widget": "string",
           "required": false
         },
         {
           "name": "body",
-          "widget": "markdown"
+          "widget": "markdown",
+          "required": false
         },
         {
           "name": "media",
           "widget": "object",
           "fields": [
+            {
+              "name": "kind",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "image",
+                "video"
+              ]
+            },
             {
               "name": "image",
               "widget": "image",
@@ -3826,6 +3941,30 @@
             },
             {
               "name": "imageAlt",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "fit",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "frame",
+                "cutout"
+              ]
+            },
+            {
+              "name": "video",
+              "widget": "file",
+              "required": false
+            },
+            {
+              "name": "videoWebm",
+              "widget": "file",
+              "required": false
+            },
+            {
+              "name": "videoUrl",
               "widget": "string",
               "required": false
             }

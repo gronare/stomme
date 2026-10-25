@@ -142,6 +142,28 @@ main > :is(.surface-dark, .surface-gradient):first-child:has(.hero-grid) > .sect
 .hero-media { border-radius: 18px; overflow: hidden; }
 /* Retarget the hero's shape with --hero-ratio, never `aspect-ratio: auto` — auto drops the width/height attributes too, and the box is 0 high until the file lands. */
 .hero-img { display: block; width: 100%; height: auto; aspect-ratio: var(--hero-ratio, 4 / 3); object-fit: cover; border-radius: 18px; border: 1px solid var(--color-line); }
+.hero-grid--below { grid-template-columns: minmax(0, 1fr); }
+.hero-video { border-radius: 18px; }
+.hero-media--shaped .media-video__el { aspect-ratio: var(--hero-ratio); object-fit: cover; }
+.command { position: relative; display: flex; align-items: center; gap: 0.75rem; max-width: 100%; min-width: 0; margin-top: 1.5rem; padding: 0.55rem 0.6rem 0.55rem 1rem; border-radius: 0.7rem; background: var(--color-dark); color: var(--color-dark-ink); font-family: var(--font-mono); font-size: 0.88rem; line-height: 1.5; text-align: left; }
+.command__line { flex: 1 1 auto; min-width: 0; overflow-x: auto; white-space: nowrap; font: inherit; color: inherit; background: none; padding: 0.2rem 0; scrollbar-width: thin; }
+@property --command-fade { syntax: "<length>"; inherits: false; initial-value: 0px; }
+@keyframes command-fade { 0%, 85% { --command-fade: 2.5rem; } 100% { --command-fade: 0px; } }
+/* A scroll timeline is inactive while the line fits, so the fade only exists when there is more command to scroll to. */
+@supports (animation-timeline: scroll()) { .command__line { -webkit-mask-image: linear-gradient(to right, #000 calc(100% - var(--command-fade)), transparent); mask-image: linear-gradient(to right, #000 calc(100% - var(--command-fade)), transparent); animation-name: command-fade; animation-timing-function: linear; animation-fill-mode: both; animation-timeline: scroll(self inline); } }
+.command__prompt { color: color-mix(in srgb, var(--color-dark-ink) 55%, var(--color-dark)); user-select: none; }
+.command__copy { flex: none; min-height: 2.25rem; padding: 0 0.75rem; font: inherit; font-size: 0.8rem; color: var(--color-highlight); background: transparent; border: 1px solid var(--color-dark-line); border-radius: 0.45rem; cursor: pointer; }
+.command__copy:hover { background: color-mix(in srgb, var(--color-dark-ink) 10%, transparent); }
+.command__copy:focus-visible { outline: 2px solid var(--color-highlight); outline-offset: 2px; }
+.command__status { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.hero-command { max-width: 38rem; }
+
+.media-video { position: relative; overflow: hidden; border-radius: 1rem; border: 1px solid var(--color-line); background: var(--color-dark); }
+.media-video__el { display: block; width: 100%; height: auto; }
+.media-video__toggle { position: absolute; right: 0.75rem; bottom: 0.75rem; display: grid; place-items: center; width: 2.5rem; height: 2.5rem; padding: 0; border-radius: 999px; border: 1px solid var(--color-dark-line); background: color-mix(in srgb, var(--color-dark) 72%, transparent); color: var(--color-dark-ink); cursor: pointer; }
+.media-video__toggle::before { content: ""; box-sizing: border-box; width: 0.75rem; height: 0.85rem; border-inline: 0.24rem solid currentColor; }
+.media-video.is-paused .media-video__toggle::before { width: 0; height: 0; margin-left: 0.2rem; border-inline: 0; border-left: 0.75rem solid currentColor; border-block: 0.45rem solid transparent; }
+.media-video__toggle:focus-visible { outline: 2px solid var(--color-highlight); outline-offset: 2px; }
 
 .hero-ticks { list-style: none; margin: 1.5rem 0 0; padding: 0; display: flex; flex-direction: column; gap: 0.6rem; }
 .hero-ticks li { display: flex; gap: 0.75rem; align-items: baseline; color: var(--color-ink); }
@@ -277,6 +299,9 @@ main .cover:first-child .cover__inner { --cover-clear: calc(var(--header-bottom)
 
 .cta-panel { border-radius: 1.25rem; padding: 3rem 2rem; text-align: center; }
 .cta-panel p.lead { margin: 1rem auto 0; max-width: 40rem; }
+.cta-panel__command { margin: 1.5rem auto 0; max-width: 40rem; }
+.cta-panel__buttons { justify-content: center; margin-bottom: 0; }
+.cta-panel__buttons .btn-outline { background: transparent; color: inherit; box-shadow: inset 0 0 0 1px currentColor; }
 
 .partner-strip { border-block: 1px solid var(--color-line); background: color-mix(in srgb, var(--color-surface) 12%, var(--color-paper)); }
 .partner-strip .inner { text-align: center; padding-block: 2.5rem; }
@@ -1165,6 +1190,9 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
   .plan__features li::before { content: '✓'; position: absolute; left: 0; top: 0; color: var(--color-brand); font-weight: 700; }
   .plan__cta { margin-top: auto; align-self: flex-start; }
   :where(.plan) > :has(+ .plan__cta) { margin-bottom: 1.5rem; }
+  .plan__note { display: flex; flex-direction: column; gap: 0.35rem; margin-top: 1.1rem; padding-top: 0.9rem; border-top: 1px solid var(--color-line); }
+  .plan__note-label { color: var(--color-brand); font-weight: 700; }
+  .plan__note-text { margin: 0; color: var(--color-muted); font-size: 0.92rem; }
 
 .post-head { margin-bottom: 2.5rem; }
   .post-latest { position: absolute; top: 1rem; left: 1rem; z-index: 2;
@@ -1680,6 +1708,9 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
   .ti-text .prose { max-width: none; }
   .ti-body { margin-top: 1rem; }
   .ti-img { display: block; width: 100%; height: auto; border-radius: 1rem; border: 1px solid var(--color-line); object-fit: cover; }
+  .ti-heading { margin-top: 0.75rem; }
+  .ti-img.ti-img--cutout { width: auto; max-width: min(100%, 20rem); margin-inline: auto; border: 0; border-radius: 0; box-shadow: none; }
+  @media (min-width: 1024px) { .ti-grid--media-only { grid-template-columns: minmax(0, 1fr); } }
 
 .tq-grid { display: grid; align-items: center; gap: 2.5rem; grid-template-columns: 1fr; }
   @media (min-width: 1024px) {
