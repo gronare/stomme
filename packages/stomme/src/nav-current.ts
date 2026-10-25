@@ -15,3 +15,14 @@ export function currentNavPath(pathname: string, hrefs: readonly string[]): stri
   }
   return best;
 }
+
+// A bare fragment ("#pricing") jumps within the page it sits on; it never names a page, so it is never the current one.
+export function namesPage(href: string): boolean {
+  return !!href && !String(href).startsWith('#');
+}
+
+// The anchor a bare fragment names lives on the front page, so off it the item has to travel there first.
+export function fragmentHref(href: string, homeHref: string, onHome: boolean): string {
+  if (onHome || !href || !String(href).startsWith('#') || href === '#') return href;
+  return `${homeHref}${href}`;
+}

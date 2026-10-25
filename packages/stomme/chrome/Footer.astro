@@ -4,6 +4,7 @@ import { Image } from 'astro:assets';
 import type { ImageMetadata } from 'astro';
 import { resolveLink, withTrailingSlash } from '../src/href';
 import { resolveLocales, splitLocalePath, localeEntryId, localeLinker } from '../src/i18n';
+import { normalizeNavPath, fragmentHref } from '../src/nav-current';
 import { site } from '@stomme/config';
 import { resolveSite } from '../src/config';
 import ContactLink from '../src/ContactLink.astro';
@@ -26,7 +27,8 @@ if (!settings) settings = (await getEntry('settings', 'site'))!.data as Settings
 if (!contact) contact = (((await getEntry('contact', 'contact').catch(() => null))?.data) ?? {}) as ContactData;
 
 const fstrings = resolveSite(site, here.locale).strings.footer;
-const inLocale = localeLinker(site, here.locale, locales.enabled ? await getCollection('pages') : []);
+const toLocale = localeLinker(site, here.locale, locales.enabled ? await getCollection('pages') : []);
+const inLocale = (href: string) => fragmentHref(toLocale(href), toLocale('/'), normalizeNavPath(here.path) === '/');
 const logo = settings.logo ?? {};
 const showMark = footer.showLogo === true && !!logo.image;
 const showWord = footer.showWordmark === true && !!logo.textPre;

@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 
 const PKG = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const jiti = createJiti(import.meta.url);
-const { normalizeNavPath, currentNavPath } = await jiti.import(resolve(PKG, 'src/nav-current.ts'));
+const { normalizeNavPath, currentNavPath, namesPage, fragmentHref } = await jiti.import(resolve(PKG, 'src/nav-current.ts'));
 const { resolveLocales, splitLocalePath } = await jiti.import(resolve(PKG, 'src/i18n.ts'));
 
 const results = [];
@@ -44,6 +44,14 @@ const LOCALIZED = ['/en', '/en/news', '/en/contact'].map(strip);
 eq(currentNavPath(strip('/en/news/one'), LOCALIZED), '/news', 'the locale prefix is stripped from both sides before comparing');
 eq(currentNavPath(strip('/en'), LOCALIZED), '/', 'a locale front page marks the front-page item, not every item');
 eq(currentNavPath(strip('/en/news'), LOCALIZED), '/news', 'a localized section page marks its own item');
+
+eq([namesPage('#pricing'), namesPage('/#pricing'), namesPage('/news/'), namesPage('')], [false, true, true, false], 'a bare fragment jumps within the page and never names the current one');
+
+eq(fragmentHref('#pricing', '/', true), '#pricing', 'on the front page a fragment item stays a jump within the page');
+eq(fragmentHref('#pricing', '/', false), '/#pricing', 'off the front page a fragment item points at the anchor on the front page');
+eq(fragmentHref('#pricing', '/en/', false), '/en/#pricing', 'a localized page sends a fragment item to its own locale front page');
+eq([fragmentHref('/news/', '/', false), fragmentHref('https://example.com/#a', '/', false), fragmentHref('', '/', false), fragmentHref('#', '/', false)], ['/news/', 'https://example.com/#a', '', '#'], 'a page link, an external link, an empty link and a bare hash are left as written');
+eq(currentNavPath('/thanks', ['/', fragmentHref('#how', '/', false)].map(normalizeNavPath)), '', 'a fragment item sent to the front page does not mark another page as current');
 
 const failed = results.filter((ok) => !ok).length;
 console.log(`\n${results.length - failed}/${results.length} nav-current checks pass`);
