@@ -150,7 +150,7 @@ main > :is(.surface-dark, .surface-gradient):first-child:has(.hero-grid) > .sect
 @property --command-fade { syntax: "<length>"; inherits: false; initial-value: 0px; }
 @keyframes command-fade { 0%, 85% { --command-fade: 2.5rem; } 100% { --command-fade: 0px; } }
 /* A scroll timeline is inactive while the line fits, so the fade only exists when there is more command to scroll to. */
-@supports (animation-timeline: scroll()) { .command__line { -webkit-mask-image: linear-gradient(to right, #000 calc(100% - var(--command-fade)), transparent); mask-image: linear-gradient(to right, #000 calc(100% - var(--command-fade)), transparent); animation-name: command-fade; animation-timing-function: linear; animation-fill-mode: both; animation-timeline: scroll(self inline); } }
+@supports (animation-timeline: scroll()) { .command__line { -webkit-mask-image: linear-gradient(to right, currentColor calc(100% - var(--command-fade)), transparent); mask-image: linear-gradient(to right, currentColor calc(100% - var(--command-fade)), transparent); animation-name: command-fade; animation-timing-function: linear; animation-fill-mode: both; animation-timeline: scroll(self inline); } }
 .command__prompt { color: color-mix(in srgb, var(--color-dark-ink) 55%, var(--color-dark)); user-select: none; }
 .command__copy { flex: none; min-height: 2.25rem; padding: 0 0.75rem; font: inherit; font-size: 0.8rem; color: var(--color-highlight); background: transparent; border: 1px solid var(--color-dark-line); border-radius: 0.45rem; cursor: pointer; }
 .command__copy:hover { background: color-mix(in srgb, var(--color-dark-ink) 10%, transparent); }
