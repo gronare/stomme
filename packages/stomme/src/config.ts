@@ -55,8 +55,10 @@ export interface SiteConfig {
     service?: { eyebrow?: string; quoteEyebrow?: string; quoteHeading?: string; cta?: string };
     listingStatus?: { available?: string; reserved?: string; sold?: string; all?: string };
     listingCta?: string;
+    docs?: Partial<DocsStrings>;
   };
   listings?: Listing[];
+  docs?: DocsConfig;
   cms?: {
     backend?: string;
     repo?: string;
@@ -72,6 +74,17 @@ export interface SiteConfig {
   };
   media?: MediaConfig;
 }
+
+// features.docs builds a documentation section from a folder of Markdown in a GitHub repo: the latest release at `route`, the branch under `route/<branch>`. `dir` (or STOMME_DOCS_DIR) reads a folder on disk instead, as one version.
+export interface DocsConfig {
+  repo?: string;
+  path?: string;
+  route?: string;
+  branch?: string;
+  dir?: string;
+}
+
+type DocsStrings = typeof STRINGS_EN.docs;
 
 // Where Sveltia keeps uploads. `git` commits them under public/media. `r2` adds Sveltia's own Cloudflare R2 library: uploads go straight from the browser to the bucket and content holds absolute URLs under publicUrl. `maxFileSize` (bytes) makes Sveltia refuse a larger upload in the browser; unset means no cap. A `pointers` key is tolerated and ignored, so older site configs keep parsing.
 export type MediaConfig =
@@ -213,6 +226,31 @@ const STRINGS_EN = {
     more: 'Read more',
     settings: 'Cookie settings',
   },
+  docs: {
+    label: 'Docs',
+    navLabel: 'Documentation',
+    menu: 'Docs menu',
+    search: 'Search the docs',
+    noResults: 'No page matches',
+    version: 'Docs for',
+    release: 'latest release',
+    unreleased: 'unreleased',
+    local: 'local folder',
+    startHere: 'Start here',
+    overview: 'Overview',
+    onThisPage: 'On this page',
+    edit: 'Edit this page on GitHub',
+    editShort: 'Edit on GitHub',
+    sourceAt: '{file} at {ref}',
+    prev: 'Previous',
+    next: 'Next',
+    pages: '{count} pages.',
+    cards: {
+      howTo: { heading: 'Get something done', body: '{count} guides for a task at hand.' },
+      reference: { heading: 'Look up an exact name', body: '{count} pages of names, keys and options.' },
+      explanation: { heading: 'Know why', body: '{count} pages on why it works the way it does.' },
+    },
+  },
 };
 
 const STRINGS_SV: typeof STRINGS_EN = {
@@ -293,6 +331,31 @@ const STRINGS_SV: typeof STRINGS_EN = {
     decline: 'Avböj',
     more: 'Läs mer',
     settings: 'Cookie-inställningar',
+  },
+  docs: {
+    label: 'Dokumentation',
+    navLabel: 'Dokumentation',
+    menu: 'Meny',
+    search: 'Sök i dokumentationen',
+    noResults: 'Ingen sida matchar',
+    version: 'Dokumentation för',
+    release: 'senaste versionen',
+    unreleased: 'ej släppt',
+    local: 'lokal mapp',
+    startHere: 'Börja här',
+    overview: 'Översikt',
+    onThisPage: 'På den här sidan',
+    edit: 'Redigera sidan på GitHub',
+    editShort: 'Redigera på GitHub',
+    sourceAt: '{file} vid {ref}',
+    prev: 'Föregående',
+    next: 'Nästa',
+    pages: '{count} sidor.',
+    cards: {
+      howTo: { heading: 'Få något gjort', body: '{count} guider för en uppgift.' },
+      reference: { heading: 'Slå upp ett exakt namn', body: '{count} sidor med namn, nycklar och val.' },
+      explanation: { heading: 'Förstå varför', body: '{count} sidor om varför det fungerar som det gör.' },
+    },
   },
 };
 
@@ -375,6 +438,31 @@ const STRINGS_NO: typeof STRINGS_EN = {
     more: 'Les mer',
     settings: 'Innstillinger for informasjonskapsler',
   },
+  docs: {
+    label: 'Dokumentasjon',
+    navLabel: 'Dokumentasjon',
+    menu: 'Meny',
+    search: 'Søk i dokumentasjonen',
+    noResults: 'Ingen side passer',
+    version: 'Dokumentasjon for',
+    release: 'nyeste versjon',
+    unreleased: 'ikke utgitt',
+    local: 'lokal mappe',
+    startHere: 'Start her',
+    overview: 'Oversikt',
+    onThisPage: 'På denne siden',
+    edit: 'Rediger siden på GitHub',
+    editShort: 'Rediger på GitHub',
+    sourceAt: '{file} ved {ref}',
+    prev: 'Forrige',
+    next: 'Neste',
+    pages: '{count} sider.',
+    cards: {
+      howTo: { heading: 'Få noe gjort', body: '{count} veiledninger for en oppgave.' },
+      reference: { heading: 'Slå opp et eksakt navn', body: '{count} sider med navn, nøkler og valg.' },
+      explanation: { heading: 'Forstå hvorfor', body: '{count} sider om hvorfor det virker som det gjør.' },
+    },
+  },
 };
 
 const STRINGS_BY_LANG: Record<string, typeof STRINGS_EN> = { en: STRINGS_EN, sv: STRINGS_SV, no: STRINGS_NO, nb: STRINGS_NO, nn: STRINGS_NO };
@@ -400,6 +488,7 @@ function baseStrings(locale?: string, cmsLocale?: string) {
     thanks: { ...STRINGS_EN.thanks, ...b.thanks },
     notFound: { ...STRINGS_EN.notFound, ...b.notFound },
     consent: { ...STRINGS_EN.consent, ...b.consent },
+    docs: { ...STRINGS_EN.docs, ...b.docs, cards: { ...STRINGS_EN.docs.cards, ...b.docs.cards } },
   };
 }
 
@@ -476,11 +565,13 @@ export function resolveSite(c?: SiteConfig, locale?: string) {
       subpages: { ...base.subpages, ...((s && (s as any).subpages) || {}) },
       post: { ...base.post, ...((s && (s as any).post) || {}) },
       consent: { ...base.consent, ...((s && (s as any).consent) || {}) },
+      docs: { ...base.docs, ...((s && s.docs) || {}), cards: { ...base.docs.cards, ...((s && s.docs?.cards) || {}) } },
     },
     listings: resolveListings(c && c.listings),
     cms: c && c.cms,
     contact: c && c.contact,
     maps: c && c.maps,
     media: c && c.media,
+    docs: c && c.docs,
   };
 }

@@ -6,6 +6,8 @@ import { previewEntrypoint, listingEntrypoint, listingCalendarEntrypoint, lookbo
 import { publicIndexPlugin } from './src/vite-public-index.mjs';
 import { createJiti } from 'jiti';
 import { resolveMediaConfig } from './src/media-config.mjs';
+import { resolveDocsConfig } from './src/docs.mjs';
+import { githubSource, localSource, loadDocs } from './src/docs-source.mjs';
 
 function resolveListings(l) {
   return (Array.isArray(l) ? l : [])
@@ -129,6 +131,40 @@ async function siteLocales(configFile) {
   }
 }
 
+async function siteDocs(configFile) {
+  if (!existsSync(configFile)) return null;
+  const mod = await createJiti(import.meta.url).import(configFile);
+  return mod.site?.docs ?? null;
+}
+
+async function setupDocs({ root, configFile, outDir, logger }) {
+  const cfg = resolveDocsConfig(await siteDocs(configFile));
+  const dir = process.env.STOMME_DOCS_DIR || cfg.dir;
+  if (!dir && !cfg.repo) {
+    throw new Error('stomme: features.docs is on but site.docs names no repo — set site.docs.repo (e.g. "owner/name"), or STOMME_DOCS_DIR for a local folder.');
+  }
+  const source = dir ? localSource(cfg, resolve(root, dir)) : githubSource(cfg);
+  const docsDir = resolve(outDir, 'docs');
+  const mediaDir = resolve(docsDir, 'media');
+  const data = await loadDocs(cfg, source, { mediaDir, logger });
+  mkdirSync(docsDir, { recursive: true });
+  const dataFile = resolve(docsDir, 'data.mjs');
+  writeFileSync(dataFile, `export default ${JSON.stringify(data)};\n`);
+  return { route: cfg.route, dataFile, mediaDir, source: dir ? `${resolve(root, dir)}` : `${cfg.repo}/${cfg.path}` };
+}
+
+function serveDocsMedia(docs) {
+  const prefix = `${docs.route}/_media/`;
+  return (req, res, next) => {
+    const path = decodeURIComponent((req.url || '').split('?')[0]);
+    if (!path.startsWith(prefix)) return next();
+    const file = resolve(docs.mediaDir, path.slice(prefix.length));
+    if (!file.startsWith(docs.mediaDir) || !existsSync(file) || !statSync(file).isFile()) return next();
+    res.setHeader('Cache-Control', 'no-cache');
+    res.end(readFileSync(file));
+  };
+}
+
 function resolveLocaleList(list) {
   const clean = [...new Set((Array.isArray(list) ? list : []).map((l) => String(l || '').trim().toLowerCase()).filter(Boolean))];
   return clean.length < 2 ? [] : clean;
@@ -144,6 +180,7 @@ export default function stomme(options = {}) {
   }
   const layout = options.layout || 'src/layouts/Base.astro';
   const configPath = options.config || 'src/site.config.ts';
+  let docs = null;
 
   return {
     name: 'stomme',
@@ -317,6 +354,14 @@ export default function stomme(options = {}) {
           enabled.push('/lookbook', '/lookbook/[slug]');
         }
 
+        if (features.docs) {
+          docs = await setupDocs({ root, configFile: resolve(root, configPath), outDir, logger });
+          updateConfig({ vite: { resolve: { alias: { '@stomme/docs': docs.dataFile } } } });
+          injectRoute({ pattern: `${docs.route}/[...slug]`, entrypoint: '@gronare/stomme/routes/docs.astro' });
+          injectRoute({ pattern: `${docs.route}/_search/[version].json`, entrypoint: '@gronare/stomme/routes/docs-search.ts' });
+          enabled.push(`${docs.route}/[...slug] (docs from ${docs.source})`, `${docs.route}/_search/[version].json`);
+        }
+
         const routed = [
           { on: features.areas, prefix: routes.towns || '/areas', entrypoint: '@gronare/stomme/routes/town.astro' },
           { on: features.services, prefix: routes.services || '/services', entrypoint: '@gronare/stomme/routes/service.astro' },
@@ -409,8 +454,13 @@ export default function stomme(options = {}) {
         logger?.info(enabled.length ? `routes: ${enabled.join(', ')}` : 'no feature/listing routes enabled');
       },
 
+      'astro:server:setup': ({ server }) => {
+        if (docs) server.middlewares.use(serveDocsMedia(docs));
+      },
+
       'astro:build:done': ({ dir, logger }) => {
         const outDir = fileURLToPath(dir);
+        if (docs && existsSync(docs.mediaDir)) cpSync(docs.mediaDir, resolve(outDir, docs.route.slice(1), '_media'), { recursive: true });
         try {
           const iconsDir = resolve(outDir, 'media/icons');
           if (existsSync(iconsDir)) {

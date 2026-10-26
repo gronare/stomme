@@ -34,3 +34,9 @@ declare module '@stomme/slot-*' {
   const Slot: import('astro/runtime/server/index.js').AstroComponentFactory;
   export default Slot;
 }
+
+// The docs feature's build-time data, written by integration.mjs only when features.docs is on.
+declare module '@stomme/docs' {
+  const docs: import('./src/docs-data').DocsData;
+  export default docs;
+}

@@ -7,6 +7,10 @@ frontmatter means disabled/not shown (see `src/kit.ts`).
 
 ## Unreleased
 
+- `features.docs` with `site.docs` builds a documentation section from a folder of
+  Markdown in a GitHub repo, read at build time: the latest release at `/docs`, the
+  default branch under `/docs/<branch>`, with a version picker, search and an
+  "On this page" outline. New strings under `strings.docs`. See `docs/features.md`.
 - `hero` and `ctaPanel` take a `command`, a copyable one-line shell command. `ctaPanel`
   also takes `cta2` and `anchor`; `plans` takes `anchor` and a per-plan `note`.
 - `hero` and `textImage` play a looping video (`media.kind: video`, `video`,

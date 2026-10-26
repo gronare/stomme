@@ -1,0 +1,266 @@
+---
+import { site } from '@stomme/config';
+import { resolveSite } from './config';
+import type { DocsData, DocsVersion, DocsPage as Page } from './docs-data';
+
+interface Props { docs: DocsData; version: DocsVersion; page: Page | null }
+const { docs, version, page } = Astro.props;
+const strings = resolveSite(site).strings;
+const t = strings.docs;
+const fill = (s: string, vars: Record<string, string | number>) => s.replace(/\{(\w+)\}/g, (m, k) => (k in vars ? String(vars[k]) : m));
+const kindLabel = (v: DocsVersion) => (v.kind === 'release' ? t.release : v.kind === 'local' ? t.local : t.unreleased);
+
+const options = docs.versions.map((v) => {
+  const same = page ? v.pages.find((p) => p.path === page.path) : null;
+  return { value: same ? same.url : v.home.url, label: `${v.label} · ${kindLabel(v)}`, selected: v.key === version.key };
+});
+const current = page ? page.url : version.home.url;
+const isOpen = (items: { path: string | null }[]) => !!page && items.some((i) => i.path === page.path);
+
+const sectionKind = (name: string) => {
+  const n = name.toLowerCase();
+  if (n.startsWith('tutorial')) return 'tutorial';
+  if (n.startsWith('how-to') || n.startsWith('how to')) return 'howTo';
+  if (n.startsWith('reference')) return 'reference';
+  if (n.startsWith('explanation')) return 'explanation';
+  return 'other';
+};
+const cards = version.nav.map((s) => {
+  const items = s.groups.flatMap((g) => g.items);
+  const first = items[0];
+  if (!first) return null;
+  const kind = sectionKind(s.name);
+  const copy = kind === 'tutorial' || kind === 'other' ? null : t.cards[kind];
+  if (kind === 'tutorial' || (kind === 'other' && items.length === 1)) {
+    return { kicker: s.nameHtml, href: first.url, headingHtml: first.titleHtml, bodyHtml: first.descriptionHtml };
+  }
+  return { kicker: s.nameHtml, href: first.url, headingHtml: copy ? copy.heading : s.nameHtml, bodyHtml: fill(copy ? copy.body : t.pages, { count: items.length }) };
+}).filter((c) => c !== null);
+const listed = version.nav.filter((s) => sectionKind(s.name) !== 'tutorial');
+const file = page ? `${docs.path ? `${docs.path}/` : ''}${page.path}` : '';
+---
+<div class="docs" data-stomme-page="docs" data-docs-search={`${docs.route}/_search/${version.key}.json`} data-copy={strings.controls.copy} data-copied={strings.controls.copied} data-no-results={t.noResults}>
+  <button class="docs-menu" type="button" aria-expanded="false" aria-controls="docs-side">{t.menu}<span class="docs-menu__bars" aria-hidden="true"></span></button>
+  <aside class="docs-side" id="docs-side">
+    <div class="docs-search" role="search">
+      <label class="docs-search__box">
+        <svg class="docs-search__icon" viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="m13 13 4.5 4.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <input class="docs-search__input" type="search" placeholder={t.search} aria-label={t.search} autocomplete="off" spellcheck="false" aria-controls="docs-hits" />
+        <kbd class="docs-search__key" aria-hidden="true">/</kbd>
+      </label>
+      <ul class="docs-hits" id="docs-hits" hidden></ul>
+    </div>
+    {options.length > 1 ? (
+      <label class="docs-version">
+        <span class="docs-version__label">{t.version}</span>
+        <select class="docs-version__select" data-docs-version>
+          {options.map((o) => <option value={o.value} selected={o.selected}>{o.label}</option>)}
+        </select>
+      </label>
+    ) : (
+      <p class="docs-version"><span class="docs-version__label">{t.version}</span><span class="docs-version__select">{options[0].label}</span></p>
+    )}
+    <nav class="docs-nav" aria-label={t.navLabel}>
+      <p class="docs-nav__head">{t.startHere}</p>
+      <ul class="docs-nav__list">
+        <li><a class="docs-nav__link" href={version.home.url} aria-current={current === version.home.url ? 'page' : undefined}>{t.overview}</a></li>
+      </ul>
+      {version.nav.map((s) => (
+        <>
+          <p class="docs-nav__head" set:html={s.nameHtml} />
+          {s.groups.map((g) => {
+            const list = (
+              <ul class="docs-nav__list">
+                {g.items.map((i) => <li><a class="docs-nav__link" href={i.url} aria-current={i.url === current ? 'page' : undefined} set:html={i.titleHtml} /></li>)}
+              </ul>
+            );
+            return g.label
+              ? <details class="docs-nav__group" open={isOpen(g.items)}><summary class="docs-nav__summary" set:html={g.labelHtml} />{list}</details>
+              : list;
+          })}
+        </>
+      ))}
+    </nav>
+  </aside>
+
+  {page ? (
+    <article class="docs-main">
+      <nav class="docs-crumbs" aria-label={strings.breadcrumbLabel}>
+        <a href={version.home.url}>{t.label}</a>{page.section && <><span aria-hidden="true"> / </span><span>{page.section}</span></>}
+      </nav>
+      <h1 class="docs-title" set:html={page.titleHtml} />
+      {page.ledeHtml && <p class="docs-lede" set:html={page.ledeHtml} />}
+      <div class="docs-body" set:html={page.html} />
+      {(page.prev || page.next) && (
+        <nav class="docs-pager">
+          {page.prev ? <a class="docs-pager__link" href={page.prev.url} rel="prev"><small>‹ {t.prev}</small><span set:html={page.prev.titleHtml} /></a> : <span></span>}
+          {page.next && <a class="docs-pager__link docs-pager__link--next" href={page.next.url} rel="next"><small>{t.next} ›</small><span set:html={page.next.titleHtml} /></a>}
+        </nav>
+      )}
+      <footer class="docs-foot">
+        <a href={page.edit}>{t.edit}</a>
+        <span>{fill(t.sourceAt, { file, ref: version.ref })}</span>
+      </footer>
+    </article>
+  ) : (
+    <article class="docs-main docs-main--home">
+      <p class="docs-crumbs">{t.label} · {version.label} · {kindLabel(version)}</p>
+      <h1 class="docs-title" set:html={version.home.titleHtml} />
+      {version.home.ledeHtml && <p class="docs-lede" set:html={version.home.ledeHtml} />}
+      {cards.length > 0 && (
+        <div class="docs-cards">
+          {cards.map((c) => (
+            <a class="docs-card" href={c.href}>
+              <span class="docs-card__kicker" set:html={c.kicker} />
+              <span class="docs-card__heading" set:html={c.headingHtml} />
+              <span class="docs-card__body" set:html={c.bodyHtml} />
+            </a>
+          ))}
+        </div>
+      )}
+      {listed.map((s) => s.groups.map((g) => (
+        <>
+          <h2 class="docs-home__head" set:html={g.labelHtml || s.nameHtml} />
+          <ul class="docs-list">
+            {g.items.map((i) => <li class="docs-list__item"><a href={i.url} set:html={i.titleHtml} /> <span set:html={i.descriptionHtml} /></li>)}
+          </ul>
+        </>
+      )))}
+    </article>
+  )}
+
+  <aside class="docs-toc">
+    {page && page.headings.length > 0 && (
+      <nav aria-label={t.onThisPage}>
+        <p class="docs-toc__head">{t.onThisPage}</p>
+        <ul class="docs-toc__list">
+          {page.headings.map((h) => <li><a class="docs-toc__link" href={`#${h.id}`} set:html={h.html} /></li>)}
+        </ul>
+        <a class="docs-toc__edit" href={page.edit}>{t.editShort} ↗</a>
+      </nav>
+    )}
+  </aside>
+</div>
+
+<script>
+  type Doc = { t: string; u: string; s: string; x: string };
+  const root = document.querySelector<HTMLElement>('.docs');
+  if (root) {
+    const side = root.querySelector<HTMLElement>('.docs-side')!;
+    const menu = root.querySelector<HTMLButtonElement>('.docs-menu')!;
+    const input = root.querySelector<HTMLInputElement>('.docs-search__input')!;
+    const hits = root.querySelector<HTMLUListElement>('.docs-hits')!;
+    const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
+
+    const header = document.querySelector<HTMLElement>('.site-header');
+    const publishTop = () => {
+      const pos = header ? getComputedStyle(header).position : '';
+      root.style.setProperty('--docs-top', pos === 'sticky' || pos === 'fixed' ? `${header!.offsetHeight}px` : '0px');
+    };
+    publishTop();
+    window.addEventListener('resize', publishTop, { passive: true });
+
+    menu.addEventListener('click', () => {
+      const open = side.classList.toggle('is-open');
+      menu.setAttribute('aria-expanded', String(open));
+    });
+
+    root.querySelector<HTMLSelectElement>('[data-docs-version]')?.addEventListener('change', (e) => {
+      const to = (e.target as HTMLSelectElement).value;
+      if (to) window.location.href = to + window.location.hash;
+    });
+
+    root.querySelectorAll<HTMLPreElement>('.docs-body pre').forEach((pre) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'docs-code__copy';
+      button.textContent = root.dataset.copy || 'Copy';
+      button.addEventListener('click', () => {
+        const done = () => {
+          button.textContent = root.dataset.copied || 'Copied';
+          window.setTimeout(() => { button.textContent = root.dataset.copy || 'Copy'; }, 1500);
+        };
+        const text = pre.querySelector('code')?.textContent ?? pre.textContent ?? '';
+        if (navigator.clipboard?.writeText) navigator.clipboard.writeText(text).then(done, () => {});
+      });
+      const wrap = document.createElement('div');
+      wrap.className = 'docs-code-wrap';
+      pre.replaceWith(wrap);
+      wrap.append(pre, button);
+    });
+
+    let corpus: Promise<Doc[]> | null = null;
+    const load = () => (corpus ??= fetch(root.dataset.docsSearch!).then((r) => (r.ok ? r.json() : [])).catch(() => []));
+    const count = (hay: string, needle: string) => { let n = 0; for (let i = hay.indexOf(needle); i !== -1 && n < 20; i = hay.indexOf(needle, i + needle.length)) n++; return n; };
+    const mark = (text: string, words: string[]) => {
+      let out = esc(text);
+      for (const w of words) out = out.replace(new RegExp(`(${esc(w).replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi'), '<mark>$1</mark>');
+      return out;
+    };
+    const search = (docs: Doc[], q: string) => {
+      const words = q.split(/\s+/).filter(Boolean);
+      return docs.map((d) => {
+        const title = d.t.toLowerCase();
+        const text = d.x.toLowerCase();
+        if (!words.every((w) => title.includes(w) || text.includes(w))) return null;
+        const score = (title.includes(q) ? 100 : 0) + (title.startsWith(q) ? 20 : 0)
+          + words.filter((w) => title.includes(w)).length * 10
+          + (words.length > 1 && text.includes(q) ? 15 + count(text, q) * 2 : 0)
+          + words.reduce((n, w) => n + Math.min(count(text, w), 5), 0);
+        let at = text.indexOf(q);
+        if (at === -1) at = Math.min(...words.map((w) => text.indexOf(w)).filter((i) => i !== -1), Infinity);
+        let snip = d.x.slice(0, 140);
+        if (Number.isFinite(at)) {
+          const from = Math.max(0, d.x.lastIndexOf(' ', Math.max(0, at - 50)) + 1);
+          snip = (from > 0 ? '…' : '') + d.x.slice(from, at + 110) + '…';
+        }
+        return { d, score, snip };
+      }).filter((r) => r !== null).sort((a, b) => b.score - a.score).slice(0, 8);
+    };
+    const render = async () => {
+      const q = input.value.trim().toLowerCase();
+      if (q.length < 2) { hits.hidden = true; hits.innerHTML = ''; return; }
+      const found = search(await load(), q);
+      if (input.value.trim().toLowerCase() !== q) return;
+      const words = q.split(/\s+/).filter(Boolean);
+      hits.innerHTML = found.length
+        ? found.map((r) => `<li><a class="docs-hits__link" href="${esc(r.d.u)}"><span class="docs-hits__title">${mark(r.d.t, words)}</span>${r.d.s ? `<span class="docs-hits__section">${esc(r.d.s)}</span>` : ''}<span class="docs-hits__snip">${mark(r.snip, words)}</span></a></li>`).join('')
+        : `<li class="docs-hits__empty">${esc(root.dataset.noResults || '')}</li>`;
+      hits.hidden = false;
+    };
+    input.addEventListener('focus', () => { load(); }, { once: true });
+    input.addEventListener('input', render);
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') { const first = hits.querySelector<HTMLAnchorElement>('a'); if (first) { e.preventDefault(); first.click(); } }
+      if (e.key === 'Escape') { input.value = ''; render(); input.blur(); }
+      if (e.key === 'ArrowDown') { const first = hits.querySelector<HTMLAnchorElement>('a'); if (first) { e.preventDefault(); first.focus(); } }
+    });
+    hits.addEventListener('keydown', (e) => {
+      const links = [...hits.querySelectorAll<HTMLAnchorElement>('a')];
+      const at = links.indexOf(document.activeElement as HTMLAnchorElement);
+      if (e.key === 'ArrowDown' && at < links.length - 1) { e.preventDefault(); links[at + 1].focus(); }
+      if (e.key === 'ArrowUp') { e.preventDefault(); (at > 0 ? links[at - 1] : input).focus(); }
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key !== '/' || e.metaKey || e.ctrlKey || e.altKey) return;
+      const el = document.activeElement as HTMLElement | null;
+      if (el && (el.isContentEditable || /^(input|textarea|select)$/i.test(el.tagName))) return;
+      e.preventDefault();
+      if (getComputedStyle(menu).display !== 'none' && !side.classList.contains('is-open')) menu.click();
+      input.focus();
+    });
+
+    const toc = [...root.querySelectorAll<HTMLAnchorElement>('.docs-toc__link')];
+    const targets = toc.map((a) => document.getElementById(decodeURIComponent(a.hash.slice(1)))).filter((h): h is HTMLElement => !!h);
+    if (targets.length) {
+      const mark = () => {
+        const line = (parseFloat(root.style.getPropertyValue('--docs-top')) || 0) + 96;
+        let on = targets[0];
+        for (const h of targets) if (h.getBoundingClientRect().top <= line) on = h;
+        toc.forEach((a) => (decodeURIComponent(a.hash.slice(1)) === on.id ? a.setAttribute('aria-current', 'true') : a.removeAttribute('aria-current')));
+      };
+      mark();
+      window.addEventListener('scroll', mark, { passive: true });
+    }
+  }
+</script>

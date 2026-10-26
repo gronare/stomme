@@ -1,0 +1,19 @@
+---
+export const prerender = true;
+import Base from '@stomme/base';
+import docs from '@stomme/docs';
+import DocsPage from '../src/DocsPage.astro';
+
+export function getStaticPaths() {
+  return docs.versions.flatMap((v) => [
+    { params: { slug: v.param }, props: { version: v.key, path: null } },
+    ...v.pages.map((p) => ({ params: { slug: p.param }, props: { version: v.key, path: p.path } })),
+  ]);
+}
+const { version: key, path } = Astro.props as { version: string; path: string | null };
+const version = docs.versions.find((v) => v.key === key)!;
+const page = path ? version.pages.find((p) => p.path === path)! : null;
+---
+<Base title={page ? `${page.title} · ${version.home.title}` : version.home.title} description={page ? page.lede : version.home.lede}>
+  <DocsPage docs={docs} version={version} page={page} />
+</Base>

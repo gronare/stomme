@@ -83,3 +83,85 @@ string spec keys off its position instead, and reordering those does move data.
 Listings are wired the same way features are: `stommeCollections(listings)` in
 `src/content.config.ts` defines the collections, and the integration injects the
 index and detail routes. Nothing to create under `src/pages/`.
+
+## Docs — a documentation section from a repo
+
+`docs` builds a documentation section from a folder of Markdown in a GitHub repo,
+read when the site is built. The pages are not content collections, so nothing about
+them is editable in the CMS: the repo is the source.
+
+```ts
+// src/site.config.ts
+export const features: StommeFeatures = { docs: true };
+
+export const site: SiteConfig = {
+  // …
+  docs: { repo: 'owner/project', path: 'docs', route: '/docs' },
+};
+```
+
+| Field | Default | |
+|---|---|---|
+| `repo` | — | `owner/name` on GitHub. Required unless `dir` is set. |
+| `path` | `docs` | the folder in the repo that holds the Markdown |
+| `route` | `/docs` | where the section is served |
+| `branch` | the repo's default branch | the unreleased version |
+| `dir` | — | a folder on disk to build from instead of GitHub |
+
+Two versions are built. The repo's latest GitHub release is served at `route`, and
+`branch` under `route/<branch>` (`/docs/main`). A version picker switches between
+them and stays on the same page when that page exists in both. A repo with no release
+gets one version, the branch, at `route`.
+
+### How the folder is read
+
+- **`README.md` is the nav and the docs home.** Its `#` heading is the title and its
+  first paragraph the lede. Each `##` is a section. A plain paragraph inside a section
+  names the group the list under it belongs to. Each list item
+  `[Title](path.md): one-line description` is a page, and the order of the items is
+  the reading order that previous and next follow.
+
+  ```md
+  # Project documentation
+
+  Start with the tutorial.
+
+  ## How-to guides
+
+  Everyday work
+
+  - [Run a job](how-to/run-a-job.md): start, watch and stop a job.
+  ```
+
+- **A page** takes its title from its first `#` heading and its lede from the first
+  paragraph that is more than an image. Every `##` gets an id and a line in
+  "On this page". GitHub-flavoured Markdown renders: tables, fenced code (with a copy
+  button), blockquotes.
+- **Links.** A relative link to a `.md` file in the folder becomes the site route,
+  keeping its `#anchor`. A link that leaves the folder goes to the file on GitHub at
+  the version's ref. External links are left as they are.
+- **Images** a page embeds are copied into the build and served from the site under
+  `route/_media/`.
+- **Search** runs in the browser over a static index built per version at
+  `route/_search/<version>.json`. `/` focuses it.
+
+### Reading from GitHub
+
+The build makes two GitHub API calls (the repo and its latest release) plus one file
+list per version, and reads the files themselves from `raw.githubusercontent.com`.
+Set `GITHUB_TOKEN` in the build's environment for a private repo, or when the build
+shares an address with many others and could meet GitHub's unauthenticated rate limit.
+When the source cannot be read, the build fails with a message that names it.
+
+### Writing docs locally
+
+Point `STOMME_DOCS_DIR` at a docs folder on disk (or set `site.docs.dir`, relative to
+the site) and the section is built from that folder as one version, without a network
+call. Links that leave the folder and the edit links still point at GitHub.
+
+```sh
+STOMME_DOCS_DIR=../project/docs pnpm dev
+```
+
+The UI strings live under `strings.docs` (English, Swedish and Norwegian ship). Add
+`route/<branch>` to `site.noindex` to keep the unreleased version out of search engines.
