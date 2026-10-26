@@ -46,7 +46,7 @@ const maskUrl = (src?: string) => {
                     : <span class="stepflow__glyph">{String(i + 1)}</span>}
                 <span class="stepflow__num">{i + 1}</span>
               </div>
-              <span class="mono stepflow__step">{`0${i + 1}`}</span>
+              {(mask || s.icon) && <span class="mono stepflow__step">{`0${i + 1}`}</span>}
               <h3 class="stepflow__title">{s.title}</h3>
               {s.body && <p class="stepflow__body">{s.body}</p>}
             </li>
