@@ -5,7 +5,8 @@ output:
   omit_empty_optional_fields: true
 # >>> cms:generated (run: pnpm cms:gen — do not edit between markers)
 backend:
-  name: git-gateway
+  name: github
+  repo: local/stomme-starter
   branch: main
 # <<< cms:generated
 media_folder: "/public/media"

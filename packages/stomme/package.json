@@ -1,7 +1,7 @@
 {
   "name": "@gronare/stomme",
   "version": "0.1.79",
-  "description": "Block-CMS engine for Astro + Sveltia CMS — types, helpers, runtime components, tooling.",
+  "description": "Block-CMS engine for Astro + Sveltia CMS \u2014 types, helpers, runtime components, tooling.",
   "type": "module",
   "repository": {
     "type": "git",
@@ -91,7 +91,8 @@
     "test:contact-switch": "node test/unit-contact-switch.mjs",
     "test:local-business": "node test/unit-local-business.mjs",
     "test:docs": "node test/unit-docs.mjs",
-    "test:units": "pnpm -s run test:contracts && pnpm -s run test:emit-fields && pnpm -s run test:collection-editors && pnpm -s run test:option-sources && pnpm -s run test:term-collections && pnpm -s run test:admin-theme && pnpm -s run test:markdown && pnpm -s run test:href && pnpm -s run test:config && pnpm -s run test:i18n && pnpm -s run test:kit && pnpm -s run test:icons && pnpm -s run test:protect && pnpm -s run test:og-pages && pnpm -s run test:media-config && pnpm -s run test:anchors && pnpm -s run test:timeline && pnpm -s run test:form-samples && pnpm -s run test:contact-switch && pnpm -s run test:local-business && pnpm -s run test:nav-current && pnpm -s run test:pages && pnpm -s run test:theme && pnpm -s run test:docs",
+    "test:cms-backend": "node test/unit-cms-backend.mjs",
+    "test:units": "pnpm -s run test:contracts && pnpm -s run test:emit-fields && pnpm -s run test:collection-editors && pnpm -s run test:option-sources && pnpm -s run test:term-collections && pnpm -s run test:admin-theme && pnpm -s run test:markdown && pnpm -s run test:href && pnpm -s run test:config && pnpm -s run test:i18n && pnpm -s run test:kit && pnpm -s run test:icons && pnpm -s run test:protect && pnpm -s run test:og-pages && pnpm -s run test:media-config && pnpm -s run test:anchors && pnpm -s run test:timeline && pnpm -s run test:form-samples && pnpm -s run test:contact-switch && pnpm -s run test:local-business && pnpm -s run test:nav-current && pnpm -s run test:pages && pnpm -s run test:theme && pnpm -s run test:docs && pnpm -s run test:cms-backend",
     "test:nav-current": "node test/unit-nav-current.mjs",
     "test:theme": "node test/unit-theme.mjs",
     "test:pages": "node test/unit-pages.mjs"

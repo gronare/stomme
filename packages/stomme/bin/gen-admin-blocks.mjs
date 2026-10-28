@@ -57,6 +57,9 @@ const BLOCKS = await (async () => {
   }
 })();
 
+const SITE_PACKAGE_NAME = (() => {
+  try { return JSON.parse(readFileSync(resolve(root, 'package.json'), 'utf8')).name || 'site'; } catch { return 'site'; }
+})();
 let ROUTES = { services: '/services', towns: '/areas', blog: '/blog' };
 let FEATURES = null;
 let CMS_LOCALE = 'en';
@@ -154,7 +157,7 @@ const { COLLECTION_EDITORS, listingEditor, termEditor } = makeCollectionEditors(
 
 const { ADDON_PANES, ADDON_PANEL_FILES } = await loadAddonCms({ slotsDir: process.env.STOMME_SLOTS_DIR, ROUTES, FEATURES, emitWidget, emitField, buttonField, navLinkField });
 
-const { generatedEditors, emitCollections, emitCms, emitSettings, emitTrackingPane } = makeSettingsPane({ q, pad, emitWidget, emitNavLinks, emitFooterLinks, emitThanksButtons, COLLECTION_EDITORS, listingEditor, termEditor, collectionEnabled, FEATURES, LISTINGS, CMS, LOCALES, ADDON_PANES, ADDON_PANEL_FILES, getStaticCollections: () => STATIC_COLLECTIONS });
+const { generatedEditors, emitCollections, emitCms, emitSettings, emitTrackingPane } = makeSettingsPane({ q, pad, emitWidget, emitNavLinks, emitFooterLinks, emitThanksButtons, COLLECTION_EDITORS, listingEditor, termEditor, collectionEnabled, FEATURES, LISTINGS, CMS, LOCALES, ADDON_PANES, ADDON_PANEL_FILES, getStaticCollections: () => STATIC_COLLECTIONS, SITE_NAME: SITE_PACKAGE_NAME });
 
 const EMITTERS = { blocks: emitWidget, collections: emitCollections, navlinks: emitNavLinks, thanksbuttons: emitThanksButtons, footerlinks: emitFooterLinks, settings: emitSettings, cms: emitCms, tracking: emitTrackingPane };
 

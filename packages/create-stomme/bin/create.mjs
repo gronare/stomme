@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import { cpSync, existsSync, readFileSync, writeFileSync } from 'node:fs';
+import { spawnSync } from 'node:child_process';
 import { resolve, relative, dirname, basename } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -24,7 +25,7 @@ if (existsSync(dest)) {
   process.exit(1);
 }
 
-const SKIP = new Set(['node_modules', 'dist', '.astro', '.netlify']);
+const SKIP = new Set(['node_modules', 'dist', '.astro', '.netlify', '.wrangler']);
 cpSync(template, dest, {
   recursive: true,
   filter: (src) => !SKIP.has(basename(src)),
@@ -64,6 +65,10 @@ if (!fromCheckout && !existsSync(npmrc)) {
       '#   //npm.pkg.github.com/:_authToken=<github token with read:packages>\n',
   );
 }
+
+// The CMS's local-repository editing only opens a folder that holds a .git, so a site outside any repository gets its own.
+const inGitRepo = spawnSync('git', ['rev-parse', '--is-inside-work-tree'], { cwd: dest, stdio: 'ignore' }).status === 0;
+if (!inGitRepo) spawnSync('git', ['init', '-q'], { cwd: dest, stdio: 'ignore' });
 
 console.log(fromCheckout
   ? `\n✓ Created ${arg}

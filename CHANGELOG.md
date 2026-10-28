@@ -24,6 +24,10 @@ frontmatter means disabled/not shown (see `src/kit.ts`).
 - New strings under `strings.controls` (copy, copied, pause and play labels).
 - The share image carries `og:image:width` and `og:image:height` when its size is known:
   a generated card, or an image uploaded to the media library.
+- With no `site.cms`, `cms:gen` writes `backend: github` and a placeholder repo,
+  `local/<package name>`, so `/admin` offers Work with Local Repository; it wrote
+  `git-gateway`, which Sveltia rejects. `create-stomme` runs `git init` in a new site
+  outside a repository.
 
 - Listing `category`, FAQ `tags` and document `group` are Sveltia relation
   fields over new term collections (`<listing>-categories`, `faq-tags`,

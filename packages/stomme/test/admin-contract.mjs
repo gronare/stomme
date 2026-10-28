@@ -18,11 +18,8 @@ if (!existsSync(join(srcAdmin, 'config.yml'))) { console.error('✗ no starter a
 // Served under /admin/ because index.html references stomme-editor.js + stomme-theme.css by absolute /admin/ paths, exactly as deployed.
 const root = mkdtempSync(join(tmpdir(), 'stomme-admin-'));
 cpSync(srcAdmin, join(root, 'admin'), { recursive: true });
-{
-  const p = join(root, 'admin/config.yml');
-  const s = readFileSync(p, 'utf8').replace(/^backend:\n(?:  .*\n)+/m, 'backend:\n  name: test-repo\n');
-  writeFileSync(p, s);
-}
+const configFile = join(root, 'admin/config.yml');
+const useTestRepo = () => writeFileSync(configFile, readFileSync(configFile, 'utf8').replace(/^backend:\n(?:  .*\n)+/m, 'backend:\n  name: test-repo\n'));
 
 const srv = http.createServer((req, res) => {
   let f = join(root, decodeURIComponent(req.url.split('?')[0]));
@@ -55,6 +52,16 @@ try {
   // A Svelte render error inside a menu kills only that subtree — the button still flips aria-expanded, so the failure is invisible unless the throw is caught here.
   const pageErrors = [];
   page.on('pageerror', (e) => pageErrors.push(String((e && e.message) || e)));
+
+  // The starter's config exactly as generated, with no site.cms: a fresh site in dev must offer local-repository editing.
+  const fresh = await browser.newPage();
+  await fresh.goto(`http://localhost:${PORT}/admin/index.html`, { waitUntil: 'domcontentloaded' });
+  const localAlert = await fresh.waitForFunction(() => [...document.querySelectorAll('button')].some((b) => /local repository/i.test(b.textContent || '')), null, { timeout: 30000 })
+    .then(() => null)
+    .catch(() => fresh.evaluate(() => (document.querySelector('[role=alert]')?.innerText || 'the local-repository button never appeared and no [role=alert] explains why').replace(/[\u2068\u2069]/g, '').replace(/\s+/g, ' ').trim()));
+  await check('the generated config with no site.cms offers "Work with Local Repository" on localhost (no config error)', () => localAlert === null || `login blocked: ${localAlert}`);
+  await fresh.close();
+  useTestRepo();
 
   await page.goto(`http://localhost:${PORT}/admin/index.html`, { waitUntil: 'domcontentloaded' });
   const loginAlert = await page.waitForFunction(() => [...document.querySelectorAll('button')].some((b) => /test repository/i.test(b.textContent || '')), null, { timeout: 30000 })

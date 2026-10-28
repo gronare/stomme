@@ -1,7 +1,7 @@
 import { i18nConfigBlock, localeFilePath, LOCALIZED_EDITORS } from './cms-i18n.mjs';
 import { termCollections } from './term-collections.mjs';
 
-export function makeSettingsPane({ q, pad, emitWidget, emitNavLinks, emitFooterLinks, emitThanksButtons, COLLECTION_EDITORS, listingEditor, termEditor = null, collectionEnabled, FEATURES, LISTINGS, CMS, LOCALES = [], ADDON_PANES, ADDON_PANEL_FILES, getStaticCollections }) {
+export function makeSettingsPane({ q, pad, emitWidget, emitNavLinks, emitFooterLinks, emitThanksButtons, COLLECTION_EDITORS, listingEditor, termEditor = null, collectionEnabled, FEATURES, LISTINGS, CMS, LOCALES = [], ADDON_PANES, ADDON_PANEL_FILES, getStaticCollections, SITE_NAME = 'site' }) {
 const multiLocale = LOCALES.length > 1;
 const on = (name) => multiLocale && LOCALIZED_EDITORS.includes(name);
 const anyLocalized = ['nav', 'footer'].some(on);
@@ -25,8 +25,10 @@ function emitCollections(indent) {
 function emitCms(indent) {
   const p = ' '.repeat(indent);
   const c = CMS || {};
-  const L = [`${p}backend:`, `${p}  name: ${c.backend || 'git-gateway'}`];
-  if (c.repo) L.push(`${p}  repo: ${c.repo}`);
+  // With no backend configured, GitHub plus a per-site placeholder repo: Sveltia rejects git-gateway, wants a repo on every Git backend, and only uses it locally to keep each site's IndexedDB apart.
+  const repo = c.repo || (c.backend ? '' : `local/${String(SITE_NAME).replace(/^@/, '').replace(/[^a-zA-Z0-9._-]+/g, '-') || 'site'}`);
+  const L = [`${p}backend:`, `${p}  name: ${c.backend || 'github'}`];
+  if (repo) L.push(`${p}  repo: ${repo}`);
   L.push(`${p}  branch: ${c.branch || 'main'}`);
   if (c.baseUrl) L.push(`${p}  base_url: ${c.baseUrl}`);
   if (c.authEndpoint) L.push(`${p}  auth_endpoint: ${c.authEndpoint}`);
