@@ -228,15 +228,16 @@ const isActive = (href: string) => namesPage(href) && navPath(href) === current;
       return Math.min(1, room / Math.max(used, 1));
     };
     var lastWidth = -1, fitting = false;
-    // The row is drawn at its designed size while it fits the viewport and scaled down only by what it needs; the button keeps its place down to 85% of that size, then moves into the menu and the row takes the space.
+    // The row is drawn at its designed size while it fits the viewport and scaled down only by what it needs; below 85% of that size the wordmark first breaks onto two lines, and only when that is not enough does the button move into the menu.
     var fitRow = function (force) {
       if (!inner || fitting) return;
       var w = header.clientWidth;
       if (!force && w === lastWidth) return;
       fitting = true; lastWidth = w;
-      header.classList.remove('cta-in-menu');
+      header.classList.remove('cta-in-menu', 'logo-wraps');
       var z = fit();
-      if (cta && mobile.matches && z < 0.85) { header.classList.add('cta-in-menu'); z = fit(); }
+      if (cta && mobile.matches && z < 0.85 && header.querySelector('.logo-word')) { header.classList.add('logo-wraps'); z = fit(); }
+      if (cta && mobile.matches && z < 0.85) { header.classList.remove('logo-wraps'); header.classList.add('cta-in-menu'); z = fit(); }
       setZoom(z < 1 ? Math.max(0.3, z * 0.995) : 1);
       fitting = false;
     };

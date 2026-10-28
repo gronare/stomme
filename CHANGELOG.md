@@ -47,6 +47,8 @@ frontmatter means disabled/not shown (see `src/kit.ts`).
 - `serviceGrid` with exactly three cards fills three columns from 1024px.
 - `steps` flow without icons shows the number once, in the circle.
 - The footer link columns sit left under the brand column when they wrap on a phone.
+- On a phone, a wordmark too long for the row breaks onto two lines before the header
+  button moves into the menu.
 
 - Listing `category`, FAQ `tags` and document `group` are Sveltia relation
   fields over new term collections (`<listing>-categories`, `faq-tags`,

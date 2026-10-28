@@ -410,6 +410,8 @@ main .cover:first-child .cover__inner { --cover-clear: calc(var(--header-bottom)
 .logo .accent { color: var(--color-brand); }
 .logo-mark { display: block; height: 1.3em; width: auto; max-width: 100%; object-fit: contain; flex: 0 0 auto; }
 .logo-word { white-space: nowrap; }
+.site-header.logo-wraps > .logo { flex-shrink: 1; }
+.site-header.logo-wraps .logo-word { white-space: normal; text-wrap: balance; }
 
 .site-header__glass { position: absolute; inset: 0; z-index: -1; zoom: 1; background: var(--color-paper); border-bottom: 1px solid var(--color-line); }
 .site-header.is-sticky:not(.is-sticky--phone) { position: sticky; top: 0; z-index: 50; }
