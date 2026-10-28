@@ -1449,7 +1449,7 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
 .service-grid { display: grid; gap: 1.25rem; grid-template-columns: 1fr; margin-top: 2.5rem; }
   @media (min-width: 640px) { .service-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
   @media (min-width: 768px) { .service-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
-  @media (min-width: 1024px) { .service-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+  @media (min-width: 1024px) { .service-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } .service-grid:has(> :nth-child(3):last-child) { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
   .service-card { transition: border-color 0.15s; }
   .service-card:hover { border-color: var(--color-brand); }
   .service-card__img { aspect-ratio: 4 / 3; width: 100%; height: auto; object-fit: cover; display: block; }
