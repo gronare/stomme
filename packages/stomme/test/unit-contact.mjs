@@ -21,17 +21,20 @@ const check = (ok, name, detail = '') => {
   console.log(`${ok ? '✓' : '✗'} ${name}${ok || !detail ? '' : `\n    ${detail}`}`);
 };
 
-const ENV_KEYS = ['RESEND_API_KEY', 'CONTACT_FROM', 'CONTACT_TO'];
+const ENV_KEYS = ['RESEND_API_KEY', 'CONTACT_FROM', 'CONTACT_TO', 'TURNSTILE_SECRET_KEY'];
 for (const k of ENV_KEYS) delete process.env[k];
 const setPlatform = (vars) => { for (const k of Object.keys(platform)) delete platform[k]; Object.assign(platform, vars); };
 const MAIL = { RESEND_API_KEY: 're_test', CONTACT_FROM: 'site@example.com', CONTACT_TO: 'owner@example.com' };
 
 let calls = [];
+let siteverify = { success: true };
 globalThis.fetch = async (url, init) => {
   calls.push({ url: String(url), init });
+  if (String(url).includes('siteverify')) return new Response(JSON.stringify(siteverify), { headers: { 'Content-Type': 'application/json' } });
   return new Response('{"id":"x"}', { status: 200 });
 };
 const sent = () => calls.filter((c) => c.url.includes('api.resend.com'));
+const verified = () => calls.filter((c) => c.url.includes('siteverify'));
 
 // The Cloudflare adapter's locals: reading `runtime.env` throws, exactly as Astro 7 ships it.
 const cloudflareLocals = { get runtime() { return { get env() { throw new Error('Astro.locals.runtime.env has been removed in Astro v6.'); } }; } };
@@ -70,6 +73,30 @@ const statuses = [];
 for (let i = 0; i < 6; i++) statuses.push((await post({}, { ip: '198.51.100.1' })).status);
 check(JSON.stringify(statuses) === JSON.stringify([200, 200, 200, 200, 200, 429]), 'the STOMME_RL binding from the platform env refuses the sixth message', statuses.join(','));
 check(kv.get('c:site.example:198.51.100.1') === '5', 'the rate limit counts per host and client address', String(kv.get('c:site.example:198.51.100.1')));
+
+// ── Turnstile ───────────────────────────────────────────────────────────────
+calls = []; setPlatform(MAIL);
+res = await post({ 'cf-turnstile-response': 'anything' });
+check(res.status === 200 && verified().length === 0, 'with no Turnstile secret the token is not checked');
+
+calls = []; setPlatform({ ...MAIL, TURNSTILE_SECRET_KEY: 'sk_test' }); siteverify = { success: true };
+res = await post({ 'cf-turnstile-response': 'good-token' });
+const verifyBody = verified()[0] ? new URLSearchParams(String(verified()[0].init.body)) : new URLSearchParams();
+check(res.status === 200 && sent().length === 1, 'a token siteverify accepts lets the message through', `HTTP ${res.status}`);
+check(verifyBody.get('secret') === 'sk_test' && verifyBody.get('response') === 'good-token' && verifyBody.get('remoteip') === '203.0.113.7', 'siteverify gets the secret, the token and the client address', verifyBody.toString());
+
+calls = []; siteverify = { success: false, 'error-codes': ['invalid-input-response'] };
+res = await post({ 'cf-turnstile-response': 'bad-token' });
+check(res.status === 403 && sent().length === 0, 'a token siteverify rejects is refused and nothing is sent', `HTTP ${res.status}`);
+
+calls = []; siteverify = { success: true };
+res = await post();
+check(res.status === 403 && sent().length === 0 && verified().length === 0, 'a missing token is refused when a secret is set');
+
+calls = []; setPlatform({}); Object.assign(process.env, MAIL, { TURNSTILE_SECRET_KEY: 'sk_node' }); siteverify = { success: false };
+res = await post({ 'cf-turnstile-response': 'bad-token' }, { locals: {} });
+check(res.status === 403 && sent().length === 0, 'the Turnstile secret is read from process.env on a Node-style target');
+for (const k of ENV_KEYS) delete process.env[k];
 
 // ── wiring ──────────────────────────────────────────────────────────────────
 const integration = readFileSync(resolve(PKG, 'integration.mjs'), 'utf8');

@@ -31,6 +31,8 @@ frontmatter means disabled/not shown (see `src/kit.ts`).
 - The built-in `/api/contact` reads its env and the `STOMME_RL` binding through
   `cloudflare:workers` on the Cloudflare adapter and `process.env` elsewhere; it no
   longer touches `locals.runtime`, which throws on Astro 7's Cloudflare adapter.
+- With `TURNSTILE_SECRET_KEY` set, `/api/contact` verifies `cf-turnstile-response`
+  with Cloudflare and answers `403` when the check fails or the token is missing.
 
 - Listing `category`, FAQ `tags` and document `group` are Sveltia relation
   fields over new term collections (`<listing>-categories`, `faq-tags`,

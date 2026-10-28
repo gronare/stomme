@@ -6,6 +6,8 @@ import { withTrailingSlash } from './href.ts';
 
 export const prerender = false;
 
+const SITEVERIFY = 'https://challenges.cloudflare.com/turnstile/v0/siteverify';
+
 // Never touches `locals.runtime`: the Cloudflare adapter turned it into a getter that throws.
 function binding(key: string): any {
   return platformEnv?.[key];
@@ -14,6 +16,19 @@ function binding(key: string): any {
 function env(key: string): string | undefined {
   const fromProcess = typeof process !== 'undefined' ? process.env?.[key] : undefined;
   return binding(key) ?? fromProcess ?? (import.meta as any).env?.[key];
+}
+
+async function turnstilePassed(secret: string, token: string, ip: string | null): Promise<boolean> {
+  if (!token) return false;
+  const body = new URLSearchParams({ secret, response: token });
+  if (ip) body.set('remoteip', ip.split(',')[0].trim());
+  try {
+    const res = await fetch(SITEVERIFY, { method: 'POST', body });
+    const out: any = await res.json();
+    return out?.success === true;
+  } catch {
+    return false;
+  }
 }
 
 export const POST: APIRoute = async ({ request, redirect }) => {
@@ -26,13 +41,19 @@ export const POST: APIRoute = async ({ request, redirect }) => {
 
   if (form.get('bot-field')) return ok({ ok: true }); // honeypot → silently "succeed"
 
+  const clientIp = request.headers.get('CF-Connecting-IP') || request.headers.get('x-forwarded-for');
   const rlKv = binding('STOMME_RL');
   if (rlKv) {
-    const ip = request.headers.get('CF-Connecting-IP') || request.headers.get('x-forwarded-for') || 'unknown';
+    const ip = clientIp || 'unknown';
     const key = `c:${new URL(request.url).hostname}:${ip}`;
     const n = Number(await rlKv.get(key)) || 0;
     if (n >= 5) return fail('Too many messages just now — please try again in a few minutes.', 429);
     await rlKv.put(key, String(n + 1), { expirationTtl: 600 });
+  }
+
+  const turnstileSecret = env('TURNSTILE_SECRET_KEY');
+  if (turnstileSecret && !(await turnstilePassed(turnstileSecret, String(form.get('cf-turnstile-response') || ''), clientIp))) {
+    return fail('We could not confirm you are not a bot. Please try again.', 403);
   }
 
   const cap = (v: FormDataEntryValue | null, n: number) => String(v || '').trim().slice(0, n);
