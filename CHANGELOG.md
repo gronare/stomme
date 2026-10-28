@@ -45,6 +45,7 @@ frontmatter means disabled/not shown (see `src/kit.ts`).
   brands render as before.
 - `ctaBox` panel: the buttons and intro align left with the heading.
 - `serviceGrid` with exactly three cards fills three columns from 1024px.
+- `steps` flow without icons shows the number once, in the circle.
 
 - Listing `category`, FAQ `tags` and document `group` are Sveltia relation
   fields over new term collections (`<listing>-categories`, `faq-tags`,
