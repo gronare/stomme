@@ -4,17 +4,18 @@ import { resolve, dirname } from 'node:path';
 
 const root = process.cwd();
 
-const raw = process.argv[2];
-if (!raw) {
-  console.error('Usage: npx stomme-new-block <BlockName>   e.g. npx stomme-new-block PromoBanner');
-  process.exit(1);
-}
-
+// `pnpm block:new -- Name` passes the `--` through as an argument of its own.
+const raw = process.argv.slice(2).find((a) => a !== '--') || '';
 const Pascal = raw
   .replace(/[^a-zA-Z0-9]+/g, ' ')
+  .trim()
   .replace(/\s+(.)/g, (_, c) => c.toUpperCase())
   .replace(/\s/g, '')
   .replace(/^(.)/, (_, c) => c.toUpperCase());
+if (!/^[A-Za-z]/.test(Pascal)) {
+  console.error('Usage: npx stomme-new-block <BlockName>   e.g. npx stomme-new-block PromoBanner');
+  process.exit(1);
+}
 const type = Pascal.charAt(0).toLowerCase() + Pascal.slice(1);
 const file = resolve(root, 'src/blocks', `${Pascal}.astro`);
 
