@@ -43,6 +43,7 @@ frontmatter means disabled/not shown (see `src/kit.ts`).
 - The wordmark accent over a dark first block, and the fact values in a split
   `ctaBox`, lift a dark brand colour to a readable lightness (OKLCH L 0.65); lighter
   brands render as before.
+- `ctaBox` panel: the buttons and intro align left with the heading.
 
 - Listing `category`, FAQ `tags` and document `group` are Sveltia relation
   fields over new term collections (`<listing>-categories`, `faq-tags`,
