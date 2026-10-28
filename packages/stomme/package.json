@@ -69,6 +69,7 @@
     "test:trailing-slash": "node test/smoke-trailing-slash.mjs",
     "test:map-proxy": "node test/smoke-map-proxy.mjs",
     "test:docs-build": "node test/smoke-docs.mjs",
+    "test:preview-command": "node test/smoke-preview-command.mjs",
     "lint:comments": "node bin/lint-comments.mjs .",
     "test:contracts": "node test/cross-file-contracts.mjs",
     "test:emit-fields": "node test/unit-emit-fields.mjs",

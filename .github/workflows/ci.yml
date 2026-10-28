@@ -125,6 +125,8 @@ jobs:
         run: pnpm --filter @gronare/stomme test:trailing-slash
       - name: docs section built from a local docs folder
         run: pnpm --filter @gronare/stomme test:docs-build
+      - name: pnpm preview serves a fresh site
+        run: pnpm --filter @gronare/stomme test:preview-command
 
   # The Sveltia DOM contract test is deliberately not per-PR: between version bumps the pinned DOM does not change, so it runs when the pin is bumped instead.
 

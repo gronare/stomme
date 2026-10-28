@@ -34,6 +34,7 @@ frontmatter means disabled/not shown (see `src/kit.ts`).
 - With `TURNSTILE_SECRET_KEY` set, `/api/contact` verifies `cf-turnstile-response`
   with Cloudflare and answers `403` when the check fails or the token is missing.
 - `stomme-new-block` takes its name after a `--`, as `pnpm block:new -- Name` passes it.
+- Starter: `pnpm preview` builds the static target and serves it.
 
 - Listing `category`, FAQ `tags` and document `group` are Sveltia relation
   fields over new term collections (`<listing>-categories`, `faq-tags`,
