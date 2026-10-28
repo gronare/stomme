@@ -18,6 +18,8 @@ async function loadAdapter() {
     if (TARGET === 'node') return mod.default({ mode: 'standalone' });
     // The og route renders with sharp/resvg (native), so prerender must run in Node; imageService 'compile' keeps sharp at build time and leaves nothing to transform at runtime, so no IMAGES binding is generated.
     if (TARGET === 'cloudflare') return mod.default({ prerenderEnvironment: 'node', imageService: 'compile' });
+    // The site ships no edge functions, and Netlify's dev emulation of them starts a Deno server that fails on Deno versions it does not expect.
+    if (TARGET === 'netlify') return mod.default({ devFeatures: { edgeFunctions: false } });
     return mod.default();
   } catch (e) {
     if (e?.code === 'ERR_MODULE_NOT_FOUND') throw new Error(`Build target "${TARGET}" needs its adapter — run:  pnpm add ${pkg}`);

@@ -316,9 +316,11 @@ export default function stomme(options = {}) {
           const previewFile = resolve(outDir, 'preview.astro');
           mkdirSync(outDir, { recursive: true });
           const cspHashes = inlineScriptHashes([pkgDir, resolve(root, 'src'), slotsDir]);
-          writeFileSync(previewFile, previewEntrypoint(isStatic, cspHashes));
+          // Rendered on request in dev on every target: a prerendered page never sees ?data=, so the CMS preview would stay empty.
+          const prerenderPreview = isStatic && command !== 'dev';
+          writeFileSync(previewFile, previewEntrypoint(prerenderPreview, cspHashes));
           injectRoute({ pattern: '/preview', entrypoint: previewFile });
-          enabled.push(`/preview${isStatic ? ' (static)' : ''}`);
+          enabled.push(`/preview${prerenderPreview ? ' (static)' : ''}`);
         }
 
         const site404 = ['404.astro', '404.md', '404.mdx', '404.html']
