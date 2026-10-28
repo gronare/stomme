@@ -34,6 +34,7 @@ frontmatter means disabled/not shown (see `src/kit.ts`).
 - With `TURNSTILE_SECRET_KEY` set, `/api/contact` verifies `cf-turnstile-response`
   with Cloudflare and answers `403` when the check fails or the token is missing.
 - `stomme-new-block` takes its name after a `--`, as `pnpm block:new -- Name` passes it.
+- The listing index page `cms:gen` seeds is `published: true`.
 - `/preview` renders on request in `astro dev` on the static target, so the CMS preview
   follows typing there.
 - Starter: `pnpm preview` builds the static target and serves it; the Netlify adapter

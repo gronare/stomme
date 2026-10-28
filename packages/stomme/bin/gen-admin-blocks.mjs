@@ -14,6 +14,7 @@ import { rewriteLabels, listingAliases } from '../src/label-paths.mjs';
 import { r2LibraryYaml, resolveMediaConfig, withMaxFileSize } from '../src/media-config.mjs';
 import { resolveCmsLocales, LOCALIZED_EDITORS } from '../src/cms-i18n.mjs';
 import { termCollections, seedTerms } from '../src/term-collections.mjs';
+import { listingIndexSeed, listingIndexSlug } from '../src/listing-seed.mjs';
 
 const root = process.cwd();
 const here = dirname(fileURLToPath(import.meta.url));
@@ -389,16 +390,11 @@ try {
 
 for (const l of LISTINGS) {
   try {
-    const slug = l.route.replace(/^\/+/, '') || l.id;
+    const slug = listingIndexSlug(l);
     const pagePath = resolve(root, 'src/content/pages', `${slug}.md`);
     if (existsSync(pagePath)) continue;
-    const label = JSON.stringify(l.label || l.id);
-    const block =
-      l.preset === 'catalog'
-        ? `  - type: catalogList\n    source: ${l.id}\n    base: ${l.route}\n    media:\n      showImages: true\n    layout:\n      filters: true\n      columns: 3`
-        : `  - type: postList\n    source: ${l.id}\n    base: ${l.route}\n    media:\n      showImages: true\n    layout:\n      featured: true\n      columns: 3`;
     mkdirSync(dirname(pagePath), { recursive: true });
-    writeFileSync(pagePath, `---\ntitle: ${label}\nseo:\n  title: ${label}\n  description: ${label}\nblocks:\n  - type: pageHeader\n    heading: ${label}\n${block}\n---\n`);
+    writeFileSync(pagePath, listingIndexSeed(l));
     console.log(`  ↳ seeded editable listing index: src/content/pages/${slug}.md (${l.id})`);
   } catch (e) {
     console.warn(`  (listing index seed skipped for ${l.id}:`, e.message + ')');
