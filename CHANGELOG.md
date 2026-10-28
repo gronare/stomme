@@ -7,6 +7,11 @@ frontmatter means disabled/not shown (see `src/kit.ts`).
 
 ## Unreleased
 
+- `create-stomme` makes a blank site by default: a home page, a contact page with its
+  form, a neutral theme, placeholder text and no photos, with services, testimonials
+  and the FAQ turned off. `--demo` scaffolds the Wren & Sorrel demo from `starter/`
+  and `--blank` the blank site; without either it asks in a terminal and makes the
+  blank site otherwise.
 - `features.docs` with `site.docs` builds a documentation section from a folder of
   Markdown in a GitHub repo, read at build time: the latest release at `/docs`, the
   default branch under `/docs/<branch>`, with a version picker, search and an

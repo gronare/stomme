@@ -130,6 +130,21 @@ jobs:
       - name: pnpm preview serves a fresh site
         run: pnpm --filter @gronare/stomme test:preview-command
 
+  # A new site starts from the blank set by default; it drifts silently when the starter gains a collection or the engine a required content file.
+  scaffold:
+    name: create-stomme (blank + demo scaffolds build)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: scaffold both variants, install and build each
+        run: pnpm --filter @gronare/create-stomme test:scaffold
+
   # The Sveltia DOM contract test is deliberately not per-PR: between version bumps the pinned DOM does not change, so it runs when the pin is bumped instead.
 
   # node --check on the plain-JS scripts — none of these go through astro check.
@@ -149,6 +164,7 @@ jobs:
           node --check packages/stomme/admin/previews.js
           node --check packages/stomme/test/smoke-preview-workerd.mjs
           node --check packages/stomme/test/smoke-metrics.mjs
+          node --check packages/create-stomme/bin/create.mjs
 
   # The manifests are published artifacts: tooling reads them raw at a tagged ref to check
   # site content against the engine's schema. One that lags its generator (collections.ts /
