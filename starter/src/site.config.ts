@@ -4,8 +4,8 @@ export const features: StommeFeatures = {
   faq: true,
   blog: false,
   areas: false,
-  services: false,
-  testimonials: false,
+  services: true,
+  testimonials: true,
   documents: false,
 };
 

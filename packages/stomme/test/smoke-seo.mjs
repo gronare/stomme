@@ -78,7 +78,7 @@ try {
     const business = homeLd.find((o) => o && o['@type'] === 'LocalBusiness');
     check(!!business, 'the home page carries a LocalBusiness application/ld+json script');
     check(business?.['@context'] === 'https://schema.org', 'the schema names its context');
-    check(business?.name === 'Starter Co', "the business name is the settings singleton's name");
+    check(business?.name === 'Wren & Sorrel', "the business name is the settings singleton's name");
     check(business?.url === SITE_URL, 'the business url is the site origin');
     check(business?.telephone === '+15550100', "the telephone is the contact singleton's E.164 number");
     check(business?.email === 'hello@example.com', 'the email comes from the same singleton');

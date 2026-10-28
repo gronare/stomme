@@ -1,70 +1,59 @@
 ---
 title: "About"
 seo:
-  title: "About — Starter Co"
-  description: "How this starter is put together — pages, blocks, and the engine underneath."
+  title: "About | Wren & Sorrel"
+  description: "A small garden studio of six gardeners and one designer, building and caring for gardens across the valley since 2014."
 blocks:
   - type: pageHeader
-    eyebrow: About
-    heading: Anatomy of this starter
-    intro: An owner-managed page — its filename is its slug, so this renders at /about.
+    heading: Gardeners first, designers second.
+    intro: Wren & Sorrel started with two people, one van and a waiting list of overgrown back gardens. Twelve years later we are seven, and we still plant every garden we draw.
     layout:
       variant: dark
-  - type: definition
-    eyebrow: The name
-    term: stom·me
-    wordClass: noun · Swedish
-    senses:
-      - text: the load-bearing *frame* of a building.
-      - text: the structure that holds a site up while everything visible gets replaced.
-        note: this starter, for example.
-  - type: prose
-    heading: How a page is put together
+  - type: textImage
+    heading: Small on purpose
     body: |
-      Every page on this site is a markdown file whose frontmatter lists blocks
-      in order — the engine renders the stack. This paragraph sits in a
-      **rich-text block**, so markdown does the usual work:
+      We take on around a dozen builds a year. That is few enough for the
+      designer to be on site every week, and for the same gardeners to keep
+      coming back once the build is done.
 
-      - headings, lists and [links](/)
-      - inline images placed under `src/assets/uploads`, optimised automatically
-      - positioning with a title keyword — `![caption](photo.jpg "right")`
-
-      Delete a block from the frontmatter and the section is gone. Add one from
-      the catalog and it appears, themed like everything else.
-  - type: fragment
-    eyebrow: A short story
-    statement: First, a *frame*.
-    body: The engine ships the blocks, the routes, the CMS and the build — the parts of a site that should not be rewritten per project.
+      Most of our work comes from neighbours of gardens we have already made.
+      We would like to keep it that way.
+    media:
+      image: /media/crew-wheelbarrow.webp
+      imageAlt: A gardener in green workwear pushing a wheelbarrow across a lawn
     layout:
-      placement: left
-  - type: fragment
-    statement: Then, the content.
-    body: Everything you are reading lives in markdown files under src/content — this fragment included.
-    layout:
-      placement: right
-  - type: fragment
-    statement: Finally, *your* site.
-    body: Replace the copy, set the theme, switch on the collections you need and delete what you don't.
-    layout:
-      placement: indent
+      flip: true
   - type: pillars
-    eyebrow: Principles
-    heading: What the engine promises
+    heading: What we hold to
     items:
-      - title: Content outlives the code
-        body: Pages are plain files. Rebuild the site, swap the theme, upgrade the engine — the words stay put.
-      - title: The catalog is the contract
-        body: Editors compose from a fixed set of blocks, so every page stays consistent and nothing renders broken.
-      - title: Boring on purpose
-        body: Static output, no client framework, one dependency to update. The excitement belongs in your content.
+      - title: Plant for the soil you have
+        body: We choose plants that suit your ground and your light, so the garden thrives without constant rescue.
+      - title: Build it once
+        body: Proper foundations, good drainage and honest materials. A patio should outlast the people who laid it.
+      - title: Leave room to grow
+        body: A new garden is a beginning. We plan for how it will look in ten years, not just on handover day.
     style:
       surface: tint
+  - type: timeline
+    heading: How we got here
+    items:
+      - year: "2014"
+        title: Two gardeners and a van
+        detail: Maintenance rounds in Millbrook, mostly hedges and lawns.
+      - year: "2017"
+        title: The first full build
+        detail: A sloping back garden turned into terraces, still on our care round today.
+      - year: "2021"
+        title: A designer joins
+        detail: Plans, planting schedules and fixed design fees.
+      - year: "2026"
+        title: Seven people, three trades
+        detail: Design, build and care under one roof.
   - type: ctaPanel
-    eyebrow: Questions?
-    heading: Talk to a human
-    intro: The contact page is a block too — a working form wired to a thank-you page.
+    heading: Walk your garden with us
+    intro: An hour on site and an honest view of what it could become.
     cta:
-      label: Contact
+      label: Book a garden visit
       link:
         page: /contact
 published: true

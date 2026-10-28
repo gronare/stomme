@@ -98,7 +98,7 @@ try {
   write('src/content/pages/guiden.md', page('Guiden', '', '/omradet', { order: 1, cover: COVER, summary: 'Guiden i korthet.', blocks: SIBLINGS }));
   write('src/content/pages/guiden.en.md', page('The guide', 'the-guide', '/omradet', { order: 1, cover: COVER, summary: 'The guide in short.', blocks: SIBLINGS }));
   write('src/content/pages/kartan.md', page('Kartan', '', '/omradet', { order: 2, summary: 'Kartan i korthet.' }));
-  write('src/content/faq/what-is-this.en.md', faqEntry(EN_QUESTION, 'This answer is written in English.'));
+  write('src/content/faq/areas-we-cover.en.md', faqEntry(EN_QUESTION, 'This answer is written in English.'));
   write('src/content/footer/footer.en.md', footerEntry(EN_TAGLINE, EN_LINK));
 
   console.log('· static build with three languages, the switcher left at its default…');
@@ -200,17 +200,17 @@ try {
   check(/aria-label="Byt språk"/.test(nav), 'the control says what it does, in the language of the page');
 
   const home = { sv: html(''), en: html('en'), no: html('no') };
-  const BASE_QUESTION = 'What is this starter?';
+  const BASE_QUESTION = 'Which areas do you work in?';
   check(home.sv.includes(BASE_QUESTION) && !home.sv.includes(EN_QUESTION), 'the site reads its own language on its own front page');
   check(home.en.includes(EN_QUESTION) && !home.en.includes(BASE_QUESTION),
     'a translated FAQ question replaces the original under /en/ — it is not shown beside it');
   check((home.en.split(EN_QUESTION).length - 1) === (home.sv.split(BASE_QUESTION).length - 1),
     'the translation is rendered exactly as many times as the question it replaced — the locale file is no second entry');
-  check(home.en.includes('How do I add a page?'), 'a question nobody translated still answers under /en/, in the default language');
+  check(home.en.includes('What happens at the first visit?'), 'a question nobody translated still answers under /en/, in the default language');
   check(home.no.includes(BASE_QUESTION) && !home.no.includes(EN_QUESTION), 'and a language with no file of its own falls back the same way');
 
   check(home.en.includes(EN_TAGLINE) && !home.sv.includes(EN_TAGLINE), 'the footer under /en/ is the translated footer');
-  check(home.no.includes('A block-built starter'), 'an untranslated footer falls back to the one the site started with');
+  check(home.no.includes('Garden design, build and care'), 'an untranslated footer falls back to the one the site started with');
   check(/<p class="mono eyebrow">Links<\/p>/.test(home.en) && /<p class="mono eyebrow">Explore<\/p>/.test(home.sv),
     "a heading the translation leaves empty falls back to the chrome's own word for it, in the page's language");
   check(new RegExp(`href="/en/about/" class="footer-link">${EN_LINK}<`).test(home.en),

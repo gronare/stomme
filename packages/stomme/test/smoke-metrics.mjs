@@ -63,7 +63,7 @@ try {
   check(home.includes('sendBeacon'), 'the beacon code itself is in the page');
   const tag = home.match(/<script[^>]*data-stomme-metrics[^>]*>/)?.[0] ?? '';
   check(tag !== '' && !/\bsrc=/.test(tag), 'the beacon is inline, never an external file');
-  check(/data-stomme-block="hero"/.test(home) && /data-stomme-block="faq"/.test(home), 'block wrappers carry data-stomme-block');
+  check(/data-stomme-block="cover"/.test(home) && /data-stomme-block="faq"/.test(home), 'block wrappers carry data-stomme-block');
 
   const town = html('areas', 'probe-town', 'index.html');
   check(/data-stomme-page="town"/.test(town), 'a town page carries data-stomme-page="town"');
@@ -82,7 +82,7 @@ try {
   check(!bare.includes('data-stomme-metrics'), 'no beacon script without an endpoint');
   check(!bare.includes(ENDPOINT), 'no endpoint anywhere in the default build');
   check(!bare.includes('sendBeacon'), 'no beacon code at all without an endpoint');
-  check(/data-stomme-block="hero"/.test(bare), 'the block markers are unconditional');
+  check(/data-stomme-block="cover"/.test(bare), 'the block markers are unconditional');
 } finally {
   restore();
   try { rmSync(DIST, { recursive: true, force: true }); } catch {}

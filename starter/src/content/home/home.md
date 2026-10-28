@@ -1,149 +1,162 @@
 ---
 seo:
-  title: Starter — a stomme site
-  description: A block-built starter on the stomme engine. Every section of this page is a block — rearrange, retheme, replace.
+  title: Wren & Sorrel | Garden design, build and care
+  description: A small garden studio that designs, builds and looks after gardens for homes in the valley. Book a garden visit.
 blocks:
-  - type: hero
-    eyebrow: Starter template
-    heading: Every section on this page is a block.
-    intro: This starter ships with a catalog of composable sections. Stack them in the CMS, swap the copy for your own, and delete the rest — the page below doubles as the tour.
-    ticks:
-      - Edited in the browser at /admin — or straight in markdown
-      - Themed with tokens, not a CSS rewrite
-      - Engine updates arrive as a version bump
+  - type: cover
+    heading: Gardens that get better every year.
+    intro: We design, build and look after gardens for homes across the valley. One small team, from the first sketch to the tenth summer.
     cta:
-      label: See how it works
+      label: Book a garden visit
       link:
-        url: "#how"
+        page: /contact
     cta2:
-      label: About this starter
+      label: See recent gardens
       link:
-        page: /about
+        url: "#work"
     media:
-      kind: highlights
-      highlights:
-        - icon: bolt
-          title: Static and fast
-          body: Plain HTML out of the box — no client framework to ship.
-        - icon: gear
-          title: Composable
-          body: Pages are stacks of typed blocks from a fixed catalog.
-        - icon: shield
-          title: Hard to break
-          body: Content is validated on every build.
-  - type: logoStrip
-    lead: Built on
-    logos:
-      - Astro
-      - Sveltia CMS
-      - Markdown
-      - TypeScript
-  - type: featureGrid
-    eyebrow: The idea
-    heading: Compose, don't code
-    intro: Three cards from the feature grid — each can carry an icon or a number, a footer tag, and a link.
-    items:
-      - icon: document
-        title: Content is just files
-        body: Every page is a markdown file with a list of blocks in its frontmatter, versioned in git next to the code.
-        tag: markdown
-      - icon: users
-        title: Editors get a real CMS
-        body: Non-developers compose pages at /admin from the same catalog — no stray HTML, no broken layouts.
-        tag: sveltia
-      - icon: refresh
-        title: Updates without merge pain
-        body: The engine is a dependency, not a copy-paste. New blocks and fixes arrive when you bump the version.
-        tag: semver
-        cta:
-          link:
-            page: /about
-  - type: steps
-    anchor: how
-    eyebrow: Workflow
-    heading: From scaffold to shipped
-    items:
-      - kicker: scaffold
-        title: Generate the site
-        body: One command scaffolds this starter — content, CMS and build wired together, running locally in a minute.
-      - kicker: compose
-        title: Stack your blocks
-        body: Build each page from the catalog — heroes, grids, pricing, galleries, FAQs, forms — and reorder with drag and drop.
-      - kicker: ship
-        title: Build and deploy
-        body: The build emits a static site. Host it anywhere that serves files.
+      kind: image
+      image: /media/perennial-walk.webp
+      imageAlt: A gravel path through deep borders of white and lilac perennials
+      overlay: strong
+    layout:
+      align: start
+      vAlign: end
+      height: tall
+  - type: serviceGrid
+    heading: Design, build and care, under one roof
+    intro: Most gardens need all three. We do them as one team, so nothing gets lost between the plan and the planting.
+  - type: textImage
+    heading: The people who plant it come back to prune it.
+    body: |
+      Wren & Sorrel is a crew of six gardeners and one designer. We take on a
+      handful of builds each season so we can stay with every garden after it
+      is finished.
+
+      That means the borders get cut back by someone who knows why they were
+      planted that way, and the plan keeps growing in the right direction.
+    media:
+      image: /media/crew-wheelbarrow.webp
+      imageAlt: A gardener in green workwear pushing a wheelbarrow across a lawn
     style:
       surface: tint
-  - type: textImage
-    heading: Text beside an image
-    body: |
-      This is the text-and-image split. The illustration here is a shipped
-      placeholder — swap it from the media library and the build optimises the
-      upload automatically.
-
-      Body copy is **markdown**, so lists, emphasis and [links](/about) all
-      work. Flip the layout switch and the image moves to the other side.
-    media:
-      image: /images/placeholders/hero.svg
-      imageAlt: Placeholder illustration shipped with the starter
-    layout:
-      flip: true
-  - type: callout
-    quote: Owners edit the content. Developers upgrade the engine. *Neither can break the other's work.*
-    layout:
-      width: xnarrow
-      align: center
-    style:
-      surface: dark
-  - type: checklist
-    eyebrow: What's in the box
-    heading: The scaffold ships ready
+  - type: steps
+    anchor: how
+    heading: From first visit to first bloom
     items:
-      - text: A catalog of 30+ section blocks
-        note: Heroes, grids, pricing, galleries, FAQs, forms — browse them all at /lookbook while developing.
-      - text: Sveltia CMS wired at /admin
-        note: Generated from the block catalog, never edited by hand.
-      - text: Contact form with a thank-you page
-      - text: SEO, share cards and sitemap
-        note: Open Graph images can be generated per page.
-      - text: Optional collections behind flags
-        note: Blog, services, areas, testimonials — switched on in site.config.ts.
-      - text: Theme tokens, not a CSS framework
+      - title: Garden visit
+        icon: pin
+        body: An hour on site with you. We look at light, soil and how you use the space, then send a summary and a rough budget.
+      - title: Design
+        icon: ruler
+        body: A scaled plan and planting schedule for a fixed fee, revised until it feels like yours.
+      - title: Build
+        icon: hammer
+        body: Our own crew lays the stone, sets the levels and plants at the right time of year.
+      - title: Care
+        icon: leaf
+        body: Regular visits keep it growing the way it was drawn, season after season.
+    layout:
+      variant: flow-filled
+  - type: gallery
+    anchor: work
+    heading: Recent gardens
+    intro: A few of the gardens we have designed, built or looked after in the last two seasons.
+    images:
+      - image: /media/rock-garden.webp
+        alt: A rockery of low alpines and silver shrubs beside a sweeping lawn
+        caption: Hillside rockery, Millbrook
+      - image: /media/lavender-arch.webp
+        alt: A brick archway framing a gravel path lined with lavender
+        caption: Lavender walk, Ashby Cross
+      - image: /media/brick-path.webp
+        alt: A curved brick path between low clipped hedges and tall grasses
+        caption: Brick path and hedging, Kesterton
+      - image: /media/cottage-front.webp
+        alt: Stone cottages behind a front garden of roses and lawn
+        caption: Cottage front garden, Ashby Cross
     layout:
       columns: 2
+  - type: testimonials
+    heading: In their words
+    style:
+      surface: dark
+  - type: plans
+    anchor: plans
+    heading: Care plans
+    intro: For gardens we built and gardens we did not. Every plan includes green waste removal and a written note after each visit.
+    plans:
+      - name: Tidy
+        pricePrefix: from
+        price: "$140"
+        period: per visit
+        description: For small gardens that need a steady hand once a month.
+        features:
+          - text: Monthly visit, two gardeners
+          - text: Lawn, edges and borders
+          - text: Seasonal pruning
+        cta:
+          label: Ask about Tidy
+          link:
+            page: /contact
+      - name: Seasonal
+        pricePrefix: from
+        price: "$260"
+        period: per month
+        description: Fortnightly care for established gardens that should look their best all year.
+        badge: Most chosen
+        highlight: true
+        features:
+          - text: Fortnightly visits
+          - text: Feeding and mulching
+          - text: Spring and autumn planting refresh
+          - text: Hedge cutting twice a year
+        cta:
+          label: Ask about Seasonal
+          link:
+            page: /contact
+      - name: Estate
+        pricePrefix: after a visit
+        price: Quoted
+        description: Large or formal gardens with a dedicated head gardener.
+        features:
+          - text: Weekly visits
+          - text: Glasshouse and kitchen garden
+          - text: Yearly planting plan
+        cta:
+          label: Talk to us
+          link:
+            page: /contact
+    footnote: Prices include tax. No contract; pause or cancel with a month's notice.
+    style:
+      surface: tint
   - type: faq
-    eyebrow: FAQ
-    heading: Questions, answered from a collection
-    intro: These entries live in the FAQ collection — each FAQ block picks what to show, by hand or by tag.
-    asideHeading: Still wondering?
-    asideBody: The aside is part of the block — point it wherever questions should land.
+    heading: Good questions
+    entries:
+      - areas-we-cover
+      - first-visit
+      - design-cost
+      - build-time
+      - care-without-build
+    asideHeading: Something else?
+    asideBody: Send us a photo of the garden and a line about what you want from it. We reply within one working day.
     asideCta:
-      label: Contact
+      label: Get in touch
       link:
         page: /contact
     layout:
       variant: accordion
-    style:
-      surface: tint
   - type: ctaBox
-    eyebrow: Next step
-    heading: Make it yours.
-    intro: Swap the wordmark, retheme the tokens, replace this copy — the structure is already standing.
+    heading: Start with a garden visit.
+    intro: An hour on site, a written summary and a rough budget. The fee comes off your design if you go ahead.
     cta:
-      label: Get in touch
+      label: Book a garden visit
       link:
         page: /contact
     cta2:
-      label: more about the starter
+      label: Read about us
       link:
         page: /about
-    facts:
-      - label: Scaffold
-        value: One command
-      - label: Engine updates
-        value: Version bump
-      - label: Lock-in
-        value: None
     layout:
-      variant: split
+      variant: classic
 ---

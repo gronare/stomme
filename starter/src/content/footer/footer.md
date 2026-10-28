@@ -1,18 +1,28 @@
 ---
 showLogo: true
 showWordmark: true
-tagline: "A block-built starter on the stomme engine — this footer is editable content too."
+tagline: "Garden design, build and care for homes in the valley. Planted to last, looked after every season."
 linksHeading: "Explore"
 links:
-  - label: Home
+  - label: Garden design
     link:
-      page: /
-  - label: About
+      page: /services/garden-design
+  - label: Garden build
+    link:
+      page: /services/garden-build
+  - label: Planting
+    link:
+      page: /services/planting
+  - label: Garden care
+    link:
+      page: /services/garden-care
+  - label: About us
     link:
       page: /about
-  - label: Contact
+  - label: Book a visit
     link:
       page: /contact
-note: "Replace this line, or clear it to hide it."
+note: ""
 showLinks: true
+showHours: true
 ---

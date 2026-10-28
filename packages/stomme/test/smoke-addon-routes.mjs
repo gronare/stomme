@@ -104,7 +104,7 @@ try {
       .replace("    formSuccess: '/thanks',", "    formSuccess: '/thanks',\n    booking: '/bokning',\n    bookingManage: '/min-bokning',\n    bookingAction: 'boka',")
       .replace("  locale: 'en-US',\n  cmsLocale: 'en',", "  locale: 'sv-SE',\n  cmsLocale: 'sv',\n  locales: ['sv', 'en', 'no'],\n  noindex: ['/min-bokning'],"));
   writeFileSync(resolve(STARTER, 'src/content/navigation/nav.md'),
-    saved.get('src/content/navigation/nav.md').replace('cta:\n  label: Contact\n  link:\n    page: /contact', 'cta:\n  label: Boka\n  link:\n    page: /bokning'));
+    saved.get('src/content/navigation/nav.md').replace('cta:\n  label: Book a visit\n  link:\n    page: /contact', 'cta:\n  label: Boka\n  link:\n    page: /bokning'));
   writeFileSync(resolve(STARTER, 'astro.config.mjs'),
     saved.get('astro.config.mjs')
       .replace('export default defineConfig({', `${SITEMAP_CONST}export default defineConfig({`)

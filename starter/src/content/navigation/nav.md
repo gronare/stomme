@@ -2,14 +2,20 @@
 showLogo: true
 showWordmark: true
 items:
-  - label: Home
+  - label: Design
     link:
-      page: /
+      page: /services/garden-design
+  - label: Build
+    link:
+      page: /services/garden-build
+  - label: Care
+    link:
+      page: /services/garden-care
   - label: About
     link:
       page: /about
 cta:
-  label: Contact
+  label: Book a visit
   link:
     page: /contact
 ---

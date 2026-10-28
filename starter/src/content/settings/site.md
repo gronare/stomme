@@ -1,6 +1,6 @@
 ---
-name: "Starter Co"
+name: "Wren & Sorrel"
 logo:
-  textPre: "Starter"
-  textAccent: "Co"
+  textPre: "Wren & Sorrel"
+  textAccent: ""
 ---
