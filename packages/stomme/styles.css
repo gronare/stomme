@@ -428,6 +428,7 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
 body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header:not(.solid, .nav-open) :is(.site-nav > a:not(.btn):hover, .nav-item--menu:is(:hover, .is-open) :is(.nav-top, .nav-caret-btn)) { color: var(--color-highlight); }
 body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header:is(.solid, .nav-open) :is(.site-nav > a:not(.btn):hover, .nav-item--menu:is(:hover, .is-open) :is(.nav-top, .nav-caret-btn)), body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header:is(.solid, .nav-open) .site-nav a[aria-current='page'], body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header:is(.solid, .nav-open) .nav-top.is-active { color: var(--color-brand); }
 body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header .logo .accent { color: var(--color-brand); }
+body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header:not(.solid, .nav-open) .logo:not(.logo--plate) .accent { color: oklch(from var(--color-brand) max(l, 0.65) c h); }
 body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header .logo.logo--plate { color: var(--color-ink); }
 body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header .logo--plate::before { display: block; }
 body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero-grid), :has(main .surface-gradient:first-child .hero-grid)) .site-header > .site-header__glass { opacity: 0; }
@@ -859,7 +860,7 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
     background: color-mix(in srgb, var(--color-on-dark) 6%, transparent);
     border: 1px solid color-mix(in srgb, var(--color-on-dark) 10%, transparent);
   }
-  .ctabox-chip b { color: var(--color-brand); font-weight: 600; letter-spacing: 0.06em; }
+  .ctabox-chip b { color: var(--color-brand); color: oklch(from var(--color-brand) max(l, 0.65) c h); font-weight: 600; letter-spacing: 0.06em; }
   @media (max-width: 320px) { .ctabox-chip { white-space: normal; } }
 
   .ctabox--panel {

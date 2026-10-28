@@ -40,6 +40,9 @@ frontmatter means disabled/not shown (see `src/kit.ts`).
   follows typing there.
 - Starter: `pnpm preview` builds the static target and serves it; the Netlify adapter
   runs without its edge-functions emulation in dev.
+- The wordmark accent over a dark first block, and the fact values in a split
+  `ctaBox`, lift a dark brand colour to a readable lightness (OKLCH L 0.65); lighter
+  brands render as before.
 
 - Listing `category`, FAQ `tags` and document `group` are Sveltia relation
   fields over new term collections (`<listing>-categories`, `faq-tags`,
