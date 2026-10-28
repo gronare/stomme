@@ -62,6 +62,9 @@ importers:
       astro:
         specifier: ^7.2.9
         version: 7.2.9(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.3)(@netlify/blobs@10.7.9)(@types/node@26.0.0)(jiti@2.7.0)(yaml@2.9.0)
+      sharp:
+        specifier: ^0.35.3
+        version: 0.35.4(@types/node@26.0.0)
     devDependencies:
       '@astrojs/cloudflare':
         specifier: ^14.2.3
@@ -10964,7 +10967,6 @@ snapshots:
       '@img/sharp-win32-ia32': 0.35.4
       '@img/sharp-win32-x64': 0.35.4
       '@types/node': 26.0.0
-    optional: true
 
   shebang-command@2.0.0:
     dependencies:
