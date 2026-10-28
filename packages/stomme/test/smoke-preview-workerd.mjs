@@ -145,6 +145,19 @@ async function main() {
     log('OK  /preview?kind=thanks renders the draft copy with a sample receipt built from the site\'s own form');
   }
 
+  // No mail keys in this worker, so a handler that read its env without throwing answers with the missing-config error; a thrown read is an Astro error page instead.
+  const form = new FormData();
+  form.set('name', 'Smoke'); form.set('email', 'smoke@example.com'); form.set('message', 'workerd contact probe');
+  const contactRes = await fetch(`${base}/api/contact`, { method: 'POST', body: form, headers: { accept: 'application/json', origin: base } });
+  const contactBody = await contactRes.text();
+  let contactJson = null;
+  try { contactJson = JSON.parse(contactBody); } catch {}
+  if (!contactJson || !/not configured/.test(contactJson.error || '')) {
+    ok = fail(`POST /api/contact on workerd did not reach the handler's own config check (HTTP ${contactRes.status}): ${contactBody.slice(0, 160)}`);
+  } else {
+    log('OK  POST /api/contact on workerd reads its env through cloudflare:workers and answers with the handler\'s own error');
+  }
+
   const logText = workerLog.join('');
   const badLog = logText.match(/Buffer is not defined|ReferenceError|is not defined/);
   if (badLog) ok = fail(`worker log carries a runtime error: "${badLog[0]}"`);

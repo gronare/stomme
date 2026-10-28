@@ -1,15 +1,22 @@
 import type { APIRoute } from 'astro';
 import { getEntry } from 'astro:content';
 import { site } from '@stomme/config';
+import { env as platformEnv } from '@stomme/runtime-env';
 import { withTrailingSlash } from './href.ts';
 
 export const prerender = false;
 
-function env(locals: any, key: string): string | undefined {
-  return locals?.runtime?.env?.[key] ?? (import.meta as any).env?.[key];
+// Never touches `locals.runtime`: the Cloudflare adapter turned it into a getter that throws.
+function binding(key: string): any {
+  return platformEnv?.[key];
 }
 
-export const POST: APIRoute = async ({ request, locals, redirect }) => {
+function env(key: string): string | undefined {
+  const fromProcess = typeof process !== 'undefined' ? process.env?.[key] : undefined;
+  return binding(key) ?? fromProcess ?? (import.meta as any).env?.[key];
+}
+
+export const POST: APIRoute = async ({ request, redirect }) => {
   const form = await request.formData();
   const wantsJson =
     (request.headers.get('accept') || '').includes('application/json') ||
@@ -19,7 +26,7 @@ export const POST: APIRoute = async ({ request, locals, redirect }) => {
 
   if (form.get('bot-field')) return ok({ ok: true }); // honeypot → silently "succeed"
 
-  const rlKv = (locals as any)?.runtime?.env?.STOMME_RL;
+  const rlKv = binding('STOMME_RL');
   if (rlKv) {
     const ip = request.headers.get('CF-Connecting-IP') || request.headers.get('x-forwarded-for') || 'unknown';
     const key = `c:${new URL(request.url).hostname}:${ip}`;
@@ -37,9 +44,9 @@ export const POST: APIRoute = async ({ request, locals, redirect }) => {
   const inbox = cap(form.get('inbox'), 120);
   const message = cap(form.get('message'), 5000);
 
-  const apiKey = env(locals, 'RESEND_API_KEY');
-  const from = env(locals, 'CONTACT_FROM');
-  let to = env(locals, 'CONTACT_TO');
+  const apiKey = env('RESEND_API_KEY');
+  const from = env('CONTACT_FROM');
+  let to = env('CONTACT_TO');
   if (!to) {
     try { to = (await getEntry('contact', 'contact'))?.data?.email; } catch {}
   }

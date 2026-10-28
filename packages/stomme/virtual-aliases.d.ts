@@ -18,6 +18,11 @@ declare module '@stomme/renderer' {
   export default BlockRenderer;
 }
 
+// The platform's bindings and secrets: `cloudflare:workers` on the Cloudflare adapter, undefined on every other target.
+declare module '@stomme/runtime-env' {
+  export const env: Record<string, any> | undefined;
+}
+
 declare module '@stomme/addon-blocks' {
   export const blocks: Record<string, import('astro/runtime/server/index.js').AstroComponentFactory>;
 }

@@ -242,6 +242,9 @@ export default function stomme(options = {}) {
           ? addonPreviewFile
           : resolve(pkgDir, 'src/AddonPreviewNoop.astro');
 
+        const onCloudflare = [config.adapter, ...(config.integrations || [])].some((i) => i?.name === '@astrojs/cloudflare');
+        slotAlias['@stomme/runtime-env'] = resolve(pkgDir, onCloudflare ? 'src/runtime-env-cloudflare.mjs' : 'src/runtime-env-noop.mjs');
+
         updateConfig({
           vite: {
             plugins: [ publicIndexPlugin(fileURLToPath(config.publicDir)) ],

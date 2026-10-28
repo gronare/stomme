@@ -28,6 +28,9 @@ frontmatter means disabled/not shown (see `src/kit.ts`).
   `local/<package name>`, so `/admin` offers Work with Local Repository; it wrote
   `git-gateway`, which Sveltia rejects. `create-stomme` runs `git init` in a new site
   outside a repository.
+- The built-in `/api/contact` reads its env and the `STOMME_RL` binding through
+  `cloudflare:workers` on the Cloudflare adapter and `process.env` elsewhere; it no
+  longer touches `locals.runtime`, which throws on Astro 7's Cloudflare adapter.
 
 - Listing `category`, FAQ `tags` and document `group` are Sveltia relation
   fields over new term collections (`<listing>-categories`, `faq-tags`,
