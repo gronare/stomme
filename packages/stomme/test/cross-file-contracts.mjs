@@ -171,6 +171,13 @@ for (const file of readdirSync(resolve(pkg, 'admin')).filter((f) => /^labels\.[\
   console.log(`  · admin/${file}: ${keys.length} entries · ${untranslated.length} emitted paths left in English`);
 }
 
+const config = read('src/config.ts');
+const cmsType = config.slice(config.indexOf('  cms?: {'), config.indexOf('  };', config.indexOf('  cms?: {')));
+const typedCmsKeys = new Set([...cmsType.matchAll(/^\s{4}([a-zA-Z]+)\?:/gm)].map((m) => m[1]));
+const readCmsKeys = new Set([...`${pane}\n${gen}`.matchAll(/\b(?:c|CMS)\s*&&\s*CMS\.([a-zA-Z]+)|\bc\.([a-zA-Z]+)/g)].map((m) => m[1] || m[2]));
+const untyped = [...readCmsKeys].filter((k) => !typedCmsKeys.has(k));
+check(readCmsKeys.size >= 8 && untyped.length === 0, `every site.cms key the generator reads is in the SiteConfig type (${readCmsKeys.size} keys)`, `missing from the type: ${untyped.join(', ')}`);
+
 const failed = results.filter((ok) => !ok).length;
 console.log(`\n${results.length - failed}/${results.length} cross-file contracts hold`);
 if (failed) { console.error('\n✗ cross-file contracts FAILED'); process.exit(1); }

@@ -68,6 +68,9 @@ export interface SiteConfig {
     apiRoot?: string;
     gatewayUrl?: string;
     identityUrl?: string;
+    siteDomain?: string;
+    // The site's directory inside its Git repository, when the site is not at the repository root.
+    repoPath?: string;
   };
   contact?: {
     endpoint?: string;
