@@ -49,6 +49,7 @@ frontmatter means disabled/not shown (see `src/kit.ts`).
 - The footer link columns sit left under the brand column when they wrap on a phone.
 - On a phone, a wordmark too long for the row breaks onto two lines before the header
   button moves into the menu.
+- The `beforeAfter` handle is a drawn SVG arrow pair.
 
 - Listing `category`, FAQ `tags` and document `group` are Sveltia relation
   fields over new term collections (`<listing>-categories`, `faq-tags`,
