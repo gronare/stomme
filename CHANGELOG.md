@@ -22,6 +22,8 @@ frontmatter means disabled/not shown (see `src/kit.ts`).
   `nightStyle()` from `@gronare/stomme/theme` in `Base.astro`; the starter does. The
   settings pane only reaches existing sites when their `config.yml` is regenerated.
 - New strings under `strings.controls` (copy, copied, pause and play labels).
+- The share image carries `og:image:width` and `og:image:height` when its size is known:
+  a generated card, or an image uploaded to the media library.
 
 - Listing `category`, FAQ `tags` and document `group` are Sveltia relation
   fields over new term collections (`<listing>-categories`, `faq-tags`,

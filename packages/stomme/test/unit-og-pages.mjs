@@ -10,7 +10,7 @@ const STUB = resolve(HERE, 'stub-astro-content.mjs');
 const jiti = createJiti(import.meta.url, { alias: { 'astro:content': STUB } });
 const { reset } = await jiti.import(STUB);
 const {
-  TYPE_FIELDS, HEADLINE_DEFAULT, SUBLINE_DEFAULT, normalizePath, ogPages, resolveShareImage,
+  TYPE_FIELDS, HEADLINE_DEFAULT, SUBLINE_DEFAULT, normalizePath, ogPages, resolveShareImage, shareImageSize,
 } = await jiti.import(resolve(PKG, 'src/og-pages.ts'));
 const pane = readFileSync(resolve(PKG, 'src/settings-pane.mjs'), 'utf8');
 
@@ -174,6 +174,13 @@ eq(await resolveShareImage('/about', undefined, { features: { blog: true } }), '
   'a page with no card of its own falls back to the site image');
 eq(await resolveShareImage('/about', '/media/page.png', { features: { blog: true } }), '/media/page.png',
   'a per-page override still wins over the fallback');
+
+const uploaded = { '/src/assets/media/share/site.png': { width: 1200, height: 630, format: 'png' } };
+eq(shareImageSize('/og/blog/hello.png', {}), { width: 1200, height: 630 }, 'a generated card states the card size');
+eq(shareImageSize('/media/share/site.png', uploaded), { width: 1200, height: 630 }, 'an uploaded share image states its own size');
+eq(shareImageSize('/media/share/gone.png', uploaded), null, 'an uploaded image the build did not find states no size');
+eq(shareImageSize('/images/hero.jpg', uploaded), null, 'an image outside the uploaded media states no size');
+eq(shareImageSize(null, uploaded), null, 'no share image states no size');
 
 const failed = results.filter((ok) => !ok).length;
 console.log(`\n${results.length - failed}/${results.length} og-page checks passed`);

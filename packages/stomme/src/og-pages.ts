@@ -1,4 +1,5 @@
 import { getCollection, getEntry } from 'astro:content';
+import { OG_WIDTH, OG_HEIGHT } from './og-size.mjs';
 import { resolveFeatures, resolveListings, type StommeFeatures, type Listing, type SiteConfig } from './config.ts';
 
 export interface OgPage {
@@ -153,4 +154,14 @@ export async function resolveShareImage(pathname: string, override: string | und
   const hit = (await ogPages(cfg)).find((p) => p.path === path);
   if (hit) return hit.card ? `/og/${hit.slug}` : hit.raw ?? null;
   return override ?? (await siteDefault(settings));
+}
+
+export interface ImageSize { width: number; height: number }
+
+export function shareImageSize(shareImage: string | null, uploaded: Record<string, ImageSize | undefined>): ImageSize | null {
+  if (!shareImage) return null;
+  if (shareImage.startsWith('/og/')) return { width: OG_WIDTH, height: OG_HEIGHT };
+  if (!shareImage.startsWith('/media/')) return null;
+  const meta = uploaded[`/src/assets/media/${shareImage.slice('/media/'.length)}`];
+  return meta?.width && meta?.height ? { width: meta.width, height: meta.height } : null;
 }

@@ -2,7 +2,7 @@
 import { getEntry, getCollection } from 'astro:content';
 // @ts-expect-error — virtual alias, no static types.
 import { site, features, listings } from '@stomme/config';
-import { resolveShareImage } from './src/og-pages.ts';
+import { resolveShareImage, shareImageSize, type ImageSize } from './src/og-pages.ts';
 import { canonicalBounceHost, demoHost, isUnlisted } from './src/config.ts';
 import { localBusinessJsonLd } from './src/local-business.ts';
 import { hreflangLinks, normalizeLocalePath, resolveLocales, splitLocalePath } from './src/i18n.ts';
@@ -32,6 +32,8 @@ const servedShareImage = shareKey ? (uploadedAssetUrls[shareKey] ?? shareImage) 
 const ogImage = servedShareImage
   ? (Astro.site ? new URL(servedShareImage, Astro.site).href : servedShareImage)
   : undefined;
+const uploadedImageSizes = import.meta.glob('/src/assets/media/**/*.{png,jpg,jpeg,webp,gif,avif}', { import: 'default', eager: true }) as Record<string, ImageSize>;
+const ogImageSize = ogImage ? shareImageSize(shareImage, uploadedImageSizes) : null;
 const ogUrl = Astro.site ? new URL(Astro.url.pathname, Astro.site).href : undefined;
 
 const locales = resolveLocales(site);
@@ -71,6 +73,8 @@ const localBusiness = isHome
 <meta property="og:site_name" content={settings.name} />
 {ogUrl && <meta property="og:url" content={ogUrl} />}
 {ogImage && <meta property="og:image" content={ogImage} />}
+{ogImageSize && <meta property="og:image:width" content={String(ogImageSize.width)} />}
+{ogImageSize && <meta property="og:image:height" content={String(ogImageSize.height)} />}
 <meta name="twitter:card" content={ogImage ? 'summary_large_image' : 'summary'} />
 {ogImage && <meta name="twitter:image" content={ogImage} />}
 {localBusiness && <script type="application/ld+json" set:html={JSON.stringify(localBusiness)} />}

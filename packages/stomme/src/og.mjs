@@ -9,8 +9,8 @@ import sharp from 'sharp';
 
 const require = createRequire(import.meta.url);
 
-export const OG_WIDTH = 1200;
-export const OG_HEIGHT = 630;
+import { OG_WIDTH, OG_HEIGHT } from './og-size.mjs';
+export { OG_WIDTH, OG_HEIGHT };
 
 let fonts = null;
 function loadFonts() {
