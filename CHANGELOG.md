@@ -26,6 +26,11 @@ frontmatter means disabled/not shown (see `src/kit.ts`).
   / `fontCustomMonoFile` for the code font. Write the theme with `themeStyle()` and
   `nightStyle()` from `@gronare/stomme/theme` in `Base.astro`; the starter does. The
   settings pane only reaches existing sites when their `config.yml` is regenerated.
+- A theme with `scheme: auto` gets a light/dark switch at the end of the header. The
+  visitor's choice sits as `data-theme="light|dark"` on `<html>`, is remembered in the
+  browser and applied before first paint; without a choice the page follows the system.
+  A site stylesheet that keys its own dark rules on `prefers-color-scheme` alone does not
+  follow a forced choice. New strings `controls.darkMode` and `controls.lightMode`.
 - New strings under `strings.controls` (copy, copied, pause and play labels).
 - The share image carries `og:image:width` and `og:image:height` when its size is known:
   a generated card, or an image uploaded to the media library.

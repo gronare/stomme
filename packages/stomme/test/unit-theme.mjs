@@ -22,8 +22,13 @@ check(themeStyle({ ...day, muted: '#666', secondary: '#09f', dark: '#111', eyebr
 check(nightStyle(day) === null, 'a theme without scheme: auto writes no night stylesheet, so a light site renders exactly as before');
 check(nightStyle({ ...day, scheme: 'light', nightBrand: '#f0a070' }) === null, 'night colours alone do not switch a light theme to dark');
 const night = nightStyle({ ...day, scheme: 'auto', nightBrand: '#f0a070', nightPaper: '#141417' });
-check(night && night.includes('@media (prefers-color-scheme: dark){:root{--color-brand:#f0a070 !important;--color-paper:#141417 !important;color-scheme:dark}}'),
-  'scheme: auto overrides the inline day palette under prefers-color-scheme: dark', night);
+const nightVars = '--color-brand:#f0a070 !important;--color-paper:#141417 !important;color-scheme:dark';
+check(night && night.includes(`@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){${nightVars}}}`),
+  'with no choice made, the night palette follows a dark system and overrides the inline day palette', night);
+check(night && night.includes(`:root[data-theme="dark"]{${nightVars}}`) && !/@media[^{]*\{[^}]*\[data-theme="dark"\]/.test(night),
+  'a visitor who chose dark gets the night palette outside the media query, so it wins over a light system', night);
+check(night && night.includes(':root[data-theme="light"]{color-scheme:light}') && !/\[data-theme="light"\]\{[^}]*--color-/.test(night),
+  'a visitor who chose light is excluded from the dark-system rule and keeps the inline day palette', night);
 check(night && night.startsWith(':root{color-scheme:light dark}'), 'an auto theme declares both colour schemes so form controls follow');
 const hostile = nightStyle({ ...day, scheme: 'auto', nightInk: 'red}</style><script>alert(1)</script>' });
 check(hostile && !hostile.includes('<') && !hostile.includes('}<'), 'a night colour cannot close the style element or the rule', hostile);

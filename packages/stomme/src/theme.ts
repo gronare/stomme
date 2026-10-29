@@ -34,9 +34,10 @@ export function themeStyle(theme: ThemeColors, fontVars: string[] = []): string 
   ].join(';');
 }
 
-// The day palette sits inline on <html>, so the night one needs !important to win over it while the visitor's system is dark.
+// The day palette sits inline on <html>, so the night one needs !important to win over it; data-theme on <html> is the visitor's own choice and beats the system either way.
 export function nightStyle(theme: ThemeColors): string | null {
   if (theme.scheme !== 'auto') return null;
   const vars = NIGHT_COLORS.flatMap(([key, prop]) => (theme[key] && clean(theme[key]) ? [`${prop}:${clean(theme[key])} !important`] : []));
-  return `:root{color-scheme:light dark}@media (prefers-color-scheme: dark){:root{${[...vars, 'color-scheme:dark'].join(';')}}}`;
+  const night = [...vars, 'color-scheme:dark'].join(';');
+  return `:root{color-scheme:light dark}@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){${night}}}:root[data-theme="dark"]{${night}}:root[data-theme="light"]{color-scheme:light}`;
 }

@@ -42,6 +42,7 @@ const listPath = splitLocalePath(Astro.url.pathname, locales).path;
 const noindex = isUnlisted(listPath, site?.noindex, site?.routes?.formSuccess) || (Astro.site ? demoHost(new URL(Astro.site).hostname) : false);
 const alternates = hreflangLinks(Astro.url.pathname, site, Astro.site, locales.enabled ? await getCollection('pages') : []);
 const bounceHost = canonicalBounceHost(Astro.site);
+const schemeAuto = ((await getEntry('theme', 'theme').catch(() => null))?.data as { scheme?: string } | undefined)?.scheme === 'auto';
 
 const isHome = normalizeLocalePath(Astro.url.pathname) === '/';
 const contact = isHome ? ((await getEntry('contact', 'contact')?.catch(() => null))?.data as any) ?? {} : {};
@@ -58,6 +59,7 @@ const localBusiness = isHome
 ---
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="format-detection" content="telephone=no" />
+{schemeAuto && <script is:inline>try{var t=localStorage.getItem('stomme-theme');if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>}
 {bounceHost && <script is:inline define:vars={{ bounceHost }}>
   var host = location.hostname;
   if (host !== bounceHost && (host.endsWith('.pages.dev') || host.endsWith('.workers.dev'))) location.replace('https://' + bounceHost + location.pathname + location.search + location.hash);

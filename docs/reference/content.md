@@ -65,7 +65,7 @@ A page's address is its file name, nested under its `parent`: a page with `paren
 | `dark`, `darkInk`, `darkLine` | derived | `--color-dark`, `--color-dark-ink`, `--color-dark-line`, for the `dark` surface |
 | `eyebrow` | `dash` | the eyebrow marker: `dash`, `bullet` or `bold` |
 | `eyebrowColor` | `brand` | `brand`, `secondary` or `highlight` |
-| `scheme` | `light` | `auto` follows the visitor's dark mode |
+| `scheme` | `light` | `auto` follows the visitor's dark mode and adds a light/dark switch to the header |
 | `nightBrand` … `nightDarkLine` | the day colour | a night twin of each colour, used with `scheme: auto` |
 | `fontDisplay`, `fontBody`, `fontMono` | the system fonts | `--font-display`, `--font-sans`, `--font-mono`, see [Theme a site](../how-to/theme-a-site.md#pick-the-fonts) |
 | `fontCustomFile`, `fontCustomBodyFile`, `fontCustomMonoFile` | none | uploaded font files under `/media/fonts/` |
