@@ -7,13 +7,20 @@ frontmatter means disabled/not shown (see `src/kit.ts`).
 
 ## Unreleased
 
+- Twelve switches now start off in the CMS: `postList` `media.showImages` and `layout.featured`,
+  `catalogList` `media.showImages` and `layout.filters`, `subpages` `media.showImages`,
+  `documentList` `layout.grouped`, `showPhone` and `showDirectContact` on `contactForm` and on each
+  `contactSwitch` item, `contactCard` `tint` and `findUs` `showHours`. `contactCard` `show` starts
+  empty. Sveltia writes a field's default into every entry that lacks the key when the entry is
+  opened, so a default of on showed a page that left the key out as on in `/admin`, while the page
+  rendered it off, and the next save turned it on. A default now always equals what the block
+  renders with the key left out. Pages render exactly as before; a block an editor adds in `/admin`
+  starts with these off, and the editor turns on what it needs.
 - `stomme-lint-content` (`pnpm lint:content` in the starter) checks every block in `src/content/`
-  against the site's catalog: each switch whose CMS default is on but which the file leaves out,
-  so the page renders it off, each field the catalog does not declare, each older field from
-  `block-migrations.json` and each unknown block type, by file and line. `--fix` writes the CMS
-  defaults in, `--fix=off` the values the page renders now, `--json` prints the report as data and
-  `--strict` exits `1` on any finding. `stomme-gen` prints one line with the counts. A site's
-  `package.json` gains the script with `"lint:content": "stomme-lint-content"`. See
+  against the site's catalog: each field the catalog does not declare, each older field from
+  `block-migrations.json` and each unknown block type, by file and line. `--json` prints the report
+  as data and `--strict` exits `1` on any finding. `stomme-gen` prints one line with the counts. A
+  site's `package.json` gains the script with `"lint:content": "stomme-lint-content"`. See
   `docs/how-to/write-pages-by-hand.md`.
 - A docs section also writes `llms.txt`, `llms-full.txt` and each page as Markdown at its path
   plus `.md`, per version, and links the Markdown from each page's head. A site with no

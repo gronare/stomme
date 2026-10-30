@@ -1,6 +1,6 @@
 import { ICON_NAMES } from './icons.ts';
 
-// FIELD POLICY (engine invariant): a new field is OPT-IN — absent from the frontmatter means off — and it must never get an `x !== false` fallback, because the CMS shows an absent boolean as OFF whatever `default:` says, so absent-means-on both changes what existing sites render and makes the editor lie. A switch whose `default:` is on but whose key a file leaves out is what stomme-lint-content reports.
+// FIELD POLICY (engine invariant): a new field is OPT-IN — absent from the frontmatter means off, never an `x !== false` fallback — and its `default:` must equal what the block renders with the key absent, because Sveltia writes a field's default into every entry that lacks the key when the entry is opened, so the next save would change the page.
 export type Field = {
   name: string;
   label: string;

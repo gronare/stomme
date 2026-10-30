@@ -627,7 +627,7 @@ const RAW_BLOCKS: BlockDef[] = [
       ...headingFieldsSuggesting('Documents', 'Read for yourself'),
       { name: 'group', label: 'Group filter', widget: 'select', options: '$documentGroups', required: false, hint: 'Show only this group. Empty shows every group under its own heading.' },
       layoutGroup([
-        { name: 'grouped', label: 'Group headings', widget: 'boolean', required: false, default: true, hint: 'Group headings on/off.' },
+        { name: 'grouped', label: 'Group headings', widget: 'boolean', required: false, default: false, hint: 'Group headings on/off.' },
       ]),
       styleGroup([surfaceField]),
     ],
@@ -664,7 +664,7 @@ const RAW_BLOCKS: BlockDef[] = [
       articleSourceField,
       { name: 'base', label: 'base', widget: 'hidden', required: false },
       mediaGroup('Cover images on the cards.', [
-        { name: 'showImages', label: 'Image previews', widget: 'boolean', required: false, default: true, hint: 'Show cover images on the cards.' },
+        { name: 'showImages', label: 'Image previews', widget: 'boolean', required: false, default: false, hint: 'Show cover images on the cards.' },
         {
           name: 'style',
           label: 'Image placement',
@@ -679,7 +679,7 @@ const RAW_BLOCKS: BlockDef[] = [
         },
       ]),
       layoutGroup([
-        { name: 'featured', label: 'Featured first post', widget: 'boolean', required: false, default: true, hint: 'Show the newest post as a large lead card.' },
+        { name: 'featured', label: 'Featured first post', widget: 'boolean', required: false, default: false, hint: 'Show the newest post as a large lead card.' },
         { name: 'columns', label: 'Columns', widget: 'number', required: false, default: 3, hint: '2 or 3.' },
         { name: 'limit', label: 'Show at most', widget: 'number', required: false, hint: 'Newest first. Empty shows every post.' },
         { name: 'archive', label: 'Archive page', widget: 'string', required: false, hint: 'Path to the archive page, e.g. /archive. When the limit cuts the list, a link to it is shown.' },
@@ -741,10 +741,10 @@ const RAW_BLOCKS: BlockDef[] = [
         ],
       },
       mediaGroup('Cover images on the cards.', [
-        { name: 'showImages', label: 'Image previews', widget: 'boolean', required: false, default: true, hint: 'Show cover images on the cards.' },
+        { name: 'showImages', label: 'Image previews', widget: 'boolean', required: false, default: false, hint: 'Show cover images on the cards.' },
       ]),
       layoutGroup([
-        { name: 'filters', label: 'Category filters', widget: 'boolean', required: false, default: true, hint: 'Show category filter chips above the grid.' },
+        { name: 'filters', label: 'Category filters', widget: 'boolean', required: false, default: false, hint: 'Show category filter chips above the grid.' },
         { name: 'columns', label: 'Columns', widget: 'number', required: false, default: 3, hint: '2 or 3.' },
       ]),
       styleGroup([surfaceField]),
@@ -777,7 +777,7 @@ const RAW_BLOCKS: BlockDef[] = [
         },
       ]),
       mediaGroup('Cover images on the cards.', [
-        { name: 'showImages', label: 'Image previews', widget: 'boolean', required: false, default: true, hint: 'Show each page\'s cover image. Cards layout only; a page with no cover keeps a card without one.' },
+        { name: 'showImages', label: 'Image previews', widget: 'boolean', required: false, default: false, hint: 'Show each page\'s cover image. Cards layout only; a page with no cover keeps a card without one.' },
       ]),
       styleGroup([surfaceField]),
     ],
@@ -888,7 +888,7 @@ const RAW_BLOCKS: BlockDef[] = [
       { name: 'intro', label: 'Intro / description', widget: 'text', required: false, hint: 'Optional line under the heading. Blank = hidden.' },
       { name: 'labelName', label: 'Field label — name', widget: 'string', required: false, hint: 'Blank uses the site wording ("Name").' },
       { name: 'labelEmail', label: 'Field label — email', widget: 'string', required: false, hint: 'Blank uses the site wording ("Email").' },
-      { name: 'showPhone', label: 'Show the phone field', widget: 'boolean', required: false, default: true },
+      { name: 'showPhone', label: 'Show the phone field', widget: 'boolean', required: false, default: false },
       { name: 'requirePhone', label: 'Make the phone field required', widget: 'boolean', required: false, default: false, hint: 'Only applies when the phone field is shown.' },
       { name: 'showCategory', label: 'Show the category dropdown', widget: 'boolean', required: false, default: false, hint: 'A dropdown the visitor picks their errand from. Needs at least one choice below.' },
       { name: 'labelCategory', label: 'Field label — category', widget: 'string', required: false, hint: 'Blank uses the site wording ("Category").' },
@@ -898,7 +898,7 @@ const RAW_BLOCKS: BlockDef[] = [
       { name: 'placeholderUnit', label: 'Unit placeholder', widget: 'string', required: false, hint: 'Faint example text inside the empty field.' },
       { name: 'labelMessage', label: 'Field label — message', widget: 'string', required: false, hint: 'Blank uses the site wording ("Describe your project"). Word it for your business.' },
       { name: 'submitLabel', label: 'Submit button text', widget: 'string', required: false, hint: 'The form\'s submit button. Blank uses the site wording ("Send request").' },
-      { name: 'showDirectContact', label: 'Show the direct-contact card', widget: 'boolean', required: false, default: true, hint: 'Off → the form fills the width (no phone/email card).' },
+      { name: 'showDirectContact', label: 'Show the direct-contact card', widget: 'boolean', required: false, default: false, hint: 'Off → the form fills the width (no phone/email card).' },
       { name: 'inbox', label: 'Inbox key', widget: 'string', required: false, hint: "Where this form's messages are delivered: the key of an inbox set up for the site. Empty means the site's default inbox." },
       layoutGroup([]),
       styleGroup([surfaceField]),
@@ -926,7 +926,7 @@ const RAW_BLOCKS: BlockDef[] = [
           { name: 'intro', label: 'Intro / description', widget: 'text', required: false, hint: 'Optional line above this form. Blank = hidden.' },
           { name: 'labelName', label: 'Field label — name', widget: 'string', required: false, hint: 'Blank uses the site wording ("Name").' },
           { name: 'labelEmail', label: 'Field label — email', widget: 'string', required: false, hint: 'Blank uses the site wording ("Email").' },
-          { name: 'showPhone', label: 'Show the phone field', widget: 'boolean', required: false, default: true },
+          { name: 'showPhone', label: 'Show the phone field', widget: 'boolean', required: false, default: false },
           { name: 'requirePhone', label: 'Make the phone field required', widget: 'boolean', required: false, default: false, hint: 'Only applies when the phone field is shown.' },
           { name: 'showCategory', label: 'Show the category dropdown', widget: 'boolean', required: false, default: false, hint: 'A dropdown the visitor picks their errand from. Needs at least one choice below.' },
           { name: 'labelCategory', label: 'Field label — category', widget: 'string', required: false, hint: 'Blank uses the site wording ("Category").' },
@@ -936,7 +936,7 @@ const RAW_BLOCKS: BlockDef[] = [
           { name: 'placeholderUnit', label: 'Unit placeholder', widget: 'string', required: false, hint: 'Faint example text inside the empty field.' },
           { name: 'labelMessage', label: 'Field label — message', widget: 'string', required: false, hint: 'Blank uses the site wording ("Describe your project"). Word it for your business.' },
           { name: 'submitLabel', label: 'Submit button text', widget: 'string', required: false, hint: 'The form\'s submit button. Blank uses the site wording ("Send request").' },
-          { name: 'showDirectContact', label: 'Show the direct-contact card', widget: 'boolean', required: false, default: true, hint: 'Off → the form fills the width (no phone/email card).' },
+          { name: 'showDirectContact', label: 'Show the direct-contact card', widget: 'boolean', required: false, default: false, hint: 'Off → the form fills the width (no phone/email card).' },
           { name: 'inbox', label: 'Inbox key', widget: 'string', required: false, hint: "Where this form's messages are delivered: the key of an inbox set up for the site. Empty means the site's default inbox." },
         ],
       },
@@ -951,7 +951,6 @@ const RAW_BLOCKS: BlockDef[] = [
     summary: 'A contact card placed anywhere, auto-filled from Contact settings. Tick what it shows.',
     fields: [
       { name: 'show', label: 'Show', widget: 'select', multiple: true, required: false,
-        default: ['phone', 'email'],
         hint: 'Tick the parts to display. Anything with no info in Contact settings is skipped (e.g. the map needs an address with lat/lng).',
         options: [
           { label: 'Phone', value: 'phone' },
@@ -962,7 +961,7 @@ const RAW_BLOCKS: BlockDef[] = [
           { label: 'Social links', value: 'socials' },
         ] },
       { name: 'label', label: 'Card heading', widget: 'string', required: false, hint: 'Blank uses the site wording ("Direct contact").' },
-      { name: 'tint', label: 'Tinted background', widget: 'boolean', required: false, default: true },
+      { name: 'tint', label: 'Tinted background', widget: 'boolean', required: false, default: false },
       layoutGroup([]),
       styleGroup([surfaceField]),
     ],
@@ -972,7 +971,7 @@ const RAW_BLOCKS: BlockDef[] = [
     summary: 'A map beside the address, contact and hours — auto-filled from Contact settings. Needs lat/lng on the address.',
     fields: [
       { name: 'heading', label: 'Heading', widget: 'string', required: false, hint: 'Blank uses the site wording ("Find us").' },
-      { name: 'showHours', label: 'Show opening hours', widget: 'boolean', required: false, default: true },
+      { name: 'showHours', label: 'Show opening hours', widget: 'boolean', required: false, default: false },
       layoutGroup([]),
       styleGroup([surfaceField]),
     ],

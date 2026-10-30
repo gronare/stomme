@@ -103,7 +103,7 @@ eq(subField('columns').widget, 'number', 'columns is a number field like every o
 eq(subField('columns').default, 2, 'the column count defaults to two');
 check(subField('variant').options.every((o) => o.label && o.label !== o.value),
   'every variant is named in words, not by its stored value');
-eq(subField('showImages').default, true, 'the cover images are on for a block the editor adds today');
+eq(subField('showImages').default, false, 'the cover images start off, as a page that leaves the key out renders them');
 check(subpages.samples.length >= 2 && subpages.samples.every((x) => Array.isArray(x.items) && x.items.length),
   'the lookbook has sample pages to draw, since the block cannot read a page there');
 

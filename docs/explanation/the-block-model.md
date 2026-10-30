@@ -16,7 +16,7 @@ Content fields sit at the top of a block. `media` holds what is shown beside or 
 
 ## A new field means off when it is absent
 
-Content written before a field existed has no value for it. So a new field is opt-in: absent means the block renders as it always did. The CMS shows an absent checkbox as off whatever its default says, and saves declared defaults into blocks the editor never touched, so suggested wording goes in a field's hint, never its default. The same rule keeps feature flags off until a site turns them on.
+Content written before a field existed has no value for it. So a new field is opt-in: absent means the block renders as it always did. The CMS writes a field's default into every block that lacks the field as soon as the page is opened, and the next save keeps it, so a default is always what the block renders with the field absent: every switch defaults to off, and suggested wording goes in a field's hint, never its default. The same rule keeps feature flags off until a site turns them on.
 
 ## Renames keep rendering
 

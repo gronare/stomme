@@ -2,6 +2,7 @@
 import { readFileSync, readdirSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { createJiti } from 'jiti';
 import { referenceLabels } from './label-reference.mjs';
 
 const pkg = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -110,7 +111,7 @@ for (const re of rewrites) {
 
 const { byPath: REFERENCE, blocks, groups, yamls } = await referenceLabels();
 
-// Sveltia writes every declared default into blocks the editor never touched, so a default on a free-text widget puts words on a live page nobody wrote. Suggested wording goes in the hint; select/boolean/number/colour defaults are visual no-ops and stay.
+// Sveltia writes every declared default into blocks the editor never touched, so a default on a free-text widget puts words on a live page nobody wrote. Suggested wording goes in the hint; the other defaults are held to what a block renders with the key left out, further down.
 const FREE_TEXT = /^(string|text|markdown)$/;
 const bare = (s) => s.replace(/"(?:[^"\\]|\\.)*"/g, '""');
 const freeTextDefaults = [];
@@ -210,6 +211,60 @@ const undeclaredLayout = readdirSync(resolve(pkg, 'blocks')).filter((f) => f.end
   return [...new Set([...src.matchAll(/layout\?\.([a-zA-Z]+)/g)].map((m) => m[1]))].filter((k) => !declared.includes(k)).map((k) => `${type}.layout.${k}`);
 });
 check(undeclaredLayout.length === 0, 'every layout option a block component honours is declared in the catalog, so the CMS offers it', undeclaredLayout.join(', '));
+
+const { defaultBlocks } = await createJiti(import.meta.url).import(resolve(pkg, 'catalog.ts'));
+const rendererOf = new Map(readdirSync(resolve(pkg, 'blocks')).filter((f) => f.endsWith('.astro')).map((f) => {
+  const src = read(`blocks/${f}`);
+  return [src.match(/data-stomme-block="([a-zA-Z]+)"/)?.[1], src];
+}));
+const renderers = [...rendererOf.values(), ...readdirSync(resolve(pkg, 'src')).filter((f) => f.endsWith('.astro')).map((f) => read(`src/${f}`))].join('\n');
+const blockRenderer = read('src/BlockRenderer.astro');
+const escape = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+// A default the renderer reaches without a literal `?? default` fallback: each regex is the line in the renderer that makes the key left out render as the default.
+const ABSENT_AS_DEFAULT = {
+  'style.surface': [blockRenderer, /block\.style\?\.surface \? surfaceClass\[block\.style\.surface\] : undefined/, /surfaceClass[^\n]*= \{(?![^}]*standard)/],
+  'layout.beside': [blockRenderer, /RATIOS = new Set\(\['equal', 'narrow', 'wide'\]\)/],
+  'hero media.ratio': [rendererOf.get('hero'), /RATIOS[^\n]*= \{ wide: [^}]*square: [^}]*\}/, /media\.ratio \? RATIOS\[media\.ratio\] : undefined/],
+  'hero layout.mediaPosition': [rendererOf.get('hero'), /layout\?\.mediaPosition === 'below'/],
+  'textImage media.kind': [rendererOf.get('textImage'), /media\.kind === 'video'/],
+  'textImage media.fit': [rendererOf.get('textImage'), /media\.fit === 'cutout'/],
+  'postList text': [rendererOf.get('postList'), /props\.text === 'full'/],
+  'postList media.style': [rendererOf.get('postList'), /media\?\.style === 'corner'/],
+  'featureGrid layout.columns': [read('styles.css'), /var\(--fg-cols, 3\)/],
+  'subpages layout.variant': [rendererOf.get('subpages'), /String\(Astro\.props\.layout!\.variant\) : 'cards'/],
+  'subpages layout.columns': [rendererOf.get('subpages'), /Number\(Astro\.props\.layout\?\.columns\) \|\| 2/],
+  'contactSwitch layout.variant': [read('src/contact-switch.ts'), /: 'segmented';/],
+};
+const defaultFields = (fields, prefix = '') => fields.flatMap((f) => {
+  const path = prefix ? `${prefix}.${f.name}` : f.name;
+  const own = f.default !== undefined ? [{ f, path }] : [];
+  return [...own, ...(Array.isArray(f.fields) ? defaultFields(f.fields, f.widget === 'list' ? `${path}[]` : path) : [])];
+});
+const onByDefault = [];
+const notTheAbsent = [];
+for (const b of defaultBlocks) {
+  for (const { f, path } of defaultFields(b.fields)) {
+    const key = `${b.type} ${path}`;
+    if (f.widget === 'boolean') {
+      if (f.default !== false) onByDefault.push(key);
+      if (new RegExp(`\\b${escape(f.name)}\\s*(?:!==\\s*false|\\?\\?\\s*true)`).test(renderers)) notTheAbsent.push(`${key} (renders on when left out)`);
+      continue;
+    }
+    if (Array.isArray(f.default)) { if (f.default.length) onByDefault.push(key); continue; }
+    if (f.widget === 'string' || f.widget === 'text' || f.widget === 'markdown') continue;
+    const held = ABSENT_AS_DEFAULT[key] ?? ABSENT_AS_DEFAULT[path.split('.').slice(-2).join('.')];
+    if (held) {
+      const [src, ...lines] = held;
+      if (!src || !lines.every((re) => re.test(src))) notTheAbsent.push(`${key} (the renderer line that makes it ${JSON.stringify(f.default)} moved)`);
+      continue;
+    }
+    const literal = typeof f.default === 'string' ? `'${escape(f.default)}'` : escape(String(f.default));
+    const src = rendererOf.get(b.type) ?? '';
+    if (!new RegExp(`\\b${escape(f.name)}\\s*\\?\\?\\s*${literal}(?![\\w'])`).test(src)) notTheAbsent.push(`${key} (no \`${f.name} ?? ${literal}\` in its renderer)`);
+  }
+}
+check(onByDefault.length === 0, 'no catalog switch defaults on and no list defaults non-empty: Sveltia writes a default into every entry that lacks the key, so it must be what the key left out renders', onByDefault.join(', '));
+check(notTheAbsent.length === 0, 'every other catalog default is what its block renders with the key left out', notTheAbsent.join('\n    '));
 
 const failed = results.filter((ok) => !ok).length;
 console.log(`\n${results.length - failed}/${results.length} cross-file contracts hold`);

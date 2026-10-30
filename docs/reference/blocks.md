@@ -2,7 +2,7 @@
 
 Every block in the library catalog (`@gronare/stomme/catalog`), with its fields as they are written in a page's frontmatter.
 
-A field path with a dot is a field inside a group: `media.kind` is written as `media: { kind: … }`. Defaults are what the CMS fills in when an editor adds the block. A page written by hand gets the same value for most fields it leaves out, but a switch reads as off when it is missing, see [Fields left out of a hand-written page](#fields-left-out-of-a-hand-written-page). Each block below is shown live, rendered by the same renderer a page uses, with the YAML that made it underneath. Run `pnpm dev` and open `/lookbook` to see every block with sample content, `/lookbook/<slug>` for one sample on its own page (the slug is the sample's label in the lookbook, such as `/lookbook/hero`), or `/admin/blocks.html` for the block gallery `cms:gen` writes. [Add a custom block](../how-to/add-a-custom-block.md) adds your own.
+A field path with a dot is a field inside a group: `media.kind` is written as `media: { kind: … }`. Defaults are what the CMS fills in when an editor adds the block, and what a block renders when a page written by hand leaves the field out; every switch defaults to off. Each block below is shown live, rendered by the same renderer a page uses, with the YAML that made it underneath. Run `pnpm dev` and open `/lookbook` to see every block with sample content, `/lookbook/<slug>` for one sample on its own page (the slug is the sample's label in the lookbook, such as `/lookbook/hero`), or `/admin/blocks.html` for the block gallery `cms:gen` writes. [Add a custom block](../how-to/add-a-custom-block.md) adds your own.
 
 ## Fields many blocks share
 
@@ -13,20 +13,6 @@ A field path with a dot is a field inside a group: `media.kind` is written as `m
 | `style.accent` | `brand` (default), `secondary`, `highlight` | the colour of the block's rule, icon or number; the eyebrow follows `eyebrowColor` in the theme instead |
 | `layout.beside` | `below` (default), `equal`, `narrow`, `wide` | places the block beside the one before it, see [Two blocks side by side](#two-blocks-side-by-side) |
 | `anchor` | text | an id, so `#anchor` links scroll to the block; every block reads it, though the CMS offers it only on `plans`, `steps` and `ctaPanel`. On a page with a `sectionNav`, a block with a heading gets the slugged heading as its id instead |
-
-### Fields left out of a hand-written page
-
-A field left out of a page is off. The CMS fills in each field's default when an editor adds a block, so for a switch whose default is on, a block written by hand that leaves it out renders it off, while the same block added in the CMS has it on. `pnpm lint:content` lists every such switch in a site, with the line to add, and `--fix` writes the CMS defaults in; see [Write pages by hand or with an agent](../how-to/write-pages-by-hand.md). In the library catalog these are:
-
-| Block | Off when left out | The CMS fills in |
-|---|---|---|
-| `postList` | `media.showImages`, `layout.featured` | `true`, `true` |
-| `catalogList` | `media.showImages`, `layout.filters` | `true`, `true` |
-| `subpages` | `media.showImages` | `true` |
-| `documentList` | `layout.grouped` | `true` |
-| `contactForm`, and each `contactSwitch` item | `showPhone`, `showDirectContact` | `true`, `true` |
-| `contactCard` | `show` (the card shows only its label), `tint` | `phone` and `email`, `true` |
-| `findUs` | `showHours` | `true` |
 
 ### Buttons
 
@@ -786,14 +772,14 @@ These blocks read entries from a collection. `cms:gen` offers a block only while
 |---|---|---|
 | `faq` | `faq` | `entries` (pick questions, in order), `tag` (every question with that tag, ignored when `entries` is set), `asideHeading`, `asideBody`, `asideCta` (a contact aside, shown when any of the heading, the body or the button label is filled; a button with no link points at `mailto:` and the contact email, or at the home page when no email is set), `layout.variant`: `list` (default), `accordion` (native `<details>`), `cards`, `split` (an index and a reader) |
 | `testimonials` | `testimonials` | none; quote cards |
-| `documentList` | `documents` | `group` (show one group), `layout.grouped` (`true` by default, a heading per group). Each row has an icon with the file extension, the title, the note and date, and the file type and size read off the built file |
+| `documentList` | `documents` | `group` (show one group), `layout.grouped` (`false` by default; `true` gives a heading per group). Each row has an icon with the file extension, the title, the note and date, and the file type and size read off the built file |
 | `linkChips` | `towns` | none; a chip link to each area's page |
 | `serviceGrid` | `services` | `services` (pick and order a subset; empty shows every service, sorted by its `order`); cards with an image or a placeholder, linking to each service's page |
-| `subpages` | `pages` | `pages` (pick pages, in order; empty shows the pages under this one; only published pages are listed), `layout.variant`: `cards` (default), `tiles`, `rows`, `chips` (labelled `strings.subpages.inSection`), `siblings` (for a subpage: the parent's title, `strings.subpages.moreInSection`, the pages beside this one and a link up); `layout.columns` `2` (default), `3`, `4` for cards and tiles; `media.showImages` (`true` by default, cards only). A card's text is the page's `summary`, or its `seo.description` when the summary is blank. Nothing to show renders nothing |
-| `postList` | the blog or an `article` listing | `text`: `excerpt` (default) or `full`; `media.showImages` (`true`), `media.style`: `top` (default) or `corner`; `layout.featured` (`true`, the newest post as a lead card tagged `strings.latest`), `layout.columns` (`3`), `layout.limit` (newest first), `layout.archive` (a path linked under the list whenever it is set; when the limit cuts the list, a line `strings.post.showingLatest` sits above the link). A card shows a picture only when the post sets `showCover`. A post's `category` shows as a chip beside the publish date |
+| `subpages` | `pages` | `pages` (pick pages, in order; empty shows the pages under this one; only published pages are listed), `layout.variant`: `cards` (default), `tiles`, `rows`, `chips` (labelled `strings.subpages.inSection`), `siblings` (for a subpage: the parent's title, `strings.subpages.moreInSection`, the pages beside this one and a link up); `layout.columns` `2` (default), `3`, `4` for cards and tiles; `media.showImages` (`false` by default; `true` shows each cover, cards only). A card's text is the page's `summary`, or its `seo.description` when the summary is blank. Nothing to show renders nothing |
+| `postList` | the blog or an `article` listing | `text`: `excerpt` (default) or `full`; `media.showImages` (`false`; `true` shows the covers), `media.style`: `top` (default) or `corner`; `layout.featured` (`false`; `true` makes the newest post a lead card tagged `strings.latest`), `layout.columns` (`3`), `layout.limit` (newest first), `layout.archive` (a path linked under the list whenever it is set; when the limit cuts the list, a line `strings.post.showingLatest` sits above the link). A card shows a picture only when the post sets `showCover`. A post's `category` shows as a chip beside the publish date |
 | `postArchive` | the blog or an `article` listing | none; every post, grouped by year, newest first |
 | `eventList` | the blog or an `article` listing, entries with an `eventDate` | `layout.limit` (`6`, upcoming events only), `layout.showPast` (`false`; `true` dims past events instead of hiding them), `emptyText` (shown when nothing is upcoming), `feedLabel` (the text of a link to `<route>/calendar.ics`; empty hides it). The page ships every dated entry and the browser hides what has passed, so a static page stays current |
-| `catalogList` | a `catalog` listing | `status`: empty (every entry), `available`, `reserved` or `sold`; `media.showImages` (`true`); `layout.filters` (`true`, category chips above the grid); `layout.columns` (`3`). Cards show the cover, a status badge, the price and the listing's specs. `source` is the listing it reads: the CMS offers the site's catalog listings and picks the only one when there is one. Without `source` it renders nothing |
+| `catalogList` | a `catalog` listing | `status`: empty (every entry), `available`, `reserved` or `sold`; `media.showImages` (`false`; `true` shows the covers); `layout.filters` (`false`; `true` puts category chips above the grid); `layout.columns` (`3`). Cards show the cover, a status badge, the price and the listing's specs. `source` is the listing it reads: the CMS offers the site's catalog listings and picks the only one when there is one. Without `source` it renders nothing |
 
 `postList`, `postArchive`, `eventList` and `catalogList` carry two more fields: `source`, the `id` of the listing to read, and `base`, the route its entries live under. The CMS offers `source` as a pick of the site's listings: `catalogList` always, the other three when the site has two or more article listings (the blog counts as one). `base` stays hidden. Left out, `base` is the `route` of the listing `source` names, so a page written by hand needs only `source`. `postList`, `postArchive` and `eventList` read the blog (`posts` under `routes.blog`) when `source` is left out. `catalogList` needs `source`; when it names no listing, `base` is `/<source>`.
 
@@ -900,11 +886,11 @@ A contact form beside a direct-contact card. It posts to the contact handler and
 |---|---|---|
 | `eyebrow`, `heading`, `intro` | text | a blank heading uses the page title; the heading is the page's H1 when the page has no `hero`, `cover` or `pageHeader` |
 | `labelName`, `labelEmail`, `labelMessage`, `submitLabel` | text | blank uses `strings.contact` |
-| `showPhone` | `true` (default) | |
+| `showPhone` | `false` (default) | `true` adds a phone field |
 | `requirePhone` | `false` (default) | |
 | `showCategory`, `categories[]`, `labelCategory` | `false`, text | a dropdown; needs at least one category |
 | `showUnit`, `labelUnit`, `placeholderUnit` | `false`, text | a short free-text field |
-| `showDirectContact` | `true` (default) | `false` lets the form fill the width |
+| `showDirectContact` | `false` (default) | `true` puts the direct-contact card beside the form; without it the form fills the width |
 | `inbox` | text | sent with the message as `inbox`, for a handler that routes by it |
 | `style.surface` | see above | |
 
@@ -954,9 +940,9 @@ The direct-contact card on its own, filled from the contact settings.
 
 | Field | Values | What it does |
 |---|---|---|
-| `show` | any of `phone`, `email`, `hours`, `address`, `map`, `socials`; default `phone`, `email` | a part with no data is skipped; `map` needs `lat` and `lng` on the address and a map provider, `maps.provider: 'osm'` or a Google `maps.key`, in the site config |
+| `show` | any of `phone`, `email`, `hours`, `address`, `map`, `socials`; default none, so the card shows only its label | a part with no data is skipped; `map` needs `lat` and `lng` on the address and a map provider, `maps.provider: 'osm'` or a Google `maps.key`, in the site config |
 | `label` | text | blank uses `strings.contact.direct` |
-| `tint` | `true` (default) | a tinted background |
+| `tint` | `false` (default) | `true` gives a tinted background |
 | `style.surface` | see above | |
 
 It reads the site's contact settings, so this reference shows its YAML only.
@@ -976,7 +962,7 @@ A map beside the address, contact details and hours, filled from the contact set
 | Field | Values | What it does |
 |---|---|---|
 | `heading` | text | blank uses `strings.contact.findUs` |
-| `showHours` | `true` (default) | |
+| `showHours` | `false` (default) | `true` lists the opening hours |
 | `style.surface` | see above | |
 
 It reads the site's contact settings, so this reference shows its YAML only.
