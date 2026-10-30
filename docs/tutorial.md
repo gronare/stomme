@@ -2,7 +2,7 @@
 
 Scaffold a site, add a page in the CMS while the preview shows it, and build it to static files.
 
-You need Node.js 24 (or 22.23.4 and later), pnpm 11, git, and Chrome or Edge for the CMS. The CMS works on your files directly through the browser's folder access, which those two browsers support.
+You need Node.js 22.19 or later, pnpm 11, git, and Chrome or Edge for the CMS. The CMS works on your files directly through the browser's folder access, which those two browsers support.
 
 ## Create the site
 

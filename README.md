@@ -8,7 +8,7 @@ A block-based site engine for Astro, for developers who build sites that other p
 
 ## Install
 
-You need Node.js 24 (or 22.23.4 and later), pnpm 11 and git.
+You need Node.js 22.19 or later, pnpm 11 and git.
 
 ```bash
 git clone https://github.com/gronare/stomme.git && pnpm -C stomme install
