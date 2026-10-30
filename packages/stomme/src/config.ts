@@ -105,6 +105,7 @@ export interface StommeFeatures {
   tracking?: boolean;
   contactForm?: boolean;
   pages?: boolean;
+  docs?: boolean;
   [flag: string]: boolean | undefined;
 }
 export const FEATURE_DEFAULTS: Required<StommeFeatures> = {
@@ -117,6 +118,7 @@ export const FEATURE_DEFAULTS: Required<StommeFeatures> = {
   tracking: false,
   contactForm: true,
   pages: true,
+  docs: false,
 };
 export function resolveFeatures(f?: StommeFeatures): Required<StommeFeatures> {
   return { ...FEATURE_DEFAULTS, ...(f || {}) };
