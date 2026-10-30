@@ -7,6 +7,14 @@ frontmatter means disabled/not shown (see `src/kit.ts`).
 
 ## Unreleased
 
+- `stomme-lint-content` (`pnpm lint:content` in the starter) checks every block in `src/content/`
+  against the site's catalog: each switch whose CMS default is on but which the file leaves out,
+  so the page renders it off, each field the catalog does not declare, each older field from
+  `block-migrations.json` and each unknown block type, by file and line. `--fix` writes the CMS
+  defaults in, `--fix=off` the values the page renders now, `--json` prints the report as data and
+  `--strict` exits `1` on any finding. `stomme-gen` prints one line with the counts. A site's
+  `package.json` gains the script with `"lint:content": "stomme-lint-content"`. See
+  `docs/how-to/write-pages-by-hand.md`.
 - The home page's LocalBusiness JSON-LD is written only when the contact settings hold a
   phone number, an address or a coordinate pair. A site with a name and nothing else, or
   only an email, socials or an organisation number, writes no JSON-LD.

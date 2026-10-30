@@ -16,6 +16,7 @@ Pages and content
 - [Translate a site](how-to/translate-a-site.md): pages in more than one language, with hreflang and a switcher.
 - [Build docs from a repo](how-to/build-docs-from-a-repo.md): a documentation section from Markdown on GitHub.
 - [Store uploads in R2](how-to/store-uploads-in-r2.md): CMS uploads straight to a Cloudflare R2 bucket.
+- [Write pages by hand or with an agent](how-to/write-pages-by-hand.md): blocks written straight into the files, checked against the site's catalog.
 
 Design and blocks
 

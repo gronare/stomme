@@ -32,7 +32,7 @@ The types and helpers `@gronare/stomme/kit` exports for writing a block's catalo
 | `fields`, `field` | the children of an `object` or `list` |
 | `summary`, `label_singular`, `collapsed` | how the CMS shows a list or object |
 
-A new field should mean "off" when it is absent, so content written before the field existed renders as it did. Put suggested wording in `hint`, never in `default`.
+A new field should mean "off" when it is absent, so content written before the field existed renders as it did. Put suggested wording in `hint`, never in `default`. A `boolean` with `default: true`, or a list with a non-empty default, is reported by [`stomme-lint-content`](commands.md#stomme-lint-content) wherever a page leaves it out.
 
 ## Helpers
 

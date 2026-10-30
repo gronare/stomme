@@ -16,6 +16,7 @@ Every script in a site's `package.json`, the scaffolder that creates a site, and
 | `pnpm preview` | `pnpm build:static`, then `astro preview` of that build on `http://localhost:4321`: every page, without the server routes such as `/api/contact` |
 | `pnpm cms:gen` | `stomme-gen`, regenerates the CMS from the catalog and the site config |
 | `pnpm block:new <Name>` | `stomme-new-block`, scaffolds `src/blocks/<Name>.astro` |
+| `pnpm lint:content` | `stomme-lint-content`, checks the blocks in `src/content/` against the catalog |
 
 Each `build:*` script sets `STOMME_TARGET` and runs `pnpm build`. See [Deploy a site](../how-to/deploy.md).
 
@@ -62,6 +63,23 @@ Text outside the markers is yours and stays. Run with no `public/admin/config.ym
 ## `stomme-new-block <Name>`
 
 Creates `src/blocks/<Name>.astro` with a heading prop and prints the two registrations it needs. The file name is the name in PascalCase and the type the same in camelCase, with anything other than letters and digits taken as a word break: `PromoBanner`, `promo banner` and `promo-banner` all make `PromoBanner.astro` with the type `promoBanner`. The name must start with a letter, and a `--` before it is ignored. It refuses to overwrite a file.
+
+## `stomme-lint-content`
+
+Reads the `blocks:` list of every `src/content/**/*.md` against the site's catalog, `src/blocks/schema.ts` plus the blocks of `STOMME_SLOTS_DIR`, and prints by file, line and block:
+
+| Finding | When |
+|---|---|
+| an unknown field | the block, one of its groups or a list item holds a key the catalog does not declare; `type` and `anchor` are allowed on every block |
+| an older field | the key is a renamed field from the package's `block-migrations.json`, which still renders through a back-compat shim |
+| an unknown block | the block's `type` is not in the catalog |
+
+| Option | What it does |
+|---|---|
+| `--json` | prints `{ files, counts }`: each file with its blocks, each block with its line and findings |
+| `--strict` | exits with `1` when anything is reported; without it the exit code is `0` |
+
+It never writes a file. A site without `src/blocks/schema.ts` is checked against the engine's catalog. `stomme-gen` runs the same check and prints one line with the counts when there is anything to report. See [Write pages by hand or with an agent](../how-to/write-pages-by-hand.md).
 
 ## Engine tools
 

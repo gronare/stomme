@@ -1,6 +1,6 @@
 import { ICON_NAMES } from './icons.ts';
 
-// FIELD POLICY (engine invariant): a new field is OPT-IN — absent from the frontmatter means off — and it must never get an `x !== false` fallback, because the CMS shows an absent boolean as OFF whatever `default:` says, so absent-means-on both changes what existing sites render and makes the editor lie. The dozen legacy `!== false` fields predate the rule and can only flip once every site's content carries an explicit value.
+// FIELD POLICY (engine invariant): a new field is OPT-IN — absent from the frontmatter means off — and it must never get an `x !== false` fallback, because the CMS shows an absent boolean as OFF whatever `default:` says, so absent-means-on both changes what existing sites render and makes the editor lie. A switch whose `default:` is on but whose key a file leaves out is what stomme-lint-content reports.
 export type Field = {
   name: string;
   label: string;

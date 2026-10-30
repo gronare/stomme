@@ -2,7 +2,7 @@
 
 Every block in the library catalog (`@gronare/stomme/catalog`), with its fields as they are written in a page's frontmatter.
 
-A field path with a dot is a field inside a group: `media.kind` is written as `media: { kind: … }`. Defaults are what the CMS fills in when an editor adds the block. A page written by hand gets the same value for most fields it leaves out, but a few switches read as off when they are missing, see [Fields left out of a hand-written page](#fields-left-out-of-a-hand-written-page). Each block below is shown live, rendered by the same renderer a page uses, with the YAML that made it underneath. Run `pnpm dev` and open `/lookbook` to see every block with sample content, `/lookbook/<slug>` for one sample on its own page (the slug is the sample's label in the lookbook, such as `/lookbook/hero`), or `/admin/blocks.html` for the block gallery `cms:gen` writes. [Add a custom block](../how-to/add-a-custom-block.md) adds your own.
+A field path with a dot is a field inside a group: `media.kind` is written as `media: { kind: … }`. Defaults are what the CMS fills in when an editor adds the block. A page written by hand gets the same value for most fields it leaves out, but a switch reads as off when it is missing, see [Fields left out of a hand-written page](#fields-left-out-of-a-hand-written-page). Each block below is shown live, rendered by the same renderer a page uses, with the YAML that made it underneath. Run `pnpm dev` and open `/lookbook` to see every block with sample content, `/lookbook/<slug>` for one sample on its own page (the slug is the sample's label in the lookbook, such as `/lookbook/hero`), or `/admin/blocks.html` for the block gallery `cms:gen` writes. [Add a custom block](../how-to/add-a-custom-block.md) adds your own.
 
 ## Fields many blocks share
 
@@ -16,7 +16,7 @@ A field path with a dot is a field inside a group: `media.kind` is written as `m
 
 ### Fields left out of a hand-written page
 
-The CMS writes every switch into the page when an editor adds a block. A page written by hand that leaves one of these out gets the opposite of the CMS default, so the feature is off:
+A field left out of a page is off. The CMS fills in each field's default when an editor adds a block, so for a switch whose default is on, a block written by hand that leaves it out renders it off, while the same block added in the CMS has it on. `pnpm lint:content` lists every such switch in a site, with the line to add, and `--fix` writes the CMS defaults in; see [Write pages by hand or with an agent](../how-to/write-pages-by-hand.md). In the library catalog these are:
 
 | Block | Off when left out | The CMS fills in |
 |---|---|---|
@@ -27,8 +27,6 @@ The CMS writes every switch into the page when an editor adds a block. A page wr
 | `contactForm`, and each `contactSwitch` item | `showPhone`, `showDirectContact` | `true`, `true` |
 | `contactCard` | `show` (the card shows only its label), `tint` | `phone` and `email`, `true` |
 | `findUs` | `showHours` | `true` |
-
-Write the field as `true` (or list the parts in `show`) to turn it on.
 
 ### Buttons
 

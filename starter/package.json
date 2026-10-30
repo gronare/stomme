@@ -10,6 +10,7 @@
     "preview": "pnpm run build:static && STOMME_TARGET=static astro preview",
     "cms:gen": "stomme-gen",
     "block:new": "stomme-new-block",
+    "lint:content": "stomme-lint-content",
     "build:static": "STOMME_TARGET=static pnpm run build",
     "build:cloudflare": "STOMME_TARGET=cloudflare pnpm run build",
     "build:vercel": "STOMME_TARGET=vercel pnpm run build",

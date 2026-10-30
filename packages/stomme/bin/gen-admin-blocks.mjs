@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { readFileSync, writeFileSync, readdirSync, copyFileSync, cpSync, mkdirSync, existsSync, rmSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
-import { fileURLToPath, pathToFileURL } from 'node:url';
+import { fileURLToPath } from 'node:url';
 import { loadAddonCms } from '../src/addon-cms.mjs';
 import { buildOptionSources } from '../src/option-sources.mjs';
 import { makeSettingsPane } from '../src/settings-pane.mjs';
@@ -16,6 +16,8 @@ import { r2LibraryYaml, resolveMediaConfig, withMaxFileSize } from '../src/media
 import { resolveCmsLocales, LOCALIZED_EDITORS } from '../src/cms-i18n.mjs';
 import { termCollections, seedTerms } from '../src/term-collections.mjs';
 import { listingIndexSeed, listingIndexSlug } from '../src/listing-seed.mjs';
+import { loadSiteBlocks } from '../src/site-blocks.mjs';
+import { lintContent, lintSummaryLine } from '../src/content-lint.mjs';
 
 const root = process.cwd();
 const here = dirname(fileURLToPath(import.meta.url));
@@ -36,28 +38,10 @@ if (!existsSync(configPath)) {
   process.exit(0);
 }
 
-const { BLOCKS: SITE_BLOCKS } = await jiti.import(schemaPath);
-if (!Array.isArray(SITE_BLOCKS)) {
-  console.error(`No BLOCKS export found in ${schemaPath}`);
+const BLOCKS = await loadSiteBlocks({ jiti, schemaPath }).catch((e) => {
+  console.error(e.message);
   process.exit(1);
-}
-
-const BLOCKS = await (async () => {
-  const slotsDir = process.env.STOMME_SLOTS_DIR;
-  const file = slotsDir ? resolve(slotsDir, 'block-catalog.mjs') : null;
-  if (!file || !existsSync(file)) return SITE_BLOCKS;
-  try {
-    const mod = await jiti.import(pathToFileURL(file).href);
-    const added = (Array.isArray(mod.BLOCKS) ? mod.BLOCKS : []).filter((b) => b && b.type);
-    const own = new Set(SITE_BLOCKS.map((b) => b.type));
-    const fresh = added.filter((b) => !own.has(b.type));
-    if (fresh.length) console.log(`  · addon blocks: ${fresh.map((b) => b.type).join(', ')}`);
-    return [ ...SITE_BLOCKS, ...fresh ];
-  } catch (e) {
-    console.warn(`  ⚠ addon blocks: ${resolve(file)} could not be read (${e.message}) — skipped`);
-    return SITE_BLOCKS;
-  }
-})();
+});
 
 const SITE_PACKAGE_NAME = (() => {
   try { return JSON.parse(readFileSync(resolve(root, 'package.json'), 'utf8')).name || 'site'; } catch { return 'site'; }
@@ -487,4 +471,12 @@ if (counts.collections) {
 }
 if (SKIPPED_BLOCKS.length) {
   console.log(`  ↳ ${SKIPPED_BLOCKS.length} block(s) skipped — collection absent: ${SKIPPED_BLOCKS.map((b) => `${b.type}→${b.collection}`).join(', ')}`);
+}
+
+try {
+  const { counts } = lintContent({ root, blocks: BLOCKS, registry: JSON.parse(readFileSync(resolve(here, '../block-migrations.json'), 'utf8')) });
+  const line = lintSummaryLine(counts);
+  if (line) console.log(`  ⚠ content: ${line}; stomme-lint-content lists them`);
+} catch (e) {
+  console.warn(`  (content lint skipped: ${e.message})`);
 }
