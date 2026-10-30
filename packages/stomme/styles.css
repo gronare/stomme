@@ -152,9 +152,9 @@ main > :is(.surface-dark, .surface-gradient):first-child:has(.hero-grid) > .sect
 /* A scroll timeline is inactive while the line fits, so the fade only exists when there is more command to scroll to. */
 @supports (animation-timeline: scroll()) { .command__line { -webkit-mask-image: linear-gradient(to right, currentColor calc(100% - var(--command-fade)), transparent); mask-image: linear-gradient(to right, currentColor calc(100% - var(--command-fade)), transparent); animation-name: command-fade; animation-timing-function: linear; animation-fill-mode: both; animation-timeline: scroll(self inline); } }
 .command__prompt { color: color-mix(in srgb, var(--color-dark-ink) 55%, var(--color-dark)); user-select: none; }
-.command__copy { flex: none; min-height: 2.25rem; padding: 0 0.75rem; font: inherit; font-size: 0.8rem; color: var(--color-highlight); background: transparent; border: 1px solid var(--color-dark-line); border-radius: 0.45rem; cursor: pointer; }
+.command__copy { flex: none; min-height: 2.25rem; padding: 0 0.75rem; font: inherit; font-size: 0.8rem; color: var(--color-dark-ink); background: transparent; border: 1px solid var(--color-dark-line); border-radius: 0.45rem; cursor: pointer; }
 .command__copy:hover { background: color-mix(in srgb, var(--color-dark-ink) 10%, transparent); }
-.command__copy:focus-visible { outline: 2px solid var(--color-highlight); outline-offset: 2px; }
+.command__copy:focus-visible { outline: 2px solid var(--color-dark-ink); outline-offset: 2px; }
 .command__status { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 .hero-command { max-width: 38rem; }
 
@@ -1854,9 +1854,9 @@ body:is(:has(main .cover:first-child), :has(main .surface-dark:first-child .hero
 .docs-body .docs-code { margin: 1.1rem 0; background: var(--color-dark); color: var(--color-dark-ink); border-radius: var(--tk-radius, 10px); padding: 0.9rem 1rem; font: 500 0.88rem/1.6 var(--font-mono); overflow-x: auto; }
 .docs-code-wrap > .docs-code { margin: 0; padding-right: 0.75rem; background: transparent; }
 .docs-body .docs-code code { background: transparent; padding: 0; color: inherit; font: inherit; border-radius: 0; }
-.docs-code__copy { margin: 0.6rem 0.6rem 0 0; font: 500 0.75rem var(--font-mono); color: var(--color-highlight); background: var(--color-dark); border: 1px solid var(--color-dark-line); border-radius: var(--tk-radius-sm, 6px); padding: 0.2rem 0.55rem; cursor: pointer; }
+.docs-code__copy { margin: 0.6rem 0.6rem 0 0; font: 500 0.75rem var(--font-mono); color: var(--color-dark-ink); background: var(--color-dark); border: 1px solid var(--color-dark-line); border-radius: var(--tk-radius-sm, 6px); padding: 0.2rem 0.55rem; cursor: pointer; }
 .docs-code__copy:hover { background: color-mix(in srgb, var(--color-dark-ink) 10%, var(--color-dark)); }
-.docs-code__copy:focus-visible { outline: 2px solid var(--color-highlight); outline-offset: 2px; }
+.docs-code__copy:focus-visible { outline: 2px solid var(--color-dark-ink); outline-offset: 2px; }
 .docs-preview { margin: 1.25rem 0 1.5rem; border: 1px solid var(--color-line); border-radius: var(--tk-radius, 10px); overflow: hidden; }
 .docs-preview__stage { background: var(--color-paper); color: var(--color-ink); overflow: hidden; border-bottom: 1px solid var(--color-line); }
 .docs-preview__stage--html { padding: 1.5rem; }
