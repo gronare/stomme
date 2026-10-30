@@ -116,7 +116,7 @@ let scHomeHero = '';
 if (shareDraft && !scOgImage) {
   try {
     const home = (await getEntry('home', 'home'))?.data;
-    const hb = (home && Array.isArray(home.blocks) ? home.blocks : []).find((b) => (b.type === 'hero' || b.type === 'coverHero') && b.media && b.media.image);
+    const hb = (home && Array.isArray(home.blocks) ? home.blocks : []).find((b) => (b.type === 'hero' || b.type === 'cover') && b.media && b.media.image);
     scHomeHero = idAsset(hb && hb.media.image);
   } catch (e) { /* no home entry — brand card */ }
 }

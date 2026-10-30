@@ -76,6 +76,11 @@ reset({
   'home/home': { data: { blocks: [{ type: 'text' }, { type: 'hero', media: { image: '/media/hero.jpg' } }] } },
 }, {});
 eq(await ogPages({}), [], 'the home hero image serves as the fallback when no ogImage is set');
+reset({
+  ...settings({ enabled: true, types: {} }),
+  'home/home': { data: { blocks: [{ type: 'cover', media: { image: '/media/cover.jpg' } }] } },
+}, {});
+eq(await ogPages({}), [], 'a cover block on the home page serves as the fallback image too');
 
 const POST = { title: 'Hello', date: '2026-01-01', excerpt: 'Lede', cover: '/media/a.jpg' };
 reset(settings({ enabled: true, types: { posts: { enabled: true } } }), { posts: [entry('hello', POST)] });

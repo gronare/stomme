@@ -51,7 +51,7 @@ function effectiveListings(cfg: OgConfig) {
 async function homeHeroImage(): Promise<string | undefined> {
   const home = await getEntry('home', 'home');
   const blocks = (home?.data?.blocks ?? []) as { type?: string; media?: { image?: string } }[];
-  const hit = blocks.find((b) => (b.type === 'hero' || b.type === 'coverHero') && !!b.media?.image);
+  const hit = blocks.find((b) => (b.type === 'hero' || b.type === 'cover') && !!b.media?.image);
   return hit?.media?.image || undefined;
 }
 
