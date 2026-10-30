@@ -18,7 +18,7 @@ Point the CMS at the site's repository, so editors can work on the files locally
    pnpm cms:gen
    ```
 
-3. Open `/admin/`. The sign-in screen offers **Work with Local Repository** on `localhost`, plus **Log in** and **Sign In Using Access Token**.
+3. Open `/admin/`. The sign-in screen offers **Work with Local Repository** on `localhost`, plus **Log in** and **Sign In Using Access Token**. With `cms.baseUrl` set, it offers **Log in** and no access-token sign-in.
 
 Without `cms`, the config names the `github` backend and a placeholder repository, `local/<package name>`, so **Work with Local Repository** works before the site has a repository on GitHub. Signing in on the deployed site needs the real `repo`.
 
@@ -30,7 +30,9 @@ The folder you pick must be the repository's root. When the site lives in a subf
 
 ## Sign in on the deployed site
 
-- **With an access token.** Choose **Sign In Using Access Token** and paste a GitHub token that can write to the repository. Saves are commits to `branch`, and a host that builds on every commit publishes them.
-- **With OAuth.** Run an OAuth server for Sveltia, set its address as `cms.baseUrl`, and editors choose **Log in**. With `cms.baseUrl` set and no `contact.endpoint`, the contact form posts to `<baseUrl>/contact`.
+Saves are commits to `branch`, and a host that builds on every commit publishes them. Sign in one of two ways:
+
+- **With an access token.** Leave `cms.baseUrl` unset, choose **Sign In Using Access Token** and paste a GitHub token that can write to the repository.
+- **With OAuth.** Run an OAuth server for Sveltia, set its address as `cms.baseUrl`, and editors choose **Log in**. `cms:gen` then writes `auth_methods: [oauth]` into the backend, so the CMS hides the access-token sign-in. With `cms.baseUrl` set and no `contact.endpoint`, the contact form posts to `<baseUrl>/contact`.
 
 [Site config](../reference/site-config.md#cms) lists every `cms` key.
