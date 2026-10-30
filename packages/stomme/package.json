@@ -123,6 +123,7 @@
     "addon-collections.ts",
     "schema-manifest.json",
     "blocks-manifest.json",
+    "block-migrations.json",
     "integration.mjs",
     "integration.d.ts",
     "Head.astro",
