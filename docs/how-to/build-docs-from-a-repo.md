@@ -49,6 +49,7 @@ To keep the unreleased version out of search engines, add `route/<branch>` to `s
 
   Each section gets a card on the docs home. A heading that starts with `How-to`, `Reference` or `Explanation` gets that kind's wording and a page count, and a `Tutorial` section's card leads straight to its first page.
 
+- **Every `.md` file** in the folder and its subfolders is published as a page and indexed for search, whether `README.md` lists it or not. Only a listed page is in the nav and the previous and next order, so delete or move a file you do not want served. On a local `dir`, files and folders whose name starts with `.` and `node_modules` are left out.
 - **A page** takes its title from its first `#` heading and its lede from the first paragraph that is more than an image. Every `##` gets an id and a line in "On this page". GitHub-flavoured Markdown renders: tables, fenced code with a copy button, and blockquotes. A fence can also show its result, see [Show live examples](#show-live-examples).
 - **Links.** A relative link to a `.md` file in the folder becomes the site route and keeps its `#anchor`. A link that leaves the folder goes to the file on GitHub at the version's ref. External links stay as they are.
 - **Images** a page embeds are copied into the build and served under `route/_media/`.
