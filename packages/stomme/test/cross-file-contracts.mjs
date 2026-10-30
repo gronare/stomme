@@ -188,6 +188,16 @@ const literalPrefixes = readdirSync(resolve(pkg, 'blocks')).filter((f) => f.ends
   .filter((f) => /<ContactLink\b[^>]*\bprefix="[^"]*[A-Za-z]/.test(read(`blocks/${f}`)));
 check(literalPrefixes.length === 0, 'no block hands ContactLink a word as a literal prefix; the word comes from the site strings so it follows the language', literalPrefixes.join(', '));
 
+const migrations = JSON.parse(read('block-migrations.json')).migrations;
+const unmigrated = readdirSync(resolve(pkg, 'blocks')).filter((f) => f.endsWith('.astro')).flatMap((f) => {
+  const src = read(`blocks/${f}`);
+  const type = src.match(/data-stomme-block="([a-zA-Z]+)"/)?.[1];
+  return [...src.matchAll(/resolveButton\(\s*[\w.?]+\s*,\s*([\w.?]+)/g)]
+    .map((m) => m[1].split('.').pop())
+    .filter((label) => !migrations.some((g) => g.blocks.includes(type) && g.label === label))
+    .map((label) => `${type}.${label}`);
+});
+check(migrations.length >= 7 && unmigrated.length === 0, 'every legacy button pair a block still renders through resolveButton has an entry in block-migrations.json', unmigrated.join(', '));
 check(JSON.parse(read('package.json')).files.includes('block-migrations.json'), 'block-migrations.json is in the package files, so the published package ships it');
 
 const failed = results.filter((ok) => !ok).length;

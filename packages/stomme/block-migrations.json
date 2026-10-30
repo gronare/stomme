@@ -57,6 +57,15 @@
       "label": "linkLabel",
       "href": "link",
       "to": "cta"
+    },
+    {
+      "kind": "button-group",
+      "note": "Plan card button: the legacy ctaLabel/ctaHref pair on each plan folds into the plan's cta group (resolveButton back-compat). `in` = the list field whose items carry the pair.",
+      "blocks": ["plans"],
+      "in": "plans",
+      "label": "ctaLabel",
+      "href": "ctaHref",
+      "to": "cta"
     }
   ]
 }
