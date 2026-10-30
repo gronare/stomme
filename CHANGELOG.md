@@ -5,6 +5,11 @@ Engine changes that affect consuming sites. Sites follow the `release` branch
 taking a new release. Field policy: new fields are opt-in — absent from the
 frontmatter means disabled/not shown (see `src/kit.ts`).
 
+## 0.2.2 — 2026-10-30
+
+- Both packages name stomme.dev as their homepage and the GitHub issues as where to report a
+  bug, with keywords, so their npm pages link to the docs and the tracker.
+
 ## 0.2.1 — 2026-10-30
 
 - The engine is published on npm as `@gronare/stomme`, the name its imports already use, so a

@@ -1,7 +1,18 @@
 {
   "name": "create-stomme",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Scaffold a new stomme site: a blank site, or the Wren & Sorrel demo.",
+  "keywords": [
+    "astro",
+    "stomme",
+    "create",
+    "scaffold",
+    "starter"
+  ],
+  "homepage": "https://stomme.dev",
+  "bugs": {
+    "url": "https://github.com/gronare/stomme/issues"
+  },
   "type": "module",
   "repository": {
     "type": "git",

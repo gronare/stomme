@@ -1,7 +1,19 @@
 {
   "name": "@gronare/stomme",
-  "version": "0.2.1",
-  "description": "Block-CMS engine for Astro + Sveltia CMS \u2014 types, helpers, runtime components, tooling.",
+  "version": "0.2.2",
+  "description": "A block-based site engine for Astro: typed blocks, a Git-backed CMS with a live preview, static output.",
+  "keywords": [
+    "astro",
+    "astro-integration",
+    "cms",
+    "sveltia",
+    "static-site",
+    "blocks"
+  ],
+  "homepage": "https://stomme.dev",
+  "bugs": {
+    "url": "https://github.com/gronare/stomme/issues"
+  },
   "type": "module",
   "repository": {
     "type": "git",
