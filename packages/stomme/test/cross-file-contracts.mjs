@@ -184,6 +184,10 @@ const readOptions = new Set([...read('integration.mjs').matchAll(/\boptions\.([a
 const untypedOptions = [...readOptions].filter((k) => !typedOptions.has(k));
 check(readOptions.size >= 5 && untypedOptions.length === 0, `every integration option the code reads is in StommeIntegrationOptions (${readOptions.size} options)`, `missing from the type: ${untypedOptions.join(', ')}`);
 
+const literalPrefixes = readdirSync(resolve(pkg, 'blocks')).filter((f) => f.endsWith('.astro'))
+  .filter((f) => /<ContactLink\b[^>]*\bprefix="[^"]*[A-Za-z]/.test(read(`blocks/${f}`)));
+check(literalPrefixes.length === 0, 'no block hands ContactLink a word as a literal prefix; the word comes from the site strings so it follows the language', literalPrefixes.join(', '));
+
 const failed = results.filter((ok) => !ok).length;
 console.log(`\n${results.length - failed}/${results.length} cross-file contracts hold`);
 if (failed) { console.error('\n✗ cross-file contracts FAILED'); process.exit(1); }

@@ -13,8 +13,9 @@ interface Props {
   ctaHref?: unknown;
   layout?: { variant?: 'light' | 'dark'; width?: 'narrow' | 'full' };
   anchor?: string;
+  site?: { strings?: { contact?: { call?: string } } };
 }
-const { eyebrow, heading, intro, cta, ctaLabel, ctaHref, anchor } = Astro.props;
+const { eyebrow, heading, intro, cta, ctaLabel, ctaHref, anchor, site } = Astro.props;
 const variant = Astro.props.layout?.variant ?? 'light';
 const width = Astro.props.layout?.width ?? 'narrow';
 const read = width !== 'full';
@@ -32,7 +33,7 @@ const contact = ((await getEntry('contact', 'contact').catch(() => null))?.data 
       {btn && (
         <div class="btn-row">
           <a href={btn.href} class="btn btn-on-dark">{btn.label}</a>
-          {contact.phone && <ContactLink kind="tel" class="btn-ghost" target={contact.phoneE164 || contact.phone} display={contact.phone} prefix="Call " suffix=" →" protect={!!contact.protectContact} />}
+          {contact.phone && <ContactLink kind="tel" class="btn-ghost" target={contact.phoneE164 || contact.phone} display={contact.phone} prefix={`${site?.strings?.contact?.call ?? 'Call'} `} suffix=" →" protect={!!contact.protectContact} />}
         </div>
       )}
     </div>

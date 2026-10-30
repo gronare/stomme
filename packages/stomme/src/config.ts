@@ -24,7 +24,7 @@ export interface SiteConfig {
     changeLanguage?: string;
     breadcrumbHome?: string;
     breadcrumbLabel?: string;
-    contact?: { name?: string; email?: string; phone?: string; category?: string; categoryPlaceholder?: string; unit?: string; message?: string; submit?: string; direct?: string; honeypot?: string; hours?: string; visit?: string; findUs?: string; follow?: string; map?: string; reveal?: string; error?: string };
+    contact?: { name?: string; email?: string; phone?: string; category?: string; categoryPlaceholder?: string; unit?: string; message?: string; submit?: string; direct?: string; honeypot?: string; hours?: string; visit?: string; findUs?: string; follow?: string; map?: string; reveal?: string; error?: string; call?: string };
     beforeAfter?: { before?: string; after?: string; compare?: string };
     controls?: { copy?: string; copied?: string; copyCommand?: string; pauseVideo?: string; playVideo?: string; darkMode?: string; lightMode?: string };
     collage?: { more?: string; more1?: string; open?: string; viewer?: string; prev?: string; next?: string; close?: string; counter?: string };
@@ -168,6 +168,7 @@ const STRINGS_EN = {
     findUs: 'Find us', follow: 'Follow', map: 'Map',
     reveal: 'Contact details — enable JavaScript to reveal',
     error: 'Sorry — could not send. Please try again or email us directly.',
+    call: 'Call',
   },
   beforeAfter: { before: 'Before', after: 'After', compare: 'Drag to compare before and after' },
   controls: { copy: 'Copy', copied: 'Copied', copyCommand: 'Copy command', pauseVideo: 'Pause video', playVideo: 'Play video', darkMode: 'Switch to dark mode', lightMode: 'Switch to light mode' },
@@ -275,6 +276,7 @@ const STRINGS_SV: typeof STRINGS_EN = {
     findUs: 'Hitta hit', follow: 'Följ oss', map: 'Karta',
     reveal: 'Kontaktuppgifter, aktivera JavaScript för att visa dem',
     error: 'Det gick inte att skicka. Försök igen eller mejla oss direkt.',
+    call: 'Ring',
   },
   beforeAfter: { before: 'Före', after: 'Efter', compare: 'Dra för att jämföra före och efter' },
   controls: { copy: 'Kopiera', copied: 'Kopierat', copyCommand: 'Kopiera kommandot', pauseVideo: 'Pausa videon', playVideo: 'Spela videon', darkMode: 'Byt till mörkt läge', lightMode: 'Byt till ljust läge' },
@@ -382,6 +384,7 @@ const STRINGS_NO: typeof STRINGS_EN = {
     findUs: 'Finn fram', follow: 'Følg oss', map: 'Kart',
     reveal: 'Kontaktopplysninger, slå på JavaScript for å vise dem',
     error: 'Det gikk ikke å sende. Prøv igjen, eller send oss en e-post direkte.',
+    call: 'Ring',
   },
   beforeAfter: { before: 'Før', after: 'Etter', compare: 'Dra for å sammenligne før og etter' },
   controls: { copy: 'Kopier', copied: 'Kopiert', copyCommand: 'Kopier kommandoen', pauseVideo: 'Sett videoen på pause', playVideo: 'Spill av videoen', darkMode: 'Bytt til mørk modus', lightMode: 'Bytt til lys modus' },
