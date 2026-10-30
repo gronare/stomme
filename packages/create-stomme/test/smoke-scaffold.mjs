@@ -60,6 +60,22 @@ try {
       check(files(join(site, 'public/media')).length > 0, 'demo: the scaffold carries its photos');
     }
   }
+
+  const engineVersion = JSON.parse(readFileSync(resolve(HERE, '../../stomme/package.json'), 'utf8')).version;
+  const packed = run('npm', ['pack', '--pack-destination', work], resolve(HERE, '..'));
+  const tarball = readdirSync(work).find((f) => f.endsWith('.tgz'));
+  check(packed.ok && tarball, 'npm pack makes the scaffolder tarball', packed.out.slice(-800));
+  if (tarball) {
+    run('tar', ['xzf', tarball], work);
+    const made = run('node', [join(work, 'package/bin/create.mjs'), 'registry', '--blank'], work);
+    const site = join(work, 'registry');
+    check(made.ok, 'a scaffold from the packed scaffolder succeeds', made.out.slice(-800));
+    const dep = made.ok ? JSON.parse(readFileSync(join(site, 'package.json'), 'utf8')).dependencies['@gronare/stomme'] : '';
+    check(dep === `npm:stomme@^${engineVersion}`, `it installs the engine from npmjs as npm:stomme@^${engineVersion}`, dep);
+    check(made.ok && !existsSync(join(site, '.npmrc')), 'it writes no .npmrc');
+    check(existsSync(join(site, '.gitignore')), 'it keeps the starter\'s .gitignore');
+    check(!made.out.includes('linked to this checkout'), 'it does not claim a link to a checkout', made.out);
+  }
 } finally {
   rmSync(work, { recursive: true, force: true });
 }

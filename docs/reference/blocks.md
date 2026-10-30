@@ -2,7 +2,7 @@
 
 Every block in the library catalog (`@gronare/stomme/catalog`), with its fields as they are written in a page's frontmatter.
 
-A field path with a dot is a field inside a group: `media.kind` is written as `media: { kind: … }`. Defaults are what the CMS fills in when an editor adds the block, and what a block renders when a page written by hand leaves the field out; every switch defaults to off. Each block below is shown live, rendered by the same renderer a page uses, with the YAML that made it underneath. Run `pnpm dev` and open `/lookbook` to see every block with sample content, `/lookbook/<slug>` for one sample on its own page (the slug is the sample's label in the lookbook, such as `/lookbook/hero`), or `/admin/blocks.html` for the block gallery `cms:gen` writes. [Add a custom block](../how-to/add-a-custom-block.md) adds your own.
+A field path with a dot is a field inside a group: `media.kind` is written as `media: { kind: … }`. Defaults are what the CMS fills in when an editor adds the block, and what a block renders when a page written by hand leaves the field out; every switch defaults to off. Each block below is shown live, rendered by the same renderer a page uses, with the YAML that made it underneath. Run `pnpm dev` and open `/lookbook` to see every block with sample content, `/lookbook/<slug>` for one sample on its own page (the slug is the sample's label in the lookbook, such as `/lookbook/hero`), or `/admin/blocks.html` for the block gallery `stomme cms` writes. [Add a custom block](../how-to/add-a-custom-block.md) adds your own.
 
 ## Fields many blocks share
 
@@ -104,7 +104,7 @@ type: hero
 eyebrow: stomme
 heading: Start a site in one line.
 intro: Scaffold a site, open the CMS and build your first page in an afternoon.
-command: git clone https://github.com/gronare/stomme.git && pnpm -C stomme install
+command: pnpm create stomme my-site
 cta:
   label: Read the tutorial
   link:
@@ -766,7 +766,7 @@ logos:
 
 ## From collections
 
-These blocks read entries from a collection. `cms:gen` offers a block only while its source is on: the feature flag, or for `postList`, `postArchive` and `eventList` the blog or an `article` listing, and for `catalogList` a `catalog` listing. [Content collections](content.md) lists the entries' fields.
+These blocks read entries from a collection. `stomme cms` offers a block only while its source is on: the feature flag, or for `postList`, `postArchive` and `eventList` the blog or an `article` listing, and for `catalogList` a `catalog` listing. [Content collections](content.md) lists the entries' fields.
 
 | Type | Reads | Fields besides `eyebrow`, `heading`, `intro`, `style.surface` |
 |---|---|---|
@@ -823,7 +823,7 @@ type: ctaPanel
 eyebrow: Try it
 heading: Make a site of your own
 intro: The scaffolder asks for a blank site or the demo garden studio.
-command: node stomme/packages/create-stomme/bin/create.mjs my-site
+command: pnpm create stomme my-site
 cta:
   label: Start the tutorial
   link:
@@ -841,7 +841,7 @@ cta2:
 ```yaml block
 type: ctaPanel
 heading: Install it and start
-command: git clone https://github.com/gronare/stomme.git && pnpm -C stomme install && node stomme/packages/create-stomme/bin/create.mjs my-site --demo
+command: pnpm create stomme my-site --demo && cd my-site && pnpm install && pnpm dev
 ```
 
 ### `ctaBox`

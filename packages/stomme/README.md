@@ -1,12 +1,18 @@
-# @gronare/stomme
+# stomme
 
 A block-based CMS engine + component library for **Astro + Sveltia CMS**. Compose pages from
 Over forty styled, themeable blocks; edit them in a Git-backed CMS with a live preview of the real
 components; ship static. Extend with your own blocks, routes and collections.
 
-Not published to a registry yet — clone the repository and scaffold from it. See the
-[repository README](https://github.com/gronare/stomme#quickstart) for the quickstart, and
-`docs/` for theming, custom blocks, collections and the contact form's handler.
+Published on npm as `stomme`. A site depends on it under the name its imports use,
+`"@gronare/stomme": "npm:stomme@^<version>"`, which the scaffolder writes:
+
+```bash
+pnpm create stomme my-site
+```
+
+See the [repository README](https://github.com/gronare/stomme#install) and `docs/` for theming,
+custom blocks, collections and the contact form's handler.
 
 ## Exports
 
@@ -28,11 +34,11 @@ Not published to a registry yet — clone the repository and scaffold from it. S
 | `@gronare/stomme/markdown`, `href`, `fonts`, `theme`, `contact` | `renderMarkdown`, `resolveLink`, `resolveFonts`, `themeStyle`/`nightStyle` (the theme's day and night colours), the contact-form handler. |
 | `@gronare/stomme/blocks/*`, `routes/*` | Individual block components and the injectable routes. |
 
-## Bin scripts
+## The `stomme` command
 
-- `stomme-gen` — generate the Sveltia admin from your catalog, and copy the preview assets.
-- `stomme-new-block` — scaffold a custom block component.
-- `stomme-gen-schema`, `stomme-gen-blocks` — emit the schema and block manifests.
-- `stomme-lint-styles` — fail on a new hardcoded colour outside the token block.
+`stomme new <directory>`, `dev`, `build [--target static|netlify|cloudflare|vercel|node]`, `cms`,
+`block new <name>` and `lint`; `stomme --help` lists them. The older bin names (`stomme-gen`,
+`stomme-new-block`, `stomme-lint-content`, `stomme-lint-styles`, `stomme-lint-comments`) still work.
+`stomme-gen-schema` and `stomme-gen-blocks` emit the engine's own schema and block manifests.
 
 Peer dependency: `astro >= 5`. Node `>= 20`.

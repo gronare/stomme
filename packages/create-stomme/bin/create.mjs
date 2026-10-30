@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { cpSync, existsSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { cpSync, existsSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import { createInterface } from 'node:readline/promises';
 import { resolve, relative, dirname, basename } from 'node:path';
@@ -10,7 +10,7 @@ const starter = resolve(here, '../../../starter');
 const template = existsSync(starter) ? starter : resolve(here, '../template');
 const blankSet = resolve(here, '../templates/blank');
 
-const USAGE = 'Usage: create-stomme <directory> [--blank | --demo]';
+const USAGE = 'Usage: pnpm create stomme <directory> [--blank | --demo]';
 const args = process.argv.slice(2);
 const flags = new Set(args.filter((a) => a.startsWith('-')));
 const unknown = [...flags].filter((f) => f !== '--blank' && f !== '--demo');
@@ -49,13 +49,15 @@ cpSync(template, dest, {
   filter: (src) => !SKIP.has(basename(src)),
 });
 
+if (existsSync(resolve(dest, 'gitignore')) && !existsSync(resolve(dest, '.gitignore'))) renameSync(resolve(dest, 'gitignore'), resolve(dest, '.gitignore'));
+
 // The blank set replaces the demo's whole content tree, so a collection it lacks fails the build instead of leaking demo entries.
 if (variant === 'blank') {
   for (const dir of ['src/content', 'public/media', 'src/assets/media']) rmSync(resolve(dest, dir), { recursive: true, force: true });
   cpSync(blankSet, dest, { recursive: true });
 }
 
-// `link:` rather than `workspace:*`: the scaffold writes its own pnpm-workspace.yaml, so the new site is its own workspace root and a `workspace:` range has nothing to resolve against.
+// The engine is published as `stomme` and installed under the name every import uses, `@gronare/stomme`. `link:` rather than `workspace:*`: the scaffold writes its own pnpm-workspace.yaml, so the new site is its own workspace root and a `workspace:` range has nothing to resolve against.
 try {
   const pkgPath = resolve(dest, 'package.json');
   const pkg = JSON.parse(readFileSync(pkgPath, 'utf8'));
@@ -65,9 +67,10 @@ try {
     const enginePkg = resolve(repoRoot, 'packages/stomme');
     fromCheckout = template === starter && existsSync(enginePkg);
     const inRepo = dest === repoRoot || dest.startsWith(repoRoot + '/');
+    const bundled = pkg.dependencies['@gronare/stomme'];
     pkg.dependencies['@gronare/stomme'] = fromCheckout
       ? 'link:' + (inRepo ? relative(dest, enginePkg).split('\\').join('/') : enginePkg)
-      : 'latest';
+      : bundled.startsWith('npm:stomme@') ? bundled : 'npm:stomme@latest';
   }
   writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + '\n');
 } catch {}
@@ -80,16 +83,6 @@ if (!existsSync(workspaceYaml)) {
     "allowBuilds:\n  '@parcel/watcher': true\n  esbuild: true\n  sharp: true\n  workerd: true\n",
   );
 }
-const npmrc = resolve(dest, '.npmrc');
-if (!fromCheckout && !existsSync(npmrc)) {
-  writeFileSync(
-    npmrc,
-    '@gronare:registry=https://npm.pkg.github.com\n' +
-      '# Auth lives in your USER ~/.npmrc (never commit a token):\n' +
-      '#   //npm.pkg.github.com/:_authToken=<github token with read:packages>\n',
-  );
-}
-
 // The CMS's local-repository editing only opens a folder that holds a .git, so a site outside any repository gets its own.
 const inGitRepo = spawnSync('git', ['rev-parse', '--is-inside-work-tree'], { cwd: dest, stdio: 'ignore' }).status === 0;
 if (!inGitRepo) spawnSync('git', ['init', '-q'], { cwd: dest, stdio: 'ignore' });
@@ -98,27 +91,16 @@ const created = variant === 'demo'
   ? 'the Wren & Sorrel demo: a garden studio with sample pages, photos, services, testimonials and FAQs'
   : 'a blank site: a home page, a contact page with its form, and placeholder text to replace';
 const editHint = variant === 'demo'
-  ? 'Then explore /admin, or start over with a blank site: create-stomme <directory> --blank'
+  ? 'Then explore /admin, or start over with a blank site: pnpm create stomme <directory> --blank'
   : 'Then open /admin to write your own pages, and recolor src/content/theme/theme.md.';
 
-console.log(fromCheckout
-  ? `\n✓ Created ${arg} as ${created}.
+const linked = fromCheckout ? '\nThe engine is linked to this checkout, so nothing is fetched from a registry.\n' : '';
 
-The engine is linked to this checkout, so nothing is fetched from a registry.
-
+console.log(`\n✓ Created ${arg} as ${created}.
+${linked}
 Next:
   cd ${arg}
   pnpm install
   pnpm dev         # site on :4321, CMS on /admin
-
-${editHint}\n`
-  : `\n✓ Created ${arg} as ${created}.
-
-Next:
-  1. Add a GitHub token (read:packages) to your user ~/.npmrc:
-       //npm.pkg.github.com/:_authToken=<token>
-  2. cd ${arg}
-     pnpm install
-     pnpm dev       # site on :4321, CMS on /admin
 
 ${editHint}\n`);

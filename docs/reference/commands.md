@@ -1,28 +1,59 @@
 # Commands
 
-Every script in a site's `package.json`, the scaffolder that creates a site, and the command-line tools the engine package ships.
+The `stomme` command a site runs, the scripts in a site's `package.json`, the scaffolder that creates a site, and the tools behind them.
+
+## `stomme`
+
+Inside a site, run it through pnpm as `pnpm stomme <command>`. After `npm i -g stomme` it runs as `stomme <command>` anywhere, which is how `stomme new` creates a site outside one. With no command, or with `--help`, it lists every command; `stomme help <command>` and `<command> --help` print one.
+
+| Command | What it does |
+|---|---|
+| `stomme new <directory> [--blank \| --demo]` | creates a site, the same as `pnpm create stomme`; see [`create-stomme`](#create-stomme-directory) |
+| `stomme dev` | runs the site's `scripts/dev.mjs` with the options given: the site on `http://localhost:4321`, the CMS at `/admin`, the live preview at `/preview` and every block at `/lookbook`. A site without that script gets `stomme cms`, then `astro dev` |
+| `stomme build [--target <target>]` | `stomme cms`, then `astro build`. `--target` (also `--target=<target>` or `-t <target>`) sets `STOMME_TARGET` to `netlify`, `static`, `cloudflare`, `vercel` or `node`; without it the site's own default applies, `netlify` in a new site. Other options go to `astro build` |
+| `stomme cms` | regenerates the CMS from the catalog and the site config; see [`stomme-gen`](#stomme-gen) |
+| `stomme block new <name>` | scaffolds `src/blocks/<Name>.astro`; see [`stomme-new-block`](#stomme-new-block-name) |
+| `stomme lint [content]` | checks the blocks in `src/content/` against the catalog; see [`stomme-lint-content`](#stomme-lint-content) |
+| `stomme lint styles` | runs `stomme-lint-styles` on the engine's own stylesheet |
+| `stomme lint comments [dir]` | runs `stomme-lint-comments` |
+| `stomme --version` | prints the engine version |
+
+An unknown command, target or option of `stomme` itself exits with `2` and the usage; otherwise the exit code is that of the step that failed.
+
+Each command runs a tool that also ships under its own name, so a script or a site that calls the older names keeps working:
+
+| Older name | Same as |
+|---|---|
+| `stomme-gen` | `stomme cms` |
+| `stomme-new-block <Name>` | `stomme block new <Name>` |
+| `stomme-lint-content` | `stomme lint content` |
+| `stomme-lint-styles` | `stomme lint styles` |
+| `stomme-lint-comments` | `stomme lint comments` |
+| `create-stomme <directory>` | `stomme new <directory>` |
 
 ## Site scripts
 
 | Script | What it runs |
 |---|---|
-| `pnpm dev` | `stomme-gen`, clears Astro's content cache, then `astro dev`: the site on `http://localhost:4321`, the CMS at `/admin`, the live preview at `/preview` and every block at `/lookbook` |
+| `pnpm dev` | `node scripts/dev.mjs`: `stomme-gen`, clears Astro's content cache, then `astro dev` with the options given |
 | `pnpm dev:web` | `astro dev` alone, without regenerating the CMS |
-| `pnpm build` | `stomme-gen` then `astro build`, for Netlify |
-| `pnpm build:cloudflare` | the build for Cloudflare Workers |
-| `pnpm build:vercel` | the build for Vercel; needs `@astrojs/vercel` |
-| `pnpm build:node` | the build for a standalone Node server; needs `@astrojs/node` |
-| `pnpm build:static` | a fully static build with no adapter |
+| `pnpm build` | `stomme build`, for Netlify |
+| `pnpm build:cloudflare` | `stomme build --target cloudflare`, for Cloudflare Workers |
+| `pnpm build:vercel` | `stomme build --target vercel`; needs `@astrojs/vercel` |
+| `pnpm build:node` | `stomme build --target node`, a standalone Node server; needs `@astrojs/node` |
+| `pnpm build:static` | `stomme build --target static`, a fully static build with no adapter |
 | `pnpm preview` | `pnpm build:static`, then `astro preview` of that build on `http://localhost:4321`: every page, without the server routes such as `/api/contact` |
-| `pnpm cms:gen` | `stomme-gen`, regenerates the CMS from the catalog and the site config |
-| `pnpm block:new <Name>` | `stomme-new-block`, scaffolds `src/blocks/<Name>.astro` |
-| `pnpm lint:content` | `stomme-lint-content`, checks the blocks in `src/content/` against the catalog |
+| `pnpm cms:gen` | `stomme cms` |
+| `pnpm block:new <Name>` | `stomme block new <Name>` |
+| `pnpm lint:content` | `stomme lint content` |
 
-Each `build:*` script sets `STOMME_TARGET` and runs `pnpm build`. See [Deploy a site](../how-to/deploy.md).
+A host builds with `pnpm build`, or the `build:*` script for its target. See [Deploy a site](../how-to/deploy.md).
 
 ## `create-stomme <directory>`
 
-Scaffolds a new site into `<directory>`, which must not exist yet. From a clone of stomme it runs as `node stomme/packages/create-stomme/bin/create.mjs <directory>` and links the site to the engine in the clone.
+Scaffolds a new site into `<directory>`, which must not exist yet. Run it as `pnpm create stomme <directory>`, `pnpm dlx create-stomme <directory>` or `stomme new <directory>`.
+
+A site made this way depends on the engine from the npm registry, `"@gronare/stomme": "npm:stomme@^<version>"`: the package is published as `stomme` and installed under the name every import uses, so no token or registry setting is needed. From a clone of stomme it runs as `node stomme/packages/create-stomme/bin/create.mjs <directory>` and links the site to the engine in the clone instead, for working on the engine.
 
 | Option | What it makes |
 |---|---|
@@ -33,7 +64,7 @@ It refuses both options at once, and any other option. With neither option it as
 
 ## `stomme-gen`
 
-Rewrites the regions of `public/admin/config.yml` between its `# >>> <name>:generated` and `# <<< <name>:generated` markers. The names it fills are `blocks` (every block the site offers), `collections` (the collection editors), `settings`, `cms` (the backend), `navlinks`, `footerlinks`, `thanksbuttons` and `tracking`. Outside the markers it also sets `media_folder` and `public_folder` and each collection's media folders, adds `media_libraries`, `output.omit_empty_optional_fields` and the rich-text `editor_components` when they are missing, and translates the field labels into `cmsLocale`.
+`stomme cms`. Rewrites the regions of `public/admin/config.yml` between its `# >>> <name>:generated` and `# <<< <name>:generated` markers. The names it fills are `blocks` (every block the site offers), `collections` (the collection editors), `settings`, `cms` (the backend), `navlinks`, `footerlinks`, `thanksbuttons` and `tracking`. Outside the markers it also sets `media_folder` and `public_folder` and each collection's media folders, adds `media_libraries`, `output.omit_empty_optional_fields` and the rich-text `editor_components` when they are missing, and translates the field labels into `cmsLocale`.
 
 It writes these files, each one replaced on every run:
 
@@ -62,11 +93,11 @@ Text outside the markers is yours and stays. Run with no `public/admin/config.ym
 
 ## `stomme-new-block <Name>`
 
-Creates `src/blocks/<Name>.astro` with a heading prop and prints the two registrations it needs. The file name is the name in PascalCase and the type the same in camelCase, with anything other than letters and digits taken as a word break: `PromoBanner`, `promo banner` and `promo-banner` all make `PromoBanner.astro` with the type `promoBanner`. The name must start with a letter, and a `--` before it is ignored. It refuses to overwrite a file.
+`stomme block new <Name>`. Creates `src/blocks/<Name>.astro` with a heading prop and prints the two registrations it needs. The file name is the name in PascalCase and the type the same in camelCase, with anything other than letters and digits taken as a word break: `PromoBanner`, `promo banner` and `promo-banner` all make `PromoBanner.astro` with the type `promoBanner`. The name must start with a letter, and a `--` before it is ignored. It refuses to overwrite a file.
 
 ## `stomme-lint-content`
 
-Reads the `blocks:` list of every `src/content/**/*.md` against the site's catalog, `src/blocks/schema.ts` plus the blocks of `STOMME_SLOTS_DIR`, and prints by file, line and block:
+`stomme lint content`. Reads the `blocks:` list of every `src/content/**/*.md` against the site's catalog, `src/blocks/schema.ts` plus the blocks of `STOMME_SLOTS_DIR`, and prints by file, line and block:
 
 | Finding | When |
 |---|---|

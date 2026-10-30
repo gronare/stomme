@@ -90,4 +90,4 @@ A theme directory holds a `theme.css` (the component layer) and, optionally, `to
 
 3. Read the build log: `style "my-theme" verified in emitted CSS` confirms the theme reached the output.
 
-A named theme with no `STOMME_THEMES_DIR`, or no `theme.css`, stops the build, so a site never ships unstyled. When `theme.md` does not exist yet, `pnpm cms:gen` copies `theme-seed.md` into its place.
+A named theme with no `STOMME_THEMES_DIR`, or no `theme.css`, stops the build, so a site never ships unstyled. When `theme.md` does not exist yet, `pnpm stomme cms` copies `theme-seed.md` into its place.

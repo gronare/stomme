@@ -13,7 +13,7 @@ const Pascal = raw
   .replace(/\s/g, '')
   .replace(/^(.)/, (_, c) => c.toUpperCase());
 if (!/^[A-Za-z]/.test(Pascal)) {
-  console.error('Usage: npx stomme-new-block <BlockName>   e.g. npx stomme-new-block PromoBanner');
+  console.error('Usage: stomme block new <BlockName>   e.g. stomme block new PromoBanner');
   process.exit(1);
 }
 const type = Pascal.charAt(0).toLowerCase() + Pascal.slice(1);
@@ -43,7 +43,7 @@ const { heading } = Astro.props;
 
 console.log(`✓ Created src/blocks/${Pascal}.astro
 
-Then register it (2 edits) and run \`stomme-gen\`:
+Then register it (2 edits) and run \`stomme cms\`:
 
   1) your BlockRenderer registry (src/blocks/BlockRenderer.astro)
        import ${Pascal} from './${Pascal}.astro';

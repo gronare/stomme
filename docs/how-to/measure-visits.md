@@ -40,7 +40,7 @@ The beacon reports only when the site is served through Cloudflare, so it suits 
    export const features: StommeFeatures = { tracking: true };
    ```
 
-2. Run `pnpm cms:gen`, then fill in the tag IDs and the privacy page in the CMS's tracking settings, or in `src/content/tracking/tracking.md`.
+2. Run `pnpm stomme cms`, then fill in the tag IDs and the privacy page in the CMS's tracking settings, or in `src/content/tracking/tracking.md`.
 
    ```yaml
    gtmId: GTM-XXXXXXX

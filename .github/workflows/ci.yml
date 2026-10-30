@@ -143,7 +143,7 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - name: scaffold both variants, install and build each
-        run: pnpm --filter @gronare/create-stomme test:scaffold
+        run: pnpm --filter create-stomme test:scaffold
 
   # The Sveltia DOM contract test is deliberately not per-PR: between version bumps the pinned DOM does not change, so it runs when the pin is bumped instead.
 
@@ -160,6 +160,7 @@ jobs:
         run: |
           node --check packages/stomme/bin/gen-admin-blocks.mjs
           node --check packages/stomme/bin/new-block.mjs
+          node --check packages/stomme/bin/stomme.mjs
           node --check packages/stomme/integration.mjs
           node --check packages/stomme/admin/previews.js
           node --check packages/stomme/test/smoke-preview-workerd.mjs

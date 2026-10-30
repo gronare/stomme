@@ -18,7 +18,7 @@ Add a collection shaped to its purpose, such as a news feed, a for-sale catalog 
 2. Run the generator.
 
    ```bash
-   pnpm cms:gen
+   pnpm stomme cms
    ```
 
    It prints `seeded editable listing index: src/content/pages/for-sale.md (boats)` for each listing whose index page does not exist yet.

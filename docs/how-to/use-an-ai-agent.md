@@ -18,8 +18,8 @@ Hand the agent `llms.txt` first and let it fetch the pages it needs, or `llms-fu
 A prompt as short as this one is enough to start:
 
 ```text
-Read https://example.com/docs/llms.txt, then set up a stomme site in this folder.
-Write pages as blocks in src/content/pages/*.md and run pnpm lint:content before you finish.
+Read https://example.com/docs/llms.txt, then create a stomme site with pnpm create stomme my-site --blank.
+Write pages as blocks in src/content/pages/*.md and run pnpm stomme lint before you finish.
 ```
 
 ## Tell it the field rule
@@ -31,7 +31,7 @@ So the agent writes out each switch it wants on and uses only the fields the cat
 ## Let it check its own work
 
 ```bash
-pnpm lint:content --strict
+pnpm stomme lint --strict
 ```
 
 It exits with `1` while any page uses a field the block does not have, an older field that has moved, or a block type the site does not have. The report names the file, the line, the block and the field, which is enough for an agent to correct the page and run it again. `--json` gives the same report as data. See [Write pages by hand or with an agent](write-pages-by-hand.md).

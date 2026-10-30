@@ -29,7 +29,7 @@ Only the home page, the editable pages and addon routes get a copy per language.
 
 An addon route with no `feature`, a `pattern` that does not start with `/`, or an `entrypoint` file that does not exist is skipped, and the build log warns about it.
 
-The site's own pages, `/`, `/<slug>` for each published page, and `/thanks`, come from the starter's `src/pages/`. `/admin/` and `/admin/blocks.html` are static files under `public/admin/`: `pnpm cms:gen` keeps `index.html` up to date and writes `blocks.html`, the gallery of the blocks the CMS offers.
+The site's own pages, `/`, `/<slug>` for each published page, and `/thanks`, come from the starter's `src/pages/`. `/admin/` and `/admin/blocks.html` are static files under `public/admin/`: `pnpm stomme cms` keeps `index.html` up to date and writes `blocks.html`, the gallery of the blocks the CMS offers.
 
 ## Built into every page
 

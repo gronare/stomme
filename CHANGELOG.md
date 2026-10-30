@@ -7,6 +7,19 @@ frontmatter means disabled/not shown (see `src/kit.ts`).
 
 ## Unreleased
 
+- One `stomme` command runs a site: `stomme dev`, `stomme build [--target static|netlify|cloudflare|vercel|node]`
+  (sets `STOMME_TARGET`), `stomme cms`, `stomme block new <name>`, `stomme lint [content|styles|comments]`
+  and `stomme new <directory>`; `stomme --help` lists them. Inside a site it runs as `pnpm stomme …`.
+  `stomme-gen`, `stomme-new-block`, `stomme-lint-content`, `stomme-lint-styles` and
+  `stomme-lint-comments` stay as they are, so a site's existing scripts need no change. The starter's
+  scripts now call `stomme`, and `scripts/dev.mjs` passes its options to `astro dev`.
+- The engine is published to npmjs as `stomme` and the scaffolder as `create-stomme`, so
+  `pnpm create stomme my-site` creates a site with no clone and no token. A site made that way
+  depends on `"@gronare/stomme": "npm:stomme@^<version>"`, so every import keeps the
+  `@gronare/stomme` name. A site that links the engine from a checkout keeps building unchanged.
+  One that wants the npm package instead replaces its `link:` dependency with that range; its
+  `@gronare:registry` line in `.npmrc` is then unused. The scaffolder no longer writes that
+  `.npmrc`, and a scaffold from the registry keeps its `.gitignore`.
 - Twelve switches now start off in the CMS: `postList` `media.showImages` and `layout.featured`,
   `catalogList` `media.showImages` and `layout.filters`, `subpages` `media.showImages`,
   `documentList` `layout.grouped`, `showPhone` and `showDirectContact` on `contactForm` and on each

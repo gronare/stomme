@@ -5,7 +5,7 @@ Write your own block component, register it beside the library's blocks, and giv
 1. Scaffold the component. The name becomes the file `src/blocks/PromoBanner.astro` and the block type `promoBanner`.
 
    ```bash
-   pnpm block:new PromoBanner
+   pnpm stomme block new promo-banner
    ```
 
    Build its markup with the library's classes (`.section`, `.display`, `.card`, …) or a scoped `<style>`, and colour it with the theme's CSS variables. [Styles](../reference/styles.md) shows each class and variable.
@@ -51,7 +51,7 @@ Write your own block component, register it beside the library's blocks, and giv
 5. Regenerate the CMS.
 
    ```bash
-   pnpm cms:gen
+   pnpm stomme cms
    ```
 
    The output lists `promoBanner` under the custom blocks, and **Promo banner** appears in the CMS's section picker.
@@ -75,6 +75,6 @@ const props = Astro.props;
   : <EngineHero {...props} />}
 ```
 
-Register it in the wrapper as `registry={{ hero: Hero }}`. A new value such as `diagram` renders from content right away. To offer it in the CMS, add it to the hero's `media.kind` options in `src/blocks/schema.ts` and run `pnpm cms:gen`.
+Register it in the wrapper as `registry={{ hero: Hero }}`. A new value such as `diagram` renders from content right away. To offer it in the CMS, add it to the hero's `media.kind` options in `src/blocks/schema.ts` and run `pnpm stomme cms`.
 
 Import engine files by their published names, such as `@gronare/stomme/Header.astro` and `@gronare/stomme/blocks/Hero.astro`. Other paths inside the package are not stable.

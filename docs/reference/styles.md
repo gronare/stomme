@@ -145,7 +145,7 @@ The theme writes these variables on `<html>`, so a block that uses them follows 
 ```html preview
 <p style="font-family: var(--font-display); font-size: 1.6rem; font-weight: 800; margin: 0">Display: Gardens that get better</p>
 <p style="font-family: var(--font-sans); margin: 0.5rem 0 0">Sans: We design, build and look after gardens for homes across the valley.</p>
-<p style="font-family: var(--font-mono); margin: 0.5rem 0 0">Mono: pnpm block:new PromoBanner</p>
+<p style="font-family: var(--font-mono); margin: 0.5rem 0 0">Mono: pnpm stomme block new promo-banner</p>
 ```
 
 ## Safe areas

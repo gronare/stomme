@@ -11,14 +11,18 @@ A block-based site engine for Astro, for developers who build sites that other p
 You need Node.js 22.19 or later, pnpm 11 and git.
 
 ```bash
-git clone https://github.com/gronare/stomme.git && pnpm -C stomme install
-node stomme/packages/create-stomme/bin/create.mjs my-site
+pnpm create stomme my-site
 cd my-site && pnpm install && pnpm dev
 ```
 
-The scaffolder asks whether to start from a blank site or the Wren & Sorrel demo, a finished site for a fictional garden studio to explore. `--blank` or `--demo` after the directory skips the question, and without a terminal it makes the blank site.
+The scaffolder asks whether to start from a blank site or the Wren & Sorrel demo, a finished site for a fictional garden studio to explore. `--blank` or `--demo` after the directory skips the question, and without a terminal it makes the blank site. The site installs the engine from the npm registry. With `npm i -g stomme`, `stomme new my-site` does the same.
 
 The site runs at `http://localhost:4321` and every block with sample content at `/lookbook`. The CMS at `/admin` edits the files on disk in Chrome or Edge. Name your GitHub repository in `site.cms` to edit through GitHub instead. [Your first site](docs/tutorial.md) takes it from here to a page edited in the CMS and built.
+
+To work on the engine itself, clone the repository, run `pnpm install` in it and scaffold with `node stomme/packages/create-stomme/bin/create.mjs my-site`, which links the site to the clone.
+
+Inside a site, `pnpm stomme` lists the commands: `dev`, `build --target static`, `cms`, `block new` and `lint`. See [Commands](docs/reference/commands.md).
+
 
 ## Usage
 
@@ -43,7 +47,7 @@ blocks:
 ## What you get
 
 - **42 blocks, styled and themeable.** Heroes, cards, pricing, galleries, FAQs, forms, maps, timelines and more. Recolour with tokens in `theme.md`, no CSS framework.
-- **A CMS generated from your block catalog.** `pnpm cms:gen` writes the Sveltia CMS config, and the preview renders the real components, not a copy.
+- **A CMS generated from your block catalog.** `pnpm stomme cms` writes the Sveltia CMS config, and the preview renders the real components, not a copy.
 - **Static by default.** Pages prerender. On an adapter build, only the live preview and the contact form's handler run on demand.
 - **Deploys anywhere.** One build script each for Netlify, Cloudflare Workers, Vercel, a Node server or plain static hosting.
 - **Optional features behind flags.** A blog with a calendar feed, services, service areas, testimonials, documents, listings (news, a for-sale catalog) and a docs section built from a repo.

@@ -1,5 +1,5 @@
 {
-  "name": "@gronare/create-stomme",
+  "name": "create-stomme",
   "version": "0.1.30",
   "description": "Scaffold a new stomme site: a blank site, or the Wren & Sorrel demo.",
   "type": "module",

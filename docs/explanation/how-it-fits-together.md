@@ -14,7 +14,7 @@ The renderer also does the work no block should repeat: it wraps each block in i
 
 ## The CMS is generated, not written
 
-`stomme-gen` reads the catalog, the site config and the content folders, and writes the Sveltia CMS config between markers in `public/admin/config.yml`. It offers a block only while its collection or feature is on, fills link pickers from the pages that exist, and translates field labels for `cmsLocale`. Text outside the markers stays yours. Because it runs on every `pnpm dev` and `pnpm build`, the CMS never drifts from the catalog.
+`stomme cms` reads the catalog, the site config and the content folders, and writes the Sveltia CMS config between markers in `public/admin/config.yml`. It offers a block only while its collection or feature is on, fills link pickers from the pages that exist, and translates field labels for `cmsLocale`. Text outside the markers stays yours. Because it runs on every `pnpm dev` and `pnpm build`, the CMS never drifts from the catalog.
 
 ## The preview renders the real components
 

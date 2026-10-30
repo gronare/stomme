@@ -24,10 +24,10 @@ blocks:
 ## Check the files
 
 ```bash
-pnpm lint:content
+pnpm stomme lint
 ```
 
-It reads every `src/content/**/*.md` against the site's catalog, the one `stomme-gen` builds the CMS from, and lists by file, line and block:
+It reads every `src/content/**/*.md` against the site's catalog, the one `stomme cms` builds the CMS from, and lists by file, line and block:
 
 - each field the catalog does not declare for that block, which the CMS does not show;
 - each older field that still renders but has moved, such as a flat `ctaLabel` that belongs in `cta`;

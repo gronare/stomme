@@ -11,7 +11,7 @@ Serve pages in more than one language, each under its own prefix, with hreflang 
    };
    ```
 
-2. Run `pnpm cms:gen`. The CMS editors for the home page, pages, navigation, FAQ and footer get a version per language.
+2. Run `pnpm stomme cms`. The CMS editors for the home page, pages, navigation, FAQ and footer get a version per language.
 3. Translate a page as a sibling file with the language before `.md`, and give it its own address with `url` if you want one.
 
    ```yaml

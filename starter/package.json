@@ -6,15 +6,15 @@
   "scripts": {
     "dev": "node scripts/dev.mjs",
     "dev:web": "astro dev",
-    "build": "stomme-gen && astro build",
+    "build": "stomme build",
     "preview": "pnpm run build:static && STOMME_TARGET=static astro preview",
-    "cms:gen": "stomme-gen",
-    "block:new": "stomme-new-block",
-    "lint:content": "stomme-lint-content",
-    "build:static": "STOMME_TARGET=static pnpm run build",
-    "build:cloudflare": "STOMME_TARGET=cloudflare pnpm run build",
-    "build:vercel": "STOMME_TARGET=vercel pnpm run build",
-    "build:node": "STOMME_TARGET=node pnpm run build"
+    "cms:gen": "stomme cms",
+    "block:new": "stomme block new",
+    "lint:content": "stomme lint content",
+    "build:static": "stomme build --target static",
+    "build:cloudflare": "stomme build --target cloudflare",
+    "build:vercel": "stomme build --target vercel",
+    "build:node": "stomme build --target node"
   },
   "dependencies": {
     "@astrojs/netlify": "^8.2.3",

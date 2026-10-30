@@ -14,7 +14,7 @@ Switch on a blog, services, service areas, testimonials, an FAQ or documents, ea
 2. Run the generator, or restart `pnpm dev`, which runs it.
 
    ```bash
-   pnpm cms:gen
+   pnpm stomme cms
    ```
 
 3. Add entries in the CMS, or as Markdown files under `src/content/<collection>/`.

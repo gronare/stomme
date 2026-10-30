@@ -2,7 +2,7 @@
 
 Every key `src/site.config.ts` exports: `site` (a `SiteConfig`), `features` (a `StommeFeatures`) and `listings` (a `Listing[]`), all typed by `@gronare/stomme/config`.
 
-`astro.config.mjs` passes them to the integration, `cms:gen` reads the file for the CMS, and the pages pass `site` and `features` to the block renderer. A key left out takes its default, so a site sets only what differs.
+`astro.config.mjs` passes them to the integration, `stomme cms` reads the file for the CMS, and the pages pass `site` and `features` to the block renderer. A key left out takes its default, so a site sets only what differs.
 
 ## `site`
 
@@ -18,7 +18,7 @@ Every key `src/site.config.ts` exports: `site` (a `SiteConfig`), `features` (a `
 | `locale` | `en-US` | the site's language and region; formats dates and picks the built-in interface text (English, Swedish or Norwegian); left unset, the interface text follows `cmsLocale` and dates format as `en-US` |
 | `locales` | none | the content languages, default first; fewer than two turns translation off, see [Translate a site](../how-to/translate-a-site.md) |
 | `localeTags` | none | the `lang` and hreflang tag per language, for example `{ sv: 'sv-SE' }` |
-| `cmsLocale` | `en` | the CMS's field labels, `en` or `sv`; rerun `pnpm cms:gen` after changing it |
+| `cmsLocale` | `en` | the CMS's field labels, `en` or `sv`; rerun `pnpm stomme cms` after changing it |
 | `strings` | the built-in text for `locale` | your own wording for any interface text, see [Strings](#strings) |
 | `noindex` | none | path prefixes marked `noindex, nofollow`, such as `['/drafts']` |
 | `style` | none | a theme directory under `STOMME_THEMES_DIR`, see [Theme a site](../how-to/theme-a-site.md#use-a-theme-directory) |
@@ -33,7 +33,7 @@ Every key `src/site.config.ts` exports: `site` (a `SiteConfig`), `features` (a `
 
 ### `cms`
 
-Written into the `backend` of `public/admin/config.yml` by `cms:gen`.
+Written into the `backend` of `public/admin/config.yml` by `stomme cms`.
 
 | Key | Default | What it does |
 |---|---|---|

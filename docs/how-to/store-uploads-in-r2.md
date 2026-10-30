@@ -19,7 +19,7 @@ By default the CMS commits uploads under `public/media/`, and the build optimise
    };
    ```
 
-3. Run `pnpm cms:gen`. The CMS config gets a Cloudflare R2 media library.
+3. Run `pnpm stomme cms`. The CMS config gets a Cloudflare R2 media library.
 4. Upload an image in the CMS. The CMS asks once for the secret access key and keeps it in your browser, never in the repository, and the image's address starts with `publicUrl`.
 
 | Key | What it sets |
@@ -30,4 +30,4 @@ By default the CMS commits uploads under `public/media/`, and the build optimise
 | `jurisdiction` | `default`, `eu` or `fedramp` |
 | `maxFileSize` | the largest upload in bytes, refused in the browser; works with either storage |
 
-A missing required key or an unknown `storage` stops `cms:gen` and the build with a message that names it.
+A missing required key or an unknown `storage` stops `stomme cms` and the build with a message that names it.

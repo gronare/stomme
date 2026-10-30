@@ -8,7 +8,7 @@ spawnSync('npx', ['stomme-gen'], { stdio: 'inherit' });
 rmSync(resolve(process.cwd(), '.astro'), { recursive: true, force: true });
 rmSync(resolve(process.cwd(), 'node_modules/.astro'), { recursive: true, force: true });
 
-const astro = spawn('npx', ['astro', 'dev'], { stdio: 'inherit' });
+const astro = spawn('npx', ['astro', 'dev', ...process.argv.slice(2)], { stdio: 'inherit' });
 
 let exiting = false;
 const shutdown = () => {
