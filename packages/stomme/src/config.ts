@@ -37,7 +37,7 @@ export interface SiteConfig {
     documents?: { separator?: string; file?: string };
     sectionNav?: { label?: string };
     subpages?: { inSection?: string; moreInSection?: string };
-    post?: { back?: string };
+    post?: { back?: string; yearCount?: string; showingLatest?: string; archive?: string };
     town?: {
       eyebrow?: string;
       heading?: string;
@@ -46,6 +46,7 @@ export interface SiteConfig {
       problemsHeading?: string;
       districtsHeading?: string;
       caseHeading?: string;
+      fieldNote?: string;
       reasons?: { title: string; body: string }[];
       servicesHeading?: string;
       servicesCta?: string;
@@ -55,6 +56,9 @@ export interface SiteConfig {
     service?: { eyebrow?: string; quoteEyebrow?: string; quoteHeading?: string; cta?: string };
     listingStatus?: { available?: string; reserved?: string; sold?: string; all?: string };
     listingCta?: string;
+    thanks?: { eyebrow?: string; heading?: string; lead?: string; recapLabel?: string; talkLabel?: string; home?: string; to?: string; from?: string };
+    notFound?: { title?: string; heading?: string; lead?: string; home?: string };
+    consent?: { text?: string; accept?: string; decline?: string; more?: string; settings?: string };
     docs?: Partial<DocsStrings>;
   };
   listings?: Listing[];

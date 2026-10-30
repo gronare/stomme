@@ -202,6 +202,37 @@ eq(resolveSite({ routes: { blog: '/news' } }).routes, { ...SITE_DEFAULTS.routes,
   'overriding one route keeps the other defaults');
 eq(resolveSite().routes, SITE_DEFAULTS.routes, 'no config resolves the default routes');
 
+// ── the strings type ────────────────────────────────────────────────────────
+const block = (text, from) => {
+  const open = text.indexOf('{', from);
+  let depth = 0;
+  for (let i = open; i < text.length; i++) {
+    if (text[i] === '{') depth++;
+    else if (text[i] === '}' && --depth === 0) return text.slice(open + 1, i);
+  }
+  return '';
+};
+const stringsType = block(source, source.indexOf('strings?:', source.indexOf('export interface SiteConfig')));
+const typedKeys = (body, key) => {
+  const re = new RegExp(`\\b${key}\\?:`, 'g');
+  for (let m; (m = re.exec(body));) {
+    const before = body.slice(0, m.index);
+    if ((before.match(/{/g) || []).length === (before.match(/}/g) || []).length) return body.slice(m.index);
+  }
+  return null;
+};
+const untyped = [];
+for (const [key, value] of Object.entries(SITE_DEFAULTS.strings)) {
+  if (key === 'docs') continue;
+  const rest = typedKeys(stringsType, key);
+  if (!rest) { untyped.push(key); continue; }
+  if (value && typeof value === 'object' && !Array.isArray(value)) {
+    const inner = block(rest, 0);
+    for (const sub of Object.keys(value)) if (!new RegExp(`\\b${sub}\\?:`).test(inner)) untyped.push(`${key}.${sub}`);
+  }
+}
+eq(untyped, [], 'every default string a site can override is declared on SiteConfig.strings, so a TypeScript site can set it');
+
 // ── listing status ──────────────────────────────────────────────────────────
 const svStrings = resolveSite({ locale: 'sv-SE', strings: { listingStatus: { available: 'Till salu', sold: 'Genomförd' } } }).strings;
 eq(LISTING_STATUS_KEYS, ['available', 'reserved', 'sold'], 'the three listing states are fixed');
