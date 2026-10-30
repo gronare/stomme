@@ -178,6 +178,12 @@ const readCmsKeys = new Set([...`${pane}\n${gen}`.matchAll(/\b(?:c|CMS)\s*&&\s*C
 const untyped = [...readCmsKeys].filter((k) => !typedCmsKeys.has(k));
 check(readCmsKeys.size >= 8 && untyped.length === 0, `every site.cms key the generator reads is in the SiteConfig type (${readCmsKeys.size} keys)`, `missing from the type: ${untyped.join(', ')}`);
 
+const optionsType = read('integration.d.ts').match(/interface StommeIntegrationOptions \{([\s\S]*?)\n\}/)?.[1] ?? '';
+const typedOptions = new Set([...optionsType.matchAll(/^\s{2}([a-zA-Z]+)\?:/gm)].map((m) => m[1]));
+const readOptions = new Set([...read('integration.mjs').matchAll(/\boptions\.([a-zA-Z]+)/g)].map((m) => m[1]));
+const untypedOptions = [...readOptions].filter((k) => !typedOptions.has(k));
+check(readOptions.size >= 5 && untypedOptions.length === 0, `every integration option the code reads is in StommeIntegrationOptions (${readOptions.size} options)`, `missing from the type: ${untypedOptions.join(', ')}`);
+
 const failed = results.filter((ok) => !ok).length;
 console.log(`\n${results.length - failed}/${results.length} cross-file contracts hold`);
 if (failed) { console.error('\n✗ cross-file contracts FAILED'); process.exit(1); }
