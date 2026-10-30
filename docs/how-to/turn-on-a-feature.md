@@ -33,6 +33,12 @@ Switch on a blog, services, service areas, testimonials, an FAQ or documents, ea
 
 A flag left out is off, so a feature added to the engine stays off until you turn it on. Two flags are on unless you set them to `false`: `pages`, the editable pages, and `contactForm`, the contact form blocks.
 
+- `blog` off still leaves `postList`, `postArchive` and `eventList` in the CMS when the site has an `article` [listing](add-a-listing.md).
+- `tracking` on loads the marketing tags and the consent banner only once an ID is set in the tracking settings.
+- `pages: false` hides the pages editor and the `subpages` block.
+- `contactForm: false` leaves both contact blocks out of every rendered page, while the CMS still offers them.
+- With no `features` export at all, the CMS turns an editor on when its folder exists under `src/content/`, and the integration injects no feature routes.
+
 The route prefixes come from `routes` in the site config, defaulting to `/blog`, `/services` and `/areas`. Every collection is defined whether its flag is on or not, so a flag never breaks a build. [Site config](../reference/site-config.md) has every key.
 
 ## Publish events from the blog
@@ -48,4 +54,4 @@ eventTime: "10:00"
 excerpt: Come and see the workshop.
 ```
 
-`postList` shows its event date in place of the publish date, `eventList` lists it while it is upcoming, and `/blog/calendar.ics` carries it as a `VEVENT` a reader can subscribe to from a calendar app.
+Its own page shows the event date and time, `eventList` lists it while it is upcoming, and `/blog/calendar.ics` carries it as a `VEVENT` a reader can subscribe to from a calendar app.
