@@ -1,0 +1,46 @@
+name: Publish
+
+on:
+  push:
+    branches: [release]
+  workflow_dispatch:
+
+concurrency:
+  group: publish
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  npm:
+    name: publish stomme + create-stomme to npmjs
+    if: github.ref == 'refs/heads/release'
+    # npm trusted publishing accepts GitHub-hosted runners only.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+          package-manager-cache: false
+      # Trusted publishing needs npm 11.5.1 or later.
+      - run: npm install -g npm@11
+      # The workspace name stays @gronare/stomme because every import and filter uses it; npmjs carries it as stomme.
+      - name: name the engine stomme
+        working-directory: packages/stomme
+        run: npm pkg set name=stomme
+      - name: publish each new version
+        run: |
+          for dir in packages/stomme packages/create-stomme; do
+            name=$(node -p "require('./$dir/package.json').name")
+            version=$(node -p "require('./$dir/package.json').version")
+            if ! out=$(npm view "$name" name 2>&1); then
+              if echo "$out" | grep -q E404; then echo "::notice::$name is not on npmjs yet; publish its first version by hand, then add this workflow as its trusted publisher"; continue; fi
+              echo "$out"; exit 1
+            fi
+            if [ -n "$(npm view "$name@$version" version)" ]; then echo "$name@$version is already on npmjs"; continue; fi
+            (cd "$dir" && npm publish --provenance --access public)
+          done
