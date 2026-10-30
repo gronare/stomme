@@ -1,6 +1,6 @@
 {
   "name": "@gronare/stomme",
-  "version": "0.1.79",
+  "version": "0.2.0",
   "description": "Block-CMS engine for Astro + Sveltia CMS \u2014 types, helpers, runtime components, tooling.",
   "type": "module",
   "repository": {

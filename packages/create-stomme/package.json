@@ -1,6 +1,6 @@
 {
   "name": "create-stomme",
-  "version": "0.1.30",
+  "version": "0.2.0",
   "description": "Scaffold a new stomme site: a blank site, or the Wren & Sorrel demo.",
   "type": "module",
   "repository": {

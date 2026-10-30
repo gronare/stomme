@@ -5,7 +5,7 @@ Engine changes that affect consuming sites. Sites follow the `release` branch
 taking a new release. Field policy: new fields are opt-in — absent from the
 frontmatter means disabled/not shown (see `src/kit.ts`).
 
-## Unreleased
+## 0.2.0 — 2026-10-30
 
 - **Breaking:** the engine no longer loads theme directories. `site.style`,
   `STOMME_STYLE` and `STOMME_THEMES_DIR` are gone, and a site that still sets `style`
