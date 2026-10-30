@@ -34,7 +34,7 @@ The default language has no prefix. Every page also answers under each other pre
 | `locale` | the site's language and region (BCP 47). It formats dates and numbers and picks the built-in interface text: English, Swedish and Norwegian (`no`, `nb`, `nn`) ship, any other language falls back to English |
 | `locales` | the content languages, default first |
 | `localeTags` | the `lang` and hreflang tag per language, when it should differ from the code in `locales`, for example `{ sv: 'sv-SE' }` |
-| `strings` | your own wording for the interface text, written in the default language |
+| `strings` | your own wording for the interface text, written in the default language. On every other language the site's `strings` are dropped and that language's built-in text is used, so the default language is the only one they reword |
 | `cmsLocale` | the language of the CMS's field labels: `en` or `sv`. Nothing on the public site |
 
 The switcher in the header shows a globe or flags, set by `languageSwitcher` in the site settings.
