@@ -40,12 +40,15 @@ ${emitWidget(8, on('home'))}`,
   folder: "src/content/pages"
   create: true
   slug: "{{slug}}"${line('pages', 2, 'i18n: true')}
+  summary: ${q(`{{fields.published | ternary('{{fields.title}}', '{{fields.title}} · ${word('Unpublished').replace(/'/g, '’')}')}}`)}
+  view_filters:
+    - { name: unpublished, label: "Unpublished", field: published, ne: true }
   view_groups:
     groups:
       - { name: parent, label: "Parent page", field: parent }
   fields:
+    - { name: published, label: "Published", widget: boolean, default: false, required: false, hint: "Off: the page is not built, so its address shows the 404 page, and it is left out of automatic submenus, subpage lists and the sitemap. A menu link added by hand stays, so remove that too."${inline('pages', 'duplicate')} }
     - { name: title, label: "Title", widget: string${inline('pages', 'true')} }${pageUrlField()}
-    - { name: published, label: "Published", widget: boolean, default: true, required: false, hint: "Uncheck to hide the page — unpublished pages aren't built."${inline('pages', 'duplicate')} }
 ${pageParentField()}
     - { name: summary, label: "Short text", widget: text, required: false, hint: "Short text used on cards, in lists and in menus that show this page."${inline('pages', 'true')} }
     - { name: cover, label: "Card image", widget: image, required: false${inline('pages', 'duplicate')} }

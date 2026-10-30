@@ -49,9 +49,9 @@ You need Node.js 22.19 or later, pnpm 11, git, and Chrome or Edge for the CMS. T
 
 7. Open **Pages** and create a new page. Fill in:
 
+   - **Published**: on. The switch is the first field of the form, and a new page starts with it off.
    - **Title**: `Pricing`
    - **SEO** › **SEO title**: `Pricing`, and **SEO description**: `What it costs.`
-   - **Published**: on
 
 8. Under **Sections**, add a **Page header** with the heading `Pricing`. The preview beside the form renders it with the real component as you type.
 

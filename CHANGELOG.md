@@ -22,8 +22,14 @@ frontmatter means disabled/not shown (see `src/kit.ts`).
   The theme's `secondary` starts at `#0ea5e9`, the colour the engine stylesheet renders without it. A site whose
   `public/admin/config.yml` has the `settings:generated` markers picks this up at its next
   `stomme-gen`; a site with hand-written settings panes keeps its own defaults until they are
-  edited. The page `published` switch still starts on: a page made in `/admin` is published, a
-  hand-written page without the key is not built.
+  edited.
+- A page made in `/admin` starts unpublished, as a page file without `published` is not built. The
+  **Published** switch is now the first field of the page form, with a hint saying what off does:
+  no page at the address, nothing in the sitemap, automatic submenus or `subpages` lists, while a
+  menu link written by hand stays. The pages list marks an unpublished page after its title and
+  has an **Unpublished** filter that includes pages without the key. Existing pages build as
+  before; an editor turns **Published** on before a new page goes live. Regenerate with
+  `stomme-gen` to get it.
 - `stomme-lint-content` (`pnpm lint:content` in the starter) checks every block in `src/content/`
   against the site's catalog: each field the catalog does not declare, each older field from
   `block-migrations.json` and each unknown block type, by file and line. `--json` prints the report

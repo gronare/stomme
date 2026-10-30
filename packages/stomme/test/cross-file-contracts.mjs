@@ -294,8 +294,6 @@ const PANE_ABSENT_AS_DEFAULT = {
   'settings og.types[].headlineField': [[ogPages, /HEADLINE_DEFAULT: Record<OgTypeKind, string> = \{ article: 'title', catalog: 'title', towns: 'name', services: 'title' \}/]],
   'settings og.types[].sublineField': [[ogPages, /SUBLINE_DEFAULT: Record<OgTypeKind, string> = \{ article: 'none', catalog: 'price', towns: 'none', services: 'none' \}/]],
 };
-// The one deliberate exception: a page made in the CMS starts published, while a hand-written file without the key stays unbuilt.
-const PANE_DEFAULT_DIFFERS = new Set(['pages published']);
 const paneFields = (fields, schema, collection, prefix = '') => (fields ?? []).flatMap((f) => {
   if (f.widget === 'list' && f.types) return [];
   const node = schema && childOf(schema, f.name);
@@ -317,7 +315,6 @@ for (const yaml of yamls) {
 }
 const paneDrift = [];
 for (const [key, { f, node }] of paneDefaults) {
-  if (PANE_DEFAULT_DIFFERS.has(key)) continue;
   const held = PANE_ABSENT_AS_DEFAULT[key];
   if (held) {
     const hits = held.map(([src, re]) => src.match(re)?.[0]);
@@ -331,8 +328,8 @@ for (const [key, { f, node }] of paneDefaults) {
 }
 check(paneDefaults.size >= 30, `the settings panes and collection editors declare ${paneDefaults.size} defaults`);
 check(paneDrift.length === 0, 'every settings-pane and collection-editor default is what the site renders with the key left out', paneDrift.join('\n    '));
-check(paneDefaults.get('pages published')?.f.default === true && absentOf(schemas.pages.shape.published)?.value === false,
-  'pages published stays the one allowed difference: the CMS starts a page published, a file without the key is not built');
+check(paneDefaults.get('pages published')?.f.default === false && absentOf(schemas.pages.shape.published)?.value === false,
+  'a page made in the CMS starts unpublished, as a file without the key is not built');
 
 const failed = results.filter((ok) => !ok).length;
 console.log(`\n${results.length - failed}/${results.length} cross-file contracts hold`);

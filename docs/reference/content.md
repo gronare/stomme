@@ -15,7 +15,9 @@ Every collection is defined whether its feature is on or not, and an empty folde
 | Collection | Folder | Fields |
 |---|---|---|
 | `home` | `home/home.md` | `seo`, `blocks` |
-| `pages` | `pages/<slug>.md` | `title`, `published` (`false` when absent; the CMS checks it for a new page), `parent`, `url`, `summary`, `cover`, `order`, `seo`, `blocks` |
+| `pages` | `pages/<slug>.md` | `title`, `published` (`false` when absent, and a page made in the CMS starts with it off), `parent`, `url`, `summary`, `cover`, `order`, `seo`, `blocks` |
+
+A page without `published: true` is not built: its address shows the 404 page, and it is left out of the sitemap, of a menu item's automatic submenu and of `subpages` lists, and none of its translations is built. A breadcrumb names it without a link, and the CMS preview still renders it. A menu link written by hand stays and leads to the 404 page. In `/admin` the **Published** switch is the first field of the page form, the pages list marks an unpublished page after its title, and the **Unpublished** filter lists them, pages without the key included.
 
 A page's address is its file name, nested under its `parent`: a page with `parent: /services` answers at `/services/<its slug>`, and gets breadcrumbs. `url` gives a translation its own slug. `summary` and `cover` show on `subpages` cards, and `order` sorts pages that share a parent.
 

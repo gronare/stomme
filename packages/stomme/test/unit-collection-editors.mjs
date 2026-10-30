@@ -4,6 +4,7 @@ import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { makeEmitters } from '../src/emit-fields.mjs';
 import { makeCollectionEditors } from '../src/collection-editors.mjs';
+import { parse as parseYaml } from 'yaml';
 
 const PKG = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const results = [];
@@ -83,7 +84,17 @@ check(/- \{ name: order, label: "Order", widget: number, required: false, defaul
 const pageFields = fieldNames(P.slice(P.indexOf('\n  fields:')));
 check(pageFields.indexOf('parent') > pageFields.indexOf('title') && pageFields.indexOf('order') < pageFields.indexOf('seo'),
   'the new fields sit after the title and before SEO', pageFields.join(', '));
+check(pageFields[0] === 'published', 'the published switch is the first field of the page form', pageFields.join(', '));
+const pagesDoc = parseYaml(P)[0];
+check(pagesDoc.fields[0].default === false, 'a page made in the CMS starts unpublished', JSON.stringify(pagesDoc.fields[0]));
+check(pagesDoc.view_filters?.some((f) => f.field === 'published' && f.ne === true && f.label === 'Unpublished'),
+  'the pages list filters to the unpublished pages, the ones without the key included', JSON.stringify(pagesDoc.view_filters));
+check(pagesDoc.summary === "{{fields.published | ternary('{{fields.title}}', '{{fields.title}} · Unpublished')}}",
+  'the pages list marks an unpublished page after its title', pagesDoc.summary);
+const svPages = parseYaml(makeCollectionEditors({ q, emitField: E.emitField, emitWidget: E.emitWidget, buttonField: E.buttonField, word: (en) => (en === 'Unpublished' ? "Opublicerad's" : en) }).COLLECTION_EDITORS.pages)[0];
+check(svPages.summary.endsWith("· Opublicerad’s')}}"), 'the list marker is in the CMS language, and a quote in it cannot end the ternary', svPages.summary);
 const localizedPages = makeCollectionEditors({ q, emitField: E.emitField, emitWidget: E.emitWidget, buttonField: E.buttonField, localized: (n) => n === 'pages' }).COLLECTION_EDITORS.pages;
+check(/name: published[^}]*i18n: duplicate/.test(localizedPages), 'published is one setting for every language');
 check(/name: parent[\s\S]*?\n {6}i18n: duplicate\n/.test(localizedPages) && /name: cover[^}]*i18n: duplicate/.test(localizedPages) && /name: order[^}]*i18n: duplicate/.test(localizedPages),
   'the parent, the card image and the order are one setting for every language',
   block(localizedPages, /^ {4}- name: parent$/));

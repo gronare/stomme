@@ -516,7 +516,7 @@ check(/^- name: home\n  label: "Home page"\n  i18n: true\n/.test(onEditors.COLLE
 check(onEditors.COLLECTION_EDITORS.home.includes('file: "src/content/home/home.{{locale}}.md"'), "home's file path carries the locale placeholder");
 check(/\n      i18n: true\n      fields:/.test(onEditors.COLLECTION_EDITORS.home), 'the home FILE declares i18n too — a collection flag alone localizes nothing');
 check(/\n  slug: "\{\{slug\}\}"\n  i18n: true\n/.test(onEditors.COLLECTION_EDITORS.pages), 'a localized pages collection declares i18n');
-check(onEditors.COLLECTION_EDITORS.pages.includes('name: published, label: "Published", widget: boolean, default: true, required: false, hint: "Uncheck to hide the page — unpublished pages aren\'t built.", i18n: duplicate'),
+check(/- \{ name: published, label: "Published", widget: boolean, default: false, required: false, hint: "[^"]+", i18n: duplicate \}/.test(onEditors.COLLECTION_EDITORS.pages),
   'publication is one decision for every language, not one per translation');
 check(onEditors.COLLECTION_EDITORS.testimonials === offEditors.COLLECTION_EDITORS.testimonials, 'an editor outside the localized set is untouched');
 check(onEditors.COLLECTION_EDITORS.pages.includes('name: url, label: "Address in this language"'),
