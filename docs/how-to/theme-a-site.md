@@ -38,10 +38,10 @@ Set a site's colours, dark mode and fonts, and restyle a component with your own
 
 ## Let the visitor choose light or dark
 
-A theme with `scheme: auto` also puts a light/dark switch at the end of the header, after the last link; on a phone it sits beside the menu button. A theme without `scheme: auto` has no night colours and gets no switch.
+A theme with `scheme: auto` also puts a light/dark switch in the header, after the header button and the `header-end` slot and before the menu button, so on a phone it sits beside the menu button. A theme without `scheme: auto` has no night colours and gets no switch.
 
 - Until the visitor clicks it, the page follows their system.
-- A click switches to the other mode and remembers it in the browser, so the next page opens in that mode without a flash of the other one.
+- A click switches to the other mode and stores it in the browser under the `localStorage` key `stomme-theme`. `Head.astro` reads that key before the page paints, so the next page opens in that mode without a flash of the other one. A site that writes its own `<head>` instead of using `Head.astro` has to include that script itself.
 - The button shows a moon in light mode and a sun in dark mode, and turns between them unless the visitor has asked their system for reduced motion.
 
 The button's label names what it does: `controls.darkMode` ("Switch to dark mode") and `controls.lightMode` ("Switch to light mode") in [`strings`](../reference/site-config.md#strings). The choice is the `data-theme` attribute on `<html>`, `light` or `dark`, so your own CSS can target it.
