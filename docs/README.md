@@ -17,6 +17,7 @@ Pages and content
 - [Build docs from a repo](how-to/build-docs-from-a-repo.md): a documentation section from Markdown on GitHub.
 - [Store uploads in R2](how-to/store-uploads-in-r2.md): CMS uploads straight to a Cloudflare R2 bucket.
 - [Write pages by hand or with an agent](how-to/write-pages-by-hand.md): blocks written straight into the files, checked against the site's catalog.
+- [Use stomme with an AI agent](how-to/use-an-ai-agent.md): the docs as text, the block catalog as data, and a check the agent runs.
 
 Design and blocks
 

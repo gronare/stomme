@@ -8,6 +8,7 @@ import { createJiti } from 'jiti';
 import { resolveMediaConfig } from './src/media-config.mjs';
 import { resolveDocsConfig } from './src/docs.mjs';
 import { githubSource, localSource, loadDocs } from './src/docs-source.mjs';
+import { agentFiles, stripMarkdown } from './src/docs-agent.mjs';
 
 function resolveListings(l) {
   return (Array.isArray(l) ? l : [])
@@ -137,7 +138,9 @@ async function siteDocs(configFile) {
   return mod.site?.docs ?? null;
 }
 
-async function setupDocs({ root, configFile, outDir, logger }) {
+const TEXT_TYPES = { '.txt': 'text/plain; charset=utf-8', '.md': 'text/markdown; charset=utf-8', '.json': 'application/json; charset=utf-8' };
+
+async function setupDocs({ root, configFile, outDir, logger, origin, rootLlms }) {
   const cfg = resolveDocsConfig(await siteDocs(configFile));
   const dir = process.env.STOMME_DOCS_DIR || cfg.dir;
   if (!dir && !cfg.repo) {
@@ -146,17 +149,33 @@ async function setupDocs({ root, configFile, outDir, logger }) {
   const source = dir ? localSource(cfg, resolve(root, dir)) : githubSource(cfg);
   const docsDir = resolve(outDir, 'docs');
   const mediaDir = resolve(docsDir, 'media');
+  const filesDir = resolve(docsDir, 'files');
   const data = await loadDocs(cfg, source, { mediaDir, logger });
+  const pkgDir = dirname(fileURLToPath(import.meta.url));
+  const blocks = cfg.blocks ? (await createJiti(import.meta.url).import(resolve(pkgDir, 'catalog.ts'))).defaultBlocks : null;
+  const engine = JSON.parse(readFileSync(resolve(pkgDir, 'package.json'), 'utf8')).version;
+  const files = agentFiles(data, { origin, blocks, engine });
+  if (rootLlms) files.set('llms.txt', files.get(`${cfg.route.slice(1)}/llms.txt`));
+  rmSync(filesDir, { recursive: true, force: true });
+  for (const [path, text] of files) {
+    mkdirSync(dirname(resolve(filesDir, path)), { recursive: true });
+    writeFileSync(resolve(filesDir, path), text);
+  }
   mkdirSync(docsDir, { recursive: true });
   const dataFile = resolve(docsDir, 'data.mjs');
-  writeFileSync(dataFile, `export default ${JSON.stringify(data)};\n`);
-  return { route: cfg.route, dataFile, mediaDir, source: dir ? `${resolve(root, dir)}` : `${cfg.repo}/${cfg.path}` };
+  writeFileSync(dataFile, `export default ${JSON.stringify(stripMarkdown(data))};\n`);
+  return { route: cfg.route, dataFile, mediaDir, filesDir, served: new Set([...files.keys()].map((p) => `/${p}`)), source: dir ? `${resolve(root, dir)}` : `${cfg.repo}/${cfg.path}` };
 }
 
 function serveDocsMedia(docs) {
   const prefix = `${docs.route}/_media/`;
   return (req, res, next) => {
     const path = decodeURIComponent((req.url || '').split('?')[0]);
+    if (docs.served.has(path)) {
+      res.setHeader('Content-Type', TEXT_TYPES[path.slice(path.lastIndexOf('.'))] || 'text/plain; charset=utf-8');
+      res.setHeader('Cache-Control', 'no-cache');
+      return res.end(readFileSync(resolve(docs.filesDir, path.slice(1))));
+    }
     if (!path.startsWith(prefix)) return next();
     const file = resolve(docs.mediaDir, path.slice(prefix.length));
     if (!file.startsWith(docs.mediaDir) || !existsSync(file) || !statSync(file).isFile()) return next();
@@ -360,11 +379,15 @@ export default function stomme(options = {}) {
         }
 
         if (features.docs) {
-          docs = await setupDocs({ root, configFile: resolve(root, configPath), outDir, logger });
+          const siteLlms = ['llms.txt.ts', 'llms.txt.js', 'llms.txt.mjs', 'llms.txt.md']
+            .some((f) => existsSync(resolve(root, 'src/pages', f)))
+            || existsSync(resolve(fileURLToPath(config.publicDir), 'llms.txt'));
+          docs = await setupDocs({ root, configFile: resolve(root, configPath), outDir, logger, origin: config.site, rootLlms: !siteLlms });
           updateConfig({ vite: { resolve: { alias: { '@stomme/docs': docs.dataFile } } } });
           injectRoute({ pattern: `${docs.route}/[...slug]`, entrypoint: '@gronare/stomme/routes/docs.astro' });
           injectRoute({ pattern: `${docs.route}/_search/[version].json`, entrypoint: '@gronare/stomme/routes/docs-search.ts' });
-          enabled.push(`${docs.route}/[...slug] (docs from ${docs.source})`, `${docs.route}/_search/[version].json`);
+          enabled.push(`${docs.route}/[...slug] (docs from ${docs.source})`, `${docs.route}/_search/[version].json`, `${docs.route}/llms.txt`, ...(siteLlms ? [] : ['/llms.txt']));
+          if (siteLlms) logger.info("using the site's own /llms.txt (the docs one is at " + `${docs.route}/llms.txt)`);
         }
 
         const routed = [
@@ -466,6 +489,7 @@ export default function stomme(options = {}) {
       'astro:build:done': ({ dir, logger }) => {
         const outDir = fileURLToPath(dir);
         if (docs && existsSync(docs.mediaDir)) cpSync(docs.mediaDir, resolve(outDir, docs.route.slice(1), '_media'), { recursive: true });
+        if (docs && existsSync(docs.filesDir)) cpSync(docs.filesDir, outDir, { recursive: true });
         try {
           const iconsDir = resolve(outDir, 'media/icons');
           if (existsSync(iconsDir)) {

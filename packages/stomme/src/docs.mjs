@@ -21,6 +21,7 @@ export function resolveDocsConfig(docs) {
     route: route === '/' ? '/docs' : route,
     branch: typeof d.branch === 'string' ? d.branch.trim() : '',
     dir: typeof d.dir === 'string' ? d.dir : '',
+    blocks: d.blocks === true,
   };
 }
 
@@ -181,6 +182,38 @@ export function imageRefs(md, file, docsPath) {
   return [...out];
 }
 
+export function markdownUrl(url, base) {
+  const cut = url.indexOf('#');
+  const path = cut === -1 ? url : url.slice(0, cut);
+  const hash = cut === -1 ? '' : url.slice(cut);
+  return `${path === pageUrl(base, '') ? `${path}index` : path.replace(/\/$/, '')}.md${hash}`;
+}
+
+const FENCE = /^ {0,3}(`{3,}|~{3,})/;
+const escapeRe = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+// Links are rewritten only outside fenced code, so a fence that shows Markdown keeps its text as written.
+export function markdownSource(md, ctx) {
+  const text = String(md ?? '');
+  const swaps = new Map();
+  const m = new Marked({ gfm: true });
+  m.walkTokens(m.lexer(text), (t) => {
+    if (t.type !== 'link' && t.type !== 'image') return;
+    const raw = String(t.href ?? '');
+    if (!raw || raw.startsWith('#') || /^[a-z][a-z0-9+.-]*:/i.test(raw) || raw.startsWith('//')) return;
+    const to = t.type === 'image' ? imageSrc(raw, ctx) : rewriteHref(raw, ctx);
+    swaps.set(raw, to.startsWith('/') && t.type === 'link' ? markdownUrl(to, ctx.base) : to);
+  });
+  if (!swaps.size) return text;
+  const pattern = new RegExp(`(\\]\\(\\s*<?|^\\s*\\[[^\\]]+\\]:\\s*<?)(${[...swaps.keys()].map(escapeRe).join('|')})(?=[>)\\s]|$)`, 'gm');
+  let fence = null;
+  return text.split('\n').map((line) => {
+    const f = FENCE.exec(line);
+    if (f && (!fence || (f[1][0] === fence[0] && f[1].length >= fence.length))) { fence = fence ? null : f[1]; return line; }
+    return fence ? line : line.replace(pattern, (_m, lead, href) => `${lead}${swaps.get(href)}`);
+  }).join('\n');
+}
+
 const ITEM_RE = /^\[([^\]]+)\]\(([^)\s#]+)(?:#[^)\s]*)?(?:\s+"[^"]*")?\)\s*(?::\s*([\s\S]*))?$/;
 
 export function parseIndex(readme) {
@@ -285,6 +318,8 @@ export function buildVersion(version, files, { repo, docsPath, media = new Map()
       text: doc.text,
       section: sectionOf.get(file) ?? null,
       edit: githubUrl(repo, version.ref, `${docsPath ? `${docsPath}/` : ''}${file}`),
+      markdownUrl: markdownUrl(pageUrl(version.base, slug), version.base),
+      markdown: markdownSource(files.get(file), ctxFor(file)),
     };
   });
   const byPath = new Map(rendered.map((p) => [p.path, p]));
@@ -308,6 +343,9 @@ export function buildVersion(version, files, { repo, docsPath, media = new Map()
       ledeHtml: inlineHtml(index.lede, homeCtx),
       lede: plainText(inlineHtml(index.lede, homeCtx)),
       edit: githubUrl(repo, version.ref, `${docsPath ? `${docsPath}/` : ''}${readmePath}`),
+      path: readmePath,
+      markdownUrl: markdownUrl(pageUrl(version.base, ''), version.base),
+      markdown: markdownSource(files.get(readmePath), homeCtx),
     },
     nav,
     pages: rendered,

@@ -44,6 +44,8 @@ const alternates = hreflangLinks(Astro.url.pathname, site, Astro.site, locales.e
 const bounceHost = canonicalBounceHost(Astro.site);
 const schemeAuto = ((await getEntry('theme', 'theme').catch(() => null))?.data as { scheme?: string } | undefined)?.scheme === 'auto';
 
+// Set by a route that also publishes the page as Markdown (the docs), before this layout renders.
+const markdownAlternate = (Astro.locals as { stommeMarkdown?: string } | undefined)?.stommeMarkdown;
 const isHome = normalizeLocalePath(Astro.url.pathname) === '/';
 const contact = isHome ? ((await getEntry('contact', 'contact')?.catch(() => null))?.data as any) ?? {} : {};
 const towns = isHome && features?.areas ? await getCollection('towns').catch(() => []) : [];
@@ -69,6 +71,7 @@ const localBusiness = isHome
 {noindex && <meta name="robots" content="noindex, nofollow" />}
 {ogUrl && <link rel="canonical" href={ogUrl} />}
 {alternates.map((a) => <link rel="alternate" hreflang={a.hreflang} href={a.href} />)}
+{markdownAlternate && <link rel="alternate" type="text/markdown" href={markdownAlternate} />}
 <meta property="og:title" content={ogTitle} />
 {description && <meta property="og:description" content={description} />}
 <meta property="og:type" content="website" />

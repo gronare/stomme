@@ -5,6 +5,9 @@ import { fileURLToPath } from 'node:url';
 import { tmpdir } from 'node:os';
 import { parseIndex, rewriteHref, headingId, renderDoc, buildVersion, resolveDocsConfig, routeParam, previewKind, parseBlockPreview, imageRefs } from '../src/docs.mjs';
 import { githubSource, localSource, loadDocs } from '../src/docs-source.mjs';
+import { markdownSource, markdownUrl } from '../src/docs.mjs';
+import { llmsTxt, llmsFullTxt, agentFiles, catalogJson, stripMarkdown } from '../src/docs-agent.mjs';
+import { createJiti } from 'jiti';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const FIXTURE = resolve(HERE, 'fixtures/docs');
@@ -120,7 +123,7 @@ eq(routeParam('/docs', '/docs/main/how-to/x/'), 'main/how-to/x', 'a page under a
 check((() => { try { buildVersion({ ref: 'main', base: '/docs' }, new Map([['a.md', '# A']]), { repo: 'acme/tool', docsPath: 'docs' }); return false; } catch (e) { return /no README\.md/.test(e.message); } })(), 'a folder without README.md fails with a message that names it');
 
 console.log('· config');
-eq(resolveDocsConfig({ repo: 'acme/tool' }), { repo: 'acme/tool', path: 'docs', route: '/docs', branch: '', dir: '' }, 'defaults: docs/ served at /docs');
+eq(resolveDocsConfig({ repo: 'acme/tool' }), { repo: 'acme/tool', path: 'docs', route: '/docs', branch: '', dir: '', blocks: false }, 'defaults: docs/ served at /docs, no block catalog');
 eq(resolveDocsConfig({ repo: 'a/b', path: '/guide/', route: 'help/' }).route, '/help', 'the route is normalised');
 
 console.log('· GitHub source');
@@ -176,6 +179,50 @@ const logged = [];
 const built = await loadDocs(cfg, memory({ 'docs/README.md': '# D\n\n## R\n\n- [X](x.md)\n', 'docs/x.md': '# X\n\n```yaml block\n: : :\n```\n' }), { logger: { info() {}, warn: (m) => logged.push(m) } });
 check(logged.length === 1 && /^docs: x\.md: a block example was shown as code only/.test(logged[0]), 'the build logs a failed example as a warning and goes on');
 check(!('warnings' in built.versions[0]) && !('warnings' in built.versions[0].pages[0]), 'warnings stay out of the data the pages are built from');
+
+console.log('· for an agent');
+eq([markdownUrl('/docs/', '/docs'), markdownUrl('/docs/how-to/run-a-job/#start', '/docs'), markdownUrl('/docs/main/', '/docs/main')], ['/docs/index.md', '/docs/how-to/run-a-job.md#start', '/docs/main/index.md'], 'a page is Markdown at its path + .md, a version home at index.md');
+eq(page('how-to/run-a-job.md').markdownUrl, '/docs/how-to/run-a-job.md', 'each page knows its Markdown address');
+const runMd = page('how-to/run-a-job.md').markdown;
+check(runMd.includes('[the settings](/docs/reference/settings.md#jobs-max)'), 'a link to another page points at that page as Markdown', runMd);
+check(runMd.includes('(https://github.com/acme/tool/blob/v1.2.0/examples/config.toml)') && runMd.includes('(https://example.test/)'), 'a link out of the folder goes to GitHub at the ref, an external one stays');
+eq(markdownSource('See [a](a.md).\n\n```md\n[a](a.md)\n```\n', { ...ctx, file: 'x.md', pages: new Set(['a.md', 'x.md']), docsPath: 'docs' }), 'See [a](/docs/a.md).\n\n```md\n[a](a.md)\n```\n', 'a link inside a fence is left as written');
+check(page('how-to/read-logs.md').markdown.includes('```yaml block'), 'a preview fence stays YAML in the Markdown');
+
+const llms = llmsTxt(v, { repo: 'acme/tool', path: 'docs' }, { abs: (u) => new URL(u, 'https://docs.example.test').href, blocks: '/docs/blocks.json', others: [{ label: 'main', base: '/docs/main' }] });
+const lines = llms.split('\n');
+eq(lines.slice(0, 4), ['# Fixture documentation', '', '> Start with the tutorial, then use fixture help to find a page.', ''], 'llms.txt opens with the README title and its lede as the summary');
+check(llms.includes('These are the docs of acme/tool/docs at release v1.2.0.') && llms.includes('[llms-full.txt](https://docs.example.test/docs/llms-full.txt)') && llms.includes('[blocks.json](https://docs.example.test/docs/blocks.json)'), 'it names the version and links llms-full.txt and blocks.json');
+check(llms.includes('Other versions: [main](https://docs.example.test/docs/main/llms.txt).'), 'it links the other versions\' llms.txt');
+eq(lines.filter((l) => l.startsWith('## ')), ['## Tutorial', '## How-to guides', '## Reference'], 'each README section is a section');
+check(llms.includes('- [Run a job](https://docs.example.test/docs/how-to/run-a-job.md): start, watch and stop a job.'), 'an item links the page as Markdown with the README description');
+check(llms.includes('- [Read the logs](https://docs.example.test/docs/how-to/read-logs.md): '), 'an item with no README description takes the page lede');
+const lone = buildVersion({ key: 'local', ref: 'main', label: 'x', kind: 'local', base: '/docs' }, new Map([['README.md', '# D\n\n## R\n\n- [A](a.md)\n'], ['a.md', '# A\n\nAy.'], ['b.md', '# B\n\nBee.']]), { repo: 'acme/tool', docsPath: 'docs' });
+check(llmsTxt(lone, { repo: 'acme/tool', path: 'docs' }).includes('## Optional\n\n- [B](/docs/b.md): Bee.'), 'a page the README does not list goes under Optional');
+
+const full = llmsFullTxt(v, { repo: 'acme/tool', path: 'docs' });
+const order = [...full.matchAll(/^Source: (\S+) \((\S+)\)$/gm)].map((m) => m[1]);
+eq(order, ['docs/README.md', 'docs/tutorial.md', 'docs/how-to/run-a-job.md', 'docs/how-to/read-logs.md', 'docs/reference/settings.md'], 'llms-full.txt holds every page in README order, each under its source path');
+check(full.includes('Source: docs/how-to/run-a-job.md (/docs/how-to/run-a-job/)\n\n# Run a job\n\nJobs run one at a time.'), 'each page keeps its own headings after the source line');
+check(full.includes('```yaml block\ntype: callout'), 'a preview fence is kept as YAML');
+
+const { defaultBlocks } = await createJiti(import.meta.url).import(resolve(HERE, '../catalog.ts'));
+const cat = catalogJson(defaultBlocks, { engine: '9.9.9' });
+eq(cat.blocks.map((b) => b.type), defaultBlocks.map((b) => b.type).sort(), 'blocks.json lists every library block');
+const postList = cat.blocks.find((b) => b.type === 'postList');
+const showImages = postList.fields.find((f) => f.name === 'media').fields.find((f) => f.name === 'showImages');
+eq([showImages.widget, showImages.default], ['boolean', false], 'a switch carries its CMS default, off');
+const surface = postList.fields.find((f) => f.name === 'style').fields.find((f) => f.name === 'surface');
+check(surface.options.some((o) => o.value === 'tint' && o.label === 'Tinted') && surface.default === 'standard', 'a select carries its options and its default');
+check(cat.engine === '9.9.9' && /left out of a page renders as its default/.test(cat.fieldPolicy), 'it names the engine version and the field policy');
+
+const agentData = { route: '/docs', repo: 'acme/tool', path: 'docs', versions: [v, buildVersion({ key: 'main', ref: 'main', label: 'main', kind: 'unreleased', base: '/docs/main' }, files, { repo: 'acme/tool', docsPath: 'docs' })] };
+const out = agentFiles(agentData, { origin: 'https://docs.example.test', blocks: defaultBlocks, engine: '9.9.9' });
+for (const p of ['docs/llms.txt', 'docs/llms-full.txt', 'docs/blocks.json', 'docs/index.md', 'docs/how-to/run-a-job.md', 'docs/main/llms.txt', 'docs/main/llms-full.txt', 'docs/main/index.md', 'docs/main/reference/settings.md']) check(out.has(p), `agentFiles writes ${p}`);
+check(out.get('docs/main/llms.txt').includes('Other versions: [v1.2.0](https://docs.example.test/docs/llms.txt).'), 'a version\'s llms.txt points back at the default one');
+check(!agentFiles(agentData).has('docs/blocks.json'), 'blocks.json only when the site asks for it');
+stripMarkdown(agentData);
+check(agentData.versions.every((x) => !('markdown' in x.home) && x.pages.every((p) => !('markdown' in p) && p.markdownUrl)), 'the page data keeps the Markdown address and drops the text');
 
 const failed = results.filter((r) => !r).length;
 console.log(`\n${results.length - failed}/${results.length} passed`);

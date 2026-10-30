@@ -30,7 +30,7 @@ const restore = () => writeFileSync(resolve(STARTER, CONFIG), saved);
 try {
   writeFileSync(resolve(STARTER, CONFIG), saved
     .replace('  faq: true,', '  faq: true,\n  docs: true,')
-    .replace("  cmsLocale: 'en',", "  cmsLocale: 'en',\n  docs: { repo: 'acme/tool', path: 'docs', route: '/docs' },"));
+    .replace("  cmsLocale: 'en',", "  cmsLocale: 'en',\n  docs: { repo: 'acme/tool', path: 'docs', route: '/docs', blocks: true },"));
 
   console.log('· static build with features.docs and STOMME_DOCS_DIR (fixture folder)…');
   rmSync(DIST, { recursive: true, force: true });
@@ -77,6 +77,18 @@ try {
     check(index.length === 4 && index.every((d) => d.t && d.u && typeof d.x === 'string'), 'a static search index lists every page', JSON.stringify(index.map((d) => d.u)));
     check(index.some((d) => d.u === '/docs/reference/settings/' && d.x.includes('Every key has a default.')), 'the index carries the page text');
 
+    const llms = existsSync(file('docs/llms.txt')) ? readFileSync(file('docs/llms.txt'), 'utf8') : '';
+    check(llms.startsWith('# Fixture documentation\n\n> ') && llms.includes('- [Run a job](https://example.com/docs/how-to/run-a-job.md): start, watch and stop a job.'), 'the build writes /docs/llms.txt with absolute links to each page as Markdown', llms.slice(0, 600));
+    check(existsSync(file('llms.txt')) && readFileSync(file('llms.txt'), 'utf8') === llms, 'a site with no llms.txt of its own gets the docs one at the root');
+    const full = existsSync(file('docs/llms-full.txt')) ? readFileSync(file('docs/llms-full.txt'), 'utf8') : '';
+    check(full.includes('Source: docs/how-to/run-a-job.md') && full.includes('# Run a job'), 'the build writes /docs/llms-full.txt with every page');
+    check(existsSync(file('docs/how-to/run-a-job.md')) && readFileSync(file('docs/how-to/run-a-job.md'), 'utf8').startsWith('# Run a job') && existsSync(file('docs/index.md')), 'each page and the home are published as Markdown');
+    check(run.includes('<link rel="alternate" type="text/markdown" href="/docs/how-to/run-a-job.md">'), 'a docs page links its Markdown in the head');
+    check(home.includes('<link rel="alternate" type="text/markdown" href="/docs/index.md">'), 'the docs home links its Markdown too');
+    const blocksJson = existsSync(file('docs/blocks.json')) ? JSON.parse(readFileSync(file('docs/blocks.json'), 'utf8')) : { blocks: [] };
+    check(blocksJson.blocks.some((b) => b.type === 'hero' && b.fields.length), 'site.docs.blocks writes the block catalog to /docs/blocks.json');
+    check(!html('').includes('type="text/markdown"'), 'a page outside the docs has no Markdown link');
+
     const sitemap = readdirSync(DIST).filter((f) => f.startsWith('sitemap-') && f !== 'sitemap-index.xml').map((f) => readFileSync(file(f), 'utf8')).join('');
     check(sitemap.includes('/docs/how-to/run-a-job/'), 'the docs pages are in the sitemap');
   }
@@ -92,6 +104,7 @@ try {
   const off = buildStatic({ STOMME_DOCS_DIR: FIXTURE });
   check(off.ok, 'the site builds with the docs feature off');
   check(off.ok && !existsSync(file('docs')), 'no docs route is injected when the feature is off');
+  check(off.ok && !existsSync(file('llms.txt')), 'and no llms.txt is written');
 } finally {
   restore();
   rmSync(DIST, { recursive: true, force: true });

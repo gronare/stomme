@@ -24,6 +24,7 @@ The pages are read at build time and are not content collections, so the CMS doe
 | `route` | `/docs` | where the section is served |
 | `branch` | the repo's default branch | the unreleased version |
 | `dir` | none | a folder on disk to build from, relative to the site, instead of GitHub |
+| `blocks` | `false` | also publish the engine's block catalog at `route/blocks.json`, for docs about stomme itself |
 
 ## Versions
 
@@ -80,6 +81,17 @@ Each example sits in a framed box on the page's paper colour, with the code and 
 - **Search** indexes an example once, from its code.
 
 Blocks that read a collection, such as `faq` or `postList`, show that site's entries, so an example of them is clearest as plain `yaml` with no preview.
+
+## Files for AI agents
+
+Every build also writes the section as plain text, so an AI agent can read it without the HTML:
+
+- **`route/llms.txt`** follows [llms.txt](https://llmstxt.org): the README title, its lede as the summary, a line naming the version, then a `##` section per README section with a link to each page as Markdown and its description from the README, or the page's lede when the README gives none. A page the README does not list goes under `## Optional`. The links are absolute when the site's `site` URL is set in `astro.config.mjs`.
+- **`route/llms-full.txt`** is every page's Markdown in one file, the README first and the rest in reading order, each under a `Source:` line with its path in the repo and its address.
+- **`route/<page>.md`** is each page as Markdown, next to its HTML at `route/<page>/`, and `route/index.md` the home. The page's links point at the other pages' Markdown, a link out of the folder at GitHub and an image at its copy under `route/_media/`. Fences, `yaml block` examples included, stay as written. Each docs page links its Markdown with `<link rel="alternate" type="text/markdown">`.
+- **`route/blocks.json`**, with `blocks: true`, is the block catalog of the engine the site builds with: each block's type, label, group, summary and samples, and each field's widget, default, options and hint.
+
+The files describe the version at `route`; each other version has its own `llms.txt`, `llms-full.txt` and pages under its prefix, and the `llms.txt` files link each other. A site with no `src/pages/llms.txt.*` and no `public/llms.txt` also gets a copy of `route/llms.txt` at `/llms.txt`. See [Use stomme with an AI agent](use-an-ai-agent.md).
 
 ## Read from GitHub
 

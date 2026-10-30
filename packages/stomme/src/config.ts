@@ -82,13 +82,14 @@ export interface SiteConfig {
   media?: MediaConfig;
 }
 
-// features.docs builds a documentation section from a folder of Markdown in a GitHub repo: the latest release at `route`, the branch under `route/<branch>`. `dir` (or STOMME_DOCS_DIR) reads a folder on disk instead, as one version.
+// features.docs builds a documentation section from a folder of Markdown in a GitHub repo: the latest release at `route`, the branch under `route/<branch>`. `dir` (or STOMME_DOCS_DIR) reads a folder on disk instead, as one version. `blocks` also publishes the engine's block catalog at `route/blocks.json`.
 export interface DocsConfig {
   repo?: string;
   path?: string;
   route?: string;
   branch?: string;
   dir?: string;
+  blocks?: boolean;
 }
 
 type DocsStrings = typeof STRINGS_EN.docs;

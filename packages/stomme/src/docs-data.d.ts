@@ -17,6 +17,7 @@ export interface DocsPage {
   headings: DocsHeading[];
   section: string | null;
   edit: string;
+  markdownUrl: string;
   prev: DocsLink | null;
   next: DocsLink | null;
 }
@@ -27,7 +28,7 @@ export interface DocsVersion {
   kind: 'release' | 'unreleased' | 'local';
   base: string;
   param: string | undefined;
-  home: { url: string; title: string; titleHtml: string; lede: string; ledeHtml: string; edit: string };
+  home: { url: string; title: string; titleHtml: string; lede: string; ledeHtml: string; edit: string; path: string; markdownUrl: string };
   nav: DocsNavSection[];
   pages: DocsPage[];
   search: { t: string; u: string; s: string; x: string }[];
