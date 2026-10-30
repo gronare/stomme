@@ -2,7 +2,13 @@
 
 Every content collection the engine defines, its folder under `src/content/` and its fields.
 
-The schemas come from `stommeCollections(listings)` in `@gronare/stomme/collections`, which `src/content.config.ts` spreads. Every collection is defined whether its feature is on or not, and an empty folder is fine. The CMS edits each one; the settings collections hold a single file.
+The schemas come from `stommeCollections(listings)` in `@gronare/stomme/collections`, which `src/content.config.ts` spreads. It also spreads `stommeAddonCollections()` from `@gronare/stomme/addon-collections`, the collections an [outside directory](../how-to/extend-from-an-outside-directory.md) declares in `collections.mjs`, or none.
+
+```ts
+export const collections = { ...stommeCollections(listings), ...stommeAddonCollections() };
+```
+
+Every collection is defined whether its feature is on or not, and an empty folder is fine. The CMS edits each one; the settings collections hold a single file.
 
 ## Pages
 
