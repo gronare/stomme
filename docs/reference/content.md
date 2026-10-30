@@ -85,7 +85,7 @@ A page's address is its file name, nested under its `parent`: a page with `paren
 | `items[]` | `label`, `link`, and `children[]` (`label`, `link`) for a submenu; `menu` fills the submenu from a collection, and `autoChildren: true` from the page's subpages |
 | `cta` | a button at the end: `label`, `link` |
 | `sticky` | `false` (default); `true` keeps the header at the top while scrolling, `phone` does so on small screens only |
-| `showLogo`, `showWordmark` | the logo image and the text wordmark |
+| `showLogo`, `showWordmark` | the logo image and the text wordmark, off unless set |
 
 ### `footer`
 
@@ -95,17 +95,17 @@ A page's address is its file name, nested under its `parent`: a page with `paren
 |---|---|
 | `dark` | a dark footer |
 | `tagline` | a line under the logo |
-| `showLinks`, `linksHeading`, `links[]`, `links2Heading`, `links2[]` | two link columns, `label` and `link` each |
+| `showLinks`, `linksHeading`, `links[]`, `links2Heading`, `links2[]` | two link columns, `label` and `link` each; the first shows only with `showLinks: true` |
 | `showTowns`, `townsHeading` | a column of areas |
 | `showContact` | the phone and email, on by default |
 | `showAddress`, `showHours`, `showSocials` | the address, opening hours and social links from the contact settings; with the address on, the tagline drops the town it would repeat |
 | `legal[]` | links on the bottom line |
 | `note` | a line of small print |
-| `showLogo`, `showWordmark` | |
+| `showLogo`, `showWordmark` | the logo image and the text wordmark, off unless set |
 
 ### `thanks` and `tracking`
 
-`thanks/thanks.md` sets the thank-you page: `variant`, `heading` (with `{name}`), `message`, `button`, `button2` and `showContact`. `tracking/tracking.md` holds `gtmId`, `ga4Id`, `metaPixelId` and `privacyUrl`, used when the `tracking` flag is on.
+`thanks/thanks.md` sets the thank-you page: `variant`, `heading` (with `{name}`), `message`, `button`, `button2` and `showContact` (the direct-contact card, off unless set). `tracking/tracking.md` holds `gtmId`, `ga4Id`, `metaPixelId` and `privacyUrl`, used when the `tracking` flag is on.
 
 ## Feature collections
 

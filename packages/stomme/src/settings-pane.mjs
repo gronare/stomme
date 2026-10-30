@@ -244,7 +244,7 @@ ${emitShareCards(6)}
           - { name: surface, label: "Tinted surface", widget: color, default: "#e0e7ff", hint: "Soft background for highlighted sections." }
           - { name: paper, label: "Page background", widget: color, default: "#ffffff", hint: "The main page background." }
           - { name: line, label: "Borders & lines", widget: color, default: "#e5e7eb", hint: "Card borders, dividers, rules." }
-          - { name: secondary, label: "Secondary", widget: color, required: false, default: "#3b82f6", hint: "A second accent you deploy by choice (eyebrow, callout)." }
+          - { name: secondary, label: "Secondary", widget: color, required: false, default: "#0ea5e9", hint: "A second accent you deploy by choice (eyebrow, callout)." }
           - { name: highlight, label: "Highlight", widget: color, default: "#f59e0b", hint: "Attention accent — tags, badges, status. Used in isolation." }
           - name: eyebrow
             label: "Eyebrow style"
@@ -355,22 +355,22 @@ ${emitShareCards(6)}
               - { label: "Off, it scrolls away with the page", value: "false" }
               - { label: "On every screen", value: "true" }
               - { label: "On phone screens only", value: "phone" }
-          - { name: showLogo, label: "Show logo mark", widget: boolean, required: false, default: true, hint: "Show the logo image (set under Identity) in the header."${inline('nav', 'duplicate')} }
-          - { name: showWordmark, label: "Show wordmark text", widget: boolean, required: false, default: true, hint: "Show the wordmark text (set under Identity) in the header."${inline('nav', 'duplicate')} }
+          - { name: showLogo, label: "Show logo mark", widget: boolean, required: false, default: false, hint: "Show the logo image (set under Identity) in the header."${inline('nav', 'duplicate')} }
+          - { name: showWordmark, label: "Show wordmark text", widget: boolean, required: false, default: false, hint: "Show the wordmark text (set under Identity) in the header."${inline('nav', 'duplicate')} }
 ${emitNavLinks(10, on('nav'))}
       - name: footer
         label: "Footer"
         file: "${filePath('footer', 'src/content/footer/footer.md')}"${line('footer', 8, 'i18n: true')}
         fields:
           - { name: dark, label: "Dark footer", widget: boolean, required: false, default: false, hint: "Use the dark surface for the footer."${inline('footer', 'duplicate')} }
-          - { name: showLogo, label: "Show logo mark", widget: boolean, required: false, default: true, hint: "Show the logo image (set under Identity) in the footer."${inline('footer', 'duplicate')} }
-          - { name: showWordmark, label: "Show wordmark text", widget: boolean, required: false, default: true, hint: "Show the wordmark text (set under Identity) in the footer."${inline('footer', 'duplicate')} }
+          - { name: showLogo, label: "Show logo mark", widget: boolean, required: false, default: false, hint: "Show the logo image (set under Identity) in the footer."${inline('footer', 'duplicate')} }
+          - { name: showWordmark, label: "Show wordmark text", widget: boolean, required: false, default: false, hint: "Show the wordmark text (set under Identity) in the footer."${inline('footer', 'duplicate')} }
           - { name: tagline, label: "Tagline", widget: string, required: false, hint: "A line under the logo."${inline('footer', 'true')} }
           - { name: showAddress, label: "Show the address", widget: boolean, required: false, default: false, hint: "Street and postcode from Site & contact, under the tagline. On, the tagline drops the town it repeats."${inline('footer', 'duplicate')} }
           - { name: showHours, label: "Show opening hours", widget: boolean, required: false, default: false, hint: "The opening hours from Site & contact, on one line."${inline('footer', 'duplicate')} }
           - { name: showSocials, label: "Show social links", widget: boolean, required: false, default: false, hint: "The social links from Site & contact."${inline('footer', 'duplicate')} }
           - { name: showContact, label: "Show phone and email", widget: boolean, required: false, default: true, hint: "The phone number and email from Site & contact, on one line."${inline('footer', 'duplicate')} }
-          - { name: showLinks, label: "Show quick links", widget: boolean, required: false, default: true${inline('footer', 'duplicate')} }
+          - { name: showLinks, label: "Show quick links", widget: boolean, required: false, default: false${inline('footer', 'duplicate')} }
 ${emitFooterLinks(10, on('footer'))}
 ${collectionEnabled('towns') ? `          - { name: showTowns, label: "Show service areas", widget: boolean, required: false, default: false, hint: "Adds a column linking every entry in the Areas collection."${inline('footer', 'duplicate')} }
           - { name: townsHeading, label: "Service areas · heading", widget: string, required: false, hint: "The heading above the service-area column, e.g. \\"Areas\\"."${inline('footer', 'true')} }
@@ -391,7 +391,7 @@ ${collectionEnabled('towns') ? `          - { name: showTowns, label: "Show serv
           - { name: heading, label: "Heading", widget: string, required: false, hint: "Big confirmation headline. Blank = localized default." }
           - { name: message, label: "Message", widget: text, required: false, hint: "Reassurance line under the heading. Blank = default." }
 ${emitThanksButtons(10)}
-          - { name: showContact, label: "Show the direct-contact card", widget: boolean, required: false, default: true, hint: "Phone / email / hours from Site & contact." }${tp ? '\n' + tp : ''}${addonPanelFiles('settings', 6)}`;
+          - { name: showContact, label: "Show the direct-contact card", widget: boolean, required: false, default: false, hint: "Phone / email / hours from Site & contact." }${tp ? '\n' + tp : ''}${addonPanelFiles('settings', 6)}`;
 }
 
 function addonPanelFiles(collection, indent) {

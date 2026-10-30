@@ -25,4 +25,5 @@ links:
 note: ""
 showLinks: true
 showHours: true
+showContact: true
 ---

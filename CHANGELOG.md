@@ -16,6 +16,14 @@ frontmatter means disabled/not shown (see `src/kit.ts`).
   rendered it off, and the next save turned it on. A default now always equals what the block
   renders with the key left out. Pages render exactly as before; a block an editor adds in `/admin`
   starts with these off, and the editor turns on what it needs.
+- The settings panes follow the same rule. The header's and the footer's `showLogo` and
+  `showWordmark`, the footer's `showLinks` and the thank-you page's `showContact` now start off in
+  `/admin`, as a file without them renders; the footer's `showContact` stays on, as it renders.
+  The theme's `secondary` starts at `#0ea5e9`, the colour the engine stylesheet renders without it. A site whose
+  `public/admin/config.yml` has the `settings:generated` markers picks this up at its next
+  `stomme-gen`; a site with hand-written settings panes keeps its own defaults until they are
+  edited. The page `published` switch still starts on: a page made in `/admin` is published, a
+  hand-written page without the key is not built.
 - `stomme-lint-content` (`pnpm lint:content` in the starter) checks every block in `src/content/`
   against the site's catalog: each field the catalog does not declare, each older field from
   `block-migrations.json` and each unknown block type, by file and line. `--json` prints the report

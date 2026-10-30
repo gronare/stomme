@@ -3,6 +3,7 @@ import { readFileSync, readdirSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createJiti } from 'jiti';
+import { parse as parseYaml } from 'yaml';
 import { referenceLabels } from './label-reference.mjs';
 
 const pkg = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -109,7 +110,7 @@ for (const re of rewrites) {
   if (target) check(new RegExp(body).test(target), `the declaration ${body.split(' =')[0]} still exists for the generator to rewrite`);
 }
 
-const { byPath: REFERENCE, blocks, groups, yamls } = await referenceLabels();
+const { byPath: REFERENCE, blocks, groups, yamls, listings: referenceListings } = await referenceLabels();
 
 // Sveltia writes every declared default into blocks the editor never touched, so a default on a free-text widget puts words on a live page nobody wrote. Suggested wording goes in the hint; the other defaults are held to what a block renders with the key left out, further down.
 const FREE_TEXT = /^(string|text|markdown)$/;
@@ -265,6 +266,73 @@ for (const b of defaultBlocks) {
 }
 check(onByDefault.length === 0, 'no catalog switch defaults on and no list defaults non-empty: Sveltia writes a default into every entry that lacks the key, so it must be what the key left out renders', onByDefault.join(', '));
 check(notTheAbsent.length === 0, 'every other catalog default is what its block renders with the key left out', notTheAbsent.join('\n    '));
+
+const { stommeCollections } = await createJiti(import.meta.url, { alias: { 'astro:content': resolve(pkg, 'bin/_astro-content-stub.mjs') } }).import(resolve(pkg, 'collections.ts'));
+const schemas = Object.fromEntries(Object.entries(stommeCollections(referenceListings)).map(([k, c]) => [k, c.schema]));
+const unwrap = (z) => {
+  while (z && ['ZodDefault', 'ZodOptional', 'ZodNullable', 'ZodEffects'].includes(z._def.typeName)) z = z._def.innerType ?? z._def.schema;
+  return z;
+};
+const childOf = (z, name) => {
+  const u = unwrap(z);
+  if (!u) return undefined;
+  if (u._def.typeName === 'ZodObject') return u.shape[name];
+  if (u._def.typeName === 'ZodRecord') return u._def.valueType;
+  if (u._def.typeName === 'ZodArray') return childOf(u.element, name);
+  return undefined;
+};
+const absentOf = (z) => { const r = z.safeParse(undefined); return r.success ? { value: r.data } : null; };
+const header = read('chrome/Header.astro');
+// A pane default the schema leaves without an absent value but a renderer resolves anyway: each [source, regex] pair is a line that makes the key left out render as the CMS default, and one of those lines must spell the default itself.
+const collectionsSrc = read('collections.ts');
+const PANE_ABSENT_AS_DEFAULT = {
+  'theme muted': [[styles, /^\s*--color-muted: #6b7280;/m]],
+  'theme secondary': [[styles, /^\s*--color-secondary: #0ea5e9;/m]],
+  'navigation sticky': [[header, /nav\.sticky === true \|\| nav\.sticky === 'true'/], [collectionsSrc, /sticky: z\.union\(\[z\.boolean\(\), z\.enum\(\['true', 'false', 'phone'\]\)\]\)\.default\(false\)/]],
+  'thanks variant': [[read('Thanks.astro'), /^\s*variant = 'classic',$/m]],
+  'pages order': [[read('src/pages.ts'), /const rank = \(value: unknown\): number => \(typeof value === 'number' && Number\.isFinite\(value\) \? value : 0\)/]],
+  'settings og.types[].headlineField': [[ogPages, /HEADLINE_DEFAULT: Record<OgTypeKind, string> = \{ article: 'title', catalog: 'title', towns: 'name', services: 'title' \}/]],
+  'settings og.types[].sublineField': [[ogPages, /SUBLINE_DEFAULT: Record<OgTypeKind, string> = \{ article: 'none', catalog: 'price', towns: 'none', services: 'none' \}/]],
+};
+// The one deliberate exception: a page made in the CMS starts published, while a hand-written file without the key stays unbuilt.
+const PANE_DEFAULT_DIFFERS = new Set(['pages published']);
+const paneFields = (fields, schema, collection, prefix = '') => (fields ?? []).flatMap((f) => {
+  if (f.widget === 'list' && f.types) return [];
+  const node = schema && childOf(schema, f.name);
+  const recordStep = !!node && unwrap(schema)._def.typeName === 'ZodRecord';
+  const path = recordStep ? `${prefix}[]` : prefix ? `${prefix}.${f.name}` : f.name;
+  const own = f.default !== undefined ? [{ f, node, key: `${collection} ${path}` }] : [];
+  return [...own, ...(Array.isArray(f.fields) ? paneFields(f.fields, node, collection, path) : [])];
+});
+const paneDefaults = new Map();
+for (const yaml of yamls) {
+  const doc = parseYaml(yaml);
+  for (const c of doc.collections ?? []) {
+    const units = c.folder ? [{ dir: c.folder, fields: c.fields }] : (c.files ?? []).map((f) => ({ dir: f.file, fields: f.fields }));
+    for (const u of units) {
+      const collection = String(u.dir).split('/')[2];
+      for (const d of paneFields(u.fields, schemas[collection], collection)) if (!paneDefaults.has(d.key)) paneDefaults.set(d.key, d);
+    }
+  }
+}
+const paneDrift = [];
+for (const [key, { f, node }] of paneDefaults) {
+  if (PANE_DEFAULT_DIFFERS.has(key)) continue;
+  const held = PANE_ABSENT_AS_DEFAULT[key];
+  if (held) {
+    const hits = held.map(([src, re]) => src.match(re)?.[0]);
+    if (!hits.every(Boolean) || !hits.some((h) => h.includes(String(f.default)))) paneDrift.push(`${key} (the renderer line that makes it ${JSON.stringify(f.default)} moved or names another value)`);
+    continue;
+  }
+  const absent = node && absentOf(node);
+  if (!absent) { paneDrift.push(`${key} (no schema default for the CMS's ${JSON.stringify(f.default)})`); continue; }
+  const value = f.widget === 'boolean' && absent.value === undefined ? false : absent.value;
+  if (JSON.stringify(value) !== JSON.stringify(f.default)) paneDrift.push(`${key} (the CMS starts ${JSON.stringify(f.default)}, a file without the key renders ${JSON.stringify(value)})`);
+}
+check(paneDefaults.size >= 30, `the settings panes and collection editors declare ${paneDefaults.size} defaults`);
+check(paneDrift.length === 0, 'every settings-pane and collection-editor default is what the site renders with the key left out', paneDrift.join('\n    '));
+check(paneDefaults.get('pages published')?.f.default === true && absentOf(schemas.pages.shape.published)?.value === false,
+  'pages published stays the one allowed difference: the CMS starts a page published, a file without the key is not built');
 
 const failed = results.filter((ok) => !ok).length;
 console.log(`\n${results.length - failed}/${results.length} cross-file contracts hold`);

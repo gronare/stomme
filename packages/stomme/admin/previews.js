@@ -309,7 +309,7 @@
     var g = function (k, d) { var x = e.getIn(['data', k]); return x == null || x === '' ? d : x; };
     var brand = g('brand', BRAND), ink = g('ink', INK), onDark = g('onDark', '#fff'),
         surface = g('surface', SURFACE), paper = g('paper', PAPER), line = g('line', LINE), highlight = g('highlight', HIGHLIGHT);
-    var secondary = g('secondary', '#3b82f6');
+    var secondary = g('secondary', '#0ea5e9');
     var ebColorKey = g('eyebrowColor', 'brand');
     var ebAccent = ebColorKey === 'secondary' ? secondary : ebColorKey === 'highlight' ? highlight : brand;
     var muted = 'color-mix(in srgb, ' + ink + ' 55%, ' + paper + ')';
