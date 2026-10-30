@@ -104,7 +104,12 @@ export function buildOptionSources({ root, ROUTES, FEATURES, LISTINGS, BLOCKS })
   }
   const DOCUMENT_GROUP_OPTIONS = documentGroupOptions();
 
-  const OPTION_SOURCES = { '$pages': PAGE_OPTIONS, '$services': SERVICE_OPTIONS, '$faq': FAQ_OPTIONS, '$faqTags': FAQ_TAG_OPTIONS, '$documentGroups': DOCUMENT_GROUP_OPTIONS };
+  const listingOptions = (preset) => LISTINGS.filter((l) => l.preset === preset).map((l) => ({ label: l.label || l.id, value: l.id }));
+
+  const OPTION_SOURCES = {
+    '$pages': PAGE_OPTIONS, '$services': SERVICE_OPTIONS, '$faq': FAQ_OPTIONS, '$faqTags': FAQ_TAG_OPTIONS, '$documentGroups': DOCUMENT_GROUP_OPTIONS,
+    '$catalogListings': listingOptions('catalog'), '$articleListings': listingOptions('article'),
+  };
 
   function collectionExists(name) {
     try {

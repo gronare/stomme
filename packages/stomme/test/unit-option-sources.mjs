@@ -160,6 +160,13 @@ try {
   check(menus.every((o) => o.value.split('::').length === 2 && o.value.split('::')[1].startsWith('/')),
     'each menu value splits into exactly one id and one absolute route');
   check(labelOf(menus, 'stock::/lager') === 'stock', 'a listing with no label falls back to its id');
+
+  console.log('\n· listing pickers');
+  const pickers = build({ LISTINGS: [...LISTINGS, { id: 'shop', route: '/shop', label: 'Shop', preset: 'catalog' }] }).OPTION_SOURCES;
+  check(JSON.stringify(pickers['$catalogListings']) === '[{"label":"stock","value":"stock"},{"label":"Shop","value":"shop"}]',
+    "the catalog picker offers every catalog listing by its label, valued by the listing's id", JSON.stringify(pickers['$catalogListings']));
+  check(JSON.stringify(values(pickers['$articleListings'])) === '["projects"]', 'the article picker offers the article listings only');
+  check(build().OPTION_SOURCES['$catalogListings'].length === 0, 'a site with no listings has an empty picker');
   check(values(build({ ROUTES: { ...ROUTES, services: '' } }).OPTION_SOURCES['$menus']).includes('services::/services'),
     'an unset services route falls back to /services rather than emitting a bare separator');
   check(!values(build({ FEATURES: { ...ALL_ON, services: false } }).OPTION_SOURCES['$menus']).some((v) => v.startsWith('services::')),

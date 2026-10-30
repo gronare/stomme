@@ -103,6 +103,16 @@ check(has(sel, /^ {4}- \{ label: "Home \(\/\)", value: "\/" \}$/m) && has(sel, /
   'a $-named select resolves its options from OPTION_SOURCES');
 check(emitField({ name: 'x', label: 'X', widget: 'select', options: '$nope' }, 0) === '',
   'an unresolvable option source emits no field at all, never an empty options list Sveltia refuses to load');
+const LISTED = [{ label: 'Stock', value: 'stock' }];
+const sole = emitField({ name: 'source', label: 'Catalog', widget: 'select', soleDefault: true, options: LISTED }, 0);
+check(has(sole, /^ {2}default: "stock"$/m), 'a soleDefault select preselects its only option, so a block added in the CMS reads that listing');
+const twoListed = emitField({ name: 'source', label: 'Catalog', widget: 'select', soleDefault: true, options: [...LISTED, { label: 'Archive', value: 'archive' }] }, 0);
+check(!has(twoListed, /default:/), 'with two options a soleDefault select preselects nothing, leaving the choice to the editor');
+const below = emitField({ name: 'source', label: 'Listing', widget: 'select', required: false, hiddenBelow: 2, options: LISTED }, 0);
+check(below === '- { name: source, label: "Listing", widget: hidden, required: false }',
+  'a select with fewer options than hiddenBelow stays in the config as a hidden field, so the value a page holds rides along', below);
+const atBelow = emitField({ name: 'source', label: 'Listing', widget: 'select', hiddenBelow: 1, options: '$nope' }, 0);
+check(has(atBelow, /widget: hidden/), 'hiddenBelow wins over omitting an empty select');
 const selMulti = emitField({ name: 'x', label: 'X', widget: 'select', multiple: true, default: ['a', 'b'], options: [{ label: 'A', value: 'a' }] }, 0);
 check(has(selMulti, /^ {2}multiple: true$/m) && has(selMulti, /^ {2}default: \["a", "b"\]$/m), 'a multiple select emits an array default in flow style');
 const rel = emitField({ name: 'svc', label: 'Service', widget: 'relation', collection: 'services', search_fields: ['title'] }, 0);

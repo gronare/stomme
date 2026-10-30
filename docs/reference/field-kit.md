@@ -24,7 +24,9 @@ The types and helpers `@gronare/stomme/kit` exports for writing a block's catalo
 | `widget` | `string`, `text`, `markdown`, `number`, `boolean`, `select`, `image`, `file`, `list`, `object` or `hidden` |
 | `required` | `false` makes the field optional; Sveltia's default is required |
 | `default`, `hint` | the value a new block starts with, and the help line |
-| `options` | for `select`: `{ label, value }` items, or a source: `$pages`, `$services`, `$faq`, `$faqTags`, `$documentGroups` |
+| `options` | for `select`: `{ label, value }` items, or a source: `$pages`, `$services`, `$faq`, `$faqTags`, `$documentGroups`, `$catalogListings`, `$articleListings` (the site's listings of that preset, by label, valued by `id`) |
+| `soleDefault` | for `select`: `true` preselects the only option when the source has exactly one |
+| `hiddenBelow` | for `select`: with fewer options than this, the field is written as `hidden`, so the CMS keeps the value a page holds without offering a choice |
 | `media_folder`, `public_folder` | leave these unset: `stomme-gen` gives every collection its upload folders, and a field of its own would put uploads where the image pipeline does not look |
 | `multiple` | for `select`, several values |
 | `fields`, `field` | the children of an `object` or `list` |

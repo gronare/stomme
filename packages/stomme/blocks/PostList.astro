@@ -1,4 +1,6 @@
 ---
+import { listings } from '@stomme/config';
+import { listingRoute } from '../src/config';
 import { getCollection } from 'astro:content';
 import Cover from '../src/Cover.astro';
 import { renderMarkdown } from '../src/markdown';
@@ -25,7 +27,8 @@ const columns = Astro.props.layout?.columns ?? 3;
 const limit = Number(Astro.props.layout?.limit) || 0;
 const archivePath = String(Astro.props.layout?.archive ?? '').trim();
 const ItemHeading = heading ? 'h3' : 'h2';
-const prefix = base ?? site?.routes?.blog ?? '/blog';
+// The blog answers on routes.blog, so a listing that reuses the id posts never moves it.
+const prefix = base ?? (source === 'posts' ? undefined : listingRoute(source, listings, site?.listings)) ?? site?.routes?.blog ?? '/blog';
 const locale = site?.locale ?? 'en-US';
 const readMore = site?.strings?.readMore ?? 'Read more';
 const latest = site?.strings?.latest ?? 'Latest';

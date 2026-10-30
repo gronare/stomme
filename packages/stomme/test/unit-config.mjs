@@ -8,7 +8,7 @@ const PKG = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const jiti = createJiti(import.meta.url);
 const {
   FEATURE_DEFAULTS, SITE_DEFAULTS, resolveFeatures, resolveSpecs, listingSpecRows,
-  resolveListings, isUnlisted, resolveSite, listingStatusKey, LISTING_STATUS_KEYS,
+  resolveListings, isUnlisted, resolveSite, listingStatusKey, LISTING_STATUS_KEYS, listingRoute,
 } = await jiti.import(resolve(PKG, 'src/config.ts'));
 const source = readFileSync(resolve(PKG, 'src/config.ts'), 'utf8');
 
@@ -89,6 +89,13 @@ eq(resolveListings([{ route: '/a', preset: 'article' }, { id: 'b', preset: 'arti
   'a listing without an id or without a route is dropped');
 eq(resolveListings([null, undefined]), [], 'holes in the listings array are dropped');
 eq(resolveListings(), [], 'no listings resolves to an empty list');
+eq(listingRoute('stock', [{ id: 'stock', route: 'lager', preset: 'catalog' }]), '/lager',
+  "a listing block with no base links under the listing's own route, normalised to start with a slash");
+eq(listingRoute('stock', [], undefined, [{ id: 'stock', route: '/till-salu', preset: 'catalog' }]), '/till-salu',
+  'the route is found in any of the listing sets the block hands over');
+eq(listingRoute('missing', [{ id: 'stock', route: '/lager', preset: 'catalog' }]), undefined,
+  'a source that names no listing has no route, so the block keeps its own fallback');
+eq(listingRoute(undefined, [{ id: 'stock', route: '/lager', preset: 'catalog' }]), undefined, 'no source has no route');
 eq(resolveListings([{ id: 'homes', route: '/homes', preset: 'catalog', specs: ['Area'] }])[0].specs,
   [{ key: 'spec_0', label: 'Area' }], 'a listing carries resolved spec definitions, not the raw input');
 

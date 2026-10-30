@@ -101,12 +101,15 @@ export function makeEmitters({ q, pad, AVAILABLE_BLOCKS, OPTION_SOURCES }) {
     }
     if (f.widget === 'select') {
       const opts = typeof f.options === 'string' ? OPTION_SOURCES[f.options] ?? [] : Array.isArray(f.options) ? f.options : [];
+      // Hidden rather than omitted: a field missing from the config is one the CMS no longer carries, so the value a page already holds must still ride along.
+      if (f.hiddenBelow && opts.length < f.hiddenBelow) return emitField({ name: f.name, label: f.label, widget: 'hidden', required: f.required }, indent, i18n);
       // A select whose source resolved empty is omitted: Sveltia rejects `options: []` as a fatal config error, and with nothing to choose no stored value could be valid anyway.
       if (opts.length === 0) return '';
       const out = [`${p}- name: ${f.name}`, `${p}  label: ${q(f.label)}`, `${p}  widget: select`];
       if (f.multiple) out.push(`${p}  multiple: true`);
       if (f.required === false) out.push(`${p}  required: false`);
-      if (f.default !== undefined) out.push(`${p}  default: ${Array.isArray(f.default) ? `[${f.default.map(q).join(', ')}]` : q(f.default)}`);
+      const preset = f.default !== undefined ? f.default : f.soleDefault && opts.length === 1 ? opts[0].value : undefined;
+      if (preset !== undefined) out.push(`${p}  default: ${Array.isArray(preset) ? `[${preset.map(q).join(', ')}]` : q(preset)}`);
       if (f.hint) out.push(`${p}  hint: ${q(f.hint)}`);
       out.push(...i18nLine);
       out.push(`${p}  options:`);

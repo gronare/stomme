@@ -123,6 +123,12 @@ blocks:
     feedLabel: "Subscribe"
   - type: documentList
     heading: "Documents"
+  - type: catalogList
+    heading: "For sale"
+    source: stock
+  - type: postList
+    heading: "Updates"
+    source: updates
   - type: subpages
     layout:
       variant: chips
@@ -220,7 +226,8 @@ try {
       .replace('  areas: false,', '  areas: true,')
       .replace('  services: false,', '  services: true,')
       .replace('  documents: false,', '  documents: true,')
-      .replace("  locale: 'en-US',\n  cmsLocale: 'en',", "  locale: 'en-US',\n  cmsLocale: 'en',\n  locales: ['en', 'sv'],"));
+      .replace("  locale: 'en-US',\n  cmsLocale: 'en',", "  locale: 'en-US',\n  cmsLocale: 'en',\n  locales: ['en', 'sv'],")
+      .replace('export const listings: Listing[] = [];', "export const listings: Listing[] = [{ id: 'stock', route: '/for-sale', label: 'For sale', preset: 'catalog' }, { id: 'updates', route: '/news', label: 'Updates', preset: 'article' }];"));
   writeFileSync(resolve(STARTER, 'src/content/navigation/nav.md'), NAV);
   writeFileSync(resolve(STARTER, 'src/content/footer/footer.md'), FOOTER);
   write('src/content/services/roof-cleaning.md', SERVICE('roof-cleaning', 'Roof cleaning', 1));
@@ -230,7 +237,9 @@ try {
   write('src/content/posts/first-post.md', POST('The first post', '2026-01-10'));
   write('src/content/posts/the-meetup.md', POST('The meetup', '2026-02-10', 'eventDate: 2026-06-01\neventTime: "18:00"\n'));
   write('src/content/documents/handbook.md', DOCUMENT);
-  added.push(resolve(STARTER, 'src/content/pages/blog.md'));
+  write('src/content/stock/the-boat.md', '---\ntitle: "The boat"\nprice: "1 000"\n---\n');
+  write('src/content/updates/new-hours.md', POST('New hours', '2026-03-01'));
+  added.push(resolve(STARTER, 'src/content/pages/blog.md'), resolve(STARTER, 'src/content/pages/for-sale.md'), resolve(STARTER, 'src/content/pages/news.md'));
   write('src/content/pages/guide.md', GUIDE);
   write('src/content/pages/details.md', DETAILS);
   write('src/content/pages/guide.sv.md', GUIDE.replace('"The guide"', '"Guiden"'));
@@ -266,6 +275,9 @@ try {
   check(has('/services/roof-cleaning/'), 'a service card links to the slashed detail address');
   check(has('/areas/riverton/'), 'a town chip does too');
   check(has('/blog/first-post/'), 'and a post card');
+  const onGuide = (href) => (hrefs.get(href) || []).includes(join('guide', 'index.html'));
+  check(onGuide('/for-sale/the-boat/'), "a catalogList with a source and no base links under the listing's own route", JSON.stringify(hrefs.get('/for-sale/the-boat/')));
+  check(onGuide('/news/new-hours/'), 'and so does a postList that reads another article listing', JSON.stringify(hrefs.get('/news/new-hours/')));
   check(has('/guide/details/'), 'a nested page keeps its slash on the last segment only');
   check(has('/sv/about/'), 'a locale-prefixed path follows the same rule');
   check(has('/sv/') && has('/'), 'a locale front page and the site root are a bare slash');
@@ -298,6 +310,7 @@ try {
     badAlternate.map(([u, f]) => `${u}   (${f})`).join('\n    '));
 } finally {
   for (const f of added) { try { rmSync(f, { force: true }); } catch {} }
+  for (const d of ['src/content/stock', 'src/content/updates']) { try { rmSync(resolve(STARTER, d), { recursive: true, force: true }); } catch {} }
   for (const [f, body] of saved) { try { writeFileSync(resolve(STARTER, f), body); } catch {} }
   try { rmSync(DIST, { recursive: true, force: true }); } catch {}
 }

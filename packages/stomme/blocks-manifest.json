@@ -188,8 +188,9 @@
         },
         {
           "name": "source",
-          "widget": "hidden",
-          "required": false
+          "widget": "select",
+          "required": false,
+          "options": "$catalogListings"
         },
         {
           "name": "base",
@@ -1370,8 +1371,9 @@
         },
         {
           "name": "source",
-          "widget": "hidden",
-          "required": false
+          "widget": "select",
+          "required": false,
+          "options": "$articleListings"
         },
         {
           "name": "base",
@@ -2957,8 +2959,9 @@
         },
         {
           "name": "source",
-          "widget": "hidden",
-          "required": false
+          "widget": "select",
+          "required": false,
+          "options": "$articleListings"
         },
         {
           "name": "base",
@@ -3034,8 +3037,9 @@
         },
         {
           "name": "source",
-          "widget": "hidden",
-          "required": false
+          "widget": "select",
+          "required": false,
+          "options": "$articleListings"
         },
         {
           "name": "base",

@@ -26,9 +26,10 @@ function emit(defaultBlocks, FEATURES, listings, LOCALES = []) {
   try {
     const { OPTION_SOURCES, collectionEnabled, AVAILABLE_BLOCKS, GROUP_ORDER } =
       buildOptionSources({ root, ROUTES, FEATURES, LISTINGS: listings, BLOCKS: defaultBlocks });
-    // A select whose source resolves empty is not emitted at all, and this root holds no content — without one seeded option per content-fed source the reference stops covering those fields and their translations read as orphans.
+    // A select whose source resolves empty is not emitted at all, and this root holds no content — without one seeded option per content-fed source, and a second article listing for the listing picker that shows only from two, the reference stops covering those fields and their translations read as orphans.
     for (const k of ['$services', '$faq', '$faqTags', '$documentGroups'])
       if (!OPTION_SOURCES[k].length) OPTION_SOURCES[k] = [{ label: 'Sample entry', value: 'sample' }];
+    if (OPTION_SOURCES['$articleListings'].length === 1) OPTION_SOURCES['$articleListings'] = [...OPTION_SOURCES['$articleListings'], { label: 'Sample entry', value: 'sample' }];
     const { emitField, emitWidget, emitNavLinks, emitFooterLinks, buttonField, emitThanksButtons } =
       makeEmitters({ q, pad, AVAILABLE_BLOCKS, OPTION_SOURCES });
     const localized = (n) => LOCALES.length > 1 && LOCALIZED_EDITORS.includes(n);

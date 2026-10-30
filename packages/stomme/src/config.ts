@@ -156,6 +156,11 @@ export function resolveListings(l?: Listing[]): (Omit<Listing, 'specs'> & { spec
     .map((x) => ({ ...x, route: x.route.startsWith('/') ? x.route : `/${x.route}`, specs: resolveSpecs(x.specs) }));
 }
 
+export function listingRoute(source: string | undefined, ...sets: (Listing[] | undefined)[]): string | undefined {
+  if (!source) return undefined;
+  return sets.flatMap((l) => resolveListings(l)).find((l) => l.id === source)?.route;
+}
+
 const STRINGS_EN = {
   readMore: 'Read more',
   latest: 'Latest',

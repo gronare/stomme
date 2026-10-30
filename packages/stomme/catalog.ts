@@ -1,4 +1,6 @@
-import { headingFields, headingFieldsSuggesting, buttonField, imageField, iconField, surfaceField, accentField, widthField, cardListField, linkedCardListField, group, mediaGroup, layoutGroup, styleGroup, anchorField, commandField, videoFields, type BlockDef } from './src/kit.ts';
+import { headingFields, headingFieldsSuggesting, buttonField, imageField, iconField, surfaceField, accentField, widthField, cardListField, linkedCardListField, group, mediaGroup, layoutGroup, styleGroup, anchorField, commandField, videoFields, type BlockDef, type Field } from './src/kit.ts';
+
+const articleSourceField: Field = { name: 'source', label: 'Listing', widget: 'select', options: '$articleListings', required: false, hiddenBelow: 2, hint: 'The listing the posts come from. Empty reads the blog.' };
 
 const RAW_BLOCKS: BlockDef[] = [
   {
@@ -659,7 +661,7 @@ const RAW_BLOCKS: BlockDef[] = [
           { label: 'The whole post, notice-board style', value: 'full' },
         ],
       },
-      { name: 'source', label: 'source', widget: 'hidden', required: false },
+      articleSourceField,
       { name: 'base', label: 'base', widget: 'hidden', required: false },
       mediaGroup('Cover images on the cards.', [
         { name: 'showImages', label: 'Image previews', widget: 'boolean', required: false, default: true, hint: 'Show cover images on the cards.' },
@@ -693,7 +695,7 @@ const RAW_BLOCKS: BlockDef[] = [
     shape: 'list',
     fields: [
       ...headingFieldsSuggesting('Archive', 'Every post'),
-      { name: 'source', label: 'source', widget: 'hidden', required: false },
+      articleSourceField,
       { name: 'base', label: 'base', widget: 'hidden', required: false },
       layoutGroup([]),
       styleGroup([surfaceField]),
@@ -707,7 +709,7 @@ const RAW_BLOCKS: BlockDef[] = [
     shape: 'list',
     fields: [
       ...headingFieldsSuggesting('Calendar', 'Upcoming'),
-      { name: 'source', label: 'source', widget: 'hidden', required: false },
+      articleSourceField,
       { name: 'base', label: 'base', widget: 'hidden', required: false },
       layoutGroup([
         { name: 'limit', label: 'How many', widget: 'number', required: false, default: 6, hint: 'How many upcoming events to show; past events, when shown, do not count' },
@@ -726,7 +728,7 @@ const RAW_BLOCKS: BlockDef[] = [
     shape: 'grid',
     fields: [
       ...headingFields,
-      { name: 'source', label: 'source', widget: 'hidden', required: false },
+      { name: 'source', label: 'Catalog', widget: 'select', options: '$catalogListings', required: false, soleDefault: true, hiddenBelow: 1, hint: 'The catalog listing whose entries the grid shows.' },
       { name: 'base', label: 'base', widget: 'hidden', required: false },
       {
         name: 'status', label: 'Show only', widget: 'select', required: false,

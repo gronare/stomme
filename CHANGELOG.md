@@ -7,6 +7,10 @@ frontmatter means disabled/not shown (see `src/kit.ts`).
 
 ## Unreleased
 
+- The CMS offers `catalogList`'s `source` as a pick of the site's catalog listings, preselected
+  when there is one, and `postList`, `postArchive` and `eventList`'s when the site has two or
+  more article listings. A listing block with no `base` links under the `route` of the listing
+  `source` names; `catalogList` falls back to `/<source>` and the blog to `routes.blog` as before.
 - `create-stomme` makes a blank site by default: a home page, a contact page with its
   form, a neutral theme, placeholder text and no photos, with services, testimonials
   and the FAQ turned off. `--demo` scaffolds the Wren & Sorrel demo from `starter/`

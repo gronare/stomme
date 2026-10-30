@@ -1,4 +1,6 @@
 ---
+import { listings } from '@stomme/config';
+import { listingRoute } from '../src/config';
 import { getCollection } from 'astro:content';
 import { withTrailingSlash } from '../src/href';
 
@@ -18,7 +20,8 @@ interface Props {
 const { eyebrow, heading, intro, emptyText, feedLabel, source = 'posts', base, site, anchor } = Astro.props;
 const limit = Astro.props.layout?.limit ?? 6;
 const showPast = Astro.props.layout?.showPast === true;
-const prefix = base ?? site?.routes?.blog ?? '/blog';
+// The blog answers on routes.blog, so a listing that reuses the id posts never moves it.
+const prefix = base ?? (source === 'posts' ? undefined : listingRoute(source, listings, site?.listings)) ?? site?.routes?.blog ?? '/blog';
 const locale = site?.locale ?? 'en-US';
 const all = Astro.props.items ?? (await getCollection(source));
 const events = all
