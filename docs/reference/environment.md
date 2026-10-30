@@ -4,7 +4,7 @@ Every environment variable the engine and the starter read, and where each one i
 
 ## On the server
 
-Set these in the host's environment for the deployed site.
+Set these in the host's environment for the deployed site. On Cloudflare Workers, `/api/contact` reads the Worker's own bindings (variables and secrets) first, then the process environment, then the build's `import.meta.env`.
 
 | Variable | What it does |
 |---|---|
@@ -12,6 +12,7 @@ Set these in the host's environment for the deployed site.
 | `CONTACT_FROM` | the sender address, on a domain verified in Resend |
 | `CONTACT_TO` | the recipient; unset, the `email` in the contact settings is used |
 | `TURNSTILE_SECRET_KEY` | the Cloudflare Turnstile secret key; when set, `/api/contact` verifies the form's `cf-turnstile-response` and refuses a message that fails |
+| `STOMME_RL` | Cloudflare Workers only, a KV namespace binding rather than a variable; when bound, `/api/contact` counts messages per visitor IP and host, and after the fifth answers `429` until 10 minutes have passed since the last accepted one |
 
 ## At build time
 
@@ -30,6 +31,8 @@ Set these in the host's environment for the deployed site.
 
 | Variable | What it does |
 |---|---|
-| `STOMME_SCHEMA` | the catalog file, default `src/blocks/schema.ts` |
+| `STOMME_SCHEMA` | the catalog file, default `src/blocks/schema.ts`; only the generator reads it, the build always uses `src/blocks/schema.ts` |
 | `STOMME_CONFIG` | the CMS config file, default `public/admin/config.yml` |
 | `STOMME_SVELTIA_SRC` | the URL of the Sveltia CMS script that `/admin` loads |
+
+The generator also reads three build-time variables: `STOMME_SLOTS_DIR` for an outside directory's `block-catalog.mjs`, CMS editors and previews, and `STOMME_STYLE` with `STOMME_THEMES_DIR` to seed `src/content/theme/theme.md` from a theme's `theme-seed.md`.
