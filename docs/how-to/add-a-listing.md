@@ -36,6 +36,8 @@ Add a collection shaped to its purpose, such as a news feed, a for-sale catalog 
 | `specs` | catalog only: the fact rows an entry carries, besides the preset's fields |
 | `options` | `columns`, `showImages`, `featured`, `filters` |
 
+A listing without an `id` or a `route`, or with a `preset` other than `article` or `catalog`, is dropped without a warning: it gets no collection, no CMS editor and no pages. A `route` without a leading `/` gets one.
+
 An `article` listing also gets a calendar feed at `route/calendar.ics`, and works with `postList`, `postArchive` and `eventList`. A `catalog` listing works with `catalogList`. A listing's `category` is picked from a term collection, `<id>-categories`, with one `title` per file.
 
 ## Keep specs stable
