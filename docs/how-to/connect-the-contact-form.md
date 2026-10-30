@@ -21,6 +21,10 @@ On an adapter build the engine serves `/api/contact`, which sends the message as
 
 If a variable is missing, the handler answers `500` with `Contact form not configured`, and the form shows its error line.
 
+The handler trims each field and keeps at most 200 characters of `name` and `email`, 60 of `phone`, 120 of `category`, `unit` and `inbox`, and 5000 of `message`. A submit without JavaScript is answered with a `303` redirect to `routes.formSuccess`, with a trailing slash.
+
+On Cloudflare Workers, bind a KV namespace as `STOMME_RL` to rate-limit the form: after five messages from one IP to one host, the handler answers `429` until ten minutes have passed since the last one it accepted. See [Deploy a site](deploy.md#cloudflare-workers).
+
 ## Point the form at your own endpoint
 
 1. Set `contact.endpoint` in `src/site.config.ts`.
