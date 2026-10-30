@@ -21,7 +21,6 @@ Every key `src/site.config.ts` exports: `site` (a `SiteConfig`), `features` (a `
 | `cmsLocale` | `en` | the CMS's field labels, `en` or `sv`; rerun `pnpm stomme cms` after changing it |
 | `strings` | the built-in text for `locale` | your own wording for any interface text, see [Strings](#strings) |
 | `noindex` | none | path prefixes marked `noindex, nofollow`, such as `['/drafts']` |
-| `style` | none | a theme directory under `STOMME_THEMES_DIR`, see [Theme a site](../how-to/theme-a-site.md#use-a-theme-directory) |
 | `metrics.endpoint` | none | an `https:` URL for first-party metrics, see [Measure visits](../how-to/measure-visits.md) |
 | `analytics.cfToken` | none | a Cloudflare Web Analytics token; the beacon loads on every page, whether or not `tracking` is on, and without waiting for the consent banner |
 | `maps.provider` | `google` when `maps.key` is set | `osm` or `google`, for the `findUs` map and `contactCard`'s mini-map |
@@ -108,14 +107,13 @@ See [Add a listing](../how-to/add-a-listing.md).
 
 ## Integration options
 
-`astro.config.mjs` calls `stomme({ features, routes: site.routes, listings, style: site.style })`.
+`astro.config.mjs` calls `stomme({ features, routes: site.routes, listings })`.
 
 | Option | Default | What it does |
 |---|---|---|
 | `features` | none | the feature flags |
 | `routes` | none | the route prefixes |
 | `listings` | none | the listings |
-| `style` | `STOMME_STYLE` | the theme directory |
 | `layout` | `src/layouts/Base.astro` | the layout injected pages render in |
 | `config` | `src/site.config.ts` | the site config file |
 | `locales` | `site.locales` | overrides the languages |

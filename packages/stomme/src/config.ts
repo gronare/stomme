@@ -13,7 +13,6 @@ export interface SiteConfig {
   // Content locales, default first. Fewer than two turns the whole i18n layer off — no locale routes, no hreflang, no switcher, and the CMS gets no i18n declaration.
   locales?: string[];
   localeTags?: Record<string, string>;
-  style?: string;
   analytics?: { cfToken?: string };
   maps?: { provider?: 'google' | 'osm'; key?: string };
   metrics?: { endpoint?: string };

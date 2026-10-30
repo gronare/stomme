@@ -22,8 +22,6 @@ Set these in the host's environment for the deployed site. On Cloudflare Workers
 | `PUBLIC_TURNSTILE_SITE_KEY` | a Cloudflare Turnstile site key; the contact form renders the widget and sends `cf-turnstile-response` |
 | `GITHUB_TOKEN` | a token for reading a private docs repository, or for GitHub's higher rate limit |
 | `STOMME_DOCS_DIR` | a local docs folder to build the docs section from, as one version |
-| `STOMME_THEMES_DIR` | the folder that holds theme directories |
-| `STOMME_STYLE` | the theme directory to use when `site.style` is unset |
 | `STOMME_SLOTS_DIR` | an [outside directory](../how-to/extend-from-an-outside-directory.md) of slots, blocks, collections, CMS editors and routes |
 | `STOMME_LOOKBOOK` | any value builds `/lookbook` into a production build |
 
@@ -35,4 +33,4 @@ Set these in the host's environment for the deployed site. On Cloudflare Workers
 | `STOMME_CONFIG` | the CMS config file, default `public/admin/config.yml` |
 | `STOMME_SVELTIA_SRC` | the URL of the Sveltia CMS script that `/admin` loads |
 
-The generator also reads three build-time variables: `STOMME_SLOTS_DIR` for an outside directory's `block-catalog.mjs`, CMS editors and previews, and `STOMME_STYLE` with `STOMME_THEMES_DIR` to seed `src/content/theme/theme.md` from a theme's `theme-seed.md`.
+The generator also reads `STOMME_SLOTS_DIR` for an outside directory's `block-catalog.mjs`, CMS editors and previews.

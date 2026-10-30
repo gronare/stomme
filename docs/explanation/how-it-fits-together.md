@@ -22,4 +22,4 @@ The CMS shows each page in an iframe on `/preview`, a route the integration inje
 
 ## The integration wires it into Astro
 
-`stomme()` in `astro.config.mjs` injects the routes a site's features need, aliases `@stomme/config`, `@stomme/catalog` and `@stomme/renderer` to the site's own files, mirrors uploads into `src/assets/` for image optimisation, and splices in a theme directory. A site carries no route files for the engine's pages, so an engine update reaches them by bumping a version. [Routes](../reference/routes.md) lists what it injects.
+`stomme()` in `astro.config.mjs` injects the routes a site's features need, aliases `@stomme/config`, `@stomme/catalog` and `@stomme/renderer` to the site's own files, and mirrors uploads into `src/assets/` for image optimisation. A site carries no route files for the engine's pages, so an engine update reaches them by bumping a version. [Routes](../reference/routes.md) lists what it injects.

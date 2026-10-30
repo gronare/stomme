@@ -2,6 +2,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { resolve, dirname } from 'node:path';
 import { mkdirSync, writeFileSync, existsSync, readFileSync, readdirSync, cpSync, rmSync, statSync } from 'node:fs';
 import { createHash } from 'node:crypto';
+import { refuseStyle } from './src/refuse-style.mjs';
 import { previewEntrypoint, listingEntrypoint, listingCalendarEntrypoint, lookbookDataModule, lookbookEntrypoint, lookbookBlockEntrypoint, localeHomeEntrypoint, localePagesEntrypoint, REVEAL } from './src/entrypoints.mjs';
 import { publicIndexPlugin } from './src/vite-public-index.mjs';
 import { createJiti } from 'jiti';
@@ -55,52 +56,6 @@ function inlineScriptHashes(dirs) {
     }
   }
   return [...hashes].sort();
-}
-
-// Optional theme "style": splices a theme's tokens.css + theme.css into the site's global.css immediately after the engine stylesheet @import, giving the cascade engine < tokens < theme < site with no !important. A named style whose theme.css is missing throws at build — a silent neutral fallback would ship unstyled pixels.
-const STYLE_IMPORT_RE = /@import\s+["'](?:@[\w-]+\/)?stomme\/styles\.css["'];?/;
-const GLOBAL_CSS_RE = /(^|\/)global\.css$/;
-// A custom property, not a CSS comment: it survives minification, so the astro:build:done guard can prove the theme layer actually reached the emitted CSS.
-const STYLE_SENTINEL = '--stomme-style';
-
-function styleThemePlugin(style, styleDir) {
-  const tokensPath = resolve(styleDir, 'tokens.css');
-  const themePath = resolve(styleDir, 'theme.css');
-  return {
-    name: 'stomme:style',
-    enforce: 'pre',
-    transform(code, id) {
-      // Identify the seam by the engine @import it carries plus a global.css basename, never an exact filesystem path: Vite resolves module ids to their realpath, which diverges from a resolve(config.root, …) path under symlinked / pnpm checkouts, and a path-equality check then silently no-ops and ships the site unthemed with a green build.
-      const bare = id.split('?')[0].replace(/\\/g, '/');
-      if (!GLOBAL_CSS_RE.test(bare)) return null;
-      if (!STYLE_IMPORT_RE.test(code)) return null;
-      if (existsSync(tokensPath)) this.addWatchFile(tokensPath);
-      this.addWatchFile(themePath);
-      const tokens = existsSync(tokensPath) ? readFileSync(tokensPath, 'utf8') : '';
-      const theme = readFileSync(themePath, 'utf8');
-      const injected =
-        `\n:root{${STYLE_SENTINEL}:${JSON.stringify(style)}}` +
-        `\n/* stomme style "${style}" — tokens (fonts + shape vars) */\n${tokens}` +
-        `\n/* stomme style "${style}" — theme (component layer) */\n${theme}\n`;
-      return { code: code.replace(STYLE_IMPORT_RE, (m) => m + injected), map: null };
-    },
-  };
-}
-
-function emittedCssHasStyle(dir) {
-  const stack = [dir];
-  while (stack.length) {
-    const cur = stack.pop();
-    let entries;
-    try { entries = readdirSync(cur, { withFileTypes: true }); } catch { continue; }
-    for (const ent of entries) {
-      const p = resolve(cur, ent.name);
-      if (ent.isDirectory()) { stack.push(p); continue; }
-      if (!/\.(css|html)$/i.test(ent.name)) continue;
-      try { if (readFileSync(p, 'utf8').includes(STYLE_SENTINEL)) return true; } catch { }
-    }
-  }
-  return false;
 }
 
 // site.config.ts is read through jiti for the same reason the generator does: a bare import of a .ts file under node_modules fails on its own import graph.
@@ -193,7 +148,7 @@ export default function stomme(options = {}) {
   const features = options.features || {};
   const routes = options.routes || {};
   const listings = resolveListings(options.listings);
-  const style = options.style || process.env.STOMME_STYLE;
+  refuseStyle(options.style || process.env.STOMME_STYLE);
   if (features.blog && !listings.some((l) => l.id === 'posts')) {
     listings.unshift({ id: 'posts', route: routes.blog || '/blog', label: 'Blog', preset: 'article' });
   }
@@ -287,28 +242,6 @@ export default function stomme(options = {}) {
         const enabled = [];
         for (const name of slotsOn) enabled.push(`slot:${name}`);
         const outDir = resolve(root, '.astro/stomme');
-
-        if (style) {
-          const themesDir = process.env.STOMME_THEMES_DIR;
-          if (!themesDir) {
-            throw new Error(
-              `stomme: style "${style}" is set but STOMME_THEMES_DIR is not. ` +
-              `Point it at the directory that holds your theme folders — ` +
-              `a missing theme would silently ship unstyled pixels.`,
-            );
-          }
-          const styleDir = resolve(themesDir, style);
-          const themeCssPath = resolve(styleDir, 'theme.css');
-          if (!existsSync(themeCssPath)) {
-            throw new Error(
-              `stomme: style "${style}" has no theme.css at ${themeCssPath}. ` +
-              `Check STOMME_THEMES_DIR and the style name — ` +
-              `a missing theme would silently ship unstyled pixels.`,
-            );
-          }
-          updateConfig({ vite: { plugins: [styleThemePlugin(style, styleDir)] } });
-          enabled.push(`style:${style}`);
-        }
 
         const isStatic = (process.env.STOMME_TARGET || 'netlify') === 'static';
 
@@ -501,16 +434,6 @@ export default function stomme(options = {}) {
         } catch (e) {
           logger?.warn(`media icons→root skipped: ${e?.message || e}`);
         }
-        if (!style) return;
-        if (emittedCssHasStyle(outDir)) {
-          logger?.info(`style "${style}" verified in emitted CSS`);
-          return;
-        }
-        throw new Error(
-          `stomme: style "${style}" is configured but the theme layer is missing from the ` +
-          `emitted CSS (no "${STYLE_SENTINEL}" sentinel under ${outDir}). The style splice ` +
-          `silently failed — the site would ship unstyled. Failing the build.`,
-        );
       },
     },
   };

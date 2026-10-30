@@ -36,7 +36,8 @@ collections:
               - { name: title, label: "SEO title", widget: string }
               - { name: description, label: "SEO description", widget: text }
           - name: blocks
-            label: "Sections · build the page (drag to reorder)"
+            label: "Sections"
+            hint: "Build the page; drag a section to reorder it."
             label_singular: "Section"
             widget: list
             required: false
@@ -2866,7 +2867,8 @@ collections:
           - { name: title, label: "SEO title", widget: string }
           - { name: description, label: "SEO description", widget: text }
       - name: blocks
-        label: "Sections · build the page (drag to reorder)"
+        label: "Sections"
+        hint: "Build the page; drag a section to reorder it."
         label_singular: "Section"
         widget: list
         required: false
@@ -5799,7 +5801,8 @@ collections:
                       - { label: "Planting (/services/planting)", value: "/services/planting" }
                   - { name: url, label: "…or a custom URL", widget: string, required: false, hint: "External link, tel: or mailto: — overrides the page above." }
       - name: blocks
-        label: "Sections · build the page (drag to reorder)"
+        label: "Sections"
+        hint: "Build the page; drag a section to reorder it."
         label_singular: "Section"
         widget: list
         required: false

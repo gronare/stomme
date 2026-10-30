@@ -7,6 +7,15 @@ frontmatter means disabled/not shown (see `src/kit.ts`).
 
 ## Unreleased
 
+- **Breaking:** the engine no longer loads theme directories. `site.style`,
+  `STOMME_STYLE` and `STOMME_THEMES_DIR` are gone, and a site that still sets `style`
+  stops the build and `stomme cms` with a message saying what to do: move the theme's
+  `tokens.css` and `theme.css` into `src/styles/global.css` right after the engine
+  import, which is where the build used to put them, and drop `style`. The CMS preview
+  reads the same `global.css`. Colours in `theme.md` are unchanged.
+- The CMS block list is labelled "Sections" once, with "build the page" as its hint,
+  instead of the long label in both the field header and the list's item count. A
+  site's `config.yml` takes it when it is regenerated.
 - One `stomme` command runs a site: `stomme dev`, `stomme build [--target static|netlify|cloudflare|vercel|node]`
   (sets `STOMME_TARGET`), `stomme cms`, `stomme block new <name>`, `stomme lint [content|styles|comments]`
   and `stomme new <directory>`; `stomme --help` lists them. Inside a site it runs as `pnpm stomme …`.

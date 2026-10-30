@@ -71,23 +71,3 @@ Write the rule in `src/styles/global.css` after the engine's import. The library
 ```
 
 To give a boxed image another shape, set the box's ratio variable, as above, rather than `aspect-ratio`. `aspect-ratio: auto` drops the image's `width` and `height` with the class's ratio, and the box measures 0 high until the file arrives.
-
-## Use a theme directory
-
-A theme directory holds a `theme.css` (the component layer) and, optionally, `tokens.css` (fonts and shape variables) and `theme-seed.md` (starting colours). The build splices it into `global.css` right after the engine import, so the order is engine, tokens, theme, then your own rules.
-
-1. Point `STOMME_THEMES_DIR` at the folder that holds your theme directories, and name the theme in `site.style` (or `STOMME_STYLE`).
-
-   ```ts
-   export const site: SiteConfig = { style: 'my-theme' };
-   ```
-
-2. Build with the variable set.
-
-   ```bash
-   STOMME_THEMES_DIR=../themes pnpm build
-   ```
-
-3. Read the build log: `style "my-theme" verified in emitted CSS` confirms the theme reached the output.
-
-A named theme with no `STOMME_THEMES_DIR`, or no `theme.css`, stops the build, so a site never ships unstyled. When `theme.md` does not exist yet, `pnpm stomme cms` copies `theme-seed.md` into its place.

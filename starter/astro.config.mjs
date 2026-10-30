@@ -33,5 +33,5 @@ export default defineConfig({
   // Nothing here reads Astro.session; left unset, an adapter provisions a session store (Cloudflare a SESSION KV namespace) that would then exist in the cloud unused.
   session: false,
   ...(adapter ? { adapter } : {}),
-  integrations: [stomme({ features, routes: site.routes, listings, style: site.style }), sitemap({ filter: (page) => !page.includes('/preview'), ...sitemapI18n(site, localePages()) })],
+  integrations: [stomme({ features, routes: site.routes, listings }), sitemap({ filter: (page) => !page.includes('/preview'), ...sitemapI18n(site, localePages()) })],
 });

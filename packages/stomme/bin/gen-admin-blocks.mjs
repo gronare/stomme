@@ -18,6 +18,7 @@ import { termCollections, seedTerms } from '../src/term-collections.mjs';
 import { listingIndexSeed, listingIndexSlug } from '../src/listing-seed.mjs';
 import { loadSiteBlocks } from '../src/site-blocks.mjs';
 import { lintContent, lintSummaryLine } from '../src/content-lint.mjs';
+import { refuseStyle } from '../src/refuse-style.mjs';
 
 const root = process.cwd();
 const here = dirname(fileURLToPath(import.meta.url));
@@ -78,24 +79,7 @@ if (blogEnabled && !LISTINGS.some((l) => l.id === 'posts')) {
   LISTINGS.unshift({ id: 'posts', route: ROUTES.blog || '/blog', label: 'Blog', preset: 'article' });
 }
 
-if (STYLE && !process.env.STOMME_THEMES_DIR) {
-  throw new Error(
-    `stomme-gen: style "${STYLE}" is set but STOMME_THEMES_DIR is not. ` +
-    `Point it at the directory that holds your theme folders.`,
-  );
-}
-const STYLE_DIR = STYLE ? resolve(process.env.STOMME_THEMES_DIR, STYLE) : null;
-if (STYLE_DIR) {
-  const themeMd = resolve(root, 'src/content/theme/theme.md');
-  const seed = resolve(STYLE_DIR, 'theme-seed.md');
-  if (existsSync(themeMd)) {
-    console.log(`stomme-gen: style "${STYLE}" — theme.md already exists, not overwriting (editor owns the colours)`);
-  } else if (existsSync(seed)) {
-    mkdirSync(dirname(themeMd), { recursive: true });
-    copyFileSync(seed, themeMd);
-    console.log(`stomme-gen: style "${STYLE}" — seeded src/content/theme/theme.md from theme-seed.md`);
-  }
-}
+refuseStyle(STYLE, 'stomme-gen');
 
 let LOCALIZED_BY_PATH = null;
 let LOCALIZED_BY_TEXT = null;
@@ -335,17 +319,8 @@ writeAdminShell({ root, here, SVELTIA_CMS_SRC });
 try {
   const libCss = readFileSync(resolve(here, '../styles.css'), 'utf8');
   const PREVIEW_BODY_RESET = '\n/* admin preview: undo the sticky-footer body layout */\nbody{display:block;min-height:auto}\n';
-  let styleCss = '';
-  if (STYLE_DIR) {
-    const tokensP = resolve(STYLE_DIR, 'tokens.css');
-    const themeP = resolve(STYLE_DIR, 'theme.css');
-    const tokens = existsSync(tokensP) ? readFileSync(tokensP, 'utf8') : '';
-    const themeCss = existsSync(themeP) ? readFileSync(themeP, 'utf8') : '';
-    if (tokens || themeCss) styleCss = `\n/* stomme style "${STYLE}" — tokens + theme (CMS preview) */\n${tokens}\n${themeCss}\n`;
-    else console.warn(`  (stomme-gen: style "${STYLE}" has no tokens.css/theme.css at ${STYLE_DIR})`);
-  }
   const siteCss = readFileSync(resolve(root, 'src/styles/global.css'), 'utf8')
-    .replace(/@import\s+["'](?:@[\w-]+\/)?stomme\/styles\.css["'];?/, () => libCss + PREVIEW_BODY_RESET + styleCss);
+    .replace(/@import\s+["'](?:@[\w-]+\/)?stomme\/styles\.css["'];?/, () => libCss + PREVIEW_BODY_RESET);
   let themeRoot = '';
   try {
     const tm = readFileSync(resolve(root, 'src/content/theme/theme.md'), 'utf8');

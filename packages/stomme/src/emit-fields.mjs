@@ -132,7 +132,8 @@ export function makeEmitters({ q, pad, AVAILABLE_BLOCKS, OPTION_SOURCES }) {
     const p = pad(indent);
     const lines = [
       `${p}- name: blocks`,
-      `${p}  label: "Sections · build the page (drag to reorder)"`,
+      `${p}  label: "Sections"`,
+      `${p}  hint: "Build the page; drag a section to reorder it."`,
       `${p}  label_singular: "Section"`,
       `${p}  widget: list`,
       `${p}  required: false`,
