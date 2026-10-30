@@ -2,7 +2,7 @@
 
 Every block in the library catalog (`@gronare/stomme/catalog`), with its fields as they are written in a page's frontmatter.
 
-A field path with a dot is a field inside a group: `media.kind` is written as `media: { kind: … }`. Defaults are what the CMS fills in. Each block below is shown live, rendered by the same renderer a page uses, with the YAML that made it underneath. Run `pnpm dev` and open `/lookbook` to see every block with sample content, or `/admin/blocks.html` for the block gallery `cms:gen` writes. [Add a custom block](../how-to/add-a-custom-block.md) adds your own.
+A field path with a dot is a field inside a group: `media.kind` is written as `media: { kind: … }`. Defaults are what the CMS fills in when an editor adds the block. A page written by hand gets the same value for most fields it leaves out, but a few switches read as off when they are missing, see [Fields left out of a hand-written page](#fields-left-out-of-a-hand-written-page). Each block below is shown live, rendered by the same renderer a page uses, with the YAML that made it underneath. Run `pnpm dev` and open `/lookbook` to see every block with sample content, `/lookbook/<slug>` for one sample on its own page (the slug is the sample's label in the lookbook, such as `/lookbook/hero`), or `/admin/blocks.html` for the block gallery `cms:gen` writes. [Add a custom block](../how-to/add-a-custom-block.md) adds your own.
 
 ## Fields many blocks share
 
@@ -12,7 +12,23 @@ A field path with a dot is a field inside a group: `media.kind` is written as `m
 | `style.surface` | `standard` (default), `tint`, `panel`, `band`, `dark`, `gradient` | the background; the renderer wraps the block in a full-width band, and a block never paints its own |
 | `style.accent` | `brand` (default), `secondary`, `highlight` | the colour of the block's rule, icon or number; the eyebrow follows `eyebrowColor` in the theme instead |
 | `layout.beside` | `below` (default), `equal`, `narrow`, `wide` | places the block beside the one before it, see [Two blocks side by side](#two-blocks-side-by-side) |
-| `anchor` | text | an id, so `#anchor` links scroll to the block |
+| `anchor` | text | an id, so `#anchor` links scroll to the block; every block reads it, though the CMS offers it only on `plans`, `steps` and `ctaPanel`. On a page with a `sectionNav`, a block with a heading gets the slugged heading as its id instead |
+
+### Fields left out of a hand-written page
+
+The CMS writes every switch into the page when an editor adds a block. A page written by hand that leaves one of these out gets the opposite of the CMS default, so the feature is off:
+
+| Block | Off when left out | The CMS fills in |
+|---|---|---|
+| `postList` | `media.showImages`, `layout.featured` | `true`, `true` |
+| `catalogList` | `media.showImages`, `layout.filters` | `true`, `true` |
+| `subpages` | `media.showImages` | `true` |
+| `documentList` | `layout.grouped` | `true` |
+| `contactForm`, and each `contactSwitch` item | `showPhone`, `showDirectContact` | `true`, `true` |
+| `contactCard` | `show` (the card shows only its label), `tint` | `phone` and `email`, `true` |
+| `findUs` | `showHours` | `true` |
+
+Write the field as `true` (or list the parts in `show`) to turn it on.
 
 ### Buttons
 
@@ -25,14 +41,25 @@ cta:
     page: /contact
 ```
 
-The older flat pairs (`ctaLabel`/`ctaHref`, `label`/`href`, `link`/`linkLabel`, `asideCtaLabel`) still render, and `block-migrations.json` in the package lists each rename to the group form.
+The older flat pairs still render. `block-migrations.json` in the package is the full list of renames to the group form:
+
+| Blocks | Flat pair | Group |
+|---|---|---|
+| `ctaBox`, `ctaPanel` | `label`, `href` | `cta` |
+| `ctaBox` | `label2`, `href2` | `cta2` |
+| `cover`, `hero`, `pageHeader` | `ctaLabel`, `ctaHref` | `cta` |
+| `cover`, `hero` | `cta2Label`, `cta2Href` | `cta2` |
+| `faq` | `asideCtaLabel`, with `asideHref` or `asideCtaHref` | `asideCta` |
+| `fragment` | `linkLabel`, `link` | `cta` |
+| `featureGrid`, on each item | `linkLabel`, `link` | the item's `cta` |
+| `plans`, on each plan | `ctaLabel`, `ctaHref` | the plan's `cta` |
 
 ### Commands, video and headings
 
 - **Command.** `hero` and `ctaPanel` take `command`, a copyable code line, see [Command](#command-a-copyable-code-line).
 - **Video.** `hero` and `textImage` play a looping video when `media.kind` is `video`, see [Video](#video).
 - **Section links.** On a page with a `sectionNav` block, every block with a heading gets an `id` slugged from the heading, made unique with `-2`, `-3`, so the chips can link to it. A page without `sectionNav` gets no ids.
-- **Underlines.** In `callout`, `definition`, `fragment` and `statPanel`, words wrapped in `*asterisks*` are underlined.
+- **Emphasis.** In these fields, words wrapped in `*asterisks*` are emphasised. In a display heading they are underlined in the heading's colour: the `hero` and `pageHeader` H1, the `featureGrid`, `ctaBox`, `statPanel` and `plans` headings, the `callout` quote and the `fragment` statement. In the `panel` layout of `ctaBox` the underlined words also turn the brand colour. In smaller text they are set in italics: the `plans` description, feature text, `note.text` and footnote, and the `definition` senses' `text`. Other plain-text fields show the asterisks as written, and Markdown fields set the words in italics.
 
 ### Two blocks side by side
 
@@ -57,6 +84,14 @@ Set `layout.beside` on the second block to `equal`, `narrow` or `wide` and the r
       value: Free
 ```
 
+### Icons
+
+`featureGrid` items, `hero` highlights and `steps` items take an `icon` by name. The names, in the order the CMS picker lists them:
+
+`check`, `star`, `heart`, `spark`, `sparkles`, `arrow`, `search`, `clock`, `calendar`, `pin`, `map`, `users`, `chat`, `bulb`, `chart`, `gauge`, `award`, `shield`, `tag`, `percent`, `coins`, `document`, `gear`, `refresh`, `link`, `globe`, `wifi`, `phone`, `mail`, `headset`, `home`, `roof`, `key`, `truck`, `tree`, `wrench`, `hammer`, `ruler`, `paint`, `plug`, `bolt`, `sun`, `panel`, `battery`, `leaf`, `flame`, `snowflake`, `thermometer`, `droplet`, `wind`, `spray`, `drone`, `camera`, `compass`
+
+An unknown or blank name draws `spark`. The CMS offers the names as a list in `featureGrid` and `hero`, but `steps` takes `items[].icon` as free text, so a typo there shows `spark`.
+
 ## Hero and headers
 
 ### `hero`
@@ -67,7 +102,7 @@ Full-width intro with a heading, text and buttons, and an optional image, video,
 |---|---|---|
 | `eyebrow`, `heading`, `intro` | text | `heading` is the page's H1 |
 | `ticks[]` | text | short checkmark lines under the intro |
-| `cta`, `cta2` | button | the button, and a quiet text link beside it |
+| `cta`, `cta2` | button | the button, and a quiet text link beside it; with no `cta2`, the phone number from the contact settings takes that place as a call link |
 | `command` | text | a copyable command |
 | `media.kind` | `none` (default), `image`, `video`, `highlights`, `motif` | what shows beside the text |
 | `media.image`, `media.imageAlt` | image, text | the picture, also the video's poster |
@@ -137,7 +172,7 @@ Title band for an inner page.
 |---|---|---|
 | `eyebrow`, `heading`, `intro` | text | `heading` is the H1 |
 | `cta` | button | |
-| `layout.variant` | `light` (default), `dark` | dark puts the title on a dark full-width band |
+| `layout.variant` | `light` (default), `dark` | dark puts the title on a dark full-width band, and when there is a `cta`, a call link to the contact settings' phone number sits beside it (`Call` followed by the number, worded by `strings.contact.call`) |
 | `layout.width` | `narrow` (default), `full` | |
 | `style.surface` | see above | |
 
@@ -267,6 +302,7 @@ A row of chips that jump to the headings below it on the same page. The chips ar
 | Field | Values | What it does |
 |---|---|---|
 | `label` | text | the row's accessible name; default from `strings.sectionNav.label` |
+| `sections[]` | `anchor`, `label` | a fixed list of chips; when set, the renderer uses it instead of reading the headings below. The CMS does not offer it |
 | `layout.sticky` | `false` (default) | `true` keeps the row at the top of the window while scrolling |
 | `style.surface` | see above | |
 
@@ -301,6 +337,7 @@ Grid of cards with an icon or a number, a title and text. A card can link.
 | `eyebrow`, `heading`, `intro` | text | |
 | `items[]` | `icon`, `title`, `body`, `tag`, `cta` | `tag` is a small label at the card's foot; `cta` makes the card a link, with `Read more` when its label is blank |
 | `layout.numbered` | `false` (default) | `true` shows 01, 02, 03 instead of icons |
+| `layout.columns` | `3` (default), `2`, `4` | cards per row from 1040px wide; between 700px and 1040px the grid has three columns, below that one |
 | `style.surface`, `style.accent` | see above | |
 
 ```yaml block
@@ -465,7 +502,7 @@ Ticked items in one or two columns.
 |---|---|---|
 | `eyebrow`, `heading`, `intro` | text | |
 | `items[]` | `text`, `note` | `note` is a line under the item |
-| `layout.columns` | `2` (default), `1` | |
+| `layout.columns` | `2` (default), `1` | any value other than `1` gives two columns |
 | `style.surface` | see above | |
 
 ```yaml block
@@ -516,7 +553,7 @@ Responsive image grid with captions.
 |---|---|---|
 | `eyebrow`, `heading`, `intro` | text | |
 | `images[]` | `image`, `alt`, `caption` | |
-| `layout.columns` | `3` (default), `2` | |
+| `layout.columns` | `3` (default), `2` | any value other than `2` gives three columns |
 | `style.surface` | see above | |
 
 ```yaml block
@@ -648,7 +685,7 @@ A dark statement panel beside a giant number, or two or three figures side by si
 | Field | Values | What it does |
 |---|---|---|
 | `eyebrow`, `heading` | text | |
-| `body` | text | a blank line starts a new paragraph |
+| `body` | Markdown | rendered as full Markdown, so a blank line starts a new paragraph and links follow the page's language |
 | `badges[]` | text | |
 | `statValue`, `statLabel` | text | the big number |
 | `stats[]` | `label`, `value`, `note` | replaces the single number when filled |
@@ -749,20 +786,26 @@ These blocks read entries from a collection. `cms:gen` offers a block only while
 
 | Type | Reads | Fields besides `eyebrow`, `heading`, `intro`, `style.surface` |
 |---|---|---|
-| `faq` | `faq` | `entries` (pick questions, in order), `tag` (every question with that tag, ignored when `entries` is set), `asideHeading`, `asideBody`, `asideCta` (a contact aside, hidden when `asideHeading` is blank), `layout.variant`: `list` (default), `accordion` (native `<details>`), `cards`, `split` (an index and a reader) |
+| `faq` | `faq` | `entries` (pick questions, in order), `tag` (every question with that tag, ignored when `entries` is set), `asideHeading`, `asideBody`, `asideCta` (a contact aside, shown when any of the heading, the body or the button label is filled; a button with no link points at `mailto:` and the contact email, or at the home page when no email is set), `layout.variant`: `list` (default), `accordion` (native `<details>`), `cards`, `split` (an index and a reader) |
 | `testimonials` | `testimonials` | none; quote cards |
 | `documentList` | `documents` | `group` (show one group), `layout.grouped` (`true` by default, a heading per group). Each row has an icon with the file extension, the title, the note and date, and the file type and size read off the built file |
 | `linkChips` | `towns` | none; a chip link to each area's page |
-| `serviceGrid` | `services` | `services` (pick and order a subset); cards with an image or a placeholder, linking to each service's page |
-| `subpages` | `pages` | `pages` (pick pages, in order; empty shows the pages under this one), `layout.variant`: `cards` (default), `tiles`, `rows`, `chips` (labelled `strings.subpages.inSection`), `siblings` (for a subpage: the parent's title, `strings.subpages.moreInSection`, the pages beside this one and a link up); `layout.columns` `2` (default), `3`, `4` for cards and tiles; `media.showImages` (`true` by default, cards only). Nothing to show renders nothing |
-| `postList` | the blog or an `article` listing | `text`: `excerpt` (default) or `full`; `media.showImages` (`true`), `media.style`: `top` (default) or `corner`; `layout.featured` (`true`, the newest post as a lead card tagged `strings.latest`), `layout.columns` (`3`), `layout.limit` (newest first), `layout.archive` (a path linked when the limit cuts the list). A post's `category` shows as a chip, and an `eventDate` replaces the publish date |
+| `serviceGrid` | `services` | `services` (pick and order a subset; empty shows every service, sorted by its `order`); cards with an image or a placeholder, linking to each service's page |
+| `subpages` | `pages` | `pages` (pick pages, in order; empty shows the pages under this one; only published pages are listed), `layout.variant`: `cards` (default), `tiles`, `rows`, `chips` (labelled `strings.subpages.inSection`), `siblings` (for a subpage: the parent's title, `strings.subpages.moreInSection`, the pages beside this one and a link up); `layout.columns` `2` (default), `3`, `4` for cards and tiles; `media.showImages` (`true` by default, cards only). A card's text is the page's `summary`, or its `seo.description` when the summary is blank. Nothing to show renders nothing |
+| `postList` | the blog or an `article` listing | `text`: `excerpt` (default) or `full`; `media.showImages` (`true`), `media.style`: `top` (default) or `corner`; `layout.featured` (`true`, the newest post as a lead card tagged `strings.latest`), `layout.columns` (`3`), `layout.limit` (newest first), `layout.archive` (a path linked under the list whenever it is set; when the limit cuts the list, a line `strings.post.showingLatest` sits above the link). A card shows a picture only when the post sets `showCover`. A post's `category` shows as a chip beside the publish date |
 | `postArchive` | the blog or an `article` listing | none; every post, grouped by year, newest first |
 | `eventList` | the blog or an `article` listing, entries with an `eventDate` | `layout.limit` (`6`, upcoming events only), `layout.showPast` (`false`; `true` dims past events instead of hiding them), `emptyText` (shown when nothing is upcoming), `feedLabel` (the text of a link to `<route>/calendar.ics`; empty hides it). The page ships every dated entry and the browser hides what has passed, so a static page stays current |
-| `catalogList` | a `catalog` listing | `status`: empty (every entry), `available`, `reserved` or `sold`; `media.showImages` (`true`); `layout.filters` (`true`, category chips above the grid); `layout.columns` (`3`). Cards show the cover, a status badge, the price and the listing's specs |
+| `catalogList` | a `catalog` listing | `status`: empty (every entry), `available`, `reserved` or `sold`; `media.showImages` (`true`); `layout.filters` (`true`, category chips above the grid); `layout.columns` (`3`). Cards show the cover, a status badge, the price and the listing's specs. Without `source` it renders nothing |
+
+`postList`, `postArchive`, `eventList` and `catalogList` also carry two fields the CMS keeps hidden: `source`, the collection to read, and `base`, the route its entries live under. The index page seeded for a listing is written with both. On a page written by hand, `postList`, `postArchive` and `eventList` read the blog (`posts` under `routes.blog`) when they are left out; for another listing, set `source` to the listing's `id` and `base` to its `route`. `catalogList` needs `source`, and `base` defaults to `/<source>`.
 
 They render the site's own entries, so this reference shows their YAML only.
 
 ```yaml
+- type: catalogList
+  heading: For sale
+  source: boats
+  base: /boats
 - type: faq
   heading: Common questions
   tag: care
@@ -857,7 +900,7 @@ A contact form beside a direct-contact card. It posts to the contact handler and
 
 | Field | Values | What it does |
 |---|---|---|
-| `eyebrow`, `heading`, `intro` | text | a blank heading uses the page title |
+| `eyebrow`, `heading`, `intro` | text | a blank heading uses the page title; the heading is the page's H1 when the page has no `hero`, `cover` or `pageHeader` |
 | `labelName`, `labelEmail`, `labelMessage`, `submitLabel` | text | blank uses `strings.contact` |
 | `showPhone` | `true` (default) | |
 | `requirePhone` | `false` (default) | |
@@ -887,8 +930,8 @@ Two or more contact forms on one surface, shown one at a time, switched without 
 
 | Field | Values | What it does |
 |---|---|---|
-| `eyebrow`, `heading`, `intro` | text | |
-| `items[]` | `label`, `description`, `intro`, and every `contactForm` field from `labelName` to `inbox` | one form per errand; the first is open when the page loads; `description` shows in the `cards` layout only |
+| `eyebrow`, `heading`, `intro` | text | the heading is the page's H1 when the page has no `hero`, `cover` or `pageHeader` |
+| `items[]` | `label`, `description`, `intro`, and every `contactForm` field from `labelName` to `inbox` | one form per errand; the first is open when the page loads; `description` shows in the `cards` layout only. An item with no `label` is dropped, and a single item shows its form with no switch |
 | `layout.variant` | `segmented` (default), `cards`, `tabs` | how the visitor switches |
 | `style.surface` | see above | |
 
@@ -913,7 +956,7 @@ The direct-contact card on its own, filled from the contact settings.
 
 | Field | Values | What it does |
 |---|---|---|
-| `show` | any of `phone`, `email`, `hours`, `address`, `map`, `socials`; default `phone`, `email` | a part with no data is skipped, and `map` needs `lat` and `lng` on the address |
+| `show` | any of `phone`, `email`, `hours`, `address`, `map`, `socials`; default `phone`, `email` | a part with no data is skipped; `map` needs `lat` and `lng` on the address and a map provider, `maps.provider: 'osm'` or a Google `maps.key`, in the site config |
 | `label` | text | blank uses `strings.contact.direct` |
 | `tint` | `true` (default) | a tinted background |
 | `style.surface` | see above | |
@@ -947,13 +990,13 @@ heading: Visit the yard
 
 ### `map`
 
-A map picture with the address and two buttons that hand the route to Google Maps or Apple Maps. No third-party script runs on the page.
+A map picture with the address and two buttons that hand the route to Google Maps or Apple Maps. No third-party script runs on the page until the visitor asks for one: with `coords` and a map provider (`maps.provider: 'osm'`, or a Google `maps.key`), the map offers a button that loads an interactive map, as `findUs` does.
 
 | Field | Values | What it does |
 |---|---|---|
 | `address` | text | shown in bold, and used for the route when there are no coordinates |
 | `note` | text | a quiet line beside the address |
-| `media.image`, `media.imageAlt` | image, text | a static map you exported; a site with a Google map key shows Google's still instead |
+| `media.image`, `media.imageAlt` | image, text | a static map you exported; with `coords` and a Google map key, a site built with an adapter shows Google's still instead, served through the site's own `/map/` route |
 | `media.credit` | text | printed over the picture; a map from OpenStreetMap must credit `© OpenStreetMap contributors` |
 | `media.pinX`, `media.pinY` | 0 to 100 | where the pin sits, in percent; leave both blank for no pin |
 | `coords.lat`, `coords.lng` | numbers | land the map app on the door instead of the street |
@@ -976,14 +1019,16 @@ note: The yard gate is on the left, past the barn.
 | `prose` | its pull-stat is for the one headline figure a text section earns; `statsBar` is the row for several |
 | `factList` | one row per fact, label beside value; `statsBar` is a row of big numbers, `definition` a single word being defined |
 | `contactSwitch` | one surface, one form at a time; two `contactForm` blocks one under the other ask the visitor to read both |
-| `map` | a picture and two route buttons, with nothing loaded from a map provider; `findUs` shows an interactive map from the contact settings |
+| `map` | a picture and two route buttons for any address you type, with nothing loaded from a map provider until the visitor clicks; `findUs` reads the address, contact details and hours from the contact settings |
 
 ## Images in Markdown
 
-Markdown fields, such as the bodies of `prose`, `textImage` and `textQuote` and of blog posts, go through `renderMarkdown` from `@gronare/stomme/markdown`. Inline images are optimised, and a title keyword lays them out: `left`, `right` or `wide`, plus `small` or `large`.
+Markdown fields, such as the bodies of `prose`, `textImage` and `textQuote` and of blog posts, go through `renderMarkdown` from `@gronare/stomme/markdown`. Each inline image becomes a figure, and a title keyword lays it out: `left`, `right`, `wide` or `center`, plus `small` or `large`. With no placement keyword the image is centred in a column up to 30rem wide. The alt text is also printed under the image as a visible caption. Only images under `/media/` that are uploads in `src/assets/media/` are optimised; any other path is used as written.
 
 ```md
 ![A workbench](/media/pages/about/bench.jpg "right small")
 ```
 
 The CMS's **Image** button writes that Markdown for editors.
+
+A link in a Markdown field to a page on the site gets a trailing slash, `[the team](/about)` becomes `/about/`, and in the `prose`, `textImage`, `textQuote` and `statPanel` bodies on a site with more than one language it points at the page in the language being read. Links to files, bare `#anchor` links and links to other sites are left as written.
