@@ -1790,6 +1790,16 @@
               "required": false
             },
             {
+              "name": "columns",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "2",
+                "3",
+                "4"
+              ]
+            },
+            {
               "name": "beside",
               "widget": "select",
               "required": false,

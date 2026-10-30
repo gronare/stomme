@@ -200,6 +200,16 @@ const unmigrated = readdirSync(resolve(pkg, 'blocks')).filter((f) => f.endsWith(
 check(migrations.length >= 7 && unmigrated.length === 0, 'every legacy button pair a block still renders through resolveButton has an entry in block-migrations.json', unmigrated.join(', '));
 check(JSON.parse(read('package.json')).files.includes('block-migrations.json'), 'block-migrations.json is in the package files, so the published package ships it');
 
+const manifestBlocks = JSON.parse(read('blocks-manifest.json')).blocks;
+const undeclaredLayout = readdirSync(resolve(pkg, 'blocks')).filter((f) => f.endsWith('.astro')).flatMap((f) => {
+  const src = read(`blocks/${f}`);
+  const type = src.match(/data-stomme-block="([a-zA-Z]+)"/)?.[1];
+  if (!manifestBlocks[type]) return [];
+  const declared = (manifestBlocks[type].fields.find((x) => x.name === 'layout')?.fields ?? []).map((x) => x.name);
+  return [...new Set([...src.matchAll(/layout\?\.([a-zA-Z]+)/g)].map((m) => m[1]))].filter((k) => !declared.includes(k)).map((k) => `${type}.layout.${k}`);
+});
+check(undeclaredLayout.length === 0, 'every layout option a block component honours is declared in the catalog, so the CMS offers it', undeclaredLayout.join(', '));
+
 const failed = results.filter((ok) => !ok).length;
 console.log(`\n${results.length - failed}/${results.length} cross-file contracts hold`);
 if (failed) { console.error('\n✗ cross-file contracts FAILED'); process.exit(1); }

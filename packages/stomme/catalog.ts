@@ -216,6 +216,11 @@ const RAW_BLOCKS: BlockDef[] = [
       linkedCardListField,
       layoutGroup([
         { name: 'numbered', label: 'Numbered (01/02/03 instead of icons)', widget: 'boolean', required: false, default: false },
+        {
+          name: 'columns', label: 'Columns', widget: 'select', required: false, default: '3',
+          hint: 'How many cards sit side by side on wide screens.',
+          options: [{ label: '2', value: '2' }, { label: '3', value: '3' }, { label: '4', value: '4' }],
+        },
       ]),
       styleGroup(),
     ],
