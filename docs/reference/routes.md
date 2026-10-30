@@ -30,7 +30,7 @@ The site's own pages, `/`, `/<slug>` for each published page, and `/thanks`, com
 
 ## Built into every page
 
-- **Head.** `@gronare/stomme/Head.astro` writes the title, description, canonical URL, Open Graph and Twitter tags, hreflang links, favicons, and on the home page local-business JSON-LD from the site settings and contact settings.
+- **Head.** `@gronare/stomme/Head.astro` writes the title, description, canonical URL, Open Graph and Twitter tags, hreflang links, favicons, and on the home page local-business JSON-LD from the site settings and contact settings when the contact settings hold a phone number, an address or a coordinate pair.
 - **noindex.** A page under `site.noindex`, the thank-you page, and any page built for a `*.pages.dev` or `*.workers.dev` address get `noindex, nofollow`.
 - **Demo-address redirect.** When `site` names a real host, a page opened on a `*.pages.dev` or `*.workers.dev` address redirects to the same path on that host.
 - **Media.** Files under `public/media/` are mirrored into `src/assets/media/` at build start, so Astro optimises CMS uploads. Files in `public/media/icons/` are also copied to the site's root.

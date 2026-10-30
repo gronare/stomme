@@ -23,11 +23,21 @@ const BLANK_CONTACT = {
 eq(localBusinessJsonLd({}), null, 'no name and no contact emits nothing at all');
 eq(localBusinessJsonLd({ name: '   ', contact: BLANK_CONTACT }), null,
   "a fleet contact file of empty strings is no contact data — a site with no name emits nothing");
-eq(localBusinessJsonLd({ name: 'Starter Co', contact: BLANK_CONTACT }),
-  { '@context': 'https://schema.org', '@type': 'LocalBusiness', name: 'Starter Co' },
-  'every blank field is left out — the name alone is still a business');
-check(localBusinessJsonLd({ contact: { email: 'hi@example.test' } })?.email === 'hi@example.test',
-  'contact data alone carries the schema when the settings name is missing');
+eq(localBusinessJsonLd({ name: 'Starter Co', contact: BLANK_CONTACT }), null,
+  'a name with every contact field blank is no business: nothing is emitted');
+eq(localBusinessJsonLd({ name: 'Starter Co' }), null, 'a name alone is no business: nothing is emitted');
+eq(localBusinessJsonLd({
+  name: 'Starter Co', url: 'https://example.com', image: 'https://example.com/og.png', towns: ['Exampletown'],
+  contact: { email: 'hi@example.test', orgNr: '556677-8899', founded: '2019', socials: [{ platform: 'github', url: 'https://github.test/x' }] },
+}), null, 'an email, a tax id, a founding year, socials and towns without a phone, address or coordinates are no business');
+check(localBusinessJsonLd({ contact: { phone: '+1 555 0100' } })?.telephone === '+1 555 0100',
+  'a phone alone carries the schema when the settings name is missing');
+check(localBusinessJsonLd({ name: 'X', contact: { address: { city: 'Trysil' } } })?.['@type'] === 'LocalBusiness',
+  'an address alone makes a business');
+check(localBusinessJsonLd({ name: 'X', contact: { address: { lat: 61.3, lng: 12.2 } } })?.['@type'] === 'LocalBusiness',
+  'a coordinate pair alone makes a business');
+check(localBusinessJsonLd({ name: 'X', contact: { address: { lat: 61.3 } } }) === null,
+  'a latitude without a longitude is no place: nothing is emitted');
 
 const full = localBusinessJsonLd({
   name: 'Starter Co',
@@ -65,8 +75,8 @@ const halfGeo = localBusinessJsonLd({ name: 'X', contact: { address: { city: 'Tr
 check(halfGeo.geo === undefined, 'a latitude without a longitude is no coordinate — geo is left out');
 eq(halfGeo.address, { '@type': 'PostalAddress', addressLocality: 'Trysil' }, 'the city alone is still an address');
 
-check(localBusinessJsonLd({ name: 'X' }).address === undefined, 'no address fields leaves the whole address out');
-check(localBusinessJsonLd({ name: 'X' }).areaServed === undefined, 'an empty towns collection leaves areaServed out');
+check(phoneOnly.address === undefined, 'no address fields leaves the whole address out');
+check(phoneOnly.areaServed === undefined, 'an empty towns collection leaves areaServed out');
 
 const failed = results.filter((ok) => !ok).length;
 console.log(`\n${results.length - failed}/${results.length} local-business checks passed`);

@@ -7,6 +7,9 @@ frontmatter means disabled/not shown (see `src/kit.ts`).
 
 ## Unreleased
 
+- The home page's LocalBusiness JSON-LD is written only when the contact settings hold a
+  phone number, an address or a coordinate pair. A site with a name and nothing else, or
+  only an email, socials or an organisation number, writes no JSON-LD.
 - The CMS offers `catalogList`'s `source` as a pick of the site's catalog listings, preselected
   when there is one, and `postList`, `postArchive` and `eventList`'s when the site has two or
   more article listings. A listing block with no `base` links under the `route` of the listing

@@ -45,9 +45,8 @@ export function localBusinessJsonLd(input: LocalBusinessInput): Record<string, u
   const sameAs = (contact.socials ?? []).map((s) => text(s && s.url)).filter(Boolean);
   const areaServed = (input.towns ?? []).map(text).filter(Boolean);
 
-  const hasContact = !!(telephone || email || taxID || foundingDate || sameAs.length
-    || Object.keys(address).length || (lat !== undefined && lng !== undefined));
-  if (!name && !hasContact) return null;
+  const hasPlace = !!(telephone || Object.keys(address).length || (lat !== undefined && lng !== undefined));
+  if (!hasPlace) return null;
 
   return {
     '@context': 'https://schema.org',
