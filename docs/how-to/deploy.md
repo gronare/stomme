@@ -34,7 +34,17 @@ A target whose adapter is missing stops the build with the command that installs
    npx wrangler deploy -c dist/server/wrangler.json
    ```
 
-3. Open the URL wrangler prints. A `*.workers.dev` or `*.pages.dev` address is marked `noindex`, and when `site` in `astro.config.mjs` names another host, a page opened on the demo address redirects there.
+3. Open the URL wrangler prints. When `site` in `astro.config.mjs` names a real host, a page opened on the `*.workers.dev` address redirects to the same path there. When `site` is itself a `*.workers.dev` or `*.pages.dev` address, every page is built with `noindex`.
+
+Set `RESEND_API_KEY`, `CONTACT_FROM` and `CONTACT_TO` as the Worker's variables or secrets; `/api/contact` reads the Worker's bindings first. To rate-limit the form, bind a KV namespace as `STOMME_RL` in the site's wrangler config at its root, such as `wrangler.jsonc`:
+
+```jsonc
+{
+  "kv_namespaces": [{ "binding": "STOMME_RL", "id": "<namespace id>" }]
+}
+```
+
+With it bound, the handler answers `429` after five messages from one visitor in ten minutes. See [Connect the contact form](connect-the-contact-form.md).
 
 If the site uses Cloudflare Web Analytics, set `analytics.cfToken`. See [Measure visits](measure-visits.md).
 
@@ -86,7 +96,7 @@ If the site uses Cloudflare Web Analytics, set `analytics.cfToken`. See [Measure
 
 3. Open the site. `/preview` is prerendered, so the CMS preview does not follow typing, and `/api/contact` does not exist. Point the form at your own handler with `contact.endpoint`, see [Connect the contact form](connect-the-contact-form.md).
 
-If the site is a GitHub Pages project site (`user.github.io/repo`), also set `base: '/repo'` in `astro.config.mjs`.
+The engine's links start at the domain's root, such as `/contact/`, and do not follow Astro's `base` option. Serve the site from the root of its host: on GitHub Pages, a user or organisation site (`user.github.io`) or a custom domain, not a project site under `user.github.io/repo`.
 
 ## Set the site's address
 
