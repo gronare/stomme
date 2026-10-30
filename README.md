@@ -15,7 +15,7 @@ pnpm create stomme my-site
 cd my-site && pnpm install && pnpm dev
 ```
 
-The scaffolder asks whether to start from a blank site or the Wren & Sorrel demo, a finished site for a fictional garden studio to explore. `--blank` or `--demo` after the directory skips the question, and without a terminal it makes the blank site. The site installs the engine from the npm registry. With `npm i -g stomme`, `stomme new my-site` does the same.
+The scaffolder asks whether to start from a blank site or the Wren & Sorrel demo, a finished site for a fictional garden studio to explore. `--blank` or `--demo` after the directory skips the question, and without a terminal it makes the blank site. The site installs the engine from the npm registry. With `npm i -g @gronare/stomme`, `stomme new my-site` does the same.
 
 The site runs at `http://localhost:4321` and every block with sample content at `/lookbook`. The CMS at `/admin` edits the files on disk in Chrome or Edge. Name your GitHub repository in `site.cms` to edit through GitHub instead. [Your first site](docs/tutorial.md) takes it from here to a page edited in the CMS and built.
 

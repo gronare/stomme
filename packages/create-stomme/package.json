@@ -1,6 +1,6 @@
 {
   "name": "create-stomme",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Scaffold a new stomme site: a blank site, or the Wren & Sorrel demo.",
   "type": "module",
   "repository": {
@@ -9,7 +9,7 @@
     "directory": "packages/create-stomme"
   },
   "bin": {
-    "create-stomme": "./bin/create.mjs"
+    "create-stomme": "bin/create.mjs"
   },
   "files": [
     "bin",

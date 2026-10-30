@@ -17,10 +17,10 @@ cpSync(starter, template, { recursive: true, filter: (src) => !SKIP.has(basename
 // npm leaves every .gitignore out of a tarball, so it travels as `gitignore` and create.mjs renames it back.
 renameSync(resolve(template, '.gitignore'), resolve(template, 'gitignore'));
 
-// A scaffold from the registry installs the engine release this scaffolder was packed beside, from npmjs, under the name its imports use.
+// A scaffold from the registry installs the engine release this scaffolder was packed beside, from npmjs.
 const engineVersion = JSON.parse(readFileSync(resolve(here, '../../stomme/package.json'), 'utf8')).version;
 const pkgPath = resolve(template, 'package.json');
 const pkg = JSON.parse(readFileSync(pkgPath, 'utf8'));
-pkg.dependencies['@gronare/stomme'] = `npm:stomme@^${engineVersion}`;
+pkg.dependencies['@gronare/stomme'] = `^${engineVersion}`;
 writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + '\n');
-console.log(`prepack: bundled starter → template/, engine npm:stomme@^${engineVersion}`);
+console.log(`prepack: bundled starter → template/, engine @gronare/stomme@^${engineVersion}`);

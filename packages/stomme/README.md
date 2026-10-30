@@ -4,8 +4,8 @@ A block-based CMS engine + component library for **Astro + Sveltia CMS**. Compos
 Over forty styled, themeable blocks; edit them in a Git-backed CMS with a live preview of the real
 components; ship static. Extend with your own blocks, routes and collections.
 
-Published on npm as `stomme`. A site depends on it under the name its imports use,
-`"@gronare/stomme": "npm:stomme@^<version>"`, which the scaffolder writes:
+Published on npm as `@gronare/stomme`, with the `stomme` command. The scaffolder writes the
+dependency for a new site:
 
 ```bash
 pnpm create stomme my-site

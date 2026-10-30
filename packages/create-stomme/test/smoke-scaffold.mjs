@@ -71,7 +71,7 @@ try {
     const site = join(work, 'registry');
     check(made.ok, 'a scaffold from the packed scaffolder succeeds', made.out.slice(-800));
     const dep = made.ok ? JSON.parse(readFileSync(join(site, 'package.json'), 'utf8')).dependencies['@gronare/stomme'] : '';
-    check(dep === `npm:stomme@^${engineVersion}`, `it installs the engine from npmjs as npm:stomme@^${engineVersion}`, dep);
+    check(dep === `^${engineVersion}`, `it installs the engine from npmjs as @gronare/stomme@^${engineVersion}`, dep);
     check(made.ok && !existsSync(join(site, '.npmrc')), 'it writes no .npmrc');
     check(existsSync(join(site, '.gitignore')), 'it keeps the starter\'s .gitignore');
     check(!made.out.includes('linked to this checkout'), 'it does not claim a link to a checkout', made.out);

@@ -4,7 +4,7 @@ The `stomme` command a site runs, the scripts in a site's `package.json`, the sc
 
 ## `stomme`
 
-Inside a site, run it through pnpm as `pnpm stomme <command>`. After `npm i -g stomme` it runs as `stomme <command>` anywhere, which is how `stomme new` creates a site outside one. With no command, or with `--help`, it lists every command; `stomme help <command>` and `<command> --help` print one.
+Inside a site, run it through pnpm as `pnpm stomme <command>`. After `npm i -g @gronare/stomme` it runs as `stomme <command>` anywhere, which is how `stomme new` creates a site outside one. With no command, or with `--help`, it lists every command; `stomme help <command>` and `<command> --help` print one.
 
 | Command | What it does |
 |---|---|
@@ -53,7 +53,7 @@ A host builds with `pnpm build`, or the `build:*` script for its target. See [De
 
 Scaffolds a new site into `<directory>`, which must not exist yet. Run it as `pnpm create stomme <directory>`, `pnpm dlx create-stomme <directory>` or `stomme new <directory>`.
 
-A site made this way depends on the engine from the npm registry, `"@gronare/stomme": "npm:stomme@^<version>"`: the package is published as `stomme` and installed under the name every import uses, so no token or registry setting is needed. From a clone of stomme it runs as `node stomme/packages/create-stomme/bin/create.mjs <directory>` and links the site to the engine in the clone instead, for working on the engine.
+A site made this way depends on the engine from the npm registry, `"@gronare/stomme": "^<version>"`, so no token or registry setting is needed. From a clone of stomme it runs as `node stomme/packages/create-stomme/bin/create.mjs <directory>` and links the site to the engine in the clone instead, for working on the engine.
 
 | Option | What it makes |
 |---|---|

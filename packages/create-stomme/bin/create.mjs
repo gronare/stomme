@@ -70,7 +70,7 @@ try {
     const bundled = pkg.dependencies['@gronare/stomme'];
     pkg.dependencies['@gronare/stomme'] = fromCheckout
       ? 'link:' + (inRepo ? relative(dest, enginePkg).split('\\').join('/') : enginePkg)
-      : bundled.startsWith('npm:stomme@') ? bundled : 'npm:stomme@latest';
+      : /^[~^]?\d/.test(bundled || '') ? bundled : 'latest';
   }
   writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + '\n');
 } catch {}

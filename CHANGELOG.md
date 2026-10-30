@@ -5,6 +5,12 @@ Engine changes that affect consuming sites. Sites follow the `release` branch
 taking a new release. Field policy: new fields are opt-in — absent from the
 frontmatter means disabled/not shown (see `src/kit.ts`).
 
+## 0.2.1 — 2026-10-30
+
+- The engine is published on npm as `@gronare/stomme`, the name its imports already use, so a
+  site made by `pnpm create stomme` depends on `"@gronare/stomme": "^<version>"` instead of an
+  alias, and a global install is `npm i -g @gronare/stomme`. The scaffolder stays `create-stomme`.
+
 ## 0.2.0 — 2026-10-30
 
 - **Breaking:** the engine no longer loads theme directories. `site.style`,
