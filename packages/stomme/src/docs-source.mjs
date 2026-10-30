@@ -117,6 +117,8 @@ export async function loadDocs(cfg, source, { mediaDir, logger } = {}) {
       }
     });
     const built = buildVersion(slot, files, { repo: cfg.repo, docsPath: cfg.path, media });
+    for (const w of built.warnings) logger?.warn?.(`docs: ${w}`);
+    delete built.warnings;
     built.param = routeParam(cfg.route, built.home.url);
     for (const p of built.pages) p.param = routeParam(cfg.route, p.url);
     versions.push(built);

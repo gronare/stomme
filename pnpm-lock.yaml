@@ -34,6 +34,9 @@ importers:
       jiti:
         specifier: ^2.6.0
         version: 2.7.0
+      js-yaml:
+        specifier: ^4.3.1
+        version: 4.3.1
       marked:
         specifier: ^18.0.5
         version: 18.0.5

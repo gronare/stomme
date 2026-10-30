@@ -13,6 +13,7 @@ export interface DocsPage {
   lede: string;
   ledeHtml: string;
   html: string;
+  previews: { type: string; [key: string]: unknown }[][];
   headings: DocsHeading[];
   section: string | null;
   edit: string;

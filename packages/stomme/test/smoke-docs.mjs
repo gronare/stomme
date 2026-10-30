@@ -68,6 +68,11 @@ try {
     check(!!img && existsSync(file(img.slice(1))), 'an embedded image is copied into the build and served from the site', img);
     check(tut.includes('<pre class="docs-code"><code class="language-sh">'), 'fenced code renders with its language');
 
+    const logs = html('docs/how-to/read-logs');
+    check(/<div class="docs-preview__stage docs-preview__stage--blocks"><span hidden(="")?><\/span>[\s\S]*?data-stomme-block="callout"[\s\S]*?Every job writes one log line per step\.[\s\S]*?<\/div><pre class="docs-code"><code class="language-yaml">type: callout/.test(logs), 'a yaml block fence renders the live block above its code');
+    check(logs.includes('<div class="docs-preview__stage docs-preview__stage--html"><!--docs-stage--><a class="btn" href="/contact">Open the logs</a>'), 'an html preview fence renders its markup above its code');
+    check(/docs-preview--failed"><p class="docs-preview__notice">[^<]+<\/p><pre class="docs-code">/.test(logs) && /docs: how-to\/read-logs\.md: a block example was shown as code only, it is not a block/.test(on.out), 'an example that is not a block shows a notice and its code, and the build log names it');
+
     const index = JSON.parse(readFileSync(file('docs/_search/local.json'), 'utf8'));
     check(index.length === 4 && index.every((d) => d.t && d.u && typeof d.x === 'string'), 'a static search index lists every page', JSON.stringify(index.map((d) => d.u)));
     check(index.some((d) => d.u === '/docs/reference/settings/' && d.x.includes('Every key has a default.')), 'the index carries the page text');

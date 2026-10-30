@@ -1,5 +1,6 @@
 ---
-import { site } from '@stomme/config';
+import { site, features } from '@stomme/config';
+import Renderer from '@stomme/renderer';
 import { resolveSite } from './config';
 import type { DocsData, DocsVersion, DocsPage as Page } from './docs-data';
 
@@ -38,6 +39,8 @@ const cards = version.nav.map((s) => {
 }).filter((c) => c !== null);
 const listed = version.nav.filter((s) => sectionKind(s.name) !== 'tutorial');
 const file = page ? `${docs.path ? `${docs.path}/` : ''}${page.path}` : '';
+// Each live example opens with a hidden span, so header rules keyed to `main .cover:first-child` never read a preview as the page's first block.
+const body = page ? page.html.split(/<!--docs-(block:\d+|preview-failed)-->/) : [];
 ---
 <div class="docs" data-stomme-page="docs" data-docs-search={`${docs.route}/_search/${version.key}.json`} data-copy={strings.controls.copy} data-copied={strings.controls.copied} data-no-results={t.noResults}>
   <button class="docs-menu" type="button" aria-expanded="false" aria-controls="docs-side">{t.menu}<span class="docs-menu__bars" aria-hidden="true"></span></button>
@@ -90,7 +93,12 @@ const file = page ? `${docs.path ? `${docs.path}/` : ''}${page.path}` : '';
       </nav>
       <h1 class="docs-title" set:html={page.titleHtml} />
       {page.ledeHtml && <p class="docs-lede" set:html={page.ledeHtml} />}
-      <div class="docs-body" set:html={page.html} />
+      <div class="docs-body">{body.map((part, i) => (i % 2 === 0
+        ? <Fragment set:html={part} />
+        : part === 'preview-failed'
+          ? <p class="docs-preview__notice">{t.previewFailed}</p>
+          : <><span hidden></span><Renderer blocks={page.previews[Number(part.slice('block:'.length))]} config={site} features={features} /></>
+      ))}</div>
       {(page.prev || page.next) && (
         <nav class="docs-pager">
           {page.prev ? <a class="docs-pager__link" href={page.prev.url} rel="prev"><small>‹ {t.prev}</small><span set:html={page.prev.titleHtml} /></a> : <span></span>}
@@ -170,7 +178,7 @@ const file = page ? `${docs.path ? `${docs.path}/` : ''}${page.path}` : '';
       if (to) window.location.href = to + window.location.hash;
     });
 
-    root.querySelectorAll<HTMLPreElement>('.docs-body pre').forEach((pre) => {
+    root.querySelectorAll<HTMLPreElement>('.docs-body pre.docs-code').forEach((pre) => {
       const button = document.createElement('button');
       button.type = 'button';
       button.className = 'docs-code__copy';

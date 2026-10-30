@@ -16,6 +16,11 @@ frontmatter means disabled/not shown (see `src/kit.ts`).
   Markdown in a GitHub repo, read at build time: the latest release at `/docs`, the
   default branch under `/docs/<branch>`, with a version picker, search and an
   "On this page" outline. New strings under `strings.docs`. See `docs/features.md`.
+- A docs page can show live examples: a ```` ```yaml block ```` fence renders its block (or
+  list of blocks) with the site's own renderer above the code, and ```` ```html preview ````
+  renders its markup as written. An example that cannot be drawn shows its code under a
+  notice, `strings.docs.previewFailed`, and the build logs it. See
+  `docs/how-to/build-docs-from-a-repo.md`.
 - `hero` and `ctaPanel` take a `command`, a copyable one-line shell command. `ctaPanel`
   also takes `cta2` and `anchor`; `plans` takes `anchor` and a per-plan `note`.
 - `hero` and `textImage` play a looping video (`media.kind: video`, `video`,

@@ -248,6 +248,7 @@ const STRINGS_EN = {
     prev: 'Previous',
     next: 'Next',
     pages: '{count} pages.',
+    previewFailed: 'This example could not be shown, so here is its code.',
     cards: {
       howTo: { heading: 'Get something done', body: '{count} guides for a task at hand.' },
       reference: { heading: 'Look up an exact name', body: '{count} pages of names, keys and options.' },
@@ -354,6 +355,7 @@ const STRINGS_SV: typeof STRINGS_EN = {
     prev: 'Föregående',
     next: 'Nästa',
     pages: '{count} sidor.',
+    previewFailed: 'Exemplet kunde inte visas, så här är koden.',
     cards: {
       howTo: { heading: 'Få något gjort', body: '{count} guider för en uppgift.' },
       reference: { heading: 'Slå upp ett exakt namn', body: '{count} sidor med namn, nycklar och val.' },
@@ -460,6 +462,7 @@ const STRINGS_NO: typeof STRINGS_EN = {
     prev: 'Forrige',
     next: 'Neste',
     pages: '{count} sider.',
+    previewFailed: 'Eksempelet kunne ikke vises, så her er koden.',
     cards: {
       howTo: { heading: 'Få noe gjort', body: '{count} veiledninger for en oppgave.' },
       reference: { heading: 'Slå opp et eksakt navn', body: '{count} sider med navn, nøkler og valg.' },

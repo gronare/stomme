@@ -3,7 +3,7 @@ import { mkdtempSync, readFileSync, existsSync, rmSync } from 'node:fs';
 import { resolve, dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { tmpdir } from 'node:os';
-import { parseIndex, rewriteHref, headingId, renderDoc, buildVersion, resolveDocsConfig, routeParam } from '../src/docs.mjs';
+import { parseIndex, rewriteHref, headingId, renderDoc, buildVersion, resolveDocsConfig, routeParam, previewKind, parseBlockPreview, imageRefs } from '../src/docs.mjs';
 import { githubSource, localSource, loadDocs } from '../src/docs-source.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -65,6 +65,40 @@ check(tut.html.includes('<h2 id="install">Install</h2>'), '## gets an id');
 eq(tut.headings.map((h) => h.id), ['install'], 'the ## headings form the page outline');
 check(tut.html.includes('<pre class="docs-code"><code class="language-sh">') && tut.html.includes('echo &quot;&lt;done&gt;&quot;'), 'fenced code keeps its language and is escaped');
 check(tut.html.includes('href="/docs/how-to/run-a-job/#watch-a-job"'), 'links in the body are rewritten');
+
+console.log('· preview fences');
+eq([previewKind('yaml block'), previewKind('yml block'), previewKind('html preview'), previewKind('yaml'), previewKind('html'), previewKind('sh block')], ['block', 'block', 'html', null, null, null], 'a word after yaml or html marks a preview, nothing else does');
+const pv = renderDoc([
+  '# P', '', 'Lede.', '', '## Look', '',
+  '```yaml block', 'type: callout', 'quote: Plants first, paths second.', '```', '',
+  '```yaml block', '- type: statsBar', '  items: [{ label: Years, value: "12" }]', '- type: logoStrip', '  logos: [Oak, Ash]', '```', '',
+  '```html preview', '<a class="btn" href="/contact">Book a visit</a>', '```', '',
+  '```yaml', 'type: not-a-preview', '```',
+].join('\n'), { ...ctx, file: 'reference/p.md' });
+eq(pv.previews.map((b) => b.map((x) => x.type)), [['callout'], ['statsBar', 'logoStrip']], 'each block fence yields its blocks, a list as a list');
+eq(pv.previews[0][0], { type: 'callout', quote: 'Plants first, paths second.' }, 'a block keeps its fields exactly as written');
+check(pv.html.includes('<!--docs-block:0-->') && pv.html.includes('<!--docs-block:1-->'), 'the body holds a numbered slot where each live block goes');
+check((pv.html.match(/<pre class="docs-code"><code class="language-yaml">/g) || []).length === 3, 'every fence still shows its code, with its language');
+check(pv.html.includes('<div class="docs-preview__stage docs-preview__stage--html"><!--docs-stage--><a class="btn" href="/contact">Book a visit</a><!--/docs-stage--></div>') && pv.html.includes('&lt;a class=&quot;btn&quot;'), 'an html preview renders its markup as-is above its escaped code');
+check(!pv.html.includes('not-a-preview</code></pre>\n</div>') && pv.html.includes('type: not-a-preview'), 'a plain yaml fence stays plain code');
+eq((pv.text.match(/Book a visit/g) || []).length, 1, 'the search text holds an html example once, from its code');
+eq(pv.warnings, [], 'good examples log nothing');
+
+const bad = renderDoc(['# B', '', '```yaml block', 'type: callout', '  quote: [unclosed', '```', '', '```yaml block', 'quote: no type', '```', '', '```yaml block', 'blocks:', '  - type: callout', '    quote: From a page', '```'].join('\n'), { ...ctx, file: 'b.md' });
+eq((bad.html.match(/<!--docs-preview-failed-->/g) || []).length, 2, 'YAML that does not parse, and YAML that is not a block, become a notice instead of a live block');
+check((bad.html.match(/docs-preview--failed/g) || []).length === 2 && bad.html.includes('quote: no type'), 'a failed example still shows its code');
+eq(bad.warnings.length, 2, 'each failure is logged');
+check(/^b\.md: .*does not parse/.test(bad.warnings[0]) && /not a block/.test(bad.warnings[1]), 'the log names the file and the reason');
+eq(bad.previews, [[{ type: 'callout', quote: 'From a page' }]], 'a page-shaped blocks: list is read as its blocks');
+eq(parseBlockPreview('[]').error !== undefined, true, 'an empty list is not a block');
+
+const mctx = { ...ctx, file: 'reference/m.md', media: new Map([['docs/assets/hero.webp', '/docs/_media/abc/hero.webp']]) };
+const md = '# M\n\n```yaml block\ntype: textImage\nmedia:\n  image: ../assets/hero.webp\n  video: ../../starter/clip.mp4\nbody: Keep /media/x.webp and see ../a.md\n```\n';
+eq(imageRefs(md, 'reference/m.md', 'docs').sort(), ['docs/assets/hero.webp', 'starter/clip.mp4'], 'media a block example names by a relative path is collected to be copied');
+const withMedia = renderDoc(md, mctx).previews[0][0];
+eq(withMedia.media.image, '/docs/_media/abc/hero.webp', 'a relative image in a block example points at its served copy');
+eq(withMedia.media.video, 'https://raw.githubusercontent.com/acme/tool/v1.2.0/starter/clip.mp4', 'one not copied is read from GitHub at the ref');
+eq(withMedia.body, 'Keep /media/x.webp and see ../a.md', 'other strings are left alone');
 
 console.log('· a version');
 const files = new Map();
@@ -135,6 +169,13 @@ const local = await loadDocs(cfg, localSource(cfg, FIXTURE));
 eq(local.versions.map((x) => [x.key, x.label, x.kind, x.base]), [['local', 'docs', 'local', '/docs']], 'a folder on disk is one version at the route, named after the folder');
 eq(local.versions[0].pages.length, 4, 'every page in the folder is built');
 await rejects(() => loadDocs(cfg, localSource(cfg, join(FIXTURE, 'nope'))), /does not exist/, 'a missing folder fails with its path');
+
+console.log('· a failed example in a build');
+const memory = (files) => ({ async versions() { return [{ key: 'local', ref: 'main', label: 'mem', kind: 'local', base: '/docs' }]; }, async tree() { return new Map(Object.keys(files).map((k) => [k, k])); }, async read(_r, p) { return Buffer.from(files[p]); } });
+const logged = [];
+const built = await loadDocs(cfg, memory({ 'docs/README.md': '# D\n\n## R\n\n- [X](x.md)\n', 'docs/x.md': '# X\n\n```yaml block\n: : :\n```\n' }), { logger: { info() {}, warn: (m) => logged.push(m) } });
+check(logged.length === 1 && /^docs: x\.md: a block example was shown as code only/.test(logged[0]), 'the build logs a failed example as a warning and goes on');
+check(!('warnings' in built.versions[0]) && !('warnings' in built.versions[0].pages[0]), 'warnings stay out of the data the pages are built from');
 
 const failed = results.filter((r) => !r).length;
 console.log(`\n${results.length - failed}/${results.length} passed`);

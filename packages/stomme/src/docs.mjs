@@ -1,4 +1,5 @@
 import { Marked } from 'marked';
+import { load as loadYaml } from 'js-yaml';
 
 const ESC = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
 export const escapeHtml = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ESC[c]);
@@ -71,7 +72,51 @@ export function headingId(text, seen) {
   return id;
 }
 
-function createRenderer(ctx, seen, headings) {
+const MEDIA_FILE = /\.(png|jpe?g|gif|webp|avif|svg|mp4|webm)$/i;
+const isRelative = (s) => !!s && !s.startsWith('/') && !s.startsWith('#') && !/^[a-z][a-z0-9+.-]*:/i.test(s);
+
+export function previewKind(lang) {
+  const [l = '', ...flags] = String(lang || '').trim().toLowerCase().split(/\s+/);
+  if ((l === 'yaml' || l === 'yml') && flags.includes('block')) return 'block';
+  if (l === 'html' && flags.includes('preview')) return 'html';
+  return null;
+}
+
+const mapStrings = (v, fn) => {
+  if (typeof v === 'string') return fn(v);
+  if (Array.isArray(v)) return v.map((x) => mapStrings(x, fn));
+  if (v && typeof v === 'object' && !(v instanceof Date)) return Object.fromEntries(Object.entries(v).map(([k, x]) => [k, mapStrings(x, fn)]));
+  return v;
+};
+
+export function previewMediaRefs(text) {
+  const out = [];
+  try { mapStrings(loadYaml(text), (s) => { if (isRelative(s) && MEDIA_FILE.test(s)) out.push(s); return s; }); } catch {}
+  return out;
+}
+
+export function parseBlockPreview(text, resolveMedia = (s) => s) {
+  let data;
+  try { data = loadYaml(text); } catch (e) { return { error: `the YAML does not parse (${String(e?.reason || e?.message || e).split('\n')[0]})` }; }
+  if (data && typeof data === 'object' && !Array.isArray(data) && !('type' in data) && Array.isArray(data.blocks)) data = data.blocks;
+  const list = Array.isArray(data) ? data : [data];
+  const bad = list.findIndex((b) => !b || typeof b !== 'object' || Array.isArray(b) || typeof b.type !== 'string' || !b.type.trim());
+  if (!list.length || bad !== -1) return { error: 'it is not a block: every block is a mapping with a type' };
+  return { blocks: JSON.parse(JSON.stringify(mapStrings(list, (s) => (isRelative(s) && MEDIA_FILE.test(s) ? resolveMedia(s) : s)))) };
+}
+
+const codeBlock = (text, lang) => {
+  const l = String(lang || '').trim().split(/\s+/)[0];
+  return `<pre class="docs-code"><code${l ? ` class="language-${escapeHtml(l)}"` : ''}>${escapeHtml(text)}</code></pre>\n`;
+};
+
+const PREVIEW_FAILED = '<!--docs-preview-failed-->';
+const previewSlot = (n) => `<!--docs-block:${n}-->`;
+const STAGE_OPEN = '<!--docs-stage-->';
+const STAGE_CLOSE = '<!--/docs-stage-->';
+const withoutStages = (html) => html.replace(/<!--docs-stage-->[\s\S]*?<!--\/docs-stage-->/g, ' ');
+
+function createRenderer(ctx, seen, headings, previews = [], warnings = []) {
   return new Marked({
     gfm: true,
     renderer: {
@@ -91,8 +136,17 @@ function createRenderer(ctx, seen, headings) {
         return `<img src="${escapeHtml(imageSrc(href, ctx))}" alt="${escapeHtml(text)}"${t} loading="lazy" decoding="async">`;
       },
       code({ text, lang }) {
-        const l = String(lang || '').trim().split(/\s+/)[0];
-        return `<pre class="docs-code"><code${l ? ` class="language-${escapeHtml(l)}"` : ''}>${escapeHtml(text)}</code></pre>\n`;
+        const kind = previewKind(lang);
+        const pre = codeBlock(text, lang);
+        if (kind === 'html') return `<div class="docs-preview"><div class="docs-preview__stage docs-preview__stage--html">${STAGE_OPEN}${text}${STAGE_CLOSE}</div>${pre}</div>\n`;
+        if (kind !== 'block') return pre;
+        const parsed = parseBlockPreview(text, (s) => mediaSrc(s, ctx));
+        if (parsed.error) {
+          warnings.push(`${ctx.file}: a block example was shown as code only, ${parsed.error}`);
+          return `<div class="docs-preview docs-preview--failed">${PREVIEW_FAILED}${pre}</div>\n`;
+        }
+        previews.push(parsed.blocks);
+        return `<div class="docs-preview"><div class="docs-preview__stage docs-preview__stage--blocks">${previewSlot(previews.length - 1)}</div>${pre}</div>\n`;
       },
     },
   });
@@ -101,6 +155,10 @@ function createRenderer(ctx, seen, headings) {
 function imageSrc(href, ctx) {
   const raw = String(href ?? '');
   if (!raw || /^[a-z][a-z0-9+.-]*:/i.test(raw) || raw.startsWith('//')) return raw;
+  return mediaSrc(raw, ctx);
+}
+
+function mediaSrc(raw, ctx) {
   const target = joinPath(`${ctx.docsPath ? `${ctx.docsPath}/` : ''}${ctx.file}`, raw.split(/[?#]/)[0]);
   if (ctx.media?.has(target)) return ctx.media.get(target);
   return `https://raw.githubusercontent.com/${ctx.repo}/${encodeURIComponent(ctx.ref)}/${target.split('/').map(encodeURIComponent).join('/')}`;
@@ -111,6 +169,10 @@ export function imageRefs(md, file, docsPath) {
   const m = new Marked({ gfm: true });
   const from = `${docsPath ? `${docsPath}/` : ''}${file}`;
   m.walkTokens(m.lexer(md), (t) => {
+    if (t.type === 'code' && previewKind(t.lang) === 'block') {
+      for (const ref of previewMediaRefs(t.text)) out.add(joinPath(from, ref.split(/[?#]/)[0]));
+      return;
+    }
     if (t.type !== 'image') return;
     const href = String(t.href ?? '');
     if (!href || /^[a-z][a-z0-9+.-]*:/i.test(href) || href.startsWith('//')) return;
@@ -146,7 +208,9 @@ export function parseIndex(readme) {
 export function renderDoc(md, ctx) {
   const seen = new Set();
   const headings = [];
-  const marked = createRenderer(ctx, seen, headings);
+  const previews = [];
+  const warnings = [];
+  const marked = createRenderer(ctx, seen, headings, previews, warnings);
   const toks = marked.lexer(String(md ?? ''));
   const links = toks.links;
   let title = '';
@@ -164,7 +228,7 @@ export function renderDoc(md, ctx) {
   }
   toks.links = links;
   const html = marked.parser(toks);
-  return { title, lede, html, headings, text: plainText(html) };
+  return { title, lede, html, headings, previews, warnings, text: plainText(withoutStages(html)) };
 }
 
 export function inlineHtml(md, ctx) {
@@ -215,6 +279,8 @@ export function buildVersion(version, files, { repo, docsPath, media = new Map()
       ledeHtml: doc.lede,
       lede: plainText(doc.lede),
       html: doc.html,
+      previews: doc.previews,
+      warnings: doc.warnings,
       headings: doc.headings,
       text: doc.text,
       section: sectionOf.get(file) ?? null,
@@ -230,7 +296,8 @@ export function buildVersion(version, files, { repo, docsPath, media = new Map()
   });
   for (const p of rendered) { p.prev ??= null; p.next ??= null; }
   const search = rendered.map(({ title, url, section, lede, text }) => ({ t: title, u: url, s: section ?? '', x: `${lede} ${text}`.trim() }));
-  for (const p of rendered) delete p.text;
+  const warnings = rendered.flatMap((p) => p.warnings);
+  for (const p of rendered) { delete p.text; delete p.warnings; }
 
   return {
     ...version,
@@ -245,6 +312,7 @@ export function buildVersion(version, files, { repo, docsPath, media = new Map()
     nav,
     pages: rendered,
     search,
+    warnings,
   };
 }
 
