@@ -2,6 +2,7 @@
 import { getCollection } from 'astro:content';
 import { withTrailingSlash } from '../src/href';
 import Cover from '../src/Cover.astro';
+import { listings } from '@stomme/config';
 import { resolveListings, listingSpecRows, listingStatusKey } from '../src/config';
 
 interface Props {
@@ -33,7 +34,7 @@ const all = Astro.props.items
     ? (await getCollection(source)).sort((a, b) => ((a.data.date ?? '') < (b.data.date ?? '') ? 1 : -1))
     : []);
 const items = only ? all.filter((i) => key(i.data.status) === only) : all;
-const listing = resolveListings(site?.listings).find((l) => l.id === source);
+const listing = [...resolveListings(listings), ...resolveListings(site?.listings)].find((l) => l.id === source);
 const cats = [...new Set(items.map((i) => i.data.category).filter(Boolean))];
 const PLACE = '/images/placeholders/service.svg';
 ---
