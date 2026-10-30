@@ -33,6 +33,7 @@ Going live
 ## Reference
 
 - [Blocks](reference/blocks.md): every block and its fields.
+- [Styles](reference/styles.md): the classes and CSS variables a custom block builds with.
 - [Site config](reference/site-config.md): every key of `site`, `features` and `listings`.
 - [Content collections](reference/content.md): every collection, its folder and its fields.
 - [Commands](reference/commands.md): the site's scripts and the engine's tools.

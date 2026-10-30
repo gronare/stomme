@@ -8,7 +8,7 @@ Write your own block component, register it beside the library's blocks, and giv
    pnpm block:new PromoBanner
    ```
 
-   Build its markup with the library's classes (`.section`, `.display`, `.card`, …) or a scoped `<style>`, and colour it with the theme's CSS variables.
+   Build its markup with the library's classes (`.section`, `.display`, `.card`, …) or a scoped `<style>`, and colour it with the theme's CSS variables. [Styles](../reference/styles.md) shows each class and variable.
 
 2. Create `src/blocks/BlockRenderer.astro`, a thin wrapper that passes your blocks to the engine's renderer.
 
