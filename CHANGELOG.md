@@ -15,7 +15,7 @@ frontmatter means disabled/not shown (see `src/kit.ts`).
 - `features.docs` with `site.docs` builds a documentation section from a folder of
   Markdown in a GitHub repo, read at build time: the latest release at `/docs`, the
   default branch under `/docs/<branch>`, with a version picker, search and an
-  "On this page" outline. New strings under `strings.docs`. See `docs/features.md`.
+  "On this page" outline. New strings under `strings.docs`. See `docs/how-to/build-docs-from-a-repo.md`.
 - A docs page can show live examples: a ```` ```yaml block ```` fence renders its block (or
   list of blocks) with the site's own renderer above the code, and ```` ```html preview ````
   renders its markup as written. An example that cannot be drawn shows its code under a
