@@ -46,6 +46,7 @@ collections:
               - name: hero
                 label: "Hero"
                 widget: object
+                description: "Full-width intro — eyebrow, H1, text and a button, with an optional image, highlights list or animated motif beside it."
                 fields:
                   - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
                   - { name: heading, label: "Heading (H1)", widget: string }
@@ -307,6 +308,7 @@ collections:
               - name: cover
                 label: "Cover (full-bleed)"
                 widget: object
+                description: "Full-bleed banner — a background photo or muted looping video, with overlaid heading, text and buttons."
                 fields:
                   - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
                   - { name: heading, label: "Heading (H1)", widget: text, hint: "Press Enter for a line break." }
@@ -448,6 +450,7 @@ collections:
               - name: pageHeader
                 label: "Page header"
                 widget: object
+                description: "Page title band (light or dark): eyebrow, H1, intro and an optional button."
                 fields:
                   - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
                   - { name: heading, label: "Heading (H1)", widget: string }
@@ -537,6 +540,7 @@ collections:
               - name: prose
                 label: "Rich text"
                 widget: object
+                description: "A block of rich (markdown) text with an optional heading."
                 fields:
                   - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
                   - { name: heading, label: "Heading (optional)", widget: string, required: false }
@@ -591,6 +595,7 @@ collections:
               - name: textImage
                 label: "Text + image"
                 widget: object
+                description: "Text beside an image or a looping video (media on the left or right)."
                 fields:
                   - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
                   - { name: heading, label: "Heading", widget: string, required: false }
@@ -663,6 +668,7 @@ collections:
               - name: textQuote
                 label: "Text + quote"
                 widget: object
+                description: "Body text paired with a pulled-out quote."
                 fields:
                   - { name: body, label: "Body text", widget: markdown }
                   - { name: quote, label: "Quote", widget: text }
@@ -717,6 +723,7 @@ collections:
               - name: fragment
                 label: "Story fragment"
                 widget: object
+                description: "A placed editorial fragment — big lead line, short body, optional link. Consecutive fragments drift across the page."
                 fields:
                   - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Usually only on the first fragment of a story." }
                   - { name: statement, label: "Statement (big line)", widget: string, hint: "Wrap words in *asterisks* to underline them." }
@@ -798,6 +805,7 @@ collections:
               - name: sectionNav
                 label: "Section links"
                 widget: object
+                description: "A row of links that jump to the headings further down this page. Nothing to fill in: it reads the sections below it."
                 fields:
                   - { name: label, label: "Accessible label", widget: string, required: false, hint: "Read by screen readers; the visible chips come from the section headings below." }
                   - name: layout
@@ -840,6 +848,7 @@ collections:
               - name: featureGrid
                 label: "Feature cards"
                 widget: object
+                description: "Grid of feature cards — icon or number, title and text; cards can link."
                 fields:
                   - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
                   - { name: heading, label: "Heading", widget: string, required: false }
@@ -951,6 +960,16 @@ collections:
                     hint: "Size and placement — rarely needs changing."
                     fields:
                       - { name: numbered, label: "Numbered (01/02/03 instead of icons)", widget: boolean, required: false, default: false }
+                      - name: columns
+                        label: "Columns"
+                        widget: select
+                        required: false
+                        default: "3"
+                        hint: "How many cards sit side by side on wide screens."
+                        options:
+                          - { label: "2", value: "2" }
+                          - { label: "3", value: "3" }
+                          - { label: "4", value: "4" }
                       - name: beside
                         label: "Placement"
                         widget: select
@@ -994,6 +1013,7 @@ collections:
               - name: pillars
                 label: "Principles / values"
                 widget: object
+                description: "Row of principle / value cards (icon, title, text)."
                 fields:
                   - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
                   - { name: heading, label: "Heading", widget: string, required: false }
@@ -1047,6 +1067,7 @@ collections:
               - name: plans
                 label: "Pricing / plans"
                 widget: object
+                description: "A row of pricing plan cards — name, price, period, features and a button."
                 fields:
                   - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
                   - { name: heading, label: "Heading", widget: string, required: false }
@@ -1154,6 +1175,7 @@ collections:
               - name: specialistGrid
                 label: "Specialist grid"
                 widget: object
+                description: "Grid of specialist / team profile cards."
                 fields:
                   - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
                   - { name: heading, label: "Heading", widget: string, required: false }
@@ -1207,6 +1229,7 @@ collections:
               - name: team
                 label: "Team"
                 widget: object
+                description: "Grid of people cards — photo, role, contact details."
                 fields:
                   - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
                   - { name: heading, label: "Heading", widget: string, required: false }
@@ -1266,6 +1289,7 @@ collections:
               - name: steps
                 label: "Process / steps"
                 widget: object
+                description: "Numbered process — a sequence of steps."
                 fields:
                   - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
                   - { name: heading, label: "Heading", widget: string, required: false }
@@ -1342,6 +1366,7 @@ collections:
               - name: checklist
                 label: "Checklist"
                 widget: object
+                description: "Ticked checklist items in one or two columns."
                 fields:
                   - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
                   - { name: heading, label: "Heading", widget: string, required: false }
@@ -1396,6 +1421,7 @@ collections:
               - name: factList
                 label: "Fact list (label + value)"
                 widget: object
+                description: "Rows of label and value — specifications, what is included, key facts."
                 fields:
                   - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
                   - { name: heading, label: "Heading", widget: string, required: false }
@@ -1469,6 +1495,7 @@ collections:
               - name: gallery
                 label: "Gallery"
                 widget: object
+                description: "Image grid (2–3 columns) with optional captions."
                 fields:
                   - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
                   - { name: heading, label: "Heading", widget: string, required: false }
@@ -1524,6 +1551,7 @@ collections:
               - name: collage
                 label: "Collage (image viewer)"
                 widget: object
+                description: "A collage of fixed height — one leading picture, a few tiles, and a chip that opens every image in a viewer. Replaces stacked full-width photos on a content page."
                 fields:
                   - name: images
                     label: "Images"
@@ -1576,6 +1604,7 @@ collections:
               - name: beforeAfter
                 label: "Before / after"
                 widget: object
+                description: "A before / after image pair."
                 fields:
                   - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
                   - { name: heading, label: "Heading", widget: string, required: false }
@@ -1626,9 +1655,59 @@ collections:
                           - { label: "Accent band", value: "band" }
                           - { label: "Dark", value: "dark" }
                           - { label: "Gradient", value: "gradient" }
+              - name: logoStrip
+                label: "Logo strip"
+                widget: object
+                description: "A centered row of partner / client names with an optional lead-in."
+                fields:
+                  - { name: lead, label: "Lead-in", widget: string, required: false, hint: "e.g. “Trusted by” or “Built on”." }
+                  - name: logos
+                    label: "Names"
+                    widget: list
+                    required: false
+                    label_singular: "Name"
+                    collapsed: true
+                    field: { name: name, label: "Name", widget: string }
+                  - name: layout
+                    label: "Layout"
+                    widget: object
+                    collapsed: true
+                    hint: "Size and placement — rarely needs changing."
+                    fields:
+                      - name: beside
+                        label: "Placement"
+                        widget: select
+                        required: false
+                        default: "below"
+                        hint: "On wide screens the block shares a row with the block above it; on small screens they stack."
+                        options:
+                          - { label: "Below the previous block", value: "below" }
+                          - { label: "Beside the previous block, equal widths", value: "equal" }
+                          - { label: "Beside the previous block, narrower", value: "narrow" }
+                          - { label: "Beside the previous block, wider", value: "wide" }
+                  - name: style
+                    label: "Appearance"
+                    widget: object
+                    collapsed: true
+                    hint: "Background and accent colour — set once when the page is designed."
+                    fields:
+                      - name: surface
+                        label: "Background"
+                        widget: select
+                        required: false
+                        default: "standard"
+                        hint: "The surface behind the section — for rhythm between blocks."
+                        options:
+                          - { label: "Standard (white)", value: "standard" }
+                          - { label: "Tinted", value: "tint" }
+                          - { label: "Panel (rounded plate)", value: "panel" }
+                          - { label: "Accent band", value: "band" }
+                          - { label: "Dark", value: "dark" }
+                          - { label: "Gradient", value: "gradient" }
               - name: definition
                 label: "Dictionary entry"
                 widget: object
+                description: "A dictionary-style word entry — term, word class and numbered senses."
                 fields:
                   - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
                   - { name: term, label: "Term", widget: string, hint: "The word being defined, e.g. \"ex·am·ple\" (use · for syllables)." }
@@ -1702,6 +1781,7 @@ collections:
               - name: callout
                 label: "Highlighted quote"
                 widget: object
+                description: "A single highlighted quote or statement."
                 fields:
                   - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
                   - { name: quote, label: "Quote / statement", widget: text, hint: "Wrap words in *asterisks* to underline them." }
@@ -1774,6 +1854,7 @@ collections:
               - name: statPanel
                 label: "Statement panel"
                 widget: object
+                description: "Dark panel with a big number, statement and badges."
                 fields:
                   - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
                   - { name: heading, label: "Heading", widget: string, required: false, hint: "Wrap words in *asterisks* to underline them." }
@@ -1835,6 +1916,7 @@ collections:
               - name: statsBar
                 label: "Stats / facts"
                 widget: object
+                description: "A row of stats / facts (label + value)."
                 fields:
                   - name: items
                     label: "Facts (label + value)"
@@ -1885,6 +1967,7 @@ collections:
               - name: timeline
                 label: "Timeline"
                 widget: object
+                description: "A line of years with one dot per milestone, the last one highlighted, and an optional note about what is planned."
                 fields:
                   - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
                   - { name: heading, label: "Heading", widget: string, required: false }
@@ -1938,57 +2021,10 @@ collections:
                           - { label: "Accent band", value: "band" }
                           - { label: "Dark", value: "dark" }
                           - { label: "Gradient", value: "gradient" }
-              - name: logoStrip
-                label: "Logo strip"
-                widget: object
-                fields:
-                  - { name: lead, label: "Lead-in", widget: string, required: false, hint: "e.g. “Trusted by” or “Built on”." }
-                  - name: logos
-                    label: "Names"
-                    widget: list
-                    required: false
-                    label_singular: "Name"
-                    collapsed: true
-                    field: { name: name, label: "Name", widget: string }
-                  - name: layout
-                    label: "Layout"
-                    widget: object
-                    collapsed: true
-                    hint: "Size and placement — rarely needs changing."
-                    fields:
-                      - name: beside
-                        label: "Placement"
-                        widget: select
-                        required: false
-                        default: "below"
-                        hint: "On wide screens the block shares a row with the block above it; on small screens they stack."
-                        options:
-                          - { label: "Below the previous block", value: "below" }
-                          - { label: "Beside the previous block, equal widths", value: "equal" }
-                          - { label: "Beside the previous block, narrower", value: "narrow" }
-                          - { label: "Beside the previous block, wider", value: "wide" }
-                  - name: style
-                    label: "Appearance"
-                    widget: object
-                    collapsed: true
-                    hint: "Background and accent colour — set once when the page is designed."
-                    fields:
-                      - name: surface
-                        label: "Background"
-                        widget: select
-                        required: false
-                        default: "standard"
-                        hint: "The surface behind the section — for rhythm between blocks."
-                        options:
-                          - { label: "Standard (white)", value: "standard" }
-                          - { label: "Tinted", value: "tint" }
-                          - { label: "Panel (rounded plate)", value: "panel" }
-                          - { label: "Accent band", value: "band" }
-                          - { label: "Dark", value: "dark" }
-                          - { label: "Gradient", value: "gradient" }
               - name: serviceGrid
                 label: "Service cards"
                 widget: object
+                description: "Service cards pulled from your Services collection."
                 fields:
                   - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
                   - { name: heading, label: "Heading", widget: string, required: false }
@@ -2043,6 +2079,7 @@ collections:
               - name: testimonials
                 label: "Testimonials"
                 widget: object
+                description: "Customer testimonials from your Testimonials collection."
                 fields:
                   - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading. Suggestion: \"Happy customers\"." }
                   - { name: heading, label: "Heading", widget: string, required: false, hint: "Suggestion: \"References\"." }
@@ -2086,6 +2123,7 @@ collections:
               - name: subpages
                 label: "Subpages"
                 widget: object
+                description: "The pages that sit under this one — photo cards, tiles, a list, a chapter row, or a band of sibling pages on a subpage."
                 fields:
                   - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
                   - { name: heading, label: "Heading", widget: string, required: false }
@@ -2164,6 +2202,7 @@ collections:
               - name: faq
                 label: "FAQ"
                 widget: object
+                description: "FAQ from your FAQ collection — list, accordion, cards or split layout."
                 fields:
                   - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
                   - { name: heading, label: "Heading", widget: string, required: false }
@@ -2267,9 +2306,324 @@ collections:
                           - { label: "Accent band", value: "band" }
                           - { label: "Dark", value: "dark" }
                           - { label: "Gradient", value: "gradient" }
+              - name: contactForm
+                label: "Contact form"
+                widget: object
+                description: "A contact form with an optional direct-contact card. Heading, intro, field labels and layout are all editable."
+                fields:
+                  - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
+                  - { name: heading, label: "Heading", widget: string, required: false, hint: "Blank uses the page title." }
+                  - { name: intro, label: "Intro / description", widget: text, required: false, hint: "Optional line under the heading. Blank = hidden." }
+                  - { name: labelName, label: "Field label — name", widget: string, required: false, hint: "Blank uses the site wording (\"Name\")." }
+                  - { name: labelEmail, label: "Field label — email", widget: string, required: false, hint: "Blank uses the site wording (\"Email\")." }
+                  - { name: showPhone, label: "Show the phone field", widget: boolean, required: false, default: true }
+                  - { name: requirePhone, label: "Make the phone field required", widget: boolean, required: false, default: false, hint: "Only applies when the phone field is shown." }
+                  - { name: showCategory, label: "Show the category dropdown", widget: boolean, required: false, default: false, hint: "A dropdown the visitor picks their errand from. Needs at least one choice below." }
+                  - { name: labelCategory, label: "Field label — category", widget: string, required: false, hint: "Blank uses the site wording (\"Category\")." }
+                  - name: categories
+                    label: "Categories"
+                    widget: list
+                    required: false
+                    label_singular: "Category"
+                    collapsed: true
+                    hint: "The choices in the dropdown, in order."
+                    field: { name: category, label: "Category", widget: string }
+                  - { name: showUnit, label: "Show the unit field", widget: boolean, required: false, default: false, hint: "A short free-text field for which unit the visitor is writing about." }
+                  - { name: labelUnit, label: "Field label — unit", widget: string, required: false, hint: "Blank uses the site wording (\"Unit\")." }
+                  - { name: placeholderUnit, label: "Unit placeholder", widget: string, required: false, hint: "Faint example text inside the empty field." }
+                  - { name: labelMessage, label: "Field label — message", widget: string, required: false, hint: "Blank uses the site wording (\"Describe your project\"). Word it for your business." }
+                  - { name: submitLabel, label: "Submit button text", widget: string, required: false, hint: "The form's submit button. Blank uses the site wording (\"Send request\")." }
+                  - { name: showDirectContact, label: "Show the direct-contact card", widget: boolean, required: false, default: true, hint: "Off → the form fills the width (no phone/email card)." }
+                  - { name: inbox, label: "Inbox key", widget: string, required: false, hint: "Where this form's messages are delivered: the key of an inbox set up for the site. Empty means the site's default inbox." }
+                  - name: layout
+                    label: "Layout"
+                    widget: object
+                    collapsed: true
+                    hint: "Size and placement — rarely needs changing."
+                    fields:
+                      - name: beside
+                        label: "Placement"
+                        widget: select
+                        required: false
+                        default: "below"
+                        hint: "On wide screens the block shares a row with the block above it; on small screens they stack."
+                        options:
+                          - { label: "Below the previous block", value: "below" }
+                          - { label: "Beside the previous block, equal widths", value: "equal" }
+                          - { label: "Beside the previous block, narrower", value: "narrow" }
+                          - { label: "Beside the previous block, wider", value: "wide" }
+                  - name: style
+                    label: "Appearance"
+                    widget: object
+                    collapsed: true
+                    hint: "Background and accent colour — set once when the page is designed."
+                    fields:
+                      - name: surface
+                        label: "Background"
+                        widget: select
+                        required: false
+                        default: "standard"
+                        hint: "The surface behind the section — for rhythm between blocks."
+                        options:
+                          - { label: "Standard (white)", value: "standard" }
+                          - { label: "Tinted", value: "tint" }
+                          - { label: "Panel (rounded plate)", value: "panel" }
+                          - { label: "Accent band", value: "band" }
+                          - { label: "Dark", value: "dark" }
+                          - { label: "Gradient", value: "gradient" }
+              - name: contactSwitch
+                label: "Contact form switcher"
+                widget: object
+                description: "Two or more contact forms sharing one surface, one at a time. The visitor picks the errand and that form appears, without a page load."
+                fields:
+                  - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
+                  - { name: heading, label: "Heading", widget: string, required: false, hint: "Blank uses the page title." }
+                  - { name: intro, label: "Intro / description", widget: text, required: false, hint: "Optional line under the heading. Blank = hidden." }
+                  - name: items
+                    label: "Forms"
+                    widget: list
+                    required: false
+                    label_singular: "Shape"
+                    collapsed: true
+                    hint: "One entry per errand, in the order they are offered. The first one is the form the page opens on."
+                    summary: "{{fields.label}}"
+                    fields:
+                      - { name: label, label: "Switch button text", widget: string, hint: "What the visitor picks, e.g. \"Report a fault\"." }
+                      - { name: description, label: "Switch description", widget: string, required: false, hint: "Where the errand goes, in one line. Shown by the choice-cards layout only." }
+                      - { name: intro, label: "Intro / description", widget: text, required: false, hint: "Optional line above this form. Blank = hidden." }
+                      - { name: labelName, label: "Field label — name", widget: string, required: false, hint: "Blank uses the site wording (\"Name\")." }
+                      - { name: labelEmail, label: "Field label — email", widget: string, required: false, hint: "Blank uses the site wording (\"Email\")." }
+                      - { name: showPhone, label: "Show the phone field", widget: boolean, required: false, default: true }
+                      - { name: requirePhone, label: "Make the phone field required", widget: boolean, required: false, default: false, hint: "Only applies when the phone field is shown." }
+                      - { name: showCategory, label: "Show the category dropdown", widget: boolean, required: false, default: false, hint: "A dropdown the visitor picks their errand from. Needs at least one choice below." }
+                      - { name: labelCategory, label: "Field label — category", widget: string, required: false, hint: "Blank uses the site wording (\"Category\")." }
+                      - name: categories
+                        label: "Categories"
+                        widget: list
+                        required: false
+                        label_singular: "Category"
+                        collapsed: true
+                        hint: "The choices in the dropdown, in order."
+                        field: { name: category, label: "Category", widget: string }
+                      - { name: showUnit, label: "Show the unit field", widget: boolean, required: false, default: false, hint: "A short free-text field for which unit the visitor is writing about." }
+                      - { name: labelUnit, label: "Field label — unit", widget: string, required: false, hint: "Blank uses the site wording (\"Unit\")." }
+                      - { name: placeholderUnit, label: "Unit placeholder", widget: string, required: false, hint: "Faint example text inside the empty field." }
+                      - { name: labelMessage, label: "Field label — message", widget: string, required: false, hint: "Blank uses the site wording (\"Describe your project\"). Word it for your business." }
+                      - { name: submitLabel, label: "Submit button text", widget: string, required: false, hint: "The form's submit button. Blank uses the site wording (\"Send request\")." }
+                      - { name: showDirectContact, label: "Show the direct-contact card", widget: boolean, required: false, default: true, hint: "Off → the form fills the width (no phone/email card)." }
+                      - { name: inbox, label: "Inbox key", widget: string, required: false, hint: "Where this form's messages are delivered: the key of an inbox set up for the site. Empty means the site's default inbox." }
+                  - name: layout
+                    label: "Layout"
+                    widget: object
+                    collapsed: true
+                    hint: "Size and placement — rarely needs changing."
+                    fields:
+                      - name: variant
+                        label: "Layout"
+                        widget: select
+                        required: false
+                        default: "segmented"
+                        hint: "How the visitor switches between the forms."
+                        options:
+                          - { label: "Segmented button", value: "segmented" }
+                          - { label: "Choice cards (with descriptions)", value: "cards" }
+                          - { label: "Tabs on the card", value: "tabs" }
+                      - name: beside
+                        label: "Placement"
+                        widget: select
+                        required: false
+                        default: "below"
+                        hint: "On wide screens the block shares a row with the block above it; on small screens they stack."
+                        options:
+                          - { label: "Below the previous block", value: "below" }
+                          - { label: "Beside the previous block, equal widths", value: "equal" }
+                          - { label: "Beside the previous block, narrower", value: "narrow" }
+                          - { label: "Beside the previous block, wider", value: "wide" }
+                  - name: style
+                    label: "Appearance"
+                    widget: object
+                    collapsed: true
+                    hint: "Background and accent colour — set once when the page is designed."
+                    fields:
+                      - name: surface
+                        label: "Background"
+                        widget: select
+                        required: false
+                        default: "standard"
+                        hint: "The surface behind the section — for rhythm between blocks."
+                        options:
+                          - { label: "Standard (white)", value: "standard" }
+                          - { label: "Tinted", value: "tint" }
+                          - { label: "Panel (rounded plate)", value: "panel" }
+                          - { label: "Accent band", value: "band" }
+                          - { label: "Dark", value: "dark" }
+                          - { label: "Gradient", value: "gradient" }
+              - name: contactCard
+                label: "Contact card"
+                widget: object
+                description: "A contact card placed anywhere, auto-filled from Contact settings. Tick what it shows."
+                fields:
+                  - name: show
+                    label: "Show"
+                    widget: select
+                    multiple: true
+                    required: false
+                    default: ["phone", "email"]
+                    hint: "Tick the parts to display. Anything with no info in Contact settings is skipped (e.g. the map needs an address with lat/lng)."
+                    options:
+                      - { label: "Phone", value: "phone" }
+                      - { label: "Email", value: "email" }
+                      - { label: "Opening hours", value: "hours" }
+                      - { label: "Address", value: "address" }
+                      - { label: "Mini-map", value: "map" }
+                      - { label: "Social links", value: "socials" }
+                  - { name: label, label: "Card heading", widget: string, required: false, hint: "Blank uses the site wording (\"Direct contact\")." }
+                  - { name: tint, label: "Tinted background", widget: boolean, required: false, default: true }
+                  - name: layout
+                    label: "Layout"
+                    widget: object
+                    collapsed: true
+                    hint: "Size and placement — rarely needs changing."
+                    fields:
+                      - name: beside
+                        label: "Placement"
+                        widget: select
+                        required: false
+                        default: "below"
+                        hint: "On wide screens the block shares a row with the block above it; on small screens they stack."
+                        options:
+                          - { label: "Below the previous block", value: "below" }
+                          - { label: "Beside the previous block, equal widths", value: "equal" }
+                          - { label: "Beside the previous block, narrower", value: "narrow" }
+                          - { label: "Beside the previous block, wider", value: "wide" }
+                  - name: style
+                    label: "Appearance"
+                    widget: object
+                    collapsed: true
+                    hint: "Background and accent colour — set once when the page is designed."
+                    fields:
+                      - name: surface
+                        label: "Background"
+                        widget: select
+                        required: false
+                        default: "standard"
+                        hint: "The surface behind the section — for rhythm between blocks."
+                        options:
+                          - { label: "Standard (white)", value: "standard" }
+                          - { label: "Tinted", value: "tint" }
+                          - { label: "Panel (rounded plate)", value: "panel" }
+                          - { label: "Accent band", value: "band" }
+                          - { label: "Dark", value: "dark" }
+                          - { label: "Gradient", value: "gradient" }
+              - name: findUs
+                label: "Find us (map)"
+                widget: object
+                description: "A map beside the address, contact and hours — auto-filled from Contact settings. Needs lat/lng on the address."
+                fields:
+                  - { name: heading, label: "Heading", widget: string, required: false, hint: "Blank uses the site wording (\"Find us\")." }
+                  - { name: showHours, label: "Show opening hours", widget: boolean, required: false, default: true }
+                  - name: layout
+                    label: "Layout"
+                    widget: object
+                    collapsed: true
+                    hint: "Size and placement — rarely needs changing."
+                    fields:
+                      - name: beside
+                        label: "Placement"
+                        widget: select
+                        required: false
+                        default: "below"
+                        hint: "On wide screens the block shares a row with the block above it; on small screens they stack."
+                        options:
+                          - { label: "Below the previous block", value: "below" }
+                          - { label: "Beside the previous block, equal widths", value: "equal" }
+                          - { label: "Beside the previous block, narrower", value: "narrow" }
+                          - { label: "Beside the previous block, wider", value: "wide" }
+                  - name: style
+                    label: "Appearance"
+                    widget: object
+                    collapsed: true
+                    hint: "Background and accent colour — set once when the page is designed."
+                    fields:
+                      - name: surface
+                        label: "Background"
+                        widget: select
+                        required: false
+                        default: "standard"
+                        hint: "The surface behind the section — for rhythm between blocks."
+                        options:
+                          - { label: "Standard (white)", value: "standard" }
+                          - { label: "Tinted", value: "tint" }
+                          - { label: "Panel (rounded plate)", value: "panel" }
+                          - { label: "Accent band", value: "band" }
+                          - { label: "Dark", value: "dark" }
+                          - { label: "Gradient", value: "gradient" }
+              - name: map
+                label: "Find your way (static map)"
+                widget: object
+                description: "A map picture with the address and two buttons that hand the route to Google Maps or Apple Maps. No third-party script runs on the page."
+                fields:
+                  - { name: address, label: "Address", widget: string, hint: "Shown in bold, and used for the route when no coordinates are given." }
+                  - { name: note, label: "Note", widget: string, required: false, hint: "A quiet line beside the address, e.g. how far it is to the lift." }
+                  - name: media
+                    label: "Media"
+                    widget: object
+                    collapsed: true
+                    hint: "The map picture, and where the pin sits on it."
+                    fields:
+                      - { name: image, label: "Map image", widget: image, required: false, hint: "A static map exported once and uploaded like any other picture. A site with a Google map key shows the Google still instead and never reads this one." }
+                      - { name: imageAlt, label: "Alt text", widget: string, required: false }
+                      - { name: credit, label: "Image credit", widget: string, required: false, hint: "Printed over the picture. A map drawn from OpenStreetMap must credit it: © OpenStreetMap contributors." }
+                      - { name: pinX, label: "Pin from the left (%)", widget: number, required: false, hint: "0 to 100. Leave both blank for no pin." }
+                      - { name: pinY, label: "Pin from the top (%)", widget: number, required: false, hint: "0 to 100." }
+                  - name: coords
+                    label: "Coordinates"
+                    widget: object
+                    collapsed: true
+                    hint: "Latitude and longitude land the map app on the door instead of the street. Blank sends the address instead."
+                    fields:
+                      - { name: lat, label: "Latitude", widget: number, required: false }
+                      - { name: lng, label: "Longitude", widget: number, required: false }
+                  - name: layout
+                    label: "Layout"
+                    widget: object
+                    collapsed: true
+                    hint: "Size and placement — rarely needs changing."
+                    fields:
+                      - name: beside
+                        label: "Placement"
+                        widget: select
+                        required: false
+                        default: "below"
+                        hint: "On wide screens the block shares a row with the block above it; on small screens they stack."
+                        options:
+                          - { label: "Below the previous block", value: "below" }
+                          - { label: "Beside the previous block, equal widths", value: "equal" }
+                          - { label: "Beside the previous block, narrower", value: "narrow" }
+                          - { label: "Beside the previous block, wider", value: "wide" }
+                  - name: style
+                    label: "Appearance"
+                    widget: object
+                    collapsed: true
+                    hint: "Background and accent colour — set once when the page is designed."
+                    fields:
+                      - name: surface
+                        label: "Background"
+                        widget: select
+                        required: false
+                        default: "standard"
+                        hint: "The surface behind the section — for rhythm between blocks."
+                        options:
+                          - { label: "Standard (white)", value: "standard" }
+                          - { label: "Tinted", value: "tint" }
+                          - { label: "Panel (rounded plate)", value: "panel" }
+                          - { label: "Accent band", value: "band" }
+                          - { label: "Dark", value: "dark" }
+                          - { label: "Gradient", value: "gradient" }
               - name: ctaPanel
                 label: "Call to action (band)"
                 widget: object
+                description: "Full-width call-to-action band with a button."
                 fields:
                   - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
                   - { name: heading, label: "Heading", widget: string, required: false }
@@ -2353,6 +2707,7 @@ collections:
               - name: ctaBox
                 label: "Call to action (box)"
                 widget: object
+                description: "A boxed call-to-action: heading, text and a button."
                 fields:
                   - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
                   - { name: heading, label: "Heading", widget: string }
@@ -2470,315 +2825,6 @@ collections:
                           - { label: "Accent band", value: "band" }
                           - { label: "Dark", value: "dark" }
                           - { label: "Gradient", value: "gradient" }
-              - name: contactForm
-                label: "Contact form"
-                widget: object
-                fields:
-                  - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
-                  - { name: heading, label: "Heading", widget: string, required: false, hint: "Blank uses the page title." }
-                  - { name: intro, label: "Intro / description", widget: text, required: false, hint: "Optional line under the heading. Blank = hidden." }
-                  - { name: labelName, label: "Field label — name", widget: string, required: false, hint: "Blank uses the site wording (\"Name\")." }
-                  - { name: labelEmail, label: "Field label — email", widget: string, required: false, hint: "Blank uses the site wording (\"Email\")." }
-                  - { name: showPhone, label: "Show the phone field", widget: boolean, required: false, default: true }
-                  - { name: requirePhone, label: "Make the phone field required", widget: boolean, required: false, default: false, hint: "Only applies when the phone field is shown." }
-                  - { name: showCategory, label: "Show the category dropdown", widget: boolean, required: false, default: false, hint: "A dropdown the visitor picks their errand from. Needs at least one choice below." }
-                  - { name: labelCategory, label: "Field label — category", widget: string, required: false, hint: "Blank uses the site wording (\"Category\")." }
-                  - name: categories
-                    label: "Categories"
-                    widget: list
-                    required: false
-                    label_singular: "Category"
-                    collapsed: true
-                    hint: "The choices in the dropdown, in order."
-                    field: { name: category, label: "Category", widget: string }
-                  - { name: showUnit, label: "Show the unit field", widget: boolean, required: false, default: false, hint: "A short free-text field for which unit the visitor is writing about." }
-                  - { name: labelUnit, label: "Field label — unit", widget: string, required: false, hint: "Blank uses the site wording (\"Unit\")." }
-                  - { name: placeholderUnit, label: "Unit placeholder", widget: string, required: false, hint: "Faint example text inside the empty field." }
-                  - { name: labelMessage, label: "Field label — message", widget: string, required: false, hint: "Blank uses the site wording (\"Describe your project\"). Word it for your business." }
-                  - { name: submitLabel, label: "Submit button text", widget: string, required: false, hint: "The form's submit button. Blank uses the site wording (\"Send request\")." }
-                  - { name: showDirectContact, label: "Show the direct-contact card", widget: boolean, required: false, default: true, hint: "Off → the form fills the width (no phone/email card)." }
-                  - { name: inbox, label: "Inbox key", widget: string, required: false, hint: "Where this form's messages are delivered: the key of an inbox set up for the site. Empty means the site's default inbox." }
-                  - name: layout
-                    label: "Layout"
-                    widget: object
-                    collapsed: true
-                    hint: "Size and placement — rarely needs changing."
-                    fields:
-                      - name: beside
-                        label: "Placement"
-                        widget: select
-                        required: false
-                        default: "below"
-                        hint: "On wide screens the block shares a row with the block above it; on small screens they stack."
-                        options:
-                          - { label: "Below the previous block", value: "below" }
-                          - { label: "Beside the previous block, equal widths", value: "equal" }
-                          - { label: "Beside the previous block, narrower", value: "narrow" }
-                          - { label: "Beside the previous block, wider", value: "wide" }
-                  - name: style
-                    label: "Appearance"
-                    widget: object
-                    collapsed: true
-                    hint: "Background and accent colour — set once when the page is designed."
-                    fields:
-                      - name: surface
-                        label: "Background"
-                        widget: select
-                        required: false
-                        default: "standard"
-                        hint: "The surface behind the section — for rhythm between blocks."
-                        options:
-                          - { label: "Standard (white)", value: "standard" }
-                          - { label: "Tinted", value: "tint" }
-                          - { label: "Panel (rounded plate)", value: "panel" }
-                          - { label: "Accent band", value: "band" }
-                          - { label: "Dark", value: "dark" }
-                          - { label: "Gradient", value: "gradient" }
-              - name: contactSwitch
-                label: "Contact form switcher"
-                widget: object
-                fields:
-                  - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
-                  - { name: heading, label: "Heading", widget: string, required: false, hint: "Blank uses the page title." }
-                  - { name: intro, label: "Intro / description", widget: text, required: false, hint: "Optional line under the heading. Blank = hidden." }
-                  - name: items
-                    label: "Forms"
-                    widget: list
-                    required: false
-                    label_singular: "Shape"
-                    collapsed: true
-                    hint: "One entry per errand, in the order they are offered. The first one is the form the page opens on."
-                    summary: "{{fields.label}}"
-                    fields:
-                      - { name: label, label: "Switch button text", widget: string, hint: "What the visitor picks, e.g. \"Report a fault\"." }
-                      - { name: description, label: "Switch description", widget: string, required: false, hint: "Where the errand goes, in one line. Shown by the choice-cards layout only." }
-                      - { name: intro, label: "Intro / description", widget: text, required: false, hint: "Optional line above this form. Blank = hidden." }
-                      - { name: labelName, label: "Field label — name", widget: string, required: false, hint: "Blank uses the site wording (\"Name\")." }
-                      - { name: labelEmail, label: "Field label — email", widget: string, required: false, hint: "Blank uses the site wording (\"Email\")." }
-                      - { name: showPhone, label: "Show the phone field", widget: boolean, required: false, default: true }
-                      - { name: requirePhone, label: "Make the phone field required", widget: boolean, required: false, default: false, hint: "Only applies when the phone field is shown." }
-                      - { name: showCategory, label: "Show the category dropdown", widget: boolean, required: false, default: false, hint: "A dropdown the visitor picks their errand from. Needs at least one choice below." }
-                      - { name: labelCategory, label: "Field label — category", widget: string, required: false, hint: "Blank uses the site wording (\"Category\")." }
-                      - name: categories
-                        label: "Categories"
-                        widget: list
-                        required: false
-                        label_singular: "Category"
-                        collapsed: true
-                        hint: "The choices in the dropdown, in order."
-                        field: { name: category, label: "Category", widget: string }
-                      - { name: showUnit, label: "Show the unit field", widget: boolean, required: false, default: false, hint: "A short free-text field for which unit the visitor is writing about." }
-                      - { name: labelUnit, label: "Field label — unit", widget: string, required: false, hint: "Blank uses the site wording (\"Unit\")." }
-                      - { name: placeholderUnit, label: "Unit placeholder", widget: string, required: false, hint: "Faint example text inside the empty field." }
-                      - { name: labelMessage, label: "Field label — message", widget: string, required: false, hint: "Blank uses the site wording (\"Describe your project\"). Word it for your business." }
-                      - { name: submitLabel, label: "Submit button text", widget: string, required: false, hint: "The form's submit button. Blank uses the site wording (\"Send request\")." }
-                      - { name: showDirectContact, label: "Show the direct-contact card", widget: boolean, required: false, default: true, hint: "Off → the form fills the width (no phone/email card)." }
-                      - { name: inbox, label: "Inbox key", widget: string, required: false, hint: "Where this form's messages are delivered: the key of an inbox set up for the site. Empty means the site's default inbox." }
-                  - name: layout
-                    label: "Layout"
-                    widget: object
-                    collapsed: true
-                    hint: "Size and placement — rarely needs changing."
-                    fields:
-                      - name: variant
-                        label: "Layout"
-                        widget: select
-                        required: false
-                        default: "segmented"
-                        hint: "How the visitor switches between the forms."
-                        options:
-                          - { label: "Segmented button", value: "segmented" }
-                          - { label: "Choice cards (with descriptions)", value: "cards" }
-                          - { label: "Tabs on the card", value: "tabs" }
-                      - name: beside
-                        label: "Placement"
-                        widget: select
-                        required: false
-                        default: "below"
-                        hint: "On wide screens the block shares a row with the block above it; on small screens they stack."
-                        options:
-                          - { label: "Below the previous block", value: "below" }
-                          - { label: "Beside the previous block, equal widths", value: "equal" }
-                          - { label: "Beside the previous block, narrower", value: "narrow" }
-                          - { label: "Beside the previous block, wider", value: "wide" }
-                  - name: style
-                    label: "Appearance"
-                    widget: object
-                    collapsed: true
-                    hint: "Background and accent colour — set once when the page is designed."
-                    fields:
-                      - name: surface
-                        label: "Background"
-                        widget: select
-                        required: false
-                        default: "standard"
-                        hint: "The surface behind the section — for rhythm between blocks."
-                        options:
-                          - { label: "Standard (white)", value: "standard" }
-                          - { label: "Tinted", value: "tint" }
-                          - { label: "Panel (rounded plate)", value: "panel" }
-                          - { label: "Accent band", value: "band" }
-                          - { label: "Dark", value: "dark" }
-                          - { label: "Gradient", value: "gradient" }
-              - name: contactCard
-                label: "Contact card"
-                widget: object
-                fields:
-                  - name: show
-                    label: "Show"
-                    widget: select
-                    multiple: true
-                    required: false
-                    default: ["phone", "email"]
-                    hint: "Tick the parts to display. Anything with no info in Contact settings is skipped (e.g. the map needs an address with lat/lng)."
-                    options:
-                      - { label: "Phone", value: "phone" }
-                      - { label: "Email", value: "email" }
-                      - { label: "Opening hours", value: "hours" }
-                      - { label: "Address", value: "address" }
-                      - { label: "Mini-map", value: "map" }
-                      - { label: "Social links", value: "socials" }
-                  - { name: label, label: "Card heading", widget: string, required: false, hint: "Blank uses the site wording (\"Direct contact\")." }
-                  - { name: tint, label: "Tinted background", widget: boolean, required: false, default: true }
-                  - name: layout
-                    label: "Layout"
-                    widget: object
-                    collapsed: true
-                    hint: "Size and placement — rarely needs changing."
-                    fields:
-                      - name: beside
-                        label: "Placement"
-                        widget: select
-                        required: false
-                        default: "below"
-                        hint: "On wide screens the block shares a row with the block above it; on small screens they stack."
-                        options:
-                          - { label: "Below the previous block", value: "below" }
-                          - { label: "Beside the previous block, equal widths", value: "equal" }
-                          - { label: "Beside the previous block, narrower", value: "narrow" }
-                          - { label: "Beside the previous block, wider", value: "wide" }
-                  - name: style
-                    label: "Appearance"
-                    widget: object
-                    collapsed: true
-                    hint: "Background and accent colour — set once when the page is designed."
-                    fields:
-                      - name: surface
-                        label: "Background"
-                        widget: select
-                        required: false
-                        default: "standard"
-                        hint: "The surface behind the section — for rhythm between blocks."
-                        options:
-                          - { label: "Standard (white)", value: "standard" }
-                          - { label: "Tinted", value: "tint" }
-                          - { label: "Panel (rounded plate)", value: "panel" }
-                          - { label: "Accent band", value: "band" }
-                          - { label: "Dark", value: "dark" }
-                          - { label: "Gradient", value: "gradient" }
-              - name: findUs
-                label: "Find us (map)"
-                widget: object
-                fields:
-                  - { name: heading, label: "Heading", widget: string, required: false, hint: "Blank uses the site wording (\"Find us\")." }
-                  - { name: showHours, label: "Show opening hours", widget: boolean, required: false, default: true }
-                  - name: layout
-                    label: "Layout"
-                    widget: object
-                    collapsed: true
-                    hint: "Size and placement — rarely needs changing."
-                    fields:
-                      - name: beside
-                        label: "Placement"
-                        widget: select
-                        required: false
-                        default: "below"
-                        hint: "On wide screens the block shares a row with the block above it; on small screens they stack."
-                        options:
-                          - { label: "Below the previous block", value: "below" }
-                          - { label: "Beside the previous block, equal widths", value: "equal" }
-                          - { label: "Beside the previous block, narrower", value: "narrow" }
-                          - { label: "Beside the previous block, wider", value: "wide" }
-                  - name: style
-                    label: "Appearance"
-                    widget: object
-                    collapsed: true
-                    hint: "Background and accent colour — set once when the page is designed."
-                    fields:
-                      - name: surface
-                        label: "Background"
-                        widget: select
-                        required: false
-                        default: "standard"
-                        hint: "The surface behind the section — for rhythm between blocks."
-                        options:
-                          - { label: "Standard (white)", value: "standard" }
-                          - { label: "Tinted", value: "tint" }
-                          - { label: "Panel (rounded plate)", value: "panel" }
-                          - { label: "Accent band", value: "band" }
-                          - { label: "Dark", value: "dark" }
-                          - { label: "Gradient", value: "gradient" }
-              - name: map
-                label: "Find your way (static map)"
-                widget: object
-                fields:
-                  - { name: address, label: "Address", widget: string, hint: "Shown in bold, and used for the route when no coordinates are given." }
-                  - { name: note, label: "Note", widget: string, required: false, hint: "A quiet line beside the address, e.g. how far it is to the lift." }
-                  - name: media
-                    label: "Media"
-                    widget: object
-                    collapsed: true
-                    hint: "The map picture, and where the pin sits on it."
-                    fields:
-                      - { name: image, label: "Map image", widget: image, required: false, hint: "A static map exported once and uploaded like any other picture. A site with a Google map key shows the Google still instead and never reads this one." }
-                      - { name: imageAlt, label: "Alt text", widget: string, required: false }
-                      - { name: credit, label: "Image credit", widget: string, required: false, hint: "Printed over the picture. A map drawn from OpenStreetMap must credit it: © OpenStreetMap contributors." }
-                      - { name: pinX, label: "Pin from the left (%)", widget: number, required: false, hint: "0 to 100. Leave both blank for no pin." }
-                      - { name: pinY, label: "Pin from the top (%)", widget: number, required: false, hint: "0 to 100." }
-                  - name: coords
-                    label: "Coordinates"
-                    widget: object
-                    collapsed: true
-                    hint: "Latitude and longitude land the map app on the door instead of the street. Blank sends the address instead."
-                    fields:
-                      - { name: lat, label: "Latitude", widget: number, required: false }
-                      - { name: lng, label: "Longitude", widget: number, required: false }
-                  - name: layout
-                    label: "Layout"
-                    widget: object
-                    collapsed: true
-                    hint: "Size and placement — rarely needs changing."
-                    fields:
-                      - name: beside
-                        label: "Placement"
-                        widget: select
-                        required: false
-                        default: "below"
-                        hint: "On wide screens the block shares a row with the block above it; on small screens they stack."
-                        options:
-                          - { label: "Below the previous block", value: "below" }
-                          - { label: "Beside the previous block, equal widths", value: "equal" }
-                          - { label: "Beside the previous block, narrower", value: "narrow" }
-                          - { label: "Beside the previous block, wider", value: "wide" }
-                  - name: style
-                    label: "Appearance"
-                    widget: object
-                    collapsed: true
-                    hint: "Background and accent colour — set once when the page is designed."
-                    fields:
-                      - name: surface
-                        label: "Background"
-                        widget: select
-                        required: false
-                        default: "standard"
-                        hint: "The surface behind the section — for rhythm between blocks."
-                        options:
-                          - { label: "Standard (white)", value: "standard" }
-                          - { label: "Tinted", value: "tint" }
-                          - { label: "Panel (rounded plate)", value: "panel" }
-                          - { label: "Accent band", value: "band" }
-                          - { label: "Dark", value: "dark" }
-                          - { label: "Gradient", value: "gradient" }
   - name: pages
     media_folder: "/public/media/pages/{{slug}}"
     public_folder: "/media/pages/{{slug}}"
@@ -2828,6 +2874,7 @@ collections:
           - name: hero
             label: "Hero"
             widget: object
+            description: "Full-width intro — eyebrow, H1, text and a button, with an optional image, highlights list or animated motif beside it."
             fields:
               - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
               - { name: heading, label: "Heading (H1)", widget: string }
@@ -3089,6 +3136,7 @@ collections:
           - name: cover
             label: "Cover (full-bleed)"
             widget: object
+            description: "Full-bleed banner — a background photo or muted looping video, with overlaid heading, text and buttons."
             fields:
               - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
               - { name: heading, label: "Heading (H1)", widget: text, hint: "Press Enter for a line break." }
@@ -3230,6 +3278,7 @@ collections:
           - name: pageHeader
             label: "Page header"
             widget: object
+            description: "Page title band (light or dark): eyebrow, H1, intro and an optional button."
             fields:
               - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
               - { name: heading, label: "Heading (H1)", widget: string }
@@ -3319,6 +3368,7 @@ collections:
           - name: prose
             label: "Rich text"
             widget: object
+            description: "A block of rich (markdown) text with an optional heading."
             fields:
               - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
               - { name: heading, label: "Heading (optional)", widget: string, required: false }
@@ -3373,6 +3423,7 @@ collections:
           - name: textImage
             label: "Text + image"
             widget: object
+            description: "Text beside an image or a looping video (media on the left or right)."
             fields:
               - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
               - { name: heading, label: "Heading", widget: string, required: false }
@@ -3445,6 +3496,7 @@ collections:
           - name: textQuote
             label: "Text + quote"
             widget: object
+            description: "Body text paired with a pulled-out quote."
             fields:
               - { name: body, label: "Body text", widget: markdown }
               - { name: quote, label: "Quote", widget: text }
@@ -3499,6 +3551,7 @@ collections:
           - name: fragment
             label: "Story fragment"
             widget: object
+            description: "A placed editorial fragment — big lead line, short body, optional link. Consecutive fragments drift across the page."
             fields:
               - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Usually only on the first fragment of a story." }
               - { name: statement, label: "Statement (big line)", widget: string, hint: "Wrap words in *asterisks* to underline them." }
@@ -3580,6 +3633,7 @@ collections:
           - name: sectionNav
             label: "Section links"
             widget: object
+            description: "A row of links that jump to the headings further down this page. Nothing to fill in: it reads the sections below it."
             fields:
               - { name: label, label: "Accessible label", widget: string, required: false, hint: "Read by screen readers; the visible chips come from the section headings below." }
               - name: layout
@@ -3622,6 +3676,7 @@ collections:
           - name: featureGrid
             label: "Feature cards"
             widget: object
+            description: "Grid of feature cards — icon or number, title and text; cards can link."
             fields:
               - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
               - { name: heading, label: "Heading", widget: string, required: false }
@@ -3733,6 +3788,16 @@ collections:
                 hint: "Size and placement — rarely needs changing."
                 fields:
                   - { name: numbered, label: "Numbered (01/02/03 instead of icons)", widget: boolean, required: false, default: false }
+                  - name: columns
+                    label: "Columns"
+                    widget: select
+                    required: false
+                    default: "3"
+                    hint: "How many cards sit side by side on wide screens."
+                    options:
+                      - { label: "2", value: "2" }
+                      - { label: "3", value: "3" }
+                      - { label: "4", value: "4" }
                   - name: beside
                     label: "Placement"
                     widget: select
@@ -3776,6 +3841,7 @@ collections:
           - name: pillars
             label: "Principles / values"
             widget: object
+            description: "Row of principle / value cards (icon, title, text)."
             fields:
               - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
               - { name: heading, label: "Heading", widget: string, required: false }
@@ -3829,6 +3895,7 @@ collections:
           - name: plans
             label: "Pricing / plans"
             widget: object
+            description: "A row of pricing plan cards — name, price, period, features and a button."
             fields:
               - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
               - { name: heading, label: "Heading", widget: string, required: false }
@@ -3936,6 +4003,7 @@ collections:
           - name: specialistGrid
             label: "Specialist grid"
             widget: object
+            description: "Grid of specialist / team profile cards."
             fields:
               - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
               - { name: heading, label: "Heading", widget: string, required: false }
@@ -3989,6 +4057,7 @@ collections:
           - name: team
             label: "Team"
             widget: object
+            description: "Grid of people cards — photo, role, contact details."
             fields:
               - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
               - { name: heading, label: "Heading", widget: string, required: false }
@@ -4048,6 +4117,7 @@ collections:
           - name: steps
             label: "Process / steps"
             widget: object
+            description: "Numbered process — a sequence of steps."
             fields:
               - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
               - { name: heading, label: "Heading", widget: string, required: false }
@@ -4124,6 +4194,7 @@ collections:
           - name: checklist
             label: "Checklist"
             widget: object
+            description: "Ticked checklist items in one or two columns."
             fields:
               - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
               - { name: heading, label: "Heading", widget: string, required: false }
@@ -4178,6 +4249,7 @@ collections:
           - name: factList
             label: "Fact list (label + value)"
             widget: object
+            description: "Rows of label and value — specifications, what is included, key facts."
             fields:
               - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
               - { name: heading, label: "Heading", widget: string, required: false }
@@ -4251,6 +4323,7 @@ collections:
           - name: gallery
             label: "Gallery"
             widget: object
+            description: "Image grid (2–3 columns) with optional captions."
             fields:
               - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
               - { name: heading, label: "Heading", widget: string, required: false }
@@ -4306,6 +4379,7 @@ collections:
           - name: collage
             label: "Collage (image viewer)"
             widget: object
+            description: "A collage of fixed height — one leading picture, a few tiles, and a chip that opens every image in a viewer. Replaces stacked full-width photos on a content page."
             fields:
               - name: images
                 label: "Images"
@@ -4358,6 +4432,7 @@ collections:
           - name: beforeAfter
             label: "Before / after"
             widget: object
+            description: "A before / after image pair."
             fields:
               - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
               - { name: heading, label: "Heading", widget: string, required: false }
@@ -4408,9 +4483,59 @@ collections:
                       - { label: "Accent band", value: "band" }
                       - { label: "Dark", value: "dark" }
                       - { label: "Gradient", value: "gradient" }
+          - name: logoStrip
+            label: "Logo strip"
+            widget: object
+            description: "A centered row of partner / client names with an optional lead-in."
+            fields:
+              - { name: lead, label: "Lead-in", widget: string, required: false, hint: "e.g. “Trusted by” or “Built on”." }
+              - name: logos
+                label: "Names"
+                widget: list
+                required: false
+                label_singular: "Name"
+                collapsed: true
+                field: { name: name, label: "Name", widget: string }
+              - name: layout
+                label: "Layout"
+                widget: object
+                collapsed: true
+                hint: "Size and placement — rarely needs changing."
+                fields:
+                  - name: beside
+                    label: "Placement"
+                    widget: select
+                    required: false
+                    default: "below"
+                    hint: "On wide screens the block shares a row with the block above it; on small screens they stack."
+                    options:
+                      - { label: "Below the previous block", value: "below" }
+                      - { label: "Beside the previous block, equal widths", value: "equal" }
+                      - { label: "Beside the previous block, narrower", value: "narrow" }
+                      - { label: "Beside the previous block, wider", value: "wide" }
+              - name: style
+                label: "Appearance"
+                widget: object
+                collapsed: true
+                hint: "Background and accent colour — set once when the page is designed."
+                fields:
+                  - name: surface
+                    label: "Background"
+                    widget: select
+                    required: false
+                    default: "standard"
+                    hint: "The surface behind the section — for rhythm between blocks."
+                    options:
+                      - { label: "Standard (white)", value: "standard" }
+                      - { label: "Tinted", value: "tint" }
+                      - { label: "Panel (rounded plate)", value: "panel" }
+                      - { label: "Accent band", value: "band" }
+                      - { label: "Dark", value: "dark" }
+                      - { label: "Gradient", value: "gradient" }
           - name: definition
             label: "Dictionary entry"
             widget: object
+            description: "A dictionary-style word entry — term, word class and numbered senses."
             fields:
               - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
               - { name: term, label: "Term", widget: string, hint: "The word being defined, e.g. \"ex·am·ple\" (use · for syllables)." }
@@ -4484,6 +4609,7 @@ collections:
           - name: callout
             label: "Highlighted quote"
             widget: object
+            description: "A single highlighted quote or statement."
             fields:
               - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
               - { name: quote, label: "Quote / statement", widget: text, hint: "Wrap words in *asterisks* to underline them." }
@@ -4556,6 +4682,7 @@ collections:
           - name: statPanel
             label: "Statement panel"
             widget: object
+            description: "Dark panel with a big number, statement and badges."
             fields:
               - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
               - { name: heading, label: "Heading", widget: string, required: false, hint: "Wrap words in *asterisks* to underline them." }
@@ -4617,6 +4744,7 @@ collections:
           - name: statsBar
             label: "Stats / facts"
             widget: object
+            description: "A row of stats / facts (label + value)."
             fields:
               - name: items
                 label: "Facts (label + value)"
@@ -4667,6 +4795,7 @@ collections:
           - name: timeline
             label: "Timeline"
             widget: object
+            description: "A line of years with one dot per milestone, the last one highlighted, and an optional note about what is planned."
             fields:
               - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
               - { name: heading, label: "Heading", widget: string, required: false }
@@ -4720,57 +4849,10 @@ collections:
                       - { label: "Accent band", value: "band" }
                       - { label: "Dark", value: "dark" }
                       - { label: "Gradient", value: "gradient" }
-          - name: logoStrip
-            label: "Logo strip"
-            widget: object
-            fields:
-              - { name: lead, label: "Lead-in", widget: string, required: false, hint: "e.g. “Trusted by” or “Built on”." }
-              - name: logos
-                label: "Names"
-                widget: list
-                required: false
-                label_singular: "Name"
-                collapsed: true
-                field: { name: name, label: "Name", widget: string }
-              - name: layout
-                label: "Layout"
-                widget: object
-                collapsed: true
-                hint: "Size and placement — rarely needs changing."
-                fields:
-                  - name: beside
-                    label: "Placement"
-                    widget: select
-                    required: false
-                    default: "below"
-                    hint: "On wide screens the block shares a row with the block above it; on small screens they stack."
-                    options:
-                      - { label: "Below the previous block", value: "below" }
-                      - { label: "Beside the previous block, equal widths", value: "equal" }
-                      - { label: "Beside the previous block, narrower", value: "narrow" }
-                      - { label: "Beside the previous block, wider", value: "wide" }
-              - name: style
-                label: "Appearance"
-                widget: object
-                collapsed: true
-                hint: "Background and accent colour — set once when the page is designed."
-                fields:
-                  - name: surface
-                    label: "Background"
-                    widget: select
-                    required: false
-                    default: "standard"
-                    hint: "The surface behind the section — for rhythm between blocks."
-                    options:
-                      - { label: "Standard (white)", value: "standard" }
-                      - { label: "Tinted", value: "tint" }
-                      - { label: "Panel (rounded plate)", value: "panel" }
-                      - { label: "Accent band", value: "band" }
-                      - { label: "Dark", value: "dark" }
-                      - { label: "Gradient", value: "gradient" }
           - name: serviceGrid
             label: "Service cards"
             widget: object
+            description: "Service cards pulled from your Services collection."
             fields:
               - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
               - { name: heading, label: "Heading", widget: string, required: false }
@@ -4825,6 +4907,7 @@ collections:
           - name: testimonials
             label: "Testimonials"
             widget: object
+            description: "Customer testimonials from your Testimonials collection."
             fields:
               - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading. Suggestion: \"Happy customers\"." }
               - { name: heading, label: "Heading", widget: string, required: false, hint: "Suggestion: \"References\"." }
@@ -4868,6 +4951,7 @@ collections:
           - name: subpages
             label: "Subpages"
             widget: object
+            description: "The pages that sit under this one — photo cards, tiles, a list, a chapter row, or a band of sibling pages on a subpage."
             fields:
               - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
               - { name: heading, label: "Heading", widget: string, required: false }
@@ -4946,6 +5030,7 @@ collections:
           - name: faq
             label: "FAQ"
             widget: object
+            description: "FAQ from your FAQ collection — list, accordion, cards or split layout."
             fields:
               - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
               - { name: heading, label: "Heading", widget: string, required: false }
@@ -5049,9 +5134,324 @@ collections:
                       - { label: "Accent band", value: "band" }
                       - { label: "Dark", value: "dark" }
                       - { label: "Gradient", value: "gradient" }
+          - name: contactForm
+            label: "Contact form"
+            widget: object
+            description: "A contact form with an optional direct-contact card. Heading, intro, field labels and layout are all editable."
+            fields:
+              - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
+              - { name: heading, label: "Heading", widget: string, required: false, hint: "Blank uses the page title." }
+              - { name: intro, label: "Intro / description", widget: text, required: false, hint: "Optional line under the heading. Blank = hidden." }
+              - { name: labelName, label: "Field label — name", widget: string, required: false, hint: "Blank uses the site wording (\"Name\")." }
+              - { name: labelEmail, label: "Field label — email", widget: string, required: false, hint: "Blank uses the site wording (\"Email\")." }
+              - { name: showPhone, label: "Show the phone field", widget: boolean, required: false, default: true }
+              - { name: requirePhone, label: "Make the phone field required", widget: boolean, required: false, default: false, hint: "Only applies when the phone field is shown." }
+              - { name: showCategory, label: "Show the category dropdown", widget: boolean, required: false, default: false, hint: "A dropdown the visitor picks their errand from. Needs at least one choice below." }
+              - { name: labelCategory, label: "Field label — category", widget: string, required: false, hint: "Blank uses the site wording (\"Category\")." }
+              - name: categories
+                label: "Categories"
+                widget: list
+                required: false
+                label_singular: "Category"
+                collapsed: true
+                hint: "The choices in the dropdown, in order."
+                field: { name: category, label: "Category", widget: string }
+              - { name: showUnit, label: "Show the unit field", widget: boolean, required: false, default: false, hint: "A short free-text field for which unit the visitor is writing about." }
+              - { name: labelUnit, label: "Field label — unit", widget: string, required: false, hint: "Blank uses the site wording (\"Unit\")." }
+              - { name: placeholderUnit, label: "Unit placeholder", widget: string, required: false, hint: "Faint example text inside the empty field." }
+              - { name: labelMessage, label: "Field label — message", widget: string, required: false, hint: "Blank uses the site wording (\"Describe your project\"). Word it for your business." }
+              - { name: submitLabel, label: "Submit button text", widget: string, required: false, hint: "The form's submit button. Blank uses the site wording (\"Send request\")." }
+              - { name: showDirectContact, label: "Show the direct-contact card", widget: boolean, required: false, default: true, hint: "Off → the form fills the width (no phone/email card)." }
+              - { name: inbox, label: "Inbox key", widget: string, required: false, hint: "Where this form's messages are delivered: the key of an inbox set up for the site. Empty means the site's default inbox." }
+              - name: layout
+                label: "Layout"
+                widget: object
+                collapsed: true
+                hint: "Size and placement — rarely needs changing."
+                fields:
+                  - name: beside
+                    label: "Placement"
+                    widget: select
+                    required: false
+                    default: "below"
+                    hint: "On wide screens the block shares a row with the block above it; on small screens they stack."
+                    options:
+                      - { label: "Below the previous block", value: "below" }
+                      - { label: "Beside the previous block, equal widths", value: "equal" }
+                      - { label: "Beside the previous block, narrower", value: "narrow" }
+                      - { label: "Beside the previous block, wider", value: "wide" }
+              - name: style
+                label: "Appearance"
+                widget: object
+                collapsed: true
+                hint: "Background and accent colour — set once when the page is designed."
+                fields:
+                  - name: surface
+                    label: "Background"
+                    widget: select
+                    required: false
+                    default: "standard"
+                    hint: "The surface behind the section — for rhythm between blocks."
+                    options:
+                      - { label: "Standard (white)", value: "standard" }
+                      - { label: "Tinted", value: "tint" }
+                      - { label: "Panel (rounded plate)", value: "panel" }
+                      - { label: "Accent band", value: "band" }
+                      - { label: "Dark", value: "dark" }
+                      - { label: "Gradient", value: "gradient" }
+          - name: contactSwitch
+            label: "Contact form switcher"
+            widget: object
+            description: "Two or more contact forms sharing one surface, one at a time. The visitor picks the errand and that form appears, without a page load."
+            fields:
+              - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
+              - { name: heading, label: "Heading", widget: string, required: false, hint: "Blank uses the page title." }
+              - { name: intro, label: "Intro / description", widget: text, required: false, hint: "Optional line under the heading. Blank = hidden." }
+              - name: items
+                label: "Forms"
+                widget: list
+                required: false
+                label_singular: "Shape"
+                collapsed: true
+                hint: "One entry per errand, in the order they are offered. The first one is the form the page opens on."
+                summary: "{{fields.label}}"
+                fields:
+                  - { name: label, label: "Switch button text", widget: string, hint: "What the visitor picks, e.g. \"Report a fault\"." }
+                  - { name: description, label: "Switch description", widget: string, required: false, hint: "Where the errand goes, in one line. Shown by the choice-cards layout only." }
+                  - { name: intro, label: "Intro / description", widget: text, required: false, hint: "Optional line above this form. Blank = hidden." }
+                  - { name: labelName, label: "Field label — name", widget: string, required: false, hint: "Blank uses the site wording (\"Name\")." }
+                  - { name: labelEmail, label: "Field label — email", widget: string, required: false, hint: "Blank uses the site wording (\"Email\")." }
+                  - { name: showPhone, label: "Show the phone field", widget: boolean, required: false, default: true }
+                  - { name: requirePhone, label: "Make the phone field required", widget: boolean, required: false, default: false, hint: "Only applies when the phone field is shown." }
+                  - { name: showCategory, label: "Show the category dropdown", widget: boolean, required: false, default: false, hint: "A dropdown the visitor picks their errand from. Needs at least one choice below." }
+                  - { name: labelCategory, label: "Field label — category", widget: string, required: false, hint: "Blank uses the site wording (\"Category\")." }
+                  - name: categories
+                    label: "Categories"
+                    widget: list
+                    required: false
+                    label_singular: "Category"
+                    collapsed: true
+                    hint: "The choices in the dropdown, in order."
+                    field: { name: category, label: "Category", widget: string }
+                  - { name: showUnit, label: "Show the unit field", widget: boolean, required: false, default: false, hint: "A short free-text field for which unit the visitor is writing about." }
+                  - { name: labelUnit, label: "Field label — unit", widget: string, required: false, hint: "Blank uses the site wording (\"Unit\")." }
+                  - { name: placeholderUnit, label: "Unit placeholder", widget: string, required: false, hint: "Faint example text inside the empty field." }
+                  - { name: labelMessage, label: "Field label — message", widget: string, required: false, hint: "Blank uses the site wording (\"Describe your project\"). Word it for your business." }
+                  - { name: submitLabel, label: "Submit button text", widget: string, required: false, hint: "The form's submit button. Blank uses the site wording (\"Send request\")." }
+                  - { name: showDirectContact, label: "Show the direct-contact card", widget: boolean, required: false, default: true, hint: "Off → the form fills the width (no phone/email card)." }
+                  - { name: inbox, label: "Inbox key", widget: string, required: false, hint: "Where this form's messages are delivered: the key of an inbox set up for the site. Empty means the site's default inbox." }
+              - name: layout
+                label: "Layout"
+                widget: object
+                collapsed: true
+                hint: "Size and placement — rarely needs changing."
+                fields:
+                  - name: variant
+                    label: "Layout"
+                    widget: select
+                    required: false
+                    default: "segmented"
+                    hint: "How the visitor switches between the forms."
+                    options:
+                      - { label: "Segmented button", value: "segmented" }
+                      - { label: "Choice cards (with descriptions)", value: "cards" }
+                      - { label: "Tabs on the card", value: "tabs" }
+                  - name: beside
+                    label: "Placement"
+                    widget: select
+                    required: false
+                    default: "below"
+                    hint: "On wide screens the block shares a row with the block above it; on small screens they stack."
+                    options:
+                      - { label: "Below the previous block", value: "below" }
+                      - { label: "Beside the previous block, equal widths", value: "equal" }
+                      - { label: "Beside the previous block, narrower", value: "narrow" }
+                      - { label: "Beside the previous block, wider", value: "wide" }
+              - name: style
+                label: "Appearance"
+                widget: object
+                collapsed: true
+                hint: "Background and accent colour — set once when the page is designed."
+                fields:
+                  - name: surface
+                    label: "Background"
+                    widget: select
+                    required: false
+                    default: "standard"
+                    hint: "The surface behind the section — for rhythm between blocks."
+                    options:
+                      - { label: "Standard (white)", value: "standard" }
+                      - { label: "Tinted", value: "tint" }
+                      - { label: "Panel (rounded plate)", value: "panel" }
+                      - { label: "Accent band", value: "band" }
+                      - { label: "Dark", value: "dark" }
+                      - { label: "Gradient", value: "gradient" }
+          - name: contactCard
+            label: "Contact card"
+            widget: object
+            description: "A contact card placed anywhere, auto-filled from Contact settings. Tick what it shows."
+            fields:
+              - name: show
+                label: "Show"
+                widget: select
+                multiple: true
+                required: false
+                default: ["phone", "email"]
+                hint: "Tick the parts to display. Anything with no info in Contact settings is skipped (e.g. the map needs an address with lat/lng)."
+                options:
+                  - { label: "Phone", value: "phone" }
+                  - { label: "Email", value: "email" }
+                  - { label: "Opening hours", value: "hours" }
+                  - { label: "Address", value: "address" }
+                  - { label: "Mini-map", value: "map" }
+                  - { label: "Social links", value: "socials" }
+              - { name: label, label: "Card heading", widget: string, required: false, hint: "Blank uses the site wording (\"Direct contact\")." }
+              - { name: tint, label: "Tinted background", widget: boolean, required: false, default: true }
+              - name: layout
+                label: "Layout"
+                widget: object
+                collapsed: true
+                hint: "Size and placement — rarely needs changing."
+                fields:
+                  - name: beside
+                    label: "Placement"
+                    widget: select
+                    required: false
+                    default: "below"
+                    hint: "On wide screens the block shares a row with the block above it; on small screens they stack."
+                    options:
+                      - { label: "Below the previous block", value: "below" }
+                      - { label: "Beside the previous block, equal widths", value: "equal" }
+                      - { label: "Beside the previous block, narrower", value: "narrow" }
+                      - { label: "Beside the previous block, wider", value: "wide" }
+              - name: style
+                label: "Appearance"
+                widget: object
+                collapsed: true
+                hint: "Background and accent colour — set once when the page is designed."
+                fields:
+                  - name: surface
+                    label: "Background"
+                    widget: select
+                    required: false
+                    default: "standard"
+                    hint: "The surface behind the section — for rhythm between blocks."
+                    options:
+                      - { label: "Standard (white)", value: "standard" }
+                      - { label: "Tinted", value: "tint" }
+                      - { label: "Panel (rounded plate)", value: "panel" }
+                      - { label: "Accent band", value: "band" }
+                      - { label: "Dark", value: "dark" }
+                      - { label: "Gradient", value: "gradient" }
+          - name: findUs
+            label: "Find us (map)"
+            widget: object
+            description: "A map beside the address, contact and hours — auto-filled from Contact settings. Needs lat/lng on the address."
+            fields:
+              - { name: heading, label: "Heading", widget: string, required: false, hint: "Blank uses the site wording (\"Find us\")." }
+              - { name: showHours, label: "Show opening hours", widget: boolean, required: false, default: true }
+              - name: layout
+                label: "Layout"
+                widget: object
+                collapsed: true
+                hint: "Size and placement — rarely needs changing."
+                fields:
+                  - name: beside
+                    label: "Placement"
+                    widget: select
+                    required: false
+                    default: "below"
+                    hint: "On wide screens the block shares a row with the block above it; on small screens they stack."
+                    options:
+                      - { label: "Below the previous block", value: "below" }
+                      - { label: "Beside the previous block, equal widths", value: "equal" }
+                      - { label: "Beside the previous block, narrower", value: "narrow" }
+                      - { label: "Beside the previous block, wider", value: "wide" }
+              - name: style
+                label: "Appearance"
+                widget: object
+                collapsed: true
+                hint: "Background and accent colour — set once when the page is designed."
+                fields:
+                  - name: surface
+                    label: "Background"
+                    widget: select
+                    required: false
+                    default: "standard"
+                    hint: "The surface behind the section — for rhythm between blocks."
+                    options:
+                      - { label: "Standard (white)", value: "standard" }
+                      - { label: "Tinted", value: "tint" }
+                      - { label: "Panel (rounded plate)", value: "panel" }
+                      - { label: "Accent band", value: "band" }
+                      - { label: "Dark", value: "dark" }
+                      - { label: "Gradient", value: "gradient" }
+          - name: map
+            label: "Find your way (static map)"
+            widget: object
+            description: "A map picture with the address and two buttons that hand the route to Google Maps or Apple Maps. No third-party script runs on the page."
+            fields:
+              - { name: address, label: "Address", widget: string, hint: "Shown in bold, and used for the route when no coordinates are given." }
+              - { name: note, label: "Note", widget: string, required: false, hint: "A quiet line beside the address, e.g. how far it is to the lift." }
+              - name: media
+                label: "Media"
+                widget: object
+                collapsed: true
+                hint: "The map picture, and where the pin sits on it."
+                fields:
+                  - { name: image, label: "Map image", widget: image, required: false, hint: "A static map exported once and uploaded like any other picture. A site with a Google map key shows the Google still instead and never reads this one." }
+                  - { name: imageAlt, label: "Alt text", widget: string, required: false }
+                  - { name: credit, label: "Image credit", widget: string, required: false, hint: "Printed over the picture. A map drawn from OpenStreetMap must credit it: © OpenStreetMap contributors." }
+                  - { name: pinX, label: "Pin from the left (%)", widget: number, required: false, hint: "0 to 100. Leave both blank for no pin." }
+                  - { name: pinY, label: "Pin from the top (%)", widget: number, required: false, hint: "0 to 100." }
+              - name: coords
+                label: "Coordinates"
+                widget: object
+                collapsed: true
+                hint: "Latitude and longitude land the map app on the door instead of the street. Blank sends the address instead."
+                fields:
+                  - { name: lat, label: "Latitude", widget: number, required: false }
+                  - { name: lng, label: "Longitude", widget: number, required: false }
+              - name: layout
+                label: "Layout"
+                widget: object
+                collapsed: true
+                hint: "Size and placement — rarely needs changing."
+                fields:
+                  - name: beside
+                    label: "Placement"
+                    widget: select
+                    required: false
+                    default: "below"
+                    hint: "On wide screens the block shares a row with the block above it; on small screens they stack."
+                    options:
+                      - { label: "Below the previous block", value: "below" }
+                      - { label: "Beside the previous block, equal widths", value: "equal" }
+                      - { label: "Beside the previous block, narrower", value: "narrow" }
+                      - { label: "Beside the previous block, wider", value: "wide" }
+              - name: style
+                label: "Appearance"
+                widget: object
+                collapsed: true
+                hint: "Background and accent colour — set once when the page is designed."
+                fields:
+                  - name: surface
+                    label: "Background"
+                    widget: select
+                    required: false
+                    default: "standard"
+                    hint: "The surface behind the section — for rhythm between blocks."
+                    options:
+                      - { label: "Standard (white)", value: "standard" }
+                      - { label: "Tinted", value: "tint" }
+                      - { label: "Panel (rounded plate)", value: "panel" }
+                      - { label: "Accent band", value: "band" }
+                      - { label: "Dark", value: "dark" }
+                      - { label: "Gradient", value: "gradient" }
           - name: ctaPanel
             label: "Call to action (band)"
             widget: object
+            description: "Full-width call-to-action band with a button."
             fields:
               - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
               - { name: heading, label: "Heading", widget: string, required: false }
@@ -5135,6 +5535,7 @@ collections:
           - name: ctaBox
             label: "Call to action (box)"
             widget: object
+            description: "A boxed call-to-action: heading, text and a button."
             fields:
               - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
               - { name: heading, label: "Heading", widget: string }
@@ -5222,315 +5623,6 @@ collections:
                       - { label: "Classic (centered panel)", value: "classic" }
                       - { label: "Split (copy + facts card)", value: "split" }
                       - { label: "Panel (dark, with readout)", value: "panel" }
-                  - name: beside
-                    label: "Placement"
-                    widget: select
-                    required: false
-                    default: "below"
-                    hint: "On wide screens the block shares a row with the block above it; on small screens they stack."
-                    options:
-                      - { label: "Below the previous block", value: "below" }
-                      - { label: "Beside the previous block, equal widths", value: "equal" }
-                      - { label: "Beside the previous block, narrower", value: "narrow" }
-                      - { label: "Beside the previous block, wider", value: "wide" }
-              - name: style
-                label: "Appearance"
-                widget: object
-                collapsed: true
-                hint: "Background and accent colour — set once when the page is designed."
-                fields:
-                  - name: surface
-                    label: "Background"
-                    widget: select
-                    required: false
-                    default: "standard"
-                    hint: "The surface behind the section — for rhythm between blocks."
-                    options:
-                      - { label: "Standard (white)", value: "standard" }
-                      - { label: "Tinted", value: "tint" }
-                      - { label: "Panel (rounded plate)", value: "panel" }
-                      - { label: "Accent band", value: "band" }
-                      - { label: "Dark", value: "dark" }
-                      - { label: "Gradient", value: "gradient" }
-          - name: contactForm
-            label: "Contact form"
-            widget: object
-            fields:
-              - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
-              - { name: heading, label: "Heading", widget: string, required: false, hint: "Blank uses the page title." }
-              - { name: intro, label: "Intro / description", widget: text, required: false, hint: "Optional line under the heading. Blank = hidden." }
-              - { name: labelName, label: "Field label — name", widget: string, required: false, hint: "Blank uses the site wording (\"Name\")." }
-              - { name: labelEmail, label: "Field label — email", widget: string, required: false, hint: "Blank uses the site wording (\"Email\")." }
-              - { name: showPhone, label: "Show the phone field", widget: boolean, required: false, default: true }
-              - { name: requirePhone, label: "Make the phone field required", widget: boolean, required: false, default: false, hint: "Only applies when the phone field is shown." }
-              - { name: showCategory, label: "Show the category dropdown", widget: boolean, required: false, default: false, hint: "A dropdown the visitor picks their errand from. Needs at least one choice below." }
-              - { name: labelCategory, label: "Field label — category", widget: string, required: false, hint: "Blank uses the site wording (\"Category\")." }
-              - name: categories
-                label: "Categories"
-                widget: list
-                required: false
-                label_singular: "Category"
-                collapsed: true
-                hint: "The choices in the dropdown, in order."
-                field: { name: category, label: "Category", widget: string }
-              - { name: showUnit, label: "Show the unit field", widget: boolean, required: false, default: false, hint: "A short free-text field for which unit the visitor is writing about." }
-              - { name: labelUnit, label: "Field label — unit", widget: string, required: false, hint: "Blank uses the site wording (\"Unit\")." }
-              - { name: placeholderUnit, label: "Unit placeholder", widget: string, required: false, hint: "Faint example text inside the empty field." }
-              - { name: labelMessage, label: "Field label — message", widget: string, required: false, hint: "Blank uses the site wording (\"Describe your project\"). Word it for your business." }
-              - { name: submitLabel, label: "Submit button text", widget: string, required: false, hint: "The form's submit button. Blank uses the site wording (\"Send request\")." }
-              - { name: showDirectContact, label: "Show the direct-contact card", widget: boolean, required: false, default: true, hint: "Off → the form fills the width (no phone/email card)." }
-              - { name: inbox, label: "Inbox key", widget: string, required: false, hint: "Where this form's messages are delivered: the key of an inbox set up for the site. Empty means the site's default inbox." }
-              - name: layout
-                label: "Layout"
-                widget: object
-                collapsed: true
-                hint: "Size and placement — rarely needs changing."
-                fields:
-                  - name: beside
-                    label: "Placement"
-                    widget: select
-                    required: false
-                    default: "below"
-                    hint: "On wide screens the block shares a row with the block above it; on small screens they stack."
-                    options:
-                      - { label: "Below the previous block", value: "below" }
-                      - { label: "Beside the previous block, equal widths", value: "equal" }
-                      - { label: "Beside the previous block, narrower", value: "narrow" }
-                      - { label: "Beside the previous block, wider", value: "wide" }
-              - name: style
-                label: "Appearance"
-                widget: object
-                collapsed: true
-                hint: "Background and accent colour — set once when the page is designed."
-                fields:
-                  - name: surface
-                    label: "Background"
-                    widget: select
-                    required: false
-                    default: "standard"
-                    hint: "The surface behind the section — for rhythm between blocks."
-                    options:
-                      - { label: "Standard (white)", value: "standard" }
-                      - { label: "Tinted", value: "tint" }
-                      - { label: "Panel (rounded plate)", value: "panel" }
-                      - { label: "Accent band", value: "band" }
-                      - { label: "Dark", value: "dark" }
-                      - { label: "Gradient", value: "gradient" }
-          - name: contactSwitch
-            label: "Contact form switcher"
-            widget: object
-            fields:
-              - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
-              - { name: heading, label: "Heading", widget: string, required: false, hint: "Blank uses the page title." }
-              - { name: intro, label: "Intro / description", widget: text, required: false, hint: "Optional line under the heading. Blank = hidden." }
-              - name: items
-                label: "Forms"
-                widget: list
-                required: false
-                label_singular: "Shape"
-                collapsed: true
-                hint: "One entry per errand, in the order they are offered. The first one is the form the page opens on."
-                summary: "{{fields.label}}"
-                fields:
-                  - { name: label, label: "Switch button text", widget: string, hint: "What the visitor picks, e.g. \"Report a fault\"." }
-                  - { name: description, label: "Switch description", widget: string, required: false, hint: "Where the errand goes, in one line. Shown by the choice-cards layout only." }
-                  - { name: intro, label: "Intro / description", widget: text, required: false, hint: "Optional line above this form. Blank = hidden." }
-                  - { name: labelName, label: "Field label — name", widget: string, required: false, hint: "Blank uses the site wording (\"Name\")." }
-                  - { name: labelEmail, label: "Field label — email", widget: string, required: false, hint: "Blank uses the site wording (\"Email\")." }
-                  - { name: showPhone, label: "Show the phone field", widget: boolean, required: false, default: true }
-                  - { name: requirePhone, label: "Make the phone field required", widget: boolean, required: false, default: false, hint: "Only applies when the phone field is shown." }
-                  - { name: showCategory, label: "Show the category dropdown", widget: boolean, required: false, default: false, hint: "A dropdown the visitor picks their errand from. Needs at least one choice below." }
-                  - { name: labelCategory, label: "Field label — category", widget: string, required: false, hint: "Blank uses the site wording (\"Category\")." }
-                  - name: categories
-                    label: "Categories"
-                    widget: list
-                    required: false
-                    label_singular: "Category"
-                    collapsed: true
-                    hint: "The choices in the dropdown, in order."
-                    field: { name: category, label: "Category", widget: string }
-                  - { name: showUnit, label: "Show the unit field", widget: boolean, required: false, default: false, hint: "A short free-text field for which unit the visitor is writing about." }
-                  - { name: labelUnit, label: "Field label — unit", widget: string, required: false, hint: "Blank uses the site wording (\"Unit\")." }
-                  - { name: placeholderUnit, label: "Unit placeholder", widget: string, required: false, hint: "Faint example text inside the empty field." }
-                  - { name: labelMessage, label: "Field label — message", widget: string, required: false, hint: "Blank uses the site wording (\"Describe your project\"). Word it for your business." }
-                  - { name: submitLabel, label: "Submit button text", widget: string, required: false, hint: "The form's submit button. Blank uses the site wording (\"Send request\")." }
-                  - { name: showDirectContact, label: "Show the direct-contact card", widget: boolean, required: false, default: true, hint: "Off → the form fills the width (no phone/email card)." }
-                  - { name: inbox, label: "Inbox key", widget: string, required: false, hint: "Where this form's messages are delivered: the key of an inbox set up for the site. Empty means the site's default inbox." }
-              - name: layout
-                label: "Layout"
-                widget: object
-                collapsed: true
-                hint: "Size and placement — rarely needs changing."
-                fields:
-                  - name: variant
-                    label: "Layout"
-                    widget: select
-                    required: false
-                    default: "segmented"
-                    hint: "How the visitor switches between the forms."
-                    options:
-                      - { label: "Segmented button", value: "segmented" }
-                      - { label: "Choice cards (with descriptions)", value: "cards" }
-                      - { label: "Tabs on the card", value: "tabs" }
-                  - name: beside
-                    label: "Placement"
-                    widget: select
-                    required: false
-                    default: "below"
-                    hint: "On wide screens the block shares a row with the block above it; on small screens they stack."
-                    options:
-                      - { label: "Below the previous block", value: "below" }
-                      - { label: "Beside the previous block, equal widths", value: "equal" }
-                      - { label: "Beside the previous block, narrower", value: "narrow" }
-                      - { label: "Beside the previous block, wider", value: "wide" }
-              - name: style
-                label: "Appearance"
-                widget: object
-                collapsed: true
-                hint: "Background and accent colour — set once when the page is designed."
-                fields:
-                  - name: surface
-                    label: "Background"
-                    widget: select
-                    required: false
-                    default: "standard"
-                    hint: "The surface behind the section — for rhythm between blocks."
-                    options:
-                      - { label: "Standard (white)", value: "standard" }
-                      - { label: "Tinted", value: "tint" }
-                      - { label: "Panel (rounded plate)", value: "panel" }
-                      - { label: "Accent band", value: "band" }
-                      - { label: "Dark", value: "dark" }
-                      - { label: "Gradient", value: "gradient" }
-          - name: contactCard
-            label: "Contact card"
-            widget: object
-            fields:
-              - name: show
-                label: "Show"
-                widget: select
-                multiple: true
-                required: false
-                default: ["phone", "email"]
-                hint: "Tick the parts to display. Anything with no info in Contact settings is skipped (e.g. the map needs an address with lat/lng)."
-                options:
-                  - { label: "Phone", value: "phone" }
-                  - { label: "Email", value: "email" }
-                  - { label: "Opening hours", value: "hours" }
-                  - { label: "Address", value: "address" }
-                  - { label: "Mini-map", value: "map" }
-                  - { label: "Social links", value: "socials" }
-              - { name: label, label: "Card heading", widget: string, required: false, hint: "Blank uses the site wording (\"Direct contact\")." }
-              - { name: tint, label: "Tinted background", widget: boolean, required: false, default: true }
-              - name: layout
-                label: "Layout"
-                widget: object
-                collapsed: true
-                hint: "Size and placement — rarely needs changing."
-                fields:
-                  - name: beside
-                    label: "Placement"
-                    widget: select
-                    required: false
-                    default: "below"
-                    hint: "On wide screens the block shares a row with the block above it; on small screens they stack."
-                    options:
-                      - { label: "Below the previous block", value: "below" }
-                      - { label: "Beside the previous block, equal widths", value: "equal" }
-                      - { label: "Beside the previous block, narrower", value: "narrow" }
-                      - { label: "Beside the previous block, wider", value: "wide" }
-              - name: style
-                label: "Appearance"
-                widget: object
-                collapsed: true
-                hint: "Background and accent colour — set once when the page is designed."
-                fields:
-                  - name: surface
-                    label: "Background"
-                    widget: select
-                    required: false
-                    default: "standard"
-                    hint: "The surface behind the section — for rhythm between blocks."
-                    options:
-                      - { label: "Standard (white)", value: "standard" }
-                      - { label: "Tinted", value: "tint" }
-                      - { label: "Panel (rounded plate)", value: "panel" }
-                      - { label: "Accent band", value: "band" }
-                      - { label: "Dark", value: "dark" }
-                      - { label: "Gradient", value: "gradient" }
-          - name: findUs
-            label: "Find us (map)"
-            widget: object
-            fields:
-              - { name: heading, label: "Heading", widget: string, required: false, hint: "Blank uses the site wording (\"Find us\")." }
-              - { name: showHours, label: "Show opening hours", widget: boolean, required: false, default: true }
-              - name: layout
-                label: "Layout"
-                widget: object
-                collapsed: true
-                hint: "Size and placement — rarely needs changing."
-                fields:
-                  - name: beside
-                    label: "Placement"
-                    widget: select
-                    required: false
-                    default: "below"
-                    hint: "On wide screens the block shares a row with the block above it; on small screens they stack."
-                    options:
-                      - { label: "Below the previous block", value: "below" }
-                      - { label: "Beside the previous block, equal widths", value: "equal" }
-                      - { label: "Beside the previous block, narrower", value: "narrow" }
-                      - { label: "Beside the previous block, wider", value: "wide" }
-              - name: style
-                label: "Appearance"
-                widget: object
-                collapsed: true
-                hint: "Background and accent colour — set once when the page is designed."
-                fields:
-                  - name: surface
-                    label: "Background"
-                    widget: select
-                    required: false
-                    default: "standard"
-                    hint: "The surface behind the section — for rhythm between blocks."
-                    options:
-                      - { label: "Standard (white)", value: "standard" }
-                      - { label: "Tinted", value: "tint" }
-                      - { label: "Panel (rounded plate)", value: "panel" }
-                      - { label: "Accent band", value: "band" }
-                      - { label: "Dark", value: "dark" }
-                      - { label: "Gradient", value: "gradient" }
-          - name: map
-            label: "Find your way (static map)"
-            widget: object
-            fields:
-              - { name: address, label: "Address", widget: string, hint: "Shown in bold, and used for the route when no coordinates are given." }
-              - { name: note, label: "Note", widget: string, required: false, hint: "A quiet line beside the address, e.g. how far it is to the lift." }
-              - name: media
-                label: "Media"
-                widget: object
-                collapsed: true
-                hint: "The map picture, and where the pin sits on it."
-                fields:
-                  - { name: image, label: "Map image", widget: image, required: false, hint: "A static map exported once and uploaded like any other picture. A site with a Google map key shows the Google still instead and never reads this one." }
-                  - { name: imageAlt, label: "Alt text", widget: string, required: false }
-                  - { name: credit, label: "Image credit", widget: string, required: false, hint: "Printed over the picture. A map drawn from OpenStreetMap must credit it: © OpenStreetMap contributors." }
-                  - { name: pinX, label: "Pin from the left (%)", widget: number, required: false, hint: "0 to 100. Leave both blank for no pin." }
-                  - { name: pinY, label: "Pin from the top (%)", widget: number, required: false, hint: "0 to 100." }
-              - name: coords
-                label: "Coordinates"
-                widget: object
-                collapsed: true
-                hint: "Latitude and longitude land the map app on the door instead of the street. Blank sends the address instead."
-                fields:
-                  - { name: lat, label: "Latitude", widget: number, required: false }
-                  - { name: lng, label: "Longitude", widget: number, required: false }
-              - name: layout
-                label: "Layout"
-                widget: object
-                collapsed: true
-                hint: "Size and placement — rarely needs changing."
-                fields:
                   - name: beside
                     label: "Placement"
                     widget: select
@@ -5716,6 +5808,7 @@ collections:
           - name: hero
             label: "Hero"
             widget: object
+            description: "Full-width intro — eyebrow, H1, text and a button, with an optional image, highlights list or animated motif beside it."
             fields:
               - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
               - { name: heading, label: "Heading (H1)", widget: string }
@@ -5977,6 +6070,7 @@ collections:
           - name: cover
             label: "Cover (full-bleed)"
             widget: object
+            description: "Full-bleed banner — a background photo or muted looping video, with overlaid heading, text and buttons."
             fields:
               - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
               - { name: heading, label: "Heading (H1)", widget: text, hint: "Press Enter for a line break." }
@@ -6118,6 +6212,7 @@ collections:
           - name: pageHeader
             label: "Page header"
             widget: object
+            description: "Page title band (light or dark): eyebrow, H1, intro and an optional button."
             fields:
               - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
               - { name: heading, label: "Heading (H1)", widget: string }
@@ -6207,6 +6302,7 @@ collections:
           - name: prose
             label: "Rich text"
             widget: object
+            description: "A block of rich (markdown) text with an optional heading."
             fields:
               - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
               - { name: heading, label: "Heading (optional)", widget: string, required: false }
@@ -6261,6 +6357,7 @@ collections:
           - name: textImage
             label: "Text + image"
             widget: object
+            description: "Text beside an image or a looping video (media on the left or right)."
             fields:
               - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
               - { name: heading, label: "Heading", widget: string, required: false }
@@ -6333,6 +6430,7 @@ collections:
           - name: textQuote
             label: "Text + quote"
             widget: object
+            description: "Body text paired with a pulled-out quote."
             fields:
               - { name: body, label: "Body text", widget: markdown }
               - { name: quote, label: "Quote", widget: text }
@@ -6387,6 +6485,7 @@ collections:
           - name: fragment
             label: "Story fragment"
             widget: object
+            description: "A placed editorial fragment — big lead line, short body, optional link. Consecutive fragments drift across the page."
             fields:
               - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Usually only on the first fragment of a story." }
               - { name: statement, label: "Statement (big line)", widget: string, hint: "Wrap words in *asterisks* to underline them." }
@@ -6468,6 +6567,7 @@ collections:
           - name: sectionNav
             label: "Section links"
             widget: object
+            description: "A row of links that jump to the headings further down this page. Nothing to fill in: it reads the sections below it."
             fields:
               - { name: label, label: "Accessible label", widget: string, required: false, hint: "Read by screen readers; the visible chips come from the section headings below." }
               - name: layout
@@ -6510,6 +6610,7 @@ collections:
           - name: featureGrid
             label: "Feature cards"
             widget: object
+            description: "Grid of feature cards — icon or number, title and text; cards can link."
             fields:
               - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
               - { name: heading, label: "Heading", widget: string, required: false }
@@ -6621,6 +6722,16 @@ collections:
                 hint: "Size and placement — rarely needs changing."
                 fields:
                   - { name: numbered, label: "Numbered (01/02/03 instead of icons)", widget: boolean, required: false, default: false }
+                  - name: columns
+                    label: "Columns"
+                    widget: select
+                    required: false
+                    default: "3"
+                    hint: "How many cards sit side by side on wide screens."
+                    options:
+                      - { label: "2", value: "2" }
+                      - { label: "3", value: "3" }
+                      - { label: "4", value: "4" }
                   - name: beside
                     label: "Placement"
                     widget: select
@@ -6664,6 +6775,7 @@ collections:
           - name: pillars
             label: "Principles / values"
             widget: object
+            description: "Row of principle / value cards (icon, title, text)."
             fields:
               - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
               - { name: heading, label: "Heading", widget: string, required: false }
@@ -6717,6 +6829,7 @@ collections:
           - name: plans
             label: "Pricing / plans"
             widget: object
+            description: "A row of pricing plan cards — name, price, period, features and a button."
             fields:
               - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
               - { name: heading, label: "Heading", widget: string, required: false }
@@ -6824,6 +6937,7 @@ collections:
           - name: specialistGrid
             label: "Specialist grid"
             widget: object
+            description: "Grid of specialist / team profile cards."
             fields:
               - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
               - { name: heading, label: "Heading", widget: string, required: false }
@@ -6877,6 +6991,7 @@ collections:
           - name: team
             label: "Team"
             widget: object
+            description: "Grid of people cards — photo, role, contact details."
             fields:
               - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
               - { name: heading, label: "Heading", widget: string, required: false }
@@ -6936,6 +7051,7 @@ collections:
           - name: steps
             label: "Process / steps"
             widget: object
+            description: "Numbered process — a sequence of steps."
             fields:
               - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
               - { name: heading, label: "Heading", widget: string, required: false }
@@ -7012,6 +7128,7 @@ collections:
           - name: checklist
             label: "Checklist"
             widget: object
+            description: "Ticked checklist items in one or two columns."
             fields:
               - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
               - { name: heading, label: "Heading", widget: string, required: false }
@@ -7066,6 +7183,7 @@ collections:
           - name: factList
             label: "Fact list (label + value)"
             widget: object
+            description: "Rows of label and value — specifications, what is included, key facts."
             fields:
               - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
               - { name: heading, label: "Heading", widget: string, required: false }
@@ -7139,6 +7257,7 @@ collections:
           - name: gallery
             label: "Gallery"
             widget: object
+            description: "Image grid (2–3 columns) with optional captions."
             fields:
               - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
               - { name: heading, label: "Heading", widget: string, required: false }
@@ -7194,6 +7313,7 @@ collections:
           - name: collage
             label: "Collage (image viewer)"
             widget: object
+            description: "A collage of fixed height — one leading picture, a few tiles, and a chip that opens every image in a viewer. Replaces stacked full-width photos on a content page."
             fields:
               - name: images
                 label: "Images"
@@ -7246,6 +7366,7 @@ collections:
           - name: beforeAfter
             label: "Before / after"
             widget: object
+            description: "A before / after image pair."
             fields:
               - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
               - { name: heading, label: "Heading", widget: string, required: false }
@@ -7296,9 +7417,59 @@ collections:
                       - { label: "Accent band", value: "band" }
                       - { label: "Dark", value: "dark" }
                       - { label: "Gradient", value: "gradient" }
+          - name: logoStrip
+            label: "Logo strip"
+            widget: object
+            description: "A centered row of partner / client names with an optional lead-in."
+            fields:
+              - { name: lead, label: "Lead-in", widget: string, required: false, hint: "e.g. “Trusted by” or “Built on”." }
+              - name: logos
+                label: "Names"
+                widget: list
+                required: false
+                label_singular: "Name"
+                collapsed: true
+                field: { name: name, label: "Name", widget: string }
+              - name: layout
+                label: "Layout"
+                widget: object
+                collapsed: true
+                hint: "Size and placement — rarely needs changing."
+                fields:
+                  - name: beside
+                    label: "Placement"
+                    widget: select
+                    required: false
+                    default: "below"
+                    hint: "On wide screens the block shares a row with the block above it; on small screens they stack."
+                    options:
+                      - { label: "Below the previous block", value: "below" }
+                      - { label: "Beside the previous block, equal widths", value: "equal" }
+                      - { label: "Beside the previous block, narrower", value: "narrow" }
+                      - { label: "Beside the previous block, wider", value: "wide" }
+              - name: style
+                label: "Appearance"
+                widget: object
+                collapsed: true
+                hint: "Background and accent colour — set once when the page is designed."
+                fields:
+                  - name: surface
+                    label: "Background"
+                    widget: select
+                    required: false
+                    default: "standard"
+                    hint: "The surface behind the section — for rhythm between blocks."
+                    options:
+                      - { label: "Standard (white)", value: "standard" }
+                      - { label: "Tinted", value: "tint" }
+                      - { label: "Panel (rounded plate)", value: "panel" }
+                      - { label: "Accent band", value: "band" }
+                      - { label: "Dark", value: "dark" }
+                      - { label: "Gradient", value: "gradient" }
           - name: definition
             label: "Dictionary entry"
             widget: object
+            description: "A dictionary-style word entry — term, word class and numbered senses."
             fields:
               - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
               - { name: term, label: "Term", widget: string, hint: "The word being defined, e.g. \"ex·am·ple\" (use · for syllables)." }
@@ -7372,6 +7543,7 @@ collections:
           - name: callout
             label: "Highlighted quote"
             widget: object
+            description: "A single highlighted quote or statement."
             fields:
               - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
               - { name: quote, label: "Quote / statement", widget: text, hint: "Wrap words in *asterisks* to underline them." }
@@ -7444,6 +7616,7 @@ collections:
           - name: statPanel
             label: "Statement panel"
             widget: object
+            description: "Dark panel with a big number, statement and badges."
             fields:
               - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
               - { name: heading, label: "Heading", widget: string, required: false, hint: "Wrap words in *asterisks* to underline them." }
@@ -7505,6 +7678,7 @@ collections:
           - name: statsBar
             label: "Stats / facts"
             widget: object
+            description: "A row of stats / facts (label + value)."
             fields:
               - name: items
                 label: "Facts (label + value)"
@@ -7555,6 +7729,7 @@ collections:
           - name: timeline
             label: "Timeline"
             widget: object
+            description: "A line of years with one dot per milestone, the last one highlighted, and an optional note about what is planned."
             fields:
               - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
               - { name: heading, label: "Heading", widget: string, required: false }
@@ -7608,57 +7783,10 @@ collections:
                       - { label: "Accent band", value: "band" }
                       - { label: "Dark", value: "dark" }
                       - { label: "Gradient", value: "gradient" }
-          - name: logoStrip
-            label: "Logo strip"
-            widget: object
-            fields:
-              - { name: lead, label: "Lead-in", widget: string, required: false, hint: "e.g. “Trusted by” or “Built on”." }
-              - name: logos
-                label: "Names"
-                widget: list
-                required: false
-                label_singular: "Name"
-                collapsed: true
-                field: { name: name, label: "Name", widget: string }
-              - name: layout
-                label: "Layout"
-                widget: object
-                collapsed: true
-                hint: "Size and placement — rarely needs changing."
-                fields:
-                  - name: beside
-                    label: "Placement"
-                    widget: select
-                    required: false
-                    default: "below"
-                    hint: "On wide screens the block shares a row with the block above it; on small screens they stack."
-                    options:
-                      - { label: "Below the previous block", value: "below" }
-                      - { label: "Beside the previous block, equal widths", value: "equal" }
-                      - { label: "Beside the previous block, narrower", value: "narrow" }
-                      - { label: "Beside the previous block, wider", value: "wide" }
-              - name: style
-                label: "Appearance"
-                widget: object
-                collapsed: true
-                hint: "Background and accent colour — set once when the page is designed."
-                fields:
-                  - name: surface
-                    label: "Background"
-                    widget: select
-                    required: false
-                    default: "standard"
-                    hint: "The surface behind the section — for rhythm between blocks."
-                    options:
-                      - { label: "Standard (white)", value: "standard" }
-                      - { label: "Tinted", value: "tint" }
-                      - { label: "Panel (rounded plate)", value: "panel" }
-                      - { label: "Accent band", value: "band" }
-                      - { label: "Dark", value: "dark" }
-                      - { label: "Gradient", value: "gradient" }
           - name: serviceGrid
             label: "Service cards"
             widget: object
+            description: "Service cards pulled from your Services collection."
             fields:
               - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
               - { name: heading, label: "Heading", widget: string, required: false }
@@ -7713,6 +7841,7 @@ collections:
           - name: testimonials
             label: "Testimonials"
             widget: object
+            description: "Customer testimonials from your Testimonials collection."
             fields:
               - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading. Suggestion: \"Happy customers\"." }
               - { name: heading, label: "Heading", widget: string, required: false, hint: "Suggestion: \"References\"." }
@@ -7756,6 +7885,7 @@ collections:
           - name: subpages
             label: "Subpages"
             widget: object
+            description: "The pages that sit under this one — photo cards, tiles, a list, a chapter row, or a band of sibling pages on a subpage."
             fields:
               - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
               - { name: heading, label: "Heading", widget: string, required: false }
@@ -7834,6 +7964,7 @@ collections:
           - name: faq
             label: "FAQ"
             widget: object
+            description: "FAQ from your FAQ collection — list, accordion, cards or split layout."
             fields:
               - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
               - { name: heading, label: "Heading", widget: string, required: false }
@@ -7937,9 +8068,324 @@ collections:
                       - { label: "Accent band", value: "band" }
                       - { label: "Dark", value: "dark" }
                       - { label: "Gradient", value: "gradient" }
+          - name: contactForm
+            label: "Contact form"
+            widget: object
+            description: "A contact form with an optional direct-contact card. Heading, intro, field labels and layout are all editable."
+            fields:
+              - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
+              - { name: heading, label: "Heading", widget: string, required: false, hint: "Blank uses the page title." }
+              - { name: intro, label: "Intro / description", widget: text, required: false, hint: "Optional line under the heading. Blank = hidden." }
+              - { name: labelName, label: "Field label — name", widget: string, required: false, hint: "Blank uses the site wording (\"Name\")." }
+              - { name: labelEmail, label: "Field label — email", widget: string, required: false, hint: "Blank uses the site wording (\"Email\")." }
+              - { name: showPhone, label: "Show the phone field", widget: boolean, required: false, default: true }
+              - { name: requirePhone, label: "Make the phone field required", widget: boolean, required: false, default: false, hint: "Only applies when the phone field is shown." }
+              - { name: showCategory, label: "Show the category dropdown", widget: boolean, required: false, default: false, hint: "A dropdown the visitor picks their errand from. Needs at least one choice below." }
+              - { name: labelCategory, label: "Field label — category", widget: string, required: false, hint: "Blank uses the site wording (\"Category\")." }
+              - name: categories
+                label: "Categories"
+                widget: list
+                required: false
+                label_singular: "Category"
+                collapsed: true
+                hint: "The choices in the dropdown, in order."
+                field: { name: category, label: "Category", widget: string }
+              - { name: showUnit, label: "Show the unit field", widget: boolean, required: false, default: false, hint: "A short free-text field for which unit the visitor is writing about." }
+              - { name: labelUnit, label: "Field label — unit", widget: string, required: false, hint: "Blank uses the site wording (\"Unit\")." }
+              - { name: placeholderUnit, label: "Unit placeholder", widget: string, required: false, hint: "Faint example text inside the empty field." }
+              - { name: labelMessage, label: "Field label — message", widget: string, required: false, hint: "Blank uses the site wording (\"Describe your project\"). Word it for your business." }
+              - { name: submitLabel, label: "Submit button text", widget: string, required: false, hint: "The form's submit button. Blank uses the site wording (\"Send request\")." }
+              - { name: showDirectContact, label: "Show the direct-contact card", widget: boolean, required: false, default: true, hint: "Off → the form fills the width (no phone/email card)." }
+              - { name: inbox, label: "Inbox key", widget: string, required: false, hint: "Where this form's messages are delivered: the key of an inbox set up for the site. Empty means the site's default inbox." }
+              - name: layout
+                label: "Layout"
+                widget: object
+                collapsed: true
+                hint: "Size and placement — rarely needs changing."
+                fields:
+                  - name: beside
+                    label: "Placement"
+                    widget: select
+                    required: false
+                    default: "below"
+                    hint: "On wide screens the block shares a row with the block above it; on small screens they stack."
+                    options:
+                      - { label: "Below the previous block", value: "below" }
+                      - { label: "Beside the previous block, equal widths", value: "equal" }
+                      - { label: "Beside the previous block, narrower", value: "narrow" }
+                      - { label: "Beside the previous block, wider", value: "wide" }
+              - name: style
+                label: "Appearance"
+                widget: object
+                collapsed: true
+                hint: "Background and accent colour — set once when the page is designed."
+                fields:
+                  - name: surface
+                    label: "Background"
+                    widget: select
+                    required: false
+                    default: "standard"
+                    hint: "The surface behind the section — for rhythm between blocks."
+                    options:
+                      - { label: "Standard (white)", value: "standard" }
+                      - { label: "Tinted", value: "tint" }
+                      - { label: "Panel (rounded plate)", value: "panel" }
+                      - { label: "Accent band", value: "band" }
+                      - { label: "Dark", value: "dark" }
+                      - { label: "Gradient", value: "gradient" }
+          - name: contactSwitch
+            label: "Contact form switcher"
+            widget: object
+            description: "Two or more contact forms sharing one surface, one at a time. The visitor picks the errand and that form appears, without a page load."
+            fields:
+              - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
+              - { name: heading, label: "Heading", widget: string, required: false, hint: "Blank uses the page title." }
+              - { name: intro, label: "Intro / description", widget: text, required: false, hint: "Optional line under the heading. Blank = hidden." }
+              - name: items
+                label: "Forms"
+                widget: list
+                required: false
+                label_singular: "Shape"
+                collapsed: true
+                hint: "One entry per errand, in the order they are offered. The first one is the form the page opens on."
+                summary: "{{fields.label}}"
+                fields:
+                  - { name: label, label: "Switch button text", widget: string, hint: "What the visitor picks, e.g. \"Report a fault\"." }
+                  - { name: description, label: "Switch description", widget: string, required: false, hint: "Where the errand goes, in one line. Shown by the choice-cards layout only." }
+                  - { name: intro, label: "Intro / description", widget: text, required: false, hint: "Optional line above this form. Blank = hidden." }
+                  - { name: labelName, label: "Field label — name", widget: string, required: false, hint: "Blank uses the site wording (\"Name\")." }
+                  - { name: labelEmail, label: "Field label — email", widget: string, required: false, hint: "Blank uses the site wording (\"Email\")." }
+                  - { name: showPhone, label: "Show the phone field", widget: boolean, required: false, default: true }
+                  - { name: requirePhone, label: "Make the phone field required", widget: boolean, required: false, default: false, hint: "Only applies when the phone field is shown." }
+                  - { name: showCategory, label: "Show the category dropdown", widget: boolean, required: false, default: false, hint: "A dropdown the visitor picks their errand from. Needs at least one choice below." }
+                  - { name: labelCategory, label: "Field label — category", widget: string, required: false, hint: "Blank uses the site wording (\"Category\")." }
+                  - name: categories
+                    label: "Categories"
+                    widget: list
+                    required: false
+                    label_singular: "Category"
+                    collapsed: true
+                    hint: "The choices in the dropdown, in order."
+                    field: { name: category, label: "Category", widget: string }
+                  - { name: showUnit, label: "Show the unit field", widget: boolean, required: false, default: false, hint: "A short free-text field for which unit the visitor is writing about." }
+                  - { name: labelUnit, label: "Field label — unit", widget: string, required: false, hint: "Blank uses the site wording (\"Unit\")." }
+                  - { name: placeholderUnit, label: "Unit placeholder", widget: string, required: false, hint: "Faint example text inside the empty field." }
+                  - { name: labelMessage, label: "Field label — message", widget: string, required: false, hint: "Blank uses the site wording (\"Describe your project\"). Word it for your business." }
+                  - { name: submitLabel, label: "Submit button text", widget: string, required: false, hint: "The form's submit button. Blank uses the site wording (\"Send request\")." }
+                  - { name: showDirectContact, label: "Show the direct-contact card", widget: boolean, required: false, default: true, hint: "Off → the form fills the width (no phone/email card)." }
+                  - { name: inbox, label: "Inbox key", widget: string, required: false, hint: "Where this form's messages are delivered: the key of an inbox set up for the site. Empty means the site's default inbox." }
+              - name: layout
+                label: "Layout"
+                widget: object
+                collapsed: true
+                hint: "Size and placement — rarely needs changing."
+                fields:
+                  - name: variant
+                    label: "Layout"
+                    widget: select
+                    required: false
+                    default: "segmented"
+                    hint: "How the visitor switches between the forms."
+                    options:
+                      - { label: "Segmented button", value: "segmented" }
+                      - { label: "Choice cards (with descriptions)", value: "cards" }
+                      - { label: "Tabs on the card", value: "tabs" }
+                  - name: beside
+                    label: "Placement"
+                    widget: select
+                    required: false
+                    default: "below"
+                    hint: "On wide screens the block shares a row with the block above it; on small screens they stack."
+                    options:
+                      - { label: "Below the previous block", value: "below" }
+                      - { label: "Beside the previous block, equal widths", value: "equal" }
+                      - { label: "Beside the previous block, narrower", value: "narrow" }
+                      - { label: "Beside the previous block, wider", value: "wide" }
+              - name: style
+                label: "Appearance"
+                widget: object
+                collapsed: true
+                hint: "Background and accent colour — set once when the page is designed."
+                fields:
+                  - name: surface
+                    label: "Background"
+                    widget: select
+                    required: false
+                    default: "standard"
+                    hint: "The surface behind the section — for rhythm between blocks."
+                    options:
+                      - { label: "Standard (white)", value: "standard" }
+                      - { label: "Tinted", value: "tint" }
+                      - { label: "Panel (rounded plate)", value: "panel" }
+                      - { label: "Accent band", value: "band" }
+                      - { label: "Dark", value: "dark" }
+                      - { label: "Gradient", value: "gradient" }
+          - name: contactCard
+            label: "Contact card"
+            widget: object
+            description: "A contact card placed anywhere, auto-filled from Contact settings. Tick what it shows."
+            fields:
+              - name: show
+                label: "Show"
+                widget: select
+                multiple: true
+                required: false
+                default: ["phone", "email"]
+                hint: "Tick the parts to display. Anything with no info in Contact settings is skipped (e.g. the map needs an address with lat/lng)."
+                options:
+                  - { label: "Phone", value: "phone" }
+                  - { label: "Email", value: "email" }
+                  - { label: "Opening hours", value: "hours" }
+                  - { label: "Address", value: "address" }
+                  - { label: "Mini-map", value: "map" }
+                  - { label: "Social links", value: "socials" }
+              - { name: label, label: "Card heading", widget: string, required: false, hint: "Blank uses the site wording (\"Direct contact\")." }
+              - { name: tint, label: "Tinted background", widget: boolean, required: false, default: true }
+              - name: layout
+                label: "Layout"
+                widget: object
+                collapsed: true
+                hint: "Size and placement — rarely needs changing."
+                fields:
+                  - name: beside
+                    label: "Placement"
+                    widget: select
+                    required: false
+                    default: "below"
+                    hint: "On wide screens the block shares a row with the block above it; on small screens they stack."
+                    options:
+                      - { label: "Below the previous block", value: "below" }
+                      - { label: "Beside the previous block, equal widths", value: "equal" }
+                      - { label: "Beside the previous block, narrower", value: "narrow" }
+                      - { label: "Beside the previous block, wider", value: "wide" }
+              - name: style
+                label: "Appearance"
+                widget: object
+                collapsed: true
+                hint: "Background and accent colour — set once when the page is designed."
+                fields:
+                  - name: surface
+                    label: "Background"
+                    widget: select
+                    required: false
+                    default: "standard"
+                    hint: "The surface behind the section — for rhythm between blocks."
+                    options:
+                      - { label: "Standard (white)", value: "standard" }
+                      - { label: "Tinted", value: "tint" }
+                      - { label: "Panel (rounded plate)", value: "panel" }
+                      - { label: "Accent band", value: "band" }
+                      - { label: "Dark", value: "dark" }
+                      - { label: "Gradient", value: "gradient" }
+          - name: findUs
+            label: "Find us (map)"
+            widget: object
+            description: "A map beside the address, contact and hours — auto-filled from Contact settings. Needs lat/lng on the address."
+            fields:
+              - { name: heading, label: "Heading", widget: string, required: false, hint: "Blank uses the site wording (\"Find us\")." }
+              - { name: showHours, label: "Show opening hours", widget: boolean, required: false, default: true }
+              - name: layout
+                label: "Layout"
+                widget: object
+                collapsed: true
+                hint: "Size and placement — rarely needs changing."
+                fields:
+                  - name: beside
+                    label: "Placement"
+                    widget: select
+                    required: false
+                    default: "below"
+                    hint: "On wide screens the block shares a row with the block above it; on small screens they stack."
+                    options:
+                      - { label: "Below the previous block", value: "below" }
+                      - { label: "Beside the previous block, equal widths", value: "equal" }
+                      - { label: "Beside the previous block, narrower", value: "narrow" }
+                      - { label: "Beside the previous block, wider", value: "wide" }
+              - name: style
+                label: "Appearance"
+                widget: object
+                collapsed: true
+                hint: "Background and accent colour — set once when the page is designed."
+                fields:
+                  - name: surface
+                    label: "Background"
+                    widget: select
+                    required: false
+                    default: "standard"
+                    hint: "The surface behind the section — for rhythm between blocks."
+                    options:
+                      - { label: "Standard (white)", value: "standard" }
+                      - { label: "Tinted", value: "tint" }
+                      - { label: "Panel (rounded plate)", value: "panel" }
+                      - { label: "Accent band", value: "band" }
+                      - { label: "Dark", value: "dark" }
+                      - { label: "Gradient", value: "gradient" }
+          - name: map
+            label: "Find your way (static map)"
+            widget: object
+            description: "A map picture with the address and two buttons that hand the route to Google Maps or Apple Maps. No third-party script runs on the page."
+            fields:
+              - { name: address, label: "Address", widget: string, hint: "Shown in bold, and used for the route when no coordinates are given." }
+              - { name: note, label: "Note", widget: string, required: false, hint: "A quiet line beside the address, e.g. how far it is to the lift." }
+              - name: media
+                label: "Media"
+                widget: object
+                collapsed: true
+                hint: "The map picture, and where the pin sits on it."
+                fields:
+                  - { name: image, label: "Map image", widget: image, required: false, hint: "A static map exported once and uploaded like any other picture. A site with a Google map key shows the Google still instead and never reads this one." }
+                  - { name: imageAlt, label: "Alt text", widget: string, required: false }
+                  - { name: credit, label: "Image credit", widget: string, required: false, hint: "Printed over the picture. A map drawn from OpenStreetMap must credit it: © OpenStreetMap contributors." }
+                  - { name: pinX, label: "Pin from the left (%)", widget: number, required: false, hint: "0 to 100. Leave both blank for no pin." }
+                  - { name: pinY, label: "Pin from the top (%)", widget: number, required: false, hint: "0 to 100." }
+              - name: coords
+                label: "Coordinates"
+                widget: object
+                collapsed: true
+                hint: "Latitude and longitude land the map app on the door instead of the street. Blank sends the address instead."
+                fields:
+                  - { name: lat, label: "Latitude", widget: number, required: false }
+                  - { name: lng, label: "Longitude", widget: number, required: false }
+              - name: layout
+                label: "Layout"
+                widget: object
+                collapsed: true
+                hint: "Size and placement — rarely needs changing."
+                fields:
+                  - name: beside
+                    label: "Placement"
+                    widget: select
+                    required: false
+                    default: "below"
+                    hint: "On wide screens the block shares a row with the block above it; on small screens they stack."
+                    options:
+                      - { label: "Below the previous block", value: "below" }
+                      - { label: "Beside the previous block, equal widths", value: "equal" }
+                      - { label: "Beside the previous block, narrower", value: "narrow" }
+                      - { label: "Beside the previous block, wider", value: "wide" }
+              - name: style
+                label: "Appearance"
+                widget: object
+                collapsed: true
+                hint: "Background and accent colour — set once when the page is designed."
+                fields:
+                  - name: surface
+                    label: "Background"
+                    widget: select
+                    required: false
+                    default: "standard"
+                    hint: "The surface behind the section — for rhythm between blocks."
+                    options:
+                      - { label: "Standard (white)", value: "standard" }
+                      - { label: "Tinted", value: "tint" }
+                      - { label: "Panel (rounded plate)", value: "panel" }
+                      - { label: "Accent band", value: "band" }
+                      - { label: "Dark", value: "dark" }
+                      - { label: "Gradient", value: "gradient" }
           - name: ctaPanel
             label: "Call to action (band)"
             widget: object
+            description: "Full-width call-to-action band with a button."
             fields:
               - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
               - { name: heading, label: "Heading", widget: string, required: false }
@@ -8023,6 +8469,7 @@ collections:
           - name: ctaBox
             label: "Call to action (box)"
             widget: object
+            description: "A boxed call-to-action: heading, text and a button."
             fields:
               - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
               - { name: heading, label: "Heading", widget: string }
@@ -8110,315 +8557,6 @@ collections:
                       - { label: "Classic (centered panel)", value: "classic" }
                       - { label: "Split (copy + facts card)", value: "split" }
                       - { label: "Panel (dark, with readout)", value: "panel" }
-                  - name: beside
-                    label: "Placement"
-                    widget: select
-                    required: false
-                    default: "below"
-                    hint: "On wide screens the block shares a row with the block above it; on small screens they stack."
-                    options:
-                      - { label: "Below the previous block", value: "below" }
-                      - { label: "Beside the previous block, equal widths", value: "equal" }
-                      - { label: "Beside the previous block, narrower", value: "narrow" }
-                      - { label: "Beside the previous block, wider", value: "wide" }
-              - name: style
-                label: "Appearance"
-                widget: object
-                collapsed: true
-                hint: "Background and accent colour — set once when the page is designed."
-                fields:
-                  - name: surface
-                    label: "Background"
-                    widget: select
-                    required: false
-                    default: "standard"
-                    hint: "The surface behind the section — for rhythm between blocks."
-                    options:
-                      - { label: "Standard (white)", value: "standard" }
-                      - { label: "Tinted", value: "tint" }
-                      - { label: "Panel (rounded plate)", value: "panel" }
-                      - { label: "Accent band", value: "band" }
-                      - { label: "Dark", value: "dark" }
-                      - { label: "Gradient", value: "gradient" }
-          - name: contactForm
-            label: "Contact form"
-            widget: object
-            fields:
-              - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
-              - { name: heading, label: "Heading", widget: string, required: false, hint: "Blank uses the page title." }
-              - { name: intro, label: "Intro / description", widget: text, required: false, hint: "Optional line under the heading. Blank = hidden." }
-              - { name: labelName, label: "Field label — name", widget: string, required: false, hint: "Blank uses the site wording (\"Name\")." }
-              - { name: labelEmail, label: "Field label — email", widget: string, required: false, hint: "Blank uses the site wording (\"Email\")." }
-              - { name: showPhone, label: "Show the phone field", widget: boolean, required: false, default: true }
-              - { name: requirePhone, label: "Make the phone field required", widget: boolean, required: false, default: false, hint: "Only applies when the phone field is shown." }
-              - { name: showCategory, label: "Show the category dropdown", widget: boolean, required: false, default: false, hint: "A dropdown the visitor picks their errand from. Needs at least one choice below." }
-              - { name: labelCategory, label: "Field label — category", widget: string, required: false, hint: "Blank uses the site wording (\"Category\")." }
-              - name: categories
-                label: "Categories"
-                widget: list
-                required: false
-                label_singular: "Category"
-                collapsed: true
-                hint: "The choices in the dropdown, in order."
-                field: { name: category, label: "Category", widget: string }
-              - { name: showUnit, label: "Show the unit field", widget: boolean, required: false, default: false, hint: "A short free-text field for which unit the visitor is writing about." }
-              - { name: labelUnit, label: "Field label — unit", widget: string, required: false, hint: "Blank uses the site wording (\"Unit\")." }
-              - { name: placeholderUnit, label: "Unit placeholder", widget: string, required: false, hint: "Faint example text inside the empty field." }
-              - { name: labelMessage, label: "Field label — message", widget: string, required: false, hint: "Blank uses the site wording (\"Describe your project\"). Word it for your business." }
-              - { name: submitLabel, label: "Submit button text", widget: string, required: false, hint: "The form's submit button. Blank uses the site wording (\"Send request\")." }
-              - { name: showDirectContact, label: "Show the direct-contact card", widget: boolean, required: false, default: true, hint: "Off → the form fills the width (no phone/email card)." }
-              - { name: inbox, label: "Inbox key", widget: string, required: false, hint: "Where this form's messages are delivered: the key of an inbox set up for the site. Empty means the site's default inbox." }
-              - name: layout
-                label: "Layout"
-                widget: object
-                collapsed: true
-                hint: "Size and placement — rarely needs changing."
-                fields:
-                  - name: beside
-                    label: "Placement"
-                    widget: select
-                    required: false
-                    default: "below"
-                    hint: "On wide screens the block shares a row with the block above it; on small screens they stack."
-                    options:
-                      - { label: "Below the previous block", value: "below" }
-                      - { label: "Beside the previous block, equal widths", value: "equal" }
-                      - { label: "Beside the previous block, narrower", value: "narrow" }
-                      - { label: "Beside the previous block, wider", value: "wide" }
-              - name: style
-                label: "Appearance"
-                widget: object
-                collapsed: true
-                hint: "Background and accent colour — set once when the page is designed."
-                fields:
-                  - name: surface
-                    label: "Background"
-                    widget: select
-                    required: false
-                    default: "standard"
-                    hint: "The surface behind the section — for rhythm between blocks."
-                    options:
-                      - { label: "Standard (white)", value: "standard" }
-                      - { label: "Tinted", value: "tint" }
-                      - { label: "Panel (rounded plate)", value: "panel" }
-                      - { label: "Accent band", value: "band" }
-                      - { label: "Dark", value: "dark" }
-                      - { label: "Gradient", value: "gradient" }
-          - name: contactSwitch
-            label: "Contact form switcher"
-            widget: object
-            fields:
-              - { name: eyebrow, label: "Eyebrow", widget: string, required: false, hint: "Small uppercase label above the heading." }
-              - { name: heading, label: "Heading", widget: string, required: false, hint: "Blank uses the page title." }
-              - { name: intro, label: "Intro / description", widget: text, required: false, hint: "Optional line under the heading. Blank = hidden." }
-              - name: items
-                label: "Forms"
-                widget: list
-                required: false
-                label_singular: "Shape"
-                collapsed: true
-                hint: "One entry per errand, in the order they are offered. The first one is the form the page opens on."
-                summary: "{{fields.label}}"
-                fields:
-                  - { name: label, label: "Switch button text", widget: string, hint: "What the visitor picks, e.g. \"Report a fault\"." }
-                  - { name: description, label: "Switch description", widget: string, required: false, hint: "Where the errand goes, in one line. Shown by the choice-cards layout only." }
-                  - { name: intro, label: "Intro / description", widget: text, required: false, hint: "Optional line above this form. Blank = hidden." }
-                  - { name: labelName, label: "Field label — name", widget: string, required: false, hint: "Blank uses the site wording (\"Name\")." }
-                  - { name: labelEmail, label: "Field label — email", widget: string, required: false, hint: "Blank uses the site wording (\"Email\")." }
-                  - { name: showPhone, label: "Show the phone field", widget: boolean, required: false, default: true }
-                  - { name: requirePhone, label: "Make the phone field required", widget: boolean, required: false, default: false, hint: "Only applies when the phone field is shown." }
-                  - { name: showCategory, label: "Show the category dropdown", widget: boolean, required: false, default: false, hint: "A dropdown the visitor picks their errand from. Needs at least one choice below." }
-                  - { name: labelCategory, label: "Field label — category", widget: string, required: false, hint: "Blank uses the site wording (\"Category\")." }
-                  - name: categories
-                    label: "Categories"
-                    widget: list
-                    required: false
-                    label_singular: "Category"
-                    collapsed: true
-                    hint: "The choices in the dropdown, in order."
-                    field: { name: category, label: "Category", widget: string }
-                  - { name: showUnit, label: "Show the unit field", widget: boolean, required: false, default: false, hint: "A short free-text field for which unit the visitor is writing about." }
-                  - { name: labelUnit, label: "Field label — unit", widget: string, required: false, hint: "Blank uses the site wording (\"Unit\")." }
-                  - { name: placeholderUnit, label: "Unit placeholder", widget: string, required: false, hint: "Faint example text inside the empty field." }
-                  - { name: labelMessage, label: "Field label — message", widget: string, required: false, hint: "Blank uses the site wording (\"Describe your project\"). Word it for your business." }
-                  - { name: submitLabel, label: "Submit button text", widget: string, required: false, hint: "The form's submit button. Blank uses the site wording (\"Send request\")." }
-                  - { name: showDirectContact, label: "Show the direct-contact card", widget: boolean, required: false, default: true, hint: "Off → the form fills the width (no phone/email card)." }
-                  - { name: inbox, label: "Inbox key", widget: string, required: false, hint: "Where this form's messages are delivered: the key of an inbox set up for the site. Empty means the site's default inbox." }
-              - name: layout
-                label: "Layout"
-                widget: object
-                collapsed: true
-                hint: "Size and placement — rarely needs changing."
-                fields:
-                  - name: variant
-                    label: "Layout"
-                    widget: select
-                    required: false
-                    default: "segmented"
-                    hint: "How the visitor switches between the forms."
-                    options:
-                      - { label: "Segmented button", value: "segmented" }
-                      - { label: "Choice cards (with descriptions)", value: "cards" }
-                      - { label: "Tabs on the card", value: "tabs" }
-                  - name: beside
-                    label: "Placement"
-                    widget: select
-                    required: false
-                    default: "below"
-                    hint: "On wide screens the block shares a row with the block above it; on small screens they stack."
-                    options:
-                      - { label: "Below the previous block", value: "below" }
-                      - { label: "Beside the previous block, equal widths", value: "equal" }
-                      - { label: "Beside the previous block, narrower", value: "narrow" }
-                      - { label: "Beside the previous block, wider", value: "wide" }
-              - name: style
-                label: "Appearance"
-                widget: object
-                collapsed: true
-                hint: "Background and accent colour — set once when the page is designed."
-                fields:
-                  - name: surface
-                    label: "Background"
-                    widget: select
-                    required: false
-                    default: "standard"
-                    hint: "The surface behind the section — for rhythm between blocks."
-                    options:
-                      - { label: "Standard (white)", value: "standard" }
-                      - { label: "Tinted", value: "tint" }
-                      - { label: "Panel (rounded plate)", value: "panel" }
-                      - { label: "Accent band", value: "band" }
-                      - { label: "Dark", value: "dark" }
-                      - { label: "Gradient", value: "gradient" }
-          - name: contactCard
-            label: "Contact card"
-            widget: object
-            fields:
-              - name: show
-                label: "Show"
-                widget: select
-                multiple: true
-                required: false
-                default: ["phone", "email"]
-                hint: "Tick the parts to display. Anything with no info in Contact settings is skipped (e.g. the map needs an address with lat/lng)."
-                options:
-                  - { label: "Phone", value: "phone" }
-                  - { label: "Email", value: "email" }
-                  - { label: "Opening hours", value: "hours" }
-                  - { label: "Address", value: "address" }
-                  - { label: "Mini-map", value: "map" }
-                  - { label: "Social links", value: "socials" }
-              - { name: label, label: "Card heading", widget: string, required: false, hint: "Blank uses the site wording (\"Direct contact\")." }
-              - { name: tint, label: "Tinted background", widget: boolean, required: false, default: true }
-              - name: layout
-                label: "Layout"
-                widget: object
-                collapsed: true
-                hint: "Size and placement — rarely needs changing."
-                fields:
-                  - name: beside
-                    label: "Placement"
-                    widget: select
-                    required: false
-                    default: "below"
-                    hint: "On wide screens the block shares a row with the block above it; on small screens they stack."
-                    options:
-                      - { label: "Below the previous block", value: "below" }
-                      - { label: "Beside the previous block, equal widths", value: "equal" }
-                      - { label: "Beside the previous block, narrower", value: "narrow" }
-                      - { label: "Beside the previous block, wider", value: "wide" }
-              - name: style
-                label: "Appearance"
-                widget: object
-                collapsed: true
-                hint: "Background and accent colour — set once when the page is designed."
-                fields:
-                  - name: surface
-                    label: "Background"
-                    widget: select
-                    required: false
-                    default: "standard"
-                    hint: "The surface behind the section — for rhythm between blocks."
-                    options:
-                      - { label: "Standard (white)", value: "standard" }
-                      - { label: "Tinted", value: "tint" }
-                      - { label: "Panel (rounded plate)", value: "panel" }
-                      - { label: "Accent band", value: "band" }
-                      - { label: "Dark", value: "dark" }
-                      - { label: "Gradient", value: "gradient" }
-          - name: findUs
-            label: "Find us (map)"
-            widget: object
-            fields:
-              - { name: heading, label: "Heading", widget: string, required: false, hint: "Blank uses the site wording (\"Find us\")." }
-              - { name: showHours, label: "Show opening hours", widget: boolean, required: false, default: true }
-              - name: layout
-                label: "Layout"
-                widget: object
-                collapsed: true
-                hint: "Size and placement — rarely needs changing."
-                fields:
-                  - name: beside
-                    label: "Placement"
-                    widget: select
-                    required: false
-                    default: "below"
-                    hint: "On wide screens the block shares a row with the block above it; on small screens they stack."
-                    options:
-                      - { label: "Below the previous block", value: "below" }
-                      - { label: "Beside the previous block, equal widths", value: "equal" }
-                      - { label: "Beside the previous block, narrower", value: "narrow" }
-                      - { label: "Beside the previous block, wider", value: "wide" }
-              - name: style
-                label: "Appearance"
-                widget: object
-                collapsed: true
-                hint: "Background and accent colour — set once when the page is designed."
-                fields:
-                  - name: surface
-                    label: "Background"
-                    widget: select
-                    required: false
-                    default: "standard"
-                    hint: "The surface behind the section — for rhythm between blocks."
-                    options:
-                      - { label: "Standard (white)", value: "standard" }
-                      - { label: "Tinted", value: "tint" }
-                      - { label: "Panel (rounded plate)", value: "panel" }
-                      - { label: "Accent band", value: "band" }
-                      - { label: "Dark", value: "dark" }
-                      - { label: "Gradient", value: "gradient" }
-          - name: map
-            label: "Find your way (static map)"
-            widget: object
-            fields:
-              - { name: address, label: "Address", widget: string, hint: "Shown in bold, and used for the route when no coordinates are given." }
-              - { name: note, label: "Note", widget: string, required: false, hint: "A quiet line beside the address, e.g. how far it is to the lift." }
-              - name: media
-                label: "Media"
-                widget: object
-                collapsed: true
-                hint: "The map picture, and where the pin sits on it."
-                fields:
-                  - { name: image, label: "Map image", widget: image, required: false, hint: "A static map exported once and uploaded like any other picture. A site with a Google map key shows the Google still instead and never reads this one." }
-                  - { name: imageAlt, label: "Alt text", widget: string, required: false }
-                  - { name: credit, label: "Image credit", widget: string, required: false, hint: "Printed over the picture. A map drawn from OpenStreetMap must credit it: © OpenStreetMap contributors." }
-                  - { name: pinX, label: "Pin from the left (%)", widget: number, required: false, hint: "0 to 100. Leave both blank for no pin." }
-                  - { name: pinY, label: "Pin from the top (%)", widget: number, required: false, hint: "0 to 100." }
-              - name: coords
-                label: "Coordinates"
-                widget: object
-                collapsed: true
-                hint: "Latitude and longitude land the map app on the door instead of the street. Blank sends the address instead."
-                fields:
-                  - { name: lat, label: "Latitude", widget: number, required: false }
-                  - { name: lng, label: "Longitude", widget: number, required: false }
-              - name: layout
-                label: "Layout"
-                widget: object
-                collapsed: true
-                hint: "Size and placement — rarely needs changing."
-                fields:
                   - name: beside
                     label: "Placement"
                     widget: select

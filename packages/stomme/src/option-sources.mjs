@@ -146,7 +146,7 @@ export function buildOptionSources({ root, ROUTES, FEATURES, LISTINGS, BLOCKS })
   for (const l of LISTINGS) MENU_OPTIONS.push({ label: l.label || l.id, value: `${l.id}::${l.route}` });
   OPTION_SOURCES['$menus'] = MENU_OPTIONS;
 
-  const GROUP_ORDER = ['Hero & headers', 'Text', 'Cards & lists', 'Media', 'Quote & highlight', 'Numbers', 'From collections', 'Calls to action', 'Automatic'];
+  const GROUP_ORDER = ['Hero & headers', 'Text', 'Cards & lists', 'Media', 'Quote & highlight', 'Numbers', 'From collections', 'Contact', 'Calls to action', 'Automatic'];
   const groupRank = (b) => { const i = GROUP_ORDER.indexOf(b.group); return i === -1 ? GROUP_ORDER.length : i; };
   AVAILABLE_BLOCKS.sort((a, b) => groupRank(a) - groupRank(b));
   return { PAGE_OPTIONS, FAQ_TAG_OPTIONS, DOCUMENT_GROUP_OPTIONS, OPTION_SOURCES, collectionEnabled, AVAILABLE_BLOCKS, SKIPPED_BLOCKS, GROUP_ORDER };

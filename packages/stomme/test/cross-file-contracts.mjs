@@ -103,7 +103,8 @@ const rewrites = [...gen.matchAll(/substitute\((\w+), (\/[^,]+\/),/g)].map((m) =
 check(rewrites.length >= 2, `${rewrites.length} generated-asset rewrites are guarded`, rewrites.join('  '));
 for (const re of rewrites) {
   const body = re.slice(1, -1).replace(/\\\//g, '/');
-  const target = body.startsWith('var LOGIN_LABEL') || body.startsWith('var COMPONENT_LABELS') ? previews : null;
+  const target = body.startsWith('var LOGIN_LABEL') || body.startsWith('var COMPONENT_LABELS') ? previews
+    : body.startsWith('var BLOCK_PICKER') || body.startsWith('var pickerSearch') ? read('admin/editor.js') : null;
   if (target) check(new RegExp(body).test(target), `the declaration ${body.split(' =')[0]} still exists for the generator to rewrite`);
 }
 
@@ -139,11 +140,11 @@ for (const yaml of yamls) {
 check(freeTextDefaults.length === 0,
   'no string/text/markdown field in the generated config declares a default — a default there is page copy Sveltia writes into blocks nobody edited',
   [...new Set(freeTextDefaults)].join(', '));
-const gallerySrc = read('admin/blocks-gallery.mjs');
+const gallerySrc = `${read('admin/blocks-gallery.mjs')}\n${read('admin/block-picker.mjs')}`;
 const galleryKeys = new Set([
   ...[...gallerySrc.matchAll(/\bt\('([\w.]+)'/g)].map((m) => m[1]),
   ...groups.map((g) => `gallery.group.${g}`),
-  ...blocks.map((b) => `block.${b.type}.summary`),
+  ...blocks.map((b) => `block.${b.type}.keywords`),
 ]);
 check(REFERENCE.size > 500 && galleryKeys.size > 30,
   `the engine emits ${REFERENCE.size} translatable field paths and ${galleryKeys.size} gallery strings`);

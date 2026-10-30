@@ -169,29 +169,62 @@ try {
       return chevrons.length === 1 && menus.length === 1;
     })));
 
-  // 0.176 named the popup via aria-controls; 0.184 dropped it for a plain [role=menu] — resolve by aria-controls when present, else the open menu holding the items, and never a global [role=option] match (the command palette and collection nav are listboxes and would shadow it).
-  await check('add-item picker opens (menu button → role=menuitem types)', async () => {
-    const id = await page.evaluate(() => {
-      const list = document.querySelector('section.field[data-field-type=list]');
-      const add = [...(list?.querySelectorAll(':scope > .field-wrapper button[aria-haspopup=menu]') || [])]
-        .find((b) => !b.closest('.item'));
-      if (!add) return null;
-      add.click();
-      return add.getAttribute('aria-controls') || '';
-    });
-    if (id === null) return false;
-    await page.waitForFunction((pid) => {
-      const host = pid ? document.getElementById(pid) : null;
-      const scope = host || [...document.querySelectorAll('[role=menu]')].find((m) => m.querySelector('button[role=menuitem]'));
-      return !!scope?.querySelector('button[role=menuitem]');
-    }, id, { timeout: 10000 });
-    await page.evaluate((pid) => {
-      const host = pid ? document.getElementById(pid) : null;
-      const scope = host || [...document.querySelectorAll('[role=menu]')].find((m) => m.querySelector('button[role=menuitem]'));
-      scope.querySelector('button[role=menuitem]').click();
-    }, id);
-    await page.waitForSelector('section.field[data-field-type=list] .item', { timeout: 10000 });
-    return true;
+  // editor.js finds Sveltia's menu by the Add button's aria-controls, else the open popup's [role=menu], and picks the [role=menuitem] whose label matches the block; each check below goes red when one of those hooks moves.
+  const ADD = 'section.field[data-key-path="blocks"] > .field-wrapper .toolbar button[aria-haspopup=menu]';
+  const clickAdd = () => page.evaluate((sel) => { const b = [...document.querySelectorAll(sel)].find((x) => !x.closest('.item')); if (!b) return false; b.click(); return true; }, ADD);
+  const sveltiaMenuLabels = () => page.evaluate(() => {
+    const add = [...document.querySelectorAll('section.field[data-key-path="blocks"] > .field-wrapper .toolbar button[aria-haspopup=menu]')].find((x) => !x.closest('.item'));
+    const id = add && add.getAttribute('aria-controls');
+    const host = id ? document.getElementById(id) : null;
+    const menu = (host && (host.matches('[role=menu]') ? host : host.querySelector('[role=menu]'))) || document.querySelector('dialog.sui.popup.open [role=menu]');
+    if (!menu) return null;
+    const items = [...menu.querySelectorAll('[role=menuitem]')];
+    return items.map((i) => ({ label: (i.getAttribute('aria-label') || (i.querySelector('.type-label') || i).textContent).replace(/[⁨⁩]/g, '').replace(/\s+/g, ' ').trim(), described: !!i.querySelector('.type-description') }));
+  });
+  let pickerLabels = [];
+  await check('block picker: Add on the blocks list opens the stomme picker, focus in its search, Sveltia\'s menu stays shut', async () => {
+    if (!(await clickAdd())) return 'no Add menu button in the blocks list toolbar (.toolbar button[aria-haspopup=menu]) — the picker has nothing to hook';
+    try { await page.waitForSelector('dialog.stomme-picker[open]', { timeout: 5000 }); }
+    catch { return 'the Add button did not open dialog.stomme-picker — editor.js no longer recognises the blocks list Add button'; }
+    pickerLabels = await page.evaluate(() => [...document.querySelectorAll('.stomme-picker .sp-card .sp-name')].map((b) => b.textContent.trim()));
+    const state = await page.evaluate(() => ({ focus: document.activeElement === document.querySelector('.stomme-picker input[type=search]'), menu: !!document.querySelector('dialog.sui.popup.open [role=menu]') }));
+    if (!state.focus) return 'the search field does not hold focus when the picker opens';
+    if (state.menu) return 'Sveltia\'s own menu opened alongside the picker';
+    return pickerLabels.length > 10 ? true : `the picker offers only ${pickerLabels.length} blocks`;
+  });
+  await check('block picker: Escape closes it and focus returns to the Add button', async () => {
+    await page.keyboard.press('Escape');
+    await page.waitForFunction(() => !document.querySelector('dialog.stomme-picker[open]'), null, { timeout: 5000 });
+    return page.waitForFunction((sel) => document.activeElement === [...document.querySelectorAll(sel)].find((x) => !x.closest('.item')), ADD, { timeout: 2000 })
+      .then(() => true, () => page.evaluate(() => `focus is on ${document.activeElement?.outerHTML.slice(0, 120)}`));
+  });
+  await check('Sveltia add menu: aria-controls → [role=menu] of [role=menuitem], every block the picker offers matched by exactly one label, each with its description', async () => {
+    await page.evaluate(() => { document.querySelector('section.field[data-key-path="blocks"]').__stommePickerOff = true; });
+    await clickAdd();
+    let items = null;
+    for (let i = 0; i < 30 && !(items && items.length); i++) { items = await sveltiaMenuLabels(); await page.waitForTimeout(100); }
+    await page.keyboard.press('Escape');
+    await page.evaluate(() => { delete document.querySelector('section.field[data-key-path="blocks"]').__stommePickerOff; });
+    await page.waitForTimeout(300);
+    if (!items || !items.length) return 'the Add button opened no [role=menu] with [role=menuitem] reachable by aria-controls or dialog.sui.popup.open';
+    const unmatched = pickerLabels.filter((l) => items.filter((it) => it.label === l).length !== 1);
+    if (unmatched.length) return `no single menu item labelled ${unmatched.slice(0, 4).map((l) => `"${l}"`).join(', ')} — the picker would fall back to Sveltia's menu (menu reads ${items.slice(0, 3).map((i) => `"${i.label}"`).join(', ')}…)`;
+    const bare = items.filter((it) => !it.described).map((it) => it.label);
+    return bare.length === 0 ? true : `menu items without a .type-description: ${bare.slice(0, 4).join(', ')}`;
+  });
+  await check('block picker: an accent-insensitive keyword search + Enter adds that block through Sveltia\'s menu', async () => {
+    await clickAdd();
+    await page.waitForSelector('dialog.stomme-picker[open]', { timeout: 5000 });
+    await page.keyboard.type('PRÍCE');
+    const first = await page.evaluate(() => document.querySelector('.stomme-picker .sp-card[aria-selected=true] .sp-name')?.textContent.trim());
+    if (!first) return 'the keyword "price" (typed "PRÍCE") selected no block';
+    await page.keyboard.press('Enter');
+    try { await page.waitForFunction((t) => [...document.querySelectorAll('section.field[data-key-path="blocks"] .item > .header .type')].some((x) => x.textContent.trim() === t), first, { timeout: 8000 }); }
+    catch { return `"${first}" never landed in the blocks list — the menu item click did not add it`; }
+    const st = await page.evaluate(() => ({ off: !!document.querySelector('section.field[data-key-path="blocks"]').__stommePickerOff, hiding: document.documentElement.classList.contains('stomme-picking') }));
+    await page.waitForTimeout(500);
+    if (st.off) return 'the picker fell back to Sveltia\'s menu (no menu found)';
+    return (await page.evaluate(() => document.documentElement.classList.contains('stomme-picking'))) ? 'html.stomme-picking was left on, hiding every popup' : true;
   });
 
   await check('list item (.item) renders', () => has(page, 'section.field[data-field-type=list] .item'));
@@ -287,23 +320,12 @@ try {
 
   await check('rich-text field mounts a toolbar (markdown widget)', async () => {
     if (await has(page, 'section.field[data-field-type=markdown] [role=toolbar]')) return true;
-    const opened = await page.evaluate(() => {
-      const list = document.querySelector('section.field[data-key-path="blocks"]');
-      const add = [...(list?.querySelectorAll(':scope > .field-wrapper button[aria-haspopup=menu]') || [])].find((b) => !b.closest('.item'));
-      if (!add) return false;
-      add.click();
-      return true;
-    });
-    if (!opened) return 'no Add button on the blocks list to add a rich-text section with';
-    await page.waitForFunction(() => document.querySelector('[role=menu] button[role=menuitem]'), null, { timeout: 10000 });
-    const picked = await page.evaluate(() => {
-      const items = [...document.querySelectorAll('[role=menu] button[role=menuitem]')];
-      const it = items.find((b) => /rich text/i.test(b.textContent || ''));
-      if (!it) return false;
-      it.click();
-      return true;
-    });
-    if (!picked) return 'the block picker offers no "Rich text" type';
+    if (!(await clickAdd())) return 'no Add button on the blocks list to add a rich-text section with';
+    await page.waitForSelector('dialog.stomme-picker[open]', { timeout: 5000 });
+    await page.keyboard.type('rich text');
+    const picked = await page.evaluate(() => document.querySelector('.stomme-picker .sp-card[aria-selected=true] .sp-name')?.textContent.trim());
+    if (!/rich text/i.test(picked || '')) return 'the block picker offers no "Rich text" type';
+    await page.keyboard.press('Enter');
     await page.waitForSelector('section.field[data-field-type=markdown] [role=toolbar]', { timeout: 15000 });
     return true;
   });

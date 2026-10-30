@@ -10,6 +10,7 @@ import { writeAdminShell } from '../src/admin-shell.mjs';
 import { makeEmitters } from '../src/emit-fields.mjs';
 import { createJiti } from 'jiti';
 import { renderGallery } from '../admin/blocks-gallery.mjs';
+import { pickerData, normalize, searchBlocks } from '../admin/block-picker.mjs';
 import { rewriteLabels, listingAliases } from '../src/label-paths.mjs';
 import { r2LibraryYaml, resolveMediaConfig, withMaxFileSize } from '../src/media-config.mjs';
 import { resolveCmsLocales, LOCALIZED_EDITORS } from '../src/cms-i18n.mjs';
@@ -334,7 +335,12 @@ try {
 try {
   const editorDest = resolve(root, 'public/admin/stomme-editor.js');
   mkdirSync(dirname(editorDest), { recursive: true });
-  writeFileSync(editorDest, readFileSync(resolve(here, '../admin/editor.js'), 'utf8'));
+  let editorSrc = readFileSync(resolve(here, '../admin/editor.js'), 'utf8');
+  const blockFields = ['blocks', ...new Set(AVAILABLE_BLOCKS.flatMap((b) => b.fields.filter((f) => f.widget === 'blocks').map((f) => f.name)))];
+  const picker = pickerData(AVAILABLE_BLOCKS, { t: localized, groupOrder: GROUP_ORDER, fields: blockFields });
+  editorSrc = substitute(editorSrc, /var BLOCK_PICKER = null;/, () => `var BLOCK_PICKER = ${JSON.stringify(picker)};`, 'the block picker data');
+  editorSrc = substitute(editorSrc, /var pickerSearch = null;/, () => `var pickerSearch = (function () {\n  ${normalize.toString()}\n  ${searchBlocks.toString()}\n  return { normalize: normalize, searchBlocks: searchBlocks };\n})();`, 'the block picker search');
+  writeFileSync(editorDest, editorSrc);
 } catch (e) {
   if (e instanceof AnchorMissing) throw e;
   console.warn('  (stomme-editor.js copy skipped:', e.message + ')');

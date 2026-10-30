@@ -1,6 +1,6 @@
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
-const SHAPES = {
+export const SHAPES = {
   hero: '<i class="col"><i class="ln w70"></i><i class="ln w90"></i><i class="ln w40"></i></i><i class="box"></i>',
   band: '<i class="bar"></i><i class="ln w50 ctr"></i>',
   prose: '<i class="ln w90"></i><i class="ln w100"></i><i class="ln w80"></i><i class="ln w95"></i>',
@@ -19,6 +19,43 @@ const SHAPES = {
   auto: '<i class="dash">auto</i>',
 };
 
+const WIREFRAME_RULES = `.wf{display:flex;flex-wrap:wrap;gap:3px;align-content:flex-start;overflow:hidden}
+.wf i,.wf b{display:block}
+.wf .ln{height:5px;border-radius:2px;background:var(--wf-line);width:100%}
+.wf .w40{width:40%}.wf .w50{width:50%}.wf .w55{width:55%}.wf .w60{width:60%}.wf .w70{width:70%}.wf .w80{width:80%}.wf .w90{width:90%}.wf .w95{width:95%}.wf .w100{width:100%}
+.wf .ctr{margin:0 auto}
+.wf .col{flex:1;display:flex;flex-direction:column;gap:4px;min-width:0}
+.wf .box{flex:0 0 30px;align-self:stretch;background:var(--wf-line);border-radius:3px;opacity:.7}
+.wf[data-shape=hero],.wf[data-shape=split]{flex-wrap:nowrap;gap:6px;align-content:stretch}
+.wf .bar{width:100%;height:20px;background:var(--wf-line);border-radius:3px}
+.wf .cell{flex:0 0 calc(50% - 2px);height:22px;background:var(--wf-line);border-radius:3px;opacity:.65}
+.wf[data-shape=grid]{align-content:center}
+.wf .img{flex:1;height:30px;background:var(--wf-line);border-radius:3px;opacity:.6}
+.wf[data-shape=gallery]{flex-wrap:nowrap;align-content:center;align-items:center}
+.wf .row{display:flex;align-items:center;gap:5px;width:100%}
+.wf .num{font:700 8px/1 var(--wf-mono);color:var(--wf-on-accent);background:var(--wf-accent);border-radius:50%;width:12px;height:12px;display:flex;align-items:center;justify-content:center;flex:0 0 12px}
+.wf .tick{font:700 9px/1 var(--wf-mono);color:var(--wf-accent);flex:0 0 12px;text-align:center}
+.wf[data-shape=steps],.wf[data-shape=checklist]{flex-direction:column;justify-content:center;gap:7px}
+.wf .prow{display:flex;align-items:center;gap:6px;width:100%}
+.wf .key{flex:0 0 24px;height:5px;border-radius:2px;background:var(--wf-line);opacity:.55}
+.wf[data-shape=pairs]{flex-direction:column;justify-content:center;gap:7px}
+.wf .qm{font:700 30px/0.7 var(--wf-serif);color:var(--wf-line)}
+.wf[data-shape=quote]{flex-direction:column;justify-content:center}
+.wf .dark{background:var(--wf-panel);border-radius:4px;width:100%;height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:4px}
+.wf .big{font:700 17px/1 var(--wf-mono);color:var(--wf-on-panel)}.wf .lt{background:var(--wf-on-panel);opacity:.5}
+.wf .pill{height:9px;width:26px;background:var(--wf-line);border-radius:9px}
+.wf[data-shape=chips]{align-content:center}
+.wf .lrow{width:100%;height:10px;background:var(--wf-line);border-radius:2px;opacity:.7}
+.wf[data-shape=list]{flex-direction:column;justify-content:center;gap:6px}
+.wf .cbox{border:1.5px solid var(--wf-line);border-radius:4px;width:100%;height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:6px}
+.wf .btn{width:34px;height:9px;background:var(--wf-accent);border-radius:3px;opacity:.8}
+.wf[data-shape=stats]{align-items:center;justify-content:space-around}
+.wf .stat{flex:1;text-align:center}.wf .stat b{font:700 13px/1 var(--wf-mono);color:var(--wf-ink)}
+.wf .dash{border:1.5px dashed var(--wf-line);border-radius:4px;width:100%;height:100%;display:flex;align-items:center;justify-content:center;font:600 9px/1 var(--wf-mono);color:var(--wf-muted);letter-spacing:.1em;text-transform:uppercase}
+`;
+
+export const wireframeCss = (scope = '') => (scope ? WIREFRAME_RULES.replace(/\.wf\b/g, `${scope} .wf`) : WIREFRAME_RULES);
+
 export function renderGallery(blocks, { t = (key, fallback) => fallback, groupOrder = [], locale = 'en' } = {}) {
   const groups = new Map();
   for (const b of blocks) {
@@ -32,7 +69,7 @@ export function renderGallery(blocks, { t = (key, fallback) => fallback, groupOr
     const cards = groups.get(g).map((b) => {
       const reads = t('gallery.ui.collection', 'Reads from a collection');
       const coll = b.collection ? `<span class="coll" title="${esc(reads)}">▢ ${esc(reads)}</span>` : '';
-      const summary = t(`block.${b.type}.summary`, b.summary || '');
+      const summary = t(`block.${b.type}.description`, b.summary || '');
       const label = t(`block.${b.type}.label`, b.label);
       return `<article class="card" data-t="${esc((label + ' ' + b.label + ' ' + (b.summary || '') + ' ' + summary).toLowerCase())}">
         <div class="wf" data-shape="${esc(b.shape || 'prose')}">${SHAPES[b.shape] || SHAPES.prose}</div>
@@ -50,7 +87,8 @@ export function renderGallery(blocks, { t = (key, fallback) => fallback, groupOr
 <title>${esc(t('gallery.ui.kicker', 'Block gallery'))}</title>
 <style>
 :root{--paper:#f4f2ec;--card:#fbfaf6;--ink:#1c1916;--muted:#756f66;--rule:#ddd8cd;--red:#a8331f;--line:#c9c3b6;
---mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;--serif:Georgia,"Times New Roman",serif}
+--mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;--serif:Georgia,"Times New Roman",serif;
+--wf-line:var(--line);--wf-accent:var(--red);--wf-on-accent:#fff;--wf-panel:var(--ink);--wf-on-panel:#fff;--wf-ink:var(--ink);--wf-muted:var(--muted);--wf-mono:var(--mono);--wf-serif:var(--serif)}
 *{box-sizing:border-box}
 body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--serif);line-height:1.5;-webkit-font-smoothing:antialiased}
 .wrap{max-width:1000px;margin:0 auto;padding:clamp(20px,5vw,52px) clamp(16px,4vw,40px) 80px}
@@ -72,41 +110,8 @@ h2 .n{color:var(--muted);font-weight:400;margin-left:.5em}
 .coll{display:inline-block;margin-top:6px;font-family:var(--mono);font-size:.62rem;letter-spacing:.04em;color:var(--red)}
 .nores{display:none;color:var(--muted);font-style:italic;padding:24px 0}.nores.show{display:block}
 footer{margin-top:50px;padding-top:14px;border-top:1px solid var(--rule);font-family:var(--mono);font-size:.7rem;color:var(--muted)}
-/* ── wireframe pictograms ── */
-.wf{flex:0 0 auto;width:92px;height:62px;background:#fff;border:1px solid var(--line);border-radius:5px;padding:7px;display:flex;flex-wrap:wrap;gap:3px;align-content:flex-start;overflow:hidden}
-.wf i,.wf b{display:block}
-.wf .ln{height:5px;border-radius:2px;background:var(--line);width:100%}
-.wf .w40{width:40%}.wf .w50{width:50%}.wf .w55{width:55%}.wf .w60{width:60%}.wf .w70{width:70%}.wf .w80{width:80%}.wf .w90{width:90%}.wf .w95{width:95%}.wf .w100{width:100%}
-.wf .ctr{margin:0 auto}
-.wf .col{flex:1;display:flex;flex-direction:column;gap:4px;min-width:0}
-.wf .box{flex:0 0 30px;align-self:stretch;background:var(--line);border-radius:3px;opacity:.7}
-.wf[data-shape=hero],.wf[data-shape=split]{flex-wrap:nowrap;gap:6px;align-content:stretch}
-.wf .bar{width:100%;height:20px;background:var(--line);border-radius:3px}
-.wf .cell{flex:0 0 calc(50% - 2px);height:22px;background:var(--line);border-radius:3px;opacity:.65}
-.wf[data-shape=grid]{align-content:center}
-.wf .img{flex:1;height:30px;background:var(--line);border-radius:3px;opacity:.6}
-.wf[data-shape=gallery]{flex-wrap:nowrap;align-content:center;align-items:center}
-.wf .row{display:flex;align-items:center;gap:5px;width:100%}
-.wf .num{font:700 8px/1 var(--mono);color:#fff;background:var(--red);border-radius:50%;width:12px;height:12px;display:flex;align-items:center;justify-content:center;flex:0 0 12px}
-.wf .tick{font:700 9px/1 var(--mono);color:var(--red);flex:0 0 12px;text-align:center}
-.wf[data-shape=steps],.wf[data-shape=checklist]{flex-direction:column;justify-content:center;gap:7px}
-.wf .prow{display:flex;align-items:center;gap:6px;width:100%}
-.wf .key{flex:0 0 24px;height:5px;border-radius:2px;background:var(--line);opacity:.55}
-.wf[data-shape=pairs]{flex-direction:column;justify-content:center;gap:7px}
-.wf .qm{font:700 30px/0.7 var(--serif);color:var(--line)}
-.wf[data-shape=quote]{flex-direction:column;justify-content:center}
-.wf .dark{background:var(--ink);border-radius:4px;width:100%;height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:4px}
-.wf .big{font:700 17px/1 var(--mono);color:#fff}.wf .lt{background:#fff;opacity:.5}
-.wf .pill{height:9px;width:26px;background:var(--line);border-radius:9px}
-.wf[data-shape=chips]{align-content:center}
-.wf .lrow{width:100%;height:10px;background:var(--line);border-radius:2px;opacity:.7}
-.wf[data-shape=list]{flex-direction:column;justify-content:center;gap:6px}
-.wf .cbox{border:1.5px solid var(--line);border-radius:4px;width:100%;height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:6px}
-.wf .btn{width:34px;height:9px;background:var(--red);border-radius:3px;opacity:.8}
-.wf[data-shape=stats]{align-items:center;justify-content:space-around}
-.wf .stat{flex:1;text-align:center}.wf .stat b{font:700 13px/1 var(--mono);color:var(--ink)}
-.wf .dash{border:1.5px dashed var(--line);border-radius:4px;width:100%;height:100%;display:flex;align-items:center;justify-content:center;font:600 9px/1 var(--mono);color:var(--muted);letter-spacing:.1em;text-transform:uppercase}
-@media(max-width:480px){.card{flex-direction:column}.wf{width:100%}}
+.wf{flex:0 0 auto;width:92px;height:62px;background:#fff;border:1px solid var(--line);border-radius:5px;padding:7px}
+${wireframeCss()}@media(max-width:480px){.card{flex-direction:column}.wf{width:100%}}
 </style>
 </head>
 <body>

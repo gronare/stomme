@@ -46,6 +46,7 @@ export function makeEmitters({ q, pad, AVAILABLE_BLOCKS, OPTION_SOURCES }) {
         `${p}  types:`];
       for (const b of types) {
         lines.push(`${p}    - name: ${b.type}`, `${p}      label: ${q(b.label)}`, `${p}      widget: object`);
+        if (b.summary) lines.push(`${p}      description: ${q(b.summary)}`);
         if (flag) lines.push(`${p}      i18n: true`);
         const sub = b.fields.map((sf) => emitField(sf, indent + 8, i18n)).filter(Boolean);
         lines.push(`${p}      fields:`);
@@ -142,6 +143,7 @@ export function makeEmitters({ q, pad, AVAILABLE_BLOCKS, OPTION_SOURCES }) {
     ];
     for (const b of AVAILABLE_BLOCKS) {
       lines.push(`${p}    - name: ${b.type}`, `${p}      label: ${q(b.label)}`, `${p}      widget: object`);
+      if (b.summary) lines.push(`${p}      description: ${q(b.summary)}`);
       if (i18n) lines.push(`${p}      i18n: true`);
       const sub = b.fields.map((f) => emitField(f, indent + 8, i18n)).filter(Boolean);
       lines.push(`${p}      fields:`, ...(sub.length ? sub : [`${p}        - { name: _auto, label: "Auto", widget: hidden${i18n ? ', i18n: duplicate' : ''} }`]));

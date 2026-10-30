@@ -1,3 +1,5 @@
+import { wireframeCss } from '../admin/blocks-gallery.mjs';
+
 // Editor theme: CSS custom properties only — they inherit through the shadow DOM, and explicit colours would break Sveltia's in-app light/dark toggle.
 // `!important` is load-bearing: Sveltia injects its own `:root,:host{--sui-…}` at runtime after this style, so equal-specificity later rules would otherwise win.
 const RAMP_LIGHT = `--sui-background-color-1-hsl: var(--sui-base-hue) 6% 100% !important; --sui-background-color-2-hsl: var(--sui-base-hue) 7% 96.5% !important; --sui-background-color-3-hsl: var(--sui-base-hue) 8% 93.5% !important; --sui-background-color-4-hsl: var(--sui-base-hue) 8% 89.5% !important; --sui-background-color-5-hsl: var(--sui-base-hue) 10% 81% !important; --sui-border-color-1-hsl: var(--sui-base-hue) 9% 56% !important; --sui-border-color-2-hsl: var(--sui-base-hue) 10% 77% !important; --sui-border-color-3-hsl: var(--sui-base-hue) 10% 83% !important;`;
@@ -27,6 +29,54 @@ const CARD_MAX = `min(${CARD_W}, 100% - 32px)`;
 const TOP = 'section.field:not(section.field section.field)';
 const TOP_PLAIN = `${TOP}:not([data-field-type=list]):not([data-field-type=boolean]):not([data-field-type=object])`;
 const TOP_LABELED = `${TOP}:not([data-field-type=boolean]):not([data-field-type=object])`;
+const PICKER_CSS = `
+    .stomme-picker{--sp-bg:hsl(var(--sui-background-color-1-hsl));--sp-soft:hsl(var(--sui-background-color-2-hsl));--sp-line:hsl(var(--sui-border-color-3-hsl));--sp-fg:var(--sui-primary-foreground-color);--sp-muted:var(--sui-tertiary-foreground-color);--sp-accent:var(--sui-primary-accent-color);--sp-on-accent:var(--sui-primary-accent-color-inverted);--sp-accent-soft:var(--sui-primary-accent-color-translucent);
+    --wf-line:hsl(var(--sui-background-color-5-hsl));--wf-accent:var(--sui-primary-accent-color);--wf-on-accent:var(--sui-primary-accent-color-inverted);--wf-panel:hsl(var(--sui-foreground-color-3-hsl));--wf-on-panel:hsl(var(--sui-background-color-1-hsl));--wf-ink:var(--sui-primary-foreground-color);--wf-muted:var(--sui-tertiary-foreground-color);--wf-mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;--wf-serif:Georgia,"Times New Roman",serif;
+    padding:0;border:0;margin:auto;background:transparent;color:var(--sp-fg);font:14px/1.45 var(--sui-font-family-default);max-width:none;max-height:none;overflow:visible}
+    .stomme-picker::backdrop{background:hsl(var(--sui-shadow-color) / 42%)}
+    .stomme-picker *{box-sizing:border-box}
+    .stomme-picker .sp-box{background:var(--sp-bg);border-radius:12px;width:min(920px,calc(100vw - 40px));height:min(640px,calc(100dvh - 40px));display:grid;grid-template-rows:auto minmax(0,1fr);box-shadow:0 20px 60px var(--sui-popup-shadow-color);overflow:hidden}
+    .stomme-picker .sp-top{display:flex;gap:12px;align-items:center;padding:14px 16px;border-bottom:1px solid var(--sp-line)}
+    .stomme-picker .sp-top h2{font-size:15px;font-weight:600;margin:0;white-space:nowrap;color:var(--sp-fg)}
+    .stomme-picker .sp-search{flex:1;min-width:0;display:flex;align-items:center;gap:8px;border:1px solid var(--sp-line);border-radius:8px;padding:0 10px;background:var(--sp-soft)}
+    .stomme-picker .sp-search:focus-within{border-color:var(--sp-accent)}
+    .stomme-picker .sp-search span{color:var(--sp-muted);font-size:16px}
+    .stomme-picker .sp-search input{border:0;background:transparent;font:inherit;color:var(--sp-fg);flex:1;min-width:0;outline:none;padding:8px 0;margin:0}
+    .stomme-picker .sp-x{border:0;background:none;font-size:22px;line-height:1;color:var(--sp-muted);cursor:pointer;padding:4px 8px;border-radius:6px}
+    .stomme-picker .sp-x:hover{background:var(--sp-soft);color:var(--sp-fg)}
+    .stomme-picker .sp-body{display:grid;grid-template-columns:190px minmax(0,1fr) 250px;min-height:0}
+    .stomme-picker .sp-groups{border-right:1px solid var(--sp-line);padding:10px 8px;overflow:auto}
+    .stomme-picker .sp-groups button{display:flex;justify-content:space-between;gap:8px;width:100%;border:0;background:none;text-align:left;font:inherit;color:var(--sp-fg);padding:7px 10px;border-radius:6px;cursor:pointer}
+    .stomme-picker .sp-groups button:hover{background:var(--sp-soft)}
+    .stomme-picker .sp-groups button[aria-current="true"]{background:var(--sp-accent-soft);font-weight:600}
+    .stomme-picker .sp-groups .sp-n{color:var(--sp-muted);font-weight:400}
+    .stomme-picker .sp-list{position:relative;overflow:auto;padding:4px 16px 16px;min-width:0;outline:none}
+    .stomme-picker .sp-list h3{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--sp-muted);margin:16px 0 8px}
+    .stomme-picker .sp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+    .stomme-picker .sp-card{border:1px solid var(--sp-line);border-radius:8px;background:var(--sp-bg);padding:8px;color:var(--sp-fg);cursor:pointer;display:flex;flex-direction:column;gap:6px;user-select:none}
+    .stomme-picker .sp-card:hover{border-color:var(--sp-accent)}
+    .stomme-picker .sp-card[aria-selected="true"]{border-color:var(--sp-accent);box-shadow:0 0 0 2px var(--sp-accent-soft)}
+    .stomme-picker .sp-list:focus-visible .sp-card[aria-selected="true"]{outline:2px solid var(--sp-accent);outline-offset:1px}
+    .stomme-picker .sp-name{font-weight:600;font-size:13px;line-height:1.3}
+    .stomme-picker .wf{height:62px;border-radius:5px;background:var(--sp-soft);padding:7px}
+    .stomme-picker .sp-side{border-left:1px solid var(--sp-line);padding:14px;display:flex;flex-direction:column;gap:10px;background:var(--sp-soft);min-width:0;overflow:auto}
+    .stomme-picker .sp-side .wf{height:80px;zoom:1.5;flex:0 0 auto;background:var(--sp-bg);border:1px solid var(--sp-line);padding:9px}
+    .stomme-picker .sp-side h4{margin:0;font-size:15px;font-weight:600}
+    .stomme-picker .sp-side p{margin:0;color:var(--sp-muted)}
+    .stomme-picker .sp-tag{align-self:flex-start;font-size:12px;background:var(--sp-bg);border:1px solid var(--sp-line);border-radius:10px;padding:1px 8px;color:var(--sp-muted)}
+    .stomme-picker .sp-add{margin-top:auto;border:0;border-radius:8px;background:var(--sp-accent);color:var(--sp-on-accent);font:inherit;font-weight:600;padding:10px;cursor:pointer}
+    .stomme-picker .sp-empty{color:var(--sp-muted);padding:30px 0;margin:0}
+    @media (max-width:760px){
+    .stomme-picker .sp-box{width:100vw;height:100dvh;border-radius:0;padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px)}
+    .stomme-picker .sp-search input{font-size:16px}
+    .stomme-picker .sp-top h2{display:none}
+    .stomme-picker .sp-body{grid-template-columns:1fr;grid-template-rows:auto minmax(0,1fr)}
+    .stomme-picker .sp-groups{display:flex;gap:4px;overflow-x:auto;border-right:0;border-bottom:1px solid var(--sp-line);padding:8px}
+    .stomme-picker .sp-groups button{width:auto;white-space:nowrap;flex:0 0 auto}
+    .stomme-picker .sp-side{display:none}
+    }
+    html.stomme-picking dialog.sui.popup{opacity:0!important}
+`;
 export const THEME_CSS = `:root{
       --sui-base-hue: 220 !important; /* neutral default; per site: brand hue (raise accent saturation too) */
       --sui-font-family-default: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif !important;
@@ -181,4 +231,6 @@ export const THEME_CSS = `:root{
     section.field[data-key-path="og.enabled"]{display:grid!important;grid-template-columns:auto minmax(0,1fr)!important;column-gap:14px!important;align-items:center!important;border:1px solid hsl(var(--sui-border-color-2-hsl))!important;border-radius:10px!important;background:hsl(var(--sui-background-color-1-hsl))!important;box-shadow:0 1px 3px hsl(var(--sui-base-hue) 8% 50% / 8%)!important;padding:14px 16px!important;margin:14px 0!important;}
     section.field[data-key-path="og.enabled"] > header{grid-column:2!important;grid-row:1!important;margin:0!important;padding:0!important;height:auto!important;min-height:0!important;}
     section.field[data-key-path="og.enabled"] > .field-wrapper{grid-column:1!important;grid-row:1 / span 2!important;}
-    section.field[data-key-path="og.enabled"] > .footer{grid-column:2!important;grid-row:2!important;margin:0!important;padding:0!important;}`;
+    section.field[data-key-path="og.enabled"] > .footer{grid-column:2!important;grid-row:2!important;margin:0!important;padding:0!important;}
+${PICKER_CSS}
+${wireframeCss('.stomme-picker')}`;

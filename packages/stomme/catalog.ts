@@ -8,7 +8,7 @@ const RAW_BLOCKS: BlockDef[] = [
     label: 'Hero',
     group: 'Hero & headers',
     summary: 'Full-width intro — eyebrow, H1, text and a button, with an optional image, highlights list or animated motif beside it.',
-    shape: 'hero',
+    shape: 'hero', keywords: ['start', 'top', 'banner', 'headline'],
     fields: [
       { name: 'eyebrow', label: 'Eyebrow', widget: 'string', required: false, hint: 'Small uppercase label above the heading.' },
       { name: 'heading', label: 'Heading (H1)', widget: 'string' },
@@ -92,7 +92,7 @@ const RAW_BLOCKS: BlockDef[] = [
     label: 'Cover (full-bleed)',
     group: 'Hero & headers',
     summary: 'Full-bleed banner — a background photo or muted looping video, with overlaid heading, text and buttons.',
-    shape: 'hero',
+    shape: 'hero', keywords: ['full-bleed', 'background image', 'video', 'banner'],
     fields: [
       { name: 'eyebrow', label: 'Eyebrow', widget: 'string', required: false, hint: 'Small uppercase label above the heading.' },
       { name: 'heading', label: 'Heading (H1)', widget: 'text', hint: 'Press Enter for a line break.' },
@@ -178,7 +178,7 @@ const RAW_BLOCKS: BlockDef[] = [
     label: 'Page header',
     group: 'Hero & headers',
     summary: 'Page title band (light or dark): eyebrow, H1, intro and an optional button.',
-    shape: 'band',
+    shape: 'band', keywords: ['title', 'heading', 'intro'],
     fields: [
       { name: 'eyebrow', label: 'Eyebrow', widget: 'string', required: false, hint: 'Small uppercase label above the heading.' },
       { name: 'heading', label: 'Heading (H1)', widget: 'string' },
@@ -196,7 +196,7 @@ const RAW_BLOCKS: BlockDef[] = [
     label: 'Rich text',
     group: 'Text',
     summary: 'A block of rich (markdown) text with an optional heading.',
-    shape: 'prose',
+    shape: 'prose', keywords: ['text', 'body', 'markdown', 'article'],
     fields: [
       { name: 'eyebrow', label: 'Eyebrow', widget: 'string', required: false, hint: 'Small uppercase label above the heading.' },
       { name: 'heading', label: 'Heading (optional)', widget: 'string', required: false },
@@ -212,7 +212,7 @@ const RAW_BLOCKS: BlockDef[] = [
     label: 'Feature cards',
     group: 'Cards & lists',
     summary: 'Grid of feature cards — icon or number, title and text; cards can link.',
-    shape: 'grid',
+    shape: 'grid', keywords: ['cards', 'features', 'benefits', 'icons'],
     fields: [
       ...headingFields,
       linkedCardListField,
@@ -232,7 +232,7 @@ const RAW_BLOCKS: BlockDef[] = [
     label: 'Service cards',
     group: 'From collections',
     summary: 'Service cards pulled from your Services collection.',
-    shape: 'grid',
+    shape: 'grid', keywords: ['services', 'offering', 'cards'],
     collection: 'services',
     fields: [
       ...headingFields,
@@ -241,13 +241,13 @@ const RAW_BLOCKS: BlockDef[] = [
       styleGroup([surfaceField]),
     ],
   },
-  { type: 'pillars', label: 'Principles / values', group: 'Cards & lists', summary: 'Row of principle / value cards (icon, title, text).', shape: 'grid', fields: [...headingFields, cardListField, layoutGroup([]), styleGroup([surfaceField])] },
+  { type: 'pillars', label: 'Principles / values', group: 'Cards & lists', summary: 'Row of principle / value cards (icon, title, text).', shape: 'grid', keywords: ['values', 'principles', 'cards'], fields: [...headingFields, cardListField, layoutGroup([]), styleGroup([surfaceField])] },
   {
     type: 'plans',
     label: 'Pricing / plans',
     group: 'Cards & lists',
     summary: 'A row of pricing plan cards — name, price, period, features and a button.',
-    shape: 'grid',
+    shape: 'grid', keywords: ['price', 'cost', 'packages', 'pricing'],
     fields: [
       ...headingFields,
       {
@@ -284,13 +284,13 @@ const RAW_BLOCKS: BlockDef[] = [
       styleGroup([surfaceField]),
     ],
   },
-  { type: 'specialistGrid', label: 'Specialist grid', group: 'Cards & lists', summary: 'Grid of specialist / team profile cards.', shape: 'grid', fields: [...headingFields, cardListField, layoutGroup([]), styleGroup([surfaceField])] },
+  { type: 'specialistGrid', label: 'Specialist grid', group: 'Cards & lists', summary: 'Grid of specialist / team profile cards.', shape: 'grid', keywords: ['staff', 'profiles', 'experts'], fields: [...headingFields, cardListField, layoutGroup([]), styleGroup([surfaceField])] },
   {
     type: 'team',
     label: 'Team',
     group: 'Cards & lists',
     summary: 'Grid of people cards — photo, role, contact details.',
-    shape: 'grid',
+    shape: 'grid', keywords: ['staff', 'people', 'colleagues', 'about us'],
     fields: [
       ...headingFields,
       {
@@ -312,7 +312,7 @@ const RAW_BLOCKS: BlockDef[] = [
     ],
   },
   {
-    type: 'steps', label: 'Process / steps', group: 'Cards & lists', summary: 'Numbered process — a sequence of steps.', shape: 'steps',
+    type: 'steps', label: 'Process / steps', group: 'Cards & lists', summary: 'Numbered process — a sequence of steps.', shape: 'steps', keywords: ['process', 'how it works', 'numbered'],
     fields: [
       ...headingFields,
       {
@@ -343,7 +343,7 @@ const RAW_BLOCKS: BlockDef[] = [
     label: 'Checklist',
     group: 'Cards & lists',
     summary: 'Ticked checklist items in one or two columns.',
-    shape: 'checklist',
+    shape: 'checklist', keywords: ['bullets', 'ticks', 'list'],
     fields: [
       ...headingFields,
       { name: 'items', label: 'Items', widget: 'list', required: false, collapsed: true, label_singular: 'Item', summary: '{{fields.text}}', fields: [{ name: 'text', label: 'Text', widget: 'string' }, { name: 'note', label: 'Sub-line (optional)', widget: 'text', required: false }] },
@@ -358,7 +358,7 @@ const RAW_BLOCKS: BlockDef[] = [
     label: 'Fact list (label + value)',
     group: 'Cards & lists',
     summary: 'Rows of label and value — specifications, what is included, key facts.',
-    shape: 'pairs',
+    shape: 'pairs', keywords: ['specifications', 'facts', 'included'],
     fields: [
       ...headingFields,
       {
@@ -384,7 +384,7 @@ const RAW_BLOCKS: BlockDef[] = [
     label: 'Gallery',
     group: 'Media',
     summary: 'Image grid (2–3 columns) with optional captions.',
-    shape: 'gallery',
+    shape: 'gallery', keywords: ['photos', 'images', 'pictures'],
     fields: [
       ...headingFields,
       { name: 'images', label: 'Images', widget: 'list', required: false, collapsed: true, label_singular: 'Image', fields: [imageField('image', 'Image'), { name: 'alt', label: 'Alt text', widget: 'string', required: false }, { name: 'caption', label: 'Caption', widget: 'string', required: false }] },
@@ -399,7 +399,7 @@ const RAW_BLOCKS: BlockDef[] = [
     label: 'Collage (image viewer)',
     group: 'Media',
     summary: 'A collage of fixed height — one leading picture, a few tiles, and a chip that opens every image in a viewer. Replaces stacked full-width photos on a content page.',
-    shape: 'gallery',
+    shape: 'gallery', keywords: ['photos', 'images', 'lightbox'],
     fields: [
       {
         name: 'images', label: 'Images', widget: 'list', required: false, collapsed: true, label_singular: 'Image',
@@ -419,7 +419,7 @@ const RAW_BLOCKS: BlockDef[] = [
     label: 'Before / after',
     group: 'Media',
     summary: 'A before / after image pair.',
-    shape: 'split',
+    shape: 'split', keywords: ['compare', 'comparison', 'photos'],
     fields: [
       ...headingFields,
       mediaGroup('The two photos being compared.', [imageField('before', 'Before image'), imageField('after', 'After image')]),
@@ -434,7 +434,7 @@ const RAW_BLOCKS: BlockDef[] = [
     label: 'Text + image',
     group: 'Text',
     summary: 'Text beside an image or a looping video (media on the left or right).',
-    shape: 'split',
+    shape: 'split', keywords: ['image', 'photo', 'video', 'side by side'],
     fields: [
       { name: 'eyebrow', label: 'Eyebrow', widget: 'string', required: false, hint: 'Small uppercase label above the heading.' },
       { name: 'heading', label: 'Heading', widget: 'string', required: false },
@@ -464,7 +464,7 @@ const RAW_BLOCKS: BlockDef[] = [
     label: 'Text + quote',
     group: 'Text',
     summary: 'Body text paired with a pulled-out quote.',
-    shape: 'split',
+    shape: 'split', keywords: ['quote', 'citation', 'body text'],
     fields: [
       { name: 'body', label: 'Body text', widget: 'markdown' },
       { name: 'quote', label: 'Quote', widget: 'text' },
@@ -480,7 +480,7 @@ const RAW_BLOCKS: BlockDef[] = [
     label: 'Dictionary entry',
     group: 'Quote & highlight',
     summary: 'A dictionary-style word entry — term, word class and numbered senses.',
-    shape: 'prose',
+    shape: 'prose', keywords: ['word', 'glossary', 'meaning'],
     fields: [
       { name: 'eyebrow', label: 'Eyebrow', widget: 'string', required: false, hint: 'Small uppercase label above the heading.' },
       { name: 'term', label: 'Term', widget: 'string', hint: 'The word being defined, e.g. "ex·am·ple" (use · for syllables).' },
@@ -513,7 +513,7 @@ const RAW_BLOCKS: BlockDef[] = [
     label: 'Story fragment',
     group: 'Text',
     summary: 'A placed editorial fragment — big lead line, short body, optional link. Consecutive fragments drift across the page.',
-    shape: 'prose',
+    shape: 'prose', keywords: ['editorial', 'lead', 'story'],
     fields: [
       { name: 'eyebrow', label: 'Eyebrow', widget: 'string', required: false, hint: 'Usually only on the first fragment of a story.' },
       { name: 'statement', label: 'Statement (big line)', widget: 'string', hint: 'Wrap words in *asterisks* to underline them.' },
@@ -534,7 +534,7 @@ const RAW_BLOCKS: BlockDef[] = [
     label: 'Section links',
     group: 'Text',
     summary: 'A row of links that jump to the headings further down this page. Nothing to fill in: it reads the sections below it.',
-    shape: 'chips',
+    shape: 'chips', keywords: ['contents', 'anchors', 'jump links', 'menu'],
     fields: [
       { name: 'label', label: 'Accessible label', widget: 'string', required: false, hint: 'Read by screen readers; the visible chips come from the section headings below.' },
       layoutGroup([
@@ -548,7 +548,7 @@ const RAW_BLOCKS: BlockDef[] = [
     label: 'Highlighted quote',
     group: 'Quote & highlight',
     summary: 'A single highlighted quote or statement.',
-    shape: 'quote',
+    shape: 'quote', keywords: ['quote', 'statement', 'highlight'],
     fields: [
       { name: 'eyebrow', label: 'Eyebrow', widget: 'string', required: false, hint: 'Small uppercase label above the heading.' },
       { name: 'quote', label: 'Quote / statement', widget: 'text', hint: 'Wrap words in *asterisks* to underline them.' },
@@ -580,7 +580,7 @@ const RAW_BLOCKS: BlockDef[] = [
     label: 'Statement panel',
     group: 'Quote & highlight',
     summary: 'Dark panel with a big number, statement and badges.',
-    shape: 'panel',
+    shape: 'panel', keywords: ['number', 'statement', 'dark'],
     fields: [
       { name: 'eyebrow', label: 'Eyebrow', widget: 'string', required: false, hint: 'Small uppercase label above the heading.' },
       { name: 'heading', label: 'Heading', widget: 'string', required: false, hint: 'Wrap words in *asterisks* to underline them.' },
@@ -612,7 +612,7 @@ const RAW_BLOCKS: BlockDef[] = [
     label: 'Testimonials',
     group: 'From collections',
     summary: 'Customer testimonials from your Testimonials collection.',
-    shape: 'quote',
+    shape: 'quote', keywords: ['reviews', 'quotes', 'customers'],
     collection: 'testimonials',
     fields: [...headingFieldsSuggesting('Happy customers', 'References'), layoutGroup([]), styleGroup([surfaceField])],
   },
@@ -621,7 +621,7 @@ const RAW_BLOCKS: BlockDef[] = [
     label: 'Documents',
     group: 'From collections',
     summary: 'Downloadable files from your Documents collection, grouped rows with file type and size.',
-    shape: 'list',
+    shape: 'list', keywords: ['files', 'downloads', 'pdf'],
     collection: 'documents',
     fields: [
       ...headingFieldsSuggesting('Documents', 'Read for yourself'),
@@ -637,7 +637,7 @@ const RAW_BLOCKS: BlockDef[] = [
     label: 'Link chips',
     group: 'From collections',
     summary: 'Chip links from your Areas collection (e.g. towns you serve).',
-    shape: 'chips',
+    shape: 'chips', keywords: ['areas', 'towns', 'places'],
     collection: 'towns',
     fields: [...headingFieldsSuggesting('Service areas', 'Where we work'), layoutGroup([]), styleGroup([surfaceField])],
   },
@@ -646,7 +646,7 @@ const RAW_BLOCKS: BlockDef[] = [
     label: 'Posts (blog / news)',
     group: 'From collections',
     summary: 'List of the latest posts — featured lead + a card grid with cover images. Works with the blog or any article listing.',
-    shape: 'list',
+    shape: 'list', keywords: ['blog', 'news', 'articles'],
     fields: [
       ...headingFields,
       {
@@ -692,7 +692,7 @@ const RAW_BLOCKS: BlockDef[] = [
     label: 'Post archive',
     group: 'From collections',
     summary: 'The complete register of every post, grouped by year, newest first — title and date rows linking to each post. Pair it with a post list that has a limit.',
-    shape: 'list',
+    shape: 'list', keywords: ['blog', 'archive', 'all posts'],
     fields: [
       ...headingFieldsSuggesting('Archive', 'Every post'),
       articleSourceField,
@@ -706,7 +706,7 @@ const RAW_BLOCKS: BlockDef[] = [
     label: 'Upcoming events',
     group: 'From collections',
     summary: 'Dated posts as a list of what is coming up — day and month beside the title, the time and a line of text. The reader\'s browser drops what has already been, so a page built months ago stays current.',
-    shape: 'list',
+    shape: 'list', keywords: ['events', 'calendar', 'upcoming'],
     fields: [
       ...headingFieldsSuggesting('Calendar', 'Upcoming'),
       articleSourceField,
@@ -725,7 +725,7 @@ const RAW_BLOCKS: BlockDef[] = [
     label: 'Catalog (for sale)',
     group: 'From collections',
     summary: 'For-sale items from a catalog listing — filterable cards with cover, status badge, price and specs.',
-    shape: 'grid',
+    shape: 'grid', keywords: ['for sale', 'products', 'price'],
     fields: [
       ...headingFields,
       { name: 'source', label: 'Catalog', widget: 'select', options: '$catalogListings', required: false, soleDefault: true, hiddenBelow: 1, hint: 'The catalog listing whose entries the grid shows.' },
@@ -755,7 +755,7 @@ const RAW_BLOCKS: BlockDef[] = [
     label: 'Subpages',
     group: 'From collections',
     summary: 'The pages that sit under this one — photo cards, tiles, a list, a chapter row, or a band of sibling pages on a subpage.',
-    shape: 'grid',
+    shape: 'grid', keywords: ['pages', 'navigation', 'children'],
     collection: 'pages',
     fields: [
       ...headingFields,
@@ -787,7 +787,7 @@ const RAW_BLOCKS: BlockDef[] = [
     label: 'Call to action (band)',
     group: 'Calls to action',
     summary: 'Full-width call-to-action band with a button.',
-    shape: 'band',
+    shape: 'band', keywords: ['cta', 'button', 'call to action'],
     fields: [...headingFields, commandField, buttonField('cta', 'Button'), buttonField('cta2', 'Second button', { hint: 'A quieter outlined button beside the first.' }), anchorField, layoutGroup([])],
   },
   {
@@ -795,7 +795,7 @@ const RAW_BLOCKS: BlockDef[] = [
     label: 'Call to action (box)',
     group: 'Calls to action',
     summary: 'A boxed call-to-action: heading, text and a button.',
-    shape: 'box',
+    shape: 'box', keywords: ['cta', 'button', 'call to action'],
     fields: [
       { name: 'eyebrow', label: 'Eyebrow', widget: 'string', required: false, hint: 'Small uppercase label above the heading.' },
       { name: 'heading', label: 'Heading', widget: 'string' },
@@ -814,7 +814,7 @@ const RAW_BLOCKS: BlockDef[] = [
     label: 'FAQ',
     group: 'From collections',
     summary: 'FAQ from your FAQ collection — list, accordion, cards or split layout.',
-    shape: 'list',
+    shape: 'list', keywords: ['questions', 'answers', 'accordion'],
     collection: 'faq',
     fields: [
       ...headingFields,
@@ -834,7 +834,7 @@ const RAW_BLOCKS: BlockDef[] = [
     label: 'Stats / facts',
     group: 'Numbers',
     summary: 'A row of stats / facts (label + value).',
-    shape: 'stats',
+    shape: 'stats', keywords: ['numbers', 'statistics', 'figures'],
     fields: [
       { name: 'items', label: 'Facts (label + value)', widget: 'list', required: false, collapsed: true, label_singular: 'Fact', summary: '{{fields.label}} {{fields.value}}', fields: [{ name: 'label', label: 'Label', widget: 'string' }, { name: 'value', label: 'Value', widget: 'string' }] },
       layoutGroup([]),
@@ -846,7 +846,7 @@ const RAW_BLOCKS: BlockDef[] = [
     label: 'Timeline',
     group: 'Numbers',
     summary: 'A line of years with one dot per milestone, the last one highlighted, and an optional note about what is planned.',
-    shape: 'pairs',
+    shape: 'pairs', keywords: ['history', 'years', 'milestones'],
     fields: [
       ...headingFields,
       {
@@ -870,7 +870,7 @@ const RAW_BLOCKS: BlockDef[] = [
     ],
   },
   {
-    type: 'logoStrip', label: 'Logo strip', group: 'Numbers', shape: 'chips',
+    type: 'logoStrip', label: 'Logo strip', group: 'Media', shape: 'chips', keywords: ['logos', 'clients', 'partners'],
     summary: 'A centered row of partner / client names with an optional lead-in.',
     fields: [
       { name: 'lead', label: 'Lead-in', widget: 'string', required: false, hint: 'e.g. “Trusted by” or “Built on”.' },
@@ -880,8 +880,8 @@ const RAW_BLOCKS: BlockDef[] = [
     ],
   },
   {
-    type: 'contactForm', label: 'Contact form', group: 'Calls to action',
-    summary: 'A contact form with an optional direct-contact card. Heading, intro, field labels and layout are all editable.', shape: 'band',
+    type: 'contactForm', label: 'Contact form', group: 'Contact',
+    summary: 'A contact form with an optional direct-contact card. Heading, intro, field labels and layout are all editable.', shape: 'band', keywords: ['form', 'email', 'message'],
     fields: [
       { name: 'eyebrow', label: 'Eyebrow', widget: 'string', required: false, hint: 'Small uppercase label above the heading.' },
       { name: 'heading', label: 'Heading', widget: 'string', required: false, hint: 'Blank uses the page title.' },
@@ -905,8 +905,8 @@ const RAW_BLOCKS: BlockDef[] = [
     ],
   },
   {
-    type: 'contactSwitch', label: 'Contact form switcher', group: 'Calls to action',
-    summary: 'Two or more contact forms sharing one surface, one at a time. The visitor picks the errand and that form appears, without a page load.', shape: 'band',
+    type: 'contactSwitch', label: 'Contact form switcher', group: 'Contact',
+    summary: 'Two or more contact forms sharing one surface, one at a time. The visitor picks the errand and that form appears, without a page load.', shape: 'band', keywords: ['forms', 'errand', 'tabs'],
     fields: [
       { name: 'eyebrow', label: 'Eyebrow', widget: 'string', required: false, hint: 'Small uppercase label above the heading.' },
       { name: 'heading', label: 'Heading', widget: 'string', required: false, hint: 'Blank uses the page title.' },
@@ -947,7 +947,7 @@ const RAW_BLOCKS: BlockDef[] = [
     ],
   },
   {
-    type: 'contactCard', label: 'Contact card', group: 'Calls to action', shape: 'box',
+    type: 'contactCard', label: 'Contact card', group: 'Contact', shape: 'box', keywords: ['phone', 'email', 'contact details'],
     summary: 'A contact card placed anywhere, auto-filled from Contact settings. Tick what it shows.',
     fields: [
       { name: 'show', label: 'Show', widget: 'select', multiple: true, required: false,
@@ -968,7 +968,7 @@ const RAW_BLOCKS: BlockDef[] = [
     ],
   },
   {
-    type: 'findUs', label: 'Find us (map)', group: 'Calls to action', shape: 'split',
+    type: 'findUs', label: 'Find us (map)', group: 'Contact', shape: 'split', keywords: ['map', 'address', 'opening hours'],
     summary: 'A map beside the address, contact and hours — auto-filled from Contact settings. Needs lat/lng on the address.',
     fields: [
       { name: 'heading', label: 'Heading', widget: 'string', required: false, hint: 'Blank uses the site wording ("Find us").' },
@@ -978,7 +978,7 @@ const RAW_BLOCKS: BlockDef[] = [
     ],
   },
   {
-    type: 'map', label: 'Find your way (static map)', group: 'Calls to action', shape: 'split',
+    type: 'map', label: 'Find your way (static map)', group: 'Contact', shape: 'split', keywords: ['map', 'directions', 'route'],
     summary: 'A map picture with the address and two buttons that hand the route to Google Maps or Apple Maps. No third-party script runs on the page.',
     fields: [
       { name: 'address', label: 'Address', widget: 'string', hint: 'Shown in bold, and used for the route when no coordinates are given.' },

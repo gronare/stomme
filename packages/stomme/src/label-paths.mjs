@@ -1,6 +1,6 @@
 import { categoriesOf } from './term-collections.mjs';
 
-const TRANSLATABLE = /\b(label|label_singular|hint): "((?:[^"\\]|\\.)*)"/g;
+const TRANSLATABLE = /\b(label|label_singular|hint|description): "((?:[^"\\]|\\.)*)"/g;
 
 const unquote = (s) => s.replace(/\\"/g, '"').replace(/\\\\/g, '\\');
 

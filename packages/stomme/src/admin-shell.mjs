@@ -39,7 +39,7 @@ try {
     `<script src="${SVELTIA_CMS_SRC}"></script>`,
   );
   {
-    let src = ''; try { src = readFileSync(resolve(here, '../admin/editor.js'), 'utf8'); } catch (e) {}
+    let src = ''; try { src = readFileSync(resolve(root, 'public/admin/stomme-editor.js'), 'utf8'); } catch (e) { try { src = readFileSync(resolve(here, '../admin/editor.js'), 'utf8'); } catch (e2) {} }
     let h = 0; for (let i = 0; i < src.length; i++) h = (h * 31 + src.charCodeAt(i)) | 0;
     const addonTag = '<script src="/admin/stomme-addon-previews.js"></script>';
     const hasAddonPreviews = existsSync(resolve(root, 'public/admin/stomme-addon-previews.js'));

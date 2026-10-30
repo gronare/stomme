@@ -413,7 +413,7 @@
     },
     "contactCard": {
       "label": "Contact card",
-      "group": "Calls to action",
+      "group": "Contact",
       "shape": "box",
       "fields": [
         {
@@ -480,7 +480,7 @@
     },
     "contactForm": {
       "label": "Contact form",
-      "group": "Calls to action",
+      "group": "Contact",
       "shape": "band",
       "fields": [
         {
@@ -612,7 +612,7 @@
     },
     "contactSwitch": {
       "label": "Contact form switcher",
-      "group": "Calls to action",
+      "group": "Contact",
       "shape": "band",
       "fields": [
         {
@@ -1847,7 +1847,7 @@
     },
     "findUs": {
       "label": "Find us (map)",
-      "group": "Calls to action",
+      "group": "Contact",
       "shape": "split",
       "fields": [
         {
@@ -2443,7 +2443,7 @@
     },
     "logoStrip": {
       "label": "Logo strip",
-      "group": "Numbers",
+      "group": "Media",
       "shape": "chips",
       "fields": [
         {
@@ -2500,7 +2500,7 @@
     },
     "map": {
       "label": "Find your way (static map)",
-      "group": "Calls to action",
+      "group": "Contact",
       "shape": "split",
       "fields": [
         {

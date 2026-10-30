@@ -30,6 +30,7 @@ export type BlockDef = {
   group?: string;
   summary?: string;
   shape?: string;
+  keywords?: string[];
   sample?: Record<string, unknown>;
   samples?: ({ _label?: string } & Record<string, unknown>)[];
 };
