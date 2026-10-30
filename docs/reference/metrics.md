@@ -28,7 +28,7 @@ The script sends with `navigator.sendBeacon` and falls back to `fetch` with `kee
 | `tel` | a `tel:` link is clicked | the link |
 | `mailto` | a `mailto:` link is clicked | the link |
 | `outbound` | a link to another host is clicked | that host |
-| `form` | a contact form is submitted | the page path |
+| `form` | a form inside an element with the class `contact-form` is submitted, which the engine's contact blocks have; another form sends nothing | the page path |
 
 ## Page markers
 

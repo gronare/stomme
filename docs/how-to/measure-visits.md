@@ -13,7 +13,7 @@ Turn on first-party metrics, Cloudflare Web Analytics, or consent-gated marketin
    ```
 
 2. Accept `POST` requests there with a JSON body sent as `text/plain`. [Metrics beacons](../reference/metrics.md) lists every body the script sends.
-3. Build and open a page. The footer carries one small inline script, and your endpoint receives a pageview.
+3. Build and open a page. The engine's `Footer.astro` carries one small inline script, and your endpoint receives a pageview. A site that replaces the footer with its own has to render `Metrics.astro` from `@gronare/stomme/Metrics.astro` itself, or no beacon is sent.
 
 The script sets no cookies and uses no `localStorage`, so it needs no consent banner. It stays silent under automated browsers. Left unset, or set to an address that is not `https:`, nothing is emitted and the script is not in the HTML.
 
