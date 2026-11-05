@@ -5,6 +5,12 @@ Engine changes that affect consuming sites. Sites follow the `release` branch
 taking a new release. Field policy: new fields are opt-in — absent from the
 frontmatter means disabled/not shown (see `src/kit.ts`).
 
+## Unreleased
+
+- The sitemap leaves out the thank-you page, every page under `site.noindex` and the unreleased
+  docs version, with no change to `astro.config.mjs`.
+- Unreleased docs pages carry `noindex, follow`.
+
 ## 0.2.2 — 2026-10-30
 
 - Both packages name stomme.dev as their homepage and the GitHub issues as where to report a

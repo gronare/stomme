@@ -91,6 +91,7 @@ try {
 
     const sitemap = readdirSync(DIST).filter((f) => f.startsWith('sitemap-') && f !== 'sitemap-index.xml').map((f) => readFileSync(file(f), 'utf8')).join('');
     check(sitemap.includes('/docs/how-to/run-a-job/'), 'the docs pages are in the sitemap');
+    check(!sitemap.includes('/thanks/') && existsSync(file('thanks/index.html')), 'the noindexed thank-you page is built but left out of the sitemap');
   }
 
   console.log('· the same build with an unreadable source…');

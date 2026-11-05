@@ -119,7 +119,7 @@ async function setupDocs({ root, configFile, outDir, logger, origin, rootLlms })
   mkdirSync(docsDir, { recursive: true });
   const dataFile = resolve(docsDir, 'data.mjs');
   writeFileSync(dataFile, `export default ${JSON.stringify(stripMarkdown(data))};\n`);
-  return { route: cfg.route, dataFile, mediaDir, filesDir, served: new Set([...files.keys()].map((p) => `/${p}`)), source: dir ? `${resolve(root, dir)}` : `${cfg.repo}/${cfg.path}` };
+  return { route: cfg.route, hidden: data.versions.slice(1).map((v) => v.base), dataFile, mediaDir, filesDir, served: new Set([...files.keys()].map((p) => `/${p}`)), source: dir ? `${resolve(root, dir)}` : `${cfg.repo}/${cfg.path}` };
 }
 
 function serveDocsMedia(docs) {
@@ -410,6 +410,15 @@ export default function stomme(options = {}) {
             injectRoute({ pattern: `${l.route}/calendar.ics`, entrypoint: calendarFile });
             enabled.push(`${l.route}/calendar.ics`);
           }
+        }
+
+        const sitemap = (config.integrations || []).find((i) => i?.name === '@astrojs/sitemap');
+        if (sitemap) {
+          const jiti = createJiti(import.meta.url);
+          const { sitemapExcludes, filterSitemap } = await jiti.import(resolve(pkgDir, 'src/sitemap.ts'));
+          const siteFile = resolve(root, configPath);
+          const siteConfig = existsSync(siteFile) ? (await jiti.import(siteFile)).site : undefined;
+          filterSitemap(sitemap, sitemapExcludes(siteConfig, docs ? docs.hidden : []));
         }
 
         logger?.info(enabled.length ? `routes: ${enabled.join(', ')}` : 'no feature/listing routes enabled');

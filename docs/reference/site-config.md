@@ -20,7 +20,7 @@ Every key `src/site.config.ts` exports: `site` (a `SiteConfig`), `features` (a `
 | `localeTags` | none | the `lang` and hreflang tag per language, for example `{ sv: 'sv-SE' }` |
 | `cmsLocale` | `en` | the CMS's field labels, `en` or `sv`; rerun `pnpm stomme cms` after changing it |
 | `strings` | the built-in text for `locale` | your own wording for any interface text, see [Strings](#strings) |
-| `noindex` | none | path prefixes marked `noindex, nofollow`, such as `['/drafts']` |
+| `noindex` | none | path prefixes marked `noindex, nofollow` and left out of the sitemap, such as `['/drafts']` |
 | `metrics.endpoint` | none | an `https:` URL for first-party metrics, see [Measure visits](../how-to/measure-visits.md) |
 | `analytics.cfToken` | none | a Cloudflare Web Analytics token; the beacon loads on every page, whether or not `tracking` is on, and without waiting for the consent banner |
 | `maps.provider` | `google` when `maps.key` is set | `osm` or `google`, for the `findUs` map and `contactCard`'s mini-map |

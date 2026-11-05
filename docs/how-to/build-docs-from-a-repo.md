@@ -30,7 +30,7 @@ The pages are read at build time and are not content collections, so the CMS doe
 
 The repo's latest GitHub release is served at `route`, and `branch` under `route/<branch>`, for example `/docs/main`. A version picker switches between them and stays on the same page when it exists in both. A repo with no release gets one version, the branch, at `route`.
 
-To keep the unreleased version out of search engines, add `route/<branch>` to `site.noindex`.
+The unreleased version stays out of search engines on its own: its pages carry `noindex, follow` and are left out of the sitemap.
 
 ## How the folder is read
 

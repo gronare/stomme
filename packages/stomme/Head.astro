@@ -35,17 +35,19 @@ const ogImage = servedShareImage
 const uploadedImageSizes = import.meta.glob('/src/assets/media/**/*.{png,jpg,jpeg,webp,gif,avif}', { import: 'default', eager: true }) as Record<string, ImageSize>;
 const ogImageSize = ogImage ? shareImageSize(shareImage, uploadedImageSizes) : null;
 const ogUrl = Astro.site ? new URL(Astro.url.pathname, Astro.site).href : undefined;
+const pageLocals = (Astro.locals ?? {}) as { stommeMarkdown?: string; stommeRobots?: string };
 
 const locales = resolveLocales(site);
 // The noindex list is written in site paths, so a locale copy of an unlisted page has to be measured against the same path or it would be the one that gets indexed.
 const listPath = splitLocalePath(Astro.url.pathname, locales).path;
 const noindex = isUnlisted(listPath, site?.noindex, site?.routes?.formSuccess) || (Astro.site ? demoHost(new URL(Astro.site).hostname) : false);
+const robots = noindex ? 'noindex, nofollow' : pageLocals.stommeRobots;
 const alternates = hreflangLinks(Astro.url.pathname, site, Astro.site, locales.enabled ? await getCollection('pages') : []);
 const bounceHost = canonicalBounceHost(Astro.site);
 const schemeAuto = ((await getEntry('theme', 'theme').catch(() => null))?.data as { scheme?: string } | undefined)?.scheme === 'auto';
 
-// Set by a route that also publishes the page as Markdown (the docs), before this layout renders.
-const markdownAlternate = (Astro.locals as { stommeMarkdown?: string } | undefined)?.stommeMarkdown;
+// Set by a route before this layout renders: the docs publish each page as Markdown and keep an unreleased version out of the index.
+const markdownAlternate = pageLocals.stommeMarkdown;
 const isHome = normalizeLocalePath(Astro.url.pathname) === '/';
 const contact = isHome ? ((await getEntry('contact', 'contact')?.catch(() => null))?.data as any) ?? {} : {};
 const towns = isHome && features?.areas ? await getCollection('towns').catch(() => []) : [];
@@ -68,7 +70,7 @@ const localBusiness = isHome
 </script>}
 <title>{title ?? settings.name}</title>
 {description && <meta name="description" content={description} />}
-{noindex && <meta name="robots" content="noindex, nofollow" />}
+{robots && <meta name="robots" content={robots} />}
 {ogUrl && <link rel="canonical" href={ogUrl} />}
 {alternates.map((a) => <link rel="alternate" hreflang={a.hreflang} href={a.href} />)}
 {markdownAlternate && <link rel="alternate" type="text/markdown" href={markdownAlternate} />}
