@@ -90,6 +90,7 @@ try {
     check(!homeLd.some((o) => o && o['@type'] === 'Organization'), 'a LocalBusiness home page carries no second Organization node');
     check(!homeLd.some((o) => o && o['@type'] === 'SoftwareApplication'), 'SoftwareApplication stays off until site.software is set');
     check(homeLd.every((o) => o !== null), 'every JSON-LD script parses as JSON');
+    check((home.body.match(/<meta name="viewport"/g) ?? []).length === 1, 'the starter page carries one viewport meta');
 
     const inner = await get('/thanks');
     check(jsonLd(inner.body).every((o) => !o || o['@type'] !== 'LocalBusiness'),

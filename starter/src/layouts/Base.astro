@@ -31,7 +31,6 @@ const night = nightStyle(theme);
 <html lang={pageLang(Astro.url.pathname, site, lang)} style={themeVars} data-eyebrow={theme.eyebrow}>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <StommeHead title={title} description={description} image={image} />
     {fonts.preloads.map((p) => <link rel="preload" as="font" type={p.type} href={p.href} crossorigin />)}
     {fonts.fontFace && <style is:inline set:html={fonts.fontFace}></style>}

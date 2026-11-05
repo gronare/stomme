@@ -20,6 +20,7 @@ frontmatter means disabled/not shown (see `src/kit.ts`).
   priority.
 - A `textImage` video loads its poster and its file only as it nears the viewport; a `hero`
   video loads at once as before.
+- The starter's layout no longer writes a second viewport meta, since `Head.astro` writes one.
 
 ## 0.2.2 — 2026-10-30
 
