@@ -18,6 +18,8 @@ frontmatter means disabled/not shown (see `src/kit.ts`).
   one-line description, cut to 160 characters.
 - Docs images carry their width and height, and a page's first image loads eagerly with high
   priority.
+- A `textImage` video loads its poster and its file only as it nears the viewport; a `hero`
+  video loads at once as before.
 
 ## 0.2.2 — 2026-10-30
 

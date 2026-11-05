@@ -83,7 +83,7 @@ const mediaWidth = below ? 2000 : 1000;
 
     {showVideo && (
       <div class:list={['hero-media', { 'hero-media--shaped': ratio }]} style={ratio ? `--hero-ratio:${ratio}` : undefined}>
-        <Video video={media.video} videoWebm={media.videoWebm} videoUrl={media.videoUrl} poster={image} alt={imageAlt} width={mediaWidth} class="hero-video" pauseLabel={controls.pauseVideo} playLabel={controls.playVideo} />
+        <Video video={media.video} videoWebm={media.videoWebm} videoUrl={media.videoUrl} poster={image} alt={imageAlt} width={mediaWidth} class="hero-video" eager pauseLabel={controls.pauseVideo} playLabel={controls.playVideo} />
       </div>
     )}
 

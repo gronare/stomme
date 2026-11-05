@@ -12,8 +12,9 @@ interface Props {
   class?: string;
   pauseLabel?: string;
   playLabel?: string;
+  eager?: boolean;
 }
-const { video, videoWebm, videoUrl, poster, alt = '', width = 1600, class: cls, pauseLabel = 'Pause video', playLabel = 'Play video' } = Astro.props;
+const { video, videoWebm, videoUrl, poster, alt = '', width = 1600, class: cls, pauseLabel = 'Pause video', playLabel = 'Play video', eager = false } = Astro.props;
 
 const videoFiles = import.meta.glob('/src/assets/media/**/*.{mp4,webm}', { query: '?url', import: 'default', eager: true }) as Record<string, string>;
 const uploads = import.meta.glob<{ default: ImageMetadata }>('/src/assets/media/**/*.{jpg,jpeg,png,webp,avif}');
@@ -30,7 +31,7 @@ const dims = posterImg ? { width: posterImg.attributes.width, height: posterImg.
 ---
 {sources.length > 0 && (
   <div class:list={['media-video', cls]}>
-    <video class="media-video__el" autoplay muted loop playsinline preload="metadata" poster={posterSrc} aria-label={alt || undefined} {...dims}>
+    <video class="media-video__el" autoplay={eager} muted loop playsinline preload={eager ? 'metadata' : 'none'} poster={eager ? posterSrc : undefined} data-lazy={eager ? undefined : ''} data-poster={eager ? undefined : posterSrc} aria-label={alt || undefined} {...dims}>
       {sources.map((src) => <source src={src} type={typeOf(src)} />)}
     </video>
     <button type="button" class="media-video__toggle" aria-label={pauseLabel} data-pause-label={pauseLabel} data-play-label={playLabel}></button>
@@ -46,6 +47,7 @@ const dims = posterImg ? { width: posterImg.attributes.width, height: posterImg.
     v.parentElement?.classList.toggle('is-paused', v.paused);
   };
   const settle = () => videos().forEach((v) => {
+    if (v.hasAttribute('data-lazy')) return label(v);
     if (still.matches) { v.removeAttribute('autoplay'); v.pause(); v.load(); }
     else if (v.paused && !v.parentElement?.classList.contains('is-held')) v.play().catch(() => {});
     label(v);
@@ -58,6 +60,21 @@ const dims = posterImg ? { width: posterImg.attributes.width, height: posterImg.
     if (v.paused) { b.parentElement?.classList.remove('is-held'); v.play().catch(() => {}); }
     else { b.parentElement?.classList.add('is-held'); v.pause(); }
   });
+  const reveal = (v: HTMLVideoElement) => {
+    v.removeAttribute('data-lazy');
+    if (v.dataset.poster) v.poster = v.dataset.poster;
+    v.preload = 'metadata';
+    if (!still.matches) v.autoplay = true;
+    v.load();
+  };
+  const near = 'IntersectionObserver' in window
+    ? new IntersectionObserver((entries) => entries.forEach((e) => {
+        if (!e.isIntersecting) return;
+        near?.unobserve(e.target);
+        reveal(e.target as HTMLVideoElement);
+      }), { rootMargin: '50% 0px' })
+    : null;
+  videos().filter((v) => v.hasAttribute('data-lazy')).forEach((v) => (near ? near.observe(v) : reveal(v)));
   still.addEventListener('change', settle);
   settle();
 </script>
