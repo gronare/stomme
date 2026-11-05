@@ -14,6 +14,10 @@ frontmatter means disabled/not shown (see `src/kit.ts`).
   links when it has no local-business data.
 - `site.software` adds `SoftwareApplication` JSON-LD to the home page, with its category,
   systems, a free offer and its repository.
+- Docs pages take their meta description from their first paragraph, or else the README's
+  one-line description, cut to 160 characters.
+- Docs images carry their width and height, and a page's first image loads eagerly with high
+  priority.
 
 ## 0.2.2 — 2026-10-30
 

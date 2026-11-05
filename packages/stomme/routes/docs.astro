@@ -17,6 +17,6 @@ const locals = Astro.locals as { stommeMarkdown?: string; stommeRobots?: string 
 locals.stommeMarkdown = page ? page.markdownUrl : version.home.markdownUrl;
 if (version !== docs.versions[0]) locals.stommeRobots = 'noindex, follow';
 ---
-<Base title={page ? `${page.title} · ${version.home.title}` : version.home.title} description={page ? page.lede : version.home.lede}>
+<Base title={page ? `${page.title} · ${version.home.title}` : version.home.title} description={page ? page.description : version.home.description}>
   <DocsPage docs={docs} version={version} page={page} />
 </Base>

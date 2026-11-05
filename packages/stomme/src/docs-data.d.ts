@@ -12,6 +12,7 @@ export interface DocsPage {
   titleHtml: string;
   lede: string;
   ledeHtml: string;
+  description: string;
   html: string;
   previews: { type: string; [key: string]: unknown }[][];
   headings: DocsHeading[];
@@ -28,7 +29,7 @@ export interface DocsVersion {
   kind: 'release' | 'unreleased' | 'local';
   base: string;
   param: string | undefined;
-  home: { url: string; title: string; titleHtml: string; lede: string; ledeHtml: string; edit: string; path: string; markdownUrl: string };
+  home: { url: string; title: string; titleHtml: string; lede: string; ledeHtml: string; description: string; edit: string; path: string; markdownUrl: string };
   nav: DocsNavSection[];
   pages: DocsPage[];
   search: { t: string; u: string; s: string; x: string }[];

@@ -66,6 +66,8 @@ try {
     const tut = html('docs/tutorial');
     const img = tut.match(/<img src="(\/docs\/_media\/[^"]+)"/)?.[1];
     check(!!img && existsSync(file(img.slice(1))), 'an embedded image is copied into the build and served from the site', img);
+    check(/<img [^>]*width="4" height="3"[^>]*fetchpriority="high"/.test(tut), "the page's first image carries its intrinsic size and loads eagerly");
+    check(/<meta name="description" content="This tutorial installs the tool and runs one job\."/.test(tut), "a docs page's meta description is its lede");
     check(tut.includes('<pre class="docs-code"><code class="language-sh">'), 'fenced code renders with its language');
 
     const logs = html('docs/how-to/read-logs');

@@ -4,7 +4,20 @@ import { createHash } from 'node:crypto';
 import { buildVersion, imageRefs, routeParam } from './docs.mjs';
 
 const MEDIA_EXT = /\.(png|jpe?g|gif|webp|avif|svg|mp4|webm)$/i;
+const IMAGE_EXT = /\.(png|jpe?g|gif|webp|avif|svg)$/i;
 const sha1 = (buf) => createHash('sha1').update(buf).digest('hex');
+
+export async function imageSize(buf) {
+  try {
+    const { default: sharp } = await import('sharp');
+    const m = await sharp(buf).metadata();
+    const width = m.autoOrient?.width ?? m.width;
+    const height = m.autoOrient?.height ?? m.pageHeight ?? m.height;
+    return width && height ? { width, height } : null;
+  } catch {
+    return null;
+  }
+}
 
 const refSlug = (ref) => String(ref).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'branch';
 
@@ -103,6 +116,7 @@ export async function loadDocs(cfg, source, { mediaDir, logger } = {}) {
       files.set(p.slice(prefix.length), buf.toString('utf8'));
     });
     const media = new Map();
+    const sizes = new Map();
     const wanted = new Set();
     for (const [file, md] of files) for (const ref of imageRefs(md, file, cfg.path)) if (tree.has(ref) && MEDIA_EXT.test(ref)) wanted.add(ref);
     await pool([...wanted], 6, async (p) => {
@@ -110,13 +124,14 @@ export async function loadDocs(cfg, source, { mediaDir, logger } = {}) {
       const id = sha1(buf).slice(0, 10);
       const name = basename(p).replace(/[^\w.-]/g, '-');
       media.set(p, `${cfg.route}/_media/${id}/${name}`);
+      if (IMAGE_EXT.test(p)) { const size = await imageSize(buf); if (size) sizes.set(p, size); }
       if (mediaDir && !written.has(`${id}/${name}`)) {
         mkdirSync(resolve(mediaDir, id), { recursive: true });
         writeFileSync(resolve(mediaDir, id, name), buf);
         written.add(`${id}/${name}`);
       }
     });
-    const built = buildVersion(slot, files, { repo: cfg.repo, docsPath: cfg.path, media });
+    const built = buildVersion(slot, files, { repo: cfg.repo, docsPath: cfg.path, media, sizes });
     for (const w of built.warnings) logger?.warn?.(`docs: ${w}`);
     delete built.warnings;
     built.param = routeParam(cfg.route, built.home.url);

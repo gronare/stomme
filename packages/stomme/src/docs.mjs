@@ -118,6 +118,7 @@ const STAGE_CLOSE = '<!--/docs-stage-->';
 const withoutStages = (html) => html.replace(/<!--docs-stage-->[\s\S]*?<!--\/docs-stage-->/g, ' ');
 
 function createRenderer(ctx, seen, headings, previews = [], warnings = []) {
+  let images = 0;
   return new Marked({
     gfm: true,
     renderer: {
@@ -134,7 +135,10 @@ function createRenderer(ctx, seen, headings, previews = [], warnings = []) {
       },
       image({ href, title, text }) {
         const t = title ? ` title="${escapeHtml(title)}"` : '';
-        return `<img src="${escapeHtml(imageSrc(href, ctx))}" alt="${escapeHtml(text)}"${t} loading="lazy" decoding="async">`;
+        const size = ctx.sizes?.get(mediaTarget(String(href ?? ''), ctx));
+        const dims = size ? ` width="${size.width}" height="${size.height}"` : '';
+        const load = images++ === 0 ? ' fetchpriority="high"' : ' loading="lazy"';
+        return `<img src="${escapeHtml(imageSrc(href, ctx))}" alt="${escapeHtml(text)}"${t}${dims}${load} decoding="async">`;
       },
       code({ text, lang }) {
         const kind = previewKind(lang);
@@ -159,8 +163,10 @@ function imageSrc(href, ctx) {
   return mediaSrc(raw, ctx);
 }
 
+const mediaTarget = (raw, ctx) => joinPath(`${ctx.docsPath ? `${ctx.docsPath}/` : ''}${ctx.file}`, raw.split(/[?#]/)[0]);
+
 function mediaSrc(raw, ctx) {
-  const target = joinPath(`${ctx.docsPath ? `${ctx.docsPath}/` : ''}${ctx.file}`, raw.split(/[?#]/)[0]);
+  const target = mediaTarget(raw, ctx);
   if (ctx.media?.has(target)) return ctx.media.get(target);
   return `https://raw.githubusercontent.com/${ctx.repo}/${encodeURIComponent(ctx.ref)}/${target.split('/').map(encodeURIComponent).join('/')}`;
 }
@@ -268,15 +274,26 @@ export function inlineHtml(md, ctx) {
   return createRenderer(ctx, new Set(), []).parseInline(String(md ?? ''));
 }
 
-export function buildVersion(version, files, { repo, docsPath, media = new Map() }) {
+export function metaDescription(text, max = 160) {
+  const s = String(text ?? '').replace(/\s+/g, ' ').trim();
+  if (s.length <= max) return s;
+  const sentences = [...s.slice(0, max + 1).matchAll(/[.!?](?=\s)/g)].map((m) => m.index + 1);
+  const end = sentences.length ? sentences[sentences.length - 1] : 0;
+  if (end >= max / 2) return s.slice(0, end);
+  const cut = s.slice(0, max).lastIndexOf(' ');
+  return `${s.slice(0, cut > 0 ? cut : max - 1).replace(/[\s,;:.\-–—]+$/, '')}…`;
+}
+
+export function buildVersion(version, files, { repo, docsPath, media = new Map(), sizes = new Map() }) {
   const pages = new Set([...files.keys()].filter((p) => /\.md$/i.test(p)));
   const readmePath = [...pages].find((p) => /^readme\.md$/i.test(p));
   if (!readmePath) throw new Error(`stomme docs: ${repo} has no README.md in ${docsPath || 'the repo root'}/ at ${version.ref} — the docs nav is read from it.`);
-  const ctxFor = (file) => ({ repo, ref: version.ref, docsPath, base: version.base, file, pages, media });
+  const ctxFor = (file) => ({ repo, ref: version.ref, docsPath, base: version.base, file, pages, media, sizes });
   const index = parseIndex(files.get(readmePath));
   const homeCtx = ctxFor(readmePath);
   const order = [];
   const sectionOf = new Map();
+  const summaryOf = new Map();
   const nav = index.sections.map((s) => ({
     name: s.name,
     nameHtml: inlineHtml(s.name, homeCtx),
@@ -295,6 +312,7 @@ export function buildVersion(version, files, { repo, docsPath, media = new Map()
           descriptionHtml: inlineHtml(it.description, homeCtx),
         };
         if (known && !sectionOf.has(rel)) { sectionOf.set(rel, s.name); order.push(item); }
+        if (known && !summaryOf.get(rel)) summaryOf.set(rel, plainText(item.descriptionHtml));
         return item;
       }),
     })),
@@ -311,6 +329,7 @@ export function buildVersion(version, files, { repo, docsPath, media = new Map()
       titleHtml: doc.title || escapeHtml(slug),
       ledeHtml: doc.lede,
       lede: plainText(doc.lede),
+      description: metaDescription(plainText(doc.lede) || summaryOf.get(file) || doc.text),
       html: doc.html,
       previews: doc.previews,
       warnings: doc.warnings,
@@ -342,6 +361,7 @@ export function buildVersion(version, files, { repo, docsPath, media = new Map()
       titleHtml: inlineHtml(index.title, homeCtx) || 'Docs',
       ledeHtml: inlineHtml(index.lede, homeCtx),
       lede: plainText(inlineHtml(index.lede, homeCtx)),
+      description: metaDescription(plainText(inlineHtml(index.lede, homeCtx))),
       edit: githubUrl(repo, version.ref, `${docsPath ? `${docsPath}/` : ''}${readmePath}`),
       path: readmePath,
       markdownUrl: markdownUrl(pageUrl(version.base, ''), version.base),

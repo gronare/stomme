@@ -32,6 +32,8 @@ The repo's latest GitHub release is served at `route`, and `branch` under `route
 
 The unreleased version stays out of search engines on its own: its pages carry `noindex, follow` and are left out of the sitemap.
 
+A page's meta description is its first paragraph, or else its one-line description in `README.md`, cut to 160 characters at the end of a sentence or a word.
+
 ## How the folder is read
 
 - **`README.md` is the nav and the docs home.** Its `#` heading is the title and its first paragraph the lede. Each `##` is a section. A plain paragraph inside a section names the group for the list under it. Each list item `[Title](path.md): one-line description` is a page, and the order of the items is the reading order that previous and next follow.

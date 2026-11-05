@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 import { tmpdir } from 'node:os';
 import { parseIndex, rewriteHref, headingId, renderDoc, buildVersion, resolveDocsConfig, routeParam, previewKind, parseBlockPreview, imageRefs } from '../src/docs.mjs';
 import { githubSource, localSource, loadDocs } from '../src/docs-source.mjs';
-import { markdownSource, markdownUrl } from '../src/docs.mjs';
+import { markdownSource, markdownUrl, metaDescription } from '../src/docs.mjs';
 import { llmsTxt, llmsFullTxt, agentFiles, catalogJson, stripMarkdown } from '../src/docs-agent.mjs';
 import { createJiti } from 'jiti';
 
@@ -64,6 +64,12 @@ eq(tut.title, 'First steps', 'the first # is the title');
 eq(tut.lede, 'This tutorial installs the tool and runs one job.', 'the lede skips a paragraph that only holds an image');
 check(!tut.html.includes('<h1') && !tut.html.includes('This tutorial installs'), 'title and lede are taken out of the body');
 check(tut.html.includes('<img src="/docs/_media/abc/board.png" alt="The fixture board"'), 'an embedded image points at its served copy');
+check(!/<img[^>]*\b(width|height)=/.test(tut.html), 'an image of unknown size carries no width or height');
+check(/<img [^>]*fetchpriority="high"/.test(tut.html) && !/<img [^>]*loading="lazy"/.test(tut.html), "a page's first image loads eagerly with high priority");
+const twoImages = renderDoc('# T\n\nIntro.\n\n![a](assets/board.png)\n\n![b](assets/board.png)\n', { ...ctx, file: 'tutorial.md', media: new Map([['docs/assets/board.png', '/docs/_media/abc/board.png']]), sizes: new Map([['docs/assets/board.png', { width: 4, height: 3 }]]) });
+const imgs = twoImages.html.match(/<img [^>]*>/g) ?? [];
+check(imgs.length === 2 && imgs.every((i) => i.includes('width="4" height="3"')), 'an image of known size carries its intrinsic width and height', imgs.join(' '));
+check(imgs[0]?.includes('fetchpriority="high"') && !imgs[0]?.includes('loading=') && imgs[1]?.includes('loading="lazy"') && !imgs[1]?.includes('fetchpriority'), 'only the first image is eager, the rest are lazy', imgs.join(' '));
 check(tut.html.includes('<h2 id="install">Install</h2>'), '## gets an id');
 eq(tut.headings.map((h) => h.id), ['install'], 'the ## headings form the page outline');
 check(tut.html.includes('<pre class="docs-code"><code class="language-sh">') && tut.html.includes('echo &quot;&lt;done&gt;&quot;'), 'fenced code keeps its language and is escaped');
@@ -118,6 +124,18 @@ eq(page('reference/settings.md').headings.map((h) => h.id), ['jobsmax', 'jobsmax
 eq(v.search.map((s) => s.u).sort(), v.pages.map((p) => p.url).sort(), 'every page is in the search index');
 check(v.search.find((s) => s.u === '/docs/reference/settings/').x.includes('Every key has a default.'), 'the index holds the page text');
 check(v.nav[1].groups[0].items[0].descriptionHtml === 'start, watch and stop a job.', 'nav items carry their description');
+eq(page('how-to/run-a-job.md').description, 'Jobs run one at a time.', "a page's meta description is its lede");
+eq(buildVersion({ ref: 'main', base: '/docs' }, new Map([['README.md', '# D\n\n## R\n\n- [X](x.md): what x is for.\n'], ['x.md', '# X\n\n## Part\n\nText.\n']]), { repo: 'acme/tool', docsPath: 'docs' }).pages[0].description, 'what x is for.', 'a page without a lede falls back to its README description');
+eq(v.home.description, 'Start with the tutorial, then use fixture help to find a page.', "the docs home's description is the README lede");
+eq(buildVersion({ ref: 'main', base: '/docs' }, new Map([['README.md', '# D\n'], ['x.md', '# X\n\n## Part\n\nOnly text under a heading.\n']]), { repo: 'acme/tool', docsPath: 'docs' }).pages[0].description, 'Part Only text under a heading.', 'a page with neither falls back to its text');
+
+console.log('· meta descriptions');
+const long = 'First sentence is here and it runs on for a while. Second sentence keeps going with more words to say. Third sentence pushes the whole text past the limit of one hundred sixty.';
+eq(metaDescription('Short.'), 'Short.', 'a short text is kept whole');
+eq(metaDescription(long), 'First sentence is here and it runs on for a while. Second sentence keeps going with more words to say.', 'a long text is cut after the last sentence that fits');
+const words = metaDescription('word '.repeat(60));
+check(words.length <= 160 && words.endsWith('word…'), 'a text without a sentence end in reach is cut at a word and ends in an ellipsis', words);
+check(metaDescription('x'.repeat(400)).length <= 160, 'a text without spaces is still held to 160 characters');
 eq(routeParam('/docs', '/docs/'), undefined, 'the docs home is the bare route');
 eq(routeParam('/docs', '/docs/main/how-to/x/'), 'main/how-to/x', 'a page under a version prefix keeps the prefix in its param');
 check((() => { try { buildVersion({ ref: 'main', base: '/docs' }, new Map([['a.md', '# A']]), { repo: 'acme/tool', docsPath: 'docs' }); return false; } catch (e) { return /no README\.md/.test(e.message); } })(), 'a folder without README.md fails with a message that names it');
@@ -150,6 +168,7 @@ check(!seenUrls.some((u) => u.endsWith('/README.md') && !u.includes('/docs/')), 
 eq(seenUrls.filter((u) => u.endsWith('.png')).length, 1, 'an image both versions share is fetched once');
 const img = data.versions[0].pages[0].html.match(/src="([^"]+)"/)[1];
 check(/^\/docs\/_media\/[0-9a-f]{10}\/board\.png$/.test(img) && existsSync(join(media, img.slice('/docs/_media/'.length))), 'the image is written under the media dir at the address the page uses');
+check(!/<img[^>]*width=/.test(data.versions[0].pages[0].html), 'an image whose bytes are not a readable image carries no size');
 rmSync(media, { recursive: true, force: true });
 
 const noRelease = await loadDocs(cfg, githubSource(cfg, { fetch: gh({ ...Object.fromEntries(Object.entries({
@@ -171,6 +190,7 @@ console.log('· local folder');
 const local = await loadDocs(cfg, localSource(cfg, FIXTURE));
 eq(local.versions.map((x) => [x.key, x.label, x.kind, x.base]), [['local', 'docs', 'local', '/docs']], 'a folder on disk is one version at the route, named after the folder');
 eq(local.versions[0].pages.length, 4, 'every page in the folder is built');
+check(local.versions[0].pages.find((p) => p.path === 'tutorial.md').html.includes('width="4" height="3"'), 'an image read from the source carries the size read from its file');
 await rejects(() => loadDocs(cfg, localSource(cfg, join(FIXTURE, 'nope'))), /does not exist/, 'a missing folder fails with its path');
 
 console.log('· a failed example in a build');
