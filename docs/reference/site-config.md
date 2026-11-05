@@ -28,6 +28,7 @@ Every key `src/site.config.ts` exports: `site` (a `SiteConfig`), `features` (a `
 | `contact.endpoint` | none | where the contact form posts, as `<endpoint>/contact` |
 | `media` | `{ storage: 'git' }` | where CMS uploads go, see [Store uploads in R2](../how-to/store-uploads-in-r2.md) |
 | `docs` | none | the docs section, see [Build docs from a repo](../how-to/build-docs-from-a-repo.md) |
+| `software` | none | the site presents a software product, see [`software`](#software) |
 | `cms` | none | the CMS backend, see [`cms`](#cms) |
 
 ### `cms`
@@ -44,6 +45,24 @@ Written into the `backend` of `public/admin/config.yml` by `stomme cms`.
 | `repoPath` | none | the site's folder inside its repository, when the site is not at the repository's root |
 
 Locally, Sveltia's **Work with Local Repository** reads and writes the folder on disk in Chrome or Edge, and needs the folder you pick to be the repository's root.
+
+### `software`
+
+Set it, even as `{}`, and the home page adds `SoftwareApplication` JSON-LD with the site's name and address.
+
+| Key | Default | What it does |
+|---|---|---|
+| `name` | the site name | the product's name |
+| `applicationCategory` | none | a schema.org category, such as `DeveloperApplication` |
+| `operatingSystem` | none | the systems it runs on, such as `macOS, Linux` |
+| `free` | `false` | `true` adds an offer at price 0 |
+| `repo` | none | the source repository's URL, written as `sameAs` |
+
+```ts
+export const site: SiteConfig = {
+  software: { applicationCategory: 'DeveloperApplication', operatingSystem: 'macOS, Linux', free: true, repo: 'https://github.com/acme/tool' },
+};
+```
 
 ### Strings
 

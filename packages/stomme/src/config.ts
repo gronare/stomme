@@ -62,6 +62,7 @@ export interface SiteConfig {
   };
   listings?: Listing[];
   docs?: DocsConfig;
+  software?: SoftwareConfig;
   cms?: {
     backend?: string;
     repo?: string;
@@ -82,6 +83,14 @@ export interface SiteConfig {
 }
 
 // features.docs builds a documentation section from a folder of Markdown in a GitHub repo: the latest release at `route`, the branch under `route/<branch>`. `dir` (or STOMME_DOCS_DIR) reads a folder on disk instead, as one version. `blocks` also publishes the engine's block catalog at `route/blocks.json`.
+export interface SoftwareConfig {
+  name?: string;
+  applicationCategory?: string;
+  operatingSystem?: string;
+  free?: boolean;
+  repo?: string;
+}
+
 export interface DocsConfig {
   repo?: string;
   path?: string;

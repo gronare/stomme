@@ -10,6 +10,10 @@ frontmatter means disabled/not shown (see `src/kit.ts`).
 - The sitemap leaves out the thank-you page, every page under `site.noindex` and the unreleased
   docs version, with no change to `astro.config.mjs`.
 - Unreleased docs pages carry `noindex, follow`.
+- The home page carries `WebSite` JSON-LD, and `Organization` JSON-LD with the logo and social
+  links when it has no local-business data.
+- `site.software` adds `SoftwareApplication` JSON-LD to the home page, with its category,
+  systems, a free offer and its repository.
 
 ## 0.2.2 — 2026-10-30
 

@@ -5,6 +5,7 @@ import { site, features, listings } from '@stomme/config';
 import { resolveShareImage, shareImageSize, type ImageSize } from './src/og-pages.ts';
 import { canonicalBounceHost, demoHost, isUnlisted } from './src/config.ts';
 import { localBusinessJsonLd } from './src/local-business.ts';
+import { organizationJsonLd, softwareJsonLd, websiteJsonLd } from './src/site-schema.ts';
 import { hreflangLinks, normalizeLocalePath, resolveLocales, splitLocalePath } from './src/i18n.ts';
 
 interface Props {
@@ -51,15 +52,20 @@ const markdownAlternate = pageLocals.stommeMarkdown;
 const isHome = normalizeLocalePath(Astro.url.pathname) === '/';
 const contact = isHome ? ((await getEntry('contact', 'contact')?.catch(() => null))?.data as any) ?? {} : {};
 const towns = isHome && features?.areas ? await getCollection('towns').catch(() => []) : [];
+const siteOrigin = Astro.site ? new URL(Astro.site).origin : undefined;
+const absolute = (path?: string) => (path && Astro.site ? new URL(path, Astro.site).href : path);
 const localBusiness = isHome
   ? localBusinessJsonLd({
       name: settings.name,
-      url: Astro.site ? new URL(Astro.site).origin : undefined,
-      image: settings.ogImage ? (Astro.site ? new URL(settings.ogImage, Astro.site).href : settings.ogImage) : undefined,
+      url: siteOrigin,
+      image: absolute(settings.ogImage),
       contact,
       towns: towns.map((t: any) => t.data?.name),
     })
   : null;
+const schemaInput = { name: settings.name, url: siteOrigin, logo: absolute(settings.logo?.image), sameAs: (contact.socials ?? []).map((s: any) => s?.url), software: site?.software };
+// LocalBusiness is already an Organization, and a second node for the same business would read as two.
+const homeSchemas = isHome ? [localBusiness ?? organizationJsonLd(schemaInput), websiteJsonLd(schemaInput), softwareJsonLd(schemaInput)].filter(Boolean) : [];
 ---
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="format-detection" content="telephone=no" />
@@ -84,7 +90,7 @@ const localBusiness = isHome
 {ogImageSize && <meta property="og:image:height" content={String(ogImageSize.height)} />}
 <meta name="twitter:card" content={ogImage ? 'summary_large_image' : 'summary'} />
 {ogImage && <meta name="twitter:image" content={ogImage} />}
-{localBusiness && <script type="application/ld+json" set:html={JSON.stringify(localBusiness)} />}
+{homeSchemas.map((schema) => <script type="application/ld+json" set:html={JSON.stringify(schema).replace(/</g, '\\u003c')} />)}
 <link rel="icon" href={favicon} type={faviconType} />
 <link rel="icon" href="/favicon.ico" sizes="32x32" />
 {settings.appleIcon && <link rel="apple-touch-icon" href={settings.appleIcon} />}

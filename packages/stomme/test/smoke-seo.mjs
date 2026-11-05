@@ -85,10 +85,16 @@ try {
     check(!('address' in (business ?? {})), "the starter's blank address fields emit no PostalAddress");
     check(!('areaServed' in (business ?? {})), 'an empty towns collection emits no areaServed');
     check(!('sameAs' in (business ?? {})), 'no socials emit no sameAs');
+    const website = homeLd.find((o) => o && o['@type'] === 'WebSite');
+    check(website?.name === 'Wren & Sorrel' && website?.url === SITE_URL, 'the home page carries WebSite JSON-LD with the site name and address');
+    check(!homeLd.some((o) => o && o['@type'] === 'Organization'), 'a LocalBusiness home page carries no second Organization node');
+    check(!homeLd.some((o) => o && o['@type'] === 'SoftwareApplication'), 'SoftwareApplication stays off until site.software is set');
+    check(homeLd.every((o) => o !== null), 'every JSON-LD script parses as JSON');
 
     const inner = await get('/thanks');
     check(jsonLd(inner.body).every((o) => !o || o['@type'] !== 'LocalBusiness'),
       'a page that is not the site root carries no LocalBusiness schema');
+    check(jsonLd(inner.body).every((o) => !o || o['@type'] !== 'WebSite'), 'a page that is not the site root carries no WebSite schema');
   }
 } finally {
   if (child?.pid) { try { process.kill(-child.pid, 'SIGTERM'); } catch { try { child.kill('SIGTERM'); } catch {} } }

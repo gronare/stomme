@@ -33,7 +33,8 @@ The site's own pages, `/`, `/<slug>` for each published page, and `/thanks`, com
 
 ## Built into every page
 
-- **Head.** `@gronare/stomme/Head.astro` writes the title, description, canonical URL, Open Graph and Twitter tags, hreflang links, favicons, and on the home page local-business JSON-LD from the site settings and contact settings when the contact settings hold a phone number, an address or a coordinate pair.
+- **Head.** `@gronare/stomme/Head.astro` writes the title, description, canonical URL, Open Graph and Twitter tags, hreflang links and favicons.
+- **JSON-LD on the home page.** `WebSite` with the site name and address. `LocalBusiness` from the site settings and contact settings when the contact settings hold a phone number, an address or a coordinate pair, and `Organization` otherwise, with the logo from the site settings and the social links from the contact settings. `SoftwareApplication` when `site.software` is set, see [Site config](site-config.md#software).
 - **noindex.** A page under `site.noindex`, the thank-you page, and any page built for a `*.pages.dev` or `*.workers.dev` address get `noindex, nofollow`. A page of the unreleased docs version gets `noindex, follow`.
 - **Sitemap.** With `@astrojs/sitemap` in `astro.config.mjs`, the integration leaves out of it every page under `site.noindex`, the thank-you page, and every page of the unreleased docs version, in every language.
 - **Demo-address redirect.** When `site` names a real host, a page opened on a `*.pages.dev` or `*.workers.dev` address redirects to the same path on that host.
