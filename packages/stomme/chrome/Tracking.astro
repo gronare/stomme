@@ -2,13 +2,14 @@
 import { getEntry } from 'astro:content';
 import { resolveFeatures } from '../src/config';
 import { features, site } from '@stomme/config';
+import { ownVisit } from '../src/own-visit';
 
 const t: any = (await getEntry('tracking', 'tracking')?.catch(() => null))?.data ?? {};
 const on = resolveFeatures(features).tracking && !!(t.gtmId || t.ga4Id || t.metaPixelId);
 const cfToken = String((site as any)?.analytics?.cfToken || '').trim();
 ---
 {cfToken && (
-  <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon={JSON.stringify({ token: cfToken })} is:inline />
+  <script is:inline set:html={`${ownVisit} || ((s) => { s.defer = true; s.src = 'https://static.cloudflareinsights.com/beacon.min.js'; s.dataset.cfBeacon = ${JSON.stringify(JSON.stringify({ token: cfToken }))}; document.head.appendChild(s); })(document.createElement('script'));`} />
 )}
 {on && (
   <Fragment>

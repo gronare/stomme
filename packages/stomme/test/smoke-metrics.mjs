@@ -12,6 +12,8 @@ const CONFIG = resolve(STARTER, 'src/site.config.ts');
 const ADMIN = resolve(STARTER, 'public/admin');
 const TOWN = resolve(STARTER, 'src/content/towns/probe-town.md');
 const ENDPOINT = 'https://metrics.invalid.example/beacon';
+const CF_TOKEN = 'probe-cf-token';
+const OPT_OUT = 'stomme-no-metrics';
 
 const results = [];
 const check = (ok, name) => { results.push([!!ok, name]); console.log(`${ok ? '✓' : '✗'} ${name}`); };
@@ -46,7 +48,7 @@ try {
   writeFileSync(CONFIG, splice(
     splice(config, /\bareas: false\b/, 'areas: true', 'the town route needs the areas feature'),
     /export const site: SiteConfig = \{/,
-    `export const site: SiteConfig = {\n  metrics: { endpoint: ${JSON.stringify(ENDPOINT)} },`,
+    `export const site: SiteConfig = {\n  metrics: { endpoint: ${JSON.stringify(ENDPOINT)} },\n  analytics: { cfToken: ${JSON.stringify(CF_TOKEN)} },`,
     'the metrics endpoint',
   ));
   writeFileSync(TOWN, '---\nname: Probe Town\n---\n');
@@ -64,6 +66,11 @@ try {
   const tag = home.match(/<script[^>]*data-stomme-metrics[^>]*>/)?.[0] ?? '';
   check(tag !== '' && !/\bsrc=/.test(tag), 'the beacon is inline, never an external file');
   check(/data-stomme-block="cover"/.test(home) && /data-stomme-block="faq"/.test(home), 'block wrappers carry data-stomme-block');
+  const beacon = home.match(/<script[^>]*data-stomme-metrics[^>]*>[\s\S]*?<\/script>/)?.[0] ?? '';
+  check(beacon.includes(OPT_OUT) && beacon.includes("get('gh')"), 'the first-party beacon honours the ?gh opt-out');
+  check(!/<script[^>]*src="https:\/\/static\.cloudflareinsights\.com/.test(home), 'the Cloudflare beacon is never a static tag that would load past the opt-out');
+  const cf = home.match(/<script>[^<]*cloudflareinsights[^<]*<\/script>/)?.[0] ?? '';
+  check(cf.includes(CF_TOKEN) && cf.includes(OPT_OUT), 'the Cloudflare beacon is added by a script that honours the opt-out');
 
   const town = html('areas', 'probe-town', 'index.html');
   check(/data-stomme-page="town"/.test(town), 'a town page carries data-stomme-page="town"');
@@ -82,6 +89,7 @@ try {
   check(!bare.includes('data-stomme-metrics'), 'no beacon script without an endpoint');
   check(!bare.includes(ENDPOINT), 'no endpoint anywhere in the default build');
   check(!bare.includes('sendBeacon'), 'no beacon code at all without an endpoint');
+  check(!bare.includes('cloudflareinsights'), 'no Cloudflare beacon without a token');
   check(/data-stomme-block="cover"/.test(bare), 'the block markers are unconditional');
 } finally {
   restore();

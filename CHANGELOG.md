@@ -7,6 +7,9 @@ frontmatter means disabled/not shown (see `src/kit.ts`).
 
 ## Unreleased
 
+- A page opened with `?gh=1` stops the first-party metrics beacon and the Cloudflare Web Analytics
+  beacon in that browser, kept in `localStorage`, and drops the parameter from the address bar;
+  `?gh=0` turns them back on. The Cloudflare beacon is now added by an inline script.
 - The sitemap leaves out the thank-you page, every page under `site.noindex` and the unreleased
   docs version, with no change to `astro.config.mjs`.
 - Unreleased docs pages carry `noindex, follow`.

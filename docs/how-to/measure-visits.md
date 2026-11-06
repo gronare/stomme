@@ -15,7 +15,7 @@ Turn on first-party metrics, Cloudflare Web Analytics, or consent-gated marketin
 2. Accept `POST` requests there with a JSON body sent as `text/plain`. [Metrics beacons](../reference/metrics.md) lists every body the script sends.
 3. Build and open a page. The engine's `Footer.astro` carries one small inline script, and your endpoint receives a pageview. A site that replaces the footer with its own has to render `Metrics.astro` from `@gronare/stomme/Metrics.astro` itself, or no beacon is sent.
 
-The script sets no cookies and uses no `localStorage`, so it needs no consent banner. It stays silent under automated browsers. Left unset, or set to an address that is not `https:`, nothing is emitted and the script is not in the HTML.
+The script sets no cookies, so it needs no consent banner. It stays silent under automated browsers, and in a browser that has opted out, see [Leave your own visits out](#leave-your-own-visits-out). Left unset, or set to an address that is not `https:`, nothing is emitted and the script is not in the HTML.
 
 ## Add Cloudflare Web Analytics
 
@@ -28,9 +28,17 @@ The script sets no cookies and uses no `localStorage`, so it needs no consent ba
    };
    ```
 
-3. Build. Every page loads Cloudflare's beacon script in its head.
+3. Build. Every page loads Cloudflare's beacon script from a small inline script in its head, except in a browser that has opted out.
 
 The beacon reports only when the site is served through Cloudflare, so it suits `build:cloudflare` or a site proxied by Cloudflare.
+
+## Leave your own visits out
+
+1. Open any page of the site with `?gh=1` added to its address, such as `https://example.com/?gh=1`.
+2. The parameter leaves the address bar, and from then on that browser sends neither the first-party beacon nor Cloudflare's.
+3. Open a page with `?gh=0` to be counted again.
+
+The choice is kept in the browser's `localStorage` under `stomme-no-metrics`. A browser that refuses storage is counted as usual.
 
 ## Add Google Tag Manager, GA4 or a Meta Pixel
 

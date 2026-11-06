@@ -22,7 +22,7 @@ Every key `src/site.config.ts` exports: `site` (a `SiteConfig`), `features` (a `
 | `strings` | the built-in text for `locale` | your own wording for any interface text, see [Strings](#strings) |
 | `noindex` | none | path prefixes marked `noindex, nofollow` and left out of the sitemap, such as `['/drafts']` |
 | `metrics.endpoint` | none | an `https:` URL for first-party metrics, see [Measure visits](../how-to/measure-visits.md) |
-| `analytics.cfToken` | none | a Cloudflare Web Analytics token; the beacon loads on every page, whether or not `tracking` is on, and without waiting for the consent banner |
+| `analytics.cfToken` | none | a Cloudflare Web Analytics token; the beacon loads on every page, whether or not `tracking` is on, and without waiting for the consent banner, except in a browser opted out with `?gh=1` |
 | `maps.provider` | `google` when `maps.key` is set | `osm` or `google`, for the `findUs` map and `contactCard`'s mini-map |
 | `maps.key` | none | a Google Maps key; on an adapter build, map stills are served through `/map/<point>.png`, so the visitor's browser does not call Google until they click |
 | `contact.endpoint` | none | where the contact form posts, as `<endpoint>/contact` |

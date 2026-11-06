@@ -1,15 +1,16 @@
 ---
 import { site } from '@stomme/config';
+import { ownVisit } from '../src/own-visit';
 
 const raw = String((site as any)?.metrics?.endpoint || '').trim();
 let endpoint = '';
 try { endpoint = new URL(raw).protocol === 'https:' ? raw : ''; } catch { endpoint = ''; }
 ---
 {endpoint && (
-  <script is:inline data-stomme-metrics data-endpoint={endpoint}>
+  <script is:inline data-stomme-metrics data-endpoint={endpoint} set:html={`
 (function () {
 const D = document, L = location, u = D.currentScript?.dataset.endpoint;
-if (!u || navigator.webdriver) return;
+if (!u || ${ownVisit} || navigator.webdriver) return;
 // text/plain, never application/json: a JSON content type preflights the beacon cross-origin and a refused preflight drops it silently. The body stays JSON.
 const pg = D.querySelector('[data-stomme-page]'), q = new URLSearchParams(L.search);
 // Every beacon carries p + k: the collector 400s a body without a path, whatever its type.
@@ -54,5 +55,5 @@ send({ t: 'vit', d: { lcp: v.lcp, cls: (v.cls * 1000 | 0) / 1000, inp: v.inp } }
 addEventListener('pagehide', flush);
 addEventListener('visibilitychange', () => D.visibilityState == 'hidden' && flush());
 })();
-  </script>
+  `} />
 )}
