@@ -154,7 +154,7 @@ export function thanksPath(site?: Pick<SiteConfig, 'routes'>): string {
   return normalizeLocalePath(String((site && site.routes && site.routes.formSuccess) || SITE_DEFAULTS.routes.formSuccess).trim());
 }
 
-// The addon routes the site serves: every `routes` value that names a path and is not one of the engine's own routes, which are built once in the default language. integration.mjs injects a twin of each enabled addon route under every non-default locale, so a path under one of these bases answers in every language. bookingTerms is no addon route: greenhouse writes it as a single-language page with no twin, so a prefixed link to it would 404.
+// The addon routes the site serves: every `routes` value that names a path and is not one of the engine's own routes, which are built once in the default language. integration.mjs injects a twin of each enabled addon route under every non-default locale, so a path under one of these bases answers in every language. bookingTerms is no addon route: greenhouse writes the page itself, once per locale, so the engine injects no twin of it.
 export function siteRouteBases(site?: Pick<SiteConfig, 'routes'>): string[] {
   const engineOwn = new Set(Object.keys(SITE_DEFAULTS.routes));
   engineOwn.add('bookingTerms');

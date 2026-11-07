@@ -272,7 +272,7 @@ eq(sitemapI18n(SITE), { i18n: { defaultLocale: 'sv', locales: { sv: 'sv-SE', en:
 {
   const bases = siteRouteBases({ routes: { booking: '/bokning', bookingTerms: '/bokningsvillkor', bookingManage: '/min-bokning' } });
   check(bases.includes('/bokning') && bases.includes('/min-bokning'), 'booking bases are prefixable');
-  check(!bases.includes('/bokningsvillkor'), 'the terms page has no locale twin, so a prefixed link to it would 404');
+  check(!bases.includes('/bokningsvillkor'), 'the terms page is written per locale by greenhouse, not injected as an addon route');
 }
 
 // ── a page's own address per language ───────────────────────────────────────
