@@ -10,6 +10,7 @@ import { resolveMediaConfig } from './src/media-config.mjs';
 import { resolveDocsConfig } from './src/docs.mjs';
 import { githubSource, localSource, loadDocs } from './src/docs-source.mjs';
 import { agentFiles, stripMarkdown } from './src/docs-agent.mjs';
+import { closeWorkersDev } from './src/workers-dev.mjs';
 
 function resolveListings(l) {
   return (Array.isArray(l) ? l : [])
@@ -155,6 +156,7 @@ export default function stomme(options = {}) {
   const layout = options.layout || 'src/layouts/Base.astro';
   const configPath = options.config || 'src/site.config.ts';
   let docs = null;
+  let built = null;
 
   return {
     name: 'stomme',
@@ -428,12 +430,20 @@ export default function stomme(options = {}) {
         logger?.info(enabled.length ? `routes: ${enabled.join(', ')}` : 'no feature/listing routes enabled');
       },
 
+      'astro:config:done': ({ config }) => {
+        built = { site: config.site, outDir: fileURLToPath(config.outDir) };
+      },
+
       'astro:server:setup': ({ server }) => {
         if (docs) server.middlewares.use(serveDocsMedia(docs));
       },
 
-      'astro:build:done': ({ dir, logger }) => {
+      'astro:build:done': async ({ dir, logger }) => {
         const outDir = fileURLToPath(dir);
+        if (built) {
+          const { canonicalBounceHost } = await createJiti(import.meta.url).import(resolve(dirname(fileURLToPath(import.meta.url)), 'src/config.ts'));
+          if (closeWorkersDev(resolve(built.outDir, 'server/wrangler.json'), canonicalBounceHost(built.site))) logger?.info('workers.dev route off: the site is served on its own domain');
+        }
         if (docs && existsSync(docs.mediaDir)) cpSync(docs.mediaDir, resolve(outDir, docs.route.slice(1), '_media'), { recursive: true });
         if (docs && existsSync(docs.filesDir)) cpSync(docs.filesDir, outDir, { recursive: true });
         try {

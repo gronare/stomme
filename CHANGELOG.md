@@ -27,6 +27,9 @@ frontmatter means disabled/not shown (see `src/kit.ts`).
 - A multilingual site serves its thank-you page under every language prefix (`/en/thanks`),
   from `thanks.<locale>.md` when it exists and from `thanks.md` otherwise. A contact form on a
   page in another language sends the visitor to the thank-you page in that language.
+- A Cloudflare build of a site whose address is its own domain writes `workers_dev: false` and
+  `preview_urls: false` into `dist/server/wrangler.json`, so a deploy turns its `*.workers.dev`
+  address off. A site on a `.workers.dev` or `.pages.dev` address keeps answering there.
 
 ## 0.2.2 — 2026-10-30
 
