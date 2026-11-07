@@ -473,6 +473,48 @@ const { page, locale } = Astro.props;
 `;
 }
 
+// An untranslated thanks entry renders the default-language entry, never the engine's stock strings: those promise a reply time the site never wrote.
+export function localeThanksEntrypoint(locale) {
+  return `---
+import Base from '@stomme/base';
+import { getCollection, getEntry } from 'astro:content';
+import { site } from '@stomme/config';
+import { resolveSite } from '@gronare/stomme/config';
+import { resolveLink } from '@gronare/stomme/href';
+import { resolveLocales, pickLocaleEntry, localeLinker, htmlLang } from '@gronare/stomme/i18n';
+import Thanks from '@gronare/stomme/Thanks.astro';
+
+const locales = resolveLocales(site);
+const { entry, locale } = pickLocaleEntry(await getCollection('thanks'), 'thanks', ${JSON.stringify(locale)}, locales);
+const ts = entry?.data ?? {};
+const lang = htmlLang(locale, site);
+const t = resolveSite(site, lang).strings.thanks;
+const link = localeLinker(site, locale, await getCollection('pages'));
+const settings = (await getEntry('settings', 'site'))?.data ?? {};
+const contact = (await getEntry('contact', 'contact')?.catch(() => null))?.data ?? {};
+---
+<Base title={t.eyebrow} description={ts.message || t.lead} lang={lang}>
+  <Thanks
+    variant={ts.variant}
+    town={contact.address?.city}
+    toLabel={t.to}
+    fromLabel={t.from}
+    eyebrow={t.eyebrow}
+    heading={(ts.heading ?? '').replace('{name}', '')}
+    message={ts.message ?? ''}
+    primaryLabel={ts.button?.label ?? ''}
+    primaryHref={link(resolveLink(ts.button?.link, '/'))}
+    secondaryLabel={ts.button2?.label ?? ''}
+    secondaryHref={link(resolveLink(ts.button2?.link, '/'))}
+    recapLabel={t.recapLabel}
+    showContact={ts.showContact === true && !!(contact.phone || contact.email)}
+    talkLabel={t.talkLabel}
+    who={settings.name}
+  />
+</Base>
+`;
+}
+
 export const REVEAL = `
 (function () {
   function dec(s) { return s ? atob(s).split('').reverse().join('') : ''; }

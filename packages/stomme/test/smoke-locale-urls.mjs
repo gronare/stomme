@@ -50,6 +50,7 @@ const COVER = '/images/placeholders/service.svg';
 const EN_QUESTION = 'This question is written in English.';
 const EN_TAGLINE = 'The footer, written in English.';
 const EN_LINK = 'About, read in English';
+const EN_THANKS = 'Thanks, written in English.';
 
 const faqEntry = (question, answer) => `---
 question: ${JSON.stringify(question)}
@@ -100,6 +101,7 @@ try {
   write('src/content/pages/kartan.md', page('Kartan', '', '/omradet', { order: 2, summary: 'Kartan i korthet.' }));
   write('src/content/faq/areas-we-cover.en.md', faqEntry(EN_QUESTION, 'This answer is written in English.'));
   write('src/content/footer/footer.en.md', footerEntry(EN_TAGLINE, EN_LINK));
+  write('src/content/thanks/thanks.en.md', `---\nheading: ${JSON.stringify(EN_THANKS)}\nmessage: "The English confirmation line."\nbutton:\n  label: "Back to the start"\n  link:\n    page: "/about"\n---\n`);
 
   console.log('· static build with three languages, the switcher left at its default…');
   rmSync(DIST, { recursive: true, force: true });
@@ -215,6 +217,20 @@ try {
     "a heading the translation leaves empty falls back to the chrome's own word for it, in the page's language");
   check(new RegExp(`href="/en/about/" class="footer-link">${EN_LINK}<`).test(home.en),
     'a translated footer link keeps its page — and lands on the address that page has in this language');
+
+  console.log('· the thanks page in every language…');
+  check(emitted('thanks') && emitted('en/thanks') && emitted('no/thanks'), 'the thanks page answers under every language prefix — /thanks, /en/thanks, /no/thanks');
+  const thanksEn = html('en/thanks');
+  check(thanksEn.includes(EN_THANKS) && /<html lang="en"/.test(thanksEn), 'the English thanks page renders thanks.en.md, in English');
+  check(/href="\/en\/about\/"/.test(thanksEn), "its button leads to the page's English address");
+  const thanksNo = html('no/thanks');
+  check(thanksNo.includes('Thanks, we have your note.') && !thanksNo.includes(EN_THANKS) && /<html lang="sv-SE"/.test(thanksNo),
+    'a language with no thanks file of its own renders the default-language text rather than a 404');
+  check(/<a class="lang-switch__row"[^>]*href="\/no\/thanks\/"/.test(thanksEn), 'the switcher on a thanks page keeps you on the thanks page');
+  check(/<meta name="robots" content="noindex/.test(thanksEn), 'the translated thanks page is kept out of the index like the original');
+  const formAt = (route) => [html(route).match(/name="_success" value="([^"]*)"/)?.[1], html(route).match(/data-success="([^"]*)"/)?.[1]];
+  check(JSON.stringify(formAt('en/contact')) === JSON.stringify(['/en/thanks/', '/en/thanks/']), 'a form under /en/ sends the visitor to the English thanks page', JSON.stringify(formAt('en/contact')));
+  check(JSON.stringify(formAt('contact')) === JSON.stringify(['/thanks/', '/thanks/']), 'and a form in the default language to the original', JSON.stringify(formAt('contact')));
 
   console.log('· the same site with the switcher set to flags…');
   writeFileSync(resolve(STARTER, 'src/content/settings/site.md'),

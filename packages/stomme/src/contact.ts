@@ -3,6 +3,7 @@ import { getEntry } from 'astro:content';
 import { site } from '@stomme/config';
 import { env as platformEnv } from '@stomme/runtime-env';
 import { withTrailingSlash } from './href.ts';
+import { resolveLocales, splitLocalePath, thanksPath } from './i18n.ts';
 
 export const prerender = false;
 
@@ -36,7 +37,10 @@ export const POST: APIRoute = async ({ request, redirect }) => {
   const wantsJson =
     (request.headers.get('accept') || '').includes('application/json') ||
     request.headers.get('x-requested-with') === 'fetch';
-  const ok = (body: any) => (wantsJson ? new Response(JSON.stringify(body), { status: 200, headers: { 'Content-Type': 'application/json' } }) : redirect(withTrailingSlash(site?.routes?.formSuccess ?? '/thanks'), 303));
+  const asked = String(form.get('_success') || '');
+  // Only a language twin of the thanks page is honoured: anything else the form names would make this an open redirect.
+  const success = asked.startsWith('/') && !asked.startsWith('//') && splitLocalePath(asked, resolveLocales(site)).path === thanksPath(site) ? asked : (site?.routes?.formSuccess ?? '/thanks');
+  const ok = (body: any) => (wantsJson ? new Response(JSON.stringify(body), { status: 200, headers: { 'Content-Type': 'application/json' } }) : redirect(withTrailingSlash(success), 303));
   const fail = (msg: string, status: number) => (wantsJson ? new Response(JSON.stringify({ ok: false, error: msg }), { status, headers: { 'Content-Type': 'application/json' } }) : new Response(msg, { status }));
 
   if (form.get('bot-field')) return ok({ ok: true }); // honeypot → silently "succeed"

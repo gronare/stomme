@@ -12,8 +12,9 @@ interface Props {
   layout?: { variant?: 'segmented' | 'cards' | 'tabs' };
   style?: { surface?: string };
   items?: SwitchItem[];
+  localeLink?: (href: string) => string;
 }
-const { site, eyebrow, heading, intro, anchor, pageHasH1, items } = Astro.props;
+const { site, eyebrow, heading, intro, anchor, pageHasH1, items, localeLink } = Astro.props;
 const variant = switchVariant(Astro.props.layout?.variant);
 const panes = switchPanes(items, anchor, heading);
 const Heading = pageHasH1 ? 'h2' : 'h1';
@@ -56,6 +57,7 @@ const switched = panes.length > 1;
       >
         <ContactForm
           site={site}
+          localeLink={localeLink}
           embedded
           anchor={p.anchor}
           intro={p.item.intro}

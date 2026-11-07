@@ -24,6 +24,9 @@ frontmatter means disabled/not shown (see `src/kit.ts`).
 - A `textImage` video loads its poster and its file only as it nears the viewport; a `hero`
   video loads at once as before.
 - The starter's layout no longer writes a second viewport meta, since `Head.astro` writes one.
+- A multilingual site serves its thank-you page under every language prefix (`/en/thanks`),
+  from `thanks.<locale>.md` when it exists and from `thanks.md` otherwise. A contact form on a
+  page in another language sends the visitor to the thank-you page in that language.
 
 ## 0.2.2 — 2026-10-30
 

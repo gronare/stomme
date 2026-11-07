@@ -150,6 +150,10 @@ function customUrl(entry: LocaleEntry | undefined, id: string, locale: string): 
   return slug;
 }
 
+export function thanksPath(site?: Pick<SiteConfig, 'routes'>): string {
+  return normalizeLocalePath(String((site && site.routes && site.routes.formSuccess) || SITE_DEFAULTS.routes.formSuccess).trim());
+}
+
 // The addon routes the site serves: every `routes` value that names a path and is not one of the engine's own routes, which are built once in the default language. integration.mjs injects a twin of each enabled addon route under every non-default locale, so a path under one of these bases answers in every language. bookingTerms is no addon route: greenhouse writes it as a single-language page with no twin, so a prefixed link to it would 404.
 export function siteRouteBases(site?: Pick<SiteConfig, 'routes'>): string[] {
   const engineOwn = new Set(Object.keys(SITE_DEFAULTS.routes));
@@ -166,7 +170,7 @@ export function siteRouteBases(site?: Pick<SiteConfig, 'routes'>): string[] {
 const underRouteBase = (path: string, routes: LocaleRoutes): boolean =>
   routes.routeBases.some((b) => path === b || path.startsWith(`${b}/`));
 
-// The paths a locale actually answers on. integration.mjs injects two routes per non-default locale — `/<loc>` and `/<loc>/[...slug]` — plus a twin of every enabled addon route, and the catch-all's static paths are the published, non-suffixed `pages` entries (localePagesEntrypoint). Everything else a site serves (/tack, listings, towns, services, 404) is built once, in the default language.
+// The paths a locale actually answers on. integration.mjs injects three routes per non-default locale — `/<loc>`, `/<loc>/[...slug]` and `/<loc><formSuccess>` — plus a twin of every enabled addon route, and the catch-all's static paths are the published, non-suffixed `pages` entries (localePagesEntrypoint). Everything else a site serves (listings, towns, services, 404) is built once, in the default language.
 export function localeRoutes(site: SiteConfig | undefined, pages: readonly LocaleEntry[] = []): LocaleRoutes {
   const locales = resolveLocales(site);
   const served = new Set<string>();
@@ -176,6 +180,7 @@ export function localeRoutes(site: SiteConfig | undefined, pages: readonly Local
   let custom = false;
   if (!locales.enabled) return { locales, served, localized, bases, routeBases, custom };
   served.add('/');
+  served.add(thanksPath(site));
   const own: LocaleEntry[] = [];
   const byId = new Map<string, LocaleEntry>();
   const written: LocaleEntry[] = [];
@@ -344,8 +349,8 @@ export function localeSwitcher(pathname: string, site: SiteConfig | undefined, e
   for (const [pid, at] of pagePaths(entries.filter((e) => stripLocaleSuffix(e.id, l.locales).locale === null))) idAt.set(at, pid);
   const id = idAt.get(path) ?? (path === '/' ? 'home' : path.slice(1));
   const ids = entries.map((e) => e.id);
-  // An addon route is served in every language, so its own path is the target everywhere — it has no page entry to look a translation up by.
-  const everywhere = underRouteBase(path, routes);
+  // An addon route and the thanks page are served in every language, so their own path is the target everywhere — neither has a page entry to look a translation up by.
+  const everywhere = underRouteBase(path, routes) || path === thanksPath(site);
   // An untranslated page has nowhere to send you in that language but its front page. The language you are already reading always points at the page you are on, translated or not.
   return l.locales.map((loc) => ({
     locale: loc,

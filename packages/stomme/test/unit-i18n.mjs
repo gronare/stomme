@@ -68,7 +68,7 @@ eq(localePathFor('/kontakt', 'en', L), '/en/kontakt', 'a page path gains the pre
 eq(localePathFor('/', 'en', L), '/en/', 'the locale front page is the prefix itself');
 eq(localePathFor('/kontakt', 'sv', L), '/kontakt', 'the default locale is served unprefixed');
 
-// The locale routes are `/<loc>` and `/<loc>/[...slug]` (integration.mjs) and the catch-all's static paths are the published, non-suffixed `pages` entries (localePagesEntrypoint) — everything else is built once, in the default language.
+// The locale routes are `/<loc>`, `/<loc>/[...slug]` and `/<loc><formSuccess>` (integration.mjs) and the catch-all's static paths are the published, non-suffixed `pages` entries (localePagesEntrypoint) — everything else is built once, in the default language.
 console.log('\n· a link is prefixed only where the locale is served');
 const PAGES = [
   { id: 'kontakt', data: { published: true } },
@@ -78,8 +78,8 @@ const PAGES = [
   { id: 'guider/vinter', data: { published: true } },
 ];
 const R = localeRoutes(SITE, PAGES);
-eq([...R.served].sort(), ['/', '/guider/vinter', '/kontakt', '/omradet'],
-  'the served set is home plus every published page, translations and drafts left out');
+eq([...R.served].sort(), ['/', '/guider/vinter', '/kontakt', '/omradet', '/thanks'],
+  'the served set is home, the thanks page and every published page, translations and drafts left out');
 eq(localeHref('/kontakt', 'en', R), '/en/kontakt', 'a localized page is rewritten into the current locale');
 eq(localeHref('/omradet', 'no', R), '/no/omradet', 'the same rule holds for every locale in the list');
 eq(localeHref('/guider/vinter', 'en', R), '/en/guider/vinter', 'a nested page slug is prefixed too');
@@ -121,7 +121,7 @@ eq(localeHref('/min-bokning', 'no', BR), '/no/min-bokning', 'each guest page is 
 eq(localeHref('/min-bokning?token=abc', 'en', BR), '/en/min-bokning?token=abc', 'a query rides along to the prefixed page');
 eq(localeHref('/bokning/', 'en', BR), '/en/bokning/', 'a trailing slash is preserved here as well');
 eq(localeHref('/bokning', 'sv', BR), '/bokning', 'the default locale is never a prefix');
-eq(localeHref('/tack', 'en', BR), '/tack', "the form confirmation is one of the engine's own routes — built once, so it stays bare");
+eq(localeHref('/tack', 'en', BR), '/en/tack', 'the form confirmation has a twin in every locale, so a link to it is prefixed');
 eq(localeHref('/blogg/nyhet', 'en', BR), '/blogg/nyhet', 'and so is a listing route');
 eq(localeHref('/bokningar', 'en', BR), '/bokningar', 'a path that merely starts with the same letters is not under the base');
 eq(localeHref('/boka', 'en', BR), '/boka', 'a bare route segment names a child, not a path — it is no base of its own');
@@ -287,7 +287,7 @@ const URL_PAGES = [
   { id: 'home.no' },
 ];
 const UR = localeRoutes(SITE, URL_PAGES);
-eq([...UR.served].sort(), ['/', '/kontakt', '/omradet'], 'the served set is still written in the default language');
+eq([...UR.served].sort(), ['/', '/kontakt', '/omradet', '/thanks'], 'the served set is still written in the default language');
 eq(localeHref('/omradet', 'en', UR), '/en/the-area', 'a link to the page lands on the address that language uses');
 eq(localeHref('/omradet', 'no', UR), '/no/omraadet', 'each language has its own address');
 eq(localeHref('/omradet', 'sv', UR), '/omradet', 'the default language is the filename, unprefixed');
@@ -342,7 +342,7 @@ const NESTED_PAGES = [
   { id: 'kontakt', data: { published: true } },
 ];
 const NR = localeRoutes(SITE, NESTED_PAGES);
-eq([...NR.served].sort(), ['/', '/kontakt', '/salja-foretag', '/salja-foretag/generationsskifte', '/salja-foretag/vardering'],
+eq([...NR.served].sort(), ['/', '/kontakt', '/salja-foretag', '/salja-foretag/generationsskifte', '/salja-foretag/vardering', '/thanks'],
   'the served set carries the nested address the default language writes');
 eq(localeHref('/salja-foretag/generationsskifte', 'en', NR), '/en/sell-a-company/succession',
   'both halves of a nested address are the ones that language names');
@@ -368,7 +368,7 @@ const HIDDEN_PARENT = localeRoutes(SITE, [
   { id: 'foralder', data: { published: false } },
   { id: 'barn', data: { published: true, parent: '/foralder' } },
 ]);
-eq([...HIDDEN_PARENT.served].sort(), ['/', '/foralder/barn'],
+eq([...HIDDEN_PARENT.served].sort(), ['/', '/foralder/barn', '/thanks'],
   'an unpublished parent still gives its published child the nested address — it is the address, not a page that must be built');
 
 console.log('\n· an address on the default-language file is ignored, loudly');

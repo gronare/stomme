@@ -98,6 +98,25 @@ res = await post({ 'cf-turnstile-response': 'bad-token' }, { locals: {} });
 check(res.status === 403 && sent().length === 0, 'the Turnstile secret is read from process.env on a Node-style target');
 for (const k of ENV_KEYS) delete process.env[k];
 
+// ── the no-JS redirect ──────────────────────────────────────────────────────
+const { site: stubSite } = await jiti.import(resolve(HERE, 'stub-stomme-config.mjs'));
+stubSite.locales = ['sv', 'en', 'no'];
+async function postPlain(fields) {
+  const fd = new FormData();
+  for (const [k, v] of Object.entries({ name: 'Ada', email: 'ada@example.com', message: 'Hello', ...fields })) fd.set(k, v);
+  const request = new Request('https://site.example/api/contact', { method: 'POST', body: fd, headers: { 'CF-Connecting-IP': '198.51.100.9' } });
+  return POST({ request, locals: {}, redirect: (to, status) => new Response(null, { status, headers: { location: to } }) });
+}
+calls = []; setPlatform(MAIL);
+res = await postPlain({ _success: '/en/thanks/' });
+check(res.status === 303 && res.headers.get('location') === '/en/thanks/', 'a form posted from an English page lands on the English thanks page', `${res.status} ${res.headers.get('location')}`);
+res = await postPlain({ _success: '//evil.example/thanks' });
+check(res.headers.get('location') === '/thanks/', 'a target that leaves the site is ignored for the default thanks page', res.headers.get('location'));
+res = await postPlain({ _success: '/en/elsewhere/' });
+check(res.headers.get('location') === '/thanks/', 'and so is any path on the site that is not a thanks page', res.headers.get('location'));
+delete stubSite.locales;
+setPlatform({});
+
 // ── wiring ──────────────────────────────────────────────────────────────────
 const integration = readFileSync(resolve(PKG, 'integration.mjs'), 'utf8');
 check(/@stomme\/runtime-env/.test(integration) && /runtime-env-cloudflare\.mjs/.test(integration), 'the integration aliases @stomme/runtime-env to the Cloudflare module on that adapter');

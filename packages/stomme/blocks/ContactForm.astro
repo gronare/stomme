@@ -14,8 +14,9 @@ interface Props {
   pageHasH1?: boolean;
   anchor?: string;
   embedded?: boolean;
+  localeLink?: (href: string) => string;
 }
-const { site, eyebrow, heading, intro, labelName, labelEmail, labelMessage, submitLabel, showPhone, requirePhone, showDirectContact, showCategory, labelCategory, categories = [], showUnit, labelUnit, placeholderUnit, inbox, pageHasH1, anchor, embedded } = Astro.props;
+const { site, eyebrow, heading, intro, labelName, labelEmail, labelMessage, submitLabel, showPhone, requirePhone, showDirectContact, showCategory, labelCategory, categories = [], showUnit, labelUnit, placeholderUnit, inbox, pageHasH1, anchor, embedded, localeLink } = Astro.props;
 // A form-only contact page has no other heading to be the page's h1, so the block takes the rank the page leaves open.
 const Heading = pageHasH1 ? 'h2' : 'h1';
 // Two forms on one page would otherwise share every field id, and a label click would land in the other form.
@@ -50,7 +51,8 @@ const contactLine = [settings.name, contact.address?.city, contact.orgNr && `Org
 const contactAction = site?.contact?.endpoint
   ? `${site.contact.endpoint}/contact`
   : site?.cms?.baseUrl ? `${site.cms.baseUrl}/contact` : '/api/contact';
-const successPath = withTrailingSlash(site?.routes?.formSuccess ?? '/thanks');
+const successBase = site?.routes?.formSuccess ?? '/thanks';
+const successPath = withTrailingSlash(localeLink ? localeLink(successBase) : successBase);
 const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || '';
 
 const recapLabels = JSON.stringify({ email: L.email, phone: L.phone, category: L.category, unit: L.unit, message: L.message });

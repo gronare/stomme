@@ -22,10 +22,10 @@ The build log lists the routes it injected on a line starting `routes:`. A route
 | `<docs route>/llms.txt`, `<docs route>/llms-full.txt`, `<docs route>/<page>.md`, and the same under each version's prefix | `features.docs` | the docs as text for AI agents, see [Build docs from a repo](../how-to/build-docs-from-a-repo.md#files-for-ai-agents); served from disk in `pnpm dev` and copied into the build output | no |
 | `<docs route>/blocks.json` | `features.docs` with `site.docs.blocks` | the engine's block catalog as JSON, the same way | no |
 | `/llms.txt` | `features.docs` | a copy of `<docs route>/llms.txt`, the same way | `src/pages/llms.txt.ts` (`.js`, `.mjs`, `.md`) or `public/llms.txt` |
-| `/<locale>`, `/<locale>/[...slug]` | each language after the first in `locales` | the home page and the editable pages in that language, prerendered | no |
+| `/<locale>`, `/<locale>/[...slug]`, `/<locale><routes.formSuccess>` | each language after the first in `locales` | the home page, the editable pages and the thank-you page in that language, prerendered | no |
 | addon routes | from `routes.mjs` in `STOMME_SLOTS_DIR`, each when its `feature` flag is on, and again under each `/<locale>` prefix | as the entrypoint says | no |
 
-Only the home page, the editable pages and addon routes get a copy per language. Service, area, listing and docs pages exist once, at their unprefixed address.
+Only the home page, the editable pages, the thank-you page and addon routes get a copy per language. Service, area, listing and docs pages exist once, at their unprefixed address.
 
 An addon route with no `feature`, a `pattern` that does not start with `/`, or an `entrypoint` file that does not exist is skipped, and the build log warns about it.
 

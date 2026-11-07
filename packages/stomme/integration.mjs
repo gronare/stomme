@@ -3,7 +3,7 @@ import { resolve, dirname } from 'node:path';
 import { mkdirSync, writeFileSync, existsSync, readFileSync, readdirSync, cpSync, rmSync, statSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { refuseStyle } from './src/refuse-style.mjs';
-import { previewEntrypoint, listingEntrypoint, listingCalendarEntrypoint, lookbookDataModule, lookbookEntrypoint, lookbookBlockEntrypoint, localeHomeEntrypoint, localePagesEntrypoint, REVEAL } from './src/entrypoints.mjs';
+import { previewEntrypoint, listingEntrypoint, listingCalendarEntrypoint, lookbookDataModule, lookbookEntrypoint, lookbookBlockEntrypoint, localeHomeEntrypoint, localePagesEntrypoint, localeThanksEntrypoint, REVEAL } from './src/entrypoints.mjs';
 import { publicIndexPlugin } from './src/vite-public-index.mjs';
 import { createJiti } from 'jiti';
 import { resolveMediaConfig } from './src/media-config.mjs';
@@ -334,6 +334,7 @@ export default function stomme(options = {}) {
         }
 
         const locales = resolveLocaleList(options.locales ?? (await siteLocales(resolve(root, configPath))));
+        const thanksRoute = `/${String(routes.formSuccess || '/thanks').trim().replace(/^\/+|\/+$/g, '')}`;
         const addonRouted = [];
 
         if (slotsDir) {
@@ -389,7 +390,10 @@ export default function stomme(options = {}) {
           const pagesFile = resolve(localeDir, 'page.astro');
           writeFileSync(pagesFile, localePagesEntrypoint(loc));
           injectRoute({ pattern: `/${loc}/[...slug]`, entrypoint: pagesFile });
-          enabled.push(`/${loc}`, `/${loc}/[...slug]`);
+          const thanksFile = resolve(localeDir, 'thanks.astro');
+          writeFileSync(thanksFile, localeThanksEntrypoint(loc));
+          injectRoute({ pattern: `/${loc}${thanksRoute}`, entrypoint: thanksFile });
+          enabled.push(`/${loc}`, `/${loc}/[...slug]`, `/${loc}${thanksRoute}`);
           // The same entrypoint, never a wrapper: the addon pages read their language off the URL, so a twin under the prefix answers in that language on its own, dynamic patterns and their static paths included.
           for (const r of addonRouted) {
             injectRoute({ pattern: `/${loc}${r.pattern}`, entrypoint: r.entrypoint });

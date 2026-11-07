@@ -27,6 +27,8 @@ Serve pages in more than one language, each under its own prefix, with hreflang 
 
 4. Build. The page answers at `/sv/om-oss/` with `<html lang="sv">`, and `/about/` carries `hreflang` links to both, plus `x-default`.
 
+The thank-you page reads `src/content/thanks/thanks.<locale>.md`, or `thanks.md` when that language has none, and a contact form on a page in a language sends the visitor to the thank-you page in that language.
+
 The default language has no prefix. Every page also answers under each other prefix: an untranslated one renders in the default language there, and its links lead on to the pages that do exist in that language. Fewer than two `locales` turns the whole layer off, with no prefixed routes, no hreflang and no switcher.
 
 | Key | What it sets |
