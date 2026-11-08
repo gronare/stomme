@@ -26,6 +26,15 @@ jobs:
           node-version: 24
           registry-url: https://registry.npmjs.org
           package-manager-cache: false
+      - uses: pnpm/action-setup@v6
+      - run: pnpm install --frozen-lockfile
+      - name: CycloneDX SBOM per package
+        run: pnpm sbom --sbom-format cyclonedx --prod --filter @gronare/stomme --filter create-stomme --out 'sbom/%s-%v.cdx.json'
+      - uses: actions/upload-artifact@v7
+        with:
+          name: sbom-${{ github.sha }}
+          path: sbom/
+          if-no-files-found: error
       # Trusted publishing needs npm 11.5.1 or later.
       - run: npm install -g npm@11
       - name: publish each new version
