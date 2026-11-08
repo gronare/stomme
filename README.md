@@ -64,6 +64,10 @@ blocks:
 - [Deploy a site](docs/how-to/deploy.md)
 - [How stomme fits together](docs/explanation/how-it-fits-together.md)
 
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md). Report a vulnerability privately as described in [SECURITY.md](SECURITY.md).
+
 ## License
 
 [AGPL-3.0-only](LICENSE). Use, modify and self-host stomme freely, client work included. If you distribute it, or run a modified version as a network service, pass the same freedoms on.

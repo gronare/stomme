@@ -1,0 +1,29 @@
+name: DCO
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  signoff:
+    name: every commit signed off by its author
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: check Signed-off-by trailers
+        env:
+          BASE: ${{ github.event.pull_request.base.sha }}
+          HEAD: ${{ github.event.pull_request.head.sha }}
+        run: |
+          fail=0
+          while IFS=$'\t' read -r sha author; do
+            if ! git log -1 --format='%(trailers:key=Signed-off-by,valueonly,unfold)' "$sha" | grep -qxF "$author"; then
+              echo "::error::$sha has no 'Signed-off-by: $author' line; amend it with git commit --amend -s, or sign a series with git rebase --signoff"
+              fail=1
+            fi
+          done < <(git log --no-merges --format='%H%x09%an <%ae>' "$BASE..$HEAD")
+          exit $fail
